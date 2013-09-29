@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Spinner
+        android:id="@+id/RaceBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignBottom="@+id/RaceBox2"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/JobBox3"
+        android:layout_toRightOf="@+id/InfoBt" />
+
+    <Spinner
+        android:id="@+id/RaceBox2"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/RaceBox1" />
+
+    <EditText
+        android:id="@+id/NameField2"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignBottom="@+id/NameField1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/NameField1"
+        android:layout_toLeftOf="@+id/NameField1"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="George" />
+
+    <Spinner
+        android:id="@+id/RaceBox3"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/RaceBox1" />
+
+    <Spinner
+        android:id="@+id/JobBox3"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/NameField3"
+        android:layout_alignLeft="@+id/NameField3"
+        android:layout_below="@+id/RaceBox3" />
+
+    <EditText
+        android:id="@+id/NameField3"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_above="@+id/StartBt"
+        android:layout_alignLeft="@+id/QuitBt"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/NameField1"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Stephen" >
+
+        <requestFocus />
+    </EditText>
+
+    <Spinner
+        android:id="@+id/JobBox2"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_above="@+id/NameField2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/NameField2"
+        android:layout_below="@+id/RaceBox1" />
+
+    <Button
+        android:id="@+id/StartBt"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignLeft="@+id/NameField1"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/RaceBox1"
+        android:text="@string/bt_begin" />
+
+    <EditText
+        android:id="@+id/NameField1"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_above="@+id/StartBt"
+        android:layout_toLeftOf="@+id/NameField3"
+        android:layout_toRightOf="@+id/InfoBt"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Cody" />
+
+    <Spinner
+        android:id="@+id/JobBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_alignBottom="@+id/JobBox2"
+        android:layout_alignRight="@+id/RaceBox1"
+        android:layout_below="@+id/RaceBox1"
+        android:layout_toRightOf="@+id/JobBox2" />
+
+    <Button
+        android:id="@+id/QuitBt"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/StartBt"
+        android:layout_alignBottom="@+id/StartBt"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="124dp"
+        android:text="@string/bt_exit" />
+
+    <Button
+        android:id="@+id/InfoBt"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/StartBt"
+        android:layout_alignBottom="@+id/StartBt"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="105dp"
+        android:text="@string/bt_about" />
+
+</RelativeLayout>
