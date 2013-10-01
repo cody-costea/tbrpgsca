@@ -8,7 +8,7 @@ public class State {
 	String name;
 	int res,mdur,dur,hpm,mpm,spm,atkm,defm,spim,wism,agim;
 	
-	public State(String name,boolean inactive,boolean auto,boolean confusion,int dur,int hpm,int spm,int mpm,
+	public State(String name,boolean inactive,boolean auto,boolean confusion,int dur,int hpm,int mpm,int spm,
 			int atkm,int defm, int wism, int spim, int agim){
 		this.name=name;
 		this.mdur=dur;
