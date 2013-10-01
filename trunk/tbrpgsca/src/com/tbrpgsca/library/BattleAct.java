@@ -96,8 +96,11 @@ public class BattleAct extends Activity {
     		if (Player[party[i]].maxhp>0) {pMb[j]=party[i];j++;}
     		else difference++;
     	j=party.length;
-    	for (int i=0;i<enemy.length;i++)
-    		if (Player[enemy[i]].maxhp>0) {pMb[j]=enemy[i];j++;}
+    	/*for (int i=0;i<enemy.length;i++)
+    		if (Player[enemy[i]].maxhp>0) {pMb[j]=enemy[i];j++;}*/
+    	int k=0;
+    	for (int i=Player.length-4;i<Player.length;i++)
+    		{Player[i].copy(Player[enemy[k]]);k++;pMb[j]=i;j++;}
         for (int i=0;i<imgActor.length;i++) {
         	playSpr(i,0);
         }

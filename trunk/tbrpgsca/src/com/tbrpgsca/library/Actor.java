@@ -126,6 +126,15 @@ public class Actor extends Job {
         for (int i=0;i<state.length;i++) state[i].remove();
     }
     
+    public void copy(Actor cloned){
+    	this.name = cloned.name;
+        this.jname = cloned.jname;
+        this.rname=cloned.rname;
+        this.raceStats(cloned.maxhp,cloned.maxmp,cloned.maxsp, cloned.atk,cloned.def,cloned.wis,cloned.spi,cloned.agi);
+        this.jobStats(cloned.hpp,cloned.mpp,cloned.spp, cloned.atkp,cloned.defp,cloned.wisp,cloned.spip,cloned.agip);
+        stats(cloned.level,maxlv);
+    }
+    
     public void levelUp() {        
         while (this.maxp<=this.exp&&this.level<this.maxlv) {
                 this.maxp *= 2;

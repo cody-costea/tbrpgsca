@@ -180,7 +180,7 @@ public class DataApp extends Application {
         
     	int maxlv = 5;
     	
-    	Actor npc[] = new Actor[8];
+    	Actor npc[] = new Actor[12];
     	
     	npc[0]=new Actor("","","", 0,0, 0,0,0, 0,0,0,0,0, 0,0,0, 0,0,0,0,0);
     	
@@ -201,6 +201,9 @@ public class DataApp extends Application {
         npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,9, 1,1,1, 0,1,0,1,0);
         npc[7].state[0].dur=-2;
         npc[7].skill.add(2);
+        
+        for (int i=npc.length-4;i<npc.length;i++)
+        	npc[i]=new Actor();
         
         return npc;
     }
@@ -303,8 +306,8 @@ public class DataApp extends Application {
 		enemy[0][2]=0;
 		enemy[0][3]=0;
 		
-		enemy[1][0]=6;
-		enemy[1][1]=5;
+		enemy[1][0]=5;
+		enemy[1][1]=6;
 		enemy[1][2]=0;
 		enemy[1][3]=0;
 		
