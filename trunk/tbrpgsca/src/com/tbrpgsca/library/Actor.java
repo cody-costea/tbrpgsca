@@ -10,12 +10,9 @@ public class Actor extends Job {
     public int auto=0,hp,mp,sp,level,maxlv,exp,maxp,atk,def,spi,wis,agi;   
     
     public void setRace(Race race, Boolean init) {
-    	if (init) {    		
-    		this.exp = 0;
-    		this.maxp = 10;
-    		this.level = 1;
-    		this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis, race.mspi, race.magi);
-    		this.hp=race.maxhp;this.mp=race.maxmp;this.sp=race.maxsp;
+    	if (init) {
+    		this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis, race.mspi, race.magi);    		
+    		this.stats(1, this.maxlv);
     		for (int i=0;i<res[i];i++)
     			this.res[i]=race.res[i];
     	}
@@ -41,6 +38,7 @@ public class Actor extends Job {
     public String applyState(boolean consume) {
     	String s="";
     	if (auto<2&&auto>-2) this.auto=0; else this.auto=2;
+    	if (consume&&hp>0) active=true;
     	this.atk=matk;
     	this.def=mdef;
     	this.spi=mspi;
@@ -81,7 +79,7 @@ public class Actor extends Job {
     }
     
     public Actor(){
-    	this("Actor",9);
+    	this("Actor",5);
     }
     
     public Actor(String name,int maxlv){
@@ -103,7 +101,7 @@ public class Actor extends Job {
     
     private void stats(int lv,int maxlv){
     	this.maxlv = maxlv;
-        this.maxp = 10;
+        this.maxp = 5;
         if (lv>1) {
             this.exp = (int) (this.maxp * (Math.pow(lv-1,2)));
         } else this.exp = 0;
@@ -132,7 +130,13 @@ public class Actor extends Job {
         this.rname=cloned.rname;
         this.raceStats(cloned.maxhp,cloned.maxmp,cloned.maxsp, cloned.atk,cloned.def,cloned.wis,cloned.spi,cloned.agi);
         this.jobStats(cloned.hpp,cloned.mpp,cloned.spp, cloned.atkp,cloned.defp,cloned.wisp,cloned.spip,cloned.agip);
-        stats(cloned.level,maxlv);
+        stats(cloned.level,cloned.maxlv);
+        for (int i=0;i<state.length;i++) {
+        	this.state[i].dur=cloned.state[i].dur;
+        	this.state[i].res=cloned.state[i].res;
+        	}
+        for (int i=0;i<res.length;i++)
+			this.res[i]=cloned.res[i];
     }
     
     public void levelUp() {        
