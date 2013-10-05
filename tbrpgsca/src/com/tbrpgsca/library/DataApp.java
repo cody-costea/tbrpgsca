@@ -193,13 +193,14 @@ public class DataApp extends Application {
         npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,9, 1,1,1, 1,1,0,0,0);
         npc[4].skill.add(9);
         npc[4].skill.add(11);
+        npc[4].state[5].res=9;
         npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,9, 1,1,1, 1,0,1,0,0);
         npc[5].skill.add(23);
         npc[5].skill.add(30);
         npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,15, 1,1,1, 1,0,0,0,1);
         npc[6].skill.add(15);
         npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,9, 1,1,1, 0,1,0,1,0);
-        npc[7].state[0].dur=-2;
+        npc[7].state[0].dur=-3;
         npc[7].skill.add(2);
         
         for (int i=npc.length-4;i<npc.length;i++)
@@ -250,7 +251,7 @@ public class DataApp extends Application {
         ability[35]=new Ability("Flare", true,true, 5, 0,12,0, 2,2, 15,0,0, 0,1, false, nstate, sleep);
         ability[36]=new Ability("Light Ray", true,true, 3, 0,3,0, 3,1, 15,0,0, 0,7, false, nstate, sleep);
         ability[37]=new Ability("Sacred Fire", true,true, 5, 0,5,0, 3,1, 20,0,0, 2,7, false, nstate, sleep);
-        ability[38]=new Ability("Confusion", true,true, 3, 0,15,0, 2,1, 0,0,0, 0,6, false, confusion, clarity);
+        ability[38]=new Ability("Confusion", true,true, 5, 0,15,0, 2,1, 0,0,0, 0,6, false, confusion, clarity);
         ability[39]=new Ability("Sleep", true,true, 3, 0,15,0, 2,1, 0,0,0, 0,6, false, sleep, clarity);
         ability[40]=new Ability("Slash", true,true, 5, 0,0,10, 4,1, 15,0,0, 1,1, false, nstate, confsleep);
         ability[41]=new Ability("Fire Wpn", true,false, 3, 0,3,2, 5,1, 17,0,0, 0,2, false, nstate, confsleep);
@@ -307,24 +308,24 @@ public class DataApp extends Application {
 		enemy[0][3]=0;
 		
 		enemy[1][0]=5;
-		enemy[1][1]=6;
+		enemy[1][1]=7;
 		enemy[1][2]=0;
 		enemy[1][3]=0;
 		
-		enemy[2][0]=5;
-		enemy[2][1]=7;
-		enemy[2][2]=0;
+		enemy[2][0]=4;
+		enemy[2][1]=6;
+		enemy[2][2]=5;
 		enemy[2][3]=0;
 				
-		enemy[3][0]=6;
-		enemy[3][1]=4;
+		enemy[3][0]=4;
+		enemy[3][1]=7;
 		enemy[3][2]=5;
 		enemy[3][3]=0;
 		
-		enemy[4][0]=5;
-		enemy[4][1]=7;
-		enemy[4][2]=4;
-		enemy[4][3]=0;
+		enemy[4][0]=6;
+		enemy[4][1]=5;
+		enemy[4][2]=7;
+		enemy[4][3]=4;
 		
 		enemy[5][0]=6;
 		enemy[5][1]=7;

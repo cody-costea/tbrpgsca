@@ -32,8 +32,8 @@ public class DemoAct extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_demo);
 		data=(DataApp)this.getApplication();
-		raceList=new ArrayAdapter<String>(this,R.layout.simple_spinner_item);
-		jobList=new ArrayAdapter<String>(this,R.layout.simple_spinner_item);
+		raceList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
+		jobList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
 		raceBox[0]=(Spinner)findViewById(R.id.RaceBox1);
 		raceBox[1]=(Spinner)findViewById(R.id.RaceBox2);
 		raceBox[2]=(Spinner)findViewById(R.id.RaceBox3);
@@ -98,10 +98,10 @@ public class DemoAct extends Activity {
 		for (int i=1;i<=3;i++) setPlayer(i);
 		Intent btInt;
 		btInt = new Intent(this, BattleAct.class);
-		/*if (level%2==1){
+		if (level%2==1){
 			btInt.putExtra("Surprise", true);		
 			btInt.putExtra("Escape", false);
-		}*/
+		}
 		btInt.putExtra("Enemy", level);
 		startActivityForResult(btInt, 1);
 		for (int i=1;i<data.Player.length;i++) data.Player[i].recover();
@@ -126,7 +126,7 @@ public class DemoAct extends Activity {
     
     private void displayMsg(String t,String s){
     	SpannableString text=new SpannableString(s);
-    	Linkify.addLinks(text, Linkify.ALL);
+    	Linkify.addLinks(text, Linkify.WEB_URLS);
     	AlertDialog.Builder msg = new AlertDialog.Builder(this);
     	msg.setCancelable(false);
     	msg.setMessage(text);
@@ -146,7 +146,7 @@ public class DemoAct extends Activity {
         if (requestCode >= 0) {
             if (resultCode == RESULT_OK) {
             	int result=data.getExtras().getInt("Outcome");
-        		if (result>0&&level<6) level++;
+        		if (result>0&&level<5) level++;
             }
         }
     }

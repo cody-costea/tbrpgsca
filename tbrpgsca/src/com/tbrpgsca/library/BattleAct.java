@@ -25,7 +25,7 @@ public class BattleAct extends Activity {
     Ability[] Skill;
     Ability[] Item;
     int pMb[] = {0,0,0, 0,0,0,0};
-    int target,difference,current,result=0;
+    int target,difference,current=6,result=0;
     
     Spinner targetBox, skillBox,itemBox;
     ArrayAdapter<String> targetList,skillList,itemList;
@@ -53,9 +53,9 @@ public class BattleAct extends Activity {
 		Use=(Button) findViewById(R.id.UseBt);
 		Escape=(Button) findViewById(R.id.RunBt);
 		Auto=(Button) findViewById(R.id.AutoBt);
-		skillList=new ArrayAdapter<String>(this,R.layout.simple_spinner_item);
-		itemList=new ArrayAdapter<String>(this,R.layout.simple_spinner_item);
-		targetList=new ArrayAdapter<String>(this,R.layout.simple_spinner_item);
+		skillList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
+		itemList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
+		targetList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
 		targetBox.setAdapter(targetList);
 		skillBox.setAdapter(skillList);
 		itemBox.setAdapter(itemList);
@@ -104,7 +104,7 @@ public class BattleAct extends Activity {
         for (int i=0;i<imgActor.length;i++) {
         	playSpr(i,0);
         }
-        if (surprise) {current=2-difference;endTurn();} else {current=6;endTurn();}
+        if (surprise) {for(int i=0;i<3-difference;i++)Player[pMb[i]].active=false;endTurn();}else endTurn();
         refreshTargetBox();
         targetBox.setSelection(3-difference);
         refreshSkillBox();
@@ -153,7 +153,7 @@ public class BattleAct extends Activity {
     	int skill=0;
     	String ability = (String)skillBox.getSelectedItem();
     	for (int i=0;i<Skill.length;i++)
-            if (ability.contains(Skill[i].name))
+            if (ability.startsWith(Skill[i].name))
             	{skill=i; break;}
     	return skill;
     }
@@ -162,7 +162,7 @@ public class BattleAct extends Activity {
     	int skill=0;
     	String ability = (String)itemBox.getSelectedItem();
     	for (int i=0;i<Item.length;i++)
-    		if (ability.contains(Item[i].name))
+    		if (ability.startsWith(Item[i].name))
             	{skill=i;break;}
     	return skill;
     }
@@ -202,7 +202,6 @@ public class BattleAct extends Activity {
         if (Player[pMb[current]].hp<1)
         	playSpr(current,1);
     	if (current<3-difference) {Player[pMb[current]].exp++; Player[pMb[current]].levelUp();}
-    	//updText.append(Player[pMb[current]].applyState(true));
     	updText.append(".");
     }
     
@@ -256,7 +255,7 @@ public class BattleAct extends Activity {
     		else {a=3;b=6;}
     	if (Player[pMb[current]].auto<0) if (a==3) {a=0;b=2;} else {a=3;b=6;}
     	target=a;
-    	while ((Player[pMb[target]].hp<1)&&(ability.hpdmg>1)) target++;
+    	while ((Player[pMb[target]].hp<1)&&(ability.hpdmg>1)&&target<b) target++;
     	
     	for (int i=target;i<=b;++i)
     		if ((Player[pMb[i]].hp<Player[pMb[target]].hp)&&(Player[pMb[i]].hp>0))
@@ -267,12 +266,15 @@ public class BattleAct extends Activity {
     @SuppressWarnings("deprecation")
     private void endTurn() {
     		imgActor[current].setBackgroundDrawable(null);
-    		current++;
+    		Player[pMb[current]].active=false;
+    		//current++;
+    		for (current=0;current<7;current++){
+    			if (Player[pMb[current]].active) break;
+    		 }
     	if (current>6) {
         	current=0;
         	for (int i=0;i<pMb.length;i++)
             	if (Player[pMb[i]].hp>0){
-            		Player[pMb[i]].active=true;
             		updText.append(Player[pMb[i]].applyState(true));
             		if (Player[pMb[i]].hp<1) playSpr(i,1);
             	}
@@ -280,18 +282,23 @@ public class BattleAct extends Activity {
     	if (!checkEnd()){
     		if (Player[pMb[current]].active){	
     			if (current<3){
-    				skillCost.setText(Player[pMb[current]].name+": "+Player[pMb[current]].hp+"/"+Player[pMb[current]].maxhp+" HP, "
-    					+Player[pMb[current]].mp+"/"+Player[pMb[current]].maxmp+" MP, "
-    					+Player[pMb[current]].sp+"/"+Player[pMb[current]].maxsp+" SP");
-    			imgActor[current].setBackgroundResource(R.drawable.current);
+    				setCurrent();
+    				refreshItemBox();
     		}
     		Player[pMb[current]].applyState(false);
-    		if (current<3) {refreshSkillBox();refreshItemBox();}
     		if ((current>2||Player[pMb[current]].auto!=0)&&Player[pMb[current]].hp>0) {
     			executeAI();endTurn();}
     		refreshTargetBox();
         	} else endTurn();
     	}
+    }
+    
+    private void setCurrent(){
+    	skillCost.setText(Player[pMb[current]].name+": "+Player[pMb[current]].hp+"/"+Player[pMb[current]].maxhp+" HP, "
+				+Player[pMb[current]].mp+"/"+Player[pMb[current]].maxmp+" MP, "
+				+Player[pMb[current]].sp+"/"+Player[pMb[current]].maxsp+" SP");
+		imgActor[current].setBackgroundResource(R.drawable.current);
+		refreshSkillBox();
     }
     
     private boolean checkEnd(){
@@ -360,13 +367,15 @@ public class BattleAct extends Activity {
 		sprAnim.setOneShot(true);}
     }
     
+    @SuppressWarnings("deprecation")
     private boolean imgClick(int i){
     	boolean a=false;
     	int s=(i>2)?i-difference:i;
-    	if (target==s){
-			executeSkill(Skill[getAIskill((i>2-difference)?false:true)]);
-			a=true;
-    	}
+    	if (target==s)
+    		if (s<3&&Player[pMb[s]].active&&s!=current) {
+    			imgActor[current].setBackgroundDrawable(null);current=s;setCurrent();} else{ 
+    		executeSkill(Skill[getAIskill((i>2-difference)?false:true)]);
+			a=true;}
 		else			
 			if (Player[pMb[i]].maxhp>0) targetBox.setSelection(s);
     	return a;
