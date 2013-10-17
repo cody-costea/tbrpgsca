@@ -193,11 +193,13 @@ public class BattleAct extends Activity {
         Player[pMb[current]].mp -= ability.mpc;
         Player[pMb[current]].sp -= ability.spc;
         if (ability.qty>0) ability.qty--;
+        int trg;
         for (int i=a;i<=b;i++) if (Player[pMb[i]].hp>0||ability.state[0]){
-        	if (i!=current) playSpr(i,3);
-        	updText.append(ability.execute(Player[pMb[current]], Player[pMb[i]]));
-        	if (Player[pMb[i]].hp<1)
-            	playSpr(i,1);
+        	trg=(Player[pMb[i]].reflect&&ability.dmgtype==2)?current:i;
+        	if (trg!=current) playSpr(i,3);
+        	updText.append(ability.execute(Player[pMb[current]], Player[pMb[trg]]));
+        	if (Player[pMb[trg]].hp<1)
+            	playSpr(trg,1);
         }        
         if (Player[pMb[current]].hp<1)
         	playSpr(current,1);

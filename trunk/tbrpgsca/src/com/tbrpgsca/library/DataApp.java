@@ -194,9 +194,12 @@ public class DataApp extends Application {
         npc[4].skill.add(9);
         npc[4].skill.add(11);
         npc[4].state[5].res=9;
+        npc[4].state[10].dur=-2;
         npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,9, 1,1,1, 1,0,1,0,0);
         npc[5].skill.add(23);
         npc[5].skill.add(30);
+        npc[5].mres[2]=7;
+        npc[5].mres[3]=1;
         npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,15, 1,1,1, 1,0,0,0,1);
         npc[6].skill.add(15);
         npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,9, 1,1,1, 0,1,0,1,0);
@@ -282,18 +285,19 @@ public class DataApp extends Application {
     }
     
     protected static State[] AddStates() {    	
-    	State state[] = new State[10];
+    	State state[] = new State[11];
     	
-    	state[0]=new State("Regen", false,false,false, -1, 10,0,0, 0,2,0,0,0);
-    	state[1]=new State("Poison", false,false,false, -1, -7,0,-3, 0,-2,0,0,0);
-    	state[2]=new State("Clarity", false,false,false, -1, 0,10,0, 0,0,1,1,0);
-    	state[3]=new State("Dizziness", false,false,false, -1, 0,-10,0, 0,0,-1,-1,0);
-    	state[4]=new State("Vigour", false,false,false, -1, 0,0,10, 1,0,0,0,1);
-    	state[5]=new State("Weakness", false,false,false, -1, 0,0,-10, -1,0,0,0,-1);
-    	state[6]=new State("Berserk", false,true,false, 7, 0,-100,0, 5,-3,0,0,3);
-    	state[7]=new State("Confusion", false,false,true, 3, 0,0,0, 0,0,0,0,0);
-    	state[8]=new State("Sleep", true,false,false, 5, 0,0,0, 0,-3,0,0,-3);
-    	state[9]=new State("Stun", true,false,false, 1, 0,0,0, 0,-1,0,0,-1);
+    	state[0]=new State("Regen", false,false,false, -1, 10,0,0, 0,2,0,0,0, false);
+    	state[1]=new State("Poison", false,false,false, -1, -7,0,-3, 0,-2,0,0,0, false);
+    	state[2]=new State("Clarity", false,false,false, -1, 0,10,0, 0,0,1,1,0, false);
+    	state[3]=new State("Dizziness", false,false,false, -1, 0,-10,0, 0,0,-1,-1,0, false);
+    	state[4]=new State("Vigour", false,false,false, -1, 0,0,10, 1,0,0,0,1, false);
+    	state[5]=new State("Weakness", false,false,false, -1, 0,0,-10, -1,0,0,0,-1, false);
+    	state[6]=new State("Berserk", false,true,false, 7, 0,-100,0, 5,-3,0,0,3, false);
+    	state[7]=new State("Confusion", false,false,true, 3, 0,0,0, 0,0,0,0,0, false);
+    	state[8]=new State("Sleep", true,false,false, 5, 0,0,0, 0,-3,0,0,-3, false);
+    	state[9]=new State("Stun", true,false,false, 1, 0,0,0, 0,-1,0,0,-1, false);
+    	state[10]=new State("Reflect", false,false,false, 7, 0,0,0, 0,0,0,0,0, true);
     	
     	return state;
     }

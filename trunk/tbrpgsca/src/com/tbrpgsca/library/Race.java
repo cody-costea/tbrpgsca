@@ -6,7 +6,7 @@ package com.tbrpgsca.library;
 public class Race {
 	public String rname;
 	public int maxhp,maxmp,maxsp,matk,mdef,mwis,mspi,magi;
-	public int res[]={3,3,3,3,3,3,3,3};
+	public int resm[]={0,0,0,0,0,0,0,0};
 	
 	public Race(){
 		this.rname="Humanoid";

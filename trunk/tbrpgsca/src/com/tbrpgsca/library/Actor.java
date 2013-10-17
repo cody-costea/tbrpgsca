@@ -5,16 +5,17 @@ package com.tbrpgsca.library;
 
 public class Actor extends Job {
     public String name;
-    public boolean active=true;
+    public boolean active=true,reflect=false;
     public State state[] = DataApp.AddStates();
-    public int auto=0,hp,mp,sp,level,maxlv,exp,maxp,atk,def,spi,wis,agi;   
+    public int auto=0,hp,mp,sp,level,maxlv,exp,maxp,atk,def,spi,wis,agi;
+    public int mres[]={3,3,3,3,3,3,3,3},res[]={3,3,3,3,3,3,3,3};
     
     public void setRace(Race race, Boolean init) {
     	if (init) {
     		this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis, race.mspi, race.magi);    		
     		this.stats(1, this.maxlv);
-    		for (int i=0;i<res[i];i++)
-    			this.res[i]=race.res[i];
+    		for (int i=0;i<res.length;i++)
+    			{this.mres[i]+=race.resm[i];checkRes(i);}
     	}
         this.rname = race.rname;
     }
@@ -22,7 +23,8 @@ public class Actor extends Job {
     public void changeJob(Job job, Boolean init) {
         this.jname = job.jname;
         this.jobStats(job.hpp,job.mpp,job.spp, job.atkp,job.defp,job.wisp,job.spip,job.agip);
-        
+        for (int i=0;i<res.length;i++)
+			{this.mres[i]+=job.resm[i];checkRes(i);}
         if (init) {
         	this.skill.clear();
         	this.skill.add(0);
@@ -35,6 +37,15 @@ public class Actor extends Job {
         }
     }
     
+    public void checkRes(int r){
+    	if (r<8&&r>=0){
+    		if (mres[r]>7) mres[r]=7;
+    		if (mres[r]<0) mres[r]=0;
+    		if (res[r]>7) res[r]=7;
+    		if (res[r]<0) res[r]=0;
+    	}
+    }
+    
     public String applyState(boolean consume) {
     	String s="";
     	if (auto<2&&auto>-2) this.auto=0; else this.auto=2;
@@ -44,6 +55,9 @@ public class Actor extends Job {
     	this.spi=mspi;
     	this.wis=mwis;
     	this.agi=magi;
+    	for (int i=0;i<res.length;i++)
+			this.res[i]=this.mres[i];
+    	this.reflect=false;
     	boolean c=false;
     	for (int i=0;i<state.length;i++)
     		if (state[i].dur!=0&&this.hp>0) {
@@ -122,6 +136,7 @@ public class Actor extends Job {
         wis=mwis;
         agi=magi;
         for (int i=0;i<state.length;i++) state[i].remove();
+        applyState(false);
     }
     
     public void copy(Actor cloned){
@@ -135,8 +150,10 @@ public class Actor extends Job {
         	this.state[i].dur=cloned.state[i].dur;
         	this.state[i].res=cloned.state[i].res;
         	}
-        for (int i=0;i<res.length;i++)
+        for (int i=0;i<res.length;i++){
+			this.mres[i]=cloned.mres[i];
 			this.res[i]=cloned.res[i];
+		}
     }
     
     public void levelUp() {        
