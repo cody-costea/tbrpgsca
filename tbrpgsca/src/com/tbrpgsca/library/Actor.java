@@ -17,6 +17,10 @@ public class Actor extends Job {
     		for (int i=0;i<res.length;i++)
     			{this.mres[i]+=race.resm[i];checkRes(i);}
     	}
+    	for (int i=0;i<race.skill.size();i++) {
+        	if (!this.skill.contains(race.skill.get(i))) 
+        			this.skill.add(race.skill.get(i));
+        }
         this.rname = race.rname;
     }
     

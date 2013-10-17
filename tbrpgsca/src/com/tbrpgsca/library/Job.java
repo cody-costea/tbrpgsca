@@ -3,15 +3,13 @@
  */
 package com.tbrpgsca.library;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 public class Job extends Race {
 	public String jname;    
-    String bSprite[] = new String[44];
-    public ArrayList<Integer> skill = new ArrayList<Integer>();        
+    String bSprite[] = new String[44];        
     public int hpp,mpp,spp,atkp,defp,wisp,spip,agip;
     
     public Job(){
