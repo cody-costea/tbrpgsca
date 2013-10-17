@@ -14,28 +14,29 @@ public class Ability {
     	String s="";
         //if ((this.hpc<=user.hp)&&(this.mpc<=user.mp)&&(this.spc<=user.sp)&&(this.lvrq<=user.level)) {
             int dmg = (int) (Math.random() * 4);
+            int res = (target.res[element]<7)?target.res[element]:-1;
             switch (dmgtype) {
                 case 1:
-                   dmg += ((this.atki*user.def/2)+user.atk/2)/(target.def*target.res[element]+1);
+                   dmg += ((this.atki*user.def/2)+user.atk/2)/(target.def*res+1);
                 case 3:
-                   dmg += (this.atki*user.wis)/(target.spi*target.res[element]+1);
+                   dmg += (this.atki*user.wis)/(target.spi*res+1);
                 case 2:
-                   dmg += (this.atki*user.spi)/(target.wis*target.res[element]+1);
+                   dmg += (this.atki*user.spi)/(target.wis*res+1);
                 case 4:
-                   dmg += ((this.atki*user.agi/2)+user.atk/2)/((target.agi/2+target.def/2)*target.res[element]+1);
+                   dmg += ((this.atki*user.agi/2)+user.atk/2)/((target.agi/2+target.def/2)*res+1);
                 case 5:
-                    dmg += ((this.atki*user.wis/2)+user.atk/2)/((target.spi/2+target.def/2)*target.res[element]+1);
+                    dmg += ((this.atki*user.wis/2)+user.atk/2)/((target.spi/2+target.def/2)*res+1);
                 case 6:
-                    dmg += ((this.atki*user.agi/2)+user.wis/2)/((target.agi/2+target.spi/2)*target.res[element]+1);
+                    dmg += ((this.atki*user.agi/2)+user.wis/2)/((target.agi/2+target.spi/2)*res+1);
                 case 7:
-                    dmg += ((this.atki*user.spi/2)+user.atk/2)/((target.wis/2+target.def/2)*target.res[element]+1);
+                    dmg += ((this.atki*user.spi/2)+user.atk/2)/((target.wis/2+target.def/2)*res+1);
                 default:
-                   dmg += (this.atki*user.atk)/(target.def*target.res[element]+1);
+                   dmg += (this.atki*user.atk)/(target.def*res+1);
             }            
             int dmghp = (hpdmg!=0) ? (dmg + this.hpdmg) : 0;
             int dmgmp = (mpdmg!=0) ? (dmg + this.mpdmg) : 0;
             int dmgsp = (spdmg!=0) ? (dmg + this.spdmg) : 0;
-            if (target.res[element]<0) {dmghp=-dmghp;dmgmp=-dmgmp;dmgsp=-dmgsp;}
+            if (res<0) {dmghp=-dmghp;dmgmp=-dmgmp;dmgsp=-dmgsp;}
             target.hp -= dmghp;
             target.mp -= dmgmp;
             target.sp -= dmgsp;

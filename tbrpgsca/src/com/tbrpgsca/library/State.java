@@ -4,12 +4,13 @@
 package com.tbrpgsca.library;
 
 public class State {
-	boolean inactive,confusion,auto;
+	boolean inactive,confusion,auto,reflect;
 	String name;
 	int res,mdur,dur,hpm,mpm,spm,atkm,defm,spim,wism,agim;
+    int resm[]={0,0,0,0,0,0,0,0};
 	
 	public State(String name,boolean inactive,boolean auto,boolean confusion,int dur,int hpm,int mpm,int spm,
-			int atkm,int defm, int wism, int spim, int agim){
+			int atkm,int defm, int wism, int spim, int agim,boolean reflect){
 		this.name=name;
 		this.mdur=dur;
 		this.dur=0;
@@ -25,6 +26,7 @@ public class State {
 		this.inactive=inactive;
 		this.confusion=confusion;
 		this.auto=(confusion)?true:auto;
+		this.reflect=reflect;
 	}
 	
 	public void inflict(){
@@ -55,7 +57,10 @@ public class State {
 			actor.spi=actor.mspi+spim;
 			actor.wis=actor.mwis+wism;
 			actor.agi=actor.magi+agim;
+			for (int i=0;i<actor.res.length;i++)
+				{actor.res[i]+=this.resm[i];actor.checkRes(i);}
 			if (inactive) actor.active=false;
+			if (reflect) actor.reflect=true;
 			if (auto&&actor.auto<2) actor.auto=1;
 			if (confusion) actor.auto=(actor.auto<2)?-1:-2;
 		}
