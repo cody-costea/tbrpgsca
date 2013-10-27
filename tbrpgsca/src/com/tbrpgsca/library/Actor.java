@@ -158,6 +158,11 @@ public class Actor extends Job {
 			this.mres[i]=cloned.mres[i];
 			this.res[i]=cloned.res[i];
 		}
+        this.skill.clear();
+        for (int i=0;i<cloned.skill.size();i++) {
+        	if (!this.skill.contains(cloned.skill.get(i))) 
+        			this.skill.add(cloned.skill.get(i));
+        }
     }
     
     public void levelUp() {        

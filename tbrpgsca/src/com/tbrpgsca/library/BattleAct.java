@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.text.method.ScrollingMovementMethod;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -195,7 +196,12 @@ public class BattleAct extends Activity {
         if (ability.qty>0) ability.qty--;
         int trg;
         for (int i=a;i<=b;i++) if (Player[pMb[i]].hp>0||ability.state[0]){
-        	trg=(Player[pMb[i]].reflect&&ability.dmgtype==2)?current:i;
+        	trg=i;
+        	if (Player[pMb[i]].reflect&&ability.dmgtype==2) {
+        		updText.append(", which is reflected");
+        		trg=current;
+        	}
+        	//trg=(Player[pMb[i]].reflect&&ability.dmgtype==2)?current:i;
         	if (trg!=current) playSpr(i,3);
         	updText.append(ability.execute(Player[pMb[current]], Player[pMb[trg]]));
         	if (Player[pMb[trg]].hp<1)
@@ -426,5 +432,14 @@ public class BattleAct extends Activity {
     		}
     		if (act) endTurn();
     	}
-    };        
+    };
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+         if (keyCode == KeyEvent.KEYCODE_BACK) {
+        	 endBt(-1);
+         return true;
+         }
+         return super.onKeyDown(keyCode, event);    
+    }
 }
