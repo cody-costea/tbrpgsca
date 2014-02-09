@@ -9,18 +9,27 @@
     tools:context=".BattleActivity" >
 
     <ImageView
-        android:id="@+id/ImgEnemy1"
+        android:id="@+id/ImgEnemy3"
         android:layout_width="128dp"
         android:layout_height="128dp"
-        android:layout_alignRight="@+id/AutoBt"
-        android:layout_alignTop="@+id/ImgPlayer1" />
-    
+        android:layout_above="@+id/TargetBox"
+        android:layout_marginRight="21dp"
+        android:layout_toLeftOf="@+id/ImgEnemy1" />
+
     <ImageView
         android:id="@+id/ImgEnemy2"
         android:layout_width="128dp"
         android:layout_height="128dp"
         android:layout_above="@+id/ItemCost"
         android:layout_alignLeft="@+id/ImgEnemy3" />
+    
+    <ImageView
+        android:id="@+id/ImgEnemy1"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignRight="@+id/SkillCost"
+        android:layout_alignTop="@+id/ImgPlayer1"
+        android:layout_marginRight="21dp" />
     
     <ImageView
         android:id="@+id/ImgEnemy4"
@@ -30,35 +39,28 @@
         android:layout_alignLeft="@+id/ImgEnemy1" />
     
     <ImageView
-        android:id="@+id/ImgEnemy3"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignRight="@+id/SkillCost"
-        android:layout_alignTop="@+id/SkillCost"
-        android:layout_marginRight="40dp" />
-    
-    <ImageView
         android:id="@+id/ImgPlayer3"
         android:layout_width="128dp"
         android:layout_height="128dp"
-        android:layout_alignLeft="@+id/SkillBox"
+        android:layout_alignLeft="@+id/SkillCost"
         android:layout_alignTop="@+id/SkillCost"
-        android:layout_marginLeft="57dp" />
-    
+        android:layout_marginLeft="29dp" />
+
+    <ImageView
+        android:id="@+id/ImgPlayer1"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignBottom="@+id/TargetBox"
+        android:layout_marginBottom="35dp"
+        android:layout_marginLeft="37dp"
+        android:layout_toRightOf="@+id/ImgPlayer3" />
+
     <ImageView
         android:id="@+id/ImgPlayer2"
         android:layout_width="128dp"
         android:layout_height="128dp"
         android:layout_above="@+id/ItemCost"
         android:layout_alignLeft="@+id/ImgPlayer3" />
-    
-    <ImageView
-        android:id="@+id/ImgPlayer1"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignLeft="@+id/SkillCost"
-        android:layout_below="@+id/SkillCost"
-        android:layout_marginLeft="38dp" />
     
     <ImageView
         android:id="@+id/ImgPlayer4"
@@ -73,8 +75,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/TargetBox"
-        android:layout_below="@+id/UseBt" />
+        android:layout_alignRight="@+id/UseBt"
+        android:layout_alignTop="@+id/ImgPlayer4" />
 
         <TextView
         android:id="@+id/SkillCost"
@@ -98,11 +100,22 @@
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <Button
+        android:id="@+id/RunBt"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ItemBox"
+        android:layout_alignLeft="@+id/AutoBt"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/ItemBox"
+        android:text="@string/bt_run" />
+
     <Spinner
         android:id="@+id/SkillBox"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/AutoBt"
+        android:layout_alignBottom="@+id/ImgPlayer3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" />
 
@@ -111,6 +124,7 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/SkillBox"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:text="@string/bt_auto" />
@@ -122,27 +136,17 @@
         android:layout_above="@+id/UseBt"
         android:layout_alignLeft="@+id/SkillBox"
         android:layout_alignRight="@+id/SkillBox"
-        android:layout_alignTop="@+id/ImgPlayer2" />
-
-    <Button
-        android:id="@+id/RunBt"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/AutoBt"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="@string/bt_run" />
+        android:layout_alignTop="@+id/ActBt"
+        android:layout_marginTop="35dp" />
 
     <Button
         android:id="@+id/ActBt"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:layout_above="@+id/TargetBox"
+        android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/TargetBox"
         android:layout_below="@+id/SkillBox"
-        android:layout_toLeftOf="@+id/ImgPlayer1"
+        android:layout_toLeftOf="@+id/ImgPlayer3"
         android:text="@string/bt_act" />
 
     <Button
@@ -150,9 +154,9 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/RunBt"
-        android:layout_alignLeft="@+id/ItemBox"
-        android:layout_toLeftOf="@+id/ItemCost"
+        android:layout_above="@+id/ItemBox"
+        android:layout_alignLeft="@+id/TargetBox"
+        android:layout_alignRight="@+id/TargetBox"
         android:text="@string/bt_use" />
-    
+
 </RelativeLayout>

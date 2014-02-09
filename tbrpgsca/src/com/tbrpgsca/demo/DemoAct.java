@@ -39,8 +39,8 @@ public class DemoAct extends Activity {
 		raceBox[2]=(Spinner)findViewById(R.id.RaceBox3);
 		for (int i=0;i<data.pcRace.length;i++) raceList.add(data.pcRace[i].rname);
 		for (int i=0;i<3;i++) raceBox[i].setAdapter(raceList);
-		raceBox[0].setSelection(2);
-		raceBox[1].setSelection(2);
+		raceBox[0].setSelection(1);
+		raceBox[1].setSelection(0);
 		raceBox[2].setSelection(2);
 		jobBox[0]=(Spinner)findViewById(R.id.JobBox1);
 		jobBox[1]=(Spinner)findViewById(R.id.JobBox2);
@@ -48,8 +48,8 @@ public class DemoAct extends Activity {
 		for (int i=0;i<data.pcJob.length;i++) jobList.add(data.pcJob[i].jname);
 		for (int i=0;i<3;i++) jobBox[i].setAdapter(jobList);
 		jobBox[0].setSelection(7);
-		jobBox[1].setSelection(4);
-		jobBox[2].setSelection(2);
+		jobBox[1].setSelection(5);
+		jobBox[2].setSelection(3);
 		name[0]=(EditText)findViewById(R.id.NameField1);
 		name[1]=(EditText)findViewById(R.id.NameField2);
 		name[2]=(EditText)findViewById(R.id.NameField3);
@@ -59,7 +59,7 @@ public class DemoAct extends Activity {
 		Begin.setOnClickListener(cAction);
 		About.setOnClickListener(cAction);
 		Exit.setOnClickListener(cAction);
-		data.party[0]=1;data.party[1]=2;data.party[2]=3;
+		data.party[0]=1;data.party[1]=2;data.party[2]=3;data.party[3]=0;
 		for (int i=0;i<data.Item.length;i++)
 			data.Item[i].qty=5;		
 	}
@@ -76,7 +76,7 @@ public class DemoAct extends Activity {
 		if (n.equals(""))
 			switch (p){
 			case 1:
-				n="Claudius";
+				n="Cody";
 				break;
 			case 2:
 				n="George";
@@ -89,7 +89,7 @@ public class DemoAct extends Activity {
 		if (raceBox[p-1].isEnabled())
 			data.Player[p].setRace(data.pcRace[raceBox[p-1].getSelectedItemPosition()], true);
 		for (int i=0;i<data.Player[p].skill.size();i++)
-			if (data.Skill[data.Player[p].skill.get(i)].lvrq>4) data.Player[p].skill.remove(i);
+			if (data.Skill[data.Player[p].skill.get(i)].lvrq>1) data.Player[p].skill.remove(i);
 		data.Player[p].changeJob(data.pcJob[jobBox[p-1].getSelectedItemPosition()], false);
 		raceBox[p-1].setEnabled(false);
 	}
