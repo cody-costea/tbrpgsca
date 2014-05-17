@@ -6,10 +6,13 @@ package com.tbrpgsca.library;
 import java.util.Locale;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 public class Job extends Race {
-	public String jname;    
-    String bSprite[] = new String[44];        
+	public String jname,bsprite;
+	DataApp data;
     public int hpp,mpp,spp,atkp,defp,wisp,spip,agip;
     
     public Job(){
@@ -26,7 +29,7 @@ public class Job extends Race {
     
     protected void jobStats(int hpp, int mpp, int spp, int atkp, int defp,
             int wisp, int spip, int agip) {        
-        setSprite(this.jname.toLowerCase(Locale.US));
+        this.bsprite=(this.jname!="")?"hero":jname.toLowerCase(Locale.US);
         this.hpp = hpp;
         this.mpp = mpp;
         this.spp = spp;
@@ -35,20 +38,28 @@ public class Job extends Race {
         this.wisp = wisp;
         this.spip = spip;
         this.agip = agip;
-    }    
-    protected void setSprite(String spr) {
-    	if (spr!="") spr="hero";
-    	String[] sprName= {"act1","act2","act3","act4","act5","act6","act7",
-    			"act8", "hit1","hit2","hit3","hit4","hit5","hit6", "fallen1",
-    			"fallen2","fallen3","fallen4","fallen5","fallen6","fallen7","fallen8",
-    			"actr1","actr2","actr3","actr4","actr5","actr6","actr7","actr8",
-    			"hitr1","hitr2","hitr3","hitr4","hitr5","hitr6", "fallenr1", "fallenr2",
-    			"fallenr3","fallenr4","fallenr5","fallenr6","fallenr7","fallenr8"};
-        for (int i=0;i<sprName.length&&i<bSprite.length;i++) {
-            this.bSprite[i] = ("b_"+spr+"_"+sprName[i]);
-        }
     }
-    public Drawable getBtSprite(int i, Activity context){
-    	return context.getResources().getDrawable(context.getResources().getIdentifier(bSprite[i], "drawable", context.getPackageName()));
-    }    
+        
+    public AnimationDrawable getBtSprite(int i, String pos, boolean bkw, Activity context){
+    	Bitmap bmp=null; int h=128,w=h,nr=7; //System.gc();
+    	AnimationDrawable sprite=new AnimationDrawable();
+    	BitmapFactory.Options opt = new BitmapFactory.Options();
+    	//opt.inPurgeable=true;opt.inDither=false;opt.inSampleSize=1;
+    	if (i>0) { 
+    		bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_"+i+"_"+pos, "drawable", context.getPackageName()),opt);
+    		h=bmp.getHeight();nr=bmp.getWidth()/h;w=bmp.getWidth()/nr;    		
+    		for (int j=0;j<nr;j++)
+    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),(i!=1||j!=0)?87:261);
+    		for (int j=nr-2;bkw&&j>0;j--)
+    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),87);
+    	}
+    	if (i!=2) {
+    		if (i!=1) {
+    			bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_1_"+pos, "drawable", context.getPackageName()),opt);
+    			h=bmp.getHeight();nr=bmp.getWidth()/h;w=bmp.getWidth()/nr;
+    		}
+    		sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, w, h)),1);
+    	}
+    	bmp.recycle(); return sprite;
+    }
 }

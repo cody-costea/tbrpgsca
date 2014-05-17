@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.text.method.ScrollingMovementMethod;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -67,7 +66,7 @@ public class BattleAct extends Activity {
 	    Bundle extra = getIntent().getExtras();	    
 	    Escape.setEnabled((extra!=null&&extra.containsKey("Escape"))?extra.getBoolean("Escape"):true);
 	    int e=(extra!=null&&extra.containsKey("Enemy"))?extra.getInt("Enemy"):0;
-        beginBattle(data.party,data.enemy[e],(extra!=null&&extra.containsKey("Surprise"))?extra.getBoolean("Surprise"):false);
+        beginBattle(data.party,data.enemy[e],(extra!=null&&extra.containsKey("Surprise"))?extra.getInt("Surprise"):0);
 	}
 
 	@Override
@@ -77,9 +76,9 @@ public class BattleAct extends Activity {
 		return true;
 	}
 	
-    public void beginBattle(int party[],int enemy[], boolean surprise) {
-    	this.surprised=surprise;
-    	if (surprise){
+    public void beginBattle(int party[],int enemy[], int surprise) {
+    	this.surprised=(surprise<0);
+    	if (surprised){
     		imgActor[0]=(ImageView) findViewById(R.id.ImgEnemy3);
     		imgActor[1]=(ImageView) findViewById(R.id.ImgEnemy4);
     		imgActor[2]=(ImageView) findViewById(R.id.ImgEnemy1);
@@ -117,11 +116,11 @@ public class BattleAct extends Activity {
     		if (Player[enemy[i]].maxhp>0) {pMb[j]=enemy[i];j++;}*/
     	int k=0;
     	for (int i=Player.length-4;i<Player.length;i++)
-    		{Player[i].copy(Player[enemy[k]]);k++;pMb[j]=i;j++;}
-        for (int i=0;i<imgActor.length;i++) {
-        	playSpr(i,0);
-        }
-        if (surprise) {for(int i=0;i<(pMb.length/2)-difference;i++)Player[pMb[i]].active=false;endTurn();}else endTurn();
+    		{Player[i].copy(Player[enemy[k]]);k++;pMb[j]=i;j++;}    	
+        for (int i=0;i<imgActor.length;i++) playSpr(i,0,false);
+        if (surprise<0) {for(int i=0;i<(pMb.length/2)-difference;i++)Player[pMb[i]].active=false;endTurn();}
+        	else if (surprise>0) {for(int i=(pMb.length/2);i<pMb.length;i++)Player[pMb[i]].active=false;endTurn();}
+        		else endTurn();
         refreshTargetBox();
         targetBox.setSelection((pMb.length/2)-difference);
         refreshSkillBox();
@@ -206,7 +205,7 @@ public class BattleAct extends Activity {
         if (target<(pMb.length/2)-difference&&ability.trg==1) {a=0;b=(pMb.length/2)-1;}        
         if (ability.trg==-1) {a=current;b=current;}
         updText.append("\n"+Player[pMb[current]].name + " performs " + ability.name);
-        playSpr(current,2);
+        playSpr(current,3,false);
         Player[pMb[current]].hp -= ability.hpc;
         Player[pMb[current]].mp -= ability.mpc;
         Player[pMb[current]].sp -= ability.spc;
@@ -219,13 +218,13 @@ public class BattleAct extends Activity {
         		trg=current;
         	}
         	//trg=(Player[pMb[i]].reflect&&ability.dmgtype==2)?current:i;
-        	if (trg!=current) playSpr(i,3);
+        	if (trg!=current) playSpr(i,1,true);
         	updText.append(ability.execute(Player[pMb[current]], Player[pMb[trg]]));
         	if (Player[pMb[trg]].hp<1)
-            	playSpr(trg,1);
+            	playSpr(trg,2,false);
         }        
         if (Player[pMb[current]].hp<1)
-        	playSpr(current,1);
+        	playSpr(current,2,false);
     	if (current<(pMb.length/2)-difference) {Player[pMb[current]].exp++; Player[pMb[current]].levelUp();}
     	updText.append(".");
     }
@@ -301,7 +300,7 @@ public class BattleAct extends Activity {
         	for (int i=0;i<pMb.length;i++)
             	if (Player[pMb[i]].hp>0){
             		updText.append(Player[pMb[i]].applyState(true));
-            		if (Player[pMb[i]].hp<1) playSpr(i,1);
+            		if (Player[pMb[i]].hp<1) playSpr(i,2,false);
             	}
         }
     	//for (current=0;!Player[pMb[current]].active;current++){}
@@ -371,35 +370,16 @@ public class BattleAct extends Activity {
     	dialog.show();
     }
     
-    private void playSpr(final int c, final int s){
-    	if (!Player[pMb[c]].bSprite[0].startsWith("b__")){
-    	AnimationDrawable sprAnim=new AnimationDrawable();
-    	int a,b;
-    	boolean reverse=(c>(pMb.length/2)-1&&!surprised)||(c<(pMb.length/2)&&surprised);
-    	switch (s){
-    	  	case 2:
-    	   		a=0;
-    	   		b=7;
-    	   	break;
-    	   	case 3:
-    	   		a=8;
-    	   		b=13;
-    	   	break;
-    	   	case 1:
-    	   		a=14;
-    	   		b=21;
-    	   	break;
-    	   	default:
-    	   		a=8;
-    	   		b=8;
-    	   	}
-    	   	if (reverse) {a+=22;b+=22;}
-    		for (int i=a;i<=b;i++){sprAnim.addFrame(Player[pMb[c]].getBtSprite(i,this), 87);    		
+    private void playSpr(int c, int s, boolean bkw){
+    	if (s>3) s=-1;
+    	String pos;
+    	if (Player[pMb[c]].bsprite!=""){    		
+    		if ((c>(pMb.length/2)-1&&!surprised)||(c<(pMb.length/2)&&surprised))
+    			pos="r"; else pos="l";
+    		AnimationDrawable sprAnim=Player[pMb[c]].getBtSprite(s, pos, bkw, this);
+    		imgActor[c].setImageDrawable(sprAnim);
+    		sprAnim.start(); sprAnim.setOneShot(true);
     	}
-    	if (s>1) {a=(reverse)?30:8;sprAnim.addFrame(Player[pMb[c]].getBtSprite(a,this), 0);}
-		imgActor[c].setImageDrawable(sprAnim);
-		sprAnim.start();
-		sprAnim.setOneShot(true);}
     }
     
     private boolean imgClick(int i){
@@ -460,13 +440,9 @@ public class BattleAct extends Activity {
     		if (act) endTurn();
     	}
     };
-    
+        
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-         if (keyCode == KeyEvent.KEYCODE_BACK) {
-        	 endBt(-1);
-         return true;
-         }
-         return super.onKeyDown(keyCode, event);    
+    public void onBackPressed(){
+    	endBt(-1);
     }
 }

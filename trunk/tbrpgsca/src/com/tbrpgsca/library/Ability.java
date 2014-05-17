@@ -33,23 +33,26 @@ public class Ability {
                 default:
                    dmg += (this.atki*user.atk)/(target.def*res+1);
             }            
-            int dmghp = (hpdmg!=0) ? (dmg + this.hpdmg) : 0;
-            int dmgmp = (mpdmg!=0) ? (dmg + this.mpdmg) : 0;
-            int dmgsp = (spdmg!=0) ? (dmg + this.spdmg) : 0;
-            if (res<0) {dmghp=-dmghp;dmgmp=-dmgmp;dmgsp=-dmgsp;}
-            target.hp -= dmghp;
-            target.mp -= dmgmp;
-            target.sp -= dmgsp;
-            if (absorb) {
+            if (dmgtype==2||dmgtype==3||(dmgtype!=4&&(int) (Math.random() * 13+user.agi/5)>2+target.agi/4)
+            		||(dmgtype==4&&(int) (Math.random() * 13+user.agi/3)>2+target.agi/4))
+            {
+            	int dmghp = (hpdmg!=0) ? (dmg + this.hpdmg) : 0;
+            	int dmgmp = (mpdmg!=0) ? (dmg + this.mpdmg) : 0;
+            	int dmgsp = (spdmg!=0) ? (dmg + this.spdmg) : 0;
+            	if (res<0) {dmghp=-dmghp;dmgmp=-dmgmp;dmgsp=-dmgsp;}
+            	target.hp -= dmghp;
+            	target.mp -= dmgmp;
+            	target.sp -= dmgsp;
+            	if (absorb) {
                 user.hp += dmghp;
                 user.mp += dmgmp;
                 user.sp += dmgsp;
-            }
-            boolean c=false;
-            if (dmghp!=0||dmgmp!=0||dmgsp!=0) s+=(", " + target.name+" suffers");            
-            if (dmghp!=0) {s+=(" "); if (dmghp<1) s+="+"; s+=-dmghp + " HP";  c=true;}
-            if (dmgmp!=0) {if (c) s+=","; s+=" "; if (dmgmp<1) s+="+"; s+=-dmgmp + " MP"; c=true;}
-            if (dmgsp!=0) {if (c) s+=","; s+=" "; if (dmgsp<1) s+="+"; s+=-dmgsp + " SP";}
+            	}
+            	boolean c=false;
+            	if (dmghp!=0||dmgmp!=0||dmgsp!=0) s+=(", " + target.name+" suffers");            
+            	if (dmghp!=0) {s+=(" "); if (dmghp<1) s+="+"; s+=-dmghp + " HP";  c=true;}
+            	if (dmgmp!=0) {if (c) s+=","; s+=" "; if (dmgmp<1) s+="+"; s+=-dmgmp + " MP"; c=true;}
+            	if (dmgsp!=0) {if (c) s+=","; s+=" "; if (dmgsp<1) s+="+"; s+=-dmgsp + " SP";}
             
             for (int i=1;i<this.state.length;i++) 
             	if (this.state[i])
@@ -59,6 +62,7 @@ public class Ability {
             	if (this.rstate[i]) {
             		target.state[i-1].remove();
             	}
+            } else s+=", but misses";
 
             s+=target.applyState(false);
             s+=user.checkStatus();
