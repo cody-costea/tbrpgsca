@@ -47,7 +47,7 @@ public class DemoAct extends Activity {
 		jobBox[2]=(Spinner)findViewById(R.id.JobBox3);
 		for (int i=0;i<data.pcJob.length;i++) jobList.add(data.pcJob[i].jname);
 		for (int i=0;i<3;i++) jobBox[i].setAdapter(jobList);
-		jobBox[0].setSelection(7);
+		jobBox[0].setSelection(0);
 		jobBox[1].setSelection(5);
 		jobBox[2].setSelection(3);
 		name[0]=(EditText)findViewById(R.id.NameField1);
@@ -87,10 +87,8 @@ public class DemoAct extends Activity {
 			}
 		data.Player[p].name=n;
 		if (raceBox[p-1].isEnabled())
-			data.Player[p].setRace(data.pcRace[raceBox[p-1].getSelectedItemPosition()], true);
-		for (int i=0;i<data.Player[p].skill.size();i++)
-			if (data.Skill[data.Player[p].skill.get(i)].lvrq>2) data.Player[p].skill.remove(i);
-		data.Player[p].changeJob(data.pcJob[jobBox[p-1].getSelectedItemPosition()], false);
+			data.Player[p].setRace(data.pcRace[raceBox[p-1].getSelectedItemPosition()], true);		
+		data.Player[p].changeJob(data.pcJob[jobBox[p-1].getSelectedItemPosition()], true);
 		raceBox[p-1].setEnabled(false);
 	}
 	

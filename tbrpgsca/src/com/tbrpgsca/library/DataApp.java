@@ -143,7 +143,7 @@ public class DataApp extends Application {
         pcJob[6].skill.add(44);        
         pcJob[6].skill.add(50);        
 
-        pcJob[7]=new Job("Paladin",1,0,0, 0,1,0,1,0);
+        pcJob[7]=new Job("Knight",1,0,0, 0,1,0,1,0);
         pcJob[7].skill.add(2);
         pcJob[7].skill.add(3);
         pcJob[7].skill.add(4);
@@ -209,10 +209,6 @@ public class DataApp extends Application {
         pcJob[13].skill.add(3);
         pcJob[13].skill.add(4);
         pcJob[13].skill.add(23);
-        pcJob[13].skill.add(25);
-        pcJob[13].skill.add(26);
-        pcJob[13].skill.add(27);
-        pcJob[13].skill.add(28);
         pcJob[13].skill.add(36);
         pcJob[13].skill.add(37);
         pcJob[13].skill.add(47);
@@ -312,12 +308,12 @@ public class DataApp extends Application {
         ability[5]=new Ability("Clarity", true,true, 3, 0,0,7, 3,-1, 0,-3,0, 0,6, false, clarity, madness);
         ability[6]=new Ability("Prayer", false,true, 5, 0,7,0, 3,-1, -23,0,0, 1,6, false, revive, nstate);
         ability[7]=new Ability("Regen", false,true, 4, 0,10,0, 3,-1, -37,0,0, 0,6, false, rvregen, poison);
-        ability[8]=new Ability("Smite", true,false, 1, 1,0,2, 1,1, 10,1,0, 0,1, false, nstate, confsleep);
+        ability[8]=new Ability("Smite", true,false, 1, 1,0,2, 1,1, 4,3,0, 0,1, false, nstate, confclarity);
         ability[9]=new Ability("Hit", true,false, 1, 3,0,1, 0,1, 12,0,0, 0,1, false, nstate, confsleep);
-        ability[10]=new Ability("Bash", true,false, 3, 3,0,5, 1,1, 15,3,0, 0,1, false, nstate, confclarity);
+        ability[10]=new Ability("Bash", true,false, 3, 3,0,5, 1,1, 7,5,0, 0,1, false, dizziness, confclarity);
         ability[11]=new Ability("Smash", true,false, 3, 5,0,3, 0,1, 18,0,1, 0,1, false, nstate, confsleep);
-        ability[12]=new Ability("Berserk", true,false, 4, 7,0,4, 0,1, 0,0,0, -1,0, false, berserk, weakness);
-        ability[13]=new Ability("Shock", true,false, 4, 4,0,7, 6,1, 20,5,0, 0,7, false, dizzystun, confclarity);
+        ability[12]=new Ability("Berserk", true,false, 4, 7,0,4, 3,1, 0,0,0, -1,0, false, berserk, weakness);
+        ability[13]=new Ability("Shock", true,false, 4, 4,0,7, 1,1, 10,5,0, 0,7, false, dizzystun, confclarity);
         ability[14]=new Ability("Crush", true,false, 5, 7,4,0, 0,1, 25,0,2, 0,1, false, stun, confsleep);
         ability[15]=new Ability("Strike", true,true, 1, 0,0,3, 4,1, 13,0,0, 0,1, false, nstate, confsleep);
         ability[16]=new Ability("Weaken", true,true, 1, 0,0,3, 4,1, 3,0,9, 0,1, false, weakness, vigour);
@@ -351,10 +347,10 @@ public class DataApp extends Application {
         ability[44]=new Ability("Stone Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,5, false, nstate, confsleep);
         ability[45]=new Ability("Dark Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,6, false, nstate, confsleep);
         ability[46]=new Ability("Vampiric Wpn", true,false, 5, 0,10,5, 5,1, 21,0,0, 0,6, true, nstate, confsleep);
-        ability[47]=new Ability("Reflect", true,true, 5, 0,10,0, 3,1, 0,0,0, 0,7, false, nstate, reflect);
+        ability[47]=new Ability("Reflect", true,true, 5, 0,10,0, 3,1, 0,0,0, 0,0, false, reflect, nstate);
         ability[48]=new Ability("Meteor", true,true, 5, 0,17,0, 2,1, 19,0,0, 1,1, false, nstate, sleep);
-        ability[49]=new Ability("Syphon", true,true, 5, 0,15,0, 2,1, 13,0,3, 1,6, true, nstate, nstate);
-        ability[50]=new Ability("Dragon Breath", true,false, 4, 0,13,7, 5,1, 17,0,0, 1,1, true, nstate, confsleep);
+        ability[49]=new Ability("Syphon", true,true, 4, 0,15,0, 2,1, 13,0,3, 1,6, true, nstate, nstate);
+        ability[50]=new Ability("Dragon Breath", true,false, 4, 0,13,7, 5,1, 17,0,0, 1,1, false, nstate, confsleep);
         
         return ability;
     }
@@ -380,12 +376,12 @@ public class DataApp extends Application {
     	State state[] = new State[11];
     	
     	state[0]=new State("Regen", false,false,false, -1, 10,0,0, 0,2,0,0,0, false);
-    	state[1]=new State("Poison", false,false,false, -1, -7,0,-3, 0,-2,0,0,0, false);
-    	state[2]=new State("Clarity", false,false,false, -1, 0,10,0, 0,0,1,1,0, false);
-    	state[3]=new State("Dizziness", false,false,false, -1, 0,-10,0, 0,0,-1,-1,0, false);
-    	state[4]=new State("Vigour", false,false,false, -1, 0,0,10, 1,0,0,0,1, false);
-    	state[5]=new State("Weakness", false,false,false, -1, 0,0,-10, -1,0,0,0,-1, false);
-    	state[6]=new State("Berserk", false,true,false, 7, 0,-100,0, 5,-3,0,0,3, false);
+    	state[1]=new State("Poison", false,false,false, 10, -7,0,-2, 0,-2,0,0,0, false);
+    	state[2]=new State("Clarity", false,false,false, -1, 0,7,0, 0,0,1,1,0, false);
+    	state[3]=new State("Dizziness", false,false,false, 3, 0,-7,0, 0,0,-1,-1,0, false);
+    	state[4]=new State("Vigour", false,false,false, -1, 0,0,7, 1,0,0,0,1, false);
+    	state[5]=new State("Weakness", false,false,false, 5, 0,0,-7, -1,0,0,0,-1, false);
+    	state[6]=new State("Berserk", false,true,false, 7, 0,0,0, 5,-3,0,0,3, false);
     	state[7]=new State("Confusion", false,false,true, 3, 0,0,0, 0,0,0,0,0, false);
     	state[8]=new State("Sleep", true,false,false, 5, 0,0,0, 0,-3,0,0,-3, false);
     	state[9]=new State("Stun", true,false,false, 1, 0,0,0, 0,-1,0,0,-1, false);

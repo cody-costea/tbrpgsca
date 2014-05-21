@@ -18,18 +18,25 @@ public class Ability {
             switch (dmgtype) {
                 case 1:
                    dmg += ((this.atki*user.def/2)+user.atk/2)/(target.def*res+1);
+                   break;
                 case 3:
                    dmg += (this.atki*user.wis)/(target.spi*res+1);
+                   break;
                 case 2:
                    dmg += (this.atki*user.spi)/(target.wis*res+1);
+                   break;
                 case 4:
                    dmg += ((this.atki*user.agi/2)+user.atk/2)/((target.agi/2+target.def/2)*res+1);
+                   break;
                 case 5:
                     dmg += ((this.atki*user.wis/2)+user.atk/2)/((target.spi/2+target.def/2)*res+1);
+                    break;
                 case 6:
                     dmg += ((this.atki*user.agi/2)+user.wis/2)/((target.agi/2+target.spi/2)*res+1);
+                    break;
                 case 7:
                     dmg += ((this.atki*user.spi/2)+user.atk/2)/((target.wis/2+target.def/2)*res+1);
+                    break;
                 default:
                    dmg += (this.atki*user.atk)/(target.def*res+1);
             }            
