@@ -40,25 +40,30 @@ public class Job extends Race {
         this.agip = agip;
     }
         
-    public AnimationDrawable getBtSprite(int i, String pos, boolean bkw, Activity context){
-    	Bitmap bmp=null; int h=128,w=h,nr=7; //System.gc();
+    public AnimationDrawable getBtSprite(int i, String pos, boolean bkw, int[] time, Activity context){
+    	Bitmap bmp=null; int h=128,w=h,nr=7; if (i>2) time[1]=0;//System.gc();
     	AnimationDrawable sprite=new AnimationDrawable();
-    	BitmapFactory.Options opt = new BitmapFactory.Options();
-    	//opt.inPurgeable=true;opt.inDither=false;opt.inSampleSize=1;
+    	/*BitmapFactory.Options opt = new BitmapFactory.Options();
+    	opt.inPurgeable=true;opt.inDither=false;opt.inSampleSize=1;*/
     	if (i>0) { 
-    		bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_"+i+"_"+pos, "drawable", context.getPackageName()),opt);
+    		bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_"+i+"_"+pos, "drawable", context.getPackageName())/*,opt*/);
     		h=bmp.getHeight();nr=bmp.getWidth()/h;w=bmp.getWidth()/nr;    		
-    		for (int j=0;j<nr;j++)
-    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),(i!=1||j!=0)?87:261);
-    		for (int j=nr-2;bkw&&j>0;j--)
+    		for (int j=0;j<nr;j++){
+    			int t=(i!=1||j!=0)?87:261;
+    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),t);
+    			if (i>2) time[1]+=t;
+    		}
+    		for (int j=nr-2;bkw&&j>0;j--){
     			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),87);
+    			if (i>2) time[1]+=87;
+    		}
     	}
     	if (i!=2) {
     		if (i!=1) {
-    			bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_1_"+pos, "drawable", context.getPackageName()),opt);
+    			bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_1_"+pos, "drawable", context.getPackageName())/*,opt*/);
     			h=bmp.getHeight();nr=bmp.getWidth()/h;w=bmp.getWidth()/nr;
     		}
-    		sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, w, h)),1);
+    		sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, w, h)),0);
     	}
     	bmp.recycle(); return sprite;
     }
