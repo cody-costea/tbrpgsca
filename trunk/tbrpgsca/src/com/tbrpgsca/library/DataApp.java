@@ -92,7 +92,7 @@ public class DataApp extends Application {
         pcJob[4].skill.add(17);
         pcJob[4].skill.add(18);
         pcJob[4].skill.add(22);
-        pcJob[4].skill.add(38);
+        pcJob[4].skill.add(39);
 
         pcJob[10]=new Job("Swashbuckler",0,0,1, 1,0,0,0,1);
         pcJob[10].skill.add(8);
@@ -335,7 +335,7 @@ public class DataApp extends Application {
         ability[32]=new Ability("Storm", true,true, 3, 0,5,0, 2,1, 15,0,0, 1,4, false, nstate, sleep);
         ability[33]=new Ability("Earthquake", true,true, 3, 0,5,0, 2,1, 15,0,0, 1,5, false, nstate, sleep);
         ability[34]=new Ability("Eclipse", true,true, 3, 0,5,0, 2,1, 13,0,0, 1,6, false, nstate, sleep);
-        ability[35]=new Ability("Flare", true,true, 5, 0,12,0, 2,2, 25,0,0, 0,1, false, nstate, sleep);
+        ability[35]=new Ability("Flare", true,true, 4, 0,12,0, 2,2, 25,0,0, 0,1, false, nstate, sleep);
         ability[36]=new Ability("Light Ray", true,true, 1, 0,3,0, 3,1, 11,0,0, 0,7, false, nstate, sleep);
         ability[37]=new Ability("Sacred Fire", true,true, 3, 0,5,0, 3,1, 15,0,0, 1,7, false, nstate, sleep);
         ability[38]=new Ability("Confusion", true,true, 5, 0,15,0, 2,1, 0,0,0, 0,6, false, confusion, clarity);
@@ -381,7 +381,7 @@ public class DataApp extends Application {
     	state[3]=new State("Dizziness", false,false,false, 3, 0,-7,0, 0,0,-1,-1,0, false);
     	state[4]=new State("Vigour", false,false,false, -1, 0,0,7, 1,0,0,0,1, false);
     	state[5]=new State("Weakness", false,false,false, 5, 0,0,-7, -1,0,0,0,-1, false);
-    	state[6]=new State("Berserk", false,true,false, 7, 0,0,0, 5,-3,0,0,3, false);
+    	state[6]=new State("Berserk", false,true,false, 7, 0,-100,15, 5,-3,0,0,3, false);
     	state[7]=new State("Confusion", false,false,true, 3, 0,0,0, 0,0,0,0,0, false);
     	state[8]=new State("Sleep", true,false,false, 5, 0,0,0, 0,-3,0,0,-3, false);
     	state[9]=new State("Stun", true,false,false, 1, 0,0,0, 0,-1,0,0,-1, false);

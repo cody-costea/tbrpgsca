@@ -25,7 +25,7 @@ public class DemoAct extends Activity {
 	Spinner jobBox[]=new Spinner[3],raceBox[]=new Spinner[3];
 	ArrayAdapter<String> jobList, raceList;
 	Button Begin,About,Exit;
-	int level=0;
+	int level=0;	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
