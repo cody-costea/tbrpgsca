@@ -41,7 +41,7 @@ public class Job extends Race {
     }
         
     public AnimationDrawable getBtSprite(int i, String pos, boolean bkw, int[] time, Activity context){
-    	Bitmap bmp=null; int h=128,w=h,nr=7; if (i>2) time[1]=0;//System.gc();
+    	Bitmap bmp=null; int h=128,w=h,nr=7,s=i>2?1:2; time[s]=0;//System.gc();
     	AnimationDrawable sprite=new AnimationDrawable();
     	/*BitmapFactory.Options opt = new BitmapFactory.Options();
     	opt.inPurgeable=true;opt.inDither=false;opt.inSampleSize=1;*/
@@ -51,19 +51,24 @@ public class Job extends Race {
     		for (int j=0;j<nr;j++){
     			int t=(i!=1||j!=0)?87:261;
     			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),t);
-    			if (i>2) time[1]+=t;
+    			time[s]+=t;
     		}
     		for (int j=nr-2;bkw&&j>0;j--){
     			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*w, 0, w, h)),87);
-    			if (i>2) time[1]+=87;
+    			time[s]+=87;
     		}
     	}
-    	if (i!=2) {
+    	if (i!=2&&i>=0) {
     		if (i!=1) {
     			bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_1_"+pos, "drawable", context.getPackageName())/*,opt*/);
     			h=bmp.getHeight();nr=bmp.getWidth()/h;w=bmp.getWidth()/nr;
     		}
     		sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, w, h)),0);
+    	}
+    	if (i<0){
+    		bmp = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_2_"+pos, "drawable", context.getPackageName())/*,opt*/);
+			h=bmp.getHeight();nr=bmp.getWidth()/h;w=bmp.getWidth()/nr;
+			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, (nr-1)*w, 0, w, h)),0);
     	}
     	bmp.recycle(); return sprite;
     }

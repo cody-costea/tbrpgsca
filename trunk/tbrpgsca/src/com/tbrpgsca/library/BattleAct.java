@@ -24,18 +24,16 @@ public class BattleAct extends Activity {
 	Actor[] Player;
     Ability[] Skill;
     Ability[] Item;
-    int pMb[] = {0,0,0,0, 0,0,0,0},waitTime[]={0,0};
+    int pMb[] = {0,0,0,0, 0,0,0,0},waitTime[]={0,0,0};
     int target,difference,current=pMb.length-1,result=0;
     
-    boolean surprised=false,waiting=false;
+    boolean surprised=false;
     
     Spinner targetBox, skillBox,itemBox;
     ArrayAdapter<String> targetList,skillList,itemList;
     TextView skillCost, updText;
     Button Act,Use,Auto,Escape;
-    ImageView imgActor[] = new ImageView[8];
-    
-    AnimationDrawable sprAnim;
+    ImageView imgActor[] = new ImageView[8];    
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +107,7 @@ public class BattleAct extends Activity {
     	int k=0;
     	for (int i=Player.length-4;i<Player.length;i++)
     		{Player[i].copy(Player[enemy[k]]);Player[i].auto=2;k++;pMb[j]=i;j++;}    	
-        for (int i=0;i<imgActor.length;i++) {imgActor[i].setOnClickListener(cAction);playSpr(i,0,false);}
+        for (int i=0;i<imgActor.length;i++) {imgActor[i].setOnClickListener(cAction);imgActor[i].setTag(0);playSpr(i,Player[pMb[i]].hp>0?0:-1,false);}
         if (surprise<0) {for(int i=0;i<(pMb.length/2)-difference;i++)Player[pMb[i]].active=false;endTurn();}
         	else if (surprise>0) {for(int i=(pMb.length/2);i<pMb.length;i++)Player[pMb[i]].active=false;endTurn();}
         		else endTurn();
@@ -201,19 +199,18 @@ public class BattleAct extends Activity {
         Player[pMb[current]].mp -= ability.mpc;
         Player[pMb[current]].sp -= ability.spc;
         if (ability.qty>0) ability.qty--;
-        int trg;
+        int trg;boolean act=true;
     	for (int i=a;i<=b;i++) if (Player[pMb[i]].hp>0||ability.state[0]){        	
         	if (Player[pMb[i]].reflect&&ability.dmgtype==2) {
         		updText.append(", which is reflected");
         		trg=current;
         	} else trg=i;
-        	if (i==a) playSpr(current,3,false);
-        	if (trg!=current) playSpr(trg,1,true);
-        	waitTime[0]=waitTime[1];
+        	if (act) {playSpr(current,3,false);act=false;}
         	updText.append(ability.execute(Player[pMb[current]], Player[pMb[trg]]));
-        	if (current!=trg&&Player[pMb[trg]].hp<1)
-            	playSpr(trg,2,false);
-        }        
+        	boolean ko=Player[pMb[trg]].hp<1;
+        	if (trg!=current) playSpr(trg,ko?2:1,ko?false:true);        	
+        }
+    	waitTime[0]=waitTime[1]>waitTime[2]?waitTime[1]:waitTime[2];
         if (Player[pMb[current]].hp<1)
         	playSpr(current,2,false);
     	if (current<(pMb.length/2)-difference) {Player[pMb[current]].exp++; Player[pMb[current]].levelUp();}
@@ -365,14 +362,16 @@ public class BattleAct extends Activity {
     		final String pos=((c>(pMb.length/2)-1&&!surprised)||(c<(pMb.length/2)&&surprised))?"r":"l";    		
     		final AnimationDrawable sprAnim=Player[pMb[c]].getBtSprite(s, pos, bkw, waitTime, this);    		
     		imgActor[c].postDelayed(new Runnable(){
-						@Override
-						public void run() {							
-				    		sprAnim.setOneShot(true);				    		
-		    				imgActor[c].setImageDrawable(sprAnim);
-							sprAnim.start();
-						}					
+				@Override
+				public void run() {
+					if (Player[pMb[c]].hp>0||s<3||!imgActor[c].getTag().equals(2)){
+						sprAnim.setOneShot(true);				    		
+						imgActor[c].setImageDrawable(sprAnim);
+						sprAnim.start();
+				   		imgActor[c].setTag(s);
+					}
+				}					
     		}, waitTime[0]);
-    		//imgActor[c].setTag(s);
     	} 	 
     }
     
