@@ -20,7 +20,7 @@ import com.tbrpgsca.library.DataApp;
 import com.tbrpgsca.library.R;
 
 public class DemoAct extends Activity {
-	DataApp data;	
+	//DataApp data;	
 	EditText name[]=new EditText[3];
 	Spinner jobBox[]=new Spinner[3],raceBox[]=new Spinner[3];
 	ArrayAdapter<String> jobList, raceList;
@@ -31,13 +31,13 @@ public class DemoAct extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_demo);
-		data=(DataApp)this.getApplication();
+		//data=(DataApp)this.getApplication();
 		raceList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
 		jobList=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item);
 		raceBox[0]=(Spinner)findViewById(R.id.RaceBox1);
 		raceBox[1]=(Spinner)findViewById(R.id.RaceBox2);
 		raceBox[2]=(Spinner)findViewById(R.id.RaceBox3);
-		for (int i=0;i<data.pcRace.length;i++) raceList.add(data.pcRace[i].rname);
+		for (int i=0;i<DataApp.pcRace.length;i++) raceList.add(DataApp.pcRace[i].rname);
 		for (int i=0;i<3;i++) raceBox[i].setAdapter(raceList);
 		raceBox[0].setSelection(1);
 		raceBox[1].setSelection(0);
@@ -45,7 +45,7 @@ public class DemoAct extends Activity {
 		jobBox[0]=(Spinner)findViewById(R.id.JobBox1);
 		jobBox[1]=(Spinner)findViewById(R.id.JobBox2);
 		jobBox[2]=(Spinner)findViewById(R.id.JobBox3);
-		for (int i=0;i<data.pcJob.length;i++) jobList.add(data.pcJob[i].jname);
+		for (int i=0;i<DataApp.pcJob.length;i++) jobList.add(DataApp.pcJob[i].jname);
 		for (int i=0;i<3;i++) jobBox[i].setAdapter(jobList);
 		jobBox[0].setSelection(0);
 		jobBox[1].setSelection(5);
@@ -59,9 +59,9 @@ public class DemoAct extends Activity {
 		Begin.setOnClickListener(cAction);
 		About.setOnClickListener(cAction);
 		Exit.setOnClickListener(cAction);
-		data.party[0]=1;data.party[1]=2;data.party[2]=3;data.party[3]=0;
-		for (int i=0;i<data.Item.length;i++)
-			data.Item[i].qty=5;		
+		DataApp.party[0]=1;DataApp.party[1]=2;DataApp.party[2]=3;DataApp.party[3]=0;
+		for (int i=0;i<DataApp.Item.length;i++)
+			DataApp.Item[i].qty=5;		
 	}
 	
 	@Override
@@ -85,10 +85,10 @@ public class DemoAct extends Activity {
 				n="Stephen";
 				break;
 			}
-		data.Player[p].name=n;
+		DataApp.Player[p].name=n;
 		if (raceBox[p-1].isEnabled())
-			data.Player[p].setRace(data.pcRace[raceBox[p-1].getSelectedItemPosition()], true);		
-		data.Player[p].changeJob(data.pcJob[jobBox[p-1].getSelectedItemPosition()], true);
+			DataApp.Player[p].setRace(DataApp.pcRace[raceBox[p-1].getSelectedItemPosition()], true);		
+		DataApp.Player[p].changeJob(DataApp.pcJob[jobBox[p-1].getSelectedItemPosition()], true);
 		raceBox[p-1].setEnabled(false);
 	}
 	
@@ -103,7 +103,7 @@ public class DemoAct extends Activity {
 		if (level==2) btInt.putExtra("Surprise", 1);
 		btInt.putExtra("Enemy", level);
 		startActivityForResult(btInt, 1);
-		for (int i=1;i<data.Player.length;i++) data.Player[i].recover();
+		for (int i=1;i<DataApp.Player.length;i++) DataApp.Player[i].recover();
 	}
 	
 	private OnClickListener cAction = new OnClickListener() {

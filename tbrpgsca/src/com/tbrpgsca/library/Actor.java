@@ -29,11 +29,7 @@ public class Actor extends Job {
         this.jobStats(job.hpp,job.mpp,job.spp, job.atkp,job.defp,job.wisp,job.spip,job.agip);
         for (int i=0;i<res.length;i++)
 			{this.mres[i]+=job.resm[i];checkRes(i);}
-        if (init) {
-        	this.skill.clear();
-        	this.skill.add(0);
-        	this.skill.add(1);
-        }
+        if (init) this.removeSkills();
         
         for (int i=0;i<job.skill.size();i++) {
         	if (!this.skill.contains(job.skill.get(i))) 
@@ -110,11 +106,18 @@ public class Actor extends Job {
             int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip){
     	super(jname, hpp,mpp,spp, atkp,defp,wisp,spip,agip);
     	this.name = name;
-        //this.jname = jname;
         this.rname=race;
         this.raceStats(maxhp,maxmp,maxsp, atk,def,wis,spi,agi);
-        //this.jobStats(hpp,mpp,spp, atkp,defp,wisp,spip,agip);
         stats(lv,maxlv);        
+    }
+    
+    public Actor(String name, String race, String jname, int lv, int maxlv,
+            int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi,
+            int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp,
+            int spip, int agip,int[] newSkill){
+    	this(name, race, jname, lv, maxlv, maxhp,maxmp,maxsp, atk,def,wis,spi,agi,
+    			hpp,mpp,spp,atkp,defp,wisp,spip,agip);
+    	this.addSkills(newSkill);
     }
     
     private void stats(int lv,int maxlv){
