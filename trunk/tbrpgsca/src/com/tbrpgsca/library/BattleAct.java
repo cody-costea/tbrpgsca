@@ -3,6 +3,8 @@
  */
 package com.tbrpgsca.library;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,11 +23,11 @@ import android.widget.TextView;
 
 public class BattleAct extends Activity {
 
-	Actor[] Player;
-    Ability[] Skill;
-    Ability[] Item;
-    int pMb[] = {0,0,0,0, 0,0,0,0},waitTime[]={0,0,0};
-    int target,difference,current=pMb.length-1,result=0;
+	Ability[] Skill = DataApp.Skill;
+    Ability[] Item = DataApp.Item;
+    Actor[] Player = {null,null,null,null,null,null,null,null};
+    int target,difference,current=Player.length-1,result=0;
+    int waitTime[]={0,0,0};
     
     boolean surprised=false;
     
@@ -33,7 +35,10 @@ public class BattleAct extends Activity {
     ArrayAdapter<String> targetList,skillList,itemList;
     TextView skillCost, updText;
     Button Act,Use,Auto,Escape;
-    ImageView imgActor[] = new ImageView[8];    
+    ImageView imgActor[] = new ImageView[8];
+    
+    ArrayList<Integer> skillId=new ArrayList<Integer>();
+    ArrayList<Integer> itemId=new ArrayList<Integer>();
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +64,10 @@ public class BattleAct extends Activity {
 		Escape.setOnClickListener(cAction);
 		Auto.setOnClickListener(cAction);
 		updText.setMovementMethod(new ScrollingMovementMethod());
-		DataApp data=(DataApp)this.getApplication();
-		Player = data.Player;
-	    Skill = data.Skill;
-	    Item = data.Item;
-	    Bundle extra = getIntent().getExtras();	    
+		Bundle extra = getIntent().getExtras();	    
 	    Escape.setEnabled((extra!=null&&extra.containsKey("Escape"))?extra.getBoolean("Escape"):true);
 	    int e=(extra!=null&&extra.containsKey("Enemy"))?extra.getInt("Enemy"):0;
-        beginBattle(data.party,data.enemy[e],(extra!=null&&extra.containsKey("Surprise"))?extra.getInt("Surprise"):0);
+        beginBattle(DataApp.party,DataApp.enemy[e],(extra!=null&&extra.containsKey("Surprise"))?extra.getInt("Surprise"):0);
 	}
 
 	@Override
@@ -99,20 +100,19 @@ public class BattleAct extends Activity {
     	}
     	difference=0;
     	int j=0;
-    	for (int i=0;i<pMb.length;i++) pMb[i]=0;
-    	for (int i=0;i<party.length;i++)
-    		if (Player[party[i]].maxhp>0) {pMb[j]=party[i];j++;}
-    		else difference++;
-    	j=party.length;
-    	int k=0;
-    	for (int i=Player.length-4;i<Player.length;i++)
-    		{Player[i].copy(Player[enemy[k]]);Player[i].auto=2;k++;pMb[j]=i;j++;}    	
-        for (int i=0;i<imgActor.length;i++) {imgActor[i].setOnClickListener(cAction);imgActor[i].setTag(0);playSpr(i,Player[pMb[i]].hp>0?0:-1,false);}
-        if (surprise<0) {for(int i=0;i<(pMb.length/2)-difference;i++)Player[pMb[i]].active=false;endTurn();}
-        	else if (surprise>0) {for(int i=(pMb.length/2);i<pMb.length;i++)Player[pMb[i]].active=false;endTurn();}
+    	for (int i=0;i<party.length;i++){
+    		Player[j]=DataApp.Player[party[i]];
+    		if (Player[j].maxhp<1) difference++;
+    		j++;
+    	}
+    	for (int k=0;k<enemy.length;k++)
+    		{Player[j]=new Actor();Player[j].copy(DataApp.Player[enemy[k]]);Player[j].auto=2;j++;}    	
+        for (int i=0;i<imgActor.length;i++) {imgActor[i].setOnClickListener(cAction);imgActor[i].setTag(0);playSpr(i,Player[i].hp>0?0:-1,false);}
+        if (surprise<0) {for(int i=0;i<(Player.length/2)-difference;i++)Player[i].active=false;endTurn();}
+        	else if (surprise>0) {for(int i=(Player.length/2);i<Player.length;i++)Player[i].active=false;endTurn();}
         		else endTurn();
         refreshTargetBox();
-        targetBox.setSelection((pMb.length/2)-difference);
+        targetBox.setSelection((Player.length/2)-difference);
         refreshSkillBox();
         refreshItemBox();
     }
@@ -120,10 +120,10 @@ public class BattleAct extends Activity {
     private void refreshTargetBox() {
     	targetList.clear();
     	String s;
-        for (int i=0;i<pMb.length;i++) {
-            if (Player[pMb[i]].maxhp>0){
-            	s=Player[pMb[i]].name+" (HP: "+Player[pMb[i]].hp;
-            	if (i<(pMb.length/2)-difference) s+=", MP: "+Player[pMb[i]].mp+", SP: "+Player[pMb[i]].sp;
+        for (int i=0;i<Player.length;i++) {
+            if (Player[i].maxhp>0){
+            	s=Player[i].name+" (HP: "+Player[i].hp;
+            	if (i<(Player.length/2)-difference) s+=", MP: "+Player[i].mp+", SP: "+Player[i].sp;
             	s+=")";
                 targetList.add(s);
             }
@@ -131,23 +131,22 @@ public class BattleAct extends Activity {
         targetList.notifyDataSetChanged();
     }
     private void refreshSkillBox() {
-        skillList.clear();
-        String trg;
-        for (int i=0;i<Player[pMb[current]].skill.size();i++)
-            if (!(Skill[Player[pMb[current]].skill.get(i)].lvrq>Player[pMb[current]].level)&&!(Skill[Player[pMb[current]].skill.get(i)].mpc>Player[pMb[current]].mp)&&
-                    !(Skill[Player[pMb[current]].skill.get(i)].spc>Player[pMb[current]].sp)&&!(Skill[Player[pMb[current]].skill.get(i)].hpc>=Player[pMb[current]].hp)){
-            	trg=(Skill[Player[pMb[current]].skill.get(i)].trg>0)?"All":"Self"; if (Skill[Player[pMb[current]].skill.get(i)].trg==0) trg="One";
-                        skillList.add(Skill[Player[pMb[current]].skill.get(i)].name+" (Rq:" + Skill[Player[pMb[current]].skill.get(i)].hpc + "HP," + Skill[Player[pMb[current]].skill.get(i)].mpc +
-                        		"MP," + Skill[Player[pMb[current]].skill.get(i)].spc + "SP;" + "Trg:"+trg+")");}
+        skillList.clear();skillId.clear();String trg;
+        for (int i=0;i<Player[current].skill.size();i++)
+            if (!(Player[current].skill.get(i).getLvRq()>Player[current].level)&&!(Player[current].skill.get(i).mpc>Player[current].mp)&&
+                    !(Player[current].skill.get(i).spc>Player[current].sp)&&!(Player[current].skill.get(i).hpc>=Player[current].hp)){
+            	trg=(Player[current].skill.get(i).trg>0)?"All":"Self"; if (Player[current].skill.get(i).trg==0) trg="One"; skillId.add(i);
+                        skillList.add(Player[current].skill.get(i).name+" (Rq:" + Player[current].skill.get(i).hpc + "HP," + Player[current].skill.get(i).mpc +
+                        		"MP," + Player[current].skill.get(i).spc + "SP;" + "Trg:"+trg+")");}
         skillList.notifyDataSetChanged();
         if (skillBox.getSelectedItemPosition()>1) skillBox.setSelection(0);
     }
     
     private void refreshItemBox() {
-        itemList.clear();
-        String trg;
+        itemList.clear();itemId.clear();String trg;
         for (int i=0;i<Item.length;i++)
-            if (Item[i].qty>0){trg=(Item[i].trg>0)?"All":"Self"; if (Item[i].trg==0) trg="One";
+            if (Item[i].qty>0){
+            	trg=(Item[i].trg>0)?"All":"Self"; if (Item[i].trg==0) trg="One"; itemId.add(i);
                 itemList.add(Item[i].name+" (Qty:"+Item[i].qty+";" + "Trg:"+trg+")");
         }
         if (itemList.getCount()==0) { Use.setEnabled(false); itemBox.setEnabled(false);}
@@ -155,91 +154,73 @@ public class BattleAct extends Activity {
         itemList.notifyDataSetChanged();
     }    
     
-    private int getSkill() {
-    	int skill=0;
-    	String ability = (String)skillBox.getSelectedItem();
-    	for (int i=0;i<Skill.length;i++)
-            if (ability.startsWith(Skill[i].name))
-            	{skill=i; break;}
-    	return skill;
-    }
-    
-    private int getItem() {
-    	int skill=0;
-    	String ability = (String)itemBox.getSelectedItem();
-    	for (int i=0;i<Item.length;i++)
-    		if (ability.startsWith(Item[i].name))
-            	{skill=i;break;}
-    	return skill;
-    }
-    
     private void executeSkill() {    	
-    	executeSkill(Skill[getSkill()]);
+    	executeSkill(Player[current].skill.get(skillId.get(skillBox.getSelectedItemPosition())));
     }
     
     private void executeSkill(Ability ability) {
-    	if (target==1&&Player[pMb[3]].hp>0&&(Player[pMb[0]].hp>0||Player[pMb[2]].hp>0)&&current>(pMb.length/2)-1&&difference==0&&!ability.range) target=3;
-    	if (target==2&&Player[pMb[0]].hp>0&&(Player[pMb[1]].hp>0||Player[pMb[3]].hp>0)&&current>(pMb.length/2)-1&&difference<2&&!ability.range) target=0;
-    	if (target==4&&Player[pMb[6]].hp>0&&(Player[pMb[5]].hp>0||Player[pMb[7]].hp>0)&&!ability.range) target=6;
-        if (target==7&&(Player[pMb[6]].hp>0||Player[pMb[4]].hp>0)&&Player[pMb[5]].hp>0&&!ability.range) target=5;
-        while ((Player[pMb[target]].hp<1&&ability.hpdmg>0)||(Player[pMb[target]].hp<1&&!ability.state[0]&&!Player[pMb[target]].active)) {
+    	if (target==1&&Player[3].hp>0&&(Player[0].hp>0||Player[2].hp>0)&&current>(Player.length/2)-1&&difference==0&&!ability.range) target=3;
+    	if (target==2&&Player[0].hp>0&&(Player[1].hp>0||Player[3].hp>0)&&current>(Player.length/2)-1&&difference<2&&!ability.range) target=0;
+    	if (target==4&&Player[6].hp>0&&(Player[5].hp>0||Player[7].hp>0)&&!ability.range) target=6;
+        if (target==7&&(Player[6].hp>0||Player[4].hp>0)&&Player[5].hp>0&&!ability.range) target=5;
+        while ((Player[target].hp<1&&ability.hpdmg>0)||(Player[target].hp<1&&!ability.state[0]&&!Player[target].active)) {
         	if (ability.hpdmg<0) target--; else target++;
-        	if (target<0) target=(pMb.length/2)-1-difference;
-            if (target>pMb.length-difference) target=(pMb.length/2)-difference;
+        	if (target<0) target=(Player.length/2)-1-difference;
+            if (target>Player.length-difference) target=(Player.length/2)-difference;
         }
         int a=target,b=target;
         if (ability.trg>1) {a=0;b=6;}
-        if (current>(pMb.length/2)-1-difference&&ability.trg<-1) {a=(pMb.length/2);b=pMb.length-1;}
-        if (current<(pMb.length/2)-difference&&ability.trg<-1) {a=0;b=(pMb.length/2)-1;}
-        if (target>(pMb.length/2)-1-difference&&ability.trg==1) {a=(pMb.length/2);b=pMb.length-1;}
-        if (target<(pMb.length/2)-difference&&ability.trg==1) {a=0;b=(pMb.length/2)-1;}        
+        if (current>(Player.length/2)-1-difference&&ability.trg<-1) {a=(Player.length/2);b=Player.length-1;}
+        if (current<(Player.length/2)-difference&&ability.trg<-1) {a=0;b=(Player.length/2)-1;}
+        if (target>(Player.length/2)-1-difference&&ability.trg==1) {a=(Player.length/2);b=Player.length-1;}
+        if (target<(Player.length/2)-difference&&ability.trg==1) {a=0;b=(Player.length/2)-1;}        
         if (ability.trg==-1) {a=current;b=current;}
-        updText.append("\n"+Player[pMb[current]].name + " performs " + ability.name);
-        Player[pMb[current]].hp -= ability.hpc;
-        Player[pMb[current]].mp -= ability.mpc;
-        Player[pMb[current]].sp -= ability.spc;
+        updText.append("\n"+Player[current].name + " performs " + ability.name);
+        Player[current].hp -= ability.hpc;
+        Player[current].mp -= ability.mpc;
+        Player[current].sp -= ability.spc;
         if (ability.qty>0) ability.qty--;
         int trg;boolean act=true;
-    	for (int i=a;i<=b;i++) if (Player[pMb[i]].hp>0||ability.state[0]){        	
-        	if (Player[pMb[i]].reflect&&ability.dmgtype==2) {
+    	for (int i=a;i<=b;i++) if (Player[i].hp>0||ability.state[0]){        	
+        	if (Player[i].reflect&&ability.dmgtype==2) {
         		updText.append(", which is reflected");
         		trg=current;
         	} else trg=i;
         	if (act) {playSpr(current,3,false);act=false;}
-        	updText.append(ability.execute(Player[pMb[current]], Player[pMb[trg]]));
-        	boolean ko=Player[pMb[trg]].hp<1;
+        	updText.append(ability.execute(Player[current], Player[trg]));
+        	boolean ko=Player[trg].hp<1;
         	if (trg!=current) playSpr(trg,ko?2:1,ko?false:true);        	
         }
     	waitTime[0]=waitTime[1]>waitTime[2]?waitTime[1]:waitTime[2];
-        if (Player[pMb[current]].hp<1)
+        if (Player[current].hp<1)
         	playSpr(current,2,false);
-    	if (current<(pMb.length/2)-difference) {Player[pMb[current]].exp++; Player[pMb[current]].levelUp();}
+    	if (current<(Player.length/2)-difference) {Player[current].exp++; Player[current].levelUp();}
     	updText.append(".");
     }
     
     private void useItem() {
-        executeSkill(Item[getItem()]);
+    	executeSkill(Item[itemId.get(itemBox.getSelectedItemPosition())]);
     }
     
     private void executeAI() {
-    	setAItarget(Skill[getAIskill(checkAIheal())]);
+    	setAItarget(getAIskill(checkAIheal()));
     }
     
     private boolean checkAIheal() {
     	boolean nHeal=false;
-    	int a = (current>(pMb.length/2)-1-difference) ? (pMb.length/2)-difference : 0;
-    	int b = (current<(pMb.length/2)-difference) ? (pMb.length/2)-1-difference : (pMb.length/2)-1-difference;
+    	int a = (current>(Player.length/2)-1-difference) ? (Player.length/2)-difference : 0;
+    	int b = (current<(Player.length/2)-difference) ? (Player.length/2)-1-difference : (Player.length/2)-1-difference;
     	for (int i=a;i<=b;i++)
-    		if (Player[pMb[i]].hp<(Player[pMb[i]].maxhp/3)) {
+    		if (Player[i].hp<(Player[i].maxhp/3)) {
     			nHeal=true;
     			break;
     		}
     	if (nHeal) {
     		nHeal=false;
-    		for (int i=0;i<Player[pMb[current]].skill.size();i++) {
-    			a=Player[pMb[current]].skill.get(i);
-    			if (Skill[a].hpdmg<0&&Skill[a].mpc<=Player[pMb[current]].mp&&Skill[a].hpc<=Player[pMb[current]].hp&&
-        				Skill[a].spc<=Player[pMb[current]].sp&&Player[pMb[current]].level>=Skill[a].lvrq) {
+    		for (int i=0;i<Player[current].skill.size();i++) {
+    			Ability s=Player[current].skill.get(i);
+    			if (s.hpdmg<0&&s.mpc<=Player[current].mp&&s.hpc<=Player[current].hp&&
+        				s.spc<=Player[current].sp&&Player[current].level>=s.getLvRq()) {
     				nHeal=true;break;
     			}
     		}
@@ -247,15 +228,15 @@ public class BattleAct extends Activity {
     	return nHeal;
     }
     
-    private int getAIskill(boolean heal) {
-    	int s=(heal) ? 1:0;
-    	int a;
-    	for (int i=0;i<Player[pMb[current]].skill.size();i++) {
-    		a=Player[pMb[current]].skill.get(i);
-    		if (Skill[a].mpc<=Player[pMb[current]].mp&&Skill[a].hpc<Player[pMb[current]].hp&&
-    				Skill[a].spc<=Player[pMb[current]].sp&&Player[pMb[current]].level>=Skill[a].lvrq)
-    			if (heal) {if (Skill[a].hpdmg<Skill[s].hpdmg&&Skill[a].hpdmg<0) s=a;}
-    			else if (Skill[a].hpdmg>Skill[s].hpdmg) s=a;
+    private Ability getAIskill(boolean heal) {
+    	Ability s=(heal) ? Skill[1]:Skill[0];
+    	Ability a;
+    	for (int i=0;i<Player[current].skill.size();i++) {
+    		a=Player[current].skill.get(i);
+    		if (a.mpc<=Player[current].mp&&a.hpc<Player[current].hp&&
+    				a.spc<=Player[current].sp&&Player[current].level>=a.getLvRq())
+    			if (heal) {if (a.hpdmg<s.hpdmg&&a.hpdmg<0) s=a;}
+    			else if (a.hpdmg>s.hpdmg) s=a;
     	}
     	return s;
     }
@@ -263,14 +244,14 @@ public class BattleAct extends Activity {
     private void setAItarget(Ability ability) {
     	int a;
     	int b;
-    	if (((current>(pMb.length/2)-1-difference)&&(ability.hpdmg>0))||((current<(pMb.length/2)-difference)&&(ability.hpdmg<1))) {a=0;b=(pMb.length/2)-1;}
-    		else {a=(pMb.length/2);b=pMb.length-1;}
-    	if (Player[pMb[current]].auto<0) if (a==(pMb.length/2)) {a=0;b=(pMb.length/2)-1;} else {a=(pMb.length/2);b=pMb.length-1;}
+    	if (((current>(Player.length/2)-1-difference)&&(ability.hpdmg>0))||((current<(Player.length/2)-difference)&&(ability.hpdmg<1))) {a=0;b=(Player.length/2)-1;}
+    		else {a=(Player.length/2);b=Player.length-1;}
+    	if (Player[current].auto<0) if (a==(Player.length/2)) {a=0;b=(Player.length/2)-1;} else {a=(Player.length/2);b=Player.length-1;}
     	target=a;
-    	while ((Player[pMb[target]].hp<1)&&(ability.hpdmg>1)&&target<b) target++;
+    	while ((Player[target].hp<1)&&(ability.hpdmg>1)&&target<b) target++;
     	
     	for (int i=target;i<=b;++i)
-    		if ((Player[pMb[i]].hp<Player[pMb[target]].hp)&&(Player[pMb[i]].hp>0))
+    		if ((Player[i].hp<Player[target].hp)&&(Player[i].hp>0))
     			target = i;
     	executeSkill(ability);
     }
@@ -278,35 +259,35 @@ public class BattleAct extends Activity {
     @SuppressWarnings("deprecation")
     private void endTurn() {
     	imgActor[current].setBackgroundDrawable(null);
-    	Player[pMb[current]].active=false;
+    	Player[current].active=false;
 
     	boolean reset=true;
-    	for (int i=0;i<pMb.length;i++){
-    		if (Player[pMb[i]].active) {reset=false;break;}
+    	for (int i=0;i<Player.length;i++){
+    		if (Player[i].active) {reset=false;break;}
     	}
     	if (reset) {
-        	for (int i=0;i<pMb.length;i++)
-            	if (Player[pMb[i]].hp>0){
-            		updText.append(Player[pMb[i]].applyState(true));
-            		if (Player[pMb[i]].hp<1) playSpr(i,2,false);
+        	for (int i=0;i<Player.length;i++)
+            	if (Player[i].hp>0){
+            		updText.append(Player[i].applyState(true));
+            		if (Player[i].hp<1) playSpr(i,2,false);
             	}
         }
-    	for (current=0;current<pMb.length;current++){
-    		if (Player[pMb[current]].active) break;
+    	for (current=0;current<Player.length;current++){
+    		if (Player[current].active) break;
     	}
     	if (current<6)
-    		for (int i=current+1;i<pMb.length;i++)
-    			if ((Player[pMb[current]].agi<Player[pMb[i]].agi)&&Player[pMb[i]].active)
+    		for (int i=current+1;i<Player.length;i++)
+    			if ((Player[current].agi<Player[i].agi)&&Player[i].active)
     				current=i;
     		
     	if (!checkEnd()){
-    		if (Player[pMb[current]].active){	
-    			if (Player[pMb[current]].auto==0){
+    		if (Player[current].active){	
+    			if (Player[current].auto==0){
     				setCurrent();
     				refreshItemBox();
     		}
-    		Player[pMb[current]].applyState(false);
-    		if (Player[pMb[current]].auto!=0&&Player[pMb[current]].hp>0) {
+    		Player[current].applyState(false);
+    		if (Player[current].auto!=0&&Player[current].hp>0) {
     			executeAI();endTurn();}
     		refreshTargetBox();
         	} else endTurn();
@@ -314,18 +295,18 @@ public class BattleAct extends Activity {
     }
     
     private void setCurrent(){
-    	skillCost.setText(Player[pMb[current]].name+": "+Player[pMb[current]].hp+"/"+Player[pMb[current]].maxhp+" HP, "
-				+Player[pMb[current]].mp+"/"+Player[pMb[current]].maxmp+" MP, "
-				+Player[pMb[current]].sp+"/"+Player[pMb[current]].maxsp+" SP");
+    	skillCost.setText(Player[current].name+": "+Player[current].hp+"/"+Player[current].maxhp+" HP, "
+				+Player[current].mp+"/"+Player[current].maxmp+" MP, "
+				+Player[current].sp+"/"+Player[current].maxsp+" SP");
 		imgActor[current].setBackgroundResource(R.drawable.current);
 		refreshSkillBox();
     }
     
     private boolean checkEnd(){
     	boolean b=false;
-    	if ((Player[pMb[0]].hp<1)&&(Player[pMb[1]].hp<1)&&(Player[pMb[2]].hp<1)&&(Player[pMb[3]].hp<1))
+    	if ((Player[0].hp<1)&&(Player[1].hp<1)&&(Player[2].hp<1)&&(Player[3].hp<1))
     		{endBt(-1);b=true;} else
-        if ((Player[pMb[4]].hp<1)&&(Player[pMb[5]].hp<1)&&(Player[pMb[6]].hp<1)&&(Player[pMb[7]].hp<1))
+        if ((Player[4].hp<1)&&(Player[5].hp<1)&&(Player[6].hp<1)&&(Player[7].hp<1))
         	{endBt(1);b=true;}
     	return b;
     }
@@ -358,17 +339,16 @@ public class BattleAct extends Activity {
     }
     
     private void playSpr(final int c, final int s, final boolean bkw){
-    	if (Player[pMb[c]].bsprite!=""){
-    		final String pos=((c>(pMb.length/2)-1&&!surprised)||(c<(pMb.length/2)&&surprised))?"r":"l";    		
-    		final AnimationDrawable sprAnim=Player[pMb[c]].getBtSprite(s, pos, bkw, waitTime, this);    		
+    	if (Player[c].bsprite!=""){
+    		final String pos=((c>(Player.length/2)-1&&!surprised)||(c<(Player.length/2)&&surprised))?"r":"l";    		
+    		final AnimationDrawable sprAnim=Player[c].getBtSprite(s, pos, bkw, waitTime, this);    		
     		imgActor[c].postDelayed(new Runnable(){
 				@Override
 				public void run() {
-					if (Player[pMb[c]].hp>0||s<3||!imgActor[c].getTag().equals(2)){
+					if (Player[c].hp>0||s<3||!imgActor[c].getTag().equals(2)){
 						sprAnim.setOneShot(true);				    		
 						imgActor[c].setImageDrawable(sprAnim);
-						sprAnim.start();
-				   		imgActor[c].setTag(s);
+						sprAnim.start();imgActor[c].setTag(s);				   		
 					}
 				}					
     		}, waitTime[0]);
@@ -377,12 +357,12 @@ public class BattleAct extends Activity {
     
     private boolean imgClick(int i){
     	boolean a=false;    	
-    	int s=(i>(pMb.length/2)-1)?i-difference:i;
+    	int s=(i>(Player.length/2)-1)?i-difference:i;
     	if (target==i){
-    		executeSkill(Skill[getAIskill((i>pMb.length/2-1&&current<pMb.length/2)||(i<pMb.length/2&&current>pMb.length/2-1)?false:true)]);
+    		executeSkill(getAIskill((i>Player.length/2-1&&current<Player.length/2)||(i<Player.length/2&&current>Player.length/2-1)?false:true));
 			a=true;}
 		else			
-			if (Player[pMb[i]].maxhp>0) targetBox.setSelection(s);
+			if (Player[i].maxhp>0) targetBox.setSelection(s);
     	return a;
     }
 

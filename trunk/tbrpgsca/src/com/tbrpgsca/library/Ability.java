@@ -7,17 +7,14 @@ public class Ability {
     public String name;
     public int trg,hpc,mpc,spc,lvrq,atki,hpdmg,mpdmg,spdmg,dmgtype,element,qty;
     public boolean battle,state[],rstate[],absorb,range;
-    
-    private static boolean nstate[] = {};
-    
+        
     public String execute(Actor user, Actor target) {
     	String s="";
-        //if ((this.hpc<=user.hp)&&(this.mpc<=user.mp)&&(this.spc<=user.sp)&&(this.lvrq<=user.level)) {
             int dmg = (int) (Math.random() * 4);
             int res = (target.res[element]<7)?target.res[element]:-1;
             switch (dmgtype) {
                 case 1:
-                   dmg += ((this.atki*user.def/2)+user.atk/2)/(target.def*res+1);
+                   dmg += (this.atki*((user.def+user.atk)/2))/(target.def*res+1);
                    break;
                 case 3:
                    dmg += (this.atki*user.wis)/(target.spi*res+1);
@@ -26,16 +23,16 @@ public class Ability {
                    dmg += (this.atki*user.spi)/(target.wis*res+1);
                    break;
                 case 4:
-                   dmg += ((this.atki*user.agi/2)+user.atk/2)/((target.agi/2+target.def/2)*res+1);
+                   dmg += (this.atki*((user.agi+user.atk)/2))/(((target.agi+target.def)/2)*res+1);
                    break;
                 case 5:
-                    dmg += ((this.atki*user.wis/2)+user.atk/2)/((target.spi/2+target.def/2)*res+1);
+                    dmg += (this.atki*((user.wis+user.atk)/2))/(((target.spi+target.def)/2)*res+1);
                     break;
                 case 6:
-                    dmg += ((this.atki*user.agi/2)+user.wis/2)/((target.agi/2+target.spi/2)*res+1);
+                    dmg += (this.atki*((user.agi+user.wis+user.atk)/3))/(((target.agi+target.spi)/2)*res+1);
                     break;
                 case 7:
-                    dmg += ((this.atki*user.spi/2)+user.atk/2)/((target.wis/2+target.def/2)*res+1);
+                    dmg += (this.atki*((user.spi+user.atk+user.def)/3))/(((target.wis+target.def)/2)*res+1);
                     break;
                 default:
                    dmg += (this.atki*user.atk)/(target.def*res+1);
@@ -73,12 +70,15 @@ public class Ability {
 
             s+=target.applyState(false);
             s+=user.checkStatus();
-        //}
         return s;
     }
     
+    public int getLvRq(){
+    	return Math.abs(this.lvrq);
+    }
+    
     public Ability(){    	
-    	this("Ability",true,false,0,0,0,0,0,1,0,0,0,0,1,false,nstate,nstate);
+    	this("Ability",true,false,0,0,0,0,0,1,0,0,0,0,1,false,new boolean[]{},new boolean[]{});
     }
     
     public Ability(String name, boolean battle, int hpdmg, int mpdmg, int spdmg,
