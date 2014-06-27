@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Race {
 	public String rname;
 	public int maxhp,maxmp,maxsp,matk,mdef,mwis,mspi,magi;
-	public int resm[]={0,0,0,0,0,0,0,0};
+	public int rres[]={0,0,0,0,0,0,0,0};
     public ArrayList<Ability> skill = new ArrayList<Ability>();
 	
 	public Race(){
@@ -16,21 +16,26 @@ public class Race {
 	}
 	
 	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk,
-    		int def, int wis, int spi, int agi) {
+    		int def, int wis, int spi, int agi, int[] newRes, int[] newSkill) {
 		this.rname = rname;
-		this.raceStats(maxhp, maxmp, maxsp, atk, def, wis, spi, agi);
 		this.addSkills();
+		this.raceStats(maxhp, maxmp, maxsp, atk, def, wis, spi, agi);
+		if (newSkill.length>0) this.addSkills(newSkill);
+		this.setResistance(newRes);
 	}
 	
 	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk,
-    		int def, int wis, int spi, int agi, int[] newSkill) {
-		this(rname,maxhp, maxmp, maxsp, atk, def, wis, spi, agi);
-		this.addSkills(newSkill);
+    		int def, int wis, int spi, int agi) {
+		this(rname,maxhp, maxmp, maxsp, atk, def, wis, spi, agi, new int[]{});
+	}
+	
+	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk,
+    		int def, int wis, int spi, int agi, int[] newRes) {
+		this(rname,maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes, new int[]{});
 	}
     
     protected void raceStats(int maxhp, int maxmp, int maxsp, int atk,
-    		int def, int wis, int spi, int agi) {
-        
+    		int def, int wis, int spi, int agi/*, int[] newSkill*/) {        
     	this.maxhp = maxhp;
         this.maxmp = maxmp;
         this.maxsp = maxsp;
@@ -38,7 +43,7 @@ public class Race {
         this.mdef = def;
         this.mwis = wis;
         this.mspi = spi;
-        this.magi = agi;
+        this.magi = agi;		
     }
     
     public void addSkills(int[] newSkill){
@@ -63,4 +68,8 @@ public class Race {
     	this.removeSkills(false);
     }
     
+    public void setResistance(int[] newRes){
+    	for (int i=0;i<newRes.length&&i<this.rres.length;i++)
+    		this.rres[i]=newRes[i];
+    }
 }

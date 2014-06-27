@@ -11,28 +11,39 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 public class Job extends Race {
-	public String jname,bsprite;
+	public String jname;protected String bsprite;
     public int hpp,mpp,spp,atkp,defp,wisp,spip,agip;
     
     public Job(){
     	this("Hero", 0, 0, 0, 0, 0, 0, 0, 0);
     }
-    
-    public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp,
-            int wisp, int spip, int agip){
-    	this.jname=jname;
+        
+    public Job(String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi,
+    		int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
+    		int agip, int[] newRes, int[] newSkill){
+    	super("", hp, mp, sp, atk, def, wis, spi, agi, newRes, newSkill);
+    	this.jname=jname;        
+        this.setSprName(this.jname);
     	this.jobStats(hpp, mpp, spp, atkp, defp, wisp, spip, agip);
     }
     
     public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp,
-            int wisp, int spip, int agip, int[] newSkill){
-    	this(jname,hpp, mpp, spp, atkp, defp, wisp, spip, agip);
-    	this.addSkills(newSkill);
+            int wisp, int spip, int agip){
+    	this(jname,hpp, mpp, spp, atkp, defp, wisp, spip, agip, new int[]{});
+    }
+    
+    public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp,
+            int wisp, int spip, int agip, int[] newRes){
+    	this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, new int[]{});
+    }
+    
+    public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp,
+            int wisp, int spip, int agip, int[] newRes, int[] newSkill){
+    	this(jname,0,0,0,0,0,0,0,0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill);
     }
     
     protected void jobStats(int hpp, int mpp, int spp, int atkp, int defp,
-            int wisp, int spip, int agip) {        
-        this.bsprite=(this.jname!="")?"hero":jname.toLowerCase(Locale.US);
+            int wisp, int spip, int agip) {
         this.hpp = hpp;
         this.mpp = mpp;
         this.spp = spp;
@@ -43,6 +54,14 @@ public class Job extends Race {
         this.agip = agip;
     }
     
+    public void setSprName(String sprName){
+    	this.bsprite=sprName.toLowerCase(Locale.US);
+    }
+    
+    public String getSprName(){
+    	return this.bsprite;
+    }
+    
     private Bitmap getBmpSpr(int i, String pos, int[] c, Activity context){
     	/*BitmapFactory.Options opt = new BitmapFactory.Options();
     	opt.inPurgeable=true;opt.inDither=false;opt.inSampleSize=1;*/
@@ -51,7 +70,7 @@ public class Job extends Race {
     	return bmp;
     }
         
-    public AnimationDrawable getBtSprite(int i, String pos, boolean bkw, int[] time, Activity context){
+    public AnimationDrawable getBtSprite(int i, String pos, int[] time, Activity context){
     	Bitmap bmp=null; int p[]={128,128,7}; int s=i>2?1:2; time[s]=0;//System.gc();
     	AnimationDrawable sprite=new AnimationDrawable();
     	if (i>0) {
@@ -66,7 +85,7 @@ public class Job extends Race {
     			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*p[1], 0, p[1], p[0])),t);
     			time[s]+=t;
     		}
-    		for (int j=p[2]-2;bkw&&j>0;j--){
+    		for (int j=p[2]-2;p[2]<7&&j>(i==1?0:-1);j--){
     			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*p[1], 0, p[1], p[0])),87);
     			time[s]+=87;
     		}
