@@ -42,10 +42,10 @@ public class DataApp extends Application {
     	
     	Race[] pcRace = new Race[4];
     			
-    	pcRace[0]=new Race("Elf", 40,25,10, 7,5,15,12,11);
-    	pcRace[2]=new Race("Human", 47,15,13, 9,11,9,11,10);
-    	pcRace[1]=new Race("Half-Orc", 55,7,13, 17,12,5,7,9);
-    	pcRace[3]=new Race("Gnome", 40,15,20, 12,8,10,5,15);
+    	pcRace[0]=new Race("Elf", 40,25,10, 7,5,15,12,11, new int[]{0,-1,1,1,1,1});
+    	pcRace[2]=new Race("Human", 47,15,13, 9,11,9,11,10, new int[]{0,0,0,0,0,0,-1,1});
+    	pcRace[1]=new Race("Half-Orc", 55,7,13, 17,12,5,7,9, new int[]{0,1,-1,-1,-1,-1});
+    	pcRace[3]=new Race("Gnome", 40,15,20, 12,8,10,5,15, new int[]{0,0,0,0,0,0,1,-1});
     	return pcRace;
     	
     }
@@ -54,8 +54,9 @@ public class DataApp extends Application {
 		
 		Job pcJob[]=new Job[15];
 		
-		pcJob[1]=new Job("Warrior",1,0,0, 1,0,0,0,1, new int[]{0,1,-1,-1,-1,-1}, new int[]{8,9,10,11,12,14});
+		pcJob[1]=new Job("Berserker",1,0,0, 1,0,0,0,1, new int[]{0,1,-1,-1,-1,-1}, new int[]{8,9,10,11,12,14});
 		pcJob[2]=new Job("Sorcerer",0,1,0, 0,0,1,0,1, new int[]{0,-1,1,1,1,1,1,-1}, new int[]{23,24,25,26,27,28,29,30,31,32,33,34,35,38});
+        pcJob[2].setSprName("Wizard");
         pcJob[3]=new Job("Monk",0,1,0, 0,1,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new int[]{2,3,4,5,6,7});
         pcJob[4]=new Job("Rogue",0,0,1, 1,0,0,0,1, new int[]{}, new int[]{15,16,17,18,22,38});
         pcJob[5]=new Job("Alchemist",0,1,0, 0,0,1,0,1, new int[]{}, new int[]{23,24,25,26,27,28,30,31,32,33,15,16,17,18,20});
@@ -66,9 +67,10 @@ public class DataApp extends Application {
         pcJob[10]=new Job("Swashbuckler",0,0,1, 1,0,0,0,1, new int[]{}, new int[]{8,9,10,11,15,16,17,18,19});
         pcJob[11]=new Job("Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, new int[]{8,9,11,23,24,29,15,16,18,45,40});
         pcJob[12]=new Job("Ninja",0,0,1, 0,0,0,0,1, new int[]{}, new int[]{8,9,11,15,16,17,2,3,5,40});
-        pcJob[13]=new Job("Templar",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new int[]{8,9,10,2,3,4,56,36,51,37,47});
+        pcJob[13]=new Job("Crusader",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new int[]{8,9,10,2,3,4,56,36,51,37,47});
+        pcJob[13].setSprName("Templar");
         pcJob[14]=new Job("Druid",0,1,0, 0,0,1,0,0, new int[]{0,0,1,1,1,1,-1,-1}, new int[]{23,25,26,27,28,30,31,32,33,52,53,54,15,16,18,48});
-        pcJob[0]=new Job("Hero",1,1,1, 0,1,0,0,0, new int[]{}, new int[]{8,9,10,11,23,24,25,26,27,28,29,41,42,43,44,45,30,31,32,33,34,36,51,37,2,3,4,5,15,16,17,18});
+        pcJob[0]=new Job("Hero",1,1,1, 0,0,0,0,0, new int[]{}, new int[]{8,9,10,11,23,24,25,26,27,28,29,41,42,43,44,45,30,31,32,33,34,36,51,37,2,3,4,5,15,16,17,18});
         	
         return pcJob;
     }
@@ -85,11 +87,11 @@ public class DataApp extends Application {
     	npc[2]=new Actor("George",maxlv);    	
     	npc[3]=new Actor("Stephen",maxlv);
     	
-        npc[4]=new Actor("Ogre","Ogre","Dragoon", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, new int[]{9,11});
+        npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, new int[]{9,11});
         npc[4].state[5].res=9;npc[4].state[10].dur=-2;
-        npc[5]=new Actor("Lizard", "Lizard", "Dragoon", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, new int[]{23,30});
-        npc[6]=new Actor("Goblin", "Goblin", "Dragoon", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, new int[]{15});
-        npc[7]=new Actor("Troll", "Troll", "Dragoon", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, new int[]{2});
+        npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, new int[]{23,30});
+        npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, new int[]{15});
+        npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, new int[]{2});
         npc[7].state[0].dur=-3;
         
         return npc;

@@ -90,7 +90,7 @@ public class DemoAct extends Activity {
 			DataApp.Player[p].setRace(DataApp.pcRace[raceBox[p-1].getSelectedItemPosition()], true);		
 		DataApp.Player[p].changeJob(DataApp.pcJob[jobBox[p-1].getSelectedItemPosition()], false);
 		raceBox[p-1].setEnabled(false);
-		DataApp.Player[1].setSprName("Knight");DataApp.Player[2].setSprName("Hero");DataApp.Player[3].setSprName("Templar");
+		//DataApp.Player[1].setSprName("Knight");DataApp.Player[2].setSprName("Dragoon");DataApp.Player[3].setSprName("Templar");
 	}
 	
 	private void beginBt(){

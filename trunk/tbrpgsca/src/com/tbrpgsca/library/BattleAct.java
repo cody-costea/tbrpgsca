@@ -183,7 +183,7 @@ public class BattleAct extends Activity {
         if (ability.qty>0) ability.qty--;
         int trg;boolean act=true;
     	for (int i=a;i<=b;i++) if (Player[i].hp>0||ability.state[0]){        	
-        	if (Player[i].reflect&&ability.dmgtype==2) {
+        	if (Player[i].reflect&&ability.dmgtype==2&&i!=current) {
         		updText.append(", which is reflected");
         		trg=current;
         	} else trg=i;
