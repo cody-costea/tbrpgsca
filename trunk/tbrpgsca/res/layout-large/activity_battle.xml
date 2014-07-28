@@ -7,67 +7,6 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".BattleActivity" >
-
-    <ImageView
-        android:id="@+id/ImgEnemy3"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_above="@+id/TargetBox"
-        android:layout_marginRight="21dp"
-        android:layout_toLeftOf="@+id/ImgEnemy1" />
-
-    <ImageView
-        android:id="@+id/ImgEnemy2"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_above="@+id/ItemCost"
-        android:layout_alignLeft="@+id/ImgEnemy3" />
-    
-    <ImageView
-        android:id="@+id/ImgEnemy1"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignRight="@+id/SkillCost"
-        android:layout_alignTop="@+id/ImgPlayer1"
-        android:layout_marginRight="21dp" />
-    
-    <ImageView
-        android:id="@+id/ImgEnemy4"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignBottom="@+id/ItemCost"
-        android:layout_alignLeft="@+id/ImgEnemy1" />
-    
-    <ImageView
-        android:id="@+id/ImgPlayer3"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignLeft="@+id/SkillCost"
-        android:layout_alignTop="@+id/SkillCost"
-        android:layout_marginLeft="29dp" />
-
-    <ImageView
-        android:id="@+id/ImgPlayer1"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignBottom="@+id/TargetBox"
-        android:layout_marginBottom="35dp"
-        android:layout_marginLeft="37dp"
-        android:layout_toRightOf="@+id/ImgPlayer3" />
-
-    <ImageView
-        android:id="@+id/ImgPlayer2"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_above="@+id/ItemCost"
-        android:layout_alignLeft="@+id/ImgPlayer3" />
-    
-    <ImageView
-        android:id="@+id/ImgPlayer4"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_alignLeft="@+id/ImgPlayer1"
-        android:layout_alignParentBottom="true" />
     
     <Spinner
         android:id="@+id/ItemBox"
@@ -76,7 +15,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignRight="@+id/UseBt"
-        android:layout_alignTop="@+id/ImgPlayer4" />
+        android:layout_below="@+id/ImgEnemy2" />
 
         <TextView
         android:id="@+id/SkillCost"
@@ -93,10 +32,11 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_alignBottom="@+id/ItemBox"
+        android:layout_alignTop="@+id/ItemBox"
         android:layout_toLeftOf="@+id/RunBt"
         android:layout_toRightOf="@+id/ItemBox"
         android:gravity="bottom"
-        android:maxLines="2"
+        android:maxLines="10"
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -108,14 +48,14 @@
         android:layout_alignBottom="@+id/ItemBox"
         android:layout_alignLeft="@+id/AutoBt"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/ItemBox"
+        android:layout_alignTop="@+id/ItemCost"
         android:text="@string/bt_run" />
 
     <Spinner
         android:id="@+id/SkillBox"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ImgPlayer3"
+        android:layout_above="@+id/TargetBox"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" />
 
@@ -145,7 +85,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/TargetBox"
-        android:layout_below="@+id/SkillBox"
+        android:layout_below="@+id/ImgPlayer3"
         android:layout_toLeftOf="@+id/ImgPlayer3"
         android:text="@string/bt_act" />
 
@@ -158,5 +98,65 @@
         android:layout_alignLeft="@+id/TargetBox"
         android:layout_alignRight="@+id/TargetBox"
         android:text="@string/bt_use" />
+
+    <ImageView
+        android:id="@+id/ImgEnemy3"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignTop="@+id/SkillCost"
+        android:layout_toLeftOf="@+id/ImgEnemy1" />
+
+    <ImageView
+        android:id="@+id/ImgEnemy1"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignTop="@+id/ImgPlayer1"
+        android:layout_toLeftOf="@+id/AutoBt" />
+
+    <ImageView
+        android:id="@+id/ImgEnemy4"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignRight="@+id/ItemCost"
+        android:layout_alignTop="@+id/ImgPlayer4"
+        android:layout_marginRight="24dp" />
+
+    <ImageView
+        android:id="@+id/ImgEnemy2"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/ImgEnemy4" />
+
+    <ImageView
+        android:id="@+id/ImgPlayer2"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_above="@+id/ItemCost"
+        android:layout_alignLeft="@+id/ImgPlayer3"
+        android:layout_marginLeft="27dp" />
+
+    <ImageView
+        android:id="@+id/ImgPlayer1"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_above="@+id/ImgPlayer4"
+        android:layout_toRightOf="@+id/ImgPlayer2" />
+
+    <ImageView
+        android:id="@+id/ImgPlayer4"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignLeft="@+id/ImgPlayer1"
+        android:layout_below="@+id/ActBt"
+        android:layout_marginLeft="26dp" />
+
+    <ImageView
+        android:id="@+id/ImgPlayer3"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_above="@+id/ImgPlayer2"
+        android:layout_alignLeft="@+id/SkillCost"
+        android:layout_marginLeft="24dp" />
 
 </RelativeLayout>

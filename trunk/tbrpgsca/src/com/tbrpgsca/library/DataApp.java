@@ -62,10 +62,11 @@ public class DataApp extends Application {
         pcJob[5]=new Job("Alchemist",0,1,0, 0,0,1,0,1, new int[]{}, new int[]{23,24,25,26,27,28,30,31,32,33,15,16,17,18,20});
         pcJob[6]=new Job("Dragoon",1,0,0, 1,0,1,0,0, new int[]{0,0,1,1,1,1,0,-1}, new int[]{8,9,10,11,23,24,25,26,27,28,30,31,32,33,41,42,43,44,50});
         pcJob[7]=new Job("Knight",1,0,0, 0,1,0,1,0, new int[]{0,1,-1,-1,-1,-1,-7,7}, new int[]{2,3,4,5,8,9,10,11,13});
-        pcJob[8]=new Job("Bard",0,0,1, 0,0,0,1,1, new int[]{0,0,0,0,0,0,-2,2}, new int[]{2,3,4,5,15,16,17,18,21});
+        pcJob[8]=new Job("Warden",0,0,1, 0,0,0,1,1, new int[]{0,0,0,0,0,0,-2,2}, new int[]{2,3,4,5,15,16,17,18,21});
+        pcJob[8].setSprName("Bard");
         pcJob[9]=new Job("Shaman",0,1,0, 0,0,1,1,0, new int[]{0,0,0,0,0,0,7,-7}, new int[]{52,53,54,55,23,24,29,34,49});
         pcJob[10]=new Job("Swashbuckler",0,0,1, 1,0,0,0,1, new int[]{}, new int[]{8,9,10,11,15,16,17,18,19});
-        pcJob[11]=new Job("Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, new int[]{8,9,11,23,24,29,15,16,18,45,40});
+        pcJob[11]=new Job("Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, new int[]{8,9,11,23,24,29,15,16,18,45,46});
         pcJob[12]=new Job("Ninja",0,0,1, 0,0,0,0,1, new int[]{}, new int[]{8,9,11,15,16,17,2,3,5,40});
         pcJob[13]=new Job("Crusader",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new int[]{8,9,10,2,3,4,56,36,51,37,47});
         pcJob[13].setSprName("Templar");
