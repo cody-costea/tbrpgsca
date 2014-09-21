@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -68,13 +67,6 @@ public class BattleAct extends Activity {
 	    Escape.setEnabled((extra!=null&&extra.containsKey("Escape"))?extra.getBoolean("Escape"):true);
 	    int e=(extra!=null&&extra.containsKey("Enemy"))?extra.getInt("Enemy"):0;
         beginBattle(DataApp.party,DataApp.enemy[e],(extra!=null&&extra.containsKey("Surprise"))?extra.getInt("Surprise"):0);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.battle, menu);
-		return true;
 	}
 	
     public void beginBattle(int party[],int enemy[], int surprise) {
@@ -328,7 +320,6 @@ public class BattleAct extends Activity {
     	msg.setPositiveButton("Exit", new DialogInterface.OnClickListener() {			
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
-				// TODO Auto-generated method stub
 				Intent outcome = new Intent();
 				outcome.putExtra("Outcome", result);
 				setResult(RESULT_OK, outcome);
@@ -347,6 +338,8 @@ public class BattleAct extends Activity {
 				@Override
 				public void run() {
 					if (s==2||s<0||Player[c].hp>0||!imgActor[c].getTag().equals(2)){
+						sprAnim.stop();
+						//sprAnim.selectDrawable(0);
 						sprAnim.setOneShot(true);				    		
 						imgActor[c].setImageDrawable(sprAnim);
 						sprAnim.start();imgActor[c].setTag(s);				   		
@@ -420,4 +413,12 @@ public class BattleAct extends Activity {
     public void onBackPressed(){
     	endBt(-1);
     }
+    
+    @Override
+    protected void onDestroy() {
+    	for (Actor player:this.Player)
+    		player.setSprites(this, false, null);
+    	super.onDestroy();
+    }
+    
 }
