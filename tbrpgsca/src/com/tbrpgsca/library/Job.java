@@ -10,9 +10,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+
 public class Job extends Race {
-	public String jname;protected String bsprite;
+	public String jname;private String sprName;
     public int hpp,mpp,spp,atkp,defp,wisp,spip,agip;
+    
+    private AnimationDrawable bSprite[]=new AnimationDrawable[5];
+    private int sprWait[]=new int[5];
     
     public Job(){
     	this("Hero", 0, 0, 0, 0, 0, 0, 0, 0);
@@ -54,50 +58,75 @@ public class Job extends Race {
         this.agip = agip;
     }
     
+    protected void setSprName(String sprName,String pos,Activity act){
+    	this.sprName=sprName.toLowerCase(Locale.US);
+    	this.setSprites(act, act!=null, pos);
+    }
+    
     public void setSprName(String sprName){
-    	this.bsprite=sprName.toLowerCase(Locale.US);
+    	this.setSprName(sprName, null, null);
+    }
+    
+    public void setSprites(Activity act,boolean get,String pos){
+    	for (int i=0;i<5;i++)   		
+    		if (get&&this.sprName!=null&&this.sprName!="")
+    			this.setBtSprite(i-1, pos, act);
+    		else
+    			this.bSprite[i]=null;
     }
     
     public String getSprName(){
-    	return this.bsprite;
+    	return this.sprName;
     }
     
     private Bitmap getBmpSpr(int i, String pos, int[] c, Activity context){
     	/*BitmapFactory.Options opt = new BitmapFactory.Options();
     	opt.inPurgeable=true;opt.inDither=false;opt.inSampleSize=1;*/
-    	Bitmap bmp=BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+bsprite+"_"+i+"_"+pos, "drawable", context.getPackageName())/*,opt*/);
+    	Bitmap bmp=BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier("bt_"+sprName+"_"+String.valueOf((i))+"_"+pos, "drawable", context.getPackageName())/*,opt*/);
     	c[0]=bmp.getHeight();c[2]=bmp.getWidth()/c[0];c[1]=bmp.getWidth()/c[2];
     	return bmp;
     }
         
-    public AnimationDrawable getBtSprite(int i, String pos, int[] time, Activity context){
-    	Bitmap bmp=null; int p[]={128,128,7}; int s=i>2?1:2; time[s]=0;//System.gc();
-    	AnimationDrawable sprite=new AnimationDrawable();
+    private void setBtSprite(int i, String pos, Activity context){
+    	Bitmap bmp=null; int x=i+1; int p[]={128,128,7}; this.sprWait[x]=0;//System.gc();
+    	this.bSprite[x]=new AnimationDrawable();
     	if (i>0) {
-    		if (i==2){
-    			bmp = getBmpSpr(1,pos,p,context);
-    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])),261);
-    			time[s]+=261;
-    		}
-    		bmp = getBmpSpr(i,pos,p,context);
-    		for (int j=0;j<p[2];j++){
-    			int t=(i!=1||j!=0)?87:261;
-    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*p[1], 0, p[1], p[0])),t);
-    			time[s]+=t;
-    		}
-    		for (int j=p[2]-2;p[2]<7&&j>(i==1?0:-1);j--){
-    			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*p[1], 0, p[1], p[0])),87);
-    			time[s]+=87;
-    		}
+            if (i==2){
+            	bmp = getBmpSpr(1,pos,p,context);
+            	this.bSprite[x].addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])),261);
+                this.sprWait[x]+=261;
+            }
+            bmp = getBmpSpr(i,pos,p,context);
+            for (int j=0;j<p[2];j++){
+            	int t=(i!=1||j!=0)?87:261;
+            	this.bSprite[x].addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*p[1], 0, p[1], p[0])),t);
+                this.sprWait[x]+=t;
+            }
+            for (int j=p[2]-2;p[2]<7&&j>(i==1?0:-1);j--){
+            	this.bSprite[x].addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, j*p[1], 0, p[1], p[0])),87);
+                this.sprWait[x]+=87;
+            }
     	}
     	if (i!=2&&i>=0) {
-    		if (i!=1) bmp = getBmpSpr(1,pos,p,context);
-    		sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])),0);
+            if (i!=1) bmp = getBmpSpr(1,pos,p,context);
+            this.bSprite[x].addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])),0);
     	}
     	if (i<0){
-    		bmp = getBmpSpr(2,pos,p,context);
-			sprite.addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, (p[2]-1)*p[1], 0, p[1], p[0])),0);
+            bmp = getBmpSpr(2,pos,p,context);
+            this.bSprite[x].addFrame(new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bmp, (p[2]-1)*p[1], 0, p[1], p[0])),0);
     	}
-    	bmp.recycle(); return sprite;
+    	bmp.recycle();
     }
+    
+    public AnimationDrawable getBtSprite(int i, String pos, int[] time, Activity act){
+    	int s=i>2?1:2; time[s]=0;
+    	if (i==2) time[s]+=261;
+    	i+=1;
+    	if (this.bSprite[i]==null&&this.sprName!="")
+    		this.setBtSprite(i-1, pos, act);
+        //time[s]+=(this.bSprite[i].getNumberOfFrames()-1)*87;
+    	time[s]+=this.sprWait[i];
+    	return this.bSprite[i];
+    }
+    
 }
