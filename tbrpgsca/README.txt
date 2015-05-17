@@ -1,25 +1,26 @@
 Turn-Based RPG Simple Combat Arena
 
-Copyright (C) 2013 Claudiu-Stefan Costea
+Copyright (C) 2015 Claudiu-Stefan Costea
 
-This program is free software: you can redistribute it and/or modify it under the terms
-of the GNU Lesser General Public License as published by the Free Software Foundation,
-either version 2.1 of the License, or (at your option) any later version.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use anything from this project, except in compliance
+with the License. You may obtain a copy of the License at
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License for more details.
+http://www.apache.org/licenses/LICENSE-2.0
 
-The terms of the GNU Lesser General Public License can be found at http://www.gnu.org/licenses/
-and also in the "LGPL2.1.txt" file.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 The program includes graphic resources copyrighted by Reiner "Tiles" Prokein, which have been
 released under the terms described at http://www.reinerstilesets.de/lizenz (and also in the
-"Reiner_license.txt" file).
+"Reiner's_Tilesets_License.txt" file).
 
-This application aims to implement a turn-based RPG combat engine, similar to those found in
-various RPG games, such as "Final Fantasy" by Square Enix. This is actually the first Android
-application I programmed on my own initiative, and I began doing it to improve my skills with
-Java and the Android SDK. Perhaps someday I'll use it in a larger RPG project.
+The purpose of this project is to implement an open-source turn-based RPG combat engine (similar
+to those found in various RPGs, such as "Final Fantasy" by Square Enix), and to offer a simple
+demonstration of its capabilities. A full RPG is beyond the scope of this application, but it
+may be used in more complex projects, compatible with its licenses.
 
 Thank you for your interest.
