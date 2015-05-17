@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.tbrpgsca.library.BattleAct;
-import com.tbrpgsca.library.DataApp;
+import com.tbrpgsca.library.AppData;
 import com.tbrpgsca.library.R;
 
 public class DemoAct extends Activity {
@@ -37,7 +37,7 @@ public class DemoAct extends Activity {
 		raceBox[0]=(Spinner)findViewById(R.id.RaceBox1);
 		raceBox[1]=(Spinner)findViewById(R.id.RaceBox2);
 		raceBox[2]=(Spinner)findViewById(R.id.RaceBox3);
-		for (int i=0;i<DataApp.pcRace.length;i++) raceList.add(DataApp.pcRace[i].rname);
+		for (int i=0;i<AppData.pcRace.length;i++) raceList.add(AppData.pcRace[i].rname);
 		for (int i=0;i<3;i++) raceBox[i].setAdapter(raceList);
 		raceBox[0].setSelection(1);
 		raceBox[1].setSelection(0);
@@ -45,7 +45,7 @@ public class DemoAct extends Activity {
 		jobBox[0]=(Spinner)findViewById(R.id.JobBox1);
 		jobBox[1]=(Spinner)findViewById(R.id.JobBox2);
 		jobBox[2]=(Spinner)findViewById(R.id.JobBox3);
-		for (int i=0;i<DataApp.pcJob.length;i++) jobList.add(DataApp.pcJob[i].jname);
+		for (int i=0;i<AppData.pcJob.length;i++) jobList.add(AppData.pcJob[i].jname);
 		for (int i=0;i<3;i++) jobBox[i].setAdapter(jobList);
 		jobBox[0].setSelection(0);
 		jobBox[1].setSelection(5);
@@ -59,9 +59,9 @@ public class DemoAct extends Activity {
 		Begin.setOnClickListener(cAction);
 		About.setOnClickListener(cAction);
 		Exit.setOnClickListener(cAction);
-		DataApp.party[0]=1;DataApp.party[1]=2;DataApp.party[2]=3;DataApp.party[3]=0;
-		for (int i=0;i<DataApp.Item.length;i++)
-			DataApp.Item[i].qty=5;		
+		AppData.party[0]=1;AppData.party[1]=2;AppData.party[2]=3;AppData.party[3]=0;
+		for (int i=0;i<AppData.Item.length;i++)
+			AppData.Item[i].qty=5;		
 	}
 	
 	@Override
@@ -85,10 +85,10 @@ public class DemoAct extends Activity {
 				n="Stephen";
 				break;
 			}
-		DataApp.Player[p].name=n;
+		AppData.Player[p].name=n;
 		if (raceBox[p-1].isEnabled())
-			DataApp.Player[p].setRace(DataApp.pcRace[raceBox[p-1].getSelectedItemPosition()], true);		
-		DataApp.Player[p].changeJob(DataApp.pcJob[jobBox[p-1].getSelectedItemPosition()], false);
+			AppData.Player[p].setRace(AppData.pcRace[raceBox[p-1].getSelectedItemPosition()], true);		
+		AppData.Player[p].changeJob(AppData.pcJob[jobBox[p-1].getSelectedItemPosition()], false);
 		raceBox[p-1].setEnabled(false);
 		//DataApp.Player[1].setSprName("Knight");DataApp.Player[2].setSprName("Dragoon");DataApp.Player[3].setSprName("Templar");
 	}
@@ -104,7 +104,7 @@ public class DemoAct extends Activity {
 		if (level==2) btInt.putExtra("Surprise", 1);
 		btInt.putExtra("Enemy", level);
 		startActivityForResult(btInt, 1);
-		for (int i=1;i<DataApp.Player.length;i++) DataApp.Player[i].recover();
+		for (int i=1;i<AppData.Player.length;i++) AppData.Player[i].recover();
 	}
 	
 	private OnClickListener cAction = new OnClickListener() {
