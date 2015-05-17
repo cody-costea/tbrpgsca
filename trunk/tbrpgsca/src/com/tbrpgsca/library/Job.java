@@ -1,6 +1,3 @@
-/*This file has been written by Claudiu-Stefan Costea,
- * and is released under the terms of the LGPL-2.1
- */
 package com.tbrpgsca.library;
 
 import java.util.Locale;
@@ -120,11 +117,9 @@ public class Job extends Race {
     
     public AnimationDrawable getBtSprite(int i, String pos, int[] time, Activity act){
     	int s=i>2?1:2; time[s]=0;
-    	if (i==2) time[s]+=261;
     	i+=1;
     	if (this.bSprite[i]==null&&this.sprName!="")
     		this.setBtSprite(i-1, pos, act);
-        //time[s]+=(this.bSprite[i].getNumberOfFrames()-1)*87;
     	time[s]+=this.sprWait[i];
     	return this.bSprite[i];
     }

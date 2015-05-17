@@ -1,6 +1,3 @@
-/*This file has been written by Claudiu-Stefan Costea,
- *and is released under the terms of the LGPL-2.1
- */
 package com.tbrpgsca.library;
 
 import java.util.ArrayList;

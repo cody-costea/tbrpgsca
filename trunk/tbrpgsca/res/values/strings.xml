@@ -13,9 +13,8 @@
     <string name="txt_race">Race</string>
     <string name="txt_job">Class</string>
     <string name="txt_name">Name</string>    
-    <string name="msg_about">The \"Turn-Based RPG Simple Combat Arena\" project is authored by Claudiu-Ştefan Costea,
-         and it is distributed under the terms of the GNU Lesser General Public License version 2.1 (described at
-         http://www.gnu.org/licenses/lgpl-2.1.html), and without any warranty.\n\nThe project includes graphic resources designed
-         by Reiner \"Tiles\" Prokein, which have been released under the terms described at http://www.reinerstilesets.de/lizenz.
-         \n\nThank you for trying this application.</string>
+    <string name="msg_about">The \"Turn-Based RPG Simple Combat Arena\" project is authored by Claudiu-Ştefan Costea, and it is
+         distributed under the terms of the Apache License, Version 2.0 (described at http://www.apache.org/licenses/LICENSE-2.0),
+         and without any warranty.\n\nThe project includes graphic resources designed by Reiner \"Tiles\" Prokein, which have been
+         released under the terms described at http://www.reinerstilesets.de/lizenz.\n\nThank you for trying this application.</string>
 </resources>
