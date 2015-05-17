@@ -1,8 +1,23 @@
+/*
+Copyright (C) 2015 Claudiu-Stefan Costea
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+*/
 package com.tbrpgsca.library;
 
 import android.app.Application;
 
-public class DataApp extends Application {
+public class AppData extends Application {
 	
     public static Ability[] Skill;
     public static Ability[] Item;    
@@ -35,7 +50,8 @@ public class DataApp extends Application {
 	private static boolean dizzystun[] = {false,false,false,false,true,false,false,false,false,false,true};
 	private static boolean reflect[] = {false,false,false,false,false,false,false,false,false,false,false,true};
     
-    private Race[] AddRaces(){
+    private Race[] AddRaces()
+    {
     	
     	Race[] pcRace = new Race[4];
     			
@@ -47,7 +63,8 @@ public class DataApp extends Application {
     	
     }
 	
-	private Job[] AddJobs() {
+	private Job[] AddJobs()
+	{
 		
 		Job pcJob[]=new Job[15];
 		
@@ -73,7 +90,8 @@ public class DataApp extends Application {
         return pcJob;
     }
     
-    private Actor[] AddCharacters() {
+    private Actor[] AddCharacters()
+    {
         
     	int maxlv = 5;
     	
@@ -95,7 +113,8 @@ public class DataApp extends Application {
         return npc;
     }
     
-    private Ability[] AddSkills() {
+    private Ability[] AddSkills()
+    {
         
         Ability ability[] = new Ability[57];
     	
@@ -161,7 +180,8 @@ public class DataApp extends Application {
         return ability;
     }
     
-    private Ability[] AddItems() {        
+    private Ability[] AddItems()
+    {        
         
         Ability item[] = new Ability[9];
     	
@@ -178,25 +198,8 @@ public class DataApp extends Application {
         return item;        
     }
     
-    protected static State[] AddStates() {    	
-    	State state[] = new State[11];
-    	
-    	state[0]=new State("Regen", false,false,false, -1, 10,0,0, 0,2,0,0,0, false);
-    	state[1]=new State("Poison", false,false,false, 10, -7,0,-2, 0,-2,0,0,0, false);
-    	state[2]=new State("Clarity", false,false,false, -1, 0,7,0, 0,0,1,1,0, false);
-    	state[3]=new State("Dizziness", false,false,false, 3, 0,-7,0, 0,0,-1,-1,0, false);
-    	state[4]=new State("Vigour", false,false,false, -1, 0,0,7, 1,0,0,0,1, false);
-    	state[5]=new State("Weakness", false,false,false, 5, 0,0,-7, -1,0,0,0,-1, false);
-    	state[6]=new State("Berserk", false,true,false, 7, 0,0,0, 5,-3,0,0,3, false);
-    	state[7]=new State("Confusion", false,false,true, 3, 0,0,0, 0,0,0,0,0, false);
-    	state[8]=new State("Sleep", true,false,false, 5, 0,0,0, 0,-3,0,0,-3, false);
-    	state[9]=new State("Stun", true,false,false, 1, 0,0,0, 0,-1,0,0,-1, false);
-    	state[10]=new State("Reflect", false,false,false, 7, 0,0,0, 0,0,0,0,0, true);
-    	
-    	return state;
-    }
-    
-    private int[][] AddEnemies(){
+    private int[][] AddEnemies()
+    {
 
 		int enemy[][]=new int[6][4];
     	
@@ -234,7 +237,8 @@ public class DataApp extends Application {
     }
     
     @Override
-	public void onCreate() {
+	public void onCreate()
+    {
     	Skill=AddSkills();
         Item=AddItems();    
     	pcRace=AddRaces();

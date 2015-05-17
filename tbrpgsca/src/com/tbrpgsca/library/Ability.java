@@ -1,15 +1,33 @@
+/*
+Copyright (C) 2015 Claudiu-Stefan Costea
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+*/
 package com.tbrpgsca.library;
 
-public class Ability {
+public class Ability
+{
     public String name;
     public int trg,hpc,mpc,spc,lvrq,atki,hpdmg,mpdmg,spdmg,dmgtype,element,qty;
     public boolean battle,state[],rstate[],absorb,range;
         
-    public String execute(Actor user, Actor target) {
+    public String execute(Actor user, Actor target)
+    {
     	String s="";
             int dmg = (int) (Math.random() * 4);
             int res = (target.res[element]<7)?target.res[element]:-1;
-            switch (dmgtype) {
+            switch (this.dmgtype)
+            {
                 case 1:
                    dmg += (this.atki*((user.def+user.atk)/2))/(target.def*res+1);
                    break;
@@ -34,15 +52,15 @@ public class Ability {
                 default:
                    dmg += (this.atki*user.atk)/(target.def*res+1);
             }            
-            if (dmgtype==2||dmgtype==3||(dmgtype!=4&&(int) (Math.random() * 13+user.agi/5)>2+target.agi/4)
-            		||(dmgtype==4&&(int) (Math.random() * 13+user.agi/3)>2+target.agi/4))
+            if (this.dmgtype==2||this.dmgtype==3||(this.dmgtype!=4&&(int) (Math.random() * 13+user.agi/5)>2+target.agi/4)
+            		||(this.dmgtype==4&&(int) (Math.random() * 13+user.agi/3)>2+target.agi/4))
             {
-            	int dmghp = (hpdmg!=0) ? (dmg + this.hpdmg) : 0;
-            	int dmgmp = (mpdmg!=0) ? (dmg + this.mpdmg) : 0;
-            	int dmgsp = (spdmg!=0) ? (dmg + this.spdmg) : 0;
+            	int dmghp = (this.hpdmg!=0) ? (dmg + this.hpdmg) : 0;
+            	int dmgmp = (this.mpdmg!=0) ? (dmg + this.mpdmg) : 0;
+            	int dmgsp = (this.spdmg!=0) ? (dmg + this.spdmg) : 0;
             	if (res<0) {dmghp=-dmghp;dmgmp=-dmgmp;dmgsp=-dmgsp;}
             	target.hp -= dmghp;target.mp -= dmgmp;target.sp -= dmgsp;
-            	if (absorb) {user.hp += dmghp/2;user.mp += dmgmp/2;user.sp += dmgsp/2;}
+            	if (this.absorb) {user.hp += dmghp/2;user.mp += dmgmp/2;user.sp += dmgsp/2;}
             	boolean c=false;
             	if (dmghp!=0||dmgmp!=0||dmgsp!=0) s+=(", " + target.name+" suffers");            
             	if (dmghp!=0) {s+=(" "); if (dmghp<1) s+="+"; s+=-dmghp + " HP";  c=true;}
@@ -52,7 +70,8 @@ public class Ability {
             	if (this.state[i])
             		target.state[i-1].inflict();            
             for (int i=1;i<this.rstate.length;i++) 
-            	if (this.rstate[i]) {
+            	if (this.rstate[i])
+            	{
             		target.state[i-1].remove();
             	}
             } else s+=", but misses";
@@ -62,22 +81,26 @@ public class Ability {
         return s;
     }
     
-    public int getLvRq(){
+    public int getLvRq()
+    {
     	return Math.abs(this.lvrq);
     }
     
-    public Ability(){    	
+    public Ability()
+    {    	
     	this("Ability",true,false,0,0,0,0,0,1,0,0,0,0,1,false,new boolean[]{},new boolean[]{});
     }
     
     public Ability(String name, boolean battle, int hpdmg, int mpdmg, int spdmg,
-    		int trg, int element, boolean state[], boolean rstate[]) {
+    		int trg, int element, boolean state[], boolean rstate[])
+    {
         this(name, battle, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,element, false, state, rstate);
     }
     
     public Ability(String name, boolean battle,boolean range,int lvrq, int hpc, int mpc,
     		int spc, int dmgtype, int atkp, int hpdmg, int mpdmg, int spdmg,  int trg,
-    		int element, boolean absorb, boolean state[], boolean rstate[]) {
+    		int element, boolean absorb, boolean state[], boolean rstate[])
+    {
         this.name = name;
         this.battle = battle;
         this.lvrq = lvrq;
