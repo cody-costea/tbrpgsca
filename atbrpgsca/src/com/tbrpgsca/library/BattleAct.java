@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Claudiu-Stefan Costea
+Copyright (C) 2016 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,15 +40,16 @@ public class BattleAct extends Activity {
 	protected static Ability[] Item;
 	protected static Actor[] Battler;
 	protected static int result = 0, surprise;
-	
+
 	protected int target, current = 7, difference = 0;
 	protected int waitTime[] = { 0, 0, 0 };
+	
 	protected Spinner targetBox, skillBox, itemBox;
 	protected ArrayAdapter<String> targetList, skillList, itemList;
 	protected TextView skillCost, updText;
 	protected Button Act, Use, Auto, Escape;
 	protected ImageView imgActor[] = new ImageView[8];
-	
+
 	protected ArrayList<Integer> skillId = new ArrayList<Integer>();
 	protected ArrayList<Integer> itemId = new ArrayList<Integer>();
 
@@ -399,8 +400,8 @@ public class BattleAct extends Activity {
 			}
 		if (nHeal) {
 			nHeal = false;
-			for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++) {
-				Ability s = BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)];
+			for (int i = 0; i < BattleAct.Battler[this.current].raceSkills.length; i++) {
+				Ability s = BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]];
 				if (s.hpdmg < 0 && s.mpc <= BattleAct.Battler[this.current].mp
 						&& s.hpc <= BattleAct.Battler[this.current].hp && s.spc <= BattleAct.Battler[this.current].sp
 						&& BattleAct.Battler[this.current].level >= s.getLvRq()) {
@@ -408,6 +409,17 @@ public class BattleAct extends Activity {
 					break;
 				}
 			}
+			if (!nHeal)
+				for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++) {
+					Ability s = BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)];
+					if (s.hpdmg < 0 && s.mpc <= BattleAct.Battler[this.current].mp
+							&& s.hpc <= BattleAct.Battler[this.current].hp
+							&& s.spc <= BattleAct.Battler[this.current].sp
+							&& BattleAct.Battler[this.current].level >= s.getLvRq()) {
+						nHeal = true;
+						break;
+					}
+				}
 		}
 		return nHeal;
 	}
