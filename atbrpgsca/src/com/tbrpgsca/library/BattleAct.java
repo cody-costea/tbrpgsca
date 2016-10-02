@@ -193,7 +193,7 @@ public class BattleAct extends Activity {
 			if (BattleAct.Battler[i] != null && BattleAct.Battler[i].maxhp > 0) {
 				s = BattleAct.Battler[i].name + " (HP: " + BattleAct.Battler[i].hp;
 				if (i < (BattleAct.Battler.length / 2) - this.difference)
-					s += ", MP: " + BattleAct.Battler[i].mp + ", SP: " + BattleAct.Battler[i].sp;
+					s += ", MP: " + BattleAct.Battler[i].mp + ", RP: " + BattleAct.Battler[i].sp;
 				s += ")";
 				this.targetList.add(s);
 			}
@@ -212,7 +212,7 @@ public class BattleAct extends Activity {
 				trg = (BattleAct.Skill[i].trg > 0) ? "All" : "Self";
 			this.skillId.add(i);
 			this.skillList.add(BattleAct.Skill[i].name + " (Rq:" + BattleAct.Skill[i].hpc + "HP,"
-					+ BattleAct.Skill[i].mpc + "MP," + BattleAct.Skill[i].spc + "SP;" + "Trg:" + trg + ")");
+					+ BattleAct.Skill[i].mpc + "MP," + BattleAct.Skill[i].spc + "RP;" + "Trg:" + trg + ")");
 		}
 		if (BattleAct.Battler[this.current].raceSkills != null)
 			for (int i = 0; i < Battler[this.current].raceSkills.length; i++)
@@ -229,7 +229,7 @@ public class BattleAct extends Activity {
 					this.skillList.add(BattleAct.Skill[Battler[this.current].raceSkills[i]].name + " (Rq:"
 							+ BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].hpc + "HP,"
 							+ BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].mpc + "MP,"
-							+ BattleAct.Skill[Battler[this.current].raceSkills[i]].spc + "SP;" + "Trg:" + trg + ")");
+							+ BattleAct.Skill[Battler[this.current].raceSkills[i]].spc + "RP;" + "Trg:" + trg + ")");
 				}
 		if (BattleAct.Battler[this.current].jobSkills != null)
 			for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++)
@@ -250,7 +250,7 @@ public class BattleAct extends Activity {
 					this.skillList.add(BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].name + " (Rq:"
 							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].hpc + "HP,"
 							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].mpc + "MP,"
-							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].spc + "SP;" + "Trg:"
+							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].spc + "RP;" + "Trg:"
 							+ trg + ")");
 				}
 		this.skillList.notifyDataSetChanged();
@@ -532,7 +532,7 @@ public class BattleAct extends Activity {
 		this.skillCost.setText(BattleAct.Battler[this.current].name + ": " + BattleAct.Battler[this.current].hp + "/"
 				+ BattleAct.Battler[this.current].maxhp + " HP, " + BattleAct.Battler[this.current].mp + "/"
 				+ BattleAct.Battler[this.current].maxmp + " MP, " + BattleAct.Battler[this.current].sp + "/"
-				+ BattleAct.Battler[this.current].maxsp + " SP");
+				+ BattleAct.Battler[this.current].maxsp + " RP");
 		this.imgActor[this.current].setBackgroundResource(R.drawable.current);
 		this.refreshSkillBox();
 	}

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Claudiu-Stefan Costea
+Copyright (C) 2016 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,10 +16,55 @@ limitations under the License.
 package com.tbrpgsca.library;
 
 public class Race {
-	public String rname;
-	public int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi;
-	public int rres[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	public int[] raceSkills;
+    protected String rname;
+    protected int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi;
+
+    protected int rres[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    protected int[] raceSkills;
+
+	public String getRaceName() {
+		return this.rname;
+	}
+
+	public int getMaxHP() {
+		return this.maxhp;
+	}
+
+	public int getMaxMP() {
+		return this.maxmp;
+	}
+
+	public int getMaxSP() {
+		return this.maxsp;
+	}
+
+	public int getMaxAtk() {
+		return this.matk;
+	}
+
+	public int getMaxDef() {
+		return this.mdef;
+	}
+
+	public int getMaxWis() {
+		return this.mwis;
+	}
+
+	public int getMaxSpi() {
+		return this.mspi;
+	}
+
+	public int getMaxAgi() {
+		return this.magi;
+	}
+
+	public int[] getRaceRes() {
+		return this.rres;
+	}
+
+	public int[] getRaceSkills() {
+		return this.raceSkills;
+	}
 
 	public Race() {
 		this("Humanoid", 25, 25, 25, 10, 10, 10, 10, 10);

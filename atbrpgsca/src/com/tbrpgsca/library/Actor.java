@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Claudiu-Stefan Costea
+Copyright (C) 2016 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,15 +18,242 @@ package com.tbrpgsca.library;
 import java.util.ArrayList;
 
 public class Actor extends Job {
-	public String name;
-	public boolean active = true, reflect = false;
-	public State state[];
-	public int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi, wis, agi;
-	public int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
+	protected String name;
+	protected boolean active = true, reflect = false;
+    protected State state[];
+    protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi, wis, agi;
+    protected int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
-	public ArrayList<Integer> jobSkills = new ArrayList<Integer>();
+    protected ArrayList<Integer> jobSkills = new ArrayList<Integer>();
 
-	public void setRace(Race race, Boolean init) {
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public boolean isActive() {
+		return this.active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public boolean isReflecting() {
+		return this.reflect;
+	}
+
+	public void setReflect(boolean reflect) {
+		this.reflect = reflect;
+	}
+
+	public State[] getState() {
+		return this.state;
+	}
+
+	public int getAuto() {
+		return this.auto;
+	}
+
+	public void setAuto(int auto) {
+		this.auto = auto;
+	}
+
+	public int getHP() {
+		return this.hp;
+	}
+
+	public void setHP(int hp) {
+		if (hp > this.maxp)
+			this.hp = maxhp;
+		else
+			this.hp = hp;
+	}
+
+	public int getMP() {
+		return this.mp;
+	}
+
+	public void setMP(int mp) {
+		if (mp > this.maxmp)
+			this.mp = this.maxmp;
+		else
+			this.mp = mp;
+	}
+
+	public int getSP() {
+		return this.sp;
+	}
+
+	public void setSP(int sp) {
+		if (sp > this.maxsp)
+			this.sp = this.maxsp;
+		else
+			this.sp = sp;
+	}
+
+	public int getLevel() {
+		return this.level;
+	}
+
+	public void setLevel(int level) {
+		if (level > this.maxlv)
+			level = this.maxlv;
+		while (this.level < level) {
+			this.exp = this.maxp;
+			this.levelUp();
+		}
+	}
+
+	public int getMaxLevel() {
+		return this.maxlv;
+	}
+
+	public void setMaxLevel(int maxlv) {
+		this.maxlv = maxlv;
+	}
+
+	public int getExp() {
+		return this.exp;
+	}
+
+	public void setExp(int exp) {
+		this.exp = exp;
+		this.levelUp();
+	}
+
+	public int getMaxExp() {
+		return this.maxp;
+	}
+
+	public int getAtk() {
+		return this.atk;
+	}
+
+	public void setAtk(int atk) {
+		this.atk = atk;
+	}
+
+	public int getDef() {
+		return this.def;
+	}
+
+	public void setDef(int def) {
+		this.def = def;
+	}
+
+	public int getSpi() {
+		return this.spi;
+	}
+
+	public void setSpi(int spi) {
+		this.spi = spi;
+	}
+
+	public int getWis() {
+		return this.wis;
+	}
+
+	public void setWis(int wis) {
+		this.wis = wis;
+	}
+
+	public int getAgi() {
+		return this.agi;
+	}
+
+	public void setAgi(int agi) {
+		this.agi = agi;
+	}
+
+	public int[] getMres() {
+		return this.mres;
+	}
+
+	public int[] getRes() {
+		return this.res;
+	}
+
+    public void setMaxAgi(int magi) {
+        this.magi = magi;
+    }
+
+    public void setMaxSpi(int mspi) {
+        this.mspi = mspi;
+    }
+
+    public void setMaxWis(int mwis) {
+        this.mwis = mwis;
+    }
+
+    public void setMaxDef(int mdef) {
+        this.mdef = mdef;
+    }
+
+    public void setMaxAtk(int matk) {
+        this.matk = matk;
+    }
+
+    public void setMaxSP(int maxsp) {
+        this.maxsp = maxsp;
+    }
+
+    public void setMaxMP(int maxmp) {
+        this.maxmp = maxmp;
+    }
+
+    public void setMaxHP(int maxhp) {
+        this.maxhp = maxhp;
+    }
+
+    public void setRaceName(String rname) {
+        this.rname = rname;
+    }
+
+    public void setJobName(String jname) {
+        this.jname = jname;
+    }
+
+    public void setHPinc(int hpp) {
+        this.hpp = hpp;
+    }
+
+    public void setMPinc(int mpp) {
+        this.mpp = mpp;
+    }
+
+    public void setSPinc(int spp) {
+        this.spp = spp;
+    }
+
+    public void setAtkInc(int atkp) {
+        this.atkp = atkp;
+    }
+
+    public void setDefInc(int defp) {
+        this.defp = defp;
+    }
+
+    public void setWisInc(int wisp) {
+        this.wisp = wisp;
+    }
+
+    public void setSpiInc(int spip) {
+        this.spip = spip;
+    }
+
+    public void setAgiInc(int agip) {
+        this.agip = agip;
+    }
+
+	public ArrayList<Integer> getJobSkills() {
+		return this.jobSkills;
+	}
+
+	public void setRace(Race race, boolean init) {
 		if (init) {
 			this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis, race.mspi, race.magi);
 			this.stats(1, this.maxlv);
@@ -39,7 +266,7 @@ public class Actor extends Job {
 		this.rname = race.rname;
 	}
 
-	public void changeJob(Job job, Boolean add) {
+	public void changeJob(Job job, boolean add) {
 		this.jname = job.jname;
 		if (add)
 			this.raceStats(this.maxhp + job.maxhp, this.maxmp + job.maxmp, this.maxsp + job.maxsp, this.matk + job.matk,
@@ -73,12 +300,12 @@ public class Actor extends Job {
 
 	public String applyState(boolean consume) {
 		String s = "";
-		if (auto < 2 && auto > -2)
+		if (this.auto < 2 && this.auto > -2)
 			this.auto = 0;
 		else
 			this.auto = 2;
-		if (consume && hp > 0)
-			active = true;
+		if (consume && this.hp > 0)
+            this.active = true;
 		this.atk = this.matk;
 		this.def = this.mdef;
 		this.spi = this.mspi;
@@ -90,7 +317,7 @@ public class Actor extends Job {
 		boolean c = false;
 		for (int i = 0; i < this.state.length; i++)
 			if (this.state[i].dur != 0 && this.hp > 0) {
-				String r = state[i].apply(this, consume);
+				String r = this.state[i].apply(this, consume);
 				if (r.length() > 0) {
 					if (c)
 						s += ", ";
@@ -109,24 +336,24 @@ public class Actor extends Job {
 
 	public String checkStatus() {
 		String s = "";
-		if (this.hp > maxhp)
-			hp = maxhp;
-		if (this.mp > maxmp)
-			mp = maxmp;
-		if (this.sp > maxsp)
-			sp = maxsp;
+		if (this.hp > this.maxhp)
+            this.hp = this.maxhp;
+		if (this.mp > this.maxmp)
+            this.mp = this.maxmp;
+		if (this.sp > this.maxsp)
+            this.sp = this.maxsp;
 		if (this.hp < 1) {
 			s += " (and falls unconcious)";
-			active = false;
-			for (int i = 0; i < state.length; i++)
+            this.active = false;
+			for (int i = 0; i < this.state.length; i++)
 				this.state[i].remove();
 		}
-		if (this.hp < -maxhp)
-			hp = -maxhp;
+		if (this.hp < -this.maxhp)
+            this.hp = -this.maxhp;
 		if (this.mp < 0)
-			mp = 0;
+            this.mp = 0;
 		if (this.sp < 0)
-			sp = 0;
+            this.sp = 0;
 		return s;
 	}
 
@@ -203,7 +430,7 @@ public class Actor extends Job {
 	public void recover() {
 		this.hp = this.maxhp;
 		this.mp = this.maxmp;
-		this.sp = this.maxsp;
+		this.sp = 0;
 		this.active = true;
 		this.atk = this.matk;
 		this.def = this.mdef;
@@ -296,10 +523,142 @@ public class Actor extends Job {
 	}
 
 	public class State {
-		public boolean inactive, confusion, auto, reflect;
-		public String name;
-		public int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism, agim;
-		public int resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		protected boolean inactive, confusion, auto, reflect;
+		protected String name;
+		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism, agim;
+		protected int resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+		public boolean isInactive() {
+			return this.inactive;
+		}
+
+		public void setInactive(boolean inactive) {
+			this.inactive = inactive;
+		}
+
+		public boolean isConfusing() {
+			return this.confusion;
+		}
+
+		public void setConfusion(boolean confusion) {
+			this.confusion = confusion;
+		}
+
+		public boolean isAuto() {
+			return this.auto;
+		}
+
+		public void setAuto(boolean auto) {
+			this.auto = auto;
+		}
+
+		public boolean isReflecting() {
+			return this.reflect;
+		}
+
+		public void setReflection(boolean reflect) {
+			this.reflect = reflect;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public int getRes() {
+			return this.res;
+		}
+
+		public void setRes(int res) {
+			this.res = res;
+		}
+
+		public int getMaxDur() {
+			return this.mdur;
+		}
+
+		public void setMaxDur(int mdur) {
+			this.mdur = mdur;
+		}
+
+		public int getDur() {
+			return this.dur;
+		}
+
+		public void setDur(int dur) {
+			this.dur = dur;
+		}
+
+		public int getHPmod() {
+			return this.hpm;
+		}
+
+		public void setHPmod(int hpm) {
+			this.hpm = hpm;
+		}
+
+		public int getMPmod() {
+			return this.mpm;
+		}
+
+		public void setMPmod(int mpm) {
+			this.mpm = mpm;
+		}
+
+		public int getSPmod() {
+			return this.spm;
+		}
+
+		public void setSPmod(int spm) {
+			this.spm = spm;
+		}
+
+		public int getAtkMod() {
+			return this.atkm;
+		}
+
+		public void setAtkMod(int atkm) {
+			this.atkm = atkm;
+		}
+
+		public int getDefMod() {
+			return this.defm;
+		}
+
+		public void setDefMod(int defm) {
+			this.defm = defm;
+		}
+
+		public int getSpiMod() {
+			return this.spim;
+		}
+
+		public void setSpiMod(int spim) {
+			this.spim = spim;
+		}
+
+		public int getWisMod() {
+			return this.wism;
+		}
+
+		public void setWisMod(int wism) {
+			this.wism = wism;
+		}
+
+		public int getAgiMod() {
+			return this.agim;
+		}
+
+		public void setAgiMod(int agim) {
+			this.agim = agim;
+		}
+
+		public int[] getResMod() {
+			return this.resm;
+		}
 
 		public State(String name, boolean inactive, boolean auto, boolean confusion, int dur, int hpm, int mpm, int spm,
 				int atkm, int defm, int wism, int spim, int agim, boolean reflect) {
@@ -340,7 +699,7 @@ public class Actor extends Job {
 					actor.sp += dmgsp;
 					boolean c = false;
 					if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
-						s += (name + " causes " + actor.name);
+						s += (this.name + " causes " + actor.name);
 					if (dmghp != 0) {
 						s += (" ");
 						if (dmghp >= 0)

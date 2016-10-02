@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Claudiu-Stefan Costea
+Copyright (C) 2016 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,9 +24,45 @@ import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 
 public class Job extends Race {
-	public String jname;
+	public int getAgiInc() {
+		return this.agip;
+	}
+
+	public int getSpiInc() {
+		return this.spip;
+	}
+
+	public int getWisInc() {
+		return this.wisp;
+	}
+
+	public int getDefInc() {
+		return this.defp;
+	}
+
+	public int getAtkInc() {
+		return this.atkp;
+	}
+
+	public int getSPinc() {
+		return this.spp;
+	}
+
+	public int getMPinc() {
+		return this.mpp;
+	}
+
+	public int getHPinc() {
+		return this.hpp;
+	}
+
+	public String getJobName() {
+		return this.jname;
+	}
+
+	protected String jname;
 	private String sprName;
-	public int hpp, mpp, spp, atkp, defp, wisp, spip, agip;
+	protected int hpp, mpp, spp, atkp, defp, wisp, spip, agip;
 
 	private AnimationDrawable bSprite[] = new AnimationDrawable[5];
 	private int sprWait[] = new int[5];
@@ -91,7 +127,7 @@ public class Job extends Race {
 
 	private Bitmap getBmpSpr(int i, String pos, int[] c, Activity context) {
 		Bitmap bmp = BitmapFactory.decodeResource(context.getResources(),
-				context.getResources().getIdentifier("bt_" + sprName + "_" + String.valueOf((i)) + "_" + pos,
+				context.getResources().getIdentifier("bt_" + this.sprName + "_" + String.valueOf((i)) + "_" + pos,
 						"drawable", context.getPackageName())/* ,opt */);
 		c[0] = bmp.getHeight();
 		c[2] = bmp.getWidth() / c[0];

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Claudiu-Stefan Costea
+Copyright (C) 2016 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ public class DemoAct extends Activity {
 		this.raceBox[1] = (Spinner) findViewById(R.id.RaceBox2);
 		this.raceBox[2] = (Spinner) findViewById(R.id.RaceBox3);
 		for (int i = 0; i < this.pcRace.length; i++)
-			this.raceList.add(this.pcRace[i].rname);
+			this.raceList.add(this.pcRace[i].getRaceName());
 		for (int i = 0; i < 3; i++)
 			this.raceBox[i].setAdapter(this.raceList);
 		this.raceBox[0].setSelection(1);
@@ -82,7 +82,7 @@ public class DemoAct extends Activity {
 		this.jobBox[1] = (Spinner) findViewById(R.id.JobBox2);
 		this.jobBox[2] = (Spinner) findViewById(R.id.JobBox3);
 		for (int i = 0; i < this.pcJob.length; i++)
-			this.jobList.add(this.pcJob[i].jname);
+			this.jobList.add(this.pcJob[i].getJobName());
 		for (int i = 0; i < 3; i++)
 			this.jobBox[i].setAdapter(this.jobList);
 		this.jobBox[0].setSelection(0);
@@ -102,7 +102,7 @@ public class DemoAct extends Activity {
 		this.Party[2] = this.Player[3];
 		this.Party[3] = null;
 		for (int i = 0; i < this.Item.length; i++)
-			this.Item[i].qty = 5;
+			this.Item[i].setQty(5);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class DemoAct extends Activity {
 				n = "Stephen";
 				break;
 			}
-		this.Player[p].name = n;
+		this.Player[p].setName(n);
 		if (this.raceBox[p - 1].isEnabled())
 			this.Player[p].setRace(this.pcRace[this.raceBox[p - 1].getSelectedItemPosition()], true);
 		this.Player[p].changeJob(this.pcJob[this.jobBox[p - 1].getSelectedItemPosition()], false);
@@ -268,11 +268,11 @@ public class DemoAct extends Activity {
     	npc[3]=new Actor("Stephen",maxlv);
     	
         npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, new int[]{9,11});
-        npc[4].state[5].res=9;npc[4].state[10].dur=-2;
+        npc[4].getState()[5].setRes(9);npc[4].getState()[10].setDur(-2);
         npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, new int[]{23,30});
         npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, new int[]{15});
         npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, new int[]{2});
-        npc[7].state[0].dur=-3;
+        npc[7].getState()[0].setDur(-3);
         
         return npc;
     }
@@ -282,63 +282,63 @@ public class DemoAct extends Activity {
         
         Ability ability[] = new Ability[57];
     	
-    	ability[0]=new Ability("Attack", true,false, 0, 0,0,0, 0,1, 10,0,0, 0,1, false, nostate, confsleep);
-        ability[1]=new Ability("Defend", true,true, 0, 0,0,0, 3,-1, 0,0,-3, -1,0, false, nostate, nostate);
+    	ability[0]=new Ability("Attack", true,false, 0, 0,0,0, 0,1, 10,0,-3, 0,1, false, nostate, confsleep);
+        ability[1]=new Ability("Defend", true,true, 0, 0,0,0, 3,-1, 0,-1,-2, -1,0, false, nostate, nostate);
         ability[2]=new Ability("Heal", false,true, 1, 0,3,0, 3,-1, -25,0,0, 0,6, false, revive, nostate);
         ability[3]=new Ability("Meditate", true,true, 1, 0,0,3, 3,-1, -3,-7,0, -1,6, false, nostate, dizziness);
         ability[4]=new Ability("Cure", false,true, 3, 0,7,0, 3,-1, -17,0,0, 0,7, false, revive, cure);
         ability[5]=new Ability("Clarity", true,true, 3, 0,0,7, 3,-1, 0,-3,0, 0,6, false, clarity, madness);
         ability[6]=new Ability("Regen", false,true, 4, 0,10,0, 3,-1, -37,0,0, 0,6, false, rvregen, poison);
         ability[7]=new Ability("Prayer", false,true, 5, 0,7,0, 3,-1, -23,0,0, 1,0, false, revive, nostate);
-        ability[8]=new Ability("Smite", true,false, 1, 1,0,2, 1,1, 4,3,0, 0,1, false, nostate, confclarity);
-        ability[9]=new Ability("Hit", true,false, 1, 3,0,1, 0,1, 12,0,0, 0,1, false, nostate, confsleep);
-        ability[10]=new Ability("Bash", true,false, 3, 3,0,5, 1,1, 7,5,0, 0,1, false, dizziness, confclarity);
-        ability[11]=new Ability("Smash", true,false, 3, 5,0,3, 0,1, 18,0,1, 0,1, false, nostate, confsleep);
+        ability[8]=new Ability("Smite", true,false, 1, 1,0,2, 1,1, 4,3,-4, 0,1, false, nostate, confclarity);
+        ability[9]=new Ability("Hit", true,false, 1, 3,0,1, 0,1, 12,0,-4, 0,1, false, nostate, confsleep);
+        ability[10]=new Ability("Bash", true,false, 3, 3,0,5, 1,1, 7,5,-5, 0,1, false, dizziness, confclarity);
+        ability[11]=new Ability("Smash", true,false, 3, 5,0,3, 0,1, 18,0,-7, 0,1, false, nostate, confsleep);
         ability[12]=new Ability("Berserk", true,false, 4, 7,0,4, 3,1, 0,0,0, -1,0, false, berserk, weakness);
-        ability[13]=new Ability("Shock", true,false, 4, 4,0,7, 1,1, 10,5,0, 0,7, false, dizzystun, confclarity);
-        ability[14]=new Ability("Crush", true,false, 5, 7,4,0, 0,1, 25,0,2, 0,1, false, stun, confsleep);
-        ability[15]=new Ability("Strike", true,true, 1, 0,0,3, 4,1, 13,0,0, 0,1, false, nostate, confsleep);
-        ability[16]=new Ability("Weaken", true,true, 1, 0,0,3, 4,1, 3,0,9, 0,1, false, weakness, vigour);
-        ability[17]=new Ability("Dash", true,true, 3, 0,0,7, 4,1, 15,0,0, 0,1, false, nostate, confsleep);
-        ability[18]=new Ability("Poison", true,true, 3, 0,0,5, 4,2, 5,0,7, 0,1, false, poison, regen);
-        ability[19]=new Ability("Pierce", true,true, 4, 0,0,10, 4,2, 15,0,0, 0,1, false, nostate, confsleep);
+        ability[13]=new Ability("Shock", true,false, 4, 4,0,7, 1,1, 10,5,-9, 0,7, false, dizzystun, confclarity);
+        ability[14]=new Ability("Crush", true,false, 5, 7,4,0, 0,1, 25,0,-11, 0,1, false, stun, confsleep);
+        ability[15]=new Ability("Strike", true,true, 1, 0,0,3, 4,1, 13,0,-3, 0,1, false, nostate, confsleep);
+        ability[16]=new Ability("Weaken", true,true, 1, 0,0,3, 4,1, 3,0,0, 0,1, false, weakness, vigour);
+        ability[17]=new Ability("Dash", true,true, 3, 0,0,7, 4,1, 15,0,-5, 0,1, false, nostate, confsleep);
+        ability[18]=new Ability("Poison", true,true, 3, 0,0,5, 4,2, 5,0,2, 0,1, false, poison, regen);
+        ability[19]=new Ability("Pierce", true,true, 4, 0,0,10, 4,2, 15,0,-7, 0,1, false, nostate, confsleep);
         ability[20]=new Ability("Toxic Gas", true,true, 4, 0,0,10, 6,3, 1,1,1, 1,1, false, tpoison, tregen);
         ability[21]=new Ability("Cheer", true,true, 4, 0,10,5, 3,-1, 0,0,-5, -2,0, false, vigour, cure);
-        ability[22]=new Ability("Venom Blade", true,false, 5, 0,0,10, 4,1, 17,0,3, 0,1, false, poison, conftregen);
-        ability[23]=new Ability("Absorb", true,true, 1, 0,0,3, 2,1, 0,7,0, 0,6, true, nostate, nostate);
-        ability[24]=new Ability("Drain", true,true, 3, 0,10,0, 2,1, 15,0,0, 0,6, true, nostate, nostate);
-        ability[25]=new Ability("Fireball", true,true, 1, 0,3,0, 2,1, 11,0,0, 0,2, false, nostate, sleep);
-        ability[26]=new Ability("Iceshard", true,true, 1, 0,3,0, 2,1, 11,0,0, 0,3, false, nostate, sleep);
-        ability[27]=new Ability("Lighting", true,true, 1, 0,3,0, 2,1, 11,0,0, 0,4, false, nostate, sleep);
-        ability[28]=new Ability("Rock", true,true, 1, 0,3,0, 2,1, 11,0,0, 0,5, false, nostate, sleep);
-        ability[29]=new Ability("Darkness", true,true, 1, 0,3,0, 2,1, 11,0,0, 0,6, false, nostate, sleep);
-        ability[30]=new Ability("Flame", true,true, 3, 0,5,0, 2,1, 15,0,0, 1,2, false, nostate, sleep);
-        ability[31]=new Ability("Blizzard", true,true, 3, 0,5,0, 2,1, 15,0,0, 1,3, false, nostate, sleep);
-        ability[32]=new Ability("Storm", true,true, 3, 0,5,0, 2,1, 15,0,0, 1,4, false, nostate, sleep);
-        ability[33]=new Ability("Earthquake", true,true, 3, 0,5,0, 2,1, 15,0,0, 1,5, false, nostate, sleep);
-        ability[34]=new Ability("Eclipse", true,true, 3, 0,5,0, 2,1, 13,0,0, 1,6, false, nostate, sleep);
-        ability[35]=new Ability("Flare", true,true, 5, 0,12,0, 2,2, 25,0,0, 0,1, false, nostate, sleep);
-        ability[36]=new Ability("Light Ray", true,true, 1, 0,3,0, 3,1, 11,0,0, 0,7, false, nostate, sleep);
-        ability[37]=new Ability("Light Burst", true,true, 3, 0,5,0, 3,1, 15,0,0, 1,7, false, nostate, sleep);
+        ability[22]=new Ability("Venom Blade", true,false, 5, 0,0,10, 4,1, 17,0,-9, 0,1, false, poison, conftregen);
+        ability[23]=new Ability("Absorb", true,true, 1, 0,0,3, 2,1, 0,7,-3, 0,6, true, nostate, nostate);
+        ability[24]=new Ability("Drain", true,true, 3, 0,10,0, 2,1, 15,0,-3, 0,6, true, nostate, nostate);
+        ability[25]=new Ability("Fireball", true,true, 1, 0,3,0, 2,1, 11,0,-5, 0,2, false, nostate, sleep);
+        ability[26]=new Ability("Iceshard", true,true, 1, 0,3,0, 2,1, 11,0,-5, 0,3, false, nostate, sleep);
+        ability[27]=new Ability("Lighting", true,true, 1, 0,3,0, 2,1, 11,0,-5, 0,4, false, nostate, sleep);
+        ability[28]=new Ability("Rock", true,true, 1, 0,3,0, 2,1, 11,0,-5, 0,5, false, nostate, sleep);
+        ability[29]=new Ability("Darkness", true,true, 1, 0,3,0, 2,1, 11,0,-5, 0,6, false, nostate, sleep);
+        ability[30]=new Ability("Flame", true,true, 3, 0,5,0, 2,1, 15,0,-7, 1,2, false, nostate, sleep);
+        ability[31]=new Ability("Blizzard", true,true, 3, 0,5,0, 2,1, 15,0,-7, 1,3, false, nostate, sleep);
+        ability[32]=new Ability("Storm", true,true, 3, 0,5,0, 2,1, 15,0,-7, 1,4, false, nostate, sleep);
+        ability[33]=new Ability("Earthquake", true,true, 3, 0,5,0, 2,1, 15,0,-7, 1,5, false, nostate, sleep);
+        ability[34]=new Ability("Eclipse", true,true, 3, 0,5,0, 2,1, 13,0,-7, 1,6, false, nostate, sleep);
+        ability[35]=new Ability("Flare", true,true, 5, 0,12,0, 2,2, 25,0,-9, 0,1, false, nostate, sleep);
+        ability[36]=new Ability("Light Ray", true,true, 1, 0,3,0, 3,1, 11,0,-5, 0,7, false, nostate, sleep);
+        ability[37]=new Ability("Light Burst", true,true, 3, 0,5,0, 3,1, 15,0,-7, 1,7, false, nostate, sleep);
         ability[38]=new Ability("Confusion", true,true, 5, 0,15,0, 2,1, 0,0,0, 0,6, false, confusion, clarity);
         ability[39]=new Ability("Sleep", true,true, 4, 0,0,17, 4,1, 3,0,17, 0,1, false, sleep, clarity);
         ability[40]=new Ability("Slash", true,true, 5, 0,10,10, 4,1, 15,0,0, 1,1, false, nostate, confsleep);
-        ability[41]=new Ability("Fire Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,2, false, nostate, confsleep);
-        ability[42]=new Ability("Ice Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,3, false, nostate, confsleep);
-        ability[43]=new Ability("Electric Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,4, false, nostate, confsleep);
-        ability[44]=new Ability("Stone Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,5, false, nostate, confsleep);
-        ability[45]=new Ability("Dark Wpn", true,false, 2, 0,3,2, 5,1, 17,0,0, 0,6, false, nostate, confsleep);
-        ability[46]=new Ability("Vampiric Wpn", true,false, 5, 0,10,5, 5,1, 21,0,0, 0,6, true, nostate, confsleep);
+        ability[41]=new Ability("Fire Wpn", true,false, 2, 0,3,2, 5,1, 17,0,-7, 0,2, false, nostate, confsleep);
+        ability[42]=new Ability("Ice Wpn", true,false, 2, 0,3,2, 5,1, 17,0,-7, 0,3, false, nostate, confsleep);
+        ability[43]=new Ability("Electric Wpn", true,false, 2, 0,3,2, 5,1, 17,0,-7, 0,4, false, nostate, confsleep);
+        ability[44]=new Ability("Stone Wpn", true,false, 2, 0,3,2, 5,1, 17,0,-7, 0,5, false, nostate, confsleep);
+        ability[45]=new Ability("Dark Wpn", true,false, 2, 0,3,2, 5,1, 17,0,-7, 0,6, false, nostate, confsleep);
+        ability[46]=new Ability("Vampiric Wpn", true,false, 5, 0,10,5, 5,1, 21,0,-9, 0,6, true, nostate, confsleep);
         ability[47]=new Ability("Reflect", true,true, 5, 0,10,0, 3,1, 0,0,0, 0,0, false, reflect, nostate);
-        ability[48]=new Ability("Meteor", true,true, 5, 0,17,0, 2,1, 19,0,0, 1,1, false, nostate, sleep);
-        ability[49]=new Ability("Syphon", true,true, 4, 0,15,0, 2,1, 13,0,3, 1,6, true, nostate, nostate);
-        ability[50]=new Ability("Dragon Breath", true,false, 4, 0,13,7, 5,1, 15,0,0, 1,1, false, nostate, confsleep);
-        ability[51]=new Ability("Light Wpn", true,false, 2, 0,3,2, 7,1, 17,0,0, 0,7, false, nostate, confsleep);
+        ability[48]=new Ability("Meteor", true,true, 5, 0,17,0, 2,1, 19,0,-11, 1,1, false, nostate, sleep);
+        ability[49]=new Ability("Syphon", true,true, 4, 0,15,0, 2,1, 13,0,-3, 1,6, true, nostate, nostate);
+        ability[50]=new Ability("Dragon Breath", true,false, 4, 0,13,7, 5,1, 15,0,-11, 1,1, false, nostate, confsleep);
+        ability[51]=new Ability("Light Wpn", true,false, 2, 0,3,2, 7,1, 17,0,-5, 0,7, false, nostate, confsleep);
         ability[52]=new Ability("Heal", false,true, 1, 0,3,0, 2,-1, -25,0,0, 0,7, false, revive, nostate);
         ability[53]=new Ability("Meditate", true,true, 1, 0,0,2, 2,-1, -3,-7,0, -1,7, false, nostate, dizziness);
         ability[54]=new Ability("Cure", false,true, 3, 0,7,0, 2,-1, -17,0,0, 0,7, false, revive, cure);
         ability[55]=new Ability("Clarity", true,true, 3, 0,0,7, 2,-1, 0,-3,0, 0,7, false, clarity, madness);
-        ability[56]=new Ability("Absorb", true,true, 1, 0,0,3, 3,1, 0,7,0, 0,7, true, nostate, nostate);
+        ability[56]=new Ability("Absorb", true,true, 1, 0,0,3, 3,1, 0,7,-3, 0,7, true, nostate, nostate);
         
         
         return ability;

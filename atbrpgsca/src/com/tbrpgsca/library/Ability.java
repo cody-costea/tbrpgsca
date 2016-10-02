@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Claudiu-Stefan Costea
+Copyright (C) 2016 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,14 +16,94 @@ limitations under the License.
 package com.tbrpgsca.library;
 
 public class Ability {
-	public String name;
-	public int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype, element, qty;
-	public boolean battle, state[], rstate[], absorb, range;
+	protected String name;
+	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype, element, qty, mqty;
+	protected boolean battle, absorb, range;
+    protected boolean[] state, rstate;
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getTrg() {
+        return this.trg;
+    }
+
+    public void setQty(int qty) {
+        if (this.mqty > 0 && qty > this.mqty)
+            this.qty = this.mqty;
+        else
+            this.qty = qty;
+    }
+
+    public int getHpCost() {
+        return this.hpc;
+    }
+
+    public int getMpCost() {
+        return this.mpc;
+    }
+
+    public int getSpCost() {
+        return this.spc;
+    }
+
+    public int getAtkMod() {
+        return this.atki;
+    }
+
+    public int getHpDmg() {
+        return this.hpdmg;
+    }
+
+    public int getMpDmg() {
+        return this.mpdmg;
+    }
+
+    public int getSpDmg() {
+        return this.spdmg;
+    }
+
+    public int getDmgType() {
+        return this.dmgtype;
+    }
+
+    public int getElement() {
+        return this.element;
+    }
+
+    public int getQty() {
+        return this.qty;
+    }
+
+    public int getMaxQty() {
+        return this.mqty;
+    }
+
+    public boolean isBattleOnly() {
+        return this.battle;
+    }
+
+    public boolean[] getState() {
+        return this.state;
+    }
+
+    public boolean[] getRstate() {
+        return this.rstate;
+    }
+
+    public boolean isAbsorbing() {
+        return this.absorb;
+    }
+
+    public boolean isRanged() {
+        return this.range;
+    }
 
 	public String execute(Actor user, Actor target) {
 		String s = "";
 		int dmg = (int) (Math.random() * 4);
-		int res = (target.res[element] < 7) ? target.res[element] : -1;
+		int res = (target.res[this.element] < 7) ? target.res[this.element] : -1;
 		switch (this.dmgtype) {
 		case 1:
 			dmg += (this.atki * ((user.def + user.atk) / 2)) / (target.def * res + 1);
@@ -93,7 +173,7 @@ public class Ability {
 				s += " ";
 				if (dmgsp < 1)
 					s += "+";
-				s += -dmgsp + " SP";
+				s += -dmgsp + " RP";
 			}
 			for (int i = 1; i < this.state.length; i++)
 				if (this.state[i])
@@ -110,6 +190,10 @@ public class Ability {
 		return s;
 	}
 
+    public void replenish() {
+        this.qty = this.mqty;
+    }
+
 	public int getLvRq() {
 		return Math.abs(this.lvrq);
 	}
@@ -124,7 +208,13 @@ public class Ability {
 	}
 
 	public Ability(String name, boolean battle, boolean range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
-			int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element, boolean absorb, boolean state[],
+				   int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element, boolean absorb, boolean state[],
+				   boolean rstate[]) {
+		this(name, battle, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg, mpdmg, spdmg, trg, element, -1, absorb, state, rstate);
+	}
+
+	public Ability(String name, boolean battle, boolean range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
+			int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element,  int mqty, boolean absorb, boolean state[],
 			boolean rstate[]) {
 		this.name = name;
 		this.battle = battle;
@@ -144,5 +234,6 @@ public class Ability {
 		this.range = range;
 		this.element = element;
 		this.qty = 0;
+		this.mqty = mqty;
 	}
 }
