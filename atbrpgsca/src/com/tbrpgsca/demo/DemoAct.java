@@ -232,24 +232,24 @@ public class DemoAct extends Activity {
 		
 		Job pcJob[]=new Job[15];
 		
-		pcJob[1]=new Job("Berserker",1,0,0, 1,0,0,0,1, new int[]{0,1,-1,-1,-1,-1}, new int[]{8,9,10,11,12,14});
-		pcJob[2]=new Job("Sorcerer",0,1,0, 0,0,1,0,1, new int[]{0,-1,1,1,1,1,1,-1}, new int[]{23,24,25,26,27,28,29,30,31,32,33,34,35,38});
+		pcJob[1]=new Job("Berserker",1,0,0, 1,0,0,0,1, new int[]{0,1,-1,-1,-1,-1}, this.Skill, new int[]{8,9,10,11,12,14});
+		pcJob[2]=new Job("Sorcerer",0,1,0, 0,0,1,0,1, new int[]{0,-1,1,1,1,1,1,-1}, this.Skill, new int[]{23,24,25,26,27,28,29,30,31,32,33,34,35,38});
         pcJob[2].setSprName("Wizard");
-        pcJob[3]=new Job("Monk",0,1,0, 0,1,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new int[]{2,3,4,5,6,7});
-        pcJob[4]=new Job("Rogue",0,0,1, 1,0,0,0,1, new int[]{}, new int[]{15,16,17,18,22,38});
-        pcJob[5]=new Job("Alchemist",0,1,0, 0,0,1,0,1, new int[]{}, new int[]{23,24,25,26,27,28,30,31,32,33,15,16,17,18,20});
-        pcJob[6]=new Job("Dragoon",1,0,0, 1,0,1,0,0, new int[]{0,0,1,1,1,1,0,-1}, new int[]{8,9,10,11,23,24,25,26,27,28,30,31,32,33,41,42,43,44,50});
-        pcJob[7]=new Job("Knight",1,0,0, 0,1,0,1,0, new int[]{0,1,-1,-1,-1,-1,-7,7}, new int[]{2,3,4,5,8,9,10,11,13});
-        pcJob[8]=new Job("Warden",0,0,1, 0,0,0,1,1, new int[]{0,0,0,0,0,0,-2,2}, new int[]{2,3,4,5,15,16,17,18,21});
+        pcJob[3]=new Job("Monk",0,1,0, 0,1,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, this.Skill, new int[]{2,3,4,5,6,7});
+        pcJob[4]=new Job("Rogue",0,0,1, 1,0,0,0,1, new int[]{}, this.Skill, new int[]{15,16,17,18,22,38});
+        pcJob[5]=new Job("Alchemist",0,1,0, 0,0,1,0,1, new int[]{}, this.Skill, new int[]{23,24,25,26,27,28,30,31,32,33,15,16,17,18,20});
+        pcJob[6]=new Job("Dragoon",1,0,0, 1,0,1,0,0, new int[]{0,0,1,1,1,1,0,-1}, this.Skill, new int[]{8,9,10,11,23,24,25,26,27,28,30,31,32,33,41,42,43,44,50});
+        pcJob[7]=new Job("Knight",1,0,0, 0,1,0,1,0, new int[]{0,1,-1,-1,-1,-1,-7,7}, this.Skill, new int[]{2,3,4,5,8,9,10,11,13});
+        pcJob[8]=new Job("Warden",0,0,1, 0,0,0,1,1, new int[]{0,0,0,0,0,0,-2,2}, this.Skill, new int[]{2,3,4,5,15,16,17,18,21});
         pcJob[8].setSprName("Bard");
-        pcJob[9]=new Job("Shaman",0,1,0, 0,0,1,1,0, new int[]{0,0,0,0,0,0,7,-7}, new int[]{52,53,54,55,23,24,29,34,49});
-        pcJob[10]=new Job("Swashbuckler",0,0,1, 1,0,0,0,1, new int[]{}, new int[]{8,9,10,11,15,16,17,18,19});
-        pcJob[11]=new Job("Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, new int[]{8,9,11,23,24,29,15,16,18,45,46});
-        pcJob[12]=new Job("Ninja",0,0,1, 0,0,0,0,1, new int[]{}, new int[]{8,9,11,15,16,17,2,3,5,40});
-        pcJob[13]=new Job("Crusader",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new int[]{8,9,10,2,3,4,56,36,51,37,47});
+        pcJob[9]=new Job("Shaman",0,1,0, 0,0,1,1,0, new int[]{0,0,0,0,0,0,7,-7}, this.Skill, new int[]{52,53,54,55,23,24,29,34,49});
+        pcJob[10]=new Job("Swashbuckler",0,0,1, 1,0,0,0,1, new int[]{}, this.Skill, new int[]{8,9,10,11,15,16,17,18,19});
+        pcJob[11]=new Job("Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, this.Skill, new int[]{8,9,11,23,24,29,15,16,18,45,46});
+        pcJob[12]=new Job("Ninja",0,0,1, 0,0,0,0,1, new int[]{}, this.Skill, new int[]{8,9,11,15,16,17,2,3,5,40});
+        pcJob[13]=new Job("Crusader",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, this.Skill, new int[]{8,9,10,2,3,4,56,36,51,37,47});
         pcJob[13].setSprName("Templar");
-        pcJob[14]=new Job("Druid",0,1,0, 0,0,1,0,0, new int[]{0,0,1,1,1,1,-1,-1}, new int[]{23,25,26,27,28,30,31,32,33,52,53,54,15,16,18,48});
-        pcJob[0]=new Job("Hero",1,1,1, 0,0,0,0,0, new int[]{}, new int[]{8,9,10,11,23,24,25,26,27,28,29,41,42,43,44,45,30,31,32,33,34,36,51,37,2,3,4,5,15,16,17,18});
+        pcJob[14]=new Job("Druid",0,1,0, 0,0,1,0,0, new int[]{0,0,1,1,1,1,-1,-1}, this.Skill, new int[]{23,25,26,27,28,30,31,32,33,52,53,54,15,16,18,48});
+        pcJob[0]=new Job("Hero",1,1,1, 0,0,0,0,0, new int[]{}, this.Skill, new int[]{8,9,10,11,23,24,25,26,27,28,29,41,42,43,44,45,30,31,32,33,34,36,51,37,2,3,4,5,15,16,17,18});
         	
         return pcJob;
     }
@@ -267,11 +267,11 @@ public class DemoAct extends Activity {
     	npc[2]=new Actor("George",maxlv);    	
     	npc[3]=new Actor("Stephen",maxlv);
     	
-        npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, new int[]{9,11});
+        npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, this.Skill, new int[]{9,11});
         npc[4].getState()[5].setRes(9);npc[4].getState()[10].setDur(-2);
-        npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, new int[]{23,30});
-        npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, new int[]{15});
-        npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, new int[]{2});
+        npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, this.Skill, new int[]{23,30});
+        npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, this.Skill, new int[]{15});
+        npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, this.Skill, new int[]{2});
         npc[7].getState()[0].setDur(-3);
         
         return npc;

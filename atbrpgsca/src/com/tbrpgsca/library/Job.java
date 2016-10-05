@@ -72,11 +72,19 @@ public class Job extends Race {
 	}
 
 	public Job(String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi, int agi, int hpp, int mpp,
-			int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes, int[] newSkill) {
+			int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes, Ability[] newSkill) {
 		super("", hp, mp, sp, atk, def, wis, spi, agi, newRes, newSkill);
 		this.jname = jname;
 		this.setSprName(this.jname);
 		this.jobStats(hpp, mpp, spp, atkp, defp, wisp, spip, agip);
+	}
+	
+	public Job(String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi, int agi, int hpp, int mpp,
+			int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes, Ability[] newSkill, int[] skills) {
+		this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, null);
+		this.raceSkills = new Ability[skills.length];
+		for (int i = 0; i < skills.length; i++)
+			this.raceSkills[i] = newSkill[skills[i]];
 	}
 
 	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip) {
@@ -85,12 +93,17 @@ public class Job extends Race {
 
 	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip,
 			int[] newRes) {
-		this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, new int[] {});
+		this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, new Ability[] {});
 	}
 
 	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes,
-			int[] newSkill) {
+			Ability[] newSkill) {
 		this(jname, 0, 0, 0, 0, 0, 0, 0, 0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill);
+	}
+	
+	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes,
+			Ability[] newSkill, int[] skills) {
+		this(jname, 0, 0, 0, 0, 0, 0, 0, 0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill, skills);
 	}
 
 	protected void jobStats(int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip) {

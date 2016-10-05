@@ -20,7 +20,7 @@ public class Race {
     protected int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi;
 
     protected int rres[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    protected int[] raceSkills;
+    protected Ability[] raceSkills;
 
 	public String getRaceName() {
 		return this.rname;
@@ -62,7 +62,7 @@ public class Race {
 		return this.rres;
 	}
 
-	public int[] getRaceSkills() {
+	public Ability[] getRaceSkills() {
 		return this.raceSkills;
 	}
 
@@ -71,7 +71,7 @@ public class Race {
 	}
 
 	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
-			int[] newRes, int[] newSkill) {
+			int[] newRes, Ability[] newSkill) {
 		this.rname = rname;
 		this.raceStats(maxhp, maxmp, maxsp, atk, def, wis, spi, agi);
 		this.raceSkills = newSkill;
@@ -84,7 +84,7 @@ public class Race {
 
 	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
 			int[] newRes) {
-		this(rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes, new int[] {});
+		this(rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes, new Ability[] {});
 	}
 
 	protected void raceStats(int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi,

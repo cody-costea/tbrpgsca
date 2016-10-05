@@ -50,7 +50,7 @@ public class BattleAct extends Activity {
 	protected Button Act, Use, Auto, Escape;
 	protected ImageView imgActor[] = new ImageView[8];
 
-	protected ArrayList<Integer> skillId = new ArrayList<Integer>();
+	protected ArrayList<Ability> skills = new ArrayList<Ability>();
 	protected ArrayList<Integer> itemId = new ArrayList<Integer>();
 
 	public static void InitiateBattle(Activity act, Actor[] party, Actor[] enemy, Ability[] skill, Ability[] item,
@@ -66,8 +66,7 @@ public class BattleAct extends Activity {
 				BattleAct.Battler[i] = party[i];
 		for (int k = 0; k < enemy.length; k++)
 			if (enemy[k] != null && enemy[k].maxhp > 0) {
-				BattleAct.Battler[k + 4] = new Actor();
-				BattleAct.Battler[k + 4].copy(enemy[k]);
+				BattleAct.Battler[k + 4] = new Actor(enemy[k]);
 				BattleAct.Battler[k + 4].auto = 2;
 			}
 		act.startActivityForResult(btInt, 1);
@@ -77,23 +76,6 @@ public class BattleAct extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (BattleAct.Battler == null || BattleAct.Skill == null || BattleAct.Item == null) {
-			BattleAct.Battler = new Actor[] {
-					new Actor("Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
-							new int[] {}, new int[] { 4 }),
-					new Actor("Stephanie", "Human", "Sorceress", 1, 3, 45, 20, 5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0,
-							1, new int[] {}, new int[] { 5 }),
-					new Actor("George", "Half-Orc", "Templar", 1, 3, 47, 15, 15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1,
-							0, new int[] {}, new int[] { 2 }),
-					new Actor("Victoria", "Elf", "Valkyrie", 1, 3, 55, 7, 13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
-							new int[] {}, new int[] { 3 }),
-					new Actor("Lizard", "Lizard", "Lizard", 3, 3, 50, 15, 10, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
-							new int[] {}, new int[] { 5 }),
-					new Actor("Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-							new int[] {}, new int[] { 3 }),
-					new Actor("Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
-							new int[] {}, new int[] { 3 }),
-					new Actor("Troll", "Troll", "Troll", 3, 3, 47, 15, 15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
-							new int[] {}, new int[] { 2 }) };
 			BattleAct.Skill = new Ability[] {
 					new Ability("Attack", true, false, 0, 0, 0, 0, 0, 1, 10, 0, 0, 0, 1, false, new boolean[] {},
 							new boolean[] {}),
@@ -110,6 +92,23 @@ public class BattleAct extends Activity {
 							new boolean[] { false, false, true }, new boolean[] { false, true }),
 					new Ability("Fireball", true, true, 2, 0, 7, 0, 2, 1, 15, 0, 0, 0, 2, false, new boolean[] {},
 							new boolean[] {}) };
+			BattleAct.Battler = new Actor[] {
+					new Actor("Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[4] }),
+					new Actor("Stephanie", "Human", "Sorceress", 1, 3, 45, 20, 5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0,
+							1, new int[] {}, new Ability[] { BattleAct.Skill[5] }),
+					new Actor("George", "Half-Orc", "Templar", 1, 3, 47, 15, 15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1,
+							0, new int[] {}, new Ability[] { BattleAct.Skill[2] }),
+					new Actor("Victoria", "Elf", "Valkyrie", 1, 3, 55, 7, 13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[3] }),
+					new Actor("Lizard", "Lizard", "Lizard", 3, 3, 50, 15, 10, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[5] }),
+					new Actor("Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+							new int[] {}, new Ability[] { BattleAct.Skill[3] }),
+					new Actor("Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[3] }),
+					new Actor("Troll", "Troll", "Troll", 3, 3, 47, 15, 15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[2] }) };			
 			BattleAct.Item = new Ability[] {
 					new Ability("Potion", true, -25, 0, 0, 0, 0, new boolean[] {}, new boolean[] {}) };
 			BattleAct.Item[0].qty = 10;
@@ -203,54 +202,54 @@ public class BattleAct extends Activity {
 
 	private void refreshSkillBox() {
 		this.skillList.clear();
-		this.skillId.clear();
+		this.skills.clear();
 		String trg;
 		for (int i = 0; i < 2; i++) {
 			if (BattleAct.Skill[i].trg == 0)
 				trg = "One";
 			else
 				trg = (BattleAct.Skill[i].trg > 0) ? "All" : "Self";
-			this.skillId.add(i);
+			this.skills.add(BattleAct.Skill[i]);
 			this.skillList.add(BattleAct.Skill[i].name + " (Rq:" + BattleAct.Skill[i].hpc + "HP,"
 					+ BattleAct.Skill[i].mpc + "MP," + BattleAct.Skill[i].spc + "RP;" + "Trg:" + trg + ")");
 		}
 		if (BattleAct.Battler[this.current].raceSkills != null)
 			for (int i = 0; i < Battler[this.current].raceSkills.length; i++)
-				if (!(BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]]
+				if (!(BattleAct.Battler[this.current].raceSkills[i]
 						.getLvRq() > BattleAct.Battler[this.current].level)
-						&& !(BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].mpc > BattleAct.Battler[this.current].mp)
-						&& !(BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].spc > BattleAct.Battler[this.current].sp)
-						&& !(BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].hpc >= BattleAct.Battler[this.current].hp)) {
-					if (BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].trg == 0)
+						&& !(BattleAct.Battler[this.current].raceSkills[i].mpc > BattleAct.Battler[this.current].mp)
+						&& !(BattleAct.Battler[this.current].raceSkills[i].spc > BattleAct.Battler[this.current].sp)
+						&& !(BattleAct.Battler[this.current].raceSkills[i].hpc >= BattleAct.Battler[this.current].hp)) {
+					if (BattleAct.Battler[this.current].raceSkills[i].trg == 0)
 						trg = "One";
 					else
-						trg = (BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].trg > 0) ? "All" : "Self";
-					this.skillId.add(Battler[this.current].raceSkills[i]);
-					this.skillList.add(BattleAct.Skill[Battler[this.current].raceSkills[i]].name + " (Rq:"
-							+ BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].hpc + "HP,"
-							+ BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]].mpc + "MP,"
-							+ BattleAct.Skill[Battler[this.current].raceSkills[i]].spc + "RP;" + "Trg:" + trg + ")");
+						trg = (BattleAct.Battler[this.current].raceSkills[i].trg > 0) ? "All" : "Self";
+					this.skills.add(BattleAct.Battler[this.current].raceSkills[i]);
+					this.skillList.add(Battler[this.current].raceSkills[i].name + " (Rq:"
+							+ BattleAct.Battler[this.current].raceSkills[i].hpc + "HP,"
+							+ BattleAct.Battler[this.current].raceSkills[i].mpc + "MP,"
+							+ BattleAct.Battler[this.current].raceSkills[i].spc + "RP;" + "Trg:" + trg + ")");
 				}
 		if (BattleAct.Battler[this.current].jobSkills != null)
 			for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++)
-				if (!(BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)]
+				if (!(BattleAct.Battler[this.current].jobSkills.get(i)
 						.getLvRq() > BattleAct.Battler[this.current].level)
-						&& !(BattleAct.Skill[BattleAct.Battler[this.current].jobSkills
-								.get(i)].mpc > BattleAct.Battler[this.current].mp)
-						&& !(BattleAct.Skill[BattleAct.Battler[this.current].jobSkills
-								.get(i)].spc > BattleAct.Battler[this.current].sp)
-						&& !(BattleAct.Skill[BattleAct.Battler[this.current].jobSkills
-								.get(i)].hpc >= BattleAct.Battler[this.current].hp)) {
-					if (BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].trg == 0)
+						&& !(BattleAct.Battler[this.current].jobSkills
+								.get(i).mpc > BattleAct.Battler[this.current].mp)
+						&& !(BattleAct.Battler[this.current].jobSkills
+								.get(i).spc > BattleAct.Battler[this.current].sp)
+						&& !(BattleAct.Battler[this.current].jobSkills
+								.get(i).hpc >= BattleAct.Battler[this.current].hp)) {
+					if (BattleAct.Battler[this.current].jobSkills.get(i).trg == 0)
 						trg = "One";
 					else
-						trg = (BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].trg > 0) ? "All"
+						trg = (BattleAct.Battler[this.current].jobSkills.get(i).trg > 0) ? "All"
 								: "Self";
-					this.skillId.add(BattleAct.Battler[this.current].jobSkills.get(i));
-					this.skillList.add(BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].name + " (Rq:"
-							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].hpc + "HP,"
-							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].mpc + "MP,"
-							+ BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)].spc + "RP;" + "Trg:"
+					this.skills.add(BattleAct.Battler[this.current].jobSkills.get(i));
+					this.skillList.add(BattleAct.Battler[this.current].jobSkills.get(i).name + " (Rq:"
+							+ BattleAct.Battler[this.current].jobSkills.get(i).hpc + "HP,"
+							+ BattleAct.Battler[this.current].jobSkills.get(i).mpc + "MP,"
+							+ BattleAct.Battler[this.current].jobSkills.get(i).spc + "RP;" + "Trg:"
 							+ trg + ")");
 				}
 		this.skillList.notifyDataSetChanged();
@@ -281,7 +280,7 @@ public class BattleAct extends Activity {
 	}
 
 	private void executeSkill() {
-		this.executeSkill(BattleAct.Skill[this.skillId.get(this.skillBox.getSelectedItemPosition())]);
+		this.executeSkill(this.skills.get(this.skillBox.getSelectedItemPosition()));
 	}
 
 	private void executeSkill(Ability ability) {
@@ -401,7 +400,7 @@ public class BattleAct extends Activity {
 		if (nHeal) {
 			nHeal = false;
 			for (int i = 0; i < BattleAct.Battler[this.current].raceSkills.length; i++) {
-				Ability s = BattleAct.Skill[BattleAct.Battler[this.current].raceSkills[i]];
+				Ability s = BattleAct.Battler[this.current].raceSkills[i];
 				if (s.hpdmg < 0 && s.mpc <= BattleAct.Battler[this.current].mp
 						&& s.hpc <= BattleAct.Battler[this.current].hp && s.spc <= BattleAct.Battler[this.current].sp
 						&& BattleAct.Battler[this.current].level >= s.getLvRq()) {
@@ -411,7 +410,7 @@ public class BattleAct extends Activity {
 			}
 			if (!nHeal)
 				for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++) {
-					Ability s = BattleAct.Skill[BattleAct.Battler[this.current].jobSkills.get(i)];
+					Ability s = BattleAct.Battler[this.current].jobSkills.get(i);
 					if (s.hpdmg < 0 && s.mpc <= BattleAct.Battler[this.current].mp
 							&& s.hpc <= BattleAct.Battler[this.current].hp
 							&& s.spc <= BattleAct.Battler[this.current].sp
@@ -431,9 +430,9 @@ public class BattleAct extends Activity {
 				|| i < BattleAct.Battler[this.current].raceSkills.length; i++)
 			for (int j = 0; j < 2; j++) {
 				if (j == 0 && i < Battler[this.current].raceSkills.length)
-					a = BattleAct.Skill[Battler[this.current].raceSkills[i]];
+					a = Battler[this.current].raceSkills[i];
 				else if (j == 1 && i < Battler[this.current].jobSkills.size())
-					a = BattleAct.Skill[Battler[this.current].jobSkills.get(i)];
+					a = Battler[this.current].jobSkills.get(i);
 				else
 					continue;
 				if (a.mpc <= BattleAct.Battler[this.current].mp && a.hpc < BattleAct.Battler[this.current].hp

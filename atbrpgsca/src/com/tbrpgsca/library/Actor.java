@@ -24,7 +24,13 @@ public class Actor extends Job {
     protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi, wis, agi;
     protected int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
-    protected ArrayList<Integer> jobSkills = new ArrayList<Integer>();
+    protected ArrayList<Ability> jobSkills = new ArrayList<Ability>();
+    
+    private Actor origin = null;
+    
+    public Actor getOrigin() {
+    	return this.origin;
+    }
 
 	public String getName() {
 		return this.name;
@@ -249,7 +255,7 @@ public class Actor extends Job {
         this.agip = agip;
     }
 
-	public ArrayList<Integer> getJobSkills() {
+	public ArrayList<Ability> getJobSkills() {
 		return this.jobSkills;
 	}
 
@@ -262,7 +268,10 @@ public class Actor extends Job {
 					this.matk + race.matk, this.mdef + race.mdef, this.mwis + race.mwis, this.mspi + race.mspi,
 					this.magi + race.magi);
 		this.setRes(race.rres, true);
-		this.raceSkills = race.raceSkills;
+		//this.raceSkills = race.raceSkills;
+		this.raceSkills = new Ability[race.raceSkills.length];
+		for (int i = 0; i < race.raceSkills.length; i++)
+			this.raceSkills[i] = new Ability(race.raceSkills[i]);
 		this.rname = race.rname;
 	}
 
@@ -378,12 +387,12 @@ public class Actor extends Job {
 			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
 			int agip, int[] newRes) {
 		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp,
-				wisp, spip, agip, newRes, new int[] {});
+				wisp, spip, agip, newRes, new Ability[] {});
 	}
 
 	public Actor(String name, String race, String jname, int lv, int maxlv, int maxhp, int maxmp, int maxsp, int atk,
 			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
-			int agip, int[] newRes, int[] newSkill) {
+			int agip, int[] newRes, Ability[] newSkill) {
 		super(jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
 				newSkill);
 		this.name = name;
@@ -391,6 +400,17 @@ public class Actor extends Job {
 		this.state = this.AddStates();
 		this.raceSkills = newSkill;
 		this.stats(lv, maxlv);
+	}
+	
+	public Actor(String name, String race, String jname, int lv, int maxlv, int maxhp, int maxmp, int maxsp, int atk,
+			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
+			int agip, int[] newRes, Ability[] newSkill, int[] skills) {
+		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp,
+				wisp, spip, agip, newRes, null);
+		this.raceSkills = new Ability[skills.length];
+		for (int i = 0; i < skills.length; i++)
+			this.raceSkills[i] = newSkill[skills[i]];
+		
 	}
 
 	private void setRes(int nres[], boolean race) {
@@ -442,19 +462,15 @@ public class Actor extends Job {
 		this.applyState(false);
 	}
 
-	public void copy(Actor cloned) {
+	public Actor(Actor cloned) {
 		this.name = cloned.name;
 		this.jname = cloned.jname;
 		this.rname = cloned.rname;
+		this.state = cloned.state;
 		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.atk, cloned.def, cloned.wis, cloned.spi,
 				cloned.agi);
 		this.jobStats(cloned.hpp, cloned.mpp, cloned.spp, cloned.atkp, cloned.defp, cloned.wisp, cloned.spip,
 				cloned.agip);
-		this.stats(cloned.level, cloned.maxlv);
-		for (int i = 0; i < state.length; i++) {
-			this.state[i].dur = cloned.state[i].dur;
-			this.state[i].res = cloned.state[i].res;
-		}
 		for (int i = 0; i < res.length; i++) {
 			this.rres[i] = cloned.rres[i];
 			this.mres[i] = cloned.mres[i];
@@ -462,14 +478,27 @@ public class Actor extends Job {
 		}
 		this.jobSkills.clear();
 		this.raceSkills = cloned.raceSkills;
-		this.addSkills(cloned.jobSkills);
+		this.addSkills(cloned.jobSkills, false);
 		this.setSprName(cloned.getSprName());
+		this.stats(cloned.level, cloned.maxlv);
+		this.origin = cloned;
 	}
 
-	public void addSkills(ArrayList<Integer> newSkill) {
-		for (int i = 0; i < newSkill.size(); i++)
-			if (!this.jobSkills.contains(newSkill.get(i)))
-				this.jobSkills.add(newSkill.get(i));
+	public void addSkills(ArrayList<Ability> newSkill, boolean noDuplicate) {
+		ArrayList<Ability> origins = null;
+		int i;
+		if (noDuplicate) {
+			origins = new ArrayList<Ability>(this.jobSkills.size() + this.raceSkills.length);
+			for (i = 0; i < this.jobSkills.size(); i++) {
+				origins.set(i, this.jobSkills.get(i).origin);
+			}
+			for (i = 0; i < this.raceSkills.length; i++) {
+				origins.add(this.raceSkills[i].origin);
+			}
+		}
+		for (i = 0; i < newSkill.size(); i++)
+			if (noDuplicate && !origins.contains(this.jobSkills.contains(newSkill.get(i))))
+				this.jobSkills.add(new Ability(newSkill.get(i)));
 	}
 
 	@Override
@@ -754,10 +783,10 @@ public class Actor extends Job {
 		}
 	}
 
-	public void addSkills(int[] newSkill) {
+	public void addSkills(Ability[] newSkill) {
 		for (int j = 0; j < newSkill.length; j++)
 			if (!this.jobSkills.contains(newSkill[j]))
-				this.jobSkills.add(newSkill[j]);
+				this.jobSkills.add(new Ability(newSkill[j]));
 	}
 
 	public void removeSkills() {

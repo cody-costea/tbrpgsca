@@ -20,6 +20,11 @@ public class Ability {
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype, element, qty, mqty;
 	protected boolean battle, absorb, range;
     protected boolean[] state, rstate;
+    protected Ability origin = null;
+    
+    public Ability getOrigin() {
+    	return this.origin;
+    }
 
     public String getName() {
         return this.name;
@@ -235,5 +240,12 @@ public class Ability {
 		this.element = element;
 		this.qty = 0;
 		this.mqty = mqty;
+	}
+	
+	public Ability(Ability cloned) {
+		this(cloned.name, cloned.battle, cloned.range, cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc, cloned.dmgtype,
+				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg, cloned.element, cloned.mqty, cloned.absorb,
+				cloned.state, cloned.rstate);
+		this.origin = cloned;
 	}
 }
