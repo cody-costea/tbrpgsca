@@ -17,7 +17,7 @@ package com.tbrpgsca.library;
 
 public class Ability {
 	protected String name;
-	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype, element, qty, mqty;
+	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype, element, qty, mqty, rqty, tqty;
 	protected boolean battle, absorb, range;
     protected boolean[] state, rstate;
     protected Ability origin = null;
@@ -196,7 +196,8 @@ public class Ability {
 	}
 
     public void replenish() {
-        this.qty = this.mqty;
+    	if (this.mqty > 0)
+    		this.qty = this.mqty;
     }
 
 	public int getLvRq() {
@@ -209,18 +210,27 @@ public class Ability {
 
 	public Ability(String name, boolean battle, int hpdmg, int mpdmg, int spdmg, int trg, int element, boolean state[],
 			boolean rstate[]) {
-		this(name, battle, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg, element, false, state, rstate);
+		this(name, battle, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg, element, 0, -1, false, state, rstate);
 	}
 
 	public Ability(String name, boolean battle, boolean range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
 				   int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element, boolean absorb, boolean state[],
 				   boolean rstate[]) {
-		this(name, battle, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg, mpdmg, spdmg, trg, element, -1, absorb, state, rstate);
+		this(name, battle, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg, mpdmg, spdmg, trg, element, -1, -1, absorb, state, rstate);
+	}
+	
+	public void checkQty() {
+		if (this.qty < this.mqty && this.rqty > -1) {
+			if (this.tqty > this.rqty) {
+				this.tqty = 0;
+				this.qty++;
+			} else this.tqty++;
+		}
 	}
 
 	public Ability(String name, boolean battle, boolean range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
-			int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element,  int mqty, boolean absorb, boolean state[],
-			boolean rstate[]) {
+			int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element, int mqty, int rqty, boolean absorb,
+			boolean state[], boolean rstate[]) {
 		this.name = name;
 		this.battle = battle;
 		this.lvrq = lvrq;
@@ -238,14 +248,16 @@ public class Ability {
 		this.rstate = rstate;
 		this.range = range;
 		this.element = element;
-		this.qty = 0;
+		this.qty = mqty > 0 ? mqty : 0;
 		this.mqty = mqty;
+		this.rqty = rqty;
+		this.tqty = 0;
 	}
 	
 	public Ability(Ability cloned) {
 		this(cloned.name, cloned.battle, cloned.range, cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc, cloned.dmgtype,
-				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg, cloned.element, cloned.mqty, cloned.absorb,
-				cloned.state, cloned.rstate);
+				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg, cloned.element, cloned.mqty, cloned.rqty,
+				cloned.absorb, cloned.state, cloned.rstate);
 		this.origin = cloned;
 	}
 }

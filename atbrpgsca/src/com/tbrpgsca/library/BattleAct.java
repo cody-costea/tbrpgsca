@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. 
-*/
+ */
 package com.tbrpgsca.library;
 
 import java.util.ArrayList;
@@ -43,18 +43,19 @@ public class BattleAct extends Activity {
 
 	protected int target, current = 7, difference = 0;
 	protected int waitTime[] = { 0, 0, 0 };
-	
+
 	protected Spinner targetBox, skillBox, itemBox;
 	protected ArrayAdapter<String> targetList, skillList, itemList;
 	protected TextView skillCost, updText;
 	protected Button Act, Use, Auto, Escape;
 	protected ImageView imgActor[] = new ImageView[8];
 
-	protected ArrayList<Ability> skills = new ArrayList<Ability>();
-	protected ArrayList<Integer> itemId = new ArrayList<Integer>();
+	protected ArrayList<Ability> cSkills = new ArrayList<Ability>();
+	protected ArrayList<Ability> crItems = new ArrayList<Ability>();
 
-	public static void InitiateBattle(Activity act, Actor[] party, Actor[] enemy, Ability[] skill, Ability[] item,
-			int surprise, boolean escapable) {
+	public static void InitiateBattle(Activity act, Actor[] party,
+			Actor[] enemy, Ability[] skill, Ability[] item, int surprise,
+			boolean escapable) {
 		Intent btInt = new Intent(act, BattleAct.class);
 		btInt.putExtra("Escape", escapable);
 		BattleAct.Battler = new Actor[8];
@@ -75,42 +76,56 @@ public class BattleAct extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (BattleAct.Battler == null || BattleAct.Skill == null || BattleAct.Item == null) {
+		if (BattleAct.Battler == null || BattleAct.Skill == null
+				|| BattleAct.Item == null) {
 			BattleAct.Skill = new Ability[] {
-					new Ability("Attack", true, false, 0, 0, 0, 0, 0, 1, 10, 0, 0, 0, 1, false, new boolean[] {},
+					new Ability("Attack", true, false, 0, 0, 0, 0, 0, 1, 10, 0,
+							0, 0, 1, false, new boolean[] {}, new boolean[] {}),
+					new Ability("Defend", true, true, 0, 0, 0, 0, 3, -1, 0, 0,
+							-1, -2, 0, false, new boolean[] {},
 							new boolean[] {}),
-					new Ability("Defend", true, true, 0, 0, 0, 0, 3, -1, 0, 0, -3, -1, 0, false, new boolean[] {},
-							new boolean[] {}),
-					new Ability("Heal", false, true, 2, 0, 7, 0, 3, -1, -25, 0, 0, 0, 6, false, new boolean[] { true },
-							new boolean[] { false, false, true, false, false, false, false, false, false, false,
-									true }),
-					new Ability("Smash", true, false, 2, 5, 0, 2, 0, 1, 12, 0, 1, 0, 1, false,
-							new boolean[] { false, false, false, false, false, false, false, false, false, false,
-									true },
-							new boolean[] {}),
-					new Ability("Poison", true, true, 2, 0, 0, 5, 4, 2, 3, 0, 9, 0, 1, false,
-							new boolean[] { false, false, true }, new boolean[] { false, true }),
-					new Ability("Fireball", true, true, 2, 0, 7, 0, 2, 1, 15, 0, 0, 0, 2, false, new boolean[] {},
+					new Ability("Heal", false, true, 2, 0, 7, 0, 3, -1, -25, 0,
+							0, 0, 6, false, new boolean[] { true },
+							new boolean[] { false, false, true, false, false,
+									false, false, false, false, false, true }),
+					new Ability("Smash", true, false, 2, 5, 0, 2, 0, 1, 12, 0,
+							1, 0, 1, false, new boolean[] { false, false,
+									false, false, false, false, false, false,
+									false, false, true }, new boolean[] {}),
+					new Ability("Poison", true, true, 2, 0, 0, 5, 4, 2, 3, 0,
+							9, 0, 1, false,
+							new boolean[] { false, false, true },
+							new boolean[] { false, true }),
+					new Ability("Fireball", true, true, 2, 0, 7, 0, 2, 1, 15,
+							0, 0, 0, 2, false, new boolean[] {},
 							new boolean[] {}) };
 			BattleAct.Battler = new Actor[] {
-					new Actor("Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
-							new int[] {}, new Ability[] { BattleAct.Skill[4] }),
-					new Actor("Stephanie", "Human", "Sorceress", 1, 3, 45, 20, 5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0,
-							1, new int[] {}, new Ability[] { BattleAct.Skill[5] }),
-					new Actor("George", "Half-Orc", "Templar", 1, 3, 47, 15, 15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1,
-							0, new int[] {}, new Ability[] { BattleAct.Skill[2] }),
-					new Actor("Victoria", "Elf", "Valkyrie", 1, 3, 55, 7, 13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
-							new int[] {}, new Ability[] { BattleAct.Skill[3] }),
-					new Actor("Lizard", "Lizard", "Lizard", 3, 3, 50, 15, 10, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
+					new Actor("Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15, 13,
+							12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0, new int[] {},
+							new Ability[] { BattleAct.Skill[4] }),
+					new Actor("Stephanie", "Human", "Sorceress", 1, 3, 45, 20,
+							5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, new Ability[] { BattleAct.Skill[5] }),
-					new Actor("Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+					new Actor("George", "Half-Orc", "Templar", 1, 3, 47, 15,
+							15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[2] }),
+					new Actor("Victoria", "Elf", "Valkyrie", 1, 3, 55, 7, 13,
+							17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
 							new int[] {}, new Ability[] { BattleAct.Skill[3] }),
-					new Actor("Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
+					new Actor("Lizard", "Lizard", "Lizard", 3, 3, 50, 15, 10,
+							13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
+							new int[] {}, new Ability[] { BattleAct.Skill[5] }),
+					new Actor("Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20,
+							13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, new Ability[] { BattleAct.Skill[3] }),
-					new Actor("Troll", "Troll", "Troll", 3, 3, 47, 15, 15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
-							new int[] {}, new Ability[] { BattleAct.Skill[2] }) };			
-			BattleAct.Item = new Ability[] {
-					new Ability("Potion", true, -25, 0, 0, 0, 0, new boolean[] {}, new boolean[] {}) };
+					new Actor("Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17, 12,
+							5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0, new int[] {},
+							new Ability[] { BattleAct.Skill[3] }),
+					new Actor("Troll", "Troll", "Troll", 3, 3, 47, 15, 15, 13,
+							12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0, new int[] {},
+							new Ability[] { BattleAct.Skill[2] }) };
+			BattleAct.Item = new Ability[] { new Ability("Potion", true, -25,
+					0, 0, 0, 0, new boolean[] {}, new boolean[] {}) };
 			BattleAct.Item[0].qty = 10;
 			for (int i = 4; i < 8; i++)
 				BattleAct.Battler[i].auto = 2;
@@ -127,9 +142,12 @@ public class BattleAct extends Activity {
 		this.Use = (Button) this.findViewById(R.id.UseBt);
 		this.Escape = (Button) this.findViewById(R.id.RunBt);
 		this.Auto = (Button) this.findViewById(R.id.AutoBt);
-		this.skillList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-		this.itemList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-		this.targetList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+		this.skillList = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item);
+		this.itemList = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item);
+		this.targetList = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item);
 		this.targetBox.setAdapter(this.targetList);
 		this.skillBox.setAdapter(this.skillList);
 		this.itemBox.setAdapter(this.itemList);
@@ -139,7 +157,9 @@ public class BattleAct extends Activity {
 		this.Auto.setOnClickListener(this.cAction);
 		this.updText.setMovementMethod(new ScrollingMovementMethod());
 		Bundle extra = this.getIntent().getExtras();
-		this.Escape.setEnabled((extra != null && extra.containsKey("Escape")) ? extra.getBoolean("Escape") : true);
+		this.Escape
+				.setEnabled((extra != null && extra.containsKey("Escape")) ? extra
+						.getBoolean("Escape") : true);
 		if (BattleAct.surprise < 0) {
 			this.imgActor[0] = (ImageView) findViewById(R.id.ImgEnemy3);
 			this.imgActor[1] = (ImageView) findViewById(R.id.ImgEnemy4);
@@ -168,7 +188,8 @@ public class BattleAct extends Activity {
 				this.difference++;
 		}
 		if (BattleAct.surprise < 0) {
-			for (int i = 0; i < (BattleAct.Battler.length / 2) - this.difference; i++)
+			for (int i = 0; i < (BattleAct.Battler.length / 2)
+					- this.difference; i++)
 				if (BattleAct.Battler[i] != null)
 					BattleAct.Battler[i].active = false;
 			this.endTurn();
@@ -180,7 +201,8 @@ public class BattleAct extends Activity {
 		} else
 			this.endTurn();
 		this.refreshTargetBox();
-		this.targetBox.setSelection((BattleAct.Battler.length / 2) - this.difference);
+		this.targetBox.setSelection((BattleAct.Battler.length / 2)
+				- this.difference);
 		this.refreshSkillBox();
 		this.refreshItemBox();
 	}
@@ -190,9 +212,11 @@ public class BattleAct extends Activity {
 		String s;
 		for (int i = 0; i < BattleAct.Battler.length; i++) {
 			if (BattleAct.Battler[i] != null && BattleAct.Battler[i].maxhp > 0) {
-				s = BattleAct.Battler[i].name + " (HP: " + BattleAct.Battler[i].hp;
+				s = BattleAct.Battler[i].name + " (HP: "
+						+ BattleAct.Battler[i].hp;
 				if (i < (BattleAct.Battler.length / 2) - this.difference)
-					s += ", MP: " + BattleAct.Battler[i].mp + ", RP: " + BattleAct.Battler[i].sp;
+					s += ", MP: " + BattleAct.Battler[i].mp + ", RP: "
+							+ BattleAct.Battler[i].sp;
 				s += ")";
 				this.targetList.add(s);
 			}
@@ -202,73 +226,59 @@ public class BattleAct extends Activity {
 
 	private void refreshSkillBox() {
 		this.skillList.clear();
-		this.skills.clear();
-		String trg;
-		for (int i = 0; i < 2; i++) {
-			if (BattleAct.Skill[i].trg == 0)
-				trg = "One";
-			else
-				trg = (BattleAct.Skill[i].trg > 0) ? "All" : "Self";
-			this.skills.add(BattleAct.Skill[i]);
-			this.skillList.add(BattleAct.Skill[i].name + " (Rq:" + BattleAct.Skill[i].hpc + "HP,"
-					+ BattleAct.Skill[i].mpc + "MP," + BattleAct.Skill[i].spc + "RP;" + "Trg:" + trg + ")");
-		}
+		this.cSkills.clear();
+		for (int i = 0; i < 2; i++)
+			this.addAbility(BattleAct.Skill[i], this.skillList, this.cSkills);
 		if (BattleAct.Battler[this.current].raceSkills != null)
 			for (int i = 0; i < Battler[this.current].raceSkills.length; i++)
-				if (!(BattleAct.Battler[this.current].raceSkills[i]
-						.getLvRq() > BattleAct.Battler[this.current].level)
-						&& !(BattleAct.Battler[this.current].raceSkills[i].mpc > BattleAct.Battler[this.current].mp)
-						&& !(BattleAct.Battler[this.current].raceSkills[i].spc > BattleAct.Battler[this.current].sp)
-						&& !(BattleAct.Battler[this.current].raceSkills[i].hpc >= BattleAct.Battler[this.current].hp)) {
-					if (BattleAct.Battler[this.current].raceSkills[i].trg == 0)
-						trg = "One";
-					else
-						trg = (BattleAct.Battler[this.current].raceSkills[i].trg > 0) ? "All" : "Self";
-					this.skills.add(BattleAct.Battler[this.current].raceSkills[i]);
-					this.skillList.add(Battler[this.current].raceSkills[i].name + " (Rq:"
-							+ BattleAct.Battler[this.current].raceSkills[i].hpc + "HP,"
-							+ BattleAct.Battler[this.current].raceSkills[i].mpc + "MP,"
-							+ BattleAct.Battler[this.current].raceSkills[i].spc + "RP;" + "Trg:" + trg + ")");
-				}
+				this.addAbility(BattleAct.Battler[this.current].raceSkills[i],
+						this.skillList, this.cSkills);
 		if (BattleAct.Battler[this.current].jobSkills != null)
-			for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++)
-				if (!(BattleAct.Battler[this.current].jobSkills.get(i)
-						.getLvRq() > BattleAct.Battler[this.current].level)
-						&& !(BattleAct.Battler[this.current].jobSkills
-								.get(i).mpc > BattleAct.Battler[this.current].mp)
-						&& !(BattleAct.Battler[this.current].jobSkills
-								.get(i).spc > BattleAct.Battler[this.current].sp)
-						&& !(BattleAct.Battler[this.current].jobSkills
-								.get(i).hpc >= BattleAct.Battler[this.current].hp)) {
-					if (BattleAct.Battler[this.current].jobSkills.get(i).trg == 0)
-						trg = "One";
-					else
-						trg = (BattleAct.Battler[this.current].jobSkills.get(i).trg > 0) ? "All"
-								: "Self";
-					this.skills.add(BattleAct.Battler[this.current].jobSkills.get(i));
-					this.skillList.add(BattleAct.Battler[this.current].jobSkills.get(i).name + " (Rq:"
-							+ BattleAct.Battler[this.current].jobSkills.get(i).hpc + "HP,"
-							+ BattleAct.Battler[this.current].jobSkills.get(i).mpc + "MP,"
-							+ BattleAct.Battler[this.current].jobSkills.get(i).spc + "RP;" + "Trg:"
-							+ trg + ")");
-				}
+			for (int i = 0; i < BattleAct.Battler[this.current].jobSkills
+					.size(); i++)
+				this.addAbility(BattleAct.Battler[this.current].jobSkills.get(i), this.skillList, this.cSkills);
 		this.skillList.notifyDataSetChanged();
 		if (this.skillBox.getSelectedItemPosition() > 1)
 			this.skillBox.setSelection(0);
 	}
 
+	private void addAbility(Ability ability, ArrayAdapter<String> abilityList, ArrayList<Ability> abilities) {
+		String trg;
+		ability.checkQty();
+		if (!(ability.getLvRq() > BattleAct.Battler[this.current].level)
+				&& !(ability.mqty > -1 && ability.qty < 1)
+				&& !(ability.mpc > BattleAct.Battler[this.current].mp)
+				&& !(ability.spc > BattleAct.Battler[this.current].sp)
+				&& !(ability.hpc >= BattleAct.Battler[this.current].hp)) {
+			if (ability.trg == 0)
+				trg = "One";
+			else
+				trg = (ability.trg > 0) ? "All" : "Self";			
+			abilities.add(ability);
+			abilityList
+					.add(ability.name
+							+ " ("
+							+ (ability.qty > 0 ? "Qty:" + ability.qty + ";"
+									: "")
+							+ (ability.hpc > 0 || ability.mpc > 0
+									|| ability.spc > 0 ? "Rq:"
+									+ (ability.hpc > 0 ? (ability.hpc + "HP")
+											: "")
+									+ (ability.mpc > 0 ? ((ability.hpc > 0 ? ","
+											: "") + (ability.mpc + "MP"))
+											: "")
+									+ (ability.spc > 0 ? (ability.hpc > 0
+											|| ability.mpc > 0 ? "," : "")
+											+ (ability.spc + "RP") : "") + ";"
+									: "") + "Trg:" + trg + ")");
+		}
+	}
+
 	private void refreshItemBox() {
 		this.itemList.clear();
-		this.itemId.clear();
-		String trg;
+		this.crItems.clear();
 		for (int i = 0; i < BattleAct.Item.length; i++)
-			if (BattleAct.Item[i].qty > 0) {
-				trg = (BattleAct.Item[i].trg > 0) ? "All" : "Self";
-				if (BattleAct.Item[i].trg == 0)
-					trg = "One";
-				this.itemId.add(i);
-				this.itemList.add(BattleAct.Item[i].name + " (Qty:" + BattleAct.Item[i].qty + ";" + "Trg:" + trg + ")");
-			}
+			this.addAbility(BattleAct.Item[i], this.itemList, this.crItems);
 		if (this.itemList.getCount() == 0) {
 			this.Use.setEnabled(false);
 			this.itemBox.setEnabled(false);
@@ -280,40 +290,42 @@ public class BattleAct extends Activity {
 	}
 
 	private void executeSkill() {
-		this.executeSkill(this.skills.get(this.skillBox.getSelectedItemPosition()));
+		this.executeSkill(this.cSkills.get(this.skillBox
+				.getSelectedItemPosition()));
 	}
 
 	private void executeSkill(Ability ability) {
-		if (this.target == 1 && (BattleAct.Battler[3] != null && BattleAct.Battler[3].hp > 0)
-				&& ((BattleAct.Battler[0] != null && BattleAct.Battler[0].hp > 0)
-						|| (BattleAct.Battler[2] != null && BattleAct.Battler[2].hp > 0))
-				&& this.current > (BattleAct.Battler.length / 2) - 1 && this.difference == 0 && !ability.range)
+		if (this.target == 1
+				&& (BattleAct.Battler[3] != null && BattleAct.Battler[3].hp > 0)
+				&& ((BattleAct.Battler[0] != null && BattleAct.Battler[0].hp > 0) || (BattleAct.Battler[2] != null && BattleAct.Battler[2].hp > 0))
+				&& this.current > (BattleAct.Battler.length / 2) - 1
+				&& this.difference == 0 && !ability.range)
 			this.target = 3;
-		if (this.target == 2 && (BattleAct.Battler[0] != null && BattleAct.Battler[0].hp > 0)
-				&& ((BattleAct.Battler[1] != null && BattleAct.Battler[1].hp > 0)
-						|| (BattleAct.Battler[3] != null && BattleAct.Battler[3].hp > 0))
-				&& this.current > (BattleAct.Battler.length / 2) - 1 && this.difference < 2 && !ability.range)
+		if (this.target == 2
+				&& (BattleAct.Battler[0] != null && BattleAct.Battler[0].hp > 0)
+				&& ((BattleAct.Battler[1] != null && BattleAct.Battler[1].hp > 0) || (BattleAct.Battler[3] != null && BattleAct.Battler[3].hp > 0))
+				&& this.current > (BattleAct.Battler.length / 2) - 1
+				&& this.difference < 2 && !ability.range)
 			this.target = 0;
-		if (this.target == 4 && (BattleAct.Battler[6] != null && BattleAct.Battler[6].hp > 0)
-				&& ((BattleAct.Battler[5] != null && BattleAct.Battler[5].hp > 0)
-						|| (BattleAct.Battler[2] != null && BattleAct.Battler[7].hp > 0))
+		if (this.target == 4
+				&& (BattleAct.Battler[6] != null && BattleAct.Battler[6].hp > 0)
+				&& ((BattleAct.Battler[5] != null && BattleAct.Battler[5].hp > 0) || (BattleAct.Battler[2] != null && BattleAct.Battler[7].hp > 0))
 				&& !ability.range)
 			this.target = 6;
 		if (this.target == 7
-				&& ((BattleAct.Battler[6] != null && BattleAct.Battler[6].hp > 0)
-						|| (BattleAct.Battler[4] != null && BattleAct.Battler[4].hp > 0))
-				&& (BattleAct.Battler[5] != null && BattleAct.Battler[5].hp > 0) && !ability.range)
+				&& ((BattleAct.Battler[6] != null && BattleAct.Battler[6].hp > 0) || (BattleAct.Battler[4] != null && BattleAct.Battler[4].hp > 0))
+				&& (BattleAct.Battler[5] != null && BattleAct.Battler[5].hp > 0)
+				&& !ability.range)
 			this.target = 5;
 		while ((BattleAct.Battler[this.target] != null && BattleAct.Battler[this.target].hp < 1)
-				&& !(ability.state.length > 0 && ability.state[0]
-						&& ((ability.hpdmg < 0 && BattleAct.Battler[this.target].mres[ability.element] < 7)
-								|| (ability.hpdmg > 0 && BattleAct.Battler[this.target].mres[ability.element] == 7)))) {
+				&& !(ability.state.length > 0 && ability.state[0] && ((ability.hpdmg < 0 && BattleAct.Battler[this.target].mres[ability.element] < 7) || (ability.hpdmg > 0 && BattleAct.Battler[this.target].mres[ability.element] == 7)))) {
 			if (ability.hpdmg < 0)
 				this.target--;
 			else
 				this.target++;
 			if (this.target < 0)
-				this.target = (BattleAct.Battler.length / 2) - 1 - this.difference;
+				this.target = (BattleAct.Battler.length / 2) - 1
+						- this.difference;
 			if (this.target > BattleAct.Battler.length - 1 - this.difference)
 				this.target = (BattleAct.Battler.length / 2) - this.difference;
 		}
@@ -322,19 +334,23 @@ public class BattleAct extends Activity {
 			a = 0;
 			b = 6;
 		}
-		if (this.current > (BattleAct.Battler.length / 2) - 1 - this.difference && ability.trg < -1) {
+		if (this.current > (BattleAct.Battler.length / 2) - 1 - this.difference
+				&& ability.trg < -1) {
 			a = (BattleAct.Battler.length / 2);
 			b = BattleAct.Battler.length - 1;
 		}
-		if (this.current < (BattleAct.Battler.length / 2) - this.difference && ability.trg < -1) {
+		if (this.current < (BattleAct.Battler.length / 2) - this.difference
+				&& ability.trg < -1) {
 			a = 0;
 			b = (BattleAct.Battler.length / 2) - 1;
 		}
-		if (this.target > (BattleAct.Battler.length / 2) - 1 - this.difference && ability.trg == 1) {
+		if (this.target > (BattleAct.Battler.length / 2) - 1 - this.difference
+				&& ability.trg == 1) {
 			a = (BattleAct.Battler.length / 2);
 			b = BattleAct.Battler.length - 1;
 		}
-		if (this.target < (BattleAct.Battler.length / 2) - this.difference && ability.trg == 1) {
+		if (this.target < (BattleAct.Battler.length / 2) - this.difference
+				&& ability.trg == 1) {
 			a = 0;
 			b = (BattleAct.Battler.length / 2) - 1;
 		}
@@ -342,7 +358,8 @@ public class BattleAct extends Activity {
 			a = this.current;
 			b = this.current;
 		}
-		this.updText.append("\n" + Battler[this.current].name + " performs " + ability.name);
+		this.updText.append("\n" + Battler[this.current].name + " performs "
+				+ ability.name);
 		BattleAct.Battler[this.current].hp -= ability.hpc;
 		BattleAct.Battler[this.current].mp -= ability.mpc;
 		BattleAct.Battler[this.current].sp -= ability.spc;
@@ -353,7 +370,8 @@ public class BattleAct extends Activity {
 		for (int i = a; i <= b; i++)
 			if ((BattleAct.Battler[i] != null && BattleAct.Battler[i].hp > 0)
 					|| (ability.state.length > 0 && ability.state[0])) {
-				if (BattleAct.Battler[i].reflect && ability.dmgtype == 2 && i != this.current) {
+				if (BattleAct.Battler[i].reflect && ability.dmgtype == 2
+						&& i != this.current) {
 					this.updText.append(", which is reflected");
 					trg = this.current;
 				} else
@@ -362,12 +380,15 @@ public class BattleAct extends Activity {
 					this.playSpr(this.current, 3);
 					act = false;
 				}
-				this.updText.append(ability.execute(BattleAct.Battler[this.current], BattleAct.Battler[trg]));
+				this.updText.append(ability
+						.execute(BattleAct.Battler[this.current],
+								BattleAct.Battler[trg]));
 				boolean ko = BattleAct.Battler[trg].hp < 1;
 				if (trg != this.current)
 					this.playSpr(trg, ko ? 2 : 1);
 			}
-		this.waitTime[0] = this.waitTime[1] > this.waitTime[2] ? this.waitTime[1] : this.waitTime[2];
+		this.waitTime[0] = this.waitTime[1] > this.waitTime[2] ? this.waitTime[1]
+				: this.waitTime[2];
 		if (BattleAct.Battler[this.current].hp < 1)
 			this.playSpr(this.current, 2);
 		if (this.current < (BattleAct.Battler.length / 2) - this.difference) {
@@ -378,7 +399,8 @@ public class BattleAct extends Activity {
 	}
 
 	private void useItem() {
-		this.executeSkill(BattleAct.Item[this.itemId.get(this.itemBox.getSelectedItemPosition())]);
+		this.executeSkill(this.crItems.get(this.itemBox
+				.getSelectedItemPosition()));
 	}
 
 	private void executeAI() {
@@ -387,10 +409,11 @@ public class BattleAct extends Activity {
 
 	private boolean checkAIheal() {
 		boolean nHeal = false;
-		int a = (this.current > (Battler.length / 2) - 1 - this.difference)
-				? (BattleAct.Battler.length / 2) - this.difference : 0;
-		int b = (this.current < (Battler.length / 2) - this.difference)
-				? (BattleAct.Battler.length / 2) - 1 - this.difference
+		int a = (this.current > (Battler.length / 2) - 1 - this.difference) ? (BattleAct.Battler.length / 2)
+				- this.difference
+				: 0;
+		int b = (this.current < (Battler.length / 2) - this.difference) ? (BattleAct.Battler.length / 2)
+				- 1 - this.difference
 				: (BattleAct.Battler.length / 2) - 1 - this.difference;
 		for (int i = a; i <= b; i++)
 			if (BattleAct.Battler[i].hp < (BattleAct.Battler[i].maxhp / 3)) {
@@ -402,19 +425,24 @@ public class BattleAct extends Activity {
 			for (int i = 0; i < BattleAct.Battler[this.current].raceSkills.length; i++) {
 				Ability s = BattleAct.Battler[this.current].raceSkills[i];
 				if (s.hpdmg < 0 && s.mpc <= BattleAct.Battler[this.current].mp
-						&& s.hpc <= BattleAct.Battler[this.current].hp && s.spc <= BattleAct.Battler[this.current].sp
+						&& s.hpc <= BattleAct.Battler[this.current].hp
+						&& s.spc <= BattleAct.Battler[this.current].sp
 						&& BattleAct.Battler[this.current].level >= s.getLvRq()) {
 					nHeal = true;
 					break;
 				}
 			}
 			if (!nHeal)
-				for (int i = 0; i < BattleAct.Battler[this.current].jobSkills.size(); i++) {
-					Ability s = BattleAct.Battler[this.current].jobSkills.get(i);
-					if (s.hpdmg < 0 && s.mpc <= BattleAct.Battler[this.current].mp
+				for (int i = 0; i < BattleAct.Battler[this.current].jobSkills
+						.size(); i++) {
+					Ability s = BattleAct.Battler[this.current].jobSkills
+							.get(i);
+					if (s.hpdmg < 0
+							&& s.mpc <= BattleAct.Battler[this.current].mp
 							&& s.hpc <= BattleAct.Battler[this.current].hp
 							&& s.spc <= BattleAct.Battler[this.current].sp
-							&& BattleAct.Battler[this.current].level >= s.getLvRq()) {
+							&& BattleAct.Battler[this.current].level >= s
+									.getLvRq()) {
 						nHeal = true;
 						break;
 					}
@@ -435,7 +463,8 @@ public class BattleAct extends Activity {
 					a = Battler[this.current].jobSkills.get(i);
 				else
 					continue;
-				if (a.mpc <= BattleAct.Battler[this.current].mp && a.hpc < BattleAct.Battler[this.current].hp
+				if (a.mpc <= BattleAct.Battler[this.current].mp
+						&& a.hpc < BattleAct.Battler[this.current].hp
 						&& a.spc <= BattleAct.Battler[this.current].sp
 						&& BattleAct.Battler[this.current].level >= a.getLvRq())
 					if (heal) {
@@ -450,8 +479,10 @@ public class BattleAct extends Activity {
 	private void setAItarget(Ability ability) {
 		int a;
 		int b;
-		if (((this.current > (BattleAct.Battler.length / 2) - 1 - this.difference) && (ability.hpdmg > 0))
-				|| ((this.current < (BattleAct.Battler.length / 2) - this.difference) && (ability.hpdmg < 1))) {
+		if (((this.current > (BattleAct.Battler.length / 2) - 1
+				- this.difference) && (ability.hpdmg > 0))
+				|| ((this.current < (BattleAct.Battler.length / 2)
+						- this.difference) && (ability.hpdmg < 1))) {
 			a = 0;
 			b = (BattleAct.Battler.length / 2) - 1;
 		} else {
@@ -467,12 +498,13 @@ public class BattleAct extends Activity {
 				b = BattleAct.Battler.length - 1;
 			}
 		this.target = a;
-		while ((BattleAct.Battler[this.target] == null || BattleAct.Battler[target].hp < 1) && (ability.hpdmg > 1)
-				&& this.target < b)
+		while ((BattleAct.Battler[this.target] == null || BattleAct.Battler[target].hp < 1)
+				&& (ability.hpdmg > 1) && this.target < b)
 			this.target++;
 
 		for (int i = this.target; i <= b; ++i)
-			if (BattleAct.Battler[i] != null && (BattleAct.Battler[i].hp < BattleAct.Battler[target].hp)
+			if (BattleAct.Battler[i] != null
+					&& (BattleAct.Battler[i].hp < BattleAct.Battler[target].hp)
 					&& (BattleAct.Battler[i].hp > 0))
 				this.target = i;
 		this.executeSkill(ability);
@@ -500,24 +532,28 @@ public class BattleAct extends Activity {
 				}
 		}
 		for (this.current = 0; this.current < BattleAct.Battler.length; this.current++) {
-			if (BattleAct.Battler[this.current] != null && BattleAct.Battler[this.current].active)
+			if (BattleAct.Battler[this.current] != null
+					&& BattleAct.Battler[this.current].active)
 				break;
 		}
 		if (this.current < 6)
 			for (int i = this.current + 1; i < BattleAct.Battler.length; i++)
-				if (BattleAct.Battler[this.current] != null && BattleAct.Battler[i] != null
+				if (BattleAct.Battler[this.current] != null
+						&& BattleAct.Battler[i] != null
 						&& (BattleAct.Battler[this.current].agi < BattleAct.Battler[i].agi)
 						&& BattleAct.Battler[i].active)
 					this.current = i;
 
 		if (!this.checkEnd()) {
-			if (BattleAct.Battler[this.current] != null && BattleAct.Battler[this.current].active) {
+			if (BattleAct.Battler[this.current] != null
+					&& BattleAct.Battler[this.current].active) {
 				if (BattleAct.Battler[this.current].auto == 0) {
 					this.setCurrent();
 					this.refreshItemBox();
 				}
 				BattleAct.Battler[this.current].applyState(false);
-				if (BattleAct.Battler[this.current].auto != 0 && BattleAct.Battler[this.current].hp > 0) {
+				if (BattleAct.Battler[this.current].auto != 0
+						&& BattleAct.Battler[this.current].hp > 0) {
 					this.executeAI();
 					this.endTurn();
 				}
@@ -528,9 +564,12 @@ public class BattleAct extends Activity {
 	}
 
 	private void setCurrent() {
-		this.skillCost.setText(BattleAct.Battler[this.current].name + ": " + BattleAct.Battler[this.current].hp + "/"
-				+ BattleAct.Battler[this.current].maxhp + " HP, " + BattleAct.Battler[this.current].mp + "/"
-				+ BattleAct.Battler[this.current].maxmp + " MP, " + BattleAct.Battler[this.current].sp + "/"
+		this.skillCost.setText(BattleAct.Battler[this.current].name + ": "
+				+ BattleAct.Battler[this.current].hp + "/"
+				+ BattleAct.Battler[this.current].maxhp + " HP, "
+				+ BattleAct.Battler[this.current].mp + "/"
+				+ BattleAct.Battler[this.current].maxmp + " MP, "
+				+ BattleAct.Battler[this.current].sp + "/"
 				+ BattleAct.Battler[this.current].maxsp + " RP");
 		this.imgActor[this.current].setBackgroundResource(R.drawable.current);
 		this.refreshSkillBox();
@@ -591,9 +630,10 @@ public class BattleAct extends Activity {
 
 	private void playSpr(final int c, final int s) {
 		if (BattleAct.Battler[c].getSprName() != "") {
-			final String pos = ((c > (BattleAct.Battler.length / 2) - 1 && BattleAct.surprise >= 0)
-					|| (c < (BattleAct.Battler.length / 2) && BattleAct.surprise < 0)) ? "r" : "l";
-			final AnimationDrawable sprAnim = Battler[c].getBtSprite(s, pos, this.waitTime, this);
+			final String pos = ((c > (BattleAct.Battler.length / 2) - 1 && BattleAct.surprise >= 0) || (c < (BattleAct.Battler.length / 2) && BattleAct.surprise < 0)) ? "r"
+					: "l";
+			final AnimationDrawable sprAnim = Battler[c].getBtSprite(s, pos,
+					this.waitTime, this);
 			this.imgActor[c].postDelayed(new Runnable() {
 				@Override
 				public void run() {
@@ -612,13 +652,16 @@ public class BattleAct extends Activity {
 
 	private boolean imgClick(int i) {
 		boolean a = false;
-		int s = (i > (BattleAct.Battler.length / 2) - 1) ? i - this.difference : i;
+		int s = (i > (BattleAct.Battler.length / 2) - 1) ? i - this.difference
+				: i;
 		if (this.target == i) {
 			this.executeSkill(this
 					.getAIskill((i > BattleAct.Battler.length / 2 - 1 && this.current < BattleAct.Battler.length / 2)
-							|| (i < Battler.length / 2 && this.current > Battler.length / 2 - 1) ? false : true));
+							|| (i < Battler.length / 2 && this.current > Battler.length / 2 - 1) ? false
+							: true));
 			a = true;
-		} else if (BattleAct.Battler[i] != null && BattleAct.Battler[i].maxhp > 0)
+		} else if (BattleAct.Battler[i] != null
+				&& BattleAct.Battler[i].maxhp > 0)
 			BattleAct.this.targetBox.setSelection(s);
 		return a;
 	}
@@ -629,7 +672,8 @@ public class BattleAct extends Activity {
 			BattleAct.this.waitTime[0] = 0;
 			boolean act = true;
 			boolean surprised = BattleAct.surprise < 0;
-			BattleAct.this.target = BattleAct.this.targetBox.getSelectedItemPosition();
+			BattleAct.this.target = BattleAct.this.targetBox
+					.getSelectedItemPosition();
 			if ((BattleAct.this.target > 2 && BattleAct.this.difference > 0)
 					|| (BattleAct.this.target > 0 && BattleAct.this.difference > 2)
 					|| (BattleAct.this.target > 1 && BattleAct.this.difference > 1))
@@ -648,28 +692,36 @@ public class BattleAct extends Activity {
 				BattleAct.this.endBt(0);
 				break;
 			case R.id.ImgPlayer1:
-				act = (surprised) ? BattleAct.this.imgClick(6) : BattleAct.this.imgClick(0);
+				act = (surprised) ? BattleAct.this.imgClick(6) : BattleAct.this
+						.imgClick(0);
 				break;
 			case R.id.ImgPlayer2:
-				act = (surprised) ? BattleAct.this.imgClick(7) : BattleAct.this.imgClick(1);
+				act = (surprised) ? BattleAct.this.imgClick(7) : BattleAct.this
+						.imgClick(1);
 				break;
 			case R.id.ImgPlayer3:
-				act = (surprised) ? BattleAct.this.imgClick(4) : BattleAct.this.imgClick(2);
+				act = (surprised) ? BattleAct.this.imgClick(4) : BattleAct.this
+						.imgClick(2);
 				break;
 			case R.id.ImgPlayer4:
-				act = (surprised) ? BattleAct.this.imgClick(5) : BattleAct.this.imgClick(3);
+				act = (surprised) ? BattleAct.this.imgClick(5) : BattleAct.this
+						.imgClick(3);
 				break;
 			case R.id.ImgEnemy1:
-				act = (surprised) ? BattleAct.this.imgClick(2) : BattleAct.this.imgClick(4);
+				act = (surprised) ? BattleAct.this.imgClick(2) : BattleAct.this
+						.imgClick(4);
 				break;
 			case R.id.ImgEnemy2:
-				act = (surprised) ? BattleAct.this.imgClick(3) : BattleAct.this.imgClick(5);
+				act = (surprised) ? BattleAct.this.imgClick(3) : BattleAct.this
+						.imgClick(5);
 				break;
 			case R.id.ImgEnemy3:
-				act = (surprised) ? BattleAct.this.imgClick(0) : BattleAct.this.imgClick(6);
+				act = (surprised) ? BattleAct.this.imgClick(0) : BattleAct.this
+						.imgClick(6);
 				break;
 			case R.id.ImgEnemy4:
-				act = (surprised) ? BattleAct.this.imgClick(1) : BattleAct.this.imgClick(7);
+				act = (surprised) ? BattleAct.this.imgClick(1) : BattleAct.this
+						.imgClick(7);
 				break;
 			}
 			if (act)
