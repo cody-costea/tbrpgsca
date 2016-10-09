@@ -140,7 +140,7 @@ public class DemoAct extends Activity {
 			surprise = -1;
 		if (this.level == 2)
 			surprise = 1;
-		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], this.Skill, this.Item, surprise,
+		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] }, this.Item, surprise,
 				this.level % 2 == 0);
 		for (int i = 1; i < this.Player.length; i++)
 			this.Player[i].recover();
@@ -263,15 +263,18 @@ public class DemoAct extends Activity {
     	
     	npc[0]=new Actor("","","", 0,0, 0,0,0, 0,0,0,0,0, 0,0,0, 0,0,0,0,0);
     	
-    	npc[1]=new Actor("Cody",maxlv);        
-    	npc[2]=new Actor("George",maxlv);    	
+    	npc[1]=new Actor("Cody",maxlv);
+    	npc[1].setItems(this.Item);
+    	npc[2]=new Actor("George",maxlv);
+    	npc[2].setItems(this.Item);
     	npc[3]=new Actor("Stephen",maxlv);
+    	npc[3].setItems(this.Item);
     	
-        npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, this.Skill, new int[]{9,11});
+        npc[4]=new Actor("Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11});
         npc[4].getState()[5].setRes(9);npc[4].getState()[10].setDur(-2);
-        npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, this.Skill, new int[]{23,30});
-        npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, this.Skill, new int[]{15});
-        npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, this.Skill, new int[]{2});
+        npc[5]=new Actor("Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, null, this.Skill, new int[]{23,30});
+        npc[6]=new Actor("Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, null, this.Skill, new int[]{15});
+        npc[7]=new Actor("Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, null, this.Skill, new int[]{2});
         npc[7].getState()[0].setDur(-3);
         
         return npc;

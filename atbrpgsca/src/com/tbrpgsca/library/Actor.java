@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. 
-*/
+ */
 package com.tbrpgsca.library;
 
 import java.util.ArrayList;
@@ -20,17 +20,24 @@ import java.util.ArrayList;
 public class Actor extends Job {
 	protected String name;
 	protected boolean active = true, reflect = false;
-    protected State state[];
-    protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi, wis, agi;
-    protected int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
+	protected State state[];
+	protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi,
+			wis, agi;
+	protected int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
-    protected ArrayList<Ability> jobSkills = new ArrayList<Ability>();
-    
-    private Actor origin = null;
-    
-    public Actor getOrigin() {
-    	return this.origin;
-    }
+	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>();
+
+	protected Ability[] items;
+
+	protected Actor originObj = null;
+
+	public Actor getOriginObj() {
+		return this.originObj;
+	}
+
+	public void removeOriginObj() {
+		this.originObj = null;
+	}
 
 	public String getName() {
 		return this.name;
@@ -90,11 +97,11 @@ public class Actor extends Job {
 			this.mp = mp;
 	}
 
-	public int getSP() {
+	public int getRP() {
 		return this.sp;
 	}
 
-	public void setSP(int sp) {
+	public void setRP(int sp) {
 		if (sp > this.maxsp)
 			this.sp = this.maxsp;
 		else
@@ -183,110 +190,132 @@ public class Actor extends Job {
 		return this.res;
 	}
 
-    public void setMaxAgi(int magi) {
-        this.magi = magi;
-    }
+	public void setMaxAgi(int magi) {
+		this.magi = magi;
+	}
 
-    public void setMaxSpi(int mspi) {
-        this.mspi = mspi;
-    }
+	public void setMaxSpi(int mspi) {
+		this.mspi = mspi;
+	}
 
-    public void setMaxWis(int mwis) {
-        this.mwis = mwis;
-    }
+	public void setMaxWis(int mwis) {
+		this.mwis = mwis;
+	}
 
-    public void setMaxDef(int mdef) {
-        this.mdef = mdef;
-    }
+	public void setMaxDef(int mdef) {
+		this.mdef = mdef;
+	}
 
-    public void setMaxAtk(int matk) {
-        this.matk = matk;
-    }
+	public void setMaxAtk(int matk) {
+		this.matk = matk;
+	}
 
-    public void setMaxSP(int maxsp) {
-        this.maxsp = maxsp;
-    }
+	public void setMaxRP(int maxsp) {
+		this.maxsp = maxsp;
+	}
 
-    public void setMaxMP(int maxmp) {
-        this.maxmp = maxmp;
-    }
+	public void setMaxMP(int maxmp) {
+		this.maxmp = maxmp;
+	}
 
-    public void setMaxHP(int maxhp) {
-        this.maxhp = maxhp;
-    }
+	public void setMaxHP(int maxhp) {
+		this.maxhp = maxhp;
+	}
 
-    public void setRaceName(String rname) {
-        this.rname = rname;
-    }
+	public void setRaceName(String rname) {
+		this.rname = rname;
+	}
 
-    public void setJobName(String jname) {
-        this.jname = jname;
-    }
+	public void setJobName(String jname) {
+		this.jname = jname;
+	}
 
-    public void setHPinc(int hpp) {
-        this.hpp = hpp;
-    }
+	public void setHPinc(int hpp) {
+		this.hpp = hpp;
+	}
 
-    public void setMPinc(int mpp) {
-        this.mpp = mpp;
-    }
+	public void setMPinc(int mpp) {
+		this.mpp = mpp;
+	}
 
-    public void setSPinc(int spp) {
-        this.spp = spp;
-    }
+	public void setRPinc(int spp) {
+		this.spp = spp;
+	}
 
-    public void setAtkInc(int atkp) {
-        this.atkp = atkp;
-    }
+	public void setAtkInc(int atkp) {
+		this.atkp = atkp;
+	}
 
-    public void setDefInc(int defp) {
-        this.defp = defp;
-    }
+	public void setDefInc(int defp) {
+		this.defp = defp;
+	}
 
-    public void setWisInc(int wisp) {
-        this.wisp = wisp;
-    }
+	public void setWisInc(int wisp) {
+		this.wisp = wisp;
+	}
 
-    public void setSpiInc(int spip) {
-        this.spip = spip;
-    }
+	public void setSpiInc(int spip) {
+		this.spip = spip;
+	}
 
-    public void setAgiInc(int agip) {
-        this.agip = agip;
-    }
+	public void setAgiInc(int agip) {
+		this.agip = agip;
+	}
 
-	public ArrayList<Ability> getJobSkills() {
+	public ArrayList<Ability> getExtraSkills() {
 		return this.jobSkills;
+	}
+
+	public Ability[] getItems() {
+		return this.items;
+	}
+
+	public void setItems(Ability[] items) {
+		this.items = items;
+	}
+
+	public void setBaseSkills(Ability[] raceSkills) {
+		this.setBaseSkills(raceSkills, true);
+	}
+
+	protected void setBaseSkills(Ability[] raceSkills, boolean clone) {
+		this.raceSkills = new Ability[raceSkills.length];
+		for (int i = 0; i < raceSkills.length; i++)
+			this.raceSkills[i] = clone ? new Ability(raceSkills[i])
+					: raceSkills[i];
 	}
 
 	public void setRace(Race race, boolean init) {
 		if (init) {
-			this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis, race.mspi, race.magi);
+			this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk,
+					race.mdef, race.mwis, race.mspi, race.magi);
 			this.stats(1, this.maxlv);
 		} else
-			this.raceStats(this.maxhp + race.maxhp, this.maxmp + race.maxmp, this.maxsp + race.maxsp,
-					this.matk + race.matk, this.mdef + race.mdef, this.mwis + race.mwis, this.mspi + race.mspi,
-					this.magi + race.magi);
+			this.raceStats(this.maxhp + race.maxhp, this.maxmp + race.maxmp,
+					this.maxsp + race.maxsp, this.matk + race.matk, this.mdef
+							+ race.mdef, this.mwis + race.mwis, this.mspi
+							+ race.mspi, this.magi + race.magi);
 		this.setRes(race.rres, true);
-		//this.raceSkills = race.raceSkills;
-		this.raceSkills = new Ability[race.raceSkills.length];
-		for (int i = 0; i < race.raceSkills.length; i++)
-			this.raceSkills[i] = new Ability(race.raceSkills[i]);
+		this.setBaseSkills(race.raceSkills);
 		this.rname = race.rname;
 	}
 
 	public void changeJob(Job job, boolean add) {
 		this.jname = job.jname;
 		if (add)
-			this.raceStats(this.maxhp + job.maxhp, this.maxmp + job.maxmp, this.maxsp + job.maxsp, this.matk + job.matk,
-					this.mdef + job.mdef, this.mwis + job.mwis, this.mspi + job.mspi, this.magi + job.magi);
-		this.jobStats(job.hpp, job.mpp, job.spp, job.atkp, job.defp, job.wisp, job.spip, job.agip);
+			this.raceStats(this.maxhp + job.maxhp, this.maxmp + job.maxmp,
+					this.maxsp + job.maxsp, this.matk + job.matk, this.mdef
+							+ job.mdef, this.mwis + job.mwis, this.mspi
+							+ job.mspi, this.magi + job.magi);
+		this.jobStats(job.hpp, job.mpp, job.spp, job.atkp, job.defp, job.wisp,
+				job.spip, job.agip);
 		if (!add) {
-			this.removeSkills();
+			this.jobSkills.clear();
 			this.resetRes();
 		}
 		this.setRes(job.rres, false);
-		this.addSkills(job.raceSkills);
+		if (job.raceSkills != null)
+			this.addSkills(job.raceSkills, true, true);
 		this.setSprName(job.getSprName());
 	}
 
@@ -314,7 +343,7 @@ public class Actor extends Job {
 		else
 			this.auto = 2;
 		if (consume && this.hp > 0)
-            this.active = true;
+			this.active = true;
 		this.atk = this.matk;
 		this.def = this.mdef;
 		this.spi = this.mspi;
@@ -346,23 +375,23 @@ public class Actor extends Job {
 	public String checkStatus() {
 		String s = "";
 		if (this.hp > this.maxhp)
-            this.hp = this.maxhp;
+			this.hp = this.maxhp;
 		if (this.mp > this.maxmp)
-            this.mp = this.maxmp;
+			this.mp = this.maxmp;
 		if (this.sp > this.maxsp)
-            this.sp = this.maxsp;
+			this.sp = this.maxsp;
 		if (this.hp < 1) {
 			s += " (and falls unconcious)";
-            this.active = false;
+			this.active = false;
 			for (int i = 0; i < this.state.length; i++)
 				this.state[i].remove();
 		}
 		if (this.hp < -this.maxhp)
-            this.hp = -this.maxhp;
+			this.hp = -this.maxhp;
 		if (this.mp < 0)
-            this.mp = 0;
+			this.mp = 0;
 		if (this.sp < 0)
-            this.sp = 0;
+			this.sp = 0;
 		return s;
 	}
 
@@ -376,41 +405,72 @@ public class Actor extends Job {
 		this.stats(1, maxlv);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv, int maxhp, int maxmp, int maxsp, int atk,
-			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
-			int agip) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp,
-				wisp, spip, agip, new int[] {});
+	public Actor(String name, String race, String jname, int lv, int maxlv,
+			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
+			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
+			int wisp, int spip, int agip) {
+		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
+				new int[] {}, new Ability[] {}, new Ability[] {}, true);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv, int maxhp, int maxmp, int maxsp, int atk,
-			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
-			int agip, int[] newRes) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp,
-				wisp, spip, agip, newRes, new Ability[] {});
+	public Actor(String name, String race, String jname, int lv, int maxlv,
+			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
+			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
+			int wisp, int spip, int agip, int[] newRes) {
+		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
+				new Ability[] {}, new Ability[] {}, true);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv, int maxhp, int maxmp, int maxsp, int atk,
-			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
-			int agip, int[] newRes, Ability[] newSkill) {
-		super(jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
-				newSkill);
+	public Actor(String name, String race, String jname, int lv, int maxlv,
+			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
+			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
+			int wisp, int spip, int agip, int[] newRes, Ability[] items,
+			Ability[] newSkill) {
+		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
+				items, newSkill, true);
+	}
+
+	public Actor(String name, Race race, Job job, Ability[] items, int lv,
+			int maxlv) {
+		this(name, race.rname, job.jname, lv, maxlv, race.maxhp, race.maxmp,
+				race.maxsp, race.matk, race.mdef, race.mwis, race.mspi,
+				race.magi, job.hpp, job.mpp, job.spp, job.atkp, job.defp,
+				job.wisp, job.spip, job.agip, race.rres, items,
+				race.raceSkills, true);
+		this.addSkills(job.raceSkills, true, true);
+	}
+
+	protected Actor(String name, String race, String jname, int lv, int maxlv,
+			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
+			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
+			int wisp, int spip, int agip, int[] newRes, Ability[] items,
+			Ability[] newSkill, boolean cloneSkills) {
+		super(jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp,
+				spp, atkp, defp, wisp, spip, agip, newRes, null);
 		this.name = name;
 		this.rname = race;
 		this.state = this.AddStates();
-		this.raceSkills = newSkill;
+		this.items = items;
+		if (newSkill != null)
+			this.setBaseSkills(newSkill, cloneSkills);
 		this.stats(lv, maxlv);
 	}
-	
-	public Actor(String name, String race, String jname, int lv, int maxlv, int maxhp, int maxmp, int maxsp, int atk,
-			int def, int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip,
-			int agip, int[] newRes, Ability[] newSkill, int[] skills) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp, spp, atkp, defp,
-				wisp, spip, agip, newRes, null);
+
+	public Actor(String name, String race, String jname, int lv, int maxlv,
+			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
+			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
+			int wisp, int spip, int agip, int[] newRes, Ability[] items,
+			Ability[] newSkill, int[] skills) {
+		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
+				items, null);
 		this.raceSkills = new Ability[skills.length];
 		for (int i = 0; i < skills.length; i++)
-			this.raceSkills[i] = newSkill[skills[i]];
-		
+			this.raceSkills[i] = new Ability(newSkill[skills[i]]);
+
 	}
 
 	private void setRes(int nres[], boolean race) {
@@ -467,10 +527,10 @@ public class Actor extends Job {
 		this.jname = cloned.jname;
 		this.rname = cloned.rname;
 		this.state = cloned.state;
-		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.atk, cloned.def, cloned.wis, cloned.spi,
-				cloned.agi);
-		this.jobStats(cloned.hpp, cloned.mpp, cloned.spp, cloned.atkp, cloned.defp, cloned.wisp, cloned.spip,
-				cloned.agip);
+		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.atk,
+				cloned.def, cloned.wis, cloned.spi, cloned.agi);
+		this.jobStats(cloned.hpp, cloned.mpp, cloned.spp, cloned.atkp,
+				cloned.defp, cloned.wisp, cloned.spip, cloned.agip);
 		for (int i = 0; i < res.length; i++) {
 			this.rres[i] = cloned.rres[i];
 			this.mres[i] = cloned.mres[i];
@@ -478,27 +538,10 @@ public class Actor extends Job {
 		}
 		this.jobSkills.clear();
 		this.raceSkills = cloned.raceSkills;
-		this.addSkills(cloned.jobSkills, false);
+		this.addSkills(cloned.jobSkills.toArray(new Ability[0]), false, true);
 		this.setSprName(cloned.getSprName());
 		this.stats(cloned.level, cloned.maxlv);
-		this.origin = cloned;
-	}
-
-	public void addSkills(ArrayList<Ability> newSkill, boolean noDuplicate) {
-		ArrayList<Ability> origins = null;
-		int i;
-		if (noDuplicate) {
-			origins = new ArrayList<Ability>(this.jobSkills.size() + this.raceSkills.length);
-			for (i = 0; i < this.jobSkills.size(); i++) {
-				origins.set(i, this.jobSkills.get(i).origin);
-			}
-			for (i = 0; i < this.raceSkills.length; i++) {
-				origins.add(this.raceSkills[i].origin);
-			}
-		}
-		for (i = 0; i < newSkill.size(); i++)
-			if (noDuplicate && !origins.contains(this.jobSkills.contains(newSkill.get(i))))
-				this.jobSkills.add(new Ability(newSkill.get(i)));
+		this.originObj = cloned;
 	}
 
 	@Override
@@ -511,17 +554,28 @@ public class Actor extends Job {
 	private State[] AddStates() {
 		State state[] = new State[11];
 
-		state[0] = new State("Regen", false, false, false, -1, 10, 0, 0, 0, 2, 0, 0, 0, false);
-		state[1] = new State("Poison", false, false, false, 10, -7, 0, -2, 0, -2, 0, 0, 0, false);
-		state[2] = new State("Clarity", false, false, false, -1, 0, 7, 0, 0, 0, 1, 1, 0, false);
-		state[3] = new State("Dizziness", false, false, false, 3, 0, -7, 0, 0, 0, -1, -1, 0, false);
-		state[4] = new State("Vigour", false, false, false, -1, 0, 0, 7, 1, 0, 0, 0, 1, false);
-		state[5] = new State("Weakness", false, false, false, 5, 0, 0, -7, -1, 0, 0, 0, -1, false);
-		state[6] = new State("Berserk", false, true, false, 7, 0, 0, 0, 5, -3, 0, 0, 3, false);
-		state[7] = new State("Confusion", false, false, true, 3, 0, 0, 0, 0, 0, 0, 0, 0, false);
-		state[8] = new State("Sleep", true, false, false, 5, 0, 0, 0, 0, -3, 0, 0, -3, false);
-		state[9] = new State("Stun", true, false, false, 1, 0, 0, 0, 0, -1, 0, 0, -1, false);
-		state[10] = new State("Reflect", false, false, false, 7, 0, 0, 0, 0, 0, 0, 0, 0, true);
+		state[0] = new State("Regen", false, false, false, -1, 10, 0, 0, 0, 2,
+				0, 0, 0, false);
+		state[1] = new State("Poison", false, false, false, 10, -7, 0, -2, 0,
+				-2, 0, 0, 0, false);
+		state[2] = new State("Clarity", false, false, false, -1, 0, 7, 0, 0, 0,
+				1, 1, 0, false);
+		state[3] = new State("Dizziness", false, false, false, 3, 0, -7, 0, 0,
+				0, -1, -1, 0, false);
+		state[4] = new State("Vigour", false, false, false, -1, 0, 0, 7, 1, 0,
+				0, 0, 1, false);
+		state[5] = new State("Weakness", false, false, false, 5, 0, 0, -7, -1,
+				0, 0, 0, -1, false);
+		state[6] = new State("Berserk", false, true, false, 7, 0, 0, 0, 5, -3,
+				0, 0, 3, false);
+		state[7] = new State("Confusion", false, false, true, 3, 0, 0, 0, 0, 0,
+				0, 0, 0, false);
+		state[8] = new State("Sleep", true, false, false, 5, 0, 0, 0, 0, -3, 0,
+				0, -3, false);
+		state[9] = new State("Stun", true, false, false, 1, 0, 0, 0, 0, -1, 0,
+				0, -1, false);
+		state[10] = new State("Reflect", false, false, false, 7, 0, 0, 0, 0, 0,
+				0, 0, 0, true);
 
 		return state;
 	}
@@ -554,7 +608,8 @@ public class Actor extends Job {
 	public class State {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
-		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism, agim;
+		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
+				agim;
 		protected int resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 		public boolean isInactive() {
@@ -637,11 +692,11 @@ public class Actor extends Job {
 			this.mpm = mpm;
 		}
 
-		public int getSPmod() {
+		public int getRPmod() {
 			return this.spm;
 		}
 
-		public void setSPmod(int spm) {
+		public void setRPmod(int spm) {
 			this.spm = spm;
 		}
 
@@ -689,8 +744,10 @@ public class Actor extends Job {
 			return this.resm;
 		}
 
-		public State(String name, boolean inactive, boolean auto, boolean confusion, int dur, int hpm, int mpm, int spm,
-				int atkm, int defm, int wism, int spim, int agim, boolean reflect) {
+		public State(String name, boolean inactive, boolean auto,
+				boolean confusion, int dur, int hpm, int mpm, int spm,
+				int atkm, int defm, int wism, int spim, int agim,
+				boolean reflect) {
 			this.name = name;
 			this.mdur = dur;
 			this.dur = 0;
@@ -751,7 +808,7 @@ public class Actor extends Job {
 						s += " ";
 						if (dmgsp >= 0)
 							s += "+";
-						s += dmgsp + " SP";
+						s += dmgsp + " RP";
 					}
 					if (this.dur > 0)
 						this.dur--;
@@ -783,13 +840,33 @@ public class Actor extends Job {
 		}
 	}
 
-	public void addSkills(Ability[] newSkill) {
-		for (int j = 0; j < newSkill.length; j++)
-			if (!this.jobSkills.contains(newSkill[j]))
-				this.jobSkills.add(new Ability(newSkill[j]));
+	public void addExtraSkills(Ability[] newSkill) {
+		this.addSkills(newSkill, true, true);
 	}
 
-	public void removeSkills() {
+	protected void addSkills(Ability[] newSkill, boolean noDuplicates,
+			boolean clone) {
+		ArrayList<Ability> origins = null;
+		int i;
+		if (noDuplicates) {
+			origins = new ArrayList<Ability>(this.jobSkills.size()
+					+ this.raceSkills.length);
+			for (i = 0; i < this.jobSkills.size(); i++) {
+				origins.set(i, this.jobSkills.get(i).originObj);
+			}
+			for (i = 0; i < this.raceSkills.length; i++) {
+				origins.add(this.raceSkills[i].originObj);
+			}
+		}
+		for (i = 0; i < newSkill.length; i++)
+			if ((!noDuplicates)
+					|| (!origins.contains(newSkill[i]) && !this.jobSkills
+							.contains(newSkill[i])))
+				this.jobSkills.add(clone ? new Ability(newSkill[i])
+						: newSkill[i]);
+	}
+
+	public void removeExtraSkills() {
 		this.jobSkills.clear();
 	}
 
