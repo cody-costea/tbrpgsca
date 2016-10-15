@@ -140,7 +140,7 @@ public class DemoAct extends Activity {
 			surprise = -1;
 		if (this.level == 2)
 			surprise = 1;
-		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] }, this.Item, surprise,
+		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] }, surprise,
 				this.level % 2 == 0);
 		for (int i = 1; i < this.Player.length; i++)
 			this.Player[i].recover();

@@ -44,7 +44,7 @@ public class Job extends Race {
 		return this.atkp;
 	}
 
-	public int getSPinc() {
+	public int getRPinc() {
 		return this.spp;
 	}
 

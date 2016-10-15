@@ -37,7 +37,6 @@ import android.widget.TextView;
 public class BattleAct extends Activity {
 
 	private static Ability[] Skill;
-	private static Ability[] Item;
 	private static Actor[] Battler;
 	private static int result = 0, surprise;
 
@@ -54,18 +53,17 @@ public class BattleAct extends Activity {
 	private ArrayList<Ability> crItems = new ArrayList<Ability>();
 
 	public static void InitiateBattle(Activity act, Actor[] party,
-			Actor[] enemy, Ability[] skill, Ability[] item, int surprise,
+			Actor[] enemy, Ability[] skill, int surprise,
 			boolean escapable) {
 		Intent btInt = new Intent(act, BattleAct.class);
 		btInt.putExtra("Escape", escapable);
 		BattleAct.Battler = new Actor[8];
 		BattleAct.Skill = skill;
-		BattleAct.Item = item;
 		BattleAct.surprise = surprise;
-		for (int i = 0; i < party.length; i++)
+		for (int i = 0; i < party.length && i < 4; i++)
 			if (party[i] != null && party[i].maxhp > 0)
 				BattleAct.Battler[i] = party[i];
-		for (int k = 0; k < enemy.length; k++)
+		for (int k = 0; k < enemy.length && k < 4; k++)
 			if (enemy[k] != null && enemy[k].maxhp > 0) {
 				BattleAct.Battler[k + 4] = new Actor(enemy[k]);
 				BattleAct.Battler[k + 4].auto = 2;
@@ -85,42 +83,40 @@ public class BattleAct extends Activity {
 							new boolean[] {}) };
 		}
 		if (BattleAct.Battler == null) {
-			BattleAct.Item = new Ability[] { new Ability("Potion", true, -25,
+			Ability[] items = new Ability[] { new Ability("Potion", true, -25,
 					0, 0, 0, 0, new boolean[] {}, new boolean[] {}) };
-			BattleAct.Item[0].qty = 10;
+			items[0].qty = 10;
 			BattleAct.Battler = new Actor[] {
 					new Actor("Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15, 13,
 							12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0, new int[] {},
-							BattleAct.Item, new Ability[] { new Ability(
-									"Poison", true, true, 2, 0, 0, 5, 4, 2, 3,
-									0, 9, 0, 1, false, new boolean[] { false,
-											false, true }, new boolean[] {
-											false, true }) }, false),
+							items, new Ability[] { new Ability("Poison", true,
+									true, 2, 0, 0, 5, 4, 2, 3, 0, 9, 0, 1,
+									false,
+									new boolean[] { false, false, true },
+									new boolean[] { false, true }) }, false),
 					new Actor("Stephanie", "Human", "Sorceress", 1, 3, 45, 20,
 							5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-							new int[] {}, BattleAct.Item,
-							new Ability[] { new Ability("Fireball", true, true,
-									2, 0, 7, 0, 2, 1, 15, 0, 0, 0, 2, false,
-									new boolean[] {}, new boolean[] {}) },
-							false),
+							new int[] {}, items, new Ability[] { new Ability(
+									"Fireball", true, true, 2, 0, 7, 0, 2, 1,
+									15, 0, 0, 0, 2, false, new boolean[] {},
+									new boolean[] {}) }, false),
 					new Actor("George", "Half-Orc", "Templar", 1, 3, 47, 15,
 							15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
-							new int[] {}, BattleAct.Item,
-							new Ability[] { new Ability("Heal", false, true, 2,
-									0, 7, 0, 3, -1, -25, 0, 0, 0, 6, false,
+							new int[] {}, items, new Ability[] { new Ability(
+									"Heal", false, true, 2, 0, 7, 0, 3, -1,
+									-25, 0, 0, 0, 6, false,
 									new boolean[] { true }, new boolean[] {
 											false, false, true, false, false,
 											false, false, false, false, false,
 											true }) }, false),
 					new Actor("Victoria", "Elf", "Valkyrie", 1, 3, 55, 7, 13,
 							17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
-							new int[] {}, BattleAct.Item,
-							new Ability[] { new Ability("Smash", true, false,
-									2, 5, 0, 2, 0, 1, 12, 0, 1, 0, 1, false,
-									new boolean[] { false, false, false, false,
+							new int[] {}, items, new Ability[] { new Ability(
+									"Smash", true, false, 2, 5, 0, 2, 0, 1, 12,
+									0, 1, 0, 1, false, new boolean[] { false,
 											false, false, false, false, false,
-											false, true }, new boolean[] {}) },
-							false),
+											false, false, false, false, true },
+									new boolean[] {}) }, false),
 					new Actor("Lizard", "Lizard", "Lizard", 3, 3, 50, 15, 10,
 							13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
 							new int[] {}, null, new Ability[] { new Ability(
@@ -770,7 +766,6 @@ public class BattleAct extends Activity {
 				player.setSprites(this, false, null);
 		BattleAct.Battler = null;
 		BattleAct.Skill = null;
-		BattleAct.Item = null;
 		super.onDestroy();
 	}
 

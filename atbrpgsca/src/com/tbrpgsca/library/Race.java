@@ -34,7 +34,7 @@ public class Race {
 		return this.maxmp;
 	}
 
-	public int getMaxSP() {
+	public int getMaxRP() {
 		return this.maxsp;
 	}
 
@@ -88,7 +88,7 @@ public class Race {
 	}
 
 	protected void raceStats(int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi,
-			int agi/* , int[] newSkill */) {
+			int agi) {
 		this.maxhp = maxhp;
 		this.maxmp = maxmp;
 		this.maxsp = maxsp;
