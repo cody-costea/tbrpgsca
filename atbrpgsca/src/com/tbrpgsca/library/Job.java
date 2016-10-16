@@ -61,7 +61,7 @@ public class Job extends Race {
 	}
 
 	protected String jname;
-	private String sprName;
+	protected String sprName;
 	protected int hpp, mpp, spp, atkp, defp, wisp, spip, agip;
 
 	private AnimationDrawable bSprite[] = new AnimationDrawable[5];

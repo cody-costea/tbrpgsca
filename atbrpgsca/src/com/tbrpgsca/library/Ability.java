@@ -15,13 +15,53 @@ limitations under the License.
  */
 package com.tbrpgsca.library;
 
-public class Ability {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
 			element, qty, mqty, rqty, tqty;
 	protected boolean battle, absorb, range;
 	protected boolean[] state, rstate;
 	protected Ability originObj = null;
+
+	protected Ability(Parcel in) {
+		this.name = in.readString();
+		this.trg = in.readInt();
+		this.hpc = in.readInt();
+		this.mpc = in.readInt();
+		this.spc = in.readInt();
+		this.lvrq = in.readInt();
+		this.atki = in.readInt();
+		this.hpdmg = in.readInt();
+		this.mpdmg = in.readInt();
+		this.spdmg = in.readInt();
+		this.dmgtype = in.readInt();
+		this.element = in.readInt();
+		this.qty = in.readInt();
+		this.mqty = in.readInt();
+		this.rqty = in.readInt();
+		this.tqty = in.readInt();
+		this.battle = in.readByte() != 0;
+		this.absorb = in.readByte() != 0;
+		this.range = in.readByte() != 0;
+		this.state = in.createBooleanArray();
+		this.rstate = in.createBooleanArray();
+		this.originObj = in.readParcelable(Ability.class.getClassLoader());
+	}
+
+	public static final Creator<Ability> CREATOR = new Creator<Ability>() {
+		@Override
+		public Ability createFromParcel(Parcel in) {
+			return new Ability(in);
+		}
+
+		@Override
+		public Ability[] newArray(int size) {
+			return new Ability[size];
+		}
+	};
 
 	public Ability getOriginObj() {
 		return this.originObj;
@@ -279,5 +319,37 @@ public class Ability {
 				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
 				cloned.state, cloned.rstate);
 		this.originObj = cloned;
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+
+		dest.writeString(this.name);
+		dest.writeInt(this.trg);
+		dest.writeInt(this.hpc);
+		dest.writeInt(this.mpc);
+		dest.writeInt(this.spc);
+		dest.writeInt(this.lvrq);
+		dest.writeInt(this.atki);
+		dest.writeInt(this.hpdmg);
+		dest.writeInt(this.mpdmg);
+		dest.writeInt(this.spdmg);
+		dest.writeInt(this.dmgtype);
+		dest.writeInt(this.element);
+		dest.writeInt(this.qty);
+		dest.writeInt(this.mqty);
+		dest.writeInt(this.rqty);
+		dest.writeInt(this.tqty);
+		dest.writeByte((byte) (this.battle ? 1 : 0));
+		dest.writeByte((byte) (this.absorb ? 1 : 0));
+		dest.writeByte((byte) (this.range ? 1 : 0));
+		dest.writeBooleanArray(this.state);
+		dest.writeBooleanArray(this.rstate);
+		dest.writeParcelable(this.originObj, flags);
 	}
 }

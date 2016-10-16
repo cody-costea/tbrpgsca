@@ -15,9 +15,12 @@ limitations under the License.
  */
 package com.tbrpgsca.library;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class Actor extends Job {
+public class Actor extends Job implements Parcelable {
 	protected String name;
 	protected boolean active = true, reflect = false;
 	protected State state[];
@@ -30,6 +33,67 @@ public class Actor extends Job {
 	protected Ability[] items;
 
 	protected Actor originObj = null;
+
+	protected Actor(Parcel in) {
+		this.name = in.readString();
+		this.active = in.readByte() != 0;
+		this.reflect = in.readByte() != 0;
+		this.state = in.createTypedArray(State.CREATOR);
+		this.auto = in.readInt();
+		this.rname = in.readString();
+		this.maxhp = in.readInt();
+		this.maxmp = in.readInt();
+		this.maxsp = in.readInt();
+		this.matk = in.readInt();
+		this.mdef = in.readInt();
+		this.mwis = in.readInt();
+		this.mspi = in.readInt();
+		this.magi = in.readInt();
+		this.rres = in.createIntArray();
+		this.raceSkills = in.createTypedArray(Ability.CREATOR);
+		this.jname = in.readString();
+		this.sprName = in.readString();
+		this.hpp = in.readInt();
+		this.mpp = in.readInt();
+		this.spp = in.readInt();
+		this.atkp = in.readInt();
+		this.defp = in.readInt();
+		this.wisp = in.readInt();
+		this.spip = in.readInt();
+		this.agip = in.readInt();
+		//this.sprWait = in.createIntArray();
+		this.mp = in.readInt();
+		this.sp = in.readInt();
+		this.hp = in.readInt();
+		this.mp = in.readInt();
+		this.sp = in.readInt();
+		this.level = in.readInt();
+		this.maxlv = in.readInt();
+		this.exp = in.readInt();
+		this.maxp = in.readInt();
+		this.atk = in.readInt();
+		this.def = in.readInt();
+		this.spi = in.readInt();
+		this.wis = in.readInt();
+		this.agi = in.readInt();
+		this.mres = in.createIntArray();
+		this.res = in.createIntArray();
+		this.jobSkills = in.createTypedArrayList(Ability.CREATOR);
+		this.items = in.createTypedArray(Ability.CREATOR);
+		this.originObj = in.readParcelable(Actor.class.getClassLoader());
+	}
+
+	public static final Creator<Actor> CREATOR = new Creator<Actor>() {
+		@Override
+		public Actor createFromParcel(Parcel in) {
+			return new Actor(in);
+		}
+
+		@Override
+		public Actor[] newArray(int size) {
+			return new Actor[size];
+		}
+	};
 
 	public Actor getOriginObj() {
 		return this.originObj;
@@ -605,12 +669,97 @@ public class Actor extends Job {
 		}
 	}
 
-	public class State {
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.name);
+		dest.writeByte((byte) (this.active ? 1 : 0));
+		dest.writeByte((byte) (this.reflect ? 1 : 0));
+		dest.writeTypedArray(this.state, flags);
+		dest.writeInt(this.auto);
+		dest.writeString(this.rname);
+		dest.writeInt(this.maxhp);
+		dest.writeInt(this.maxmp);
+		dest.writeInt(this.maxsp);
+		dest.writeInt(this.matk);
+		dest.writeInt(this.mdef);
+		dest.writeInt(this.mwis);
+		dest.writeInt(this.mspi);
+		dest.writeInt(this.magi);
+		dest.writeIntArray(this.rres);
+		dest.writeTypedArray(this.raceSkills, flags);
+		dest.writeString(this.jname);
+		dest.writeString(this.sprName);
+		dest.writeInt(this.hpp);
+		dest.writeInt(this.mpp);
+		dest.writeInt(this.spp);
+		dest.writeInt(this.atkp);
+		dest.writeInt(this.defp);
+		dest.writeInt(this.wisp);
+		dest.writeInt(this.spip);
+		dest.writeInt(this.agip);
+		//dest.writeIntArray(this.sprWait);
+		dest.writeInt(this.hp);
+		dest.writeInt(this.mp);
+		dest.writeInt(this.sp);
+		dest.writeInt(this.level);
+		dest.writeInt(this.maxlv);
+		dest.writeInt(this.exp);
+		dest.writeInt(this.maxp);
+		dest.writeInt(this.atk);
+		dest.writeInt(this.def);
+		dest.writeInt(this.spi);
+		dest.writeInt(this.wis);
+		dest.writeInt(this.agi);
+		dest.writeIntArray(this.mres);
+		dest.writeIntArray(this.res);
+		dest.writeTypedList(this.jobSkills);
+		dest.writeTypedArray(this.items, flags);
+		dest.writeParcelable(this.originObj, flags);
+	}
+
+	public static class State implements Parcelable {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
 		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
 				agim;
 		protected int resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+		protected State(Parcel in) {
+			this.inactive = in.readByte() != 0;
+			this.confusion = in.readByte() != 0;
+			this.auto = in.readByte() != 0;
+			this.reflect = in.readByte() != 0;
+			this.name = in.readString();
+			this.res = in.readInt();
+			this.mdur = in.readInt();
+			this.dur = in.readInt();
+			this.hpm = in.readInt();
+			this.mpm = in.readInt();
+			this.spm = in.readInt();
+			this.atkm = in.readInt();
+			this.defm = in.readInt();
+			this.spim = in.readInt();
+			this.wism = in.readInt();
+			this.agim = in.readInt();
+			this.resm = in.createIntArray();
+		}
+
+		public static final Creator<State> CREATOR = new Creator<State>() {
+			@Override
+			public State createFromParcel(Parcel in) {
+				return new State(in);
+			}
+
+			@Override
+			public State[] newArray(int size) {
+				return new State[size];
+			}
+		};
 
 		public boolean isInactive() {
 			return this.inactive;
@@ -837,6 +986,32 @@ public class Actor extends Job {
 		public void remove() {
 			if (this.dur > -2)
 				this.dur = 0;
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeByte((byte) (this.inactive ? 1 : 0));
+			dest.writeByte((byte) (this.confusion ? 1 : 0));
+			dest.writeByte((byte) (this.auto ? 1 : 0));
+			dest.writeByte((byte) (this.reflect ? 1 : 0));
+			dest.writeString(this.name);
+			dest.writeInt(this.res);
+			dest.writeInt(this.mdur);
+			dest.writeInt(this.dur);
+			dest.writeInt(this.hpm);
+			dest.writeInt(this.mpm);
+			dest.writeInt(this.spm);
+			dest.writeInt(this.atkm);
+			dest.writeInt(this.defm);
+			dest.writeInt(this.spim);
+			dest.writeInt(this.wism);
+			dest.writeInt(this.agim);
+			dest.writeIntArray(this.resm);
 		}
 	}
 
