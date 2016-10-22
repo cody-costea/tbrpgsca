@@ -62,8 +62,6 @@ public class Actor extends Job implements Parcelable {
 		this.spip = in.readInt();
 		this.agip = in.readInt();
 		//this.sprWait = in.createIntArray();
-		this.mp = in.readInt();
-		this.sp = in.readInt();
 		this.hp = in.readInt();
 		this.mp = in.readInt();
 		this.sp = in.readInt();
@@ -447,6 +445,7 @@ public class Actor extends Job implements Parcelable {
 		if (this.hp < 1) {
 			s += " (and falls unconcious)";
 			this.active = false;
+			this.sp = 0;
 			for (int i = 0; i < this.state.length; i++)
 				this.state[i].remove();
 		}
