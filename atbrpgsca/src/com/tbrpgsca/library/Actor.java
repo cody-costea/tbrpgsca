@@ -726,7 +726,7 @@ public class Actor extends Job implements Parcelable {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
 		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
-				agim;
+				agim, originId;
 		protected int resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 		protected State(Parcel in) {
@@ -747,6 +747,7 @@ public class Actor extends Job implements Parcelable {
 			this.wism = in.readInt();
 			this.agim = in.readInt();
 			this.resm = in.createIntArray();
+			this.originId = in.readInt();
 		}
 
 		public static final Creator<State> CREATOR = new Creator<State>() {
@@ -892,6 +893,10 @@ public class Actor extends Job implements Parcelable {
 		public int[] getResMod() {
 			return this.resm;
 		}
+		
+		public int getOriginId() {
+			return this.originId;
+		}
 
 		public State(String name, boolean inactive, boolean auto,
 				boolean confusion, int dur, int hpm, int mpm, int spm,
@@ -1012,6 +1017,7 @@ public class Actor extends Job implements Parcelable {
 			dest.writeInt(this.wism);
 			dest.writeInt(this.agim);
 			dest.writeIntArray(this.resm);
+			dest.writeInt(this.originId);
 		}
 	}
 

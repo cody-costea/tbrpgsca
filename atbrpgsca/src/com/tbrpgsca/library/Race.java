@@ -17,7 +17,7 @@ package com.tbrpgsca.library;
 
 public class Race {
     protected String rname;
-    protected int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi;
+    protected int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi, originId;
 
     protected int rres[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     protected Ability[] raceSkills;
@@ -64,6 +64,10 @@ public class Race {
 
 	public Ability[] getRaceSkills() {
 		return this.raceSkills;
+	}
+	
+	public int getOriginId() {
+		return this.originId;
 	}
 
 	public Race() {
