@@ -61,7 +61,6 @@ public class Actor extends Job implements Parcelable {
 		this.wisp = in.readInt();
 		this.spip = in.readInt();
 		this.agip = in.readInt();
-		//this.sprWait = in.createIntArray();
 		this.hp = in.readInt();
 		this.mp = in.readInt();
 		this.sp = in.readInt();
@@ -79,6 +78,7 @@ public class Actor extends Job implements Parcelable {
 		this.jobSkills = in.createTypedArrayList(Ability.CREATOR);
 		this.items = in.createTypedArray(Ability.CREATOR);
 		this.originObj = in.readParcelable(Actor.class.getClassLoader());
+		this.originId = in.readInt();
 	}
 
 	public static final Creator<Actor> CREATOR = new Creator<Actor>() {
@@ -605,6 +605,7 @@ public class Actor extends Job implements Parcelable {
 		this.setSprName(cloned.getSprName());
 		this.stats(cloned.level, cloned.maxlv);
 		this.originObj = cloned;
+		this.originId = cloned.originId;
 	}
 
 	@Override
@@ -701,7 +702,6 @@ public class Actor extends Job implements Parcelable {
 		dest.writeInt(this.wisp);
 		dest.writeInt(this.spip);
 		dest.writeInt(this.agip);
-		//dest.writeIntArray(this.sprWait);
 		dest.writeInt(this.hp);
 		dest.writeInt(this.mp);
 		dest.writeInt(this.sp);
@@ -719,6 +719,7 @@ public class Actor extends Job implements Parcelable {
 		dest.writeTypedList(this.jobSkills);
 		dest.writeTypedArray(this.items, flags);
 		dest.writeParcelable(this.originObj, flags);
+		dest.writeInt(this.originId);
 	}
 
 	public static class State implements Parcelable {

@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.SpannableString;
 import android.text.util.Linkify;
 import android.view.Menu;
@@ -140,10 +141,10 @@ public class DemoAct extends Activity {
 			surprise = -1;
 		if (this.level == 2)
 			surprise = 1;
-		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] }, surprise,
-				this.level % 2 == 0);
 		for (int i = 1; i < this.Player.length; i++)
 			this.Player[i].recover();
+		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] }, surprise,
+				this.level % 2 == 0, true);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {
@@ -184,8 +185,10 @@ public class DemoAct extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode >= 0) {
 			if (resultCode == RESULT_OK) {
-				int result = data.getExtras().getInt("Outcome");
-				if (result > 0 && DemoAct.this.level < 5)
+				Bundle extra = data.getExtras();
+				if (extra.containsKey("Party"))
+					System.arraycopy(extra.getParcelableArray("Party"), 0, this.Party, 0, 4);
+				if (extra.getInt("Outcome") > 0 && DemoAct.this.level < 5)
 					DemoAct.this.level++;
 			}
 		}

@@ -21,7 +21,7 @@ import android.os.Parcelable;
 public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
-			element, qty, mqty, rqty, tqty;
+			element, qty, mqty, rqty, tqty, originId;
 	protected boolean battle, absorb, range;
 	protected boolean[] state, rstate;
 	protected Ability originObj = null;
@@ -49,6 +49,7 @@ public class Ability implements Parcelable {
 		this.state = in.createBooleanArray();
 		this.rstate = in.createBooleanArray();
 		this.originObj = in.readParcelable(Ability.class.getClassLoader());
+		this.originId = in.readInt();
 	}
 
 	public static final Creator<Ability> CREATOR = new Creator<Ability>() {
@@ -149,6 +150,8 @@ public class Ability implements Parcelable {
 	public boolean isRanged() {
 		return this.range;
 	}
+
+	public int getOriginId() { return this.originId; }
 
 	public String execute(Actor user, Actor target) {
 		String s = "";
@@ -319,6 +322,7 @@ public class Ability implements Parcelable {
 				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
 				cloned.state, cloned.rstate);
 		this.originObj = cloned;
+		this.originId = cloned.originId;
 	}
 
 	@Override
@@ -351,5 +355,6 @@ public class Ability implements Parcelable {
 		dest.writeBooleanArray(this.state);
 		dest.writeBooleanArray(this.rstate);
 		dest.writeParcelable(this.originObj, flags);
+		dest.writeInt(this.originId);
 	}
 }

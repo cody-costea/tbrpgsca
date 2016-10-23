@@ -37,11 +37,14 @@ import android.widget.TextView;
 
 public class BattleAct extends Activity {
 
+	private static Parcelable[] cachedParty = null;
+	private static Parcelable[] cachedEnemy = null;
+	private static Ability[] cachedSkill = null;
+
 	private Ability[] Skill;
 	private Actor[] Battler;
-	private int result = 0, surprise = 0;
+	private int result = 0, surprise = 0, target, current = 7, difference = 0;
 
-	private int target, current = 7, difference = 0;
 	private int waitTime[] = { 0, 0, 0 };
 
 	private Spinner targetBox, skillBox, itemBox;
@@ -53,24 +56,21 @@ public class BattleAct extends Activity {
 	private ArrayList<Ability> cSkills = new ArrayList<Ability>();
 	private ArrayList<Ability> crItems = new ArrayList<Ability>();
 
+	public static void PlayDemo(Activity act) {
+		InitiateBattle(act, null, null, null, 0, true, false);
+	}
+
 	public static void InitiateBattle(Activity act, Actor[] party,
 			Actor[] enemy, Ability[] skill, int surprise,
-			boolean escapable) {
+			boolean escapable, boolean staticCache) {
+		if (staticCache) {
+			BattleAct.cachedParty = party;
+			BattleAct.cachedEnemy = enemy;
+			BattleAct.cachedSkill = skill;
+		}
 		Intent btInt = new Intent(act, BattleAct.class);
 		btInt.putExtra("Escape", escapable);
 		btInt.putExtra("Surprise", surprise);
-		//BattleAct.this.surprise = surprise;
-		/*BattleAct.this.Battler = new Actor[8];
-		BattleAct.this.Skill = skill;
-
-		for (int i = 0; i < party.length && i < 4; i++)
-			if (party[i] != null && party[i].maxhp > 0)
-				BattleAct.this.Battler[i] = party[i];
-		for (int k = 0; k < enemy.length && k < 4; k++)
-			if (enemy[k] != null && enemy[k].maxhp > 0) {
-				BattleAct.this.Battler[k + 4] = new Actor(enemy[k]);
-				BattleAct.this.Battler[k + 4].auto = 2;
-			}*/
 		btInt.putExtra("Party", party);
 		btInt.putExtra("Enemy", enemy);
 		btInt.putExtra("Skill", skill);
@@ -81,32 +81,45 @@ public class BattleAct extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle extra = this.getIntent().getExtras();
-		if (extra.containsKey("suprise"))
+		if (extra.containsKey("Surprise"))
 			this.surprise = extra.getInt("Surprise");
-		if (extra.containsKey("Party") && extra.containsKey("Enemy")) {
-			Parcelable[] party = extra.getParcelableArray("Party");
-			Parcelable[] enemy = extra.getParcelableArray("Enemy");
+		Parcelable[] party = null;
+		Parcelable[] enemy = null;
+		if (BattleAct.cachedParty != null && BattleAct.cachedEnemy != null) {
+			party = BattleAct.cachedParty;
+			enemy = BattleAct.cachedEnemy;
+		}
+		else if (extra.containsKey("Party") && extra.containsKey("Enemy")) {
+			party = extra.getParcelableArray("Party");
+			enemy = extra.getParcelableArray("Enemy");
+		}
+		if (party != null && enemy != null) {
 			BattleAct.this.Battler = new Actor[8];
 			for (int i = 0; i < party.length && i < 4; i++)
 				if (party[i] != null)
-					BattleAct.this.Battler[i] = (Actor)party[i];
+					BattleAct.this.Battler[i] = (Actor) party[i];
 			for (int k = 0; k < enemy.length && k < 4; k++)
 				if (enemy[k] != null) {
-					BattleAct.this.Battler[k + 4] = (Actor)enemy[k];
+					BattleAct.this.Battler[k + 4] = BattleAct.cachedEnemy == null ? (Actor) enemy[k] : new Actor((Actor) enemy[k]);
 					BattleAct.this.Battler[k + 4].auto = 2;
 				}
 		}
-		if (extra.containsKey("Skill")) {
+		if (BattleAct.cachedSkill != null) {
+			this.Skill = BattleAct.cachedSkill;
+		}
+		else if (extra.containsKey("Skill")) {
 			Parcelable[] skill = extra.getParcelableArray("Skill");
-			this.Skill = new Ability[skill.length];
-			System.arraycopy(skill, 0, this.Skill, 0, skill.length);
+			if (skill != null) {
+				this.Skill = new Ability[skill.length];
+				System.arraycopy(skill, 0, this.Skill, 0, skill.length);
+			}
 		}
 		if (BattleAct.this.Skill == null) {
 			BattleAct.this.Skill = new Ability[] {
 					new Ability("Attack", true, false, 0, 0, 0, 0, 0, 1, 10, 0,
 							0, 0, 1, false, new boolean[] {}, new boolean[] {}),
 					new Ability("Defend", true, true, 0, 0, 0, 0, 3, -1, 0, 0,
-							-1, -2, 0, false, new boolean[] {},
+							-1, -1, 0, false, new boolean[] {},
 							new boolean[] {}) };
 		}
 		if (BattleAct.this.Battler == null) {
@@ -670,13 +683,12 @@ public class BattleAct extends Activity {
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
 				Intent outcome = new Intent();
-				Actor[] party = new Actor[] { BattleAct.this.Battler[0], BattleAct.this.Battler[1],
-						BattleAct.this.Battler[2], BattleAct.this.Battler[3] };
-				Actor[] enemy = new Actor[] { BattleAct.this.Battler[4], BattleAct.this.Battler[5],
-						BattleAct.this.Battler[6], BattleAct.this.Battler[7] };
 				outcome.putExtra("Outcome", BattleAct.this.result);
-				outcome.putExtra("Party", party);
-				outcome.putExtra("Enemy", enemy);
+				if (BattleAct.cachedParty == null) {
+					Actor[] party = new Actor[]{BattleAct.this.Battler[0], BattleAct.this.Battler[1],
+							BattleAct.this.Battler[2], BattleAct.this.Battler[3]};
+					outcome.putExtra("Party", party);
+				}
 				BattleAct.this.setResult(RESULT_OK, outcome);
 				BattleAct.this.finish();
 			}
@@ -796,8 +808,9 @@ public class BattleAct extends Activity {
 		for (Actor player : BattleAct.this.Battler)
 			if (player != null)
 				player.setSprites(this, false, null);
-		BattleAct.this.Battler = null;
-		BattleAct.this.Skill = null;
+		BattleAct.cachedParty = null;
+		BattleAct.cachedEnemy = null;
+		BattleAct.cachedSkill = null;
 		super.onDestroy();
 	}
 
