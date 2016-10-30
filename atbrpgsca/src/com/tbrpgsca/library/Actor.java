@@ -459,46 +459,47 @@ public class Actor extends Job implements Parcelable {
 	}
 
 	public Actor() {
-		this("Actor", 5);
+		this(0, "Actor", 5);
 	}
 
-	public Actor(String name, int maxlv) {
+	public Actor(int id, String name, int maxlv) {
+		this.originId = id;
 		this.name = name;
 		this.state = this.AddStates();
 		this.stats(1, maxlv);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv,
+	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
 			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
 			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
 			int wisp, int spip, int agip) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
 				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
 				new int[] {}, new Ability[] {}, new Ability[] {}, true);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv,
+	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
 			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
 			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
 			int wisp, int spip, int agip, int[] newRes) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
 				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
 				new Ability[] {}, new Ability[] {}, true);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv,
+	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
 			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
 			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
 			int wisp, int spip, int agip, int[] newRes, Ability[] items,
 			Ability[] newSkill) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
 				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
 				items, newSkill, true);
 	}
 
-	public Actor(String name, Race race, Job job, Ability[] items, int lv,
+	public Actor(int id, String name, Race race, Job job, Ability[] items, int lv,
 			int maxlv) {
-		this(name, race.rname, job.jname, lv, maxlv, race.maxhp, race.maxmp,
+		this(id, name, race.rname, job.jname, lv, maxlv, race.maxhp, race.maxmp,
 				race.maxsp, race.matk, race.mdef, race.mwis, race.mspi,
 				race.magi, job.hpp, job.mpp, job.spp, job.atkp, job.defp,
 				job.wisp, job.spip, job.agip, race.rres, items,
@@ -506,12 +507,12 @@ public class Actor extends Job implements Parcelable {
 		this.addSkills(job.raceSkills, true, true);
 	}
 
-	protected Actor(String name, String race, String jname, int lv, int maxlv,
+	protected Actor(int id, String name, String race, String jname, int lv, int maxlv,
 			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
 			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
 			int wisp, int spip, int agip, int[] newRes, Ability[] items,
 			Ability[] newSkill, boolean cloneSkills) {
-		super(jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp,
+		super(id, jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp,
 				spp, atkp, defp, wisp, spip, agip, newRes, null);
 		this.name = name;
 		this.rname = race;
@@ -522,12 +523,12 @@ public class Actor extends Job implements Parcelable {
 		this.stats(lv, maxlv);
 	}
 
-	public Actor(String name, String race, String jname, int lv, int maxlv,
+	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
 			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
 			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
 			int wisp, int spip, int agip, int[] newRes, Ability[] items,
 			Ability[] newSkill, int[] skills) {
-		this(name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
 				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
 				items, null);
 		this.raceSkills = new Ability[skills.length];
@@ -618,27 +619,27 @@ public class Actor extends Job implements Parcelable {
 	private State[] AddStates() {
 		State state[] = new State[11];
 
-		state[0] = new State("Regen", false, false, false, -1, 10, 0, 0, 0, 2,
+		state[0] = new State(1, "Regen", false, false, false, -1, 10, 0, 0, 0, 2,
 				0, 0, 0, false);
-		state[1] = new State("Poison", false, false, false, 10, -7, 0, -2, 0,
+		state[1] = new State(2, "Poison", false, false, false, 10, -7, 0, -2, 0,
 				-2, 0, 0, 0, false);
-		state[2] = new State("Clarity", false, false, false, -1, 0, 7, 0, 0, 0,
+		state[2] = new State(3, "Clarity", false, false, false, -1, 0, 7, 0, 0, 0,
 				1, 1, 0, false);
-		state[3] = new State("Dizziness", false, false, false, 3, 0, -7, 0, 0,
+		state[3] = new State(4, "Dizziness", false, false, false, 3, 0, -7, 0, 0,
 				0, -1, -1, 0, false);
-		state[4] = new State("Vigour", false, false, false, -1, 0, 0, 7, 1, 0,
+		state[4] = new State(5, "Vigour", false, false, false, -1, 0, 0, 7, 1, 0,
 				0, 0, 1, false);
-		state[5] = new State("Weakness", false, false, false, 5, 0, 0, -7, -1,
+		state[5] = new State(6, "Weakness", false, false, false, 5, 0, 0, -7, -1,
 				0, 0, 0, -1, false);
-		state[6] = new State("Berserk", false, true, false, 7, 0, 0, 0, 5, -3,
+		state[6] = new State(7, "Berserk", false, true, false, 7, 0, 0, 0, 5, -3,
 				0, 0, 3, false);
-		state[7] = new State("Confusion", false, false, true, 3, 0, 0, 0, 0, 0,
+		state[7] = new State(8, "Confusion", false, false, true, 3, 0, 0, 0, 0, 0,
 				0, 0, 0, false);
-		state[8] = new State("Sleep", true, false, false, 5, 0, 0, 0, 0, -3, 0,
+		state[8] = new State(9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3, 0,
 				0, -3, false);
-		state[9] = new State("Stun", true, false, false, 1, 0, 0, 0, 0, -1, 0,
+		state[9] = new State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1, 0,
 				0, -1, false);
-		state[10] = new State("Reflect", false, false, false, 7, 0, 0, 0, 0, 0,
+		state[10] = new State(11, "Reflect", false, false, false, 7, 0, 0, 0, 0, 0,
 				0, 0, 0, true);
 
 		return state;
@@ -898,10 +899,11 @@ public class Actor extends Job implements Parcelable {
 			return this.originId;
 		}
 
-		public State(String name, boolean inactive, boolean auto,
+		public State(int id, String name, boolean inactive, boolean auto,
 				boolean confusion, int dur, int hpm, int mpm, int spm,
 				int atkm, int defm, int wism, int spim, int agim,
 				boolean reflect) {
+			this.originId = id;
 			this.name = name;
 			this.mdur = dur;
 			this.dur = 0;

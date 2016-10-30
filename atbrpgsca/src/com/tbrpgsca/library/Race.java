@@ -71,24 +71,25 @@ public class Race {
 	}
 
 	public Race() {
-		this("Humanoid", 25, 25, 25, 10, 10, 10, 10, 10);
+		this(0, "Humanoid", 25, 25, 25, 10, 10, 10, 10, 10);
 	}
 
-	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
+	public Race(int id, String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
 			int[] newRes, Ability[] newSkill) {
+		this.originId = id;
 		this.rname = rname;
 		this.raceStats(maxhp, maxmp, maxsp, atk, def, wis, spi, agi);
 		this.raceSkills = newSkill;
 		this.setResistance(newRes);
 	}
 
-	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi) {
-		this(rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, new int[] {});
+	public Race(int originId, String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi) {
+		this(originId, rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, new int[] {});
 	}
 
-	public Race(String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
+	public Race(int id, String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
 			int[] newRes) {
-		this(rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes, new Ability[] {});
+		this(id, rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes, new Ability[] {});
 	}
 
 	protected void raceStats(int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi,

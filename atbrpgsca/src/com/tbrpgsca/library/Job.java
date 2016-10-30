@@ -68,42 +68,42 @@ public class Job extends Race {
 	private int sprWait[] = new int[5];
 
 	public Job() {
-		this("Hero", 0, 0, 0, 0, 0, 0, 0, 0);
+		this(0, "Hero", 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 
-	public Job(String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi, int agi, int hpp, int mpp,
+	public Job(int id, String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi, int agi, int hpp, int mpp,
 			int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes, Ability[] newSkill) {
-		super("", hp, mp, sp, atk, def, wis, spi, agi, newRes, newSkill);
+		super(id, "", hp, mp, sp, atk, def, wis, spi, agi, newRes, newSkill);
 		this.jname = jname;
 		this.setSprName(this.jname);
 		this.jobStats(hpp, mpp, spp, atkp, defp, wisp, spip, agip);
 	}
 	
-	public Job(String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi, int agi, int hpp, int mpp,
+	public Job(int id, String jname, int hp, int mp, int sp, int atk, int def, int wis, int spi, int agi, int hpp, int mpp,
 			int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes, Ability[] newSkill, int[] skills) {
-		this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, null);
+		this(id, jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, null);
 		this.raceSkills = new Ability[skills.length];
 		for (int i = 0; i < skills.length; i++)
 			this.raceSkills[i] = newSkill[skills[i]];
 	}
 
-	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip) {
-		this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, new int[] {});
+	public Job(int id, String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip) {
+		this(id, jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, new int[] {});
 	}
 
-	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip,
+	public Job(int id, String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip,
 			int[] newRes) {
-		this(jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, new Ability[] {});
+		this(id, jname, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, new Ability[] {});
 	}
 
-	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes,
+	public Job(int id, String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes,
 			Ability[] newSkill) {
-		this(jname, 0, 0, 0, 0, 0, 0, 0, 0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill);
+		this(id, jname, 0, 0, 0, 0, 0, 0, 0, 0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill);
 	}
 	
-	public Job(String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes,
+	public Job(int id, String jname, int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip, int[] newRes,
 			Ability[] newSkill, int[] skills) {
-		this(jname, 0, 0, 0, 0, 0, 0, 0, 0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill, skills);
+		this(id, jname, 0, 0, 0, 0, 0, 0, 0, 0, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes, newSkill, skills);
 	}
 
 	protected void jobStats(int hpp, int mpp, int spp, int atkp, int defp, int wisp, int spip, int agip) {

@@ -160,41 +160,41 @@ public class Ability implements Parcelable {
 				: -1;
 		switch (this.dmgtype) {
 		case 1:
-			dmg += (this.atki * ((user.def + user.atk) / 2))
+			dmg += (this.atki + ((user.def + user.atk) / 2))
 					/ (target.def * res + 1);
 			break;
 		case 3:
-			dmg += (this.atki * user.wis) / (target.spi * res + 1);
+			dmg += (this.atki + user.wis) / (target.spi * res + 1);
 			break;
 		case 2:
-			dmg += (this.atki * user.spi) / (target.wis * res + 1);
+			dmg += (this.atki + user.spi) / (target.wis * res + 1);
 			break;
 		case 4:
-			dmg += (this.atki * ((user.agi + user.atk) / 2))
+			dmg += (this.atki + ((user.agi + user.atk) / 2))
 					/ (((target.agi + target.def) / 2) * res + 1);
 			break;
 		case 5:
-			dmg += (this.atki * ((user.wis + user.atk) / 2))
+			dmg += (this.atki + ((user.wis + user.atk) / 2))
 					/ (((target.spi + target.def) / 2) * res + 1);
 			break;
 		case 6:
-			dmg += (this.atki * ((user.agi + user.wis + user.atk) / 3))
+			dmg += (this.atki + ((user.agi + user.wis + user.atk) / 3))
 					/ (((target.agi + target.spi) / 2) * res + 1);
 			break;
 		case 7:
-			dmg += (this.atki * ((user.spi + user.atk + user.def) / 3))
+			dmg += (this.atki + ((user.spi + user.atk + user.def) / 3))
 					/ (((target.wis + target.def) / 2) * res + 1);
 			break;
 		default:
-			dmg += (this.atki * user.atk) / (target.def * res + 1);
+			dmg += (this.atki + user.atk) / (target.def * res + 1);
 		}
 		if (this.dmgtype == 2
 				|| this.dmgtype == 3
 				|| (this.dmgtype != 4 && (int) (Math.random() * 13 + user.agi / 5) > 2 + target.agi / 4)
 				|| (this.dmgtype == 4 && (int) (Math.random() * 13 + user.agi / 3) > 2 + target.agi / 4)) {
-			int dmghp = (this.hpdmg != 0) ? (dmg + this.hpdmg) : 0;
-			int dmgmp = (this.mpdmg != 0) ? (dmg + this.mpdmg) : 0;
-			int dmgsp = (this.spdmg != 0) ? (dmg + this.spdmg) : 0;
+			int dmghp = (this.hpdmg != 0) ? (((this.hpdmg < 0 ? -1 : 1) * dmg) + this.hpdmg) : 0;
+			int dmgmp = (this.mpdmg != 0) ? (((this.mpdmg < 0 ? -1 : 1) * dmg) + this.mpdmg) : 0;
+			int dmgsp = (this.spdmg != 0) ? (((this.spdmg < 0 ? -1 : 1) * dmg) + this.spdmg) : 0;
 			if (res < 0) {
 				dmghp = -dmghp;
 				dmgmp = -dmgmp;
@@ -260,21 +260,21 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability() {
-		this("Ability", true, false, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, false,
+		this(0, "Ability", true, false, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, false,
 				new boolean[] {}, new boolean[] {});
 	}
 
-	public Ability(String name, boolean battle, int hpdmg, int mpdmg,
+	public Ability(int id, String name, boolean battle, int hpdmg, int mpdmg,
 			int spdmg, int trg, int element, boolean state[], boolean rstate[]) {
-		this(name, battle, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
+		this(id, name, battle, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
 				element, 0, -1, false, state, rstate);
 	}
 
-	public Ability(String name, boolean battle, boolean range, int lvrq,
+	public Ability(int id, String name, boolean battle, boolean range, int lvrq,
 			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
 			int mpdmg, int spdmg, int trg, int element, boolean absorb,
 			boolean state[], boolean rstate[]) {
-		this(name, battle, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
+		this(id, name, battle, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
 				mpdmg, spdmg, trg, element, -1, -1, absorb, state, rstate);
 	}
 
@@ -288,10 +288,11 @@ public class Ability implements Parcelable {
 		}
 	}
 
-	public Ability(String name, boolean battle, boolean range, int lvrq,
+	public Ability(int id, String name, boolean battle, boolean range, int lvrq,
 			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
 			int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
 			boolean absorb, boolean state[], boolean rstate[]) {
+		this.originId = id;
 		this.name = name;
 		this.battle = battle;
 		this.lvrq = lvrq;
@@ -316,7 +317,7 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(Ability cloned) {
-		this(cloned.name, cloned.battle, cloned.range, cloned.lvrq, cloned.hpc,
+		this(cloned.originId, cloned.name, cloned.battle, cloned.range, cloned.lvrq, cloned.hpc,
 				cloned.mpc, cloned.spc, cloned.dmgtype, cloned.atki,
 				cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg,
 				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
