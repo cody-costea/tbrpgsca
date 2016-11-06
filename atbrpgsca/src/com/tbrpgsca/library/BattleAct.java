@@ -116,20 +116,20 @@ public class BattleAct extends Activity {
 		}
 		if (BattleAct.this.Skill == null) {
 			BattleAct.this.Skill = new Ability[] {
-					new Ability(0, "Attack", true, false, 0, 0, 0, 0, 0, 1, 10, 0,
+					new Ability(0, "Attack", false, false, 0, 0, 0, 0, 0, 1, 10, 0,
 							0, 0, 1, false, new boolean[] {}, new boolean[] {}),
-					new Ability(0, "Defend", true, true, 0, 0, 0, 0, 3, -1, 0, 0,
+					new Ability(0, "Defend", false, true, 0, 0, 0, 0, 3, -1, 0, 0,
 							-1, -1, 0, false, new boolean[] {},
 							new boolean[] {}) };
 		}
 		if (BattleAct.this.Battler == null) {
-			Ability[] items = new Ability[] { new Ability(0, "Potion", true, -25,
+			Ability[] items = new Ability[] { new Ability(0, "Potion", false, -25,
 					0, 0, 0, 0, new boolean[] {}, new boolean[] {}) };
 			items[0].qty = 10;
 			BattleAct.this.Battler = new Actor[] {
 					new Actor(0, "Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15, 13,
 							12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0, new int[] {},
-							items, new Ability[] { new Ability(0, "Poison", true,
+							items, new Ability[] { new Ability(0, "Poison", false,
 									true, 2, 0, 0, 5, 4, 2, 3, 0, 9, 0, 1,
 									false,
 									new boolean[] { false, false, true },
@@ -137,7 +137,7 @@ public class BattleAct extends Activity {
 					new Actor(0, "Stephanie", "Human", "Sorceress", 1, 3, 45, 20,
 							5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, items, new Ability[] { new Ability(
-									0, "Fireball", true, true, 2, 0, 7, 0, 2, 1,
+									0, "Fireball", false, true, 2, 0, 7, 0, 2, 1,
 									15, 0, 0, 0, 2, false, new boolean[] {},
 									new boolean[] {}) }, false),
 					new Actor(0, "George", "Half-Orc", "Templar", 1, 3, 47, 15,
@@ -152,7 +152,7 @@ public class BattleAct extends Activity {
 					new Actor(0, "Victoria", "Elf", "Valkyrie", 1, 3, 55, 7, 13,
 							17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
 							new int[] {}, items, new Ability[] { new Ability(
-									0, "Smash", true, false, 2, 5, 0, 2, 0, 1, 12,
+									0, "Smash", false, false, 2, 5, 0, 2, 0, 1, 12,
 									0, 1, 0, 1, false, new boolean[] { false,
 											false, false, false, false, false,
 											false, false, false, false, true },
@@ -160,19 +160,19 @@ public class BattleAct extends Activity {
 					new Actor(0, "Lizard", "Lizard", "Lizard", 3, 3, 50, 15, 10,
 							13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
 							new int[] {}, null, new Ability[] { new Ability(
-									0, "Fireball", true, true, 2, 0, 7, 0, 2, 1,
+									0, "Fireball", false, true, 2, 0, 7, 0, 2, 1,
 									15, 0, 0, 0, 2, false, new boolean[] {},
 									new boolean[] {}) }, false),
 					new Actor(0, "Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20,
 							13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, null, new Ability[] { new Ability(
-									0, "Poison", true, true, 2, 0, 0, 5, 4, 2, 3,
+									0, "Poison", false, true, 2, 0, 0, 5, 4, 2, 3,
 									0, 9, 0, 1, false, new boolean[] { false,
 											false, true }, new boolean[] {
 											false, true }) }, false),
 					new Actor(0, "Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17, 12,
 							5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0, new int[] {},
-							null, new Ability[] { new Ability(0, "Smash", true,
+							null, new Ability[] { new Ability(0, "Smash", false,
 									false, 2, 5, 0, 2, 0, 1, 12, 0, 1, 0, 1,
 									false, new boolean[] { false, false, false,
 											false, false, false, false, false,
@@ -662,7 +662,7 @@ public class BattleAct extends Activity {
 		String s;
 		if (r > 0) {
 			t = "Victory";
-			s = "The party has won the battle!";
+			s = "The party has won the steal!";
 		} else {
 			t = "Defeat";
 			if (r < 0)

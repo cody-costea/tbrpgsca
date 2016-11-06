@@ -601,8 +601,16 @@ public class Actor extends Job implements Parcelable {
 			this.res[i] = cloned.res[i];
 		}
 		this.jobSkills.clear();
-		this.raceSkills = cloned.raceSkills;
+		this.raceSkills = new Ability[cloned.raceSkills.length];
+		for (int i = 0; i < this.raceSkills.length; i++)
+			this.raceSkills[i] = new Ability(cloned.raceSkills[i]);
 		this.addSkills(cloned.jobSkills.toArray(new Ability[0]), false, true);
+		if (cloned.items != null) {
+			this.items = new Ability[cloned.items.length];
+			for (int i = 0; i < this.items.length; i++) {
+				this.items[i] = cloned.items[i];
+			}
+		}
 		this.setSprName(cloned.getSprName());
 		this.stats(cloned.level, cloned.maxlv);
 		this.originObj = cloned;

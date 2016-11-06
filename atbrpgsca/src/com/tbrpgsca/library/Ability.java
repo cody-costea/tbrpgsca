@@ -22,7 +22,7 @@ public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
 			element, qty, mqty, rqty, tqty, originId;
-	protected boolean battle, absorb, range;
+	protected boolean steal, absorb, range;
 	protected boolean[] state, rstate;
 	protected Ability originObj = null;
 
@@ -43,7 +43,7 @@ public class Ability implements Parcelable {
 		this.mqty = in.readInt();
 		this.rqty = in.readInt();
 		this.tqty = in.readInt();
-		this.battle = in.readByte() != 0;
+		this.steal = in.readByte() != 0;
 		this.absorb = in.readByte() != 0;
 		this.range = in.readByte() != 0;
 		this.state = in.createBooleanArray();
@@ -131,8 +131,8 @@ public class Ability implements Parcelable {
 		return this.mqty;
 	}
 
-	public boolean isBattleOnly() {
-		return this.battle;
+	public boolean isStealing() {
+		return this.steal;
 	}
 
 	public boolean[] getState() {
@@ -163,10 +163,10 @@ public class Ability implements Parcelable {
 			dmg += (this.atki + ((user.def + user.atk) / 2))
 					/ (target.def * res + 1);
 			break;
-		case 3:
+		case 2:
 			dmg += (this.atki + user.wis) / (target.spi * res + 1);
 			break;
-		case 2:
+		case 3:
 			dmg += (this.atki + user.spi) / (target.wis * res + 1);
 			break;
 		case 4:
@@ -242,6 +242,19 @@ public class Ability implements Parcelable {
 				if (this.rstate[i]) {
 					target.state[i - 1].remove();
 				}
+			if (this.steal && user.items != null && target.items != null && target.items.length > 0
+					&& ((int)(Math.random() * 12 + user.agi / 4) > 4 + target.agi / 3)) {
+				int itemId = (int)(Math.random() * target.items.length);
+				if (itemId < target.items.length && target.items[itemId].qty > 0) {
+					for (int i = 0; i < user.items.length; i++) {
+						if (user.items[i].originId == target.items[itemId].originId) {
+							target.items[itemId].qty--;
+							user.items[i].qty++;
+							s += ", and steals " + target.items[itemId].name;
+						}
+					}
+				}
+			}
 		} else
 			s += ", but misses";
 
@@ -264,17 +277,17 @@ public class Ability implements Parcelable {
 				new boolean[] {}, new boolean[] {});
 	}
 
-	public Ability(int id, String name, boolean battle, int hpdmg, int mpdmg,
-			int spdmg, int trg, int element, boolean state[], boolean rstate[]) {
-		this(id, name, battle, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
+	public Ability(int id, String name, boolean steal, int hpdmg, int mpdmg,
+				   int spdmg, int trg, int element, boolean state[], boolean rstate[]) {
+		this(id, name, steal, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
 				element, 0, -1, false, state, rstate);
 	}
 
-	public Ability(int id, String name, boolean battle, boolean range, int lvrq,
-			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-			int mpdmg, int spdmg, int trg, int element, boolean absorb,
-			boolean state[], boolean rstate[]) {
-		this(id, name, battle, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
+	public Ability(int id, String name, boolean steal, boolean range, int lvrq,
+				   int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
+				   int mpdmg, int spdmg, int trg, int element, boolean absorb,
+				   boolean state[], boolean rstate[]) {
+		this(id, name, steal, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
 				mpdmg, spdmg, trg, element, -1, -1, absorb, state, rstate);
 	}
 
@@ -288,13 +301,13 @@ public class Ability implements Parcelable {
 		}
 	}
 
-	public Ability(int id, String name, boolean battle, boolean range, int lvrq,
-			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-			int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
-			boolean absorb, boolean state[], boolean rstate[]) {
+	public Ability(int id, String name, boolean steal, boolean range, int lvrq,
+				   int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
+				   int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
+				   boolean absorb, boolean state[], boolean rstate[]) {
 		this.originId = id;
 		this.name = name;
-		this.battle = battle;
+		this.steal = steal;
 		this.lvrq = lvrq;
 		this.hpc = hpc;
 		this.mpc = mpc;
@@ -317,7 +330,7 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(Ability cloned) {
-		this(cloned.originId, cloned.name, cloned.battle, cloned.range, cloned.lvrq, cloned.hpc,
+		this(cloned.originId, cloned.name, cloned.steal, cloned.range, cloned.lvrq, cloned.hpc,
 				cloned.mpc, cloned.spc, cloned.dmgtype, cloned.atki,
 				cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg,
 				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
@@ -350,7 +363,7 @@ public class Ability implements Parcelable {
 		dest.writeInt(this.mqty);
 		dest.writeInt(this.rqty);
 		dest.writeInt(this.tqty);
-		dest.writeByte((byte) (this.battle ? 1 : 0));
+		dest.writeByte((byte) (this.steal ? 1 : 0));
 		dest.writeByte((byte) (this.absorb ? 1 : 0));
 		dest.writeByte((byte) (this.range ? 1 : 0));
 		dest.writeBooleanArray(this.state);
