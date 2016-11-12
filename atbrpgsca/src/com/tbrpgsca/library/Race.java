@@ -12,15 +12,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. 
-*/
+ */
 package com.tbrpgsca.library;
 
 public class Race {
-    protected String rname;
-    protected int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi, originId;
+	protected String rname;
+	protected int maxhp, maxmp, maxsp, matk, mdef, mwis, mspi, magi, originId;
 
-    protected int rres[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    protected Ability[] raceSkills;
+	protected int rres[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	protected Ability[] raceSkills;
 
 	public String getRaceName() {
 		return this.rname;
@@ -65,7 +65,7 @@ public class Race {
 	public Ability[] getRaceSkills() {
 		return this.raceSkills;
 	}
-	
+
 	public int getOriginId() {
 		return this.originId;
 	}
@@ -74,8 +74,8 @@ public class Race {
 		this(0, "Humanoid", 25, 25, 25, 10, 10, 10, 10, 10);
 	}
 
-	public Race(int id, String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
-			int[] newRes, Ability[] newSkill) {
+	public Race(int id, String rname, int maxhp, int maxmp, int maxsp, int atk,
+			int def, int wis, int spi, int agi, int[] newRes, Ability[] newSkill) {
 		this.originId = id;
 		this.rname = rname;
 		this.raceStats(maxhp, maxmp, maxsp, atk, def, wis, spi, agi);
@@ -83,17 +83,20 @@ public class Race {
 		this.setResistance(newRes);
 	}
 
-	public Race(int originId, String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi) {
-		this(originId, rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, new int[] {});
+	public Race(int originId, String rname, int maxhp, int maxmp, int maxsp,
+			int atk, int def, int wis, int spi, int agi) {
+		this(originId, rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi,
+				new int[] {});
 	}
 
-	public Race(int id, String rname, int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi, int agi,
-			int[] newRes) {
-		this(id, rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes, new Ability[] {});
+	public Race(int id, String rname, int maxhp, int maxmp, int maxsp, int atk,
+			int def, int wis, int spi, int agi, int[] newRes) {
+		this(id, rname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, newRes,
+				new Ability[] {});
 	}
 
-	protected void raceStats(int maxhp, int maxmp, int maxsp, int atk, int def, int wis, int spi,
-			int agi) {
+	protected void raceStats(int maxhp, int maxmp, int maxsp, int atk, int def,
+			int wis, int spi, int agi) {
 		this.maxhp = maxhp;
 		this.maxmp = maxmp;
 		this.maxsp = maxsp;

@@ -151,7 +151,9 @@ public class Ability implements Parcelable {
 		return this.range;
 	}
 
-	public int getOriginId() { return this.originId; }
+	public int getOriginId() {
+		return this.originId;
+	}
 
 	public String execute(Actor user, Actor target) {
 		String s = "";
@@ -192,9 +194,12 @@ public class Ability implements Parcelable {
 				|| this.dmgtype == 3
 				|| (this.dmgtype != 4 && (int) (Math.random() * 13 + user.agi / 5) > 2 + target.agi / 4)
 				|| (this.dmgtype == 4 && (int) (Math.random() * 13 + user.agi / 3) > 2 + target.agi / 4)) {
-			int dmghp = (this.hpdmg != 0) ? (((this.hpdmg < 0 ? -1 : 1) * dmg) + this.hpdmg) : 0;
-			int dmgmp = (this.mpdmg != 0) ? (((this.mpdmg < 0 ? -1 : 1) * dmg) + this.mpdmg) : 0;
-			int dmgsp = (this.spdmg != 0) ? (((this.spdmg < 0 ? -1 : 1) * dmg) + this.spdmg) : 0;
+			int dmghp = (this.hpdmg != 0) ? (((this.hpdmg < 0 ? -1 : 1) * dmg) + this.hpdmg)
+					: 0;
+			int dmgmp = (this.mpdmg != 0) ? (((this.mpdmg < 0 ? -1 : 1) * dmg) + this.mpdmg)
+					: 0;
+			int dmgsp = (this.spdmg != 0) ? (((this.spdmg < 0 ? -1 : 1) * dmg) + this.spdmg)
+					: 0;
 			if (res < 0) {
 				dmghp = -dmghp;
 				dmgmp = -dmgmp;
@@ -242,15 +247,19 @@ public class Ability implements Parcelable {
 				if (this.rstate[i]) {
 					target.state[i - 1].remove();
 				}
-			if (this.steal && user.items != null && target.items != null && target.items.length > 0
-					&& ((int)(Math.random() * 12 + user.agi / 4) > 4 + target.agi / 3)) {
-				int itemId = (int)(Math.random() * target.items.length);
-				if (itemId < target.items.length && target.items[itemId].qty > 0) {
+			if (this.steal
+					&& user.items != null
+					&& target.items != null
+					&& target.items.length > 0
+					&& ((int) (Math.random() * 12 + user.agi / 4) > 4 + target.agi / 3)) {
+				int itemId = (int) (Math.random() * target.items.length);
+				if (itemId < target.items.length
+						&& target.items[itemId].qty > 0) {
 					for (int i = 0; i < user.items.length; i++) {
 						if (user.items[i].originId == target.items[itemId].originId) {
 							target.items[itemId].qty--;
 							user.items[i].qty++;
-							s += ", and steals " + target.items[itemId].name;
+							s += ", " + target.items[itemId].name + " stolen";
 						}
 					}
 				}
@@ -278,15 +287,15 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(int id, String name, boolean steal, int hpdmg, int mpdmg,
-				   int spdmg, int trg, int element, boolean state[], boolean rstate[]) {
+			int spdmg, int trg, int element, boolean state[], boolean rstate[]) {
 		this(id, name, steal, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
 				element, 0, -1, false, state, rstate);
 	}
 
 	public Ability(int id, String name, boolean steal, boolean range, int lvrq,
-				   int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-				   int mpdmg, int spdmg, int trg, int element, boolean absorb,
-				   boolean state[], boolean rstate[]) {
+			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
+			int mpdmg, int spdmg, int trg, int element, boolean absorb,
+			boolean state[], boolean rstate[]) {
 		this(id, name, steal, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
 				mpdmg, spdmg, trg, element, -1, -1, absorb, state, rstate);
 	}
@@ -302,9 +311,9 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(int id, String name, boolean steal, boolean range, int lvrq,
-				   int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-				   int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
-				   boolean absorb, boolean state[], boolean rstate[]) {
+			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
+			int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
+			boolean absorb, boolean state[], boolean rstate[]) {
 		this.originId = id;
 		this.name = name;
 		this.steal = steal;
@@ -330,11 +339,11 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(Ability cloned) {
-		this(cloned.originId, cloned.name, cloned.steal, cloned.range, cloned.lvrq, cloned.hpc,
-				cloned.mpc, cloned.spc, cloned.dmgtype, cloned.atki,
-				cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg,
-				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
-				cloned.state, cloned.rstate);
+		this(cloned.originId, cloned.name, cloned.steal, cloned.range,
+				cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc,
+				cloned.dmgtype, cloned.atki, cloned.hpdmg, cloned.mpdmg,
+				cloned.spdmg, cloned.trg, cloned.element, cloned.mqty,
+				cloned.rqty, cloned.absorb, cloned.state, cloned.rstate);
 		this.originObj = cloned;
 		this.originId = cloned.originId;
 	}

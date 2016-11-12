@@ -469,51 +469,51 @@ public class Actor extends Job implements Parcelable {
 		this.stats(1, maxlv);
 	}
 
-	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
-			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
-			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
-			int wisp, int spip, int agip) {
-		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
-				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
+	public Actor(int id, String name, String race, String jname, int lv,
+			int maxlv, int maxhp, int maxmp, int maxsp, int atk, int def,
+			int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp,
+			int defp, int wisp, int spip, int agip) {
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
+				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
 				new int[] {}, new Ability[] {}, new Ability[] {}, true);
 	}
 
-	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
-			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
-			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
-			int wisp, int spip, int agip, int[] newRes) {
-		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
-				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
-				new Ability[] {}, new Ability[] {}, true);
+	public Actor(int id, String name, String race, String jname, int lv,
+			int maxlv, int maxhp, int maxmp, int maxsp, int atk, int def,
+			int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp,
+			int defp, int wisp, int spip, int agip, int[] newRes) {
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
+				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
+				newRes, new Ability[] {}, new Ability[] {}, true);
 	}
 
-	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
-			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
-			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
-			int wisp, int spip, int agip, int[] newRes, Ability[] items,
-			Ability[] newSkill) {
-		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
-				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
-				items, newSkill, true);
+	public Actor(int id, String name, String race, String jname, int lv,
+			int maxlv, int maxhp, int maxmp, int maxsp, int atk, int def,
+			int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp,
+			int defp, int wisp, int spip, int agip, int[] newRes,
+			Ability[] items, Ability[] newSkill) {
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
+				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
+				newRes, items, newSkill, true);
 	}
 
-	public Actor(int id, String name, Race race, Job job, Ability[] items, int lv,
-			int maxlv) {
-		this(id, name, race.rname, job.jname, lv, maxlv, race.maxhp, race.maxmp,
-				race.maxsp, race.matk, race.mdef, race.mwis, race.mspi,
-				race.magi, job.hpp, job.mpp, job.spp, job.atkp, job.defp,
-				job.wisp, job.spip, job.agip, race.rres, items,
+	public Actor(int id, String name, Race race, Job job, Ability[] items,
+			int lv, int maxlv) {
+		this(id, name, race.rname, job.jname, lv, maxlv, race.maxhp,
+				race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis,
+				race.mspi, race.magi, job.hpp, job.mpp, job.spp, job.atkp,
+				job.defp, job.wisp, job.spip, job.agip, race.rres, items,
 				race.raceSkills, true);
 		this.addSkills(job.raceSkills, true, true);
 	}
 
-	protected Actor(int id, String name, String race, String jname, int lv, int maxlv,
-			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
-			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
-			int wisp, int spip, int agip, int[] newRes, Ability[] items,
-			Ability[] newSkill, boolean cloneSkills) {
-		super(id, jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp, mpp,
-				spp, atkp, defp, wisp, spip, agip, newRes, null);
+	protected Actor(int id, String name, String race, String jname, int lv,
+			int maxlv, int maxhp, int maxmp, int maxsp, int atk, int def,
+			int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp,
+			int defp, int wisp, int spip, int agip, int[] newRes,
+			Ability[] items, Ability[] newSkill, boolean cloneSkills) {
+		super(id, jname, maxhp, maxmp, maxsp, atk, def, wis, spi, agi, hpp,
+				mpp, spp, atkp, defp, wisp, spip, agip, newRes, null);
 		this.name = name;
 		this.rname = race;
 		this.state = this.AddStates();
@@ -523,14 +523,14 @@ public class Actor extends Job implements Parcelable {
 		this.stats(lv, maxlv);
 	}
 
-	public Actor(int id, String name, String race, String jname, int lv, int maxlv,
-			int maxhp, int maxmp, int maxsp, int atk, int def, int wis,
-			int spi, int agi, int hpp, int mpp, int spp, int atkp, int defp,
-			int wisp, int spip, int agip, int[] newRes, Ability[] items,
-			Ability[] newSkill, int[] skills) {
-		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def, wis,
-				spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip, newRes,
-				items, null);
+	public Actor(int id, String name, String race, String jname, int lv,
+			int maxlv, int maxhp, int maxmp, int maxsp, int atk, int def,
+			int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp,
+			int defp, int wisp, int spip, int agip, int[] newRes,
+			Ability[] items, Ability[] newSkill, int[] skills) {
+		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
+				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
+				newRes, items, null);
 		this.raceSkills = new Ability[skills.length];
 		for (int i = 0; i < skills.length; i++)
 			this.raceSkills[i] = new Ability(newSkill[skills[i]]);
@@ -627,28 +627,28 @@ public class Actor extends Job implements Parcelable {
 	private State[] AddStates() {
 		State state[] = new State[11];
 
-		state[0] = new State(1, "Regen", false, false, false, -1, 10, 0, 0, 0, 2,
-				0, 0, 0, false);
-		state[1] = new State(2, "Poison", false, false, false, 10, -7, 0, -2, 0,
-				-2, 0, 0, 0, false);
-		state[2] = new State(3, "Clarity", false, false, false, -1, 0, 7, 0, 0, 0,
-				1, 1, 0, false);
-		state[3] = new State(4, "Dizziness", false, false, false, 3, 0, -7, 0, 0,
-				0, -1, -1, 0, false);
-		state[4] = new State(5, "Vigour", false, false, false, -1, 0, 0, 7, 1, 0,
-				0, 0, 1, false);
-		state[5] = new State(6, "Weakness", false, false, false, 5, 0, 0, -7, -1,
-				0, 0, 0, -1, false);
-		state[6] = new State(7, "Berserk", false, true, false, 7, 0, 0, 0, 5, -3,
-				0, 0, 3, false);
-		state[7] = new State(8, "Confusion", false, false, true, 3, 0, 0, 0, 0, 0,
-				0, 0, 0, false);
-		state[8] = new State(9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3, 0,
-				0, -3, false);
-		state[9] = new State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1, 0,
-				0, -1, false);
-		state[10] = new State(11, "Reflect", false, false, false, 7, 0, 0, 0, 0, 0,
-				0, 0, 0, true);
+		state[0] = new State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
+				2, 0, 0, 0, false);
+		state[1] = new State(2, "Poison", false, false, false, 10, -7, 0, -2,
+				0, -2, 0, 0, 0, false);
+		state[2] = new State(3, "Clarity", false, false, false, -1, 0, 7, 0, 0,
+				0, 1, 1, 0, false);
+		state[3] = new State(4, "Dizziness", false, false, false, 3, 0, -7, 0,
+				0, 0, -1, -1, 0, false);
+		state[4] = new State(5, "Vigour", false, false, false, -1, 0, 0, 7, 1,
+				0, 0, 0, 1, false);
+		state[5] = new State(6, "Weakness", false, false, false, 5, 0, 0, -7,
+				-1, 0, 0, 0, -1, false);
+		state[6] = new State(7, "Berserk", false, true, false, 7, 0, 0, 0, 5,
+				-3, 0, 0, 3, false);
+		state[7] = new State(8, "Confusion", false, false, true, 3, 0, 0, 0, 0,
+				0, 0, 0, 0, false);
+		state[8] = new State(9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3,
+				0, 0, -3, false);
+		state[9] = new State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1,
+				0, 0, -1, false);
+		state[10] = new State(11, "Reflect", false, false, false, 7, 0, 0, 0,
+				0, 0, 0, 0, 0, true);
 
 		return state;
 	}
@@ -902,7 +902,7 @@ public class Actor extends Job implements Parcelable {
 		public int[] getResMod() {
 			return this.resm;
 		}
-		
+
 		public int getOriginId() {
 			return this.originId;
 		}

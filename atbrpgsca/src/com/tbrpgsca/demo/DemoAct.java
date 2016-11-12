@@ -20,7 +20,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.SpannableString;
 import android.text.util.Linkify;
 import android.view.Menu;
@@ -143,8 +142,8 @@ public class DemoAct extends Activity {
 			surprise = 1;
 		for (int i = 1; i < this.Player.length; i++)
 			this.Player[i].recover();
-		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] }, surprise,
-				this.level % 2 == 0, true);
+		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] },
+				this.Item, surprise, this.level % 2 == 0, true);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {
