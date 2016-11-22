@@ -36,17 +36,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class BattleAct extends Activity {
-
+	
 	private static Parcelable[] cachedParty = null;
 	private static Parcelable[] cachedEnemy = null;
 	private static Ability[] cachedSkill = null;
-	private static Ability[] cachedItem = null;
+	private static ArrayList<Ability> cachedItem = null;
 
 	private Ability[] Skill;
-	private Ability[] Item;
+	private ArrayList<Ability> Item;
 	private Actor[] Battler;
+	
 	private int result = 0, surprise = 0, target, current = 7, difference = 0;
-
 	private int waitTime[] = { 0, 0, 0 };
 
 	private Spinner targetBox, skillBox, itemBox;
@@ -63,8 +63,8 @@ public class BattleAct extends Activity {
 	}
 
 	public static void InitiateBattle(Activity act, Actor[] party,
-			Actor[] enemy, Ability[] skill, Ability[] item, int surprise,
-			boolean escapable, boolean staticCache) {
+			Actor[] enemy, Ability[] skill, ArrayList<Ability> item,
+			int surprise, boolean escapable, boolean staticCache) {
 		if (staticCache) {
 			BattleAct.cachedParty = party;
 			BattleAct.cachedEnemy = enemy;
@@ -77,7 +77,7 @@ public class BattleAct extends Activity {
 		btInt.putExtra("Party", party);
 		btInt.putExtra("Enemy", enemy);
 		btInt.putExtra("Skill", skill);
-		btInt.putExtra("Item", item);
+		btInt.putParcelableArrayListExtra("Item", item);
 		act.startActivityForResult(btInt, 1);
 	}
 
@@ -89,13 +89,8 @@ public class BattleAct extends Activity {
 			this.surprise = extra.getInt("Surprise");
 		if (BattleAct.cachedItem != null)
 			this.Item = BattleAct.cachedItem;
-		else if (extra.containsKey("Item")) {
-			Parcelable[] item = extra.getParcelableArray("Item");
-			if (item != null) {
-				this.Item = new Ability[item.length];
-				System.arraycopy(item, 0, this.Item, 0, item.length);
-			}
-		}
+		else if (extra.containsKey("Item"))
+			this.Item = extra.getParcelableArrayList("Item");
 		Parcelable[] party = null;
 		Parcelable[] enemy = null;
 		if (BattleAct.cachedParty != null && BattleAct.cachedEnemy != null) {
@@ -359,8 +354,10 @@ public class BattleAct extends Activity {
 		this.itemList.clear();
 		this.crItems.clear();
 		if (BattleAct.this.Battler[this.current].items != null)
-			for (int i = 0; i < BattleAct.this.Battler[this.current].items.length; i++)
-				this.addAbility(BattleAct.this.Battler[this.current].items[i],
+			for (int i = 0; i < BattleAct.this.Battler[this.current].items
+					.size(); i++)
+				this.addAbility(
+						BattleAct.this.Battler[this.current].items.get(i),
 						this.itemList, this.crItems);
 		if (this.itemList.getCount() == 0) {
 			this.Use.setEnabled(false);
@@ -488,8 +485,10 @@ public class BattleAct extends Activity {
 	}
 
 	private void useItem() {
-		this.executeSkill(this.crItems.get(this.itemBox
-				.getSelectedItemPosition()));
+		Ability item = this.crItems.get(this.itemBox.getSelectedItemPosition());
+		this.executeSkill(item);
+		if (item.qty == 0)
+			this.Battler[this.current].items.remove(item);
 	}
 
 	private void executeAI() {
@@ -716,11 +715,11 @@ public class BattleAct extends Activity {
 			public void onClick(DialogInterface arg0, int arg1) {
 				Intent outcome = new Intent();
 				outcome.putExtra("Outcome", BattleAct.this.result);
-				if (BattleAct.this.Item != null) {
-					outcome.putExtra("Item", BattleAct.this.Item);
+				if (BattleAct.cachedItem == null && BattleAct.this.Item != null) {
+					outcome.putParcelableArrayListExtra("Item",
+							BattleAct.this.Item);
 					for (int i = 0; i < 4; i++)
-						if (BattleAct.this.Battler[i] != null)
-							BattleAct.this.Battler[i].items = null;
+						BattleAct.this.Battler[i].items = null;
 				}
 				if (BattleAct.cachedParty == null) {
 					Actor[] party = new Actor[] { BattleAct.this.Battler[0],
@@ -854,4 +853,5 @@ public class BattleAct extends Activity {
 		BattleAct.cachedItem = null;
 		super.onDestroy();
 	}
+	
 }

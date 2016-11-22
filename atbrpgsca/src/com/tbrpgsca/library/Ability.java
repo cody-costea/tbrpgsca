@@ -15,16 +15,18 @@ limitations under the License.
  */
 package com.tbrpgsca.library;
 
+import java.util.ArrayList;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Ability implements Parcelable {
+
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
 			element, qty, mqty, rqty, tqty, originId;
 	protected boolean steal, absorb, range;
 	protected boolean[] state, rstate;
-	protected Ability originObj = null;
 
 	protected Ability(Parcel in) {
 		this.name = in.readString();
@@ -48,7 +50,6 @@ public class Ability implements Parcelable {
 		this.range = in.readByte() != 0;
 		this.state = in.createBooleanArray();
 		this.rstate = in.createBooleanArray();
-		this.originObj = in.readParcelable(Ability.class.getClassLoader());
 		this.originId = in.readInt();
 	}
 
@@ -63,14 +64,6 @@ public class Ability implements Parcelable {
 			return new Ability[size];
 		}
 	};
-
-	public Ability getOriginObj() {
-		return this.originObj;
-	}
-
-	public void removeOriginObj() {
-		this.originObj = null;
-	}
 
 	public String getName() {
 		return this.name;
@@ -111,7 +104,7 @@ public class Ability implements Parcelable {
 		return this.mpdmg;
 	}
 
-	public int getSpDmg() {
+	public int geRpDmg() {
 		return this.spdmg;
 	}
 
@@ -248,20 +241,31 @@ public class Ability implements Parcelable {
 					target.state[i - 1].remove();
 				}
 			if (this.steal
-					&& user.items != null
 					&& target.items != null
-					&& target.items.length > 0
+					&& target.items.size() > 0
+					&& target.items != user.items
 					&& ((int) (Math.random() * 12 + user.agi / 4) > 4 + target.agi / 3)) {
-				int itemId = (int) (Math.random() * target.items.length);
-				if (itemId < target.items.length
-						&& target.items[itemId].qty > 0) {
-					for (int i = 0; i < user.items.length; i++) {
-						if (user.items[i].originId == target.items[itemId].originId) {
-							target.items[itemId].qty--;
-							user.items[i].qty++;
-							s += ", " + target.items[itemId].name + " stolen";
-						}
+				int itemId = (int) (Math.random() * target.items.size());
+				if (itemId < target.items.size()
+						&& target.items.get(itemId).qty > 0) {
+					boolean found = false;
+					if (user.items != null)
+						for (int i = 0; i < user.items.size(); i++)
+							if (user.items.get(i).originId == target.items
+									.get(itemId).originId) {
+								user.items.get(i).qty++;
+								found = true;
+								break;
+							} else
+								user.items = new ArrayList<Ability>();
+					if (!found) {
+						user.items.add(new Ability(target.items.get(itemId)));
+						user.items.get(user.items.size() - 1).qty = 1;
 					}
+					target.items.get(itemId).qty--;
+					if (target.items.get(itemId).qty == 0)
+						target.items.remove(itemId);
+					s += ", " + target.items.get(itemId).name + " stolen";
 				}
 			}
 		} else
@@ -344,7 +348,6 @@ public class Ability implements Parcelable {
 				cloned.dmgtype, cloned.atki, cloned.hpdmg, cloned.mpdmg,
 				cloned.spdmg, cloned.trg, cloned.element, cloned.mqty,
 				cloned.rqty, cloned.absorb, cloned.state, cloned.rstate);
-		this.originObj = cloned;
 		this.originId = cloned.originId;
 	}
 
@@ -355,7 +358,6 @@ public class Ability implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-
 		dest.writeString(this.name);
 		dest.writeInt(this.trg);
 		dest.writeInt(this.hpc);
@@ -377,7 +379,7 @@ public class Ability implements Parcelable {
 		dest.writeByte((byte) (this.range ? 1 : 0));
 		dest.writeBooleanArray(this.state);
 		dest.writeBooleanArray(this.rstate);
-		dest.writeParcelable(this.originObj, flags);
 		dest.writeInt(this.originId);
 	}
+
 }

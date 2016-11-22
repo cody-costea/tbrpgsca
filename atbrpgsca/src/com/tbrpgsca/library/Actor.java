@@ -30,9 +30,7 @@ public class Actor extends Job implements Parcelable {
 
 	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>();
 
-	protected Ability[] items;
-
-	protected Actor originObj = null;
+	protected ArrayList<Ability> items = null;
 
 	protected Actor(Parcel in) {
 		this.name = in.readString();
@@ -76,8 +74,7 @@ public class Actor extends Job implements Parcelable {
 		this.mres = in.createIntArray();
 		this.res = in.createIntArray();
 		this.jobSkills = in.createTypedArrayList(Ability.CREATOR);
-		this.items = in.createTypedArray(Ability.CREATOR);
-		this.originObj = in.readParcelable(Actor.class.getClassLoader());
+		this.items = in.createTypedArrayList(Ability.CREATOR);
 		this.originId = in.readInt();
 	}
 
@@ -92,14 +89,6 @@ public class Actor extends Job implements Parcelable {
 			return new Actor[size];
 		}
 	};
-
-	public Actor getOriginObj() {
-		return this.originObj;
-	}
-
-	public void removeOriginObj() {
-		this.originObj = null;
-	}
 
 	public String getName() {
 		return this.name;
@@ -328,11 +317,11 @@ public class Actor extends Job implements Parcelable {
 		return this.jobSkills;
 	}
 
-	public Ability[] getItems() {
+	public ArrayList<Ability> getItems() {
 		return this.items;
 	}
 
-	public void setItems(Ability[] items) {
+	public void setItems(ArrayList<Ability> items) {
 		this.items = items;
 	}
 
@@ -517,7 +506,11 @@ public class Actor extends Job implements Parcelable {
 		this.name = name;
 		this.rname = race;
 		this.state = this.AddStates();
-		this.items = items;
+		if (items != null) {
+			this.items = new ArrayList<Ability>(items.length);
+			for (int i = 0; i < items.length; i++)
+				this.items.add(items[i]);
+		}
 		if (newSkill != null)
 			this.setBaseSkills(newSkill, cloneSkills);
 		this.stats(lv, maxlv);
@@ -606,14 +599,12 @@ public class Actor extends Job implements Parcelable {
 			this.raceSkills[i] = new Ability(cloned.raceSkills[i]);
 		this.addSkills(cloned.jobSkills.toArray(new Ability[0]), false, true);
 		if (cloned.items != null) {
-			this.items = new Ability[cloned.items.length];
-			for (int i = 0; i < this.items.length; i++) {
-				this.items[i] = cloned.items[i];
-			}
+			this.items = new ArrayList<Ability>(cloned.items.size());
+			for (int i = 0; i < this.items.size(); i++)
+				this.items.add(new Ability(cloned.items.get(i)));
 		}
 		this.setSprName(cloned.getSprName());
 		this.stats(cloned.level, cloned.maxlv);
-		this.originObj = cloned;
 		this.originId = cloned.originId;
 	}
 
@@ -726,8 +717,7 @@ public class Actor extends Job implements Parcelable {
 		dest.writeIntArray(this.mres);
 		dest.writeIntArray(this.res);
 		dest.writeTypedList(this.jobSkills);
-		dest.writeTypedArray(this.items, flags);
-		dest.writeParcelable(this.originObj, flags);
+		dest.writeTypedList(this.items);
 		dest.writeInt(this.originId);
 	}
 
@@ -1037,21 +1027,21 @@ public class Actor extends Job implements Parcelable {
 
 	protected void addSkills(Ability[] newSkill, boolean noDuplicates,
 			boolean clone) {
-		ArrayList<Ability> origins = null;
+		ArrayList<Integer> origins = null;
 		int i;
 		if (noDuplicates) {
-			origins = new ArrayList<Ability>(this.jobSkills.size()
+			origins = new ArrayList<Integer>(this.jobSkills.size()
 					+ this.raceSkills.length);
 			for (i = 0; i < this.jobSkills.size(); i++) {
-				origins.set(i, this.jobSkills.get(i).originObj);
+				origins.add(this.jobSkills.get(i).originId);
 			}
 			for (i = 0; i < this.raceSkills.length; i++) {
-				origins.add(this.raceSkills[i].originObj);
+				origins.add(this.raceSkills[i].originId);
 			}
 		}
 		for (i = 0; i < newSkill.length; i++)
 			if ((!noDuplicates)
-					|| (!origins.contains(newSkill[i]) && !this.jobSkills
+					|| (!origins.contains(newSkill[i].originId) && !this.jobSkills
 							.contains(newSkill[i])))
 				this.jobSkills.add(clone ? new Ability(newSkill[i])
 						: newSkill[i]);

@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.tbrpgsca.demo;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -40,7 +42,7 @@ import com.tbrpgsca.library.Race;
 public class DemoAct extends Activity {
 
 	private Ability[] Skill;
-	private Ability[] Item;
+	private ArrayList<Ability> Item;
 	private Race[] pcRace;
 	private Job[] pcJob;
 	private Actor[] Player;
@@ -101,8 +103,8 @@ public class DemoAct extends Activity {
 		this.Party[1] = this.Player[2];
 		this.Party[2] = this.Player[3];
 		this.Party[3] = null;
-		for (int i = 0; i < this.Item.length; i++)
-			this.Item[i].setQty(5);
+		for (int i = 0; i < this.Item.size(); i++)
+			this.Item.get(i).setQty(5);
 	}
 
 	@Override
@@ -266,11 +268,8 @@ public class DemoAct extends Activity {
     	npc[0]=new Actor(0, "","","", 0,0, 0,0,0, 0,0,0,0,0, 0,0,0, 0,0,0,0,0);
     	
     	npc[1]=new Actor(1, "Cody",maxlv);
-    	npc[1].setItems(this.Item);
     	npc[2]=new Actor(2, "George",maxlv);
-    	npc[2].setItems(this.Item);
     	npc[3]=new Actor(3, "Stephen",maxlv);
-    	npc[3].setItems(this.Item);
     	
         npc[4]=new Actor(4, "Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11});
         npc[4].getState()[5].setRes(9);npc[4].getState()[10].setDur(-2);
@@ -349,20 +348,20 @@ public class DemoAct extends Activity {
         return ability;
     }
     
-    private Ability[] AddItems()
+    private ArrayList<Ability> AddItems()
     {        
         
-        Ability item[] = new Ability[9];
+        ArrayList<Ability> item = new ArrayList<Ability>(9);
     	
-    	item[0]=new Ability(1, "Potion", true, -25,0,0, 0,0, nostate, nostate);
-        item[1]=new Ability(2, "Ether", true, 0,-10,0, 0,0, nostate, nostate);
-        item[2]=new Ability(3, "Tonic", true, 0,0,-10, 0,0, nostate, nostate);
-        item[3]=new Ability(4, "Antidote", true, 0,0,0, 0,0, nostate, poison);
-        item[4]=new Ability(5, "Hi-Ether", true, 0,-25,0, 0,0, nostate, dizziness);
-        item[5]=new Ability(6, "Hi-Tonic", true, 0,-20,0, 0,0, vigour, weakness);
-        item[6]=new Ability(7, "Panacea", true, 0,0,0, 0,0, nostate, cure);
-        item[7]=new Ability(8, "Elixir", true, -100,-100,-100, 0,0, revive, nostate);
-        item[8]=new Ability(9, "Hi-Potion", true, -50,0,0, 0,0, revive, poison);
+    	item.add(new Ability(1, "Potion", true, -25,0,0, 0,0, nostate, nostate));
+        item.add(new Ability(2, "Ether", true, 0,-10,0, 0,0, nostate, nostate));
+        item.add(new Ability(3, "Tonic", true, 0,0,-10, 0,0, nostate, nostate));
+        item.add(new Ability(4, "Antidote", true, 0,0,0, 0,0, nostate, poison));
+        item.add(new Ability(5, "Hi-Ether", true, 0,-25,0, 0,0, nostate, dizziness));
+        item.add(new Ability(6, "Hi-Tonic", true, 0,-20,0, 0,0, vigour, weakness));
+        item.add(new Ability(7, "Panacea", true, 0,0,0, 0,0, nostate, cure));
+        item.add(new Ability(8, "Elixir", true, -100,-100,-100, 0,0, revive, nostate));
+        item.add(new Ability(9, "Hi-Potion", true, -50,0,0, 0,0, revive, poison));
         
         return item;        
     }
