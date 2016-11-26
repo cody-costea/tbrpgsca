@@ -29,7 +29,6 @@ public class Actor extends Job implements Parcelable {
 	protected int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
 	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>();
-
 	protected ArrayList<Ability> items = null;
 
 	protected Actor(Parcel in) {
@@ -94,24 +93,27 @@ public class Actor extends Job implements Parcelable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public Actor setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public boolean isActive() {
 		return this.active;
 	}
 
-	public void setActive(boolean active) {
+	public Actor setActive(boolean active) {
 		this.active = active;
+		return this;
 	}
 
 	public boolean isReflecting() {
 		return this.reflect;
 	}
 
-	public void setReflect(boolean reflect) {
+	public Actor setReflect(boolean reflect) {
 		this.reflect = reflect;
+		return this;
 	}
 
 	public State[] getState() {
@@ -122,71 +124,69 @@ public class Actor extends Job implements Parcelable {
 		return this.auto;
 	}
 
-	public void setAuto(int auto) {
+	public Actor setAuto(int auto) {
 		this.auto = auto;
+		return this;
 	}
 
 	public int getHP() {
 		return this.hp;
 	}
 
-	public void setHP(int hp) {
-		if (hp > this.maxp)
-			this.hp = maxhp;
-		else
-			this.hp = hp;
+	public Actor setHP(int hp) {
+		this.hp = (hp > this.maxp) ? this.maxhp : hp;
+		return this;
 	}
 
 	public int getMP() {
 		return this.mp;
 	}
 
-	public void setMP(int mp) {
-		if (mp > this.maxmp)
-			this.mp = this.maxmp;
-		else
-			this.mp = mp;
+	public Actor setMP(int mp) {
+		this.mp = (mp > this.maxmp) ? this.maxmp : mp;
+		return this;
 	}
 
 	public int getRP() {
 		return this.sp;
 	}
 
-	public void setRP(int sp) {
-		if (sp > this.maxsp)
-			this.sp = this.maxsp;
-		else
-			this.sp = sp;
+	public Actor setRP(int sp) {
+		this.sp = (sp > this.maxsp) ? this.maxsp : sp;
+		return this;
 	}
 
 	public int getLevel() {
 		return this.level;
 	}
 
-	public void setLevel(int level) {
+	public Actor setLevel(int level) {
 		if (level > this.maxlv)
 			level = this.maxlv;
 		while (this.level < level) {
 			this.exp = this.maxp;
 			this.levelUp();
 		}
+		return this;
 	}
 
 	public int getMaxLevel() {
 		return this.maxlv;
 	}
 
-	public void setMaxLevel(int maxlv) {
+	public Actor setMaxLevel(int maxlv) {
 		this.maxlv = maxlv;
+		return this;
 	}
 
 	public int getExp() {
 		return this.exp;
 	}
 
-	public void setExp(int exp) {
+	public Actor setExp(int exp) {
 		this.exp = exp;
 		this.levelUp();
+		return this;
 	}
 
 	public int getMaxExp() {
@@ -197,40 +197,45 @@ public class Actor extends Job implements Parcelable {
 		return this.atk;
 	}
 
-	public void setAtk(int atk) {
+	public Actor setAtk(int atk) {
 		this.atk = atk;
+		return this;
 	}
 
 	public int getDef() {
 		return this.def;
 	}
 
-	public void setDef(int def) {
+	public Actor setDef(int def) {
 		this.def = def;
+		return this;
 	}
 
 	public int getSpi() {
 		return this.spi;
 	}
 
-	public void setSpi(int spi) {
+	public Actor setSpi(int spi) {
 		this.spi = spi;
+		return this;
 	}
 
 	public int getWis() {
 		return this.wis;
 	}
 
-	public void setWis(int wis) {
+	public Actor setWis(int wis) {
 		this.wis = wis;
+		return this;
 	}
 
 	public int getAgi() {
 		return this.agi;
 	}
 
-	public void setAgi(int agi) {
+	public Actor setAgi(int agi) {
 		this.agi = agi;
+		return this;
 	}
 
 	public int[] getMres() {
@@ -241,76 +246,94 @@ public class Actor extends Job implements Parcelable {
 		return this.res;
 	}
 
-	public void setMaxAgi(int magi) {
+	public Actor setMaxAgi(int magi) {
 		this.magi = magi;
+		return this;
 	}
 
-	public void setMaxSpi(int mspi) {
+	public Actor setMaxSpi(int mspi) {
 		this.mspi = mspi;
+		return this;
 	}
 
-	public void setMaxWis(int mwis) {
+	public Actor setMaxWis(int mwis) {
 		this.mwis = mwis;
+		return this;
 	}
 
-	public void setMaxDef(int mdef) {
+	public Actor setMaxDef(int mdef) {
 		this.mdef = mdef;
+		return this;
 	}
 
-	public void setMaxAtk(int matk) {
+	public Actor setMaxAtk(int matk) {
 		this.matk = matk;
+		return this;
 	}
 
-	public void setMaxRP(int maxsp) {
+	public Actor setMaxRP(int maxsp) {
 		this.maxsp = maxsp;
+		return this;
 	}
 
-	public void setMaxMP(int maxmp) {
+	public Actor setMaxMP(int maxmp) {
 		this.maxmp = maxmp;
+		return this;
 	}
 
-	public void setMaxHP(int maxhp) {
+	public Actor setMaxHP(int maxhp) {
 		this.maxhp = maxhp;
+		return this;
 	}
 
-	public void setRaceName(String rname) {
+	public Actor setRaceName(String rname) {
 		this.rname = rname;
+		return this;
 	}
 
-	public void setJobName(String jname) {
+	public Actor setJobName(String jname) {
 		this.jname = jname;
+		return this;
 	}
 
-	public void setHPinc(int hpp) {
+	public Actor setHPinc(int hpp) {
 		this.hpp = hpp;
+		return this;
 	}
 
-	public void setMPinc(int mpp) {
+	public Actor setMPinc(int mpp) {
 		this.mpp = mpp;
+		return this;
 	}
 
-	public void setRPinc(int spp) {
+	public Actor setRPinc(int spp) {
 		this.spp = spp;
+		return this;
 	}
 
-	public void setAtkInc(int atkp) {
+	public Actor setAtkInc(int atkp) {
 		this.atkp = atkp;
+		return this;
 	}
 
-	public void setDefInc(int defp) {
+	public Actor setDefInc(int defp) {
 		this.defp = defp;
+		return this;
 	}
 
-	public void setWisInc(int wisp) {
+	public Actor setWisInc(int wisp) {
 		this.wisp = wisp;
+		return this;
 	}
 
-	public void setSpiInc(int spip) {
+	public Actor setSpiInc(int spip) {
 		this.spip = spip;
+		return this;
 	}
 
-	public void setAgiInc(int agip) {
+	public Actor setAgiInc(int agip) {
 		this.agip = agip;
+		return this;
 	}
 
 	public ArrayList<Ability> getExtraSkills() {
@@ -321,12 +344,14 @@ public class Actor extends Job implements Parcelable {
 		return this.items;
 	}
 
-	public void setItems(ArrayList<Ability> items) {
+	public Actor setItems(ArrayList<Ability> items) {
 		this.items = items;
+		return this;
 	}
 
-	public void setBaseSkills(Ability[] raceSkills) {
+	public Actor setBaseSkills(Ability[] raceSkills) {
 		this.setBaseSkills(raceSkills, true);
+		return this;
 	}
 
 	protected void setBaseSkills(Ability[] raceSkills, boolean clone) {
@@ -336,7 +361,7 @@ public class Actor extends Job implements Parcelable {
 					: raceSkills[i];
 	}
 
-	public void setRace(Race race, boolean init) {
+	public Actor setRace(Race race, boolean init) {
 		if (init) {
 			this.raceStats(race.maxhp, race.maxmp, race.maxsp, race.matk,
 					race.mdef, race.mwis, race.mspi, race.magi);
@@ -349,9 +374,10 @@ public class Actor extends Job implements Parcelable {
 		this.setRes(race.rres, true);
 		this.setBaseSkills(race.raceSkills);
 		this.rname = race.rname;
+		return this;
 	}
 
-	public void changeJob(Job job, boolean add) {
+	public Actor changeJob(Job job, boolean add) {
 		this.jname = job.jname;
 		if (add)
 			this.raceStats(this.maxhp + job.maxhp, this.maxmp + job.maxmp,
@@ -368,6 +394,7 @@ public class Actor extends Job implements Parcelable {
 		if (job.raceSkills != null)
 			this.addSkills(job.raceSkills, true, true);
 		this.setSprName(job.getSprName());
+		return this;
 	}
 
 	public void checkRes(int r) {
@@ -584,8 +611,8 @@ public class Actor extends Job implements Parcelable {
 		this.jname = cloned.jname;
 		this.rname = cloned.rname;
 		this.state = cloned.state;
-		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.atk,
-				cloned.def, cloned.wis, cloned.spi, cloned.agi);
+		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.matk,
+				cloned.mdef, cloned.mwis, cloned.mspi, cloned.magi);
 		this.jobStats(cloned.hpp, cloned.mpp, cloned.spp, cloned.atkp,
 				cloned.defp, cloned.wisp, cloned.spip, cloned.agip);
 		for (int i = 0; i < res.length; i++) {
@@ -600,14 +627,16 @@ public class Actor extends Job implements Parcelable {
 		this.addSkills(cloned.jobSkills.toArray(new Ability[0]), false, true);
 		if (cloned.items != null) {
 			this.items = new ArrayList<Ability>(cloned.items.size());
-			for (int i = 0; i < this.items.size(); i++)
+			for (int i = 0; i < cloned.items.size(); i++)
 				this.items.add(new Ability(cloned.items.get(i)));
 		}
 		this.setSprName(cloned.getSprName());
-		this.stats(cloned.level, cloned.maxlv);
+		this.level = cloned.level;
+		this.maxlv = cloned.maxlv;
+		this.recover();
 		this.originId = cloned.originId;
 	}
-
+	
 	@Override
 	public void setResistance(int[] newRes) {
 		this.mres = new int[] { 3, 3, 3, 3, 3, 3, 3, 3 };
@@ -617,7 +646,6 @@ public class Actor extends Job implements Parcelable {
 
 	private State[] AddStates() {
 		State state[] = new State[11];
-
 		state[0] = new State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
 				2, 0, 0, 0, false);
 		state[1] = new State(2, "Poison", false, false, false, 10, -7, 0, -2,
@@ -765,24 +793,27 @@ public class Actor extends Job implements Parcelable {
 			return this.inactive;
 		}
 
-		public void setInactive(boolean inactive) {
+		public State setInactive(boolean inactive) {
 			this.inactive = inactive;
+			return this;
 		}
 
 		public boolean isConfusing() {
 			return this.confusion;
 		}
 
-		public void setConfusion(boolean confusion) {
+		public State setConfusion(boolean confusion) {
 			this.confusion = confusion;
+			return this;
 		}
 
 		public boolean isAuto() {
 			return this.auto;
 		}
 
-		public void setAuto(boolean auto) {
+		public State setAuto(boolean auto) {
 			this.auto = auto;
+			return this;
 		}
 
 		public boolean isReflecting() {
@@ -805,88 +836,99 @@ public class Actor extends Job implements Parcelable {
 			return this.res;
 		}
 
-		public void setRes(int res) {
+		public State setRes(int res) {
 			this.res = res;
+			return this;
 		}
 
 		public int getMaxDur() {
 			return this.mdur;
 		}
 
-		public void setMaxDur(int mdur) {
+		public State setMaxDur(int mdur) {
 			this.mdur = mdur;
+			return this;
 		}
 
 		public int getDur() {
 			return this.dur;
 		}
 
-		public void setDur(int dur) {
+		public State setDur(int dur) {
 			this.dur = dur;
+			return this;
 		}
 
 		public int getHPmod() {
 			return this.hpm;
 		}
 
-		public void setHPmod(int hpm) {
+		public State setHPmod(int hpm) {
 			this.hpm = hpm;
+			return this;
 		}
 
 		public int getMPmod() {
 			return this.mpm;
 		}
 
-		public void setMPmod(int mpm) {
+		public State setMPmod(int mpm) {
 			this.mpm = mpm;
+			return this;
 		}
 
 		public int getRPmod() {
 			return this.spm;
 		}
 
-		public void setRPmod(int spm) {
+		public State setRPmod(int spm) {
 			this.spm = spm;
+			return this;
 		}
 
 		public int getAtkMod() {
 			return this.atkm;
 		}
 
-		public void setAtkMod(int atkm) {
+		public State setAtkMod(int atkm) {
 			this.atkm = atkm;
+			return this;
 		}
 
 		public int getDefMod() {
 			return this.defm;
 		}
 
-		public void setDefMod(int defm) {
+		public State setDefMod(int defm) {
 			this.defm = defm;
+			return this;
 		}
 
 		public int getSpiMod() {
 			return this.spim;
 		}
 
-		public void setSpiMod(int spim) {
+		public State setSpiMod(int spim) {
 			this.spim = spim;
+			return this;
 		}
 
 		public int getWisMod() {
 			return this.wism;
 		}
 
-		public void setWisMod(int wism) {
+		public State setWisMod(int wism) {
 			this.wism = wism;
+			return this;
 		}
 
 		public int getAgiMod() {
 			return this.agim;
 		}
 
-		public void setAgiMod(int agim) {
+		public State setAgiMod(int agim) {
 			this.agim = agim;
+			return this;
 		}
 
 		public int[] getResMod() {
@@ -1021,8 +1063,9 @@ public class Actor extends Job implements Parcelable {
 		}
 	}
 
-	public void addExtraSkills(Ability[] newSkill) {
+	public Actor addExtraSkills(Ability[] newSkill) {
 		this.addSkills(newSkill, true, true);
+		return this;
 	}
 
 	protected void addSkills(Ability[] newSkill, boolean noDuplicates,
@@ -1047,8 +1090,8 @@ public class Actor extends Job implements Parcelable {
 						: newSkill[i]);
 	}
 
-	public void removeExtraSkills() {
+	public Actor removeExtraSkills() {
 		this.jobSkills.clear();
+		return this;
 	}
-
 }

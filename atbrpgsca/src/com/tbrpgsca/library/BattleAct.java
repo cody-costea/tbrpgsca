@@ -693,7 +693,7 @@ public class BattleAct extends Activity {
 		String s;
 		if (r > 0) {
 			t = "Victory";
-			s = "The party has won the steal!";
+			s = "The party has won the battle!";
 		} else {
 			t = "Defeat";
 			if (r < 0)
@@ -718,7 +718,7 @@ public class BattleAct extends Activity {
 				if (BattleAct.cachedItem == null && BattleAct.this.Item != null) {
 					outcome.putParcelableArrayListExtra("Item",
 							BattleAct.this.Item);
-					for (int i = 0; i < 4; i++)
+					for (int i = 0; i < 4 - BattleAct.this.difference; i++)
 						BattleAct.this.Battler[i].items = null;
 				}
 				if (BattleAct.cachedParty == null) {

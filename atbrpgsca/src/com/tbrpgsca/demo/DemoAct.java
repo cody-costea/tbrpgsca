@@ -16,6 +16,7 @@ limitations under the License.
 package com.tbrpgsca.demo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -189,6 +190,8 @@ public class DemoAct extends Activity {
 				Bundle extra = data.getExtras();
 				if (extra.containsKey("Party"))
 					System.arraycopy(extra.getParcelableArray("Party"), 0, this.Party, 0, 4);
+				if (extra.containsKey("Item"))
+					this.Item = extra.getParcelableArrayList("Item");
 				if (extra.getInt("Outcome") > 0 && DemoAct.this.level < 5)
 					DemoAct.this.level++;
 			}
@@ -271,11 +274,15 @@ public class DemoAct extends Activity {
     	npc[2]=new Actor(2, "George",maxlv);
     	npc[3]=new Actor(3, "Stephen",maxlv);
     	
-        npc[4]=new Actor(4, "Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11});
+        npc[4]=new Actor(4, "Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11})
+        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(0)).setQty(2), new Ability(this.Item.get(1)).setQty(1))));
         npc[4].getState()[5].setRes(9);npc[4].getState()[10].setDur(-2);
-        npc[5]=new Actor(5, "Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, null, this.Skill, new int[]{23,30});
-        npc[6]=new Actor(6, "Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, null, this.Skill, new int[]{15});
-        npc[7]=new Actor(7, "Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, null, this.Skill, new int[]{2});
+        npc[5]=new Actor(5, "Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, null, this.Skill, new int[]{23,30})
+        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(4)).setQty(1), new Ability(this.Item.get(8)).setQty(1))));
+        npc[6]=new Actor(6, "Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, null, this.Skill, new int[]{15})
+        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(3)).setQty(2), new Ability(this.Item.get(6)).setQty(1))));
+        npc[7]=new Actor(7, "Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, null, this.Skill, new int[]{2})
+        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(7)).setQty(1))));
         npc[7].getState()[0].setDur(-3);
         
         return npc;
@@ -342,8 +349,7 @@ public class DemoAct extends Activity {
         ability[53]=new Ability(54, "Meditate", false,true, 1, 0,0,2, 2,1, -3,-7,0, -1,7, false, nostate, dizziness);
         ability[54]=new Ability(55, "Cure", false,true, 3, 0,7,0, 2,1, -17,0,0, 0,7, false, revive, cure);
         ability[55]=new Ability(56, "Clarity", false,true, 3, 0,0,7, 2,1, 0,-3,0, 0,7, false, clarity, madness);
-        ability[56]=new Ability(57, "Absorb", false,true, 1, 0,0,3, 3,1, 0,7,-3, 0,7, true, nostate, nostate);
-        
+        ability[56]=new Ability(57, "Absorb", false,true, 1, 0,0,3, 3,1, 0,7,-3, 0,7, true, nostate, nostate);        
         
         return ability;
     }

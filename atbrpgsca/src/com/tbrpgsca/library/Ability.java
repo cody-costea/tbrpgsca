@@ -73,11 +73,12 @@ public class Ability implements Parcelable {
 		return this.trg;
 	}
 
-	public void setQty(int qty) {
+	public Ability setQty(int qty) {
 		if (this.mqty > 0 && qty > this.mqty)
 			this.qty = this.mqty;
 		else
 			this.qty = qty;
+		return this;
 	}
 
 	public int getHpCost() {
@@ -348,6 +349,7 @@ public class Ability implements Parcelable {
 				cloned.dmgtype, cloned.atki, cloned.hpdmg, cloned.mpdmg,
 				cloned.spdmg, cloned.trg, cloned.element, cloned.mqty,
 				cloned.rqty, cloned.absorb, cloned.state, cloned.rstate);
+		this.qty = cloned.qty;
 		this.originId = cloned.originId;
 	}
 
