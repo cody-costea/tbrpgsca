@@ -21,12 +21,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Ability implements Parcelable {
-
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
 			element, qty, mqty, rqty, tqty, originId;
-	protected boolean steal, absorb, range;
-	protected boolean[] state, rstate;
+	protected boolean steal, absorb, range, state[], rstate[];
 
 	protected Ability(Parcel in) {
 		this.name = in.readString();
@@ -149,7 +147,7 @@ public class Ability implements Parcelable {
 		return this.originId;
 	}
 
-	public String execute(Actor user, Actor target) {
+	public String execute(Actor user, Actor target, boolean applyCosts) {
 		String s = "";
 		int dmg = (int) (Math.random() * 4);
 		int res = (target.res[this.element] < 7) ? target.res[this.element]
@@ -206,6 +204,13 @@ public class Ability implements Parcelable {
 				user.hp += dmghp / 2;
 				user.mp += dmgmp / 2;
 				user.sp += dmgsp / 2;
+			}
+			if (applyCosts) {
+				user.hp -= this.hpc;
+				user.mp -= this.mpc;
+				user.sp -= this.spc;
+				if (this.qty > 0)
+					this.qty--;
 			}
 			boolean c = false;
 			if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
@@ -264,9 +269,9 @@ public class Ability implements Parcelable {
 						user.items.get(user.items.size() - 1).qty = 1;
 					}
 					target.items.get(itemId).qty--;
+					s += ", " + target.items.get(itemId).name + " stolen";
 					if (target.items.get(itemId).qty == 0)
 						target.items.remove(itemId);
-					s += ", " + target.items.get(itemId).name + " stolen";
 				}
 			}
 		} else
@@ -383,5 +388,4 @@ public class Ability implements Parcelable {
 		dest.writeBooleanArray(this.rstate);
 		dest.writeInt(this.originId);
 	}
-
 }

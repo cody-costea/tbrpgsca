@@ -274,14 +274,14 @@ public class DemoAct extends Activity {
     	npc[2]=new Actor(2, "George",maxlv);
     	npc[3]=new Actor(3, "Stephen",maxlv);
     	
-        npc[4]=new Actor(4, "Ogre","Ogre","Ogre", 3,maxlv, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11})
+        npc[4]=new Actor(4, "Ogre","Ogre","Ogre", 9,9, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11})
         	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(0)).setQty(2), new Ability(this.Item.get(1)).setQty(1))));
         npc[4].getState()[5].setRes(9);npc[4].getState()[10].setDur(-2);
-        npc[5]=new Actor(5, "Lizard", "Lizard", "Lizard", 3, maxlv, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, null, this.Skill, new int[]{23,30})
+        npc[5]=new Actor(5, "Lizard", "Lizard", "Lizard", 9, 9, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, null, this.Skill, new int[]{23,30})
         	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(4)).setQty(1), new Ability(this.Item.get(8)).setQty(1))));
-        npc[6]=new Actor(6, "Goblin", "Goblin", "Goblin", 3, maxlv, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, null, this.Skill, new int[]{15})
+        npc[6]=new Actor(6, "Goblin", "Goblin", "Goblin", 9, 9, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, null, this.Skill, new int[]{15})
         	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(3)).setQty(2), new Ability(this.Item.get(6)).setQty(1))));
-        npc[7]=new Actor(7, "Troll", "Troll", "Troll", 3, maxlv, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, null, this.Skill, new int[]{2})
+        npc[7]=new Actor(7, "Troll", "Troll", "Troll", 9, 9, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, null, this.Skill, new int[]{2})
         	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(7)).setQty(1))));
         npc[7].getState()[0].setDur(-3);
         

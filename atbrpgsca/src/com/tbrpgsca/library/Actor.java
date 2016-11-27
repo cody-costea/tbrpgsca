@@ -25,11 +25,9 @@ public class Actor extends Job implements Parcelable {
 	protected boolean active = true, reflect = false;
 	protected State state[];
 	protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi,
-			wis, agi;
-	protected int mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
+			wis, agi, mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
-	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>();
-	protected ArrayList<Ability> items = null;
+	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>(), items = null;
 
 	protected Actor(Parcel in) {
 		this.name = in.readString();
@@ -372,7 +370,7 @@ public class Actor extends Job implements Parcelable {
 							+ race.mdef, this.mwis + race.mwis, this.mspi
 							+ race.mspi, this.magi + race.magi);
 		this.setRes(race.rres, true);
-		this.setBaseSkills(race.raceSkills);
+		this.setBaseSkills(race.raceSkills, true);
 		this.rname = race.rname;
 		return this;
 	}
@@ -633,6 +631,7 @@ public class Actor extends Job implements Parcelable {
 		this.setSprName(cloned.getSprName());
 		this.level = cloned.level;
 		this.maxlv = cloned.maxlv;
+		this.resetRes();
 		this.recover();
 		this.originId = cloned.originId;
 	}
@@ -753,8 +752,7 @@ public class Actor extends Job implements Parcelable {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
 		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
-				agim, originId;
-		protected int resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+				agim, originId, resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 		protected State(Parcel in) {
 			this.inactive = in.readByte() != 0;
