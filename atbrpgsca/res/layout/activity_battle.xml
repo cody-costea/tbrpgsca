@@ -36,16 +36,6 @@
         android:layout_above="@+id/ItemCost"
         android:layout_alignLeft="@+id/ImgPlayer3" />
 
-    <TextView
-        android:id="@+id/SkillCost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/ItemCost"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/AutoBt"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
     <Button
         android:id="@+id/AutoBt"
         style="?android:attr/buttonStyleSmall"
@@ -72,18 +62,6 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/linearLayout1" />
 
-    <TextView
-        android:id="@+id/ItemCost"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_alignLeft="@+id/ImgPlayer3"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/RunBt"
-        android:gravity="bottom"
-        android:maxLines="2"
-        android:scrollbars="vertical"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
     <ImageView
         android:id="@+id/ImgEnemy3"
         android:layout_width="128dp"
@@ -105,6 +83,28 @@
         android:layout_height="128dp"
         android:layout_alignLeft="@+id/ImgPlayer4"
         android:layout_below="@+id/SkillCost" />
+
+    <TextView
+        android:id="@+id/SkillCost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ItemCost"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/AutoBt"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/ItemCost"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignLeft="@+id/ImgPlayer3"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/RunBt"
+        android:gravity="bottom"
+        android:maxLines="2"
+        android:scrollbars="vertical"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <LinearLayout
         android:id="@+id/linearLayout1"

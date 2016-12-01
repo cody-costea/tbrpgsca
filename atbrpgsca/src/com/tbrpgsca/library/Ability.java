@@ -184,6 +184,7 @@ public class Ability implements Parcelable {
 		}
 		if (this.dmgtype == 2
 				|| this.dmgtype == 3
+				|| (this.qty > 0 && this.mqty < 1)
 				|| (this.dmgtype != 4 && (int) (Math.random() * 13 + user.agi / 5) > 2 + target.agi / 4)
 				|| (this.dmgtype == 4 && (int) (Math.random() * 13 + user.agi / 3) > 2 + target.agi / 4)) {
 			int dmghp = (this.hpdmg != 0) ? (((this.hpdmg < 0 ? -1 : 1) * dmg) + this.hpdmg)
@@ -248,22 +249,24 @@ public class Ability implements Parcelable {
 				}
 			if (this.steal
 					&& target.items != null
-					&& target.items.size() > 0
 					&& target.items != user.items
+					&& target.items.size() > 0
 					&& ((int) (Math.random() * 12 + user.agi / 4) > 4 + target.agi / 3)) {
 				int itemId = (int) (Math.random() * target.items.size());
 				if (itemId < target.items.size()
 						&& target.items.get(itemId).qty > 0) {
 					boolean found = false;
-					if (user.items != null)
+					if (user.items != null) {
 						for (int i = 0; i < user.items.size(); i++)
 							if (user.items.get(i).originId == target.items
 									.get(itemId).originId) {
 								user.items.get(i).qty++;
 								found = true;
 								break;
-							} else
-								user.items = new ArrayList<Ability>();
+							}
+					}
+					else
+						user.items = new ArrayList<Ability>();
 					if (!found) {
 						user.items.add(new Ability(target.items.get(itemId)));
 						user.items.get(user.items.size() - 1).qty = 1;
