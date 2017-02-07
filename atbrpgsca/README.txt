@@ -18,6 +18,11 @@ The program includes graphic resources copyrighted by Reiner "Tiles" Prokein, wh
 released under the terms described at http://www.reinerstilesets.de/lizenz (and also in the
 "Reiner's_Tilesets_License.txt" file).
 
+The program also uses the "Rhino" Java library, developed by Mozilla, released under the terms
+described at https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/License (and also
+in the files "rhino_license.txt" and "rhino_mpl.txt"). Its source code can be found at
+https://github.com/mozilla/rhino. 
+
 The purpose of this project is to implement an open-source turn-based RPG combat engine (similar
 to those found in various RPGs, such as "Final Fantasy" by Square Enix), and to offer a simple
 demonstration of its capabilities. A full RPG is beyond the scope of this application, but it

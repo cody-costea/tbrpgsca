@@ -132,7 +132,7 @@ public class Actor extends Job implements Parcelable {
 	}
 
 	public Actor setHP(int hp) {
-		this.hp = (hp > this.maxp) ? this.maxhp : hp;
+		this.hp = (hp > this.maxhp) ? this.maxhp : hp;
 		return this;
 	}
 

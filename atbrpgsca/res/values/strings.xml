@@ -16,5 +16,7 @@
     <string name="msg_about">The \"Turn-Based RPG Simple Combat Arena\" project is authored by Claudiu-Ştefan Costea, and it is
          distributed under the terms of the Apache License, Version 2.0 (described at http://www.apache.org/licenses/LICENSE-2.0),
          and without any warranty.\n\nThe project includes graphic resources designed by Reiner \"Tiles\" Prokein, which have been
-         released under the terms described at http://www.reinerstilesets.de/lizenz.\n\nThank you for trying this application.</string>
+         released under the terms described at http://www.reinerstilesets.de/lizenz.\n\nThe project also includes the \"Rhino\" Java
+         library, developed by Mozilla, released under the terms described at https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/License.
+         Its source code can be found at https://github.com/mozilla/rhino.\n\nThank you for trying this application.</string>
 </resources>
