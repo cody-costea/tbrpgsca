@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016 Claudiu-Stefan Costea
+Copyright (C) 2017 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -490,25 +490,25 @@ public class BattleAct extends Activity {
 
 	private void executeSkill(Ability ability) {
 		if (this.target == 1
-				&& (BattleAct.this.Battler[3] != null && BattleAct.this.Battler[3].hp > 0)
-				&& ((BattleAct.this.Battler[0] != null && BattleAct.this.Battler[0].hp > 0) || (BattleAct.this.Battler[2] != null && BattleAct.this.Battler[2].hp > 0))
+				&& (BattleAct.this.Battler[3] != null && BattleAct.this.Battler[3].canGuard)
+				&& ((BattleAct.this.Battler[0] != null && BattleAct.this.Battler[0].canGuard) || (BattleAct.this.Battler[2] != null && BattleAct.this.Battler[2].canGuard))
 				&& this.current > (BattleAct.this.Battler.length / 2) - 1
 				&& this.difference == 0 && !ability.range)
 			this.target = 3;
 		if (this.target == 2
-				&& (BattleAct.this.Battler[0] != null && BattleAct.this.Battler[0].hp > 0)
-				&& ((BattleAct.this.Battler[1] != null && BattleAct.this.Battler[1].hp > 0) || (BattleAct.this.Battler[3] != null && BattleAct.this.Battler[3].hp > 0))
+				&& (BattleAct.this.Battler[0] != null && BattleAct.this.Battler[0].canGuard)
+				&& ((BattleAct.this.Battler[1] != null && BattleAct.this.Battler[1].canGuard) || (BattleAct.this.Battler[3] != null && BattleAct.this.Battler[3].canGuard))
 				&& this.current > (BattleAct.this.Battler.length / 2) - 1
 				&& this.difference < 2 && !ability.range)
 			this.target = 0;
 		if (this.target == 4
-				&& (BattleAct.this.Battler[6] != null && BattleAct.this.Battler[6].hp > 0)
-				&& ((BattleAct.this.Battler[5] != null && BattleAct.this.Battler[5].hp > 0) || (BattleAct.this.Battler[2] != null && BattleAct.this.Battler[7].hp > 0))
+				&& (BattleAct.this.Battler[6] != null && BattleAct.this.Battler[6].canGuard)
+				&& ((BattleAct.this.Battler[5] != null && BattleAct.this.Battler[5].canGuard) || (BattleAct.this.Battler[7] != null && BattleAct.this.Battler[7].canGuard))
 				&& !ability.range)
 			this.target = 6;
 		if (this.target == 7
-				&& ((BattleAct.this.Battler[6] != null && BattleAct.this.Battler[6].hp > 0) || (BattleAct.this.Battler[4] != null && BattleAct.this.Battler[4].hp > 0))
-				&& (BattleAct.this.Battler[5] != null && BattleAct.this.Battler[5].hp > 0)
+				&& ((BattleAct.this.Battler[6] != null && BattleAct.this.Battler[6].canGuard) || (BattleAct.this.Battler[4] != null && BattleAct.this.Battler[4].canGuard))
+				&& (BattleAct.this.Battler[5] != null && BattleAct.this.Battler[5].canGuard)
 				&& !ability.range)
 			this.target = 5;
 		while ((BattleAct.this.Battler[this.target] != null && BattleAct.this.Battler[this.target].hp < 1)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016 Claudiu-Stefan Costea
+Copyright (C) 2017 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class Actor extends Job implements Parcelable {
 	protected String name;
-	protected boolean active = true, reflect = false;
+	protected boolean active = true, reflect = false, canGuard = true;
 	protected State state[];
 	protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi,
 			wis, agi, mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
@@ -73,6 +73,7 @@ public class Actor extends Job implements Parcelable {
 		this.jobSkills = in.createTypedArrayList(Ability.CREATOR);
 		this.items = in.createTypedArrayList(Ability.CREATOR);
 		this.originId = in.readInt();
+		this.canGuard = in.readByte() != 0;
 	}
 
 	public static final Creator<Actor> CREATOR = new Creator<Actor>() {
@@ -111,6 +112,15 @@ public class Actor extends Job implements Parcelable {
 
 	public Actor setReflect(boolean reflect) {
 		this.reflect = reflect;
+		return this;
+	}
+	
+	public boolean canGuard() {
+		return this.canGuard;
+	}
+
+	public Actor setGuards(boolean canGuard) {
+		this.canGuard = canGuard;
 		return this;
 	}
 
@@ -418,8 +428,11 @@ public class Actor extends Job implements Parcelable {
 			this.auto = 0;
 		else
 			this.auto = 2;
-		if (consume && this.hp > 0)
-			this.active = true;
+		if (this.hp > 0) {
+			if (consume)
+				this.active = true;
+			this.canGuard = true;
+		}
 		this.atk = this.matk;
 		this.def = this.mdef;
 		this.spi = this.mspi;
@@ -459,6 +472,7 @@ public class Actor extends Job implements Parcelable {
 		if (this.hp < 1) {
 			s += " (and falls unconcious)";
 			this.active = false;
+			this.canGuard = false;
 			this.sp = 0;
 			for (int i = 0; i < this.state.length; i++)
 				this.state[i].remove();
@@ -581,8 +595,10 @@ public class Actor extends Job implements Parcelable {
 		this.level = 1;
 		this.levelUp();
 		this.recover();
-		if (this.hp < 1)
+		if (this.hp < 1) {
 			this.active = false;
+			this.canGuard = false;
+		}
 	}
 
 	public void recover() {
@@ -590,6 +606,7 @@ public class Actor extends Job implements Parcelable {
 		this.mp = this.maxmp;
 		this.sp = 0;
 		this.active = true;
+		this.canGuard = true;
 		this.atk = this.matk;
 		this.def = this.mdef;
 		this.spi = this.mspi;
@@ -742,6 +759,7 @@ public class Actor extends Job implements Parcelable {
 		dest.writeTypedList(this.jobSkills);
 		dest.writeTypedList(this.items);
 		dest.writeInt(this.originId);
+		dest.writeByte((byte) (this.canGuard ? 1 : 0));
 	}
 
 	public static class State implements Parcelable {
@@ -1012,8 +1030,10 @@ public class Actor extends Job implements Parcelable {
 					actor.res[i] += this.resm[i];
 					actor.checkRes(i);
 				}
-				if (this.inactive)
+				if (this.inactive) {
 					actor.active = false;
+					actor.canGuard = false;
+				}
 				if (this.reflect)
 					actor.reflect = true;
 				if (this.auto && actor.auto < 2)
