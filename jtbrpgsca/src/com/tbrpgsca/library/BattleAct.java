@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2017 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -752,7 +752,8 @@ public class BattleAct extends Activity {
 			BattleAct.this.Battler[this.current].active = false;
 
 		boolean reset = true;
-		for (int i = 0; i < BattleAct.this.Battler.length; i++) {
+		int i;
+		for (i = 0; i < BattleAct.this.Battler.length; i++) {
 			if (BattleAct.this.Battler[i] != null
 					&& BattleAct.this.Battler[i].active) {
 				reset = false;
@@ -774,7 +775,7 @@ public class BattleAct extends Activity {
 			}
 
 		if (reset) {
-			for (int i = 0; i < BattleAct.this.Battler.length; i++)
+			for (i = 0; i < BattleAct.this.Battler.length; i++)
 				if (BattleAct.this.Battler[i] != null
 						&& BattleAct.this.Battler[i].hp > 0) {
 					this.updText.append(BattleAct.this.Battler[i]
@@ -782,14 +783,15 @@ public class BattleAct extends Activity {
 					if (BattleAct.this.Battler[i].hp < 1)
 						this.playSpr(i, 2);
 				}
+			i = 0;
 		}
-		for (this.current = 0; this.current < BattleAct.this.Battler.length; this.current++) {
+		for (this.current = i; this.current < BattleAct.this.Battler.length; this.current++) {
 			if (BattleAct.this.Battler[this.current] != null
 					&& BattleAct.this.Battler[this.current].active)
 				break;
 		}
 		if (this.current < 6)
-			for (int i = this.current + 1; i < BattleAct.this.Battler.length; i++)
+			for (i = this.current + 1; i < BattleAct.this.Battler.length; i++)
 				if (BattleAct.this.Battler[this.current] != null
 						&& BattleAct.this.Battler[i] != null
 						&& (BattleAct.this.Battler[this.current].agi < BattleAct.this.Battler[i].agi)
@@ -906,8 +908,9 @@ public class BattleAct extends Activity {
 
 	private void playSpr(final int c, final int s) {
 		if (BattleAct.this.Battler[c].sprName != "") {
-			final String pos = ((c > (BattleAct.this.Battler.length / 2) - 1 && BattleAct.this.surprise >= 0) || (c < (BattleAct.this.Battler.length / 2) && BattleAct.this.surprise < 0)) ? "r"
-					: "l";
+			final String pos = ((c > (BattleAct.this.Battler.length / 2) - 1 && BattleAct.this.surprise >= 0)
+					|| (c < (BattleAct.this.Battler.length / 2) && BattleAct.this.surprise < 0))
+					? "r" : "l";
 			final AnimationDrawable sprAnim = Battler[c].getBtSprite(s, pos,
 					this.waitTime, this);
 			this.imgActor[c].postDelayed(new Runnable() {

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2017 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -1029,6 +1029,10 @@ public class Actor extends Job implements Parcelable {
 				for (int i = 0; i < actor.res.length; i++) {
 					actor.res[i] += this.resm[i];
 					actor.checkRes(i);
+				}
+				if (actor.active && this.dur > 0 && this.dur == this.mdur
+						&& (this.inactive || this.auto || this.confusion)) {
+					this.dur--;
 				}
 				if (this.inactive) {
 					actor.active = false;
