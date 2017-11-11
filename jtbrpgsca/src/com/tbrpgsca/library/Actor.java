@@ -74,6 +74,9 @@ public class Actor extends Job implements Parcelable {
 		this.items = in.createTypedArrayList(Ability.CREATOR);
 		this.originId = in.readInt();
 		this.canGuard = in.readByte() != 0;
+		for (int i = 0; i < this.state.length;i++) {
+			this.state[i].actor = this;
+		}
 	}
 
 	public static final Creator<Actor> CREATOR = new Creator<Actor>() {
@@ -444,7 +447,7 @@ public class Actor extends Job implements Parcelable {
 		boolean c = false;
 		for (int i = 0; i < this.state.length; i++)
 			if (this.state[i].dur != 0 && this.hp > 0) {
-				String r = this.state[i].apply(this, consume);
+				String r = this.state[i].apply(consume);
 				if (r.length() > 0) {
 					if (c)
 						s += ", ";
@@ -658,27 +661,27 @@ public class Actor extends Job implements Parcelable {
 
 	private State[] AddStates() {
 		State state[] = new State[11];
-		state[0] = new State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
+		state[0] = new State(this, 1, "Regen", false, false, false, -1, 10, 0, 0, 0,
 				2, 0, 0, 0, false);
-		state[1] = new State(2, "Poison", false, false, false, 10, -7, 0, -2,
+		state[1] = new State(this, 2, "Poison", false, false, false, 10, -7, 0, -2,
 				0, -2, 0, 0, 0, false);
-		state[2] = new State(3, "Clarity", false, false, false, -1, 0, 7, 0, 0,
+		state[2] = new State(this, 3, "Clarity", false, false, false, -1, 0, 7, 0, 0,
 				0, 1, 1, 0, false);
-		state[3] = new State(4, "Dizziness", false, false, false, 3, 0, -7, 0,
+		state[3] = new State(this, 4, "Dizziness", false, false, false, 3, 0, -7, 0,
 				0, 0, -1, -1, 0, false);
-		state[4] = new State(5, "Vigour", false, false, false, -1, 0, 0, 7, 1,
+		state[4] = new State(this, 5, "Vigour", false, false, false, -1, 0, 0, 7, 1,
 				0, 0, 0, 1, false);
-		state[5] = new State(6, "Weakness", false, false, false, 5, 0, 0, -7,
+		state[5] = new State(this, 6, "Weakness", false, false, false, 5, 0, 0, -7,
 				-1, 0, 0, 0, -1, false);
-		state[6] = new State(7, "Berserk", false, true, false, 7, 0, 0, 0, 5,
+		state[6] = new State(this, 7, "Berserk", false, true, false, 7, 0, 0, 0, 5,
 				-3, 0, 0, 3, false);
-		state[7] = new State(8, "Confusion", false, false, true, 3, 0, 0, 0, 0,
+		state[7] = new State(this, 8, "Confusion", false, false, true, 3, 0, 0, 0, 0,
 				0, 0, 0, 0, false);
-		state[8] = new State(9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3,
+		state[8] = new State(this, 9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3,
 				0, 0, -3, false);
-		state[9] = new State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1,
+		state[9] = new State(this, 10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1,
 				0, 0, -1, false);
-		state[10] = new State(11, "Reflect", false, false, false, 7, 0, 0, 0,
+		state[10] = new State(this, 11, "Reflect", false, false, false, 7, 0, 0, 0,
 				0, 0, 0, 0, 0, true);
 
 		return state;
@@ -767,6 +770,7 @@ public class Actor extends Job implements Parcelable {
 		protected String name;
 		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
 				agim, originId, resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		protected Actor actor;
 
 		protected State(Parcel in) {
 			this.inactive = in.readByte() != 0;
@@ -951,10 +955,11 @@ public class Actor extends Job implements Parcelable {
 			return this.originId;
 		}
 
-		public State(int id, String name, boolean inactive, boolean auto,
+		protected State(Actor actor, int id, String name, boolean inactive, boolean auto,
 				boolean confusion, int dur, int hpm, int mpm, int spm,
 				int atkm, int defm, int wism, int spim, int agim,
 				boolean reflect) {
+			this.actor = actor;
 			this.originId = id;
 			this.name = name;
 			this.mdur = dur;
@@ -980,7 +985,7 @@ public class Actor extends Job implements Parcelable {
 				this.dur = this.mdur;
 		}
 
-		public String apply(Actor actor, boolean consume) {
+		public String apply(boolean consume) {
 			String s = "";
 			if (this.dur != 0 && actor.hp > 0) {
 				if (consume) {

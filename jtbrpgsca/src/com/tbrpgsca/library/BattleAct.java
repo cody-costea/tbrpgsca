@@ -512,7 +512,8 @@ public class BattleAct extends Activity {
 				&& !ability.range)
 			this.target = 5;
 		while ((BattleAct.this.Battler[this.target] != null && BattleAct.this.Battler[this.target].hp < 1)
-				&& !(ability.state.length > 0 && ability.state[0] && ((ability.hpdmg < 0 && BattleAct.this.Battler[this.target].mres[ability.element] < 7) || (ability.hpdmg > 0 && BattleAct.this.Battler[this.target].mres[ability.element] == 7)))) {
+				&& !(ability.state.length > 0 && ability.state[0] && ((ability.hpdmg < 0 && BattleAct.this.Battler[this.target].mres[ability.element] < 7)
+						|| (ability.hpdmg > 0 && BattleAct.this.Battler[this.target].mres[ability.element] == 7)))) {
 			if (ability.hpdmg < 0)
 				this.target--;
 			else
@@ -751,21 +752,9 @@ public class BattleAct extends Activity {
 		if (BattleAct.this.Battler[this.current] != null)
 			BattleAct.this.Battler[this.current].active = false;
 
-		boolean reset = true;
-		int i;
-		for (i = 0; i < BattleAct.this.Battler.length; i++) {
-			if (BattleAct.this.Battler[i] != null
-					&& BattleAct.this.Battler[i].active) {
-				reset = false;
-				break;
-			}
-		}
-
 		if (this.jScript != null && this.jScript.length > 2
 				&& this.jScript[2] != null)
 			try {
-				this.jsScope.put("Reset", this.jsScope,
-						Context.javaToJS(reset, this.jsScope));
 				this.jsScope.put("Current", this.jsScope,
 						Context.javaToJS(this.current, this.jsScope));
 				this.jsContext.evaluateString(this.jsScope, this.jScript[2],
@@ -774,6 +763,16 @@ public class BattleAct extends Activity {
 				Log.e("Rhino JS error", ex.getMessage());
 			}
 
+		boolean reset = true;
+		for (this.current = 0; this.current < BattleAct.this.Battler.length; this.current++) {
+			if (BattleAct.this.Battler[this.current] != null
+					&& BattleAct.this.Battler[this.current].active) {
+				reset = false;
+				break;
+			}
+		}
+
+		int i;
 		if (reset) {
 			for (i = 0; i < BattleAct.this.Battler.length; i++)
 				if (BattleAct.this.Battler[i] != null
@@ -783,13 +782,12 @@ public class BattleAct extends Activity {
 					if (BattleAct.this.Battler[i].hp < 1)
 						this.playSpr(i, 2);
 				}
-			i = 0;
+			for (this.current = 0; this.current < BattleAct.this.Battler.length; this.current++)
+				if (BattleAct.this.Battler[this.current] != null
+						&& BattleAct.this.Battler[this.current].active)
+					break;
 		}
-		for (this.current = i; this.current < BattleAct.this.Battler.length; this.current++) {
-			if (BattleAct.this.Battler[this.current] != null
-					&& BattleAct.this.Battler[this.current].active)
-				break;
-		}
+		
 		if (this.current < 6)
 			for (i = this.current + 1; i < BattleAct.this.Battler.length; i++)
 				if (BattleAct.this.Battler[this.current] != null

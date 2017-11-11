@@ -188,8 +188,12 @@ public class DemoAct extends Activity {
 		if (requestCode >= 0) {
 			if (resultCode == RESULT_OK) {
 				Bundle extra = data.getExtras();
-				if (extra.containsKey("Party"))
+				if (extra.containsKey("Party")) {
 					System.arraycopy(extra.getParcelableArray("Party"), 0, this.Party, 0, 4);
+					this.Player[1] = this.Party[0];
+					this.Player[2] = this.Party[1];
+					this.Player[3] = this.Party[2];
+				}
 				if (extra.containsKey("Item"))
 					this.Item = extra.getParcelableArrayList("Item");
 				if (extra.getInt("Outcome") > 0 && DemoAct.this.level < 5)
