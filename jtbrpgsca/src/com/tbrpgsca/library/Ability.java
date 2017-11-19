@@ -24,7 +24,8 @@ public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
 			element, qty, mqty, rqty, tqty, originId;
-	protected boolean steal, absorb, range, state[], rstate[];
+	protected boolean steal, absorb, range, restore;
+	protected Actor.State[] state, rstate;
 
 	protected Ability(Parcel in) {
 		this.name = in.readString();
@@ -46,8 +47,9 @@ public class Ability implements Parcelable {
 		this.steal = in.readByte() != 0;
 		this.absorb = in.readByte() != 0;
 		this.range = in.readByte() != 0;
-		this.state = in.createBooleanArray();
-		this.rstate = in.createBooleanArray();
+		this.restore = in.readByte() != 0;
+		this.state = in.createTypedArray(Actor.State.CREATOR);
+		this.rstate = in.createTypedArray(Actor.State.CREATOR);
 		this.originId = in.readInt();
 	}
 
@@ -127,11 +129,11 @@ public class Ability implements Parcelable {
 		return this.steal;
 	}
 
-	public boolean[] getState() {
+	public Actor.State[] getState() {
 		return this.state;
 	}
 
-	public boolean[] getRstate() {
+	public Actor.State[] getRstate() {
 		return this.rstate;
 	}
 
@@ -240,13 +242,18 @@ public class Ability implements Parcelable {
 					s += "+";
 				s += -dmgsp + " RP";
 			}
-			for (int i = 1; i < this.state.length; i++)
-				if (this.state[i])
-					target.state[i - 1].inflict();
-			for (int i = 1; i < this.rstate.length; i++)
-				if (this.rstate[i]) {
-					target.state[i - 1].remove();
-				}
+			if (this.state != null)
+				for (Actor.State state : this.state)
+						state.inflict(target, false);
+			if (this.rstate != null)
+				for (Actor.State state : this.rstate) {
+					if (target.currentState != null)
+						for (Actor.State aState : target.currentState)
+							if (aState.originId == state.originId) {
+								aState.remove();
+								break;
+							}
+			}
 			if (this.steal
 					&& target.items != null
 					&& target.items != user.items
@@ -296,21 +303,21 @@ public class Ability implements Parcelable {
 
 	public Ability() {
 		this(0, "Ability", true, false, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, false,
-				new boolean[] {}, new boolean[] {});
+				new Actor.State[] {}, new Actor.State[] {});
 	}
 
 	public Ability(int id, String name, boolean steal, int hpdmg, int mpdmg,
-			int spdmg, int trg, int element, boolean state[], boolean rstate[]) {
+				   int spdmg, int trg, int element, boolean restoreKO, Actor.State state[], Actor.State rstate[]) {
 		this(id, name, steal, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
-				element, 0, -1, false, state, rstate);
+				element, 0, -1, false, restoreKO, state, rstate);
 	}
 
 	public Ability(int id, String name, boolean steal, boolean range, int lvrq,
-			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-			int mpdmg, int spdmg, int trg, int element, boolean absorb,
-			boolean state[], boolean rstate[]) {
+				   int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
+				   int mpdmg, int spdmg, int trg, int element, boolean absorb,
+				   Actor.State state[], Actor.State rstate[]) {
 		this(id, name, steal, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
-				mpdmg, spdmg, trg, element, -1, -1, absorb, state, rstate);
+				mpdmg, spdmg, trg, element, -1, -1, absorb, false, state, rstate);
 	}
 
 	public void checkQty() {
@@ -324,9 +331,9 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(int id, String name, boolean steal, boolean range, int lvrq,
-			int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-			int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
-			boolean absorb, boolean state[], boolean rstate[]) {
+				   int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
+				   int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
+				   boolean absorb, boolean restoreKO, Actor.State state[], Actor.State rstate[]) {
 		this.originId = id;
 		this.name = name;
 		this.steal = steal;
@@ -349,14 +356,15 @@ public class Ability implements Parcelable {
 		this.mqty = mqty;
 		this.rqty = rqty;
 		this.tqty = 0;
+		this.restore = restoreKO;
 	}
 
 	public Ability(Ability cloned) {
 		this(cloned.originId, cloned.name, cloned.steal, cloned.range,
-				cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc,
-				cloned.dmgtype, cloned.atki, cloned.hpdmg, cloned.mpdmg,
-				cloned.spdmg, cloned.trg, cloned.element, cloned.mqty,
-				cloned.rqty, cloned.absorb, cloned.state, cloned.rstate);
+				cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc, cloned.dmgtype,
+				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg,
+				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
+				cloned.restore, cloned.state, cloned.rstate);
 		this.qty = cloned.qty;
 		this.originId = cloned.originId;
 	}
@@ -387,8 +395,17 @@ public class Ability implements Parcelable {
 		dest.writeByte((byte) (this.steal ? 1 : 0));
 		dest.writeByte((byte) (this.absorb ? 1 : 0));
 		dest.writeByte((byte) (this.range ? 1 : 0));
-		dest.writeBooleanArray(this.state);
-		dest.writeBooleanArray(this.rstate);
+		dest.writeByte((byte) (this.restore ? 1 : 0));
+		dest.writeTypedArray(this.state, flags);
+		dest.writeTypedArray(this.rstate, flags);
 		dest.writeInt(this.originId);
+	}
+
+
+
+	@Override
+	public boolean equals(Object eq) {
+		return eq != null && (eq instanceof Ability)
+				&& this.originId == ((Ability)eq).originId;
 	}
 }

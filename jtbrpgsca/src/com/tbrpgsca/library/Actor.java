@@ -17,23 +17,28 @@ package com.tbrpgsca.library;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.ArrayMap;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Actor extends Job implements Parcelable {
 	protected String name;
 	protected boolean active = true, reflect = false, canGuard = true;
-	protected State state[];
 	protected int auto = 0, hp, mp, sp, level, maxlv, exp, maxp, atk, def, spi,
 			wis, agi, mres[], res[] = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
 	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>(), items = null;
 
+	protected ArrayList<State> currentState = null;
+	protected SparseIntArray stateRes = null;
+
 	protected Actor(Parcel in) {
 		this.name = in.readString();
 		this.active = in.readByte() != 0;
 		this.reflect = in.readByte() != 0;
-		this.state = in.createTypedArray(State.CREATOR);
+		this.currentState = in.createTypedArrayList(State.CREATOR);
 		this.auto = in.readInt();
 		this.rname = in.readString();
 		this.maxhp = in.readInt();
@@ -74,8 +79,13 @@ public class Actor extends Job implements Parcelable {
 		this.items = in.createTypedArrayList(Ability.CREATOR);
 		this.originId = in.readInt();
 		this.canGuard = in.readByte() != 0;
-		for (int i = 0; i < this.state.length;i++) {
-			this.state[i].actor = this;
+		final int[] stateResKey = in.createIntArray();
+		final int[] stateResValue = in.createIntArray();
+		if (stateResValue.length > 0) {
+			this.stateRes = new SparseIntArray(stateResKey.length);
+			for (int i = 0; i < stateResKey.length; i++) {
+				this.stateRes.put(stateResKey[i], stateResValue[i]);
+			}
 		}
 	}
 
@@ -127,8 +137,26 @@ public class Actor extends Job implements Parcelable {
 		return this;
 	}
 
-	public State[] getState() {
-		return this.state;
+	public int getStatesCount() {
+		return this.currentState == null ? 0 : this.currentState.size();
+	}
+
+	public Actor.State getState(int i) {
+		return this.currentState == null || i < 0 || i >= this.currentState.size()
+				? null : this.currentState.get(i);
+	}
+
+	public Actor addState(State state) {
+		state.inflict(this, true);
+		return this;
+	}
+
+	public Actor setStateRes(State state, int res) {
+		if (this.stateRes == null) {
+			this.stateRes = new SparseIntArray();
+		}
+		this.stateRes.put(state.originId, res);
+		return this;
 	}
 
 	public int getAuto() {
@@ -445,19 +473,20 @@ public class Actor extends Job implements Parcelable {
 			this.res[i] = this.mres[i];
 		this.reflect = false;
 		boolean c = false;
-		for (int i = 0; i < this.state.length; i++)
-			if (this.state[i].dur != 0 && this.hp > 0) {
-				String r = this.state[i].apply(consume);
-				if (r.length() > 0) {
-					if (c)
-						s += ", ";
-					if (consume && !c) {
-						s += "\n";
-						c = true;
+		if (this.currentState != null)
+			for (State state : this.currentState)
+				if (state.dur != 0 && this.hp > 0) {
+					String r = state.apply(this, consume);
+					if (r.length() > 0) {
+						if (c)
+							s += ", ";
+						if (consume && !c) {
+							s += "\n";
+							c = true;
+						}
+						s += r;
 					}
-					s += r;
 				}
-			}
 		s += checkStatus();
 		if (c && consume)
 			s += ".";
@@ -477,8 +506,9 @@ public class Actor extends Job implements Parcelable {
 			this.active = false;
 			this.canGuard = false;
 			this.sp = 0;
-			for (int i = 0; i < this.state.length; i++)
-				this.state[i].remove();
+			if (this.currentState != null)
+				for (State state : this.currentState)
+					state.remove();
 		}
 		if (this.hp < -this.maxhp)
 			this.hp = -this.maxhp;
@@ -496,7 +526,7 @@ public class Actor extends Job implements Parcelable {
 	public Actor(int id, String name, int maxlv) {
 		this.originId = id;
 		this.name = name;
-		this.state = this.AddStates();
+		//this.state = this.AddStates();
 		this.stats(1, maxlv);
 	}
 
@@ -547,7 +577,7 @@ public class Actor extends Job implements Parcelable {
 				mpp, spp, atkp, defp, wisp, spip, agip, newRes, null);
 		this.name = name;
 		this.rname = race;
-		this.state = this.AddStates();
+		//this.state = this.AddStates();
 		this.items = items;
 		if (newSkill != null)
 			this.setBaseSkills(newSkill, cloneSkills);
@@ -615,8 +645,10 @@ public class Actor extends Job implements Parcelable {
 		this.spi = this.mspi;
 		this.wis = this.mwis;
 		this.agi = this.magi;
-		for (int i = 0; i < this.state.length; i++)
-			this.state[i].remove();
+		if (this.currentState != null)
+			for (State state : this.currentState)
+				if (state.remove())
+					this.currentState.remove(state);
 		this.applyState(false);
 	}
 
@@ -624,7 +656,13 @@ public class Actor extends Job implements Parcelable {
 		this.name = cloned.name;
 		this.jname = cloned.jname;
 		this.rname = cloned.rname;
-		this.state = cloned.state;
+		//this.state = cloned.state;
+		if (cloned.currentState != null) {
+			this.currentState = new ArrayList<>(cloned.currentState.size());
+			for (State state : cloned.currentState) {
+				this.currentState.add(new State(state));
+			}
+		}
 		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.matk,
 				cloned.mdef, cloned.mwis, cloned.mspi, cloned.magi);
 		this.jobStats(cloned.hpp, cloned.mpp, cloned.spp, cloned.atkp,
@@ -657,34 +695,6 @@ public class Actor extends Job implements Parcelable {
 		this.mres = new int[] { 3, 3, 3, 3, 3, 3, 3, 3 };
 		for (int i = 0; i < newRes.length && i < this.mres.length; i++)
 			this.mres[i] = newRes[i];
-	}
-
-	private State[] AddStates() {
-		State state[] = new State[11];
-		state[0] = new State(this, 1, "Regen", false, false, false, -1, 10, 0, 0, 0,
-				2, 0, 0, 0, false);
-		state[1] = new State(this, 2, "Poison", false, false, false, 10, -7, 0, -2,
-				0, -2, 0, 0, 0, false);
-		state[2] = new State(this, 3, "Clarity", false, false, false, -1, 0, 7, 0, 0,
-				0, 1, 1, 0, false);
-		state[3] = new State(this, 4, "Dizziness", false, false, false, 3, 0, -7, 0,
-				0, 0, -1, -1, 0, false);
-		state[4] = new State(this, 5, "Vigour", false, false, false, -1, 0, 0, 7, 1,
-				0, 0, 0, 1, false);
-		state[5] = new State(this, 6, "Weakness", false, false, false, 5, 0, 0, -7,
-				-1, 0, 0, 0, -1, false);
-		state[6] = new State(this, 7, "Berserk", false, true, false, 7, 0, 0, 0, 5,
-				-3, 0, 0, 3, false);
-		state[7] = new State(this, 8, "Confusion", false, false, true, 3, 0, 0, 0, 0,
-				0, 0, 0, 0, false);
-		state[8] = new State(this, 9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3,
-				0, 0, -3, false);
-		state[9] = new State(this, 10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1,
-				0, 0, -1, false);
-		state[10] = new State(this, 11, "Reflect", false, false, false, 7, 0, 0, 0,
-				0, 0, 0, 0, 0, true);
-
-		return state;
 	}
 
 	public void levelUp() {
@@ -722,7 +732,7 @@ public class Actor extends Job implements Parcelable {
 		dest.writeString(this.name);
 		dest.writeByte((byte) (this.active ? 1 : 0));
 		dest.writeByte((byte) (this.reflect ? 1 : 0));
-		dest.writeTypedArray(this.state, flags);
+		dest.writeTypedList(this.currentState);
 		dest.writeInt(this.auto);
 		dest.writeString(this.rname);
 		dest.writeInt(this.maxhp);
@@ -763,12 +773,21 @@ public class Actor extends Job implements Parcelable {
 		dest.writeTypedList(this.items);
 		dest.writeInt(this.originId);
 		dest.writeByte((byte) (this.canGuard ? 1 : 0));
-	}
+		final int stateResSize = this.stateRes == null ? 0 : this.stateRes.size();
+		final int[] stateResKey = new int[stateResSize];
+		final int[] stateResValue = new int[stateResSize];
+		for (int i = 0; i < stateResSize; i++) {
+			stateResKey[i] = this.stateRes.keyAt(i);
+			stateResValue[i] = this.stateRes.valueAt(i);
+		}
+		dest.writeIntArray(stateResKey);
+		dest.writeIntArray(stateResValue);
+ 	}
 
 	public static class State implements Parcelable {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
-		protected int res, mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
+		protected int mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
 				agim, originId, resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		protected Actor actor;
 
@@ -778,7 +797,6 @@ public class Actor extends Job implements Parcelable {
 			this.auto = in.readByte() != 0;
 			this.reflect = in.readByte() != 0;
 			this.name = in.readString();
-			this.res = in.readInt();
 			this.mdur = in.readInt();
 			this.dur = in.readInt();
 			this.hpm = in.readInt();
@@ -805,11 +823,11 @@ public class Actor extends Job implements Parcelable {
 			}
 		};
 
-		public boolean isInactive() {
+		public boolean isDeactivating() {
 			return this.inactive;
 		}
 
-		public State setInactive(boolean inactive) {
+		public State setDeactivating(boolean inactive) {
 			this.inactive = inactive;
 			return this;
 		}
@@ -818,7 +836,7 @@ public class Actor extends Job implements Parcelable {
 			return this.confusion;
 		}
 
-		public State setConfusion(boolean confusion) {
+		public State setConfusing(boolean confusion) {
 			this.confusion = confusion;
 			return this;
 		}
@@ -846,15 +864,6 @@ public class Actor extends Job implements Parcelable {
 
 		public void setName(String name) {
 			this.name = name;
-		}
-
-		public int getRes() {
-			return this.res;
-		}
-
-		public State setRes(int res) {
-			this.res = res;
-			return this;
 		}
 
 		public int getMaxDur() {
@@ -955,16 +964,14 @@ public class Actor extends Job implements Parcelable {
 			return this.originId;
 		}
 
-		protected State(Actor actor, int id, String name, boolean inactive, boolean auto,
+		public State(int id, String name, boolean inactive, boolean auto,
 				boolean confusion, int dur, int hpm, int mpm, int spm,
 				int atkm, int defm, int wism, int spim, int agim,
 				boolean reflect) {
-			this.actor = actor;
 			this.originId = id;
 			this.name = name;
 			this.mdur = dur;
-			this.dur = 0;
-			this.res = 0;
+			this.dur = dur;
 			this.hpm = hpm;
 			this.mpm = mpm;
 			this.spm = spm;
@@ -979,13 +986,31 @@ public class Actor extends Job implements Parcelable {
 			this.reflect = reflect;
 		}
 
-		public void inflict() {
-			int rnd = (int) (Math.random() * 10);
-			if (this.dur > -2 && rnd > res)
-				this.dur = this.mdur;
+		public State(State clone) {
+			this(clone.originId, clone.name, clone.inactive, clone.auto,
+					clone.confusion, clone.dur, clone.hpm, clone.mpm, clone.spm,
+					clone.atkm, clone.defm, clone.wism, clone.spim, clone.agim,
+					clone.reflect);
 		}
 
-		public String apply(boolean consume) {
+		protected void inflict(Actor actor, boolean always) {
+			if (this.dur > -2 && (always || actor.stateRes == null || actor.stateRes.indexOfKey(this.originId) < 0
+					|| (int) (Math.random() * 10) > actor.stateRes.get(this.originId))) {
+				State aState;
+				if (actor.currentState == null)
+					actor.currentState = new ArrayList<>(1);
+				else
+					for (State state : actor.currentState)
+						if (state.originId == this.originId && state.dur < this.mdur) {
+							state.dur = this.mdur;
+							return;
+						}
+				aState = new State(this);
+				actor.currentState.add(aState);
+			}
+		}
+
+		protected String apply(Actor actor, boolean consume) {
 			String s = "";
 			if (this.dur != 0 && actor.hp > 0) {
 				if (consume) {
@@ -1053,9 +1078,13 @@ public class Actor extends Job implements Parcelable {
 			return s;
 		}
 
-		public void remove() {
-			if (this.dur > -2)
+		protected boolean remove() {
+			if (this.dur > -2) {
 				this.dur = 0;
+				return true;
+			}
+			else
+				return false;
 		}
 
 		@Override
@@ -1070,7 +1099,6 @@ public class Actor extends Job implements Parcelable {
 			dest.writeByte((byte) (this.auto ? 1 : 0));
 			dest.writeByte((byte) (this.reflect ? 1 : 0));
 			dest.writeString(this.name);
-			dest.writeInt(this.res);
 			dest.writeInt(this.mdur);
 			dest.writeInt(this.dur);
 			dest.writeInt(this.hpm);
@@ -1083,6 +1111,12 @@ public class Actor extends Job implements Parcelable {
 			dest.writeInt(this.agim);
 			dest.writeIntArray(this.resm);
 			dest.writeInt(this.originId);
+		}
+
+		@Override
+		public boolean equals(Object eq) {
+			return eq != null && (eq instanceof State)
+					&& this.originId == ((State)eq).originId;
 		}
 	}
 
@@ -1116,5 +1150,11 @@ public class Actor extends Job implements Parcelable {
 	public Actor removeExtraSkills() {
 		this.jobSkills.clear();
 		return this;
+	}
+
+	@Override
+	public boolean equals(Object eq) {
+		return eq != null && (eq instanceof Actor)
+				&& this.originId == ((Actor)eq).originId;
 	}
 }

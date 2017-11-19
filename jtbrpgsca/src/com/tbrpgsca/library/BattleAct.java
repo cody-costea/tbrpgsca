@@ -205,92 +205,77 @@ public class BattleAct extends Activity {
 		if (BattleAct.this.Skill == null) {
 			BattleAct.this.Skill = new Ability[] {
 					new Ability(0, "Attack", false, false, 0, 0, 0, 0, 0, 1,
-							10, 0, -3, 0, 1, false, new boolean[] {},
-							new boolean[] {}),
+							10, 0, -3, 0, 1, false, null, null),
 					new Ability(0, "Defend", false, true, 0, 0, 0, 0, 3, -1, 0,
-							-2, -1, -1, 0, false, new boolean[] {},
-							new boolean[] {}) };
+							-2, -1, -1, 0, false, null, null) };
 		}
+		Actor.State regen = new Actor.State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
+				2, 0, 0, 0, false);
+		Actor.State poison = new Actor.State(2, "Poison", false, false, false, 10, -7, 0, -2,
+				0, -2, 0, 0, 0, false);
+		Actor.State dizziness = new Actor.State(4, "Dizziness", false, false, false, 3, 0, -7, 0,
+				0, 0, -1, -1, 0, false);
 		if (BattleAct.this.Battler == null) {
 			ArrayList<Ability> items = new ArrayList<Ability>(
 					Arrays.asList(new Ability(1, "Potion", false, -25, 0, 0, 0,
-							0, new boolean[] {}, new boolean[] {}).setQty(10)));
+							0, false, null, null).setQty(10)));
 			BattleAct.this.Battler = new Actor[] {
 					new Actor(0, "Cody", "Half-Elf", "Hero", 1, 3, 50, 10, 15,
 							13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Steal", true, true, 2, 0, 0, 0, 3, 0, 0,
-									0, 0, 0, 1, 5, 3, false, new boolean[] {},
-									new boolean[] {}) }, false),
+									0, 0, 0, 1, 5, 3, false, false, null, null) }, false),
 					new Actor(0, "Stephanie", "Human", "Sorceress", 1, 3, 45,
 							20, 5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Iceshard", false, true, 2, 0, 7, 0, 2, 1,
-									15, 0, 0, 0, 3, false, new boolean[] {},
-									new boolean[] {}) }, false),
+									15, 0, 0, 0, 3, false, null,null) }, false),
 					new Actor(0, "George", "Half-Orc", "Templar", 1, 3, 47, 15,
 							15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Regen", false, true, 2, 0, 7, 0, 3, 1,
-									-25, 0, 0, 0, 6, false, new boolean[] {
-											true, true }, new boolean[] {
-											false, false, true, false, false,
-											false, false, false, false, false,
-											true }) }, false),
+									-25, 0, 0, 0, 6, -1,-1, false, true, new Actor.State[] { regen }, new Actor.State[] { poison, dizziness }) }, false),
 					new Actor(0, "Victoria", "Elf", "Valkyrie", 1, 3, 55, 7,
 							13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Bash", false, false, 2, 0, 0, 5, 1, 1, 12,
-									0, -5, 0, 1, false, new boolean[] { false,
-											false, false, false, false, true,
-											false, false, false, false, true },
-									new boolean[] {}) }, false),
+									0, -5, 0, 1, false, new Actor.State[] { dizziness }, null) }, false),
 					new Actor(0, "Lizard", "Lizard", "Lizard", 3, 3, 50, 15,
 							10, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
 							new int[] {}, new ArrayList<Ability>(Arrays.asList(new Ability(
 									new Ability(4, "Ether", true, 0, -10, 0, 0,
-											0, new boolean[] {},
-											new boolean[] {})).setQty(2))),
+											0, false, null,null)).setQty(2))),
 							new Ability[] { new Ability(0, "Fireball", false,
 									true, 2, 0, 7, 0, 2, 1, 15, 0, 0, 0, 2,
-									false, new boolean[] {}, new boolean[] {}) },
+									false, null, null) },
 							false),
 					new Actor(0, "Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20,
 							13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, new ArrayList<Ability>(
 									Arrays.asList(new Ability(new Ability(2,
-											"Antidote", true, 0, 0, 0, 0, 0,
-											new boolean[] {}, new boolean[] {
-													false, false, true }))
+											"Antidote", true, 0, 0, 0, 0, 0, false,
+											null, new Actor.State[] { poison }))
 											.setQty(3))),
 							new Ability[] { new Ability(0, "Poison", false,
 									true, 2, 0, 0, 5, 4, 2, 3, 0, 9, 0, 1, 3,
-									7, false, new boolean[] { false, false,
-											true },
-									new boolean[] { false, true }) }, false),
+									7, false, false, new Actor.State[] { poison },
+									new Actor.State[] { regen }) }, false),
 					new Actor(0, "Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17,
 							12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0, new int[] {},
 							new ArrayList<Ability>(Arrays.asList(new Ability(
 									items.get(0)).setQty(2))),
 							new Ability[] { new Ability(0, "Smash", false,
 									false, 2, 2, 0, 3, 0, 1, 12, 0, -7, 0, 1,
-									false, new boolean[] { false, false, false,
-											false, false, false, false, false,
-											false, false, true },
-									new boolean[] {}) }, false),
+									false, new Actor.State[] { dizziness }, null) }, false),
 					new Actor(0, "Troll", "Troll", "Troll", 3, 3, 47, 15, 15,
 							13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
 							new int[] {}, new ArrayList<Ability>(
 									Arrays.asList(new Ability(new Ability(3,
 											"Elixir", true, -100, -100, -100,
-											0, 0, new boolean[] { true },
-											new boolean[] {})).setQty(1))),
+											0, 0, true, null, null)).setQty(1))),
 							new Ability[] { new Ability(0, "Heal", false, true,
-									2, 0, 7, 0, 3, 1, -25, 0, 0, 0, 6, false,
-									new boolean[] { true }, new boolean[] {
-											false, false, true, false, false,
-											false, false, false, false, false,
-											true }) }, false) };
+									2, 0, 7, 0, 3, 1, -25, 0, 0, 0, 6, -1, -1, false,
+									true, null, new Actor.State[] { dizziness }) }, false) };
 			for (int i = 4; i < 8; i++)
 				BattleAct.this.Battler[i].auto = 2;
 			BattleAct.this.surprise = 0;
@@ -512,7 +497,7 @@ public class BattleAct extends Activity {
 				&& !ability.range)
 			this.target = 5;
 		while ((BattleAct.this.Battler[this.target] != null && BattleAct.this.Battler[this.target].hp < 1)
-				&& !(ability.state.length > 0 && ability.state[0] && ((ability.hpdmg < 0 && BattleAct.this.Battler[this.target].mres[ability.element] < 7)
+				&& !(ability.restore && ((ability.hpdmg < 0 && BattleAct.this.Battler[this.target].mres[ability.element] < 7)
 						|| (ability.hpdmg > 0 && BattleAct.this.Battler[this.target].mres[ability.element] == 7)))) {
 			if (ability.hpdmg < 0)
 				this.target--;
@@ -581,7 +566,7 @@ public class BattleAct extends Activity {
 		boolean cost = true;
 		for (int i = a; i <= b; i++)
 			if (BattleAct.this.Battler[i] != null
-					&& ((BattleAct.this.Battler[i].hp > 0) || (ability.state.length > 0 && ability.state[0]))) {
+					&& (BattleAct.this.Battler[i].hp > 0 || ability.restore)) {
 				if (BattleAct.this.Battler[i].reflect && ability.dmgtype == 2
 						&& i != this.current) {
 					this.updText.append(", which is reflected");
