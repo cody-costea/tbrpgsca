@@ -209,11 +209,11 @@ public class BattleAct extends Activity {
 					new Ability(0, "Defend", false, true, 0, 0, 0, 0, 3, -1, 0,
 							-2, -1, -1, 0, false, null, null) };
 		}
-		Actor.State regen = new Actor.State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
+		Actor.State regen = new Actor.State(1, "Regen", false, false, false, -1, 0, 10, 0, 0, 0,
 				2, 0, 0, 0, false);
-		Actor.State poison = new Actor.State(2, "Poison", false, false, false, 10, -7, 0, -2,
+		Actor.State poison = new Actor.State(2, "Poison", false, false, false, 10, 0, -7, 0, -2,
 				0, -2, 0, 0, 0, false);
-		Actor.State dizziness = new Actor.State(4, "Dizziness", false, false, false, 3, 0, -7, 0,
+		Actor.State dizziness = new Actor.State(4, "Dizziness", false, false, false, 3, 0, 0, -7, 0,
 				0, 0, -1, -1, 0, false);
 		if (BattleAct.this.Battler == null) {
 			ArrayList<Ability> items = new ArrayList<Ability>(
@@ -872,9 +872,13 @@ public class BattleAct extends Activity {
 								&& BattleAct.this.Item != null) {
 							outcome.putParcelableArrayListExtra("Item",
 									BattleAct.this.Item);
-							for (int i = 0; i < 4 - BattleAct.this.difference; i++)
+							for (int i = 0; i < 4 - BattleAct.this.difference; i++) {
 								BattleAct.this.Battler[i].items = null;
+								BattleAct.this.Battler[i].cleanStates();
+							}
 						}
+						else for (int i = 0; i < 4 - BattleAct.this.difference; i++)
+								BattleAct.this.Battler[i].cleanStates();
 						if (BattleAct.cachedParty == null) {
 							Actor[] party = new Actor[] {
 									BattleAct.this.Battler[0],

@@ -224,4 +224,10 @@ public class Job extends Race {
 		return this.bSprite[i];
 	}
 
+	@Override
+	public boolean equals(Object eq) {
+		return eq != null && (eq instanceof Job)
+				&& this.originId == ((Job)eq).originId;
+	}
+
 }

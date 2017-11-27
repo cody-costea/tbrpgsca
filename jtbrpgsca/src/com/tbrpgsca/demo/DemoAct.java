@@ -148,7 +148,7 @@ public class DemoAct extends Activity {
 			this.Player[i].recover();
 		//BattleAct.PlayDemo(this);
 		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] },
-				this.Item, null, surprise, this.level % 2 == 0, true);
+				this.Item, null, surprise, this.level % 2 == 0, false);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {
@@ -207,27 +207,27 @@ public class DemoAct extends Activity {
 	private Actor.State[] AddStates()
 	{
 		Actor.State state[] = new Actor.State[11];
-		state[0] = new Actor.State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
+		state[0] = new Actor.State(1, "Regen", false, false, false, -1, 0, 10, 0, 0, 0,
 				2, 0, 0, 0, false);
-		state[1] = new Actor.State(2, "Poison", false, false, false, 10, -7, 0, -2,
+		state[1] = new Actor.State(2, "Poison", false, false, false, 10, 0, -7, 0, -2,
 				0, -2, 0, 0, 0, false);
-		state[2] = new Actor.State(3, "Clarity", false, false, false, -1, 0, 7, 0, 0,
+		state[2] = new Actor.State(3, "Clarity", false, false, false, -1, 0, 0, 7, 0, 0,
 				0, 1, 1, 0, false);
-		state[3] = new Actor.State(4, "Dizziness", false, false, false, 3, 0, -7, 0,
+		state[3] = new Actor.State(4, "Dizziness", false, false, false, 3, 0, 0, -7, 0,
 				0, 0, -1, -1, 0, false);
-		state[4] = new Actor.State(5, "Vigour", false, false, false, -1, 0, 0, 7, 1,
+		state[4] = new Actor.State(5, "Vigour", false, false, false, -1, 0, 0, 0, 7, 1,
 				0, 0, 0, 1, false);
-		state[5] = new Actor.State(6, "Weakness", false, false, false, 5, 0, 0, -7,
+		state[5] = new Actor.State(6, "Weakness", false, false, false, 5, 0, 0, 0, -7,
 				-1, 0, 0, 0, -1, false);
-		state[6] = new Actor.State(7, "Berserk", false, true, false, 7, 0, 0, 0, 5,
+		state[6] = new Actor.State(7, "Berserk", false, true, false, 7, 0, 0, 0, 0, 5,
 				-3, 0, 0, 3, false);
-		state[7] = new Actor.State(8, "Confusion", false, false, true, 3, 0, 0, 0, 0,
+		state[7] = new Actor.State(8, "Confusion", false, false, true, 3, 2, 0, 0, 0, 0,
 				0, 0, 0, 0, false);
-		state[8] = new Actor.State(9, "Sleep", true, false, false, 5, 0, 0, 0, 0, -3,
+		state[8] = new Actor.State(9, "Sleep", true, false, false, 5, 1, 0, 0, 0, 0, -3,
 				0, 0, -3, false);
-		state[9] = new Actor.State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, -1,
+		state[9] = new Actor.State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, 0, -1,
 				0, 0, -1, false);
-		state[10] = new Actor.State(11, "Reflect", false, false, false, 7, 0, 0, 0,
+		state[10] = new Actor.State(11, "Reflect", false, false, false, 7, 0,0, 0, 0,
 				0, 0, 0, 0, 0, true);
 		return state;
 	}

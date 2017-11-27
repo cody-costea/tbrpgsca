@@ -111,4 +111,10 @@ public class Race {
 		for (int i = 0; i < newRes.length && i < this.rres.length; i++)
 			this.rres[i] = newRes[i];
 	}
+
+	@Override
+	public boolean equals(Object eq) {
+		return eq != null && (eq instanceof Race)
+				&& this.originId == ((Race)eq).originId;
+	}
 }

@@ -23,7 +23,8 @@ import android.os.Parcelable;
 public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
-			element, qty, mqty, rqty, tqty, originId;
+			element, qty, mqty, rqty, tqty;
+	protected final int originId;
 	protected boolean steal, absorb, range, restore;
 	protected Actor.State[] state, rstate;
 
@@ -250,7 +251,7 @@ public class Ability implements Parcelable {
 					if (target.currentState != null)
 						for (Actor.State aState : target.currentState)
 							if (aState.originId == state.originId) {
-								aState.remove();
+								aState.remove(target, false, false);
 								break;
 							}
 			}
@@ -366,7 +367,6 @@ public class Ability implements Parcelable {
 				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
 				cloned.restore, cloned.state, cloned.rstate);
 		this.qty = cloned.qty;
-		this.originId = cloned.originId;
 	}
 
 	@Override
@@ -400,8 +400,6 @@ public class Ability implements Parcelable {
 		dest.writeTypedArray(this.rstate, flags);
 		dest.writeInt(this.originId);
 	}
-
-
 
 	@Override
 	public boolean equals(Object eq) {

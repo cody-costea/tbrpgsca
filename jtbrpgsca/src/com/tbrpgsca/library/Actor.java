@@ -32,7 +32,7 @@ public class Actor extends Job implements Parcelable {
 	protected ArrayList<Ability> jobSkills = new ArrayList<Ability>(), items = null;
 
 	protected ArrayList<State> currentState = null;
-	protected SparseIntArray stateRes = null;
+	protected SparseIntArray stateRes, stateDur = null;
 
 	protected Actor(Parcel in) {
 		this.name = in.readString();
@@ -83,9 +83,15 @@ public class Actor extends Job implements Parcelable {
 		final int[] stateResValue = in.createIntArray();
 		if (stateResValue.length > 0) {
 			this.stateRes = new SparseIntArray(stateResKey.length);
-			for (int i = 0; i < stateResKey.length; i++) {
+			for (int i = 0; i < stateResKey.length; i++)
 				this.stateRes.put(stateResKey[i], stateResValue[i]);
-			}
+		}
+		final int[] stateDurKey = in.createIntArray();
+		final int[] stateDurValue = in.createIntArray();
+		if (stateDurValue.length > 0) {
+			this.stateDur = new SparseIntArray(stateDurKey.length);
+			for (int i = 0; i < stateDurKey.length; i++)
+				this.stateDur.put(stateDurKey[i], stateDurValue[i]);
 		}
 	}
 
@@ -141,6 +147,13 @@ public class Actor extends Job implements Parcelable {
 		return this.currentState == null ? 0 : this.currentState.size();
 	}
 
+	public int getStateIndex(State state) {
+		if (this.currentState == null)
+			return -1;
+		else
+			return this.currentState.indexOf(state);
+	}
+
 	public Actor.State getState(int i) {
 		return this.currentState == null || i < 0 || i >= this.currentState.size()
 				? null : this.currentState.get(i);
@@ -156,6 +169,49 @@ public class Actor extends Job implements Parcelable {
 			this.stateRes = new SparseIntArray();
 		}
 		this.stateRes.put(state.originId, res);
+		return this;
+	}
+
+	public int getStateRes(State state) {
+		if (this.stateRes == null)
+			return 0;
+		else
+			return this.stateRes.get(state.originId,0);
+	}
+
+	public Actor setStateDur(State state, int dur) {
+		if (this.currentState != null && this.currentState.indexOf(state) > -1)
+			this.stateDur.put(state.originId, dur);
+		return this;
+	}
+
+	public int getStateDur(State state) {
+		if (this.stateDur == null)
+			return 0;
+		else
+			return this.stateDur.get(state.originId,0);
+	}
+
+	public boolean removeState(State state, boolean always) {
+		if (this.currentState.indexOf(state) > -1) {
+			return state.remove(this, true, always);
+		}
+		else
+			return false;
+	}
+
+	public Actor cleanStates() {
+		if (this.currentState != null) {
+			for (Actor.State state : this.currentState)
+				if (this.stateDur.get(state.originId, -1) == 0) {
+					this.stateDur.delete(state.originId);
+					this.currentState.remove(state);
+				}
+			if (currentState.size() == 0) {
+				this.currentState = null;
+				this.stateDur = null;
+			}
+		}
 		return this;
 	}
 
@@ -475,7 +531,7 @@ public class Actor extends Job implements Parcelable {
 		boolean c = false;
 		if (this.currentState != null)
 			for (State state : this.currentState)
-				if (state.dur != 0 && this.hp > 0) {
+				if (this.stateDur.get(state.originId, 0) != 0 && this.hp > 0) {
 					String r = state.apply(this, consume);
 					if (r.length() > 0) {
 						if (c)
@@ -508,7 +564,7 @@ public class Actor extends Job implements Parcelable {
 			this.sp = 0;
 			if (this.currentState != null)
 				for (State state : this.currentState)
-					state.remove();
+					state.remove(this, false, false);
 		}
 		if (this.hp < -this.maxhp)
 			this.hp = -this.maxhp;
@@ -526,7 +582,6 @@ public class Actor extends Job implements Parcelable {
 	public Actor(int id, String name, int maxlv) {
 		this.originId = id;
 		this.name = name;
-		//this.state = this.AddStates();
 		this.stats(1, maxlv);
 	}
 
@@ -647,8 +702,7 @@ public class Actor extends Job implements Parcelable {
 		this.agi = this.magi;
 		if (this.currentState != null)
 			for (State state : this.currentState)
-				if (state.remove())
-					this.currentState.remove(state);
+				state.remove(this, true, false);
 		this.applyState(false);
 	}
 
@@ -782,12 +836,21 @@ public class Actor extends Job implements Parcelable {
 		}
 		dest.writeIntArray(stateResKey);
 		dest.writeIntArray(stateResValue);
+		final int stateDurSize = this.stateDur == null ? 0 : this.stateDur.size();
+		final int[] stateDurKey = new int[stateDurSize];
+		final int[] stateDurValue = new int[stateDurSize];
+		for (int i = 0; i < stateDurSize; i++) {
+			stateDurKey[i] = this.stateDur.keyAt(i);
+			stateDurValue[i] = this.stateDur.valueAt(i);
+		}
+		dest.writeIntArray(stateDurKey);
+		dest.writeIntArray(stateDurValue);
  	}
 
 	public static class State implements Parcelable {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
-		protected int mdur, dur, hpm, mpm, spm, atkm, defm, spim, wism,
+		protected int mdur, res, hpm, mpm, spm, atkm, defm, spim, wism,
 				agim, originId, resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		protected Actor actor;
 
@@ -798,7 +861,7 @@ public class Actor extends Job implements Parcelable {
 			this.reflect = in.readByte() != 0;
 			this.name = in.readString();
 			this.mdur = in.readInt();
-			this.dur = in.readInt();
+			this.res = in.readInt();
 			this.hpm = in.readInt();
 			this.mpm = in.readInt();
 			this.spm = in.readInt();
@@ -875,12 +938,12 @@ public class Actor extends Job implements Parcelable {
 			return this;
 		}
 
-		public int getDur() {
-			return this.dur;
+		public int getRes() {
+			return this.res;
 		}
 
-		public State setDur(int dur) {
-			this.dur = dur;
+		public State setRes(int res) {
+			this.res = res;
 			return this;
 		}
 
@@ -965,13 +1028,13 @@ public class Actor extends Job implements Parcelable {
 		}
 
 		public State(int id, String name, boolean inactive, boolean auto,
-				boolean confusion, int dur, int hpm, int mpm, int spm,
+				boolean confusion, int dur, int res, int hpm, int mpm, int spm,
 				int atkm, int defm, int wism, int spim, int agim,
 				boolean reflect) {
 			this.originId = id;
 			this.name = name;
 			this.mdur = dur;
-			this.dur = dur;
+			this.res = res;
 			this.hpm = hpm;
 			this.mpm = mpm;
 			this.spm = spm;
@@ -988,31 +1051,33 @@ public class Actor extends Job implements Parcelable {
 
 		public State(State clone) {
 			this(clone.originId, clone.name, clone.inactive, clone.auto,
-					clone.confusion, clone.dur, clone.hpm, clone.mpm, clone.spm,
+					clone.confusion, clone.mdur, clone.res, clone.hpm, clone.mpm, clone.spm,
 					clone.atkm, clone.defm, clone.wism, clone.spim, clone.agim,
 					clone.reflect);
 		}
 
 		protected void inflict(Actor actor, boolean always) {
-			if (this.dur > -2 && (always || actor.stateRes == null || actor.stateRes.indexOfKey(this.originId) < 0
-					|| (int) (Math.random() * 10) > actor.stateRes.get(this.originId))) {
-				State aState;
-				if (actor.currentState == null)
+			if (always || actor.stateRes == null || actor.stateRes.indexOfKey(this.originId) < 0
+					|| (int) (Math.random() * 10) > actor.stateRes.get(this.originId) + this.res) {
+				if (actor.currentState == null) {
 					actor.currentState = new ArrayList<>(1);
-				else
-					for (State state : actor.currentState)
-						if (state.originId == this.originId && state.dur < this.mdur) {
-							state.dur = this.mdur;
-							return;
-						}
-				aState = new State(this);
-				actor.currentState.add(aState);
+					actor.stateDur = new SparseIntArray();
+				}
+				if (actor.currentState.indexOf(this) > -1) {
+					if (actor.stateDur.get(this.originId, 0) < this.mdur)
+						actor.stateDur.put(this.originId, this.mdur);
+				}
+				else {
+					actor.currentState.add(this);
+					actor.stateDur.put(this.originId, this.mdur);
+				}
 			}
 		}
 
 		protected String apply(Actor actor, boolean consume) {
 			String s = "";
-			if (this.dur != 0 && actor.hp > 0) {
+			int dur = actor.stateDur.get(this.originId, 0);
+			if (dur != 0 && actor.hp > 0) {
 				if (consume) {
 					int rnd = (int) (Math.random() * 3);
 					int dmghp = ((actor.maxhp + rnd) * this.hpm) / 100;
@@ -1048,8 +1113,12 @@ public class Actor extends Job implements Parcelable {
 							s += "+";
 						s += dmgsp + " RP";
 					}
-					if (this.dur > 0)
-						this.dur--;
+					if (dur > 0)
+						actor.stateDur.put(this.originId, --dur);
+				}
+				else if (actor.active && dur > 0 && dur == this.mdur
+						&& (this.inactive || this.auto || this.confusion)) {
+					actor.stateDur.put(this.originId, --dur);
 				}
 				actor.atk = actor.matk + this.atkm;
 				actor.def = actor.mdef + this.defm;
@@ -1060,10 +1129,7 @@ public class Actor extends Job implements Parcelable {
 					actor.res[i] += this.resm[i];
 					actor.checkRes(i);
 				}
-				if (actor.active && this.dur > 0 && this.dur == this.mdur
-						&& (this.inactive || this.auto || this.confusion)) {
-					this.dur--;
-				}
+
 				if (this.inactive) {
 					actor.active = false;
 					actor.canGuard = false;
@@ -1078,9 +1144,13 @@ public class Actor extends Job implements Parcelable {
 			return s;
 		}
 
-		protected boolean remove() {
-			if (this.dur > -2) {
-				this.dur = 0;
+		protected boolean remove(Actor actor, boolean delete, boolean always) {
+			if (actor.stateDur != null && (always || actor.stateDur.get(this.originId, -2) > -2)) {
+				if (delete) {
+					actor.currentState.remove(this);
+					actor.stateDur.delete(this.originId);
+				}
+				else actor.stateDur.put(this.originId, 0);
 				return true;
 			}
 			else
@@ -1100,7 +1170,7 @@ public class Actor extends Job implements Parcelable {
 			dest.writeByte((byte) (this.reflect ? 1 : 0));
 			dest.writeString(this.name);
 			dest.writeInt(this.mdur);
-			dest.writeInt(this.dur);
+			dest.writeInt(this.res);
 			dest.writeInt(this.hpm);
 			dest.writeInt(this.mpm);
 			dest.writeInt(this.spm);
@@ -1141,8 +1211,8 @@ public class Actor extends Job implements Parcelable {
 		}
 		for (i = 0; i < newSkill.length; i++)
 			if ((!noDuplicates)
-					|| (!origins.contains(newSkill[i].originId) && !this.jobSkills
-							.contains(newSkill[i])))
+					|| (origins.indexOf(newSkill[i].originId ) == -1 && this.jobSkills
+							.indexOf(newSkill[i]) == -1))
 				this.jobSkills.add(clone ? new Ability(newSkill[i])
 						: newSkill[i]);
 	}
