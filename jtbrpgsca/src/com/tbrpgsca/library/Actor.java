@@ -632,7 +632,6 @@ public class Actor extends Job implements Parcelable {
 				mpp, spp, atkp, defp, wisp, spip, agip, newRes, null);
 		this.name = name;
 		this.rname = race;
-		//this.state = this.AddStates();
 		this.items = items;
 		if (newSkill != null)
 			this.setBaseSkills(newSkill, cloneSkills);
@@ -851,8 +850,8 @@ public class Actor extends Job implements Parcelable {
 		protected boolean inactive, confusion, auto, reflect;
 		protected String name;
 		protected int mdur, res, hpm, mpm, spm, atkm, defm, spim, wism,
-				agim, originId, resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		protected Actor actor;
+				agim, resm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		protected final int originId;
 
 		protected State(Parcel in) {
 			this.inactive = in.readByte() != 0;
@@ -1064,7 +1063,8 @@ public class Actor extends Job implements Parcelable {
 					actor.stateDur = new SparseIntArray();
 				}
 				if (actor.currentState.indexOf(this) > -1) {
-					if (actor.stateDur.get(this.originId, 0) < this.mdur)
+					int dur = actor.stateDur.get(this.originId, 0);
+					if (dur > -1 && dur < this.mdur)
 						actor.stateDur.put(this.originId, this.mdur);
 				}
 				else {
@@ -1114,12 +1114,11 @@ public class Actor extends Job implements Parcelable {
 						s += dmgsp + " RP";
 					}
 					if (dur > 0)
-						actor.stateDur.put(this.originId, --dur);
+						actor.stateDur.put(this.originId, dur - 1);
 				}
 				else if (actor.active && dur > 0 && dur == this.mdur
-						&& (this.inactive || this.auto || this.confusion)) {
-					actor.stateDur.put(this.originId, --dur);
-				}
+						&& (this.inactive || this.auto || this.confusion))
+					actor.stateDur.put(this.originId, dur - 1);
 				actor.atk = actor.matk + this.atkm;
 				actor.def = actor.mdef + this.defm;
 				actor.spi = actor.mspi + this.spim;

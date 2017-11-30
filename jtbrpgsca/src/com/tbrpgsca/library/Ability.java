@@ -23,10 +23,10 @@ import android.os.Parcelable;
 public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
-			element, qty, mqty, rqty, tqty;
+			element, qty, mqty, rqty, tqty, rstate[];
 	protected final int originId;
 	protected boolean steal, absorb, range, restore;
-	protected Actor.State[] state, rstate;
+	protected Actor.State[] state;
 
 	protected Ability(Parcel in) {
 		this.name = in.readString();
@@ -50,7 +50,7 @@ public class Ability implements Parcelable {
 		this.range = in.readByte() != 0;
 		this.restore = in.readByte() != 0;
 		this.state = in.createTypedArray(Actor.State.CREATOR);
-		this.rstate = in.createTypedArray(Actor.State.CREATOR);
+		this.rstate = in.createIntArray();
 		this.originId = in.readInt();
 	}
 
@@ -130,11 +130,11 @@ public class Ability implements Parcelable {
 		return this.steal;
 	}
 
-	public Actor.State[] getState() {
+	public Actor.State[] getStates() {
 		return this.state;
 	}
 
-	public Actor.State[] getRstate() {
+	public int[] getRemovedStatesOriginIds() {
 		return this.rstate;
 	}
 
@@ -247,13 +247,14 @@ public class Ability implements Parcelable {
 				for (Actor.State state : this.state)
 						state.inflict(target, false);
 			if (this.rstate != null)
-				for (Actor.State state : this.rstate) {
-					if (target.currentState != null)
+				for (int i = 0; i < this.rstate.length; i++) {
+					if (target.currentState != null) {
 						for (Actor.State aState : target.currentState)
-							if (aState.originId == state.originId) {
+							if (aState.originId == this.rstate[i]) {
 								aState.remove(target, false, false);
 								break;
 							}
+					} else break;
 			}
 			if (this.steal
 					&& target.items != null
@@ -350,7 +351,11 @@ public class Ability implements Parcelable {
 		this.dmgtype = dmgtype;
 		this.trg = trg;
 		this.state = state;
-		this.rstate = rstate;
+		if (rstate != null) {
+			this.rstate = new int[rstate.length];
+			for (int i = 0; i < rstate.length; i++)
+				this.rstate[i] = rstate[i].originId;
+		}
 		this.range = range;
 		this.element = element;
 		this.qty = mqty > 0 ? mqty : 0;
@@ -365,8 +370,9 @@ public class Ability implements Parcelable {
 				cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc, cloned.dmgtype,
 				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg,
 				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
-				cloned.restore, cloned.state, cloned.rstate);
+				cloned.restore, cloned.state, null);
 		this.qty = cloned.qty;
+		this.rstate = cloned.rstate;
 	}
 
 	@Override
@@ -397,7 +403,7 @@ public class Ability implements Parcelable {
 		dest.writeByte((byte) (this.range ? 1 : 0));
 		dest.writeByte((byte) (this.restore ? 1 : 0));
 		dest.writeTypedArray(this.state, flags);
-		dest.writeTypedArray(this.rstate, flags);
+		dest.writeIntArray(this.rstate);
 		dest.writeInt(this.originId);
 	}
 
