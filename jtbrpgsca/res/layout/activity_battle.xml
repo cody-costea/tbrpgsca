@@ -9,6 +9,15 @@
     tools:context=".BattleActivity" >
 
     <ImageView
+        android:id="@+id/ImgArena"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/SkillCost"
+        android:layout_above="@id/ItemCost"
+        android:layout_toRightOf="@id/linearLayout1"
+        />
+
+    <ImageView
         android:id="@+id/ImgEnemy1"
         android:layout_width="128dp"
         android:layout_height="128dp"

@@ -129,11 +129,11 @@ public class BattleAct extends Activity {
 	};
 
 	public static void PlayDemo(Activity act) {
-		BattleAct.InitiateBattle(act, null, null, null, null, null, 0, true,
+		BattleAct.InitiateBattle(act, 0, null, null, null, null, null, 0, true,
 				false);
 	}
 
-	public static void InitiateBattle(Activity act, Actor[] party,
+	public static void InitiateBattle(Activity act, int arenaDrawableId, Actor[] party,
 			Actor[] enemy, Ability[] skills, ArrayList<Ability> items,
 			String[] scripts, int surprise, boolean escapable,
 			boolean staticCache) {
@@ -152,6 +152,7 @@ public class BattleAct extends Activity {
 		btInt.putExtra("Skill", skills);
 		btInt.putParcelableArrayListExtra("Item", items);
 		btInt.putExtra("Script", scripts);
+		btInt.putExtra("Arena", arenaDrawableId);
 		act.startActivityForResult(btInt, 1);
 	}
 
@@ -282,6 +283,9 @@ public class BattleAct extends Activity {
 		}
 		BattleAct.this.result = 0;
 		this.setContentView(R.layout.activity_battle);
+		int arenaId = extra.getInt("Arena", 0);
+		if (arenaId != 0)
+			((ImageView)this.findViewById(R.id.ImgArena)).setBackgroundDrawable(this.getResources().getDrawable(arenaId));
 		this.targetBox = (Spinner) this.findViewById(R.id.TargetBox);
 		this.skillBox = (Spinner) this.findViewById(R.id.SkillBox);
 		this.itemBox = (Spinner) this.findViewById(R.id.ItemBox);

@@ -246,15 +246,13 @@ public class Ability implements Parcelable {
 			if (this.state != null)
 				for (Actor.State state : this.state)
 						state.inflict(target, false);
-			if (this.rstate != null)
+			if (target.currentState != null && this.rstate != null)
 				for (int i = 0; i < this.rstate.length; i++) {
-					if (target.currentState != null) {
-						for (Actor.State aState : target.currentState)
-							if (aState.originId == this.rstate[i]) {
-								aState.remove(target, false, false);
-								break;
-							}
-					} else break;
+					for (Actor.State aState : target.currentState)
+						if (aState.originId == this.rstate[i]) {
+							aState.remove(target, false, false);
+							break;
+						}
 			}
 			if (this.steal
 					&& target.items != null

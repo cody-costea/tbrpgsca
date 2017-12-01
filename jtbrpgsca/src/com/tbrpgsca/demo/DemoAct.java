@@ -147,8 +147,8 @@ public class DemoAct extends Activity {
 		for (int i = 1; i < this.Player.length; i++)
 			this.Player[i].recover();
 		//BattleAct.PlayDemo(this);
-		BattleAct.InitiateBattle(this, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] },
-				this.Item, null, surprise, this.level % 2 == 0, false);
+		BattleAct.InitiateBattle(this, 0, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] },
+				this.Item, null, surprise, this.level % 2 == 0, true);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {

@@ -1058,10 +1058,10 @@ public class Actor extends Job implements Parcelable {
 		protected void inflict(Actor actor, boolean always) {
 			if (always || actor.stateRes == null || actor.stateRes.indexOfKey(this.originId) < 0
 					|| (int) (Math.random() * 10) > actor.stateRes.get(this.originId) + this.res) {
-				if (actor.currentState == null) {
+				if (actor.currentState == null)
 					actor.currentState = new ArrayList<>(1);
-					actor.stateDur = new SparseIntArray();
-				}
+				if (actor.stateDur == null)
+					actor.stateDur = new SparseIntArray(1);
 				if (actor.currentState.indexOf(this) > -1) {
 					int dur = actor.stateDur.get(this.originId, 0);
 					if (dur > -1 && dur < this.mdur)
