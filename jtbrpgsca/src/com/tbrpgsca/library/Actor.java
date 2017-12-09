@@ -529,7 +529,7 @@ public class Actor extends Job implements Parcelable {
 			this.res[i] = this.mres[i];
 		this.reflect = false;
 		boolean c = false;
-		if (this.currentState != null)
+		if (this.currentState != null && this.stateDur != null)
 			for (State state : this.currentState)
 				if (this.stateDur.get(state.originId, 0) != 0 && this.hp > 0) {
 					String r = state.apply(this, consume);
