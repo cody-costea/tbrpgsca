@@ -21,6 +21,7 @@ import java.util.Arrays;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -64,6 +65,8 @@ public class BattleAct extends Activity {
 
 	private ArrayList<Ability> cSkills = new ArrayList<Ability>(),
 			crItems = new ArrayList<Ability>();
+
+	private MediaPlayer songPlayer;
 
 	private OnClickListener cAction = new OnClickListener() {
 		@Override
@@ -129,14 +132,14 @@ public class BattleAct extends Activity {
 	};
 
 	public static void PlayDemo(Activity act) {
-		BattleAct.InitiateBattle(act, 0, null, null, null, null, null, 0, true,
+		BattleAct.InitiateBattle(act, 0, 0, null, null, null, null, null, 0, true,
 				false);
 	}
 
-	public static void InitiateBattle(Activity act, int arenaDrawableId, Actor[] party,
-			Actor[] enemy, Ability[] skills, ArrayList<Ability> items,
-			String[] scripts, int surprise, boolean escapable,
-			boolean staticCache) {
+	public static void InitiateBattle(Activity act, int arenaDrawableId, int songId,
+									  Actor[] party, Actor[] enemy, Ability[] skills,
+									  ArrayList<Ability> items, String[] scripts,
+									  int surprise, boolean escapable, boolean staticCache) {
 		if (staticCache) {
 			BattleAct.cachedParty = party;
 			BattleAct.cachedEnemy = enemy;
@@ -153,6 +156,7 @@ public class BattleAct extends Activity {
 		btInt.putParcelableArrayListExtra("Item", items);
 		btInt.putExtra("Script", scripts);
 		btInt.putExtra("Arena", arenaDrawableId);
+		btInt.putExtra("Song", songId);
 		act.startActivityForResult(btInt, 1);
 	}
 
@@ -225,12 +229,12 @@ public class BattleAct extends Activity {
 							13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Steal", 0, true, true, 2, 0, 0, 0, 3, 0, 0,
-									0, 0, 0, 1, 5, 3, false, false, null, null) }, false),
+									0, 0, 0, 1, 5, 3, false, false, null, null) }, null),
 					new Actor(0, "Stephanie", "Human", "Sorceress", 1, 3, 45,
 							20, 5, 13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Iceshard", 0, false, true, 2, 0, 7, 0, 2, 1,
-									15, 0, 0, 0, 3, false, null,null) }, false),
+									15, 0, 0, 0, 3, false, null,null) }, null),
 					new Actor(0, "George", "Half-Orc", "Templar", 1, 3, 47, 15,
 							15, 13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
 							new int[] {}, items, new Ability[] { new Ability(0,
@@ -240,7 +244,7 @@ public class BattleAct extends Activity {
 							13, 17, 12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0,
 							new int[] {}, items, new Ability[] { new Ability(0,
 									"Bash", 0, false, false, 2, 0, 0, 5, 1, 1, 12,
-									0, -5, 0, 1, false, new Actor.State[] { dizziness }, null) }, false),
+									0, -5, 0, 1, false, new Actor.State[] { dizziness }, null) }, null),
 					new Actor(0, "Lizard", "Lizard", "Lizard", 3, 3, 50, 15,
 							10, 13, 12, 9, 7, 5, 1, 1, 1, 1, 0, 1, 0, 0,
 							new int[] {}, new ArrayList<Ability>(Arrays.asList(new Ability(
@@ -248,8 +252,7 @@ public class BattleAct extends Activity {
 											0, false, null,null)).setQty(2))),
 							new Ability[] { new Ability(0, "Fireball", 0, false,
 									true, 2, 0, 7, 0, 2, 1, 15, 0, 0, 0, 2,
-									false, null, null) },
-							false),
+									false, null, null) }, null),
 					new Actor(0, "Goblin", "Goblin", "Goblin", 3, 3, 45, 5, 20,
 							13, 12, 5, 5, 1, 1, 1, 1, 1, 0, 0, 0, 1,
 							new int[] {}, new ArrayList<Ability>(
@@ -260,14 +263,14 @@ public class BattleAct extends Activity {
 							new Ability[] { new Ability(0, "Poison", 0, false,
 									true, 2, 0, 0, 5, 4, 2, 3, 0, 9, 0, 1, 3,
 									7, false, false, new Actor.State[] { poison },
-									new Actor.State[] { regen }) }, false),
+									new Actor.State[] { regen }) }, null),
 					new Actor(0, "Ogre", "Ogre", "Ogre", 3, 3, 55, 7, 13, 17,
 							12, 5, 7, 3, 1, 1, 1, 1, 1, 0, 0, 0, new int[] {},
 							new ArrayList<Ability>(Arrays.asList(new Ability(
 									items.get(0)).setQty(2))),
 							new Ability[] { new Ability(0, "Smash", 0, false,
 									false, 2, 2, 0, 3, 0, 1, 12, 0, -7, 0, 1,
-									false, new Actor.State[] { dizziness }, null) }, false),
+									false, new Actor.State[] { dizziness }, null) }, null),
 					new Actor(0, "Troll", "Troll", "Troll", 3, 3, 47, 15, 15,
 							13, 12, 5, 10, 7, 1, 1, 1, 0, 1, 0, 1, 0,
 							new int[] {}, new ArrayList<Ability>(
@@ -276,12 +279,18 @@ public class BattleAct extends Activity {
 											0, 0, true, null, null)).setQty(1))),
 							new Ability[] { new Ability(0, "Heal", 0, false, true,
 									2, 0, 7, 0, 3, 1, -25, 0, 0, 0, 6, -1, -1, false,
-									true, null, new Actor.State[] { dizziness }) }, false) };
+									true, null, new Actor.State[] { dizziness }) }, null) };
 			for (int i = 4; i < 8; i++)
 				BattleAct.this.Battler[i].auto = 2;
 			BattleAct.this.surprise = 0;
 		}
 		BattleAct.this.result = 0;
+		int songId = extra.getInt("Song", 0);
+		if (songId != 0 && this.songPlayer == null) {
+			songPlayer = MediaPlayer.create(this, songId);
+			songPlayer.setLooping(true);
+			songPlayer.start();
+		}
 		this.setContentView(R.layout.activity_battle);
 		int arenaId = extra.getInt("Arena", 0);
 		if (arenaId != 0)
@@ -962,6 +971,8 @@ public class BattleAct extends Activity {
 		BattleAct.cachedScript = null;
 		if (this.jsContext != null)
 			Context.exit();
+		if (this.songPlayer != null)
+			songPlayer.release();
 		super.onDestroy();
 	}
 }
