@@ -30,7 +30,7 @@ public class Ability implements Parcelable {
 	protected boolean steal, absorb, range, restore;
 	protected Actor.State[] state;
 	protected MediaPlayer media;
-	private Context mediaContext;
+	protected Context mediaContext;
 
 	protected Ability(Parcel in) {
 		this.name = in.readString();

@@ -445,15 +445,16 @@ public class Actor extends Job implements Parcelable {
 	}
 
 	public Actor setBaseSkills(Ability[] raceSkills) {
-		this.setBaseSkills(raceSkills, true);
+		this.setBaseSkills(raceSkills, false);
 		return this;
 	}
 
-	protected void setBaseSkills(Ability[] raceSkills, boolean clone) {
+	public Actor setBaseSkills(Ability[] raceSkills, boolean clone) {
 		this.raceSkills = new Ability[raceSkills.length];
 		for (int i = 0; i < raceSkills.length; i++)
-			this.raceSkills[i] = clone ? new Ability(raceSkills[i])
+			this.raceSkills[i] = clone || raceSkills[i].mqty > 0 ? new Ability(raceSkills[i])
 					: raceSkills[i];
+		return this;
 	}
 
 	public Actor setRace(Race race, boolean init) {
@@ -467,7 +468,7 @@ public class Actor extends Job implements Parcelable {
 							+ race.mdef, this.mwis + race.mwis, this.mspi
 							+ race.mspi, this.magi + race.magi);
 		this.setRes(race.rres, true);
-		this.setBaseSkills(race.raceSkills, true);
+		this.setBaseSkills(race.raceSkills, false);
 		this.rname = race.rname;
 		return this;
 	}
@@ -487,7 +488,7 @@ public class Actor extends Job implements Parcelable {
 		}
 		this.setRes(job.rres, false);
 		if (job.raceSkills != null)
-			this.addSkills(job.raceSkills, true, true);
+			this.addSkills(job.raceSkills, true, false);
 		this.setSprName(job.getSprName());
 		return this;
 	}
@@ -591,7 +592,7 @@ public class Actor extends Job implements Parcelable {
 			int defp, int wisp, int spip, int agip) {
 		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
 				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
-				new int[] {}, null, new Ability[] {}, true);
+				new int[] {}, null, new Ability[] {}, false);
 	}
 
 	public Actor(int id, String name, String race, String jname, int lv,
@@ -600,7 +601,7 @@ public class Actor extends Job implements Parcelable {
 			int defp, int wisp, int spip, int agip, int[] newRes) {
 		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
 				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
-				newRes, null, new Ability[] {}, true);
+				newRes, null, new Ability[] {}, false);
 	}
 
 	public Actor(int id, String name, String race, String jname, int lv,
@@ -610,7 +611,7 @@ public class Actor extends Job implements Parcelable {
 			ArrayList<Ability> items, Ability[] newSkill) {
 		this(id, name, race, jname, lv, maxlv, maxhp, maxmp, maxsp, atk, def,
 				wis, spi, agi, hpp, mpp, spp, atkp, defp, wisp, spip, agip,
-				newRes, items, newSkill, true);
+				newRes, items, newSkill, false);
 	}
 
 	public Actor(int id, String name, Race race, Job job,
@@ -619,11 +620,11 @@ public class Actor extends Job implements Parcelable {
 				race.maxmp, race.maxsp, race.matk, race.mdef, race.mwis,
 				race.mspi, race.magi, job.hpp, job.mpp, job.spp, job.atkp,
 				job.defp, job.wisp, job.spip, job.agip, race.rres, items,
-				race.raceSkills, true);
-		this.addSkills(job.raceSkills, true, true);
+				race.raceSkills, false);
+		this.addSkills(job.raceSkills, true, false);
 	}
 
-	protected Actor(int id, String name, String race, String jname, int lv,
+	public Actor(int id, String name, String race, String jname, int lv,
 			int maxlv, int maxhp, int maxmp, int maxsp, int atk, int def,
 			int wis, int spi, int agi, int hpp, int mpp, int spp, int atkp,
 			int defp, int wisp, int spip, int agip, int[] newRes,
@@ -648,7 +649,7 @@ public class Actor extends Job implements Parcelable {
 				newRes, items, null);
 		this.raceSkills = new Ability[skills.length];
 		for (int i = 0; i < skills.length; i++)
-			this.raceSkills[i] = new Ability(newSkill[skills[i]]);
+			this.raceSkills[i] = newSkill[skills[i]].mqty > 0 ? new Ability(newSkill[skills[i]]) : newSkill[skills[i]];
 
 	}
 
@@ -1190,11 +1191,11 @@ public class Actor extends Job implements Parcelable {
 	}
 
 	public Actor addExtraSkills(Ability[] newSkill) {
-		this.addSkills(newSkill, true, true);
+		this.addSkills(newSkill, true, false);
 		return this;
 	}
 
-	protected void addSkills(Ability[] newSkill, boolean noDuplicates,
+	public Actor addSkills(Ability[] newSkill, boolean noDuplicates,
 			boolean clone) {
 		ArrayList<Integer> origins = null;
 		int i;
@@ -1212,8 +1213,9 @@ public class Actor extends Job implements Parcelable {
 			if ((!noDuplicates)
 					|| (origins.indexOf(newSkill[i].originId ) == -1 && this.jobSkills
 							.indexOf(newSkill[i]) == -1))
-				this.jobSkills.add(clone ? new Ability(newSkill[i])
+				this.jobSkills.add(clone || newSkill[i].mqty > 0 ? new Ability(newSkill[i])
 						: newSkill[i]);
+		return this;
 	}
 
 	public Actor removeExtraSkills() {
