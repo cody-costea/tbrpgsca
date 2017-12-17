@@ -12,10 +12,10 @@
         android:id="@+id/ImgArena"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/SkillCost"
-        android:layout_above="@id/ItemCost"
-        android:layout_toRightOf="@id/linearLayout1"
-        android:layout_toLeftOf="@id/AutoBt"
+        android:layout_below="@+id/SkillCost"
+        android:layout_above="@+id/ItemCost"
+        android:layout_toRightOf="@+id/linearLayout1"
+        android:layout_toLeftOf="@+id/AutoBt"
         />
     
     <TextView
