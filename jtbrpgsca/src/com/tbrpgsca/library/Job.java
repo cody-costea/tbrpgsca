@@ -141,7 +141,7 @@ public class Job extends Race {
 
 	public void setSprites(Activity act, boolean get, String pos) {
 		for (int i = 0; i < 5; i++)
-			if (get && this.sprName != null && this.sprName != "")
+			if (get && this.sprName != null && !this.sprName.equals(""))
 				this.setBtSprite(i - 1, pos, act);
 			else
 				this.bSprite[i] = null;
@@ -218,7 +218,7 @@ public class Job extends Race {
 		int s = i > 2 ? 1 : 2;
 		time[s] = 0;
 		i += 1;
-		if (this.bSprite[i] == null && this.sprName != "")
+		if (this.bSprite[i] == null && !this.sprName.equals(""))
 			this.setBtSprite(i - 1, pos, act);
 		time[s] += this.sprWait[i];
 		return this.bSprite[i];

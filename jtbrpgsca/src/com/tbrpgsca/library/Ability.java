@@ -17,7 +17,9 @@ package com.tbrpgsca.library;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -25,12 +27,13 @@ import android.os.Parcelable;
 public class Ability implements Parcelable {
 	protected String name;
 	protected int trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg, dmgtype,
-			element, qty, mqty, rqty, tqty, rstate[], soundId;
+			element, qty, mqty, rqty, tqty, rstate[], soundId, animSprId;
 	protected final int originId;
 	protected boolean steal, absorb, range, restore;
 	protected Actor.State[] state;
 	protected MediaPlayer media;
 	protected Context mediaContext;
+	protected AnimationDrawable animDrw;
 
 	protected Ability(Parcel in) {
 		this.name = in.readString();
@@ -57,6 +60,7 @@ public class Ability implements Parcelable {
 		this.rstate = in.createIntArray();
 		this.originId = in.readInt();
 		this.soundId = in.readInt();
+		this.animSprId = in.readInt();
 	}
 
 	public static final Creator<Ability> CREATOR = new Creator<Ability>() {
@@ -158,6 +162,16 @@ public class Ability implements Parcelable {
 	public int getSoundId() {
 		return this.soundId;
 	}
+
+    public int getAnimationDrawableId() {
+        return this.animSprId;
+    }
+
+    public AnimationDrawable getAnimationDrawable(Context act) {
+	    if (this.animDrw == null && this.animSprId > 0)
+	        this.animDrw = (AnimationDrawable)act.getResources().getDrawable(this.animSprId);
+	    return this.animDrw;
+    }
 
 	public Ability setSoundId(int soundId) {
 		this.soundId = soundId;
@@ -337,21 +351,21 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability() {
-		this(0, "Ability", 0, true, false, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, false,
+		this(0, "Ability", 0, 0, true, false, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, false,
 				new Actor.State[] {}, new Actor.State[] {});
 	}
 
-	public Ability(int id, String name, int soundId, boolean range, int hpdmg, int mpdmg,
+	public Ability(int id, String name, int animDrwId, int soundId, boolean range, int hpdmg, int mpdmg,
 				   int spdmg, int trg, int element, boolean restoreKO, Actor.State state[], Actor.State rstate[]) {
-		this(id, name, soundId, false, range, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
+		this(id, name, animDrwId, soundId, false, range, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
 				element, 0, -1, false, restoreKO, state, rstate);
 	}
 
-	public Ability(int id, String name, int soundId, boolean steal, boolean range,
+	public Ability(int id, String name, int animDrwId, int soundId, boolean steal, boolean range,
 				   int lvrq, int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
 				   int mpdmg, int spdmg, int trg, int element, boolean absorb,
 				   Actor.State state[], Actor.State rstate[]) {
-		this(id, name, soundId, steal, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
+		this(id, name, animDrwId, soundId, steal, range, lvrq, hpc, mpc, spc, dmgtype, atkp, hpdmg,
 				mpdmg, spdmg, trg, element, -1, -1, absorb, false, state, rstate);
 	}
 
@@ -365,12 +379,13 @@ public class Ability implements Parcelable {
 		}
 	}
 
-	public Ability(int id, String name, int soundId, boolean steal, boolean range,
+	public Ability(int id, String name, int animDrwId, int soundId, boolean steal, boolean range,
 				   int lvrq, int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
 				   int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
 				   boolean absorb, boolean restoreKO, Actor.State state[], Actor.State rstate[]) {
 		this.originId = id;
 		this.name = name;
+		this.animSprId = animDrwId;
 		this.soundId = soundId;
 		this.steal = steal;
 		this.lvrq = lvrq;
@@ -400,11 +415,10 @@ public class Ability implements Parcelable {
 	}
 
 	public Ability(Ability cloned) {
-		this(cloned.originId, cloned.name, cloned.soundId, cloned.steal, cloned.range,
-				cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc, cloned.dmgtype,
-				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg,
-				cloned.element, cloned.mqty, cloned.rqty, cloned.absorb,
-				cloned.restore, cloned.state, null);
+		this(cloned.originId, cloned.name, cloned.animSprId, cloned.soundId, cloned.steal,
+                cloned.range,  cloned.lvrq, cloned.hpc, cloned.mpc, cloned.spc, cloned.dmgtype,
+				cloned.atki, cloned.hpdmg, cloned.mpdmg, cloned.spdmg, cloned.trg, cloned.element,
+                cloned.mqty, cloned.rqty, cloned.absorb, cloned.restore, cloned.state, null);
 		this.qty = cloned.qty;
 		this.rstate = cloned.rstate;
 	}
@@ -440,6 +454,7 @@ public class Ability implements Parcelable {
 		dest.writeIntArray(this.rstate);
 		dest.writeInt(this.originId);
 		dest.writeInt(this.soundId);
+		dest.writeInt(this.animSprId);
 	}
 
 	@Override
