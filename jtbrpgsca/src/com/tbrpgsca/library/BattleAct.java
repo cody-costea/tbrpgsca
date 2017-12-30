@@ -837,24 +837,8 @@ public class BattleAct extends Activity {
 				+ BattleAct.this.Battler[this.current].maxmp + " MP, "
 				+ BattleAct.this.Battler[this.current].sp + "/"
 				+ BattleAct.this.Battler[this.current].maxsp + " RP");
-		//this.imgActor[this.current].setBackgroundResource(R.drawable.current);
-		final AnimationDrawable skillSpr;
-		if ((skillSpr = (AnimationDrawable)this.imgActor[this.current].getDrawable()) != null
-				&& skillSpr.isRunning()) {
-			final int c = this.current;
-			int animTime = 0;
-			for (int i = 0; i < skillSpr.getNumberOfFrames(); i++)
-			    animTime += skillSpr.getDuration(i);
-			this.imgActor[c].postDelayed(new Runnable() {
-				@Override
-				public void run() {
-				    if (c == BattleAct.this.current)
-					    BattleAct.this.imgActor[c].setImageResource(R.drawable.current);
-				}
-			}, waitTime[0] + animTime);
-		}
-		else
-			BattleAct.this.imgActor[BattleAct.this.current].setImageResource(R.drawable.current);
+		if (this.imgActor[this.current].getDrawable() == null)
+            BattleAct.this.imgActor[BattleAct.this.current].setImageResource(R.drawable.current);
 		/*Drawable backSpr;
 		if ((backSpr = this.imgActor[this.current].getBackground()) != null)
 			backSpr.setColorFilter(this.crColor);*/
@@ -943,8 +927,20 @@ public class BattleAct extends Activity {
 							|| !BattleAct.this.imgActor[c].getTag().equals(2)) {
                         if (animDrwId > 0) {
                             final AnimationDrawable animDrw = (AnimationDrawable)BattleAct.this.getResources().getDrawable(animDrwId);
+                            int animDur = 0;
+                            for (int i = 0; i < animDrw.getNumberOfFrames(); i++)
+                                animDur += animDrw.getDuration(i);
                             BattleAct.this.imgActor[c].setImageDrawable(animDrw);
                             animDrw.start();
+                            BattleAct.this.imgActor[c].postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (c == BattleAct.this.current)
+                                        BattleAct.this.imgActor[c].setImageResource(R.drawable.current);
+                                    else
+                                        BattleAct.this.imgActor[c].setImageDrawable(null);
+                                }
+                            }, animDur);
                         }
                         if (a != null)
                             a.playSound(BattleAct.this);
