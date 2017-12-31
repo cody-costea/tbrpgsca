@@ -17,10 +17,8 @@ package com.tbrpgsca.library;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
@@ -347,7 +345,7 @@ public class BattleAct extends Activity {
 			this.imgActor[i].setTag(0);
 			if (BattleAct.this.Battler[i] != null
 					&& BattleAct.this.Battler[i].maxhp > 0)
-				this.playSpr(i, BattleAct.this.Battler[i].hp > 0 ? 0 : -1, 0, null);
+				this.playSpr(i, BattleAct.this.Battler[i].hp > 0 ? 0 : -1, null, false);
 			else if (i < 4)
 				this.difference++;
 		}
@@ -588,22 +586,26 @@ public class BattleAct extends Activity {
 					trg = this.current;
 				} else
 					trg = i;
-				if (act) {
-					this.playSpr(this.current,3, 0, ability);
-					act = false;
-				}
 				this.updText.append(ability.execute(
 						BattleAct.this.Battler[this.current],
 						BattleAct.this.Battler[trg], cost));
+				if (trg == this.current) {
+                    this.playSpr(this.current, 3, ability, cost);
+                    act = false;
+                }
+				else {
+                    if (act) {
+                        this.playSpr(this.current, 3, null, false);
+                        act = false;
+                    }
+                    this.playSpr(trg, BattleAct.this.Battler[trg].hp < 1 ? 2 : 1, ability, cost);
+                }
 				cost = false;
-				boolean ko = BattleAct.this.Battler[trg].hp < 1;
-				//if (trg != this.current)
-                this.playSpr(trg, ko ? 2 : 1, ability.animSprId, null);
 			}
 		this.waitTime[0] = this.waitTime[1] > this.waitTime[2] ? this.waitTime[1]
 				: this.waitTime[2];
 		if (BattleAct.this.Battler[this.current].hp < 1)
-			this.playSpr(this.current, 2, 0, null);
+			this.playSpr(this.current, 2, null, false);
 		if (this.current < (BattleAct.this.Battler.length / 2)
 				- this.difference) {
 			BattleAct.this.Battler[this.current].exp++;
@@ -781,7 +783,7 @@ public class BattleAct extends Activity {
 					this.updText.append(BattleAct.this.Battler[i]
 							.applyState(true));
 					if (BattleAct.this.Battler[i].hp < 1)
-						this.playSpr(i, 2, 0, null);
+						this.playSpr(i, 2, null, false);
 				}
 			for (this.current = 0; this.current < BattleAct.this.Battler.length; this.current++)
 				if (BattleAct.this.Battler[this.current] != null
@@ -913,7 +915,7 @@ public class BattleAct extends Activity {
 				})).create().show();
 	}
 
-	private void playSpr(final int c, final int s, final int animDrwId, final Ability a) {
+	private void playSpr(final int c, final int s, final Ability a, final boolean playSnd) {
 		if (!BattleAct.this.Battler[c].sprName.equals("")) {
 			final String pos = ((c > (BattleAct.this.Battler.length / 2) - 1 && BattleAct.this.surprise >= 0)
 					|| (c < (BattleAct.this.Battler.length / 2) && BattleAct.this.surprise < 0))
@@ -925,25 +927,27 @@ public class BattleAct extends Activity {
 				public void run() {
 					if (s == 2 || s < 0 || BattleAct.this.Battler[c].hp > 0
 							|| !BattleAct.this.imgActor[c].getTag().equals(2)) {
-                        if (animDrwId > 0) {
-                            final AnimationDrawable animDrw = (AnimationDrawable)BattleAct.this.getResources().getDrawable(animDrwId);
-                            int animDur = 0;
-                            for (int i = 0; i < animDrw.getNumberOfFrames(); i++)
-                                animDur += animDrw.getDuration(i);
-                            BattleAct.this.imgActor[c].setImageDrawable(animDrw);
-                            animDrw.start();
-                            BattleAct.this.imgActor[c].postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (c == BattleAct.this.current)
-                                        BattleAct.this.imgActor[c].setImageResource(R.drawable.current);
-                                    else
-                                        BattleAct.this.imgActor[c].setImageDrawable(null);
-                                }
-                            }, animDur);
-                        }
-                        if (a != null)
-                            a.playSound(BattleAct.this);
+                        if (a != null) {
+							if (a.animSprId > 0) {
+								final AnimationDrawable animDrw = (AnimationDrawable) BattleAct.this.getResources().getDrawable(a.animSprId);
+								int animDur = 0;
+								for (int i = 0; i < animDrw.getNumberOfFrames(); i++)
+									animDur += animDrw.getDuration(i);
+								BattleAct.this.imgActor[c].setImageDrawable(animDrw);
+								animDrw.start();
+								BattleAct.this.imgActor[c].postDelayed(new Runnable() {
+									@Override
+									public void run() {
+										if (c == BattleAct.this.current)
+											BattleAct.this.imgActor[c].setImageResource(R.drawable.current);
+										else
+											BattleAct.this.imgActor[c].setImageDrawable(null);
+									}
+								}, animDur);
+							}
+							if (playSnd)
+								a.playSound(BattleAct.this);
+						}
 						sprAnim.stop();
 						sprAnim.setOneShot(true);
                         //sprAnim.setColorFilter(c == BattleAct.this.current ? crColor : null);
