@@ -17,11 +17,9 @@ package com.tbrpgsca.library;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.ArrayMap;
 import android.util.SparseIntArray;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Actor extends Job implements Parcelable {
 	protected String name;
@@ -714,12 +712,20 @@ public class Actor extends Job implements Parcelable {
 		this.name = cloned.name;
 		this.jname = cloned.jname;
 		this.rname = cloned.rname;
-		//this.state = cloned.state;
 		if (cloned.currentState != null) {
 			this.currentState = new ArrayList<>(cloned.currentState.size());
-			for (State state : cloned.currentState) {
+			for (State state : cloned.currentState)
 				this.currentState.add(new State(state));
-			}
+		}
+		if (cloned.stateRes != null) {
+			this.stateRes = new SparseIntArray(cloned.stateRes.size());
+			for (int i = 0; i < cloned.stateRes.size(); i++)
+				this.stateRes.put(cloned.stateRes.keyAt(i), cloned.stateRes.valueAt(i));
+		}
+		if (cloned.stateDur != null) {
+			this.stateDur = new SparseIntArray(cloned.stateDur.size());
+			for (int i = 0; i < cloned.stateDur.size(); i++)
+				this.stateDur.put(cloned.stateDur.keyAt(i), cloned.stateDur.valueAt(i));
 		}
 		this.raceStats(cloned.maxhp, cloned.maxmp, cloned.maxsp, cloned.matk,
 				cloned.mdef, cloned.mwis, cloned.mspi, cloned.magi);
@@ -1069,7 +1075,7 @@ public class Actor extends Job implements Parcelable {
 					actor.stateDur = new SparseIntArray(1);
 				if (actor.currentState.indexOf(this) > -1) {
 					int dur = actor.stateDur.get(this.originId, 0);
-					if (dur > -1 && dur < this.mdur)
+					if (dur > -1 && (dur < this.mdur || this.mdur < 0))
 						actor.stateDur.put(this.originId, this.mdur);
 				}
 				else {
