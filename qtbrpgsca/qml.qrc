@@ -2,5 +2,41 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
+        <file>hero_l_act.gif</file>
+        <file>hero_l_act.mng</file>
+        <file>hero_l_cast.gif</file>
+        <file>hero_l_cast.mng</file>
+        <file>hero_l_fallen.gif</file>
+        <file>hero_l_fallen.mng</file>
+        <file>hero_l_hit.gif</file>
+        <file>hero_l_hit.mng</file>
+        <file>hero_l_idle.gif</file>
+        <file>hero_l_idle.mng</file>
+        <file>hero_l_ko.gif</file>
+        <file>hero_l_ko.mng</file>
+        <file>hero_l_restored.gif</file>
+        <file>hero_l_restored.mng</file>
+        <file>hero_l_run.gif</file>
+        <file>hero_l_run.mng</file>
+        <file>hero_l_walk.gif</file>
+        <file>hero_l_walk.mng</file>
+        <file>hero_r_act.gif</file>
+        <file>hero_r_act.mng</file>
+        <file>hero_r_cast.gif</file>
+        <file>hero_r_cast.mng</file>
+        <file>hero_r_fallen.gif</file>
+        <file>hero_r_fallen.mng</file>
+        <file>hero_r_hit.gif</file>
+        <file>hero_r_hit.mng</file>
+        <file>hero_r_idle.gif</file>
+        <file>hero_r_idle.mng</file>
+        <file>hero_r_ko.gif</file>
+        <file>hero_r_ko.mng</file>
+        <file>hero_r_restored.gif</file>
+        <file>hero_r_restored.mng</file>
+        <file>hero_r_run.gif</file>
+        <file>hero_r_run.mng</file>
+        <file>hero_r_walk.gif</file>
+        <file>hero_r_walk.mng</file>
     </qresource>
 </RCC>

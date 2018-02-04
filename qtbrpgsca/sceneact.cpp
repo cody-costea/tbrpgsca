@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2018 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ void SceneAct::setBattler(int i)
         this->bSkills[i].append(*this->battler[i]->extraSkills[j]);
     }
     this->battlerNames.append(this->battler[i]->name);
-    this->sprites.append(this->battler[i]->jobName);
+    this->sprites.append(/*this->battler[i]->jobName*/"hero");
 }
 
 bool SceneAct::setCurrentActive(bool activate)
@@ -115,8 +115,6 @@ bool SceneAct::setCurrentActive(bool activate)
 
 QString SceneAct::endTurn(QString ret)
 {
-    QString s = (QStringLiteral("current: %1").arg(this->current));
-    qInfo(s.toLatin1());
     if (this->status == 0)
     {
         do
@@ -216,7 +214,7 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
         ret += this->battler[this->current]->execAbility(skill, *(this->battler[i]), (i == this->fTarget));
     }
 
-    ret += this->endTurn(ret);
+    //ret += this->endTurn(ret);
 
     return ret;
 }
