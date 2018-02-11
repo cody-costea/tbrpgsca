@@ -31,15 +31,24 @@ Rectangle {
     property alias btL3: btL3
 
     Rectangle {
+        anchors {
+            left: parent.left
+            top: parent.top
+            bottom: parent.Bottom
+        }
         id: controlsRct
         x: 0
         y: 0
         width: 128
-        height: 360
+        height: parent.height
         color: "#ffffff"
 
         ComboBox {
             id: skillBox
+            anchors {
+                bottom: skillBtn.top
+                margins: 5
+            }
             x: 8
             y: 46
             width: 112
@@ -49,6 +58,10 @@ Rectangle {
 
         Button {
             id: skillBtn
+            anchors {
+                bottom: targetBox.top
+                margins: 5
+            }
             x: 8
             y: 82
             width: 112
@@ -59,6 +72,10 @@ Rectangle {
 
         ComboBox {
             id: targetBox
+            anchors {
+                centerIn: parent.Center
+                margins: 5
+            }
             x: 8
             y: 112
             width: 112
@@ -68,6 +85,10 @@ Rectangle {
 
         Button {
             id: itemBtn
+            anchors {
+                top: targetBox.bottom
+                margins: 5
+            }
             x: 8
             y: 148
             width: 112
@@ -78,6 +99,10 @@ Rectangle {
 
         ComboBox {
             id: itemBox
+            anchors {
+                top: itemBtn.bottom
+                margins: 5
+            }
             x: 8
             y: 179
             width: 112
@@ -87,15 +112,24 @@ Rectangle {
 
         Button {
             id: runBtn
+            anchors {
+                bottom: parent.bottom
+                margins: 5
+            }
             x: 8
             y: 330
             width: 112
             height: 25
             text: "Run"
+            font.pointSize: 10
         }
 
         Button {
             id: autoBtn
+            anchors {
+                bottom: runBtn.top
+                margins: 5
+            }
             x: 8
             y: 299
             width: 112
@@ -106,6 +140,11 @@ Rectangle {
 
         Text {
             id: skillText
+            anchors {
+                bottom: skillBox.top
+                margins: 5
+            }
+
             x: 8
             y: 6
             width: 112
@@ -116,6 +155,12 @@ Rectangle {
         }
 
         Text {
+            anchors {
+                top: itemBox.bottom
+                bottom: actorText.top
+                margins: 5
+            }
+
             id: itemText
             x: 8
             y: 215
@@ -127,6 +172,11 @@ Rectangle {
 
         Text {
             id: actorText
+            anchors {
+                bottom: autoBtn.top
+                margins: 5
+            }
+
             x: 8
             y: 255
             width: 112
@@ -138,88 +188,148 @@ Rectangle {
 
     Image {
         id: arenaImg
+        anchors {
+            top: parent.top
+            right: parent.right
+            left: controlsRct.right
+        }
+
         x: 129
         y: 0
         width: 511
         height: 297
+        fillMode: Image.PreserveAspectFit
 
         AnimatedImage {
-            id: btR4
+            id: btR3
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
+            }
             x: 383
             y: 168
             width: 128
             height: 128
             source: ""
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
-            id: btR3
+            id: btR4
+            anchors {
+                right: btR2.left
+                top: parent.top
+            }
             x: 255
             y: 0
             width: 128
             height: 128
             source: ""
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btR2
+            anchors {
+                right: parent.right
+                bottom: btR3.top
+            }
+
             x: 383
             y: 40
             width: 128
             height: 128
             source: ""
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btR1
+            anchors {
+                top: btR4.bottom
+                right: btR3.left
+            }
+
             x: 255
             y: 128
             width: 128
             height: 128
-            source: ""
+            source: ""            
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btL4
+            anchors {
+                left: btL2.right
+                bottom: parent.bottom
+            }
+
             x: 127
             y: 168
             width: 128
             height: 128
-            source: ""
+            source: ""            
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btL2
+            anchors {
+                top: btL3.bottom
+                left: parent.left
+            }
+
             x: 0
             y: 128
             width: 128
             height: 128
             currentFrame: 0
             playing: false
-            source: ""
+            source: ""            
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btL1
+            anchors {
+                left: btL3.right
+                bottom: btL4.top
+            }
+
             x: 127
             y: 40
             width: 128
             height: 128
             source: ""
+            fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btL3
+            anchors {
+                top: parent.top
+                left: parent.left
+            }
+
             x: 0
             y: 0
             width: 128
             height: 128
             source: ""
+            fillMode: Image.PreserveAspectFit
         }
     }
 
     ScrollView {
         id: textScroll
+        anchors {
+            bottom: parent.bottom
+            top: arenaImg.bottom
+            left: controlsRct.right
+            right: parent.right
+        }
+
         x: 129
         y: 297
         width: 511
@@ -228,6 +338,7 @@ Rectangle {
 
         TextArea {
             id: textArea
+            anchors.fill: parent
             x: -10
             y: -6
             width: 511

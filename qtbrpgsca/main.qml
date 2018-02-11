@@ -23,8 +23,6 @@ Item {
         visible: true
         width: 640
         height: 360
-        maximumWidth: 640
-        maximumHeight: 360
         minimumWidth: 640
         minimumHeight: 360
         title: qsTr("Turn-Based RPG Simple Combat Arena")
@@ -50,9 +48,7 @@ Item {
                     execAI();
                 }
                 else {
-                    arenaForm.skillBtn.enabled = true;
                     arenaForm.autoBtn.enabled = true;
-                    arenaForm.itemBtn.enabled = true;
                     arenaForm.skillBox.enabled = true;
                     arenaForm.itemBox.enabled = true
                     arenaForm.targetBox.enabled = true;;
@@ -60,7 +56,11 @@ Item {
                     arenaForm.mainRct.skillBox.model = arena.crSkillsNames;
                     arenaForm.mainRct.itemBox.model = arena.crItemsNames;
                     arenaForm.mainRct.targetBox.model = arena.battlerNames;
-                    arenaForm.mainRct.actorText.text = arena.battlerNames[arenaForm.crActor];
+                    arenaForm.mainRct.actorText.text = arena.getBattlerDesc(arenaForm.crActor);
+                    if (arena.checkCrSkill(arenaForm.mainRct.skillBox))
+                        arenaForm.skillBtn.enabled = true;
+                    if (arena.checkCrItem(arenaForm.mainRct.itemBox))
+                        arenaForm.itemBtn.enabled = true;
                 }
             }
 
@@ -122,11 +122,13 @@ Item {
             }
 
             skillBox.onCurrentIndexChanged: {
-                arenaForm.mainRct.skillText.text = arena.crSkillsNames[arenaForm.mainRct.skillBox.currentIndex];
+                arenaForm.mainRct.skillText.text = arena.getCrSkillDesc(arenaForm.mainRct.skillBox.currentIndex);
+                arenaForm.mainRct.skillBtn.enabled = arena.checkCrSkill(arenaForm.mainRct.skillBox.currentIndex);
             }
 
             itemBox.onCurrentIndexChanged: {
-                arenaForm.mainRct.itemText.text = arena.crItemsNames[arenaForm.mainRct.itemBox.currentIndex];
+                arenaForm.mainRct.itemText.text = arena.getCrItemDesc(arenaForm.mainRct.itemBox.currentIndex);
+                arenaForm.mainRct.itemBtn.enabled = arena.checkCrItem(arenaForm.mainRct.itemBox.currentIndex);
             }
 
             Component.onCompleted: {

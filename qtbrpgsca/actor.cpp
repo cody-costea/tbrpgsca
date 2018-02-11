@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2018 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ void Actor::calcRes()
 
 QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
 {
-    QString s = "";
+    QString s = this->name + " performs " + ability.name;
     if (applyCosts)
     {
         this->hp -= ability.hpc;
@@ -228,7 +228,7 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
             s += (" ");
             if (dmghp < 1)
                 s += "+";
-            s += -dmghp + " HP";
+            s += QString::number(-dmghp) + " HP";
             c = true;
         }
         if (dmgmp != 0)
@@ -238,7 +238,7 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
             s += " ";
             if (dmgmp < 1)
                 s += "+";
-            s += -dmgmp + " MP";
+            s += QString::number(-dmgmp) + " MP";
             c = true;
         }
         if (dmgsp != 0)
@@ -248,7 +248,7 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
             s += " ";
             if (dmgsp < 1)
                 s += "+";
-            s += -dmgsp + " RP";
+            s += QString::number(-dmgsp) + " RP";
         }
         for (int i = 1; i < State::State::STATESN; i++)
             if (ability.state[i])
@@ -336,7 +336,7 @@ QString Actor::applyState(State& state, bool consume)
                 s += (" ");
                 if (dmghp >= 0)
                     s += "+";
-                s += dmghp + " HP";
+                s += QString::number(dmghp) + " HP";
                 c = true;
             }
             if (dmgmp != 0)
@@ -346,7 +346,7 @@ QString Actor::applyState(State& state, bool consume)
                 s += " ";
                 if (dmgmp >= 0)
                     s += "+";
-                s += dmgmp + " MP";
+                s += QString::number(dmgmp) + " MP";
                 c = true;
             }
             if (dmgsp != 0)
@@ -356,7 +356,7 @@ QString Actor::applyState(State& state, bool consume)
                 s += " ";
                 if (dmgsp >= 0)
                     s += "+";
-                s += dmgsp + " RP";
+                s += QString::number(dmgsp) + " RP";
             }
             if (state.dur > 0)
                 state.dur--;

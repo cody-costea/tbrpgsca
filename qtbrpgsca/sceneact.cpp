@@ -372,14 +372,67 @@ QStringList SceneAct::getBattlerNames()
     return this->battlerNames;
 }
 
+QString SceneAct::getBattlerDesc(int i) {
+    return this->battlerNames[i] + ", Lv:" + QString::number(this->battler[i]->lv)
+            + "\nHP:" + QString::number(this->battler[i]->hp)
+            + "/" + QString::number(this->battler[i]->maxhp)
+            + ", MP:" + QString::number(this->battler[i]->mp)
+            + "/" + QString::number(this->battler[i]->maxmp)
+            + ",\nRP:" + QString::number(this->battler[i]->sp)
+            + "/" + QString::number(this->battler[i]->maxsp)
+            + ", XP:" + QString::number(this->battler[i]->exp)
+            + "/" + QString::number(this->battler[i]->maxp);
+}
+
 QStringList SceneAct::getCrSkillsNames()
 {
     return this->skillNames;
 }
 
+QString SceneAct::getCrSkillDesc(int i) {
+    return this->skillNames[i]
+            + (this->bSkills[this->current][i].mqty < 1 ? ""
+                : " * " + QString::number(this->bSkills[this->current][i].qty))
+            + ", Lv:" + QString::number(this->bSkills[this->current][i].lvrq)
+            + "\nHPc:" + QString::number(this->bSkills[this->current][i].hpc)
+            + ", MPc:" + QString::number(this->bSkills[this->current][i].mpc)
+            + ", RPc:" + QString::number(this->bSkills[this->current][i].spc)
+            + "\nHPd:" + QString::number(this->bSkills[this->current][i].hpdmg)
+            + ", MPd:" + QString::number(this->bSkills[this->current][i].mpdmg)
+            + ", RPd:" + QString::number(this->bSkills[this->current][i].spdmg);
+}
+
+bool SceneAct::checkCrSkill(int i) {
+    return this->battler[this->current]->lv >= this->bSkills[this->current][i].lvrq
+            && this->battler[this->current]->hp >= this->bSkills[this->current][i].hpc
+            && this->battler[this->current]->mp >= this->bSkills[this->current][i].mpc
+            && this->battler[this->current]->sp >= this->bSkills[this->current][i].spc
+            && (this->bSkills[this->current][i].mqty < 1 || this->bSkills[this->current][i].qty > 0);
+}
+
 QStringList SceneAct::getCrItemsNames()
 {
     return this->itemNames;
+}
+
+QString SceneAct::getCrItemDesc(int i) {
+    return this->itemNames[i]
+            + " * " + QString::number((*this->battler[this->current]->items)[i].qty)
+            + "\nHPc:" + QString::number((*this->battler[this->current]->items)[i].hpc)
+            + ", MPc:" + QString::number((*this->battler[this->current]->items)[i].mpc)
+            + ", RPc:" + QString::number((*this->battler[this->current]->items)[i].spc)
+            + "\nHPd:" + QString::number((*this->battler[this->current]->items)[i].hpdmg)
+            + ", MPd:" + QString::number((*this->battler[this->current]->items)[i].mpdmg)
+            + ", RPd:" + QString::number((*this->battler[this->current]->items)[i].spdmg);
+}
+
+bool SceneAct::checkCrItem(int i) {
+    return this->battler[this->current]->lv >= (*this->battler[this->current]->items)[i].lvrq
+            && this->battler[this->current]->hp >= (*this->battler[this->current]->items)[i].hpc
+            && this->battler[this->current]->mp >= (*this->battler[this->current]->items)[i].mpc
+            && this->battler[this->current]->sp >= (*this->battler[this->current]->items)[i].spc
+            && ((*this->battler[this->current]->items)[i].qty < 0
+                || (*this->battler[this->current]->items)[i].qty > 0);
 }
 
 QStringList SceneAct::getSprites()
