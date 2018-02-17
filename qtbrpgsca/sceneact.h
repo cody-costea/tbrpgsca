@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2018 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -68,13 +68,27 @@ public:
 
     Q_INVOKABLE QStringList getBattlerNames();
 
+    Q_INVOKABLE QString getBattlerDesc(int i);
+
     Q_INVOKABLE QStringList getCrSkillsNames();
 
+    Q_INVOKABLE QString getCrSkillDesc(int i);
+
+    Q_INVOKABLE bool checkCrSkill(int i);
+
     Q_INVOKABLE QStringList getCrItemsNames();
+
+    Q_INVOKABLE QString getCrItemDesc(int i);
+
+    Q_INVOKABLE bool checkCrItem(int i);
 
     Q_INVOKABLE QStringList getSprites();
 
     Q_INVOKABLE bool checkIfKO(int actor);
+
+    Q_INVOKABLE bool checkIfSkillHeals(int skill);
+
+    Q_INVOKABLE bool checkIfItemHeals(int item);
 
     Q_INVOKABLE bool checkIfReflects(int user, int skill, int target);
 

@@ -1,5 +1,5 @@
-import QtQuick.Controls 2.3
-import QtQuick 2.4
+import QtQuick.Controls 2.2
+import QtQuick 2.2
 
 Rectangle {
     id: mainRct
@@ -203,7 +203,7 @@ Rectangle {
         AnimatedImage {
             id: btR3
             anchors {
-                right: parent.right
+                left: btR1.right
                 bottom: parent.bottom
             }
             x: 383
@@ -217,7 +217,7 @@ Rectangle {
         AnimatedImage {
             id: btR4
             anchors {
-                right: btR2.left
+                left: parent.horizontalCenter
                 top: parent.top
             }
             x: 255
@@ -231,7 +231,7 @@ Rectangle {
         AnimatedImage {
             id: btR2
             anchors {
-                right: parent.right
+                left: btR4.right
                 bottom: btR3.top
             }
 
@@ -246,22 +246,22 @@ Rectangle {
         AnimatedImage {
             id: btR1
             anchors {
+                left: parent.horizontalCenter
                 top: btR4.bottom
-                right: btR3.left
             }
 
             x: 255
             y: 128
             width: 128
             height: 128
-            source: ""            
+            source: ""
             fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btL4
             anchors {
-                left: btL2.right
+                right: parent.horizontalCenter
                 bottom: parent.bottom
             }
 
@@ -269,7 +269,7 @@ Rectangle {
             y: 168
             width: 128
             height: 128
-            source: ""            
+            source: ""
             fillMode: Image.PreserveAspectFit
         }
 
@@ -277,7 +277,7 @@ Rectangle {
             id: btL2
             anchors {
                 top: btL3.bottom
-                left: parent.left
+                right: btL4.left
             }
 
             x: 0
@@ -286,14 +286,14 @@ Rectangle {
             height: 128
             currentFrame: 0
             playing: false
-            source: ""            
+            source: ""
             fillMode: Image.PreserveAspectFit
         }
 
         AnimatedImage {
             id: btL1
             anchors {
-                left: btL3.right
+                right: parent.horizontalCenter
                 bottom: btL4.top
             }
 
@@ -309,7 +309,7 @@ Rectangle {
             id: btL3
             anchors {
                 top: parent.top
-                left: parent.left
+                right: btL1.left
             }
 
             x: 0

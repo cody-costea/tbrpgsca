@@ -32,17 +32,17 @@ Item {
             anchors.fill: parent
 
             property var actorImg: []
-            property string sprType: ".mng";
+            property string sprType: ".gif";
             property int sprCount: 0;
             property int crActor: 0;
 
             function beginTurn() {
                 arenaForm.crActor = arena.current;
                 if (arena.status > 0) {
-                    arenaForm.mainRct.textArea.append("The party has won!");
+                    arenaForm.textArea.append("The party has won!");
                 }
                 else if (arena.status < 0) {
-                    arenaForm.mainRct.textArea.append("The party has been defeated!");
+                    arenaForm.textArea.append("The party has been defeated!");
                 }
                 else if (arena.checkIfAI()) {
                     execAI();
@@ -53,14 +53,12 @@ Item {
                     arenaForm.itemBox.enabled = true
                     arenaForm.targetBox.enabled = true;;
                     arenaForm.runBtn.enabled = true;
-                    arenaForm.mainRct.skillBox.model = arena.crSkillsNames;
-                    arenaForm.mainRct.itemBox.model = arena.crItemsNames;
-                    arenaForm.mainRct.targetBox.model = arena.battlerNames;
-                    arenaForm.mainRct.actorText.text = arena.getBattlerDesc(arenaForm.crActor);
-                    if (arena.checkCrSkill(arenaForm.mainRct.skillBox))
-                        arenaForm.skillBtn.enabled = true;
-                    if (arena.checkCrItem(arenaForm.mainRct.itemBox))
-                        arenaForm.itemBtn.enabled = true;
+                    arenaForm.skillBox.model = arena.crSkillsNames;
+                    arenaForm.itemBox.model = arena.crItemsNames;
+                    arenaForm.targetBox.model = arena.battlerNames;
+                    arenaForm.actorText.text = arena.getBattlerDesc(arenaForm.crActor);
+                    checkCrSkillAct();
+                    checkCrItemUse();
                 }
             }
 
@@ -83,7 +81,7 @@ Item {
                 arenaForm.itemBox.enabled = false;
                 arenaForm.targetBox.enabled = false;
                 arenaForm.runBtn.enabled = false;
-                arenaForm.mainRct.textArea.append(arena.endTurn(""));
+                arenaForm.textArea.append(arena.endTurn(""));
                 arenaForm.playAnim();
             }
 
@@ -108,7 +106,7 @@ Item {
             }
 
             function execAI() {
-                arenaForm.mainRct.textArea.append(arena.executeAI(""));
+                arenaForm.textArea.append(arena.executeAI(""));
                 arenaForm.endTurn();
             }
 
@@ -121,14 +119,31 @@ Item {
                 }
             }
 
+            function checkCrSkillAct() {
+                arenaForm.skillBtn.enabled = arena.checkCrSkill(arenaForm.skillBox.currentIndex)
+                        && (!arena.checkIfKO(arenaForm.targetBox.currentIndex)
+                            || arena.checkIfSkillHeals(arenaForm.skillBox.currentIndex));
+            }
+
+            function checkCrItemUse() {
+                arenaForm.itemBtn.enabled = arena.checkCrItem(arenaForm.itemBox.currentIndex)
+                        && (!arena.checkIfKO(arenaForm.targetBox.currentIndex)
+                            || arena.checkIfItemHeals(arenaForm.itemBox.currentIndex));
+            }
+
             skillBox.onCurrentIndexChanged: {
-                arenaForm.mainRct.skillText.text = arena.getCrSkillDesc(arenaForm.mainRct.skillBox.currentIndex);
-                arenaForm.mainRct.skillBtn.enabled = arena.checkCrSkill(arenaForm.mainRct.skillBox.currentIndex);
+                arenaForm.skillText.text = arena.getCrSkillDesc(arenaForm.skillBox.currentIndex);
+                checkCrSkillAct();
             }
 
             itemBox.onCurrentIndexChanged: {
-                arenaForm.mainRct.itemText.text = arena.getCrItemDesc(arenaForm.mainRct.itemBox.currentIndex);
-                arenaForm.mainRct.itemBtn.enabled = arena.checkCrItem(arenaForm.mainRct.itemBox.currentIndex);
+                arenaForm.itemText.text = arena.getCrItemDesc(arenaForm.itemBox.currentIndex);
+                checkCrItemUse();
+            }
+
+            targetBox.onCurrentIndexChanged: {
+                checkCrSkillAct();
+                checkCrItemUse();
             }
 
             Component.onCompleted: {
@@ -149,19 +164,20 @@ Item {
                 }
 
                 arenaForm.beginTurn();
+                arenaForm.targetBox.currentIndex = arena.enemyIndex;
             }
 
             skillBtn.onClicked: {
-                arenaForm.mainRct.textArea.append(
-                            arena.performSkill(arenaForm.mainRct.skillBox.currentIndex,
-                                               arenaForm.mainRct.targetBox.currentIndex, ""));
+                arenaForm.textArea.append(
+                            arena.performSkill(arenaForm.skillBox.currentIndex,
+                                               arenaForm.targetBox.currentIndex, ""));
                 arenaForm.endTurn();
             }
 
             itemBtn.onClicked: {
-                arenaForm.mainRct.textArea.append(
-                            arena.useItem(arenaForm.mainRct.itemBox.currentIndex,
-                                               arenaForm.mainRct.targetBox.currentIndex, ""));
+                arenaForm.textArea.append(
+                            arena.useItem(arenaForm.itemBox.currentIndex,
+                                               arenaForm.targetBox.currentIndex, ""));
                 arenaForm.endTurn();
             }
 
@@ -170,42 +186,42 @@ Item {
             }
 
             btL1.onPlayingChanged: {
-                if (!arenaForm.mainRct.btL1.playing) {
+                if (!arenaForm.btL1.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btL2.onPlayingChanged: {
-                if (!arenaForm.mainRct.btL2.playing) {
+                if (!arenaForm.btL2.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btL3.onPlayingChanged: {
-                if (!arenaForm.mainRct.btL3.playing) {
+                if (!arenaForm.btL3.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btL4.onPlayingChanged: {
-                if (!arenaForm.mainRct.btL4.playing) {
+                if (!arenaForm.btL4.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btR1.onPlayingChanged: {
-                if (!arenaForm.mainRct.btR1.playing) {
+                if (!arenaForm.btR1.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btR2.onPlayingChanged: {
-                if (!arenaForm.mainRct.btR2.playing) {
+                if (!arenaForm.btR2.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btR3.onPlayingChanged: {
-                if (!arenaForm.mainRct.btR3.playing) {
+                if (!arenaForm.btR3.playing) {
                     arenaForm.sprCountMod();
                 }
             }
             btR4.onPlayingChanged: {
-                if (!arenaForm.mainRct.btR4.playing) {
+                if (!arenaForm.btR4.playing) {
                     arenaForm.sprCountMod();
                 }
             }

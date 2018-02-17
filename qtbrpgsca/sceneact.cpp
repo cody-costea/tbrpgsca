@@ -211,7 +211,10 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
 
     for (int i = this->fTarget; i <= this->lTarget; i++)
     {
-        ret += this->battler[this->current]->execAbility(skill, *(this->battler[i]), (i == this->fTarget));
+        if (skill.hpdmg < 0 || this->battler[i]->hp > 0)
+        {
+            ret += this->battler[this->current]->execAbility(skill, *(this->battler[i]), (i == this->fTarget));
+        }
     }
 
     //ret += this->endTurn(ret);
@@ -301,7 +304,7 @@ QString SceneAct::setAItarget(Ability& ability, QString ret)
 {
     int f;
     int l;
-    if (this->current < this->enemyIndex && !ability.hpdmg < 0)
+    if (this->current < this->enemyIndex && ability.hpdmg >= 0)
     {
         f = this->enemyIndex;
         l = this->battlerNr;
@@ -442,7 +445,22 @@ QStringList SceneAct::getSprites()
 
 bool SceneAct::checkIfKO(int actor)
 {
-    return actor < this->battlerNr && this->battler[actor]->hp < 1;
+    return actor > -1 && actor < this->battlerNr && this->battler != NULL
+            && actor < this->battlerNr && this->battler[actor]->hp < 1;
+}
+
+bool SceneAct::checkIfSkillHeals(int skill)
+{
+    return skill > -1 && this->current > -1 && this->current < this->battlerNr
+            && skill < this->bSkills[this->current].size()
+            && (this->bSkills[this->current][skill].trg < 0
+            || this->bSkills[this->current][skill].hpdmg < 0);
+}
+
+bool SceneAct::checkIfItemHeals(int item)
+{
+    return item > -1 && this->crItems != NULL
+            && item < (*this->crItems).size() && (*this->crItems)[item].hpdmg < 0;
 }
 
 bool SceneAct::checkIfReflects(int user, int skill, int target)
