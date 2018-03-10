@@ -130,7 +130,7 @@ Item {
                 var trg = arenaForm.targetBox.currentIndex;
                 var item = arenaForm.itemBox.currentIndex;
                 arenaForm.itemBtn.enabled = arena.checkCrItem(item) && (!arena.checkIfKO(trg) || arena.checkIfItemHeals(item))
-                        && arena.getGuardianVsSkill(trg, item) === trg;
+                        && arena.getGuardianVsItem(trg, item) === trg;
             }
 
             skillBox.onCurrentIndexChanged: {
@@ -146,6 +146,50 @@ Item {
             targetBox.onCurrentIndexChanged: {
                 checkCrSkillAct();
                 checkCrItemUse();
+            }
+
+            btL1Mouse.onClicked: {
+                arenaForm.targetBox.currentIndex = 0;
+            }
+
+            btL2Mouse.onClicked: {
+                if (arena.enemyIndex > 1) {
+                    arenaForm.targetBox.currentIndex = 1;
+                }
+            }
+
+            btL3Mouse.onClicked: {
+                if (arena.enemyIndex > 2) {
+                    arenaForm.targetBox.currentIndex = 2;
+                }
+            }
+
+            btL4Mouse.onClicked: {
+                if (arena.enemyIndex > 3) {
+                    arenaForm.targetBox.currentIndex = 3;
+                }
+            }
+
+            btR1Mouse.onClicked: {
+                arenaForm.targetBox.currentIndex = arena.enemyIndex;
+            }
+
+            btR2Mouse.onClicked: {
+                if (arena.enemyIndex + 1 < arena.battlerNr) {
+                    arenaForm.targetBox.currentIndex = arena.enemyIndex + 1;
+                }
+            }
+
+            btR3Mouse.onClicked: {
+                if (arena.enemyIndex + 2 < arena.battlerNr) {
+                    arenaForm.targetBox.currentIndex = arena.enemyIndex + 2;
+                }
+            }
+
+            btR4Mouse.onClicked: {
+                if (arena.enemyIndex + 3 < arena.battlerNr) {
+                    arenaForm.targetBox.currentIndex = arena.enemyIndex + 3;
+                }
             }
 
             Component.onCompleted: {

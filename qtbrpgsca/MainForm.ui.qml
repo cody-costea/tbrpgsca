@@ -7,6 +7,22 @@ Rectangle {
     width: 640
     height: 360
     color: "#000000"
+    property alias btR4Mouse: btR4Mouse
+    property alias btR4Ability: btR4Ability
+    property alias btR2Mouse: btR2Mouse
+    property alias btR2Ability: btR2Ability
+    property alias btR3Ability: btR3Ability
+    property alias btR3Mouse: btR3Mouse
+    property alias btR1Ability: btR1Ability
+    property alias btR1Mouse: btR1Mouse
+    property alias btL4Ability: btL4Ability
+    property alias btL4Mouse: btL4Mouse
+    property alias btL2Mouse: btL2Mouse
+    property alias btL2Ability: btL2Ability
+    property alias btL1Mouse: btL1Mouse
+    property alias btL1Ability: btL1Ability
+    property alias btL3Ability: btL3Ability
+    property alias btL3Mouse: btL3Mouse
     property alias btR3: btR3
     property alias btR2: btR2
     property alias btL3: btL3
@@ -212,6 +228,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btR2Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btR2Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -226,6 +262,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btR4Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btR4Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -241,6 +297,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btR3Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btR3Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -256,6 +332,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btR1Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btR1Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -271,6 +367,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btL4Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btL4Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -288,6 +404,26 @@ Rectangle {
             playing: false
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btL3Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btL3Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -303,6 +439,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btL1Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btL1Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
 
         AnimatedImage {
@@ -318,6 +474,26 @@ Rectangle {
             height: 128
             source: ""
             fillMode: Image.PreserveAspectFit
+
+            AnimatedImage {
+                id: btL2Ability
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+                source: ""
+                fillMode: Image.PreserveAspectFit
+            }
+
+            MouseArea {
+                id: btL2Mouse
+                anchors.fill: parent
+                x: 0
+                y: 0
+                width: 128
+                height: 128
+            }
         }
     }
 
