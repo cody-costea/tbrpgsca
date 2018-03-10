@@ -84,6 +84,10 @@ public:
 
     Q_INVOKABLE QStringList getSprites();
 
+    Q_INVOKABLE int getGuardianVsSkill(int target, int skill);
+
+    Q_INVOKABLE int getGuardianVsItem(int target, int item);
+
     Q_INVOKABLE bool checkIfKO(int actor);
 
     Q_INVOKABLE bool checkIfSkillHeals(int skill);
@@ -109,6 +113,8 @@ private:
     bool copyParty, copyEnemy;
 
     QString executeAbility(Ability& skill, int target, QString ret);
+
+    int getGuardian(int target, Ability& skill);
 
     int checkAIheal(int ret);
 

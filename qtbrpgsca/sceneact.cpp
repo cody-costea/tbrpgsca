@@ -172,6 +172,7 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
     switch (skill.trg)
     {
         default:
+            target = this->getGuardian(target, skill);
             this->fTarget = target;
             this->lTarget = target;
             break;
@@ -220,6 +221,75 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
     //ret += this->endTurn(ret);
 
     return ret;
+}
+
+int SceneAct::getGuardian(int target, Ability& skill)
+{
+    if (skill.range)
+    {
+        return target;
+    }
+    int f;
+    int l;
+    if (this->current < this->enemyIndex)
+    {
+        if (target <= this->enemyIndex || target == this->battlerNr - 1)
+        {
+            return target;
+        }
+        f = this->enemyIndex;
+        l = this->battlerNr - 1;
+    }
+    else
+    {
+        if (target >= this->enemyIndex - 1 || target == 0)
+        {
+            return target;
+        }
+        f = 0;
+        l = this->enemyIndex - 1;
+    }
+    int i, difF = 0, difL = 0, guardF = target, guardL = target;
+    for (i = f; i < target; i++)
+    {
+        if (this->battler[i]->hp > 0)
+        {
+            if (guardF == target)
+            {
+                guardF = i;
+            }
+            difF++;
+        }
+    }
+    if (difF == 0)
+    {
+        return target;
+    }
+    else
+    {
+        for (i = l; i > target; i--)
+        {
+            if (this->battler[i]->hp > 0)
+            {
+                if (guardL == target)
+                {
+                    guardL = i;
+                }
+                difL++;
+            }
+        }
+        return difL == 0 ? target : (difF < difL ? guardF : guardL);
+    }
+}
+
+int SceneAct::getGuardianVsSkill(int target, int skill)
+{
+    return this->getGuardian(target, this->bSkills[this->current][skill]);
+}
+
+int SceneAct::getGuardianVsItem(int target, int item)
+{
+    return this->getGuardian(target, (*this->crItems)[item]);
 }
 
 bool SceneAct::checkIfAI()

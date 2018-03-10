@@ -135,7 +135,7 @@ namespace qtbrpgsca
         Actor PARTY[4] =
         {
             Actor(1, "Cody", RACES[1], JOBS[3], 1, 9, ITEMS),
-            Actor(2, "Victoria", RACES[0], JOBS[0], 1, 9, ITEMS),
+            Actor(2, "Victoria", RACES[0], JOBS[2], 1, 9, ITEMS),
             Actor(3, "Stephanie", RACES[3], JOBS[1], 1, 9, ITEMS),
             Actor(4, "George", RACES[2], JOBS[0], 1, 9, ITEMS)
         };
@@ -143,9 +143,9 @@ namespace qtbrpgsca
         Actor ENEMY[4] =
         {
             Actor(5, "Goblin", RACES[3], JOBS[3], 1, 9, NULL),
-            Actor(6, "Ogre", RACES[2], JOBS[0], 1, 9, NULL),
             Actor(7, "Lizard", RACES[0], JOBS[1], 1, 9, NULL),
-            Actor(8, "Troll", RACES[1], JOBS[0], 1, 9, NULL)
+            Actor(8, "Troll", RACES[1], JOBS[0], 1, 9, NULL),
+            Actor(6, "Ogre", RACES[2], JOBS[0], 1, 9, NULL)
         };
 
         ~DemoLib()

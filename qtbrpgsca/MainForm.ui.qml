@@ -7,6 +7,10 @@ Rectangle {
     width: 640
     height: 360
     color: "#000000"
+    property alias btR3: btR3
+    property alias btR2: btR2
+    property alias btL3: btL3
+    property alias btL2: btL2
     property alias itemText: itemText
     property alias actorText: actorText
     property alias skillText: skillText
@@ -22,13 +26,9 @@ Rectangle {
     property alias arenaImg: arenaImg
     property alias mainRct: mainRct
     property alias btR4: btR4
-    property alias btR2: btR2
     property alias btR1: btR1
-    property alias btR3: btR3
-    property alias btL2: btL2
     property alias btL1: btL1
     property alias btL4: btL4
-    property alias btL3: btL3
 
     Rectangle {
         anchors {
@@ -201,7 +201,7 @@ Rectangle {
         fillMode: Image.PreserveAspectFit
 
         AnimatedImage {
-            id: btR3
+            id: btR2
             anchors {
                 left: btR1.right
                 bottom: parent.bottom
@@ -229,10 +229,10 @@ Rectangle {
         }
 
         AnimatedImage {
-            id: btR2
+            id: btR3
             anchors {
                 left: btR4.right
-                bottom: btR3.top
+                bottom: btR2.top
             }
 
             x: 383
@@ -274,9 +274,9 @@ Rectangle {
         }
 
         AnimatedImage {
-            id: btL2
+            id: btL3
             anchors {
-                top: btL3.bottom
+                top: btL2.bottom
                 right: btL4.left
             }
 
@@ -306,7 +306,7 @@ Rectangle {
         }
 
         AnimatedImage {
-            id: btL3
+            id: btL2
             anchors {
                 top: parent.top
                 right: btL1.left

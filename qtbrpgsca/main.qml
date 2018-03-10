@@ -120,15 +120,17 @@ Item {
             }
 
             function checkCrSkillAct() {
-                arenaForm.skillBtn.enabled = arena.checkCrSkill(arenaForm.skillBox.currentIndex)
-                        && (!arena.checkIfKO(arenaForm.targetBox.currentIndex)
-                            || arena.checkIfSkillHeals(arenaForm.skillBox.currentIndex));
+                var trg = arenaForm.targetBox.currentIndex;
+                var skill = arenaForm.skillBox.currentIndex;
+                arenaForm.skillBtn.enabled = arena.checkCrSkill(skill) && (!arena.checkIfKO(trg) || arena.checkIfSkillHeals(skill))
+                        && arena.getGuardianVsSkill(trg, skill) === trg;
             }
 
             function checkCrItemUse() {
-                arenaForm.itemBtn.enabled = arena.checkCrItem(arenaForm.itemBox.currentIndex)
-                        && (!arena.checkIfKO(arenaForm.targetBox.currentIndex)
-                            || arena.checkIfItemHeals(arenaForm.itemBox.currentIndex));
+                var trg = arenaForm.targetBox.currentIndex;
+                var item = arenaForm.itemBox.currentIndex;
+                arenaForm.itemBtn.enabled = arena.checkCrItem(item) && (!arena.checkIfKO(trg) || arena.checkIfItemHeals(item))
+                        && arena.getGuardianVsSkill(trg, item) === trg;
             }
 
             skillBox.onCurrentIndexChanged: {
