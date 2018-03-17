@@ -299,7 +299,7 @@ bool SceneAct::checkIfAI()
 
 QString SceneAct::executeAI(QString ret)
 {
-    return this->setAItarget(this->getAIskill(this->checkAIheal(-1)), ret);
+    return this->setAItarget(this->bSkills[this->current][this->getAIskill(this->checkAIheal(-1))], ret);
 }
 
 int SceneAct::checkAIheal(int ret) {
@@ -346,11 +346,14 @@ int SceneAct::checkAIheal(int ret) {
     return ret;
 }
 
-Ability& SceneAct::getAIskill(int healSkill)
+int SceneAct::getAIskill(int healSkill)
 {
     if (healSkill < 0)
+    {
         healSkill = 0;
-    Ability* ret = &this->bSkills[this->current][healSkill];
+    }
+    int ret = healSkill;
+    Ability* s = &this->bSkills[this->current][healSkill];
     for (int i = healSkill + 1; i < this->bSkills[this->current].size(); i++)
     {
         Ability* a = &this->bSkills[this->current][i];
@@ -361,13 +364,20 @@ Ability& SceneAct::getAIskill(int healSkill)
         {
             if (healSkill > 0)
             {
-                if (a->hpdmg < ret->hpdmg && ret->hpdmg < 0)
-                    ret = a;
-            } else if (a->hpdmg > ret->hpdmg)
-                ret = a;
+                if (a->hpdmg < s->hpdmg && a->hpdmg < 0)
+                {
+                    s = a;
+                    ret = i;
+                }
+            }
+            else if (a->hpdmg > s->hpdmg)
+            {
+                s = a;
+                ret = i;
+            }
         }
     }
-    return *ret;
+    return ret;
 }
 
 QString SceneAct::setAItarget(Ability& ability, QString ret)

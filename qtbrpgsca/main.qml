@@ -36,7 +36,7 @@ Item {
             property int sprCount: 0;
             property int crActor: 0;
 
-            function beginTurn() {
+            function beginTurn(target) {
                 arenaForm.crActor = arena.current;
                 if (arena.status > 0) {
                     arenaForm.textArea.append("The party has won!");
@@ -57,8 +57,10 @@ Item {
                     arenaForm.itemBox.model = arena.crItemsNames;
                     arenaForm.targetBox.model = arena.battlerNames;
                     arenaForm.actorText.text = arena.getBattlerDesc(arenaForm.crActor);
-                    checkCrSkillAct();
-                    checkCrItemUse();
+                    arenaForm.skillBox.currentIndex = arena.getAIskill(
+                                target === undefined ? (arenaForm.targetBox.currentIndex >= arena.enemyIndex ? 0 : 1) : target);
+                    arenaForm.checkCrSkillAct();
+                    arenaForm.checkCrItemUse();
                 }
             }
 
@@ -70,7 +72,7 @@ Item {
                             'fallen' + arenaForm.sprType;
                     arenaForm.actorImg[arenaForm.crActor].playing = true;
                 }
-                arenaForm.beginTurn();
+                arenaForm.beginTurn(undefined);
             }
 
             function endTurn() {
@@ -133,6 +135,13 @@ Item {
                         && arena.getGuardianVsItem(trg, item) === trg;
             }
 
+            function execCrSkill() {
+                arenaForm.textArea.append(
+                            arena.performSkill(arenaForm.skillBox.currentIndex,
+                                               arenaForm.targetBox.currentIndex, ""));
+                arenaForm.endTurn();
+            }
+
             skillBox.onCurrentIndexChanged: {
                 arenaForm.skillText.text = arena.getCrSkillDesc(arenaForm.skillBox.currentIndex);
                 checkCrSkillAct();
@@ -149,46 +158,110 @@ Item {
             }
 
             btL1Mouse.onClicked: {
-                arenaForm.targetBox.currentIndex = 0;
+                if (arenaForm.targetBox.currentIndex === 0) {
+                    if (arenaForm.skillBtn.enabled) {
+                        arenaForm.execCrSkill();
+                    }
+                }
+                else {
+                    arenaForm.targetBox.currentIndex = 0;
+                    arenaForm.skillBox.currentIndex = arena.getAIskill(1);
+                }
             }
 
             btL2Mouse.onClicked: {
                 if (arena.enemyIndex > 1) {
-                    arenaForm.targetBox.currentIndex = 1;
+                    if (arenaForm.targetBox.currentIndex === 1) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
+                    }
+                    else {
+                        arenaForm.targetBox.currentIndex = 1;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(1);
+                    }
                 }
             }
 
             btL3Mouse.onClicked: {
                 if (arena.enemyIndex > 2) {
-                    arenaForm.targetBox.currentIndex = 2;
+                    if (arenaForm.targetBox.currentIndex === 2) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
+                    }
+                    else {
+                        arenaForm.targetBox.currentIndex = 2;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(1);
+                    }
                 }
             }
 
             btL4Mouse.onClicked: {
                 if (arena.enemyIndex > 3) {
-                    arenaForm.targetBox.currentIndex = 3;
+                    if (arenaForm.targetBox.currentIndex === 3) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
+                    }
+                    else {
+                        arenaForm.targetBox.currentIndex = 3;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(1);
+                    }
                 }
             }
 
             btR1Mouse.onClicked: {
-                arenaForm.targetBox.currentIndex = arena.enemyIndex;
+                if (arenaForm.targetBox.currentIndex === arena.enemyIndex) {
+                    if (arenaForm.skillBtn.enabled) {
+                        arenaForm.execCrSkill();
+                    }
+                }
+                else {
+                    arenaForm.targetBox.currentIndex = arena.enemyIndex;
+                    arenaForm.skillBox.currentIndex = arena.getAIskill(0);
+                }
             }
 
             btR2Mouse.onClicked: {
                 if (arena.enemyIndex + 1 < arena.battlerNr) {
-                    arenaForm.targetBox.currentIndex = arena.enemyIndex + 1;
+                    if (arenaForm.targetBox.currentIndex === arena.enemyIndex + 1) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
+                    }
+                    else {
+                        arenaForm.targetBox.currentIndex = arena.enemyIndex + 1;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(0);
+                    }
                 }
             }
 
             btR3Mouse.onClicked: {
                 if (arena.enemyIndex + 2 < arena.battlerNr) {
-                    arenaForm.targetBox.currentIndex = arena.enemyIndex + 2;
+                    if (arenaForm.targetBox.currentIndex === arena.enemyIndex + 2) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
+                    }
+                    else {
+                        arenaForm.targetBox.currentIndex = arena.enemyIndex + 2;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(0);
+                    }
                 }
             }
 
             btR4Mouse.onClicked: {
                 if (arena.enemyIndex + 3 < arena.battlerNr) {
-                    arenaForm.targetBox.currentIndex = arena.enemyIndex + 3;
+                    if (arenaForm.targetBox.currentIndex === arena.enemyIndex + 3) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
+                    }
+                    else {
+                        arenaForm.targetBox.currentIndex = arena.enemyIndex + 3;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(0);
+                    }
                 }
             }
 
@@ -209,15 +282,12 @@ Item {
                     j++;
                 }
 
-                arenaForm.beginTurn();
+                arenaForm.beginTurn(arena.enemyIndex);
                 arenaForm.targetBox.currentIndex = arena.enemyIndex;
             }
 
             skillBtn.onClicked: {
-                arenaForm.textArea.append(
-                            arena.performSkill(arenaForm.skillBox.currentIndex,
-                                               arenaForm.targetBox.currentIndex, ""));
-                arenaForm.endTurn();
+                arenaForm.execCrSkill();
             }
 
             itemBtn.onClicked: {

@@ -66,6 +66,8 @@ public:
 
     Q_INVOKABLE int getStatus();
 
+    Q_INVOKABLE getAIskill(int healSkill);
+
     Q_INVOKABLE QStringList getBattlerNames();
 
     Q_INVOKABLE QString getBattlerDesc(int i);
@@ -117,8 +119,6 @@ private:
     int getGuardian(int target, Ability& skill);
 
     int checkAIheal(int ret);
-
-    Ability& getAIskill(int healSkill);
 
     QString setAItarget(Ability& ability, QString ret);
 
