@@ -35,6 +35,7 @@ Item {
             property string sprType: ".gif";
             property int sprCount: 0;
             property int crActor: 0;
+            property bool automatic: false;
 
             function beginTurn(target) {
                 arenaForm.crActor = arena.current;
@@ -44,11 +45,11 @@ Item {
                 else if (arena.status < 0) {
                     arenaForm.textArea.append("The party has been defeated!");
                 }
-                else if (arena.checkIfAI()) {
-                    execAI();
+                else if (arenaForm.automatic || arena.checkIfAI()) {
+                    arenaForm.execAI();
                 }
                 else {
-                    arenaForm.autoBtn.enabled = true;
+                    //arenaForm.autoBtn.enabled = true;
                     arenaForm.skillBox.enabled = true;
                     arenaForm.itemBox.enabled = true
                     arenaForm.targetBox.enabled = true;;
@@ -77,7 +78,7 @@ Item {
 
             function endTurn() {
                 arenaForm.skillBtn.enabled = false;
-                arenaForm.autoBtn.enabled = false;
+                //arenaForm.autoBtn.enabled = false;
                 arenaForm.itemBtn.enabled = false;
                 arenaForm.skillBox.enabled = false;
                 arenaForm.itemBox.enabled = false;
@@ -298,7 +299,9 @@ Item {
             }
 
             autoBtn.onClicked: {
-                arenaForm.execAI();
+                if ((arenaForm.automatic = !arenaForm.automatic)) {
+                    arenaForm.execAI();
+                }
             }
 
             btL1.onPlayingChanged: {

@@ -66,7 +66,7 @@ public:
 
     Q_INVOKABLE int getStatus();
 
-    Q_INVOKABLE getAIskill(int healSkill);
+    Q_INVOKABLE int getAIskill(int healSkill);
 
     Q_INVOKABLE QStringList getBattlerNames();
 
