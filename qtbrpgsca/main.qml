@@ -49,7 +49,6 @@ Item {
                     arenaForm.execAI();
                 }
                 else {
-                    //arenaForm.autoBtn.enabled = true;
                     arenaForm.skillBox.enabled = true;
                     arenaForm.itemBox.enabled = true
                     arenaForm.targetBox.enabled = true;;
@@ -78,7 +77,6 @@ Item {
 
             function endTurn() {
                 arenaForm.skillBtn.enabled = false;
-                //arenaForm.autoBtn.enabled = false;
                 arenaForm.itemBtn.enabled = false;
                 arenaForm.skillBox.enabled = false;
                 arenaForm.itemBox.enabled = false;
@@ -301,6 +299,10 @@ Item {
             autoBtn.onClicked: {
                 if ((arenaForm.automatic = !arenaForm.automatic)) {
                     arenaForm.execAI();
+                    arenaForm.autoBtn.text = "Manual";
+                }
+                else {
+                    arenaForm.autoBtn.text = "Auto";
                 }
             }
 
