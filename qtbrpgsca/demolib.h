@@ -109,9 +109,9 @@ namespace qtbrpgsca
 
         Race* RACES[4] =
         {
-            new Race(1, "Elf", 40,25,10, 7,5,15,12,11, new int[Actor::RESN]{0,-1,1,1,1,1}, STD_SKILLS, 2),
+            new Race(1, "Elf", 40,25,10, 7,5,15,12,11, new int[Actor::RESN]{0,-1,1,1,1,1,0,0}, STD_SKILLS, 2),
             new Race(2, "Human", 47,15,13, 9,11,9,11,10, new int[Actor::RESN]{0,0,0,0,0,0,-1,1}, STD_SKILLS, 2),
-            new Race(3, "Half-Orc", 55,7,13, 17,12,5,7,9, new int[Actor::RESN]{0,1,-1,-1,-1,-1}, STD_SKILLS, 2),
+            new Race(3, "Half-Orc", 55,7,13, 17,12,5,7,9, new int[Actor::RESN]{0,1,-1,-1,-1,-1,0,0}, STD_SKILLS, 2),
             new Race(4, "Gnome", 40,15,20, 12,8,10,5,15, new int[Actor::RESN]{0,0,0,0,0,0,1,-1}, STD_SKILLS, 2)
         };
 

@@ -51,8 +51,9 @@ Item {
                 else {
                     arenaForm.skillBox.enabled = true;
                     arenaForm.itemBox.enabled = true
-                    arenaForm.targetBox.enabled = true;;
+                    arenaForm.targetBox.enabled = true;
                     arenaForm.runBtn.enabled = true;
+                    arenaForm.autoBtn.enabled = true;
                     arenaForm.skillBox.model = arena.crSkillsNames;
                     arenaForm.itemBox.model = arena.crItemsNames;
                     arenaForm.targetBox.model = arena.battlerNames;
@@ -143,33 +144,35 @@ Item {
 
             skillBox.onCurrentIndexChanged: {
                 arenaForm.skillText.text = arena.getCrSkillDesc(arenaForm.skillBox.currentIndex);
-                checkCrSkillAct();
+                arenaForm.checkCrSkillAct();
             }
 
             itemBox.onCurrentIndexChanged: {
                 arenaForm.itemText.text = arena.getCrItemDesc(arenaForm.itemBox.currentIndex);
-                checkCrItemUse();
+                arenaForm.checkCrItemUse();
             }
 
             targetBox.onCurrentIndexChanged: {
-                checkCrSkillAct();
-                checkCrItemUse();
+                arenaForm.checkCrSkillAct();
+                arenaForm.checkCrItemUse();
             }
 
             btL1Mouse.onClicked: {
-                if (arenaForm.targetBox.currentIndex === 0) {
-                    if (arenaForm.skillBtn.enabled) {
-                        arenaForm.execCrSkill();
+                if (arenaForm.targetBox.enabled) {
+                    if (arenaForm.targetBox.currentIndex === 0) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
                     }
-                }
-                else {
-                    arenaForm.targetBox.currentIndex = 0;
-                    arenaForm.skillBox.currentIndex = arena.getAIskill(1);
+                    else {
+                        arenaForm.targetBox.currentIndex = 0;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(1);
+                    }
                 }
             }
 
             btL2Mouse.onClicked: {
-                if (arena.enemyIndex > 1) {
+                if (arenaForm.targetBox.enabled && arena.enemyIndex > 1) {
                     if (arenaForm.targetBox.currentIndex === 1) {
                         if (arenaForm.skillBtn.enabled) {
                             arenaForm.execCrSkill();
@@ -183,7 +186,7 @@ Item {
             }
 
             btL3Mouse.onClicked: {
-                if (arena.enemyIndex > 2) {
+                if (arenaForm.targetBox.enabled && arena.enemyIndex > 2) {
                     if (arenaForm.targetBox.currentIndex === 2) {
                         if (arenaForm.skillBtn.enabled) {
                             arenaForm.execCrSkill();
@@ -197,7 +200,7 @@ Item {
             }
 
             btL4Mouse.onClicked: {
-                if (arena.enemyIndex > 3) {
+                if (arenaForm.targetBox.enabled && arena.enemyIndex > 3) {
                     if (arenaForm.targetBox.currentIndex === 3) {
                         if (arenaForm.skillBtn.enabled) {
                             arenaForm.execCrSkill();
@@ -211,19 +214,21 @@ Item {
             }
 
             btR1Mouse.onClicked: {
-                if (arenaForm.targetBox.currentIndex === arena.enemyIndex) {
-                    if (arenaForm.skillBtn.enabled) {
-                        arenaForm.execCrSkill();
+                if (arenaForm.targetBox.enabled) {
+                    if (arenaForm.targetBox.currentIndex === arena.enemyIndex) {
+                        if (arenaForm.skillBtn.enabled) {
+                            arenaForm.execCrSkill();
+                        }
                     }
-                }
-                else {
-                    arenaForm.targetBox.currentIndex = arena.enemyIndex;
-                    arenaForm.skillBox.currentIndex = arena.getAIskill(0);
+                    else {
+                        arenaForm.targetBox.currentIndex = arena.enemyIndex;
+                        arenaForm.skillBox.currentIndex = arena.getAIskill(0);
+                    }
                 }
             }
 
             btR2Mouse.onClicked: {
-                if (arena.enemyIndex + 1 < arena.battlerNr) {
+                if (arenaForm.targetBox.enabled && arena.enemyIndex + 1 < arena.battlerNr) {
                     if (arenaForm.targetBox.currentIndex === arena.enemyIndex + 1) {
                         if (arenaForm.skillBtn.enabled) {
                             arenaForm.execCrSkill();
@@ -237,7 +242,7 @@ Item {
             }
 
             btR3Mouse.onClicked: {
-                if (arena.enemyIndex + 2 < arena.battlerNr) {
+                if (arenaForm.targetBox.enabled && arena.enemyIndex + 2 < arena.battlerNr) {
                     if (arenaForm.targetBox.currentIndex === arena.enemyIndex + 2) {
                         if (arenaForm.skillBtn.enabled) {
                             arenaForm.execCrSkill();
@@ -251,7 +256,7 @@ Item {
             }
 
             btR4Mouse.onClicked: {
-                if (arena.enemyIndex + 3 < arena.battlerNr) {
+                if (arenaForm.targetBox.enabled && arena.enemyIndex + 3 < arena.battlerNr) {
                     if (arenaForm.targetBox.currentIndex === arena.enemyIndex + 3) {
                         if (arenaForm.skillBtn.enabled) {
                             arenaForm.execCrSkill();
@@ -298,11 +303,14 @@ Item {
 
             autoBtn.onClicked: {
                 if ((arenaForm.automatic = !arenaForm.automatic)) {
-                    arenaForm.execAI();
+                    if (!arena.checkIfAI()) {
+                        arenaForm.execAI();
+                    }
                     arenaForm.autoBtn.text = "Manual";
                 }
                 else {
                     arenaForm.autoBtn.text = "Auto";
+                    arenaForm.autoBtn.enabled = false;
                 }
             }
 
