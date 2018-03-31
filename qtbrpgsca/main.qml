@@ -136,6 +136,7 @@ Item {
             }
 
             function execCrSkill() {
+                arenaForm.autoBtn.enabled = false;
                 arenaForm.textArea.append(
                             arena.performSkill(arenaForm.skillBox.currentIndex,
                                                arenaForm.targetBox.currentIndex, ""));
@@ -295,6 +296,7 @@ Item {
             }
 
             itemBtn.onClicked: {
+                arenaForm.autoBtn.enabled = false;
                 arenaForm.textArea.append(
                             arena.useItem(arenaForm.itemBox.currentIndex,
                                                arenaForm.targetBox.currentIndex, ""));
