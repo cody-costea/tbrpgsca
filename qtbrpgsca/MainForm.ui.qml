@@ -7,6 +7,14 @@ Rectangle {
     width: 640
     height: 360
     color: "#000000"
+    property alias btR4Selector: btR4Selector
+    property alias btR2Selector: btR2Selector
+    property alias btR3Selector: btR3Selector
+    property alias btL4Selector: btL4Selector
+    property alias btR1Selector: btR1Selector
+    property alias btL2Selector: btL2Selector
+    property alias btL1Selector: btL1Selector
+    property alias btL3Selector: btL3Selector
     property alias btR4Mouse: btR4Mouse
     property alias btR4Ability: btR4Ability
     property alias btR2Mouse: btR2Mouse
@@ -216,10 +224,10 @@ Rectangle {
         height: 297
         fillMode: Image.PreserveAspectFit
 
-        AnimatedImage {
-            id: btR2
+        Image {
+            id: btR2Selector
             anchors {
-                left: btR1.right
+                left: btR1Selector.right
                 bottom: parent.bottom
             }
             x: 383
@@ -230,28 +238,39 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btR2Ability
+                id: btR2
                 anchors.fill: parent
-                x: 0
-                y: 0
+                x: 383
+                y: 168
                 width: 128
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btR2Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btR2Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btR2Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btR4
+        Image {
+            id: btR4Selector
             anchors {
                 left: parent.horizontalCenter
                 top: parent.top
@@ -264,31 +283,42 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btR4Ability
+                id: btR4
                 anchors.fill: parent
-                x: 0
+                x: 255
                 y: 0
                 width: 128
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btR4Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btR4Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btR4Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btR3
+        Image {
+            id: btR3Selector
             anchors {
-                left: btR4.right
-                bottom: btR2.top
+                left: btR4Selector.right
+                bottom: btR2Selector.top
             }
 
             x: 383
@@ -299,31 +329,42 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btR3Ability
+                id: btR3
                 anchors.fill: parent
-                x: 0
-                y: 0
+                x: 383
+                y: 40
                 width: 128
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btR3Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btR3Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btR3Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btR1
+        Image {
+            id: btR1Selector
             anchors {
                 left: parent.horizontalCenter
-                top: btR4.bottom
+                top: btR4Selector.bottom
             }
 
             x: 255
@@ -334,28 +375,39 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btR1Ability
+                id: btR1
                 anchors.fill: parent
-                x: 0
-                y: 0
+                x: 255
+                y: 128
                 width: 128
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btR1Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btR1Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btR1Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btL4
+        Image {
+            id: btL4Selector
             anchors {
                 right: parent.horizontalCenter
                 bottom: parent.bottom
@@ -369,68 +421,90 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btL4Ability
+                id: btL4
                 anchors.fill: parent
-                x: 0
-                y: 0
+                x: 127
+                y: 168
                 width: 128
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btL4Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btL4Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btL4Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btL3
+        Image {
+            id: btL3Selector
             anchors {
-                top: btL2.bottom
-                right: btL4.left
+                top: btL2Selector.bottom
+                right: btL4Selector.left
             }
 
             x: 0
             y: 128
             width: 128
             height: 128
-            currentFrame: 0
-            playing: false
             source: ""
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btL3Ability
+                id: btL3
                 anchors.fill: parent
                 x: 0
-                y: 0
+                y: 128
                 width: 128
                 height: 128
+                currentFrame: 0
+                playing: false
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btL3Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btL3Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btL3Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btL1
+        Image {
+            id: btL1Selector
             anchors {
                 right: parent.horizontalCenter
-                bottom: btL4.top
+                bottom: btL4Selector.top
             }
 
             x: 127
@@ -441,31 +515,42 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btL1Ability
+                id: btL1
                 anchors.fill: parent
-                x: 0
-                y: 0
+                x: 127
+                y: 40
                 width: 128
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btL1Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btL1Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btL1Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
 
-        AnimatedImage {
-            id: btL2
+        Image {
+            id: btL2Selector
             anchors {
                 top: parent.top
-                right: btL1.left
+                right: btL1Selector.left
             }
 
             x: 0
@@ -476,7 +561,7 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             AnimatedImage {
-                id: btL2Ability
+                id: btL2
                 anchors.fill: parent
                 x: 0
                 y: 0
@@ -484,15 +569,26 @@ Rectangle {
                 height: 128
                 source: ""
                 fillMode: Image.PreserveAspectFit
-            }
 
-            MouseArea {
-                id: btL2Mouse
-                anchors.fill: parent
-                x: 0
-                y: 0
-                width: 128
-                height: 128
+                AnimatedImage {
+                    id: btL2Ability
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                    source: ""
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                MouseArea {
+                    id: btL2Mouse
+                    anchors.fill: parent
+                    x: 0
+                    y: 0
+                    width: 128
+                    height: 128
+                }
             }
         }
     }

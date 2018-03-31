@@ -32,6 +32,9 @@ Item {
             anchors.fill: parent
 
             property var actorImg: []
+            property var abilityImg: []
+            property var selectorImg: []
+
             property string sprType: ".gif";
             property int sprCount: 0;
             property int crActor: 0;
@@ -62,6 +65,7 @@ Item {
                                 target === undefined ? (arenaForm.targetBox.currentIndex >= arena.enemyIndex ? 0 : 1) : target);
                     arenaForm.checkCrSkillAct();
                     arenaForm.checkCrItemUse();
+                    arenaForm.selectorImg[arenaForm.crActor].source = 'qrc:/current.png';
                 }
             }
 
@@ -77,6 +81,7 @@ Item {
             }
 
             function endTurn() {
+                arenaForm.selectorImg[arenaForm.crActor].source = '';
                 arenaForm.skillBtn.enabled = false;
                 arenaForm.itemBtn.enabled = false;
                 arenaForm.skillBox.enabled = false;
@@ -273,6 +278,8 @@ Item {
             Component.onCompleted: {
                 var i, j = 1;
                 for (i = 0; i < 4 && i < arena.enemyIndex; i++) {
+                    arenaForm.abilityImg.push(arenaForm.mainRct["btL" + (i + 1) + "Ability"]);
+                    arenaForm.selectorImg.push(arenaForm.mainRct["btL" + (i + 1) + "Selector"]);
                     arenaForm.actorImg.push(arenaForm.mainRct["btL" + (i + 1)]);
                     arenaForm.actorImg[i].source =
                             'qrc:/' + arena.sprites[i] + '_l_idle' + arenaForm.sprType;
@@ -280,6 +287,8 @@ Item {
                 }
                 //TODO: de revizuit
                 for (i = arena.enemyIndex; j <= 4 && i < arena.battlerNr; i++) {
+                    arenaForm.abilityImg.push(arenaForm.mainRct["btR" + j + "Ability"]);
+                    arenaForm.selectorImg.push(arenaForm.mainRct["btR" + j + "Selector"]);
                     arenaForm.actorImg.push(arenaForm.mainRct["btR" + j]);
                     arenaForm.actorImg[i].source =
                             'qrc:/' + arena.sprites[i] + '_r_idle' + arenaForm.sprType;
