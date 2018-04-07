@@ -59,8 +59,8 @@ SceneAct::SceneAct(Actor* party, int partyNr, bool copyParty, Actor* enemy, int 
 void SceneAct::setBattler(int i)
 {
     int j;
-    this->bSkills[i].reserve(this->battler[i]->rSkillsNr + this->battler[i]->jSkillsNr
-                             + this->battler[i]->extraSkills.size());
+    int exs = this->battler[i]->extraSkills == NULL ? 0 : this->battler[i]->extraSkills->size();
+    this->bSkills[i].reserve(this->battler[i]->rSkillsNr + this->battler[i]->jSkillsNr + exs);
     for (j = 0; j < this->battler[i]->rSkillsNr; j++)
     {
         this->bSkills[i].append(*this->battler[i]->raceSkills[j]);
@@ -69,9 +69,9 @@ void SceneAct::setBattler(int i)
     {
         this->bSkills[i].append(*this->battler[i]->jobSkills[j]);
     }
-    for (j = 0; j < this->battler[i]->extraSkills.size(); j++)
+    for (j = 0; j < exs; j++)
     {
-        this->bSkills[i].append(*this->battler[i]->extraSkills[j]);
+        this->bSkills[i].append(*this->battler[i]->extraSkills->operator [](j));
     }
     this->battlerNames.append(this->battler[i]->name);
     this->sprites.append(/*this->battler[i]->jobName*/"hero");

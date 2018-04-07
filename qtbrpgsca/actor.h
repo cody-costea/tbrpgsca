@@ -34,7 +34,7 @@ namespace qtbrpgsca
         exp = 0, maxp = 15, automatic = 0,* res = NULL;
         bool active = true, reflect = false, guards = true;
         QVector<Ability>* items = NULL;
-        QVector<Ability*> extraSkills;
+        QVector<Ability*>* extraSkills = NULL;
         QVector<State*>* state = NULL;
         QMap<State*, int>* stateDur = NULL;
         QMap<State*, int>* stateRes = NULL;

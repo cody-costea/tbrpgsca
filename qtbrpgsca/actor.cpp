@@ -465,7 +465,14 @@ Actor::~Actor()
     {
         delete this->items;
     }
-    delete this->state;
-    delete this->stateDur;
-    delete this->stateRes;
+    if (this->state != NULL)
+    {
+        delete this->state;
+        delete this->stateDur;
+        delete this->stateRes;
+    }
+    if (this->extraSkills != NULL)
+    {
+        delete this->extraSkills;
+    }
 }
