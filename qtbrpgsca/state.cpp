@@ -43,39 +43,46 @@ State::State(int id, QString name, bool inactive, bool automatic, bool confusion
 
 bool State::inflict(Actor& actor)
 {
+    if (actor.stateDur != NULL && actor.stateDur->operator [](this) < 0)
+    {
+        return true;
+    }
     int rnd = std::rand() % 11;
     int res = this->res;
-    if (actor.stateRes.contains(this))
+    if (actor.stateRes != NULL && actor.stateRes->contains(this))
     {
-        res += actor.stateRes[this];
+        res += actor.stateRes->operator [](this);
     }
-    if (actor.stateDur[this] > -2 && rnd > res)
+    if (rnd > res)
     {
-        if (actor.state.contains(this))
+        if (actor.state == NULL)
         {
-            if (actor.stateDur[this] >= this->mdur)
+            actor.state = new QVector<State*>();
+            actor.stateDur = new QMap<State*, int>();
+            actor.stateRes = new QMap<State*, int>();
+        }
+        if (actor.state->contains(this))
+        {
+            if (actor.stateDur->operator [](this) >= this->mdur)
             {
                 return true;
             }
         }
         else
         {
-            actor.state.append(this);
+            actor.state->append(this);
         }
-        actor.stateDur[this] = this->mdur;
+        actor.stateDur->operator [](this) = this->mdur;
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 bool State::remove(Actor& actor)
 {
-    if (actor.stateDur.contains(this) && actor.stateDur[this] > -1)
+    if (actor.stateDur != NULL && actor.stateDur->contains(this) && actor.stateDur->operator [](this) > -1)
     {
-        actor.stateDur[this] = 0;
+        actor.stateDur->operator [](this) = 0;
         return true;
     }
     else

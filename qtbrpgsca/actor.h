@@ -35,9 +35,9 @@ namespace qtbrpgsca
         bool active = true, reflect = false, guards = true;
         QVector<Ability>* items = NULL;
         QVector<Ability*> extraSkills;
-        QVector<State*> state;
-        QMap<State*, int> stateDur;
-        QMap<State*, int> stateRes;
+        QVector<State*>* state = NULL;
+        QMap<State*, int>* stateDur = NULL;
+        QMap<State*, int>* stateRes = NULL;
 
         Actor(int id, QString name, QString race, QString job, int lv, int maxlv,
               int maxhp, int maxmp, int maxsp, int matk, int mdef, int mspi, int mwis,

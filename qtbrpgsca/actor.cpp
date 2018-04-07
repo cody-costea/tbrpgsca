@@ -41,7 +41,7 @@ Actor::Actor(int id, QString name, Race* race, Job* job, int lv, int maxlv, QVec
 void Actor::stats(int id, QString name, int lv, int maxlv, QVector<Ability>* items)
 {
     this->id = id;
-    this->name = name;    
+    this->name = name;
     this->automatic = 0;
     this->lv = lv;
     this->maxlv = maxlv;
@@ -74,9 +74,12 @@ void Actor::recover()
     this->spi = this->mspi;
     this->wis = this->mwis;
     this->agi = this->magi;
-    for (int i = 0; i < this->state.size(); i++)
+    if (this->state != NULL)
     {
-        this->state[i]->remove(*this);
+        for (int i = 0; i < this->state->size(); i++)
+        {
+            this->state->operator [](i)->remove(*this);
+        }
     }
     this->applyStates(false);
 }
@@ -312,72 +315,71 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
 QString Actor::applyState(State& state, bool consume)
 {
     QString s = "";
-    if (this->stateDur[&state] != 0 && this->hp > 0)
+    if (consume)
     {
-        if (consume)
+        int rnd = std::rand() % 4;
+        int dmghp = ((this->maxhp + rnd) * state.hpm) / 100;
+        int dmgmp = ((this->maxmp + rnd) * state.mpm) / 100;
+        int dmgsp = ((this->maxsp + rnd) * state.spm) / 100;
+        this->hp += dmghp;
+        this->mp += dmgmp;
+        this->sp += dmgsp;
+        bool c = false;
+        if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
+            s += (state.name + " causes " + this->name);
+        if (dmghp != 0)
         {
-            int rnd = std::rand() % 4;
-            int dmghp = ((this->maxhp + rnd) * state.hpm) / 100;
-            int dmgmp = ((this->maxmp + rnd) * state.mpm) / 100;
-            int dmgsp = ((this->maxsp + rnd) * state.spm) / 100;
-            this->hp += dmghp;
-            this->mp += dmgmp;
-            this->sp += dmgsp;
-            bool c = false;
-            if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
-                s += (state.name + " causes " + this->name);
-            if (dmghp != 0)
-            {
-                s += (" ");
-                if (dmghp >= 0)
-                    s += "+";
-                s += QString::number(dmghp) + " HP";
-                c = true;
-            }
-            if (dmgmp != 0)
-            {
-                if (c)
-                    s += ",";
-                s += " ";
-                if (dmgmp >= 0)
-                    s += "+";
-                s += QString::number(dmgmp) + " MP";
-                c = true;
-            }
-            if (dmgsp != 0)
-            {
-                if (c)
-                    s += ",";
-                s += " ";
-                if (dmgsp >= 0)
-                    s += "+";
-                s += QString::number(dmgsp) + " RP";
-            }
-            if (this->stateDur[&state] > 0)
-                this->stateDur[&state]--;
+            s += (" ");
+            if (dmghp >= 0)
+                s += "+";
+            s += QString::number(dmghp) + " HP";
+            c = true;
         }
-        this->atk = this->matk + state.atkm;
-        this->def = this->mdef + state.defm;
-        this->spi = this->mspi + state.spim;
-        this->wis = this->mwis + state.wism;
-        this->agi = this->magi + state.agim;
-        for (int i = 0; i < RESN; i++)
+        if (dmgmp != 0)
         {
-            this->res[i] += state.resm[i];
-            this->checkRes(i);
+            if (c)
+                s += ",";
+            s += " ";
+            if (dmgmp >= 0)
+                s += "+";
+            s += QString::number(dmgmp) + " MP";
+            c = true;
         }
-        if (state.inactive)
+        if (dmgsp != 0)
         {
-            this->active = false;
-            this->guards = false;
+            if (c)
+                s += ",";
+            s += " ";
+            if (dmgsp >= 0)
+                s += "+";
+            s += QString::number(dmgsp) + " RP";
         }
-        if (state.reflect)
-            this->reflect = true;
-        if (state.automatic && this->automatic < 2)
-            this->automatic = 1;
-        if (state.confusion)
-            this->automatic = (this->automatic < 2) ? -1 : -2;
+        if (this->stateDur != NULL && this->stateDur->operator [](&state) > 0)
+        {
+            this->stateDur->operator [](&state)--;
+        }
     }
+    this->atk = this->matk + state.atkm;
+    this->def = this->mdef + state.defm;
+    this->spi = this->mspi + state.spim;
+    this->wis = this->mwis + state.wism;
+    this->agi = this->magi + state.agim;
+    for (int i = 0; i < RESN; i++)
+    {
+        this->res[i] += state.resm[i];
+        this->checkRes(i);
+    }
+    if (state.inactive)
+    {
+        this->active = false;
+        this->guards = false;
+    }
+    if (state.reflect)
+        this->reflect = true;
+    if (state.automatic && this->automatic < 2)
+        this->automatic = 1;
+    if (state.confusion)
+        this->automatic = (this->automatic < 2) ? -1 : -2;
     return s;
 }
 
@@ -396,8 +398,11 @@ QString Actor::checkStatus()
         this->active = false;
         this->guards = false;
         this->sp = 0;
-        for (int i = 0; i < this->state.size(); i++)
-            this->state[i]->remove(*this);
+        if (this->state != NULL)
+        {
+            for (int i = 0; i < this->state->size(); i++)
+                this->state->operator [](i)->remove(*this);
+        }
     }
     if (this->hp < -this->maxhp)
         this->hp = -this->maxhp;
@@ -428,22 +433,25 @@ QString Actor::applyStates(bool consume)
     this->reflect = false;
     this->guards = true;
     bool c = false;
-    for (int i = 0; i < this->state.size(); i++)
-        if (this->stateDur[this->state[i]] != 0 && this->hp > 0)
-        {
-            QString r = this->applyState(*(this->state[i]), consume);
-            if (r.length() > 0)
+    if (this->state != NULL)
+    {
+        for (int i = 0; i < this->state->size(); i++)
+            if (this->stateDur->operator [](this->state->operator [](i)) != 0 && this->hp > 0)
             {
-                if (c)
-                    s += ", ";
-                if (consume && !c)
+                QString r = this->applyState(*(this->state->operator [](i)), consume);
+                if (r.length() > 0)
                 {
-                    s += "\n";
-                    c = true;
+                    if (c)
+                        s += ", ";
+                    if (consume && !c)
+                    {
+                        s += "\n";
+                        c = true;
+                    }
+                    s += r;
                 }
-                s += r;
             }
-        }
+    }
     s += checkStatus();
     if (c && consume)
         s += ".";
@@ -457,4 +465,7 @@ Actor::~Actor()
     {
         delete this->items;
     }
+    delete this->state;
+    delete this->stateDur;
+    delete this->stateRes;
 }
