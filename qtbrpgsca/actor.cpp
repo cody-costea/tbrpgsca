@@ -56,7 +56,7 @@ void Actor::stats(int id, QString name, int lv, int maxlv, QVector<Ability>* ite
         delete[] this->res;
     }
     this->res = new int[RESN];
-    this->setStates();
+    //this->setStates();
     this->levelUp();
     this->recover();
 }
@@ -68,13 +68,16 @@ void Actor::recover()
     this->mp = this->maxmp;
     this->sp = 0;
     this->active = true;
+    this->guards = true;
     this->atk = this->matk;
     this->def = this->mdef;
     this->spi = this->mspi;
     this->wis = this->mwis;
     this->agi = this->magi;
-    for (int i = 0; i < State::State::STATESN; i++)
-        this->state[i].remove();
+    for (int i = 0; i < this->state.size(); i++)
+    {
+        this->state[i]->remove(*this);
+    }
     this->applyStates(false);
 }
 
@@ -250,14 +253,14 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
                 s += "+";
             s += QString::number(-dmgsp) + " RP";
         }
-        for (int i = 1; i < State::State::STATESN; i++)
-            if (ability.state[i])
-                target.state[i - 1].inflict();
-        for (int i = 1; i < State::State::STATESN; i++)
-            if (ability.rstate[i])
-            {
-                target.state[i - 1].remove();
-            }
+        for (int i = 0; i < ability.staten; i++)
+        {
+            ability.state[i]->inflict(target);
+        }
+        for (int i = 0; i < ability.rstaten; i++)
+        {
+            ability.rstate[i]->remove(target);
+        }
         if (ability.steal
                 && target.items != NULL
                 && target.items != this->items
@@ -273,7 +276,8 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
                 {
                     for (int i = 0; i < this->items->size(); i++)
                         if (this->items->operator [](i).id == target.items
-                               ->at(itemId).id) {
+                               ->at(itemId).id)
+                        {
                             this->items->operator [](i).qty++;
                             found = true;
                             break;
@@ -305,20 +309,10 @@ QString Actor::execAbility(Ability& ability, Actor& target, bool applyCosts)
     return s;
 }
 
-void Actor::setStates()
-{
-    if (this->state != NULL)
-    {
-        delete[] this->state;
-    }
-    this->state = State::GET_STATES();
-
-}
-
 QString Actor::applyState(State& state, bool consume)
 {
     QString s = "";
-    if (state.dur != 0 && this->hp > 0)
+    if (this->stateDur[&state] != 0 && this->hp > 0)
     {
         if (consume)
         {
@@ -332,7 +326,8 @@ QString Actor::applyState(State& state, bool consume)
             bool c = false;
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
                 s += (state.name + " causes " + this->name);
-            if (dmghp != 0) {
+            if (dmghp != 0)
+            {
                 s += (" ");
                 if (dmghp >= 0)
                     s += "+";
@@ -358,8 +353,8 @@ QString Actor::applyState(State& state, bool consume)
                     s += "+";
                 s += QString::number(dmgsp) + " RP";
             }
-            if (state.dur > 0)
-                state.dur--;
+            if (this->stateDur[&state] > 0)
+                this->stateDur[&state]--;
         }
         this->atk = this->matk + state.atkm;
         this->def = this->mdef + state.defm;
@@ -372,7 +367,10 @@ QString Actor::applyState(State& state, bool consume)
             this->checkRes(i);
         }
         if (state.inactive)
+        {
             this->active = false;
+            this->guards = false;
+        }
         if (state.reflect)
             this->reflect = true;
         if (state.automatic && this->automatic < 2)
@@ -396,9 +394,10 @@ QString Actor::checkStatus()
     {
         s += " (and falls unconcious)";
         this->active = false;
+        this->guards = false;
         this->sp = 0;
-        for (int i = 0; i < State::State::STATESN; i++)
-            this->state[i].remove();
+        for (int i = 0; i < this->state.size(); i++)
+            this->state[i]->remove(*this);
     }
     if (this->hp < -this->maxhp)
         this->hp = -this->maxhp;
@@ -417,7 +416,9 @@ QString Actor::applyStates(bool consume)
     else
         this->automatic = 2;
     if (consume && this->hp > 0)
+    {
         this->active = true;
+    }
     this->atk = this->matk;
     this->def = this->mdef;
     this->spi = this->mspi;
@@ -425,11 +426,12 @@ QString Actor::applyStates(bool consume)
     this->agi = this->magi;
     this->calcRes();
     this->reflect = false;
+    this->guards = true;
     bool c = false;
-    for (int i = 0; i < State::STATESN; i++)
-        if (this->state[i].dur != 0 && this->hp > 0)
+    for (int i = 0; i < this->state.size(); i++)
+        if (this->stateDur[this->state[i]] != 0 && this->hp > 0)
         {
-            QString r = this->applyState(state[i], consume);
+            QString r = this->applyState(*(this->state[i]), consume);
             if (r.length() > 0)
             {
                 if (c)
@@ -451,7 +453,6 @@ QString Actor::applyStates(bool consume)
 Actor::~Actor()
 {
     delete[] this->res;
-    delete[] this->state;
     if (this->freeItems)
     {
         delete this->items;

@@ -252,7 +252,7 @@ int SceneAct::getGuardian(int target, Ability& skill)
     int i, difF = 0, difL = 0, guardF = target, guardL = target;
     for (i = f; i < target; i++)
     {
-        if (this->battler[i]->hp > 0)
+        if (this->battler[i]->hp > 0 && this->battler[i]->guards)
         {
             if (guardF == target)
             {
@@ -269,7 +269,7 @@ int SceneAct::getGuardian(int target, Ability& skill)
     {
         for (i = l; i > target; i--)
         {
-            if (this->battler[i]->hp > 0)
+            if (this->battler[i]->hp > 0 && this->battler[i]->guards)
             {
                 if (guardL == target)
                 {
@@ -534,13 +534,16 @@ bool SceneAct::checkIfSkillHeals(int skill)
     return skill > -1 && this->current > -1 && this->current < this->battlerNr
             && skill < this->bSkills[this->current].size()
             && (this->bSkills[this->current][skill].trg < 0
-            || this->bSkills[this->current][skill].hpdmg < 0);
+            || (this->bSkills[this->current][skill].restore
+            && this->bSkills[this->current][skill].hpdmg < 0));
 }
 
 bool SceneAct::checkIfItemHeals(int item)
 {
     return item > -1 && this->crItems != NULL
-            && item < (*this->crItems).size() && (*this->crItems)[item].hpdmg < 0;
+            && item < (*this->crItems).size()
+            && (*this->crItems)[item].restore
+            && (*this->crItems)[item].hpdmg < 0;
 }
 
 bool SceneAct::checkIfReflects(int user, int skill, int target)

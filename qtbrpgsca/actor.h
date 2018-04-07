@@ -26,19 +26,18 @@ limitations under the License.
 
 namespace qtbrpgsca
 {
-
-    struct State;
-
     class Actor : public Race, public Job
     {
     public:
         QString name;
         int id, hp, mp, sp, atk, def, spi, wis, agi, lv, maxlv,
         exp = 0, maxp = 15, automatic = 0,* res = NULL;
-        bool active = true, reflect = false;
-        State* state = NULL;
+        bool active = true, reflect = false, guards = true;
         QVector<Ability>* items = NULL;
         QVector<Ability*> extraSkills;
+        QVector<State*> state;
+        QMap<State*, int> stateDur;
+        QMap<State*, int> stateRes;
 
         Actor(int id, QString name, QString race, QString job, int lv, int maxlv,
               int maxhp, int maxmp, int maxsp, int matk, int mdef, int mspi, int mwis,
@@ -70,7 +69,6 @@ namespace qtbrpgsca
         bool freeItems = false;
 
         void calcRes();
-        void setStates();
         void stats(int id, QString name, int lv, int maxlv, QVector<Ability>* items);
         void checkRes(int i);
     };

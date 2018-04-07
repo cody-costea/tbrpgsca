@@ -22,7 +22,6 @@ limitations under the License.
 
 namespace qtbrpgsca
 {
-
     struct Ability;
 
     class Race

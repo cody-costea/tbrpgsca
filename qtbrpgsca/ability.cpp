@@ -21,8 +21,9 @@ using namespace qtbrpgsca;
 
 Ability::Ability(int id, QString name, bool steal, bool range, int lvrq,
                  int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-                 int mpdmg, int spdmg, int trg, int element, int mqty, int rqty,
-                 bool absorb, const bool* state, const bool* rstate)
+                 int mpdmg, int spdmg, int trg, int element, int mqty,
+                 int rqty, bool absorb, bool restore, State** state,
+                 int staten, State** rstate, int rstaten)
 {
     this->id = id;
     this->name = name;
@@ -36,10 +37,13 @@ Ability::Ability(int id, QString name, bool steal, bool range, int lvrq,
     this->mpdmg = mpdmg;
     this->spdmg = spdmg;
     this->absorb = absorb;
+    this->restore = restore;
     this->dmgtype = dmgtype;
     this->trg = trg;
     this->state = state;
+    this->staten = staten;
     this->rstate = rstate;
+    this->rstaten = rstaten;
     this->range = range;
     this->element = element;
     this->qty = mqty > 0 ? mqty : 0;
@@ -48,16 +52,17 @@ Ability::Ability(int id, QString name, bool steal, bool range, int lvrq,
     this->tqty = 0;
 }
 
-Ability::Ability(int id, QString name, int hpdmg, int mpdmg, int spdmg, int trg,
-                 int element, const bool* state, const bool* rstate) :
+Ability::Ability(int id, QString name, int hpdmg, int mpdmg, int spdmg,
+                 int trg, int element, bool restore, State** state,
+                 int staten, State** rstate, int rstaten) :
     Ability(id, name, false, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
-            element, 0, -1, false, state, rstate)
+            element, 0, -1, false, restore, state, staten, rstate, rstaten)
 {
 
 }
 
 Ability::Ability() :
-    Ability(0, "", false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, State::STATE_NONE, State::STATE_NONE)
+    Ability(0, "", false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NULL, 0, NULL, 0)
 {
 
 }
