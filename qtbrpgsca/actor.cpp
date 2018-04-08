@@ -56,7 +56,6 @@ void Actor::stats(int id, QString name, int lv, int maxlv, QVector<Ability>* ite
         delete[] this->res;
     }
     this->res = new int[RESN];
-    //this->setStates();
     this->levelUp();
     this->recover();
 }
@@ -151,6 +150,7 @@ void Actor::calcRes()
     for (int i = 0; i < RESN; i++)
     {
         this->res[i] = 3 + this->rres[i] + this->jres[i];
+        this->checkRes(i);
     }
 }
 
