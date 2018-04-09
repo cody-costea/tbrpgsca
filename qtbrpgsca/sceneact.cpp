@@ -18,9 +18,10 @@ limitations under the License.
 
 using namespace qtbrpgsca;
 
-SceneAct::SceneAct(QString arenaSong, Actor* party, int partyNr, bool copyParty, Actor* enemy, int enemyNr, bool copyEnemy, int surprise)
+SceneAct::SceneAct(QString arenaImage, QString arenaSong, Actor* party, int partyNr, bool copyParty, Actor* enemy, int enemyNr, bool copyEnemy, int surprise)
 {
     int i, k;
+    this->arenaImage = arenaImage;
     this->arenaSong = arenaSong;
     this->status = 0;
     this->battlerNr = partyNr + enemyNr;
@@ -572,6 +573,11 @@ QString SceneAct::getLastAbilityAudio()
 QString SceneAct::getArenaSongFile()
 {
     return this->arenaSong;
+}
+
+QString SceneAct::getArenaImageFile()
+{
+    return this->arenaImage;
 }
 
 SceneAct::~SceneAct()

@@ -311,8 +311,12 @@ Item {
             Component.onCompleted: {
                 var s = arena.getArenaSongFile();
                 if (s !== "") {
-                    arenaForm.arenaSong = 'qrc:/' + s;
+                    arenaForm.arenaSong.source = 'qrc:/' + s;
                     arenaForm.arenaSong.play();
+                }
+                s = arena.getArenaImageFile();
+                if (s !== "") {
+                    arenaForm.arenaImg.source = 'qrc:/' + s;
                 }
 
                 var i, j = 1;
