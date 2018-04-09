@@ -19,14 +19,16 @@ limitations under the License.
 
 using namespace qtbrpgsca;
 
-Ability::Ability(int id, QString name, bool steal, bool range, int lvrq,
-                 int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-                 int mpdmg, int spdmg, int trg, int element, int mqty,
-                 int rqty, bool absorb, bool restore, State** state,
+Ability::Ability(int id, QString name, QString anim, QString audio, bool steal,
+                 bool range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
+                 int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element,
+                 int mqty, int rqty, bool absorb, bool restore, State** state,
                  int staten, State** rstate, int rstaten)
 {
     this->id = id;
     this->name = name;
+    this->anim = anim;
+    this->audio = audio;
     this->steal = steal;
     this->lvrq = lvrq;
     this->hpc = hpc;
@@ -52,17 +54,17 @@ Ability::Ability(int id, QString name, bool steal, bool range, int lvrq,
     this->tqty = 0;
 }
 
-Ability::Ability(int id, QString name, int hpdmg, int mpdmg, int spdmg,
-                 int trg, int element, bool restore, State** state,
-                 int staten, State** rstate, int rstaten) :
-    Ability(id, name, false, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
+Ability::Ability(int id, QString name, QString anim, QString audio, int hpdmg,
+                 int mpdmg, int spdmg, int trg, int element, bool restore,
+                 State** state, int staten, State** rstate, int rstaten) :
+    Ability(id, name, anim, audio, false, true, 0, 0, 0, 0, 0, 0, hpdmg, mpdmg, spdmg, trg,
             element, 0, -1, false, restore, state, staten, rstate, rstaten)
 {
 
 }
 
 Ability::Ability() :
-    Ability(0, "", false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NULL, 0, NULL, 0)
+    Ability(0, "", "", "", false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NULL, 0, NULL, 0)
 {
 
 }

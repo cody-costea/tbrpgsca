@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     DemoLib* demoLib = new DemoLib();
-    SceneAct scene(demoLib->PARTY, 4, false, demoLib->ENEMY, 4, true, 0);
+    SceneAct scene("", demoLib->PARTY, 4, false, demoLib->ENEMY, 4, true, 0);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("arena", &scene);

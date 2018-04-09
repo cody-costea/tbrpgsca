@@ -18,9 +18,10 @@ limitations under the License.
 
 using namespace qtbrpgsca;
 
-SceneAct::SceneAct(Actor* party, int partyNr, bool copyParty, Actor* enemy, int enemyNr, bool copyEnemy, int surprise)
+SceneAct::SceneAct(QString arenaSong, Actor* party, int partyNr, bool copyParty, Actor* enemy, int enemyNr, bool copyEnemy, int surprise)
 {
     int i, k;
+    this->arenaSong = arenaSong;
     this->status = 0;
     this->battlerNr = partyNr + enemyNr;
     this->battler = new Actor*[this->battlerNr];
@@ -210,6 +211,9 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
             break;
     }
 
+    this->abilityAnim = &skill.anim;
+    this->abilityAudio = &skill.audio;
+
     for (int i = this->fTarget; i <= this->lTarget; i++)
     {
         if (skill.hpdmg < 0 || this->battler[i]->hp > 0)
@@ -219,6 +223,9 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
     }
 
     //ret += this->endTurn(ret);
+
+    this->battler[this->current]->exp++;
+    this->battler[this->current]->levelUp();
 
     return ret;
 }
@@ -550,6 +557,21 @@ bool SceneAct::checkIfReflects(int user, int skill, int target)
 {
     return user < this->battlerNr && target < this->battlerNr && skill < this->bSkills[user].size()
             && this->battler[target]->reflect && this->bSkills[user][skill].dmgtype == 2;
+}
+
+QString SceneAct::getLastAbilityAnim()
+{
+    return this->abilityAnim == NULL ? "" : *this->abilityAnim;
+}
+
+QString SceneAct::getLastAbilityAudio()
+{
+    return this->abilityAudio == NULL ? "" : *this->abilityAudio;
+}
+
+QString SceneAct::getArenaSongFile()
+{
+    return this->arenaSong;
 }
 
 SceneAct::~SceneAct()

@@ -42,7 +42,7 @@ class SceneAct : public QObject
     Q_PROPERTY(QStringList sprites READ getSprites)
 public:
 
-    SceneAct(Actor* party, int partyNr, bool copyParty, Actor* enemy, int enemyNr, bool copyEnemy, int surprise);
+    SceneAct(QString arenaSong, Actor* party, int partyNr, bool copyParty, Actor* enemy, int enemyNr, bool copyEnemy, int surprise);
 
     Q_INVOKABLE bool setCurrentActive(bool activate);
 
@@ -84,6 +84,12 @@ public:
 
     Q_INVOKABLE bool checkCrItem(int i);
 
+    Q_INVOKABLE QString getArenaSongFile();
+
+    Q_INVOKABLE QString getLastAbilityAudio();
+
+    Q_INVOKABLE QString getLastAbilityAnim();
+
     Q_INVOKABLE QStringList getSprites();
 
     Q_INVOKABLE int getGuardianVsSkill(int target, int skill);
@@ -108,6 +114,8 @@ private:
     QVector<Ability>* bSkills;
     QVector<Ability>* crItems;
 
+    QString arenaSong;
+    QString* abilityAnim,* abilityAudio;
     QStringList battlerNames, skillNames, itemNames, sprites;
 
     int battlerNr, status, current, enemyIndex, fTarget, lTarget;

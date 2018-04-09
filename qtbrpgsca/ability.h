@@ -27,21 +27,21 @@ namespace qtbrpgsca
     struct Ability
     {
     public:
-        QString name;
+        QString name, anim, audio;
         int id, trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg,
         dmgtype, element, qty, mqty, rqty, tqty, staten, rstaten;
         bool steal, absorb, range, restore;
         State** state,** rstate;
 
-        Ability(int id, QString name, bool steal, bool range, int lvrq,
-                int hpc, int mpc, int spc, int dmgtype, int atkp, int hpdmg,
-                int mpdmg, int spdmg, int trg, int element, int mqty,
-                int rqty, bool absorb, bool restore, State** state,
+        Ability(int id, QString name, QString anim, QString audio, bool steal,
+                bool range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
+                int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element,
+                int mqty, int rqty, bool absorb, bool restore, State** state,
                 int staten, State** rstate, int rstaten);
 
-        Ability(int id, QString name, int hpdmg, int mpdmg, int spdmg,
-                int trg, int element, bool restore, State** state,
-                int staten, State** rstate, int rstaten);
+        Ability(int id, QString name, QString anim, QString audio, int hpdmg,
+                int mpdmg, int spdmg, int trg, int element, bool restore,
+                State** state, int staten, State** rstate, int rstaten);
 
         Ability();
 

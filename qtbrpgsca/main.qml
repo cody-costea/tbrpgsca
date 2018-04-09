@@ -16,6 +16,7 @@ limitations under the License.
 
 import QtQuick 2.2
 import QtQuick.Window 2.2
+import QtMultimedia 5.8
 
 Item {
 
@@ -39,6 +40,9 @@ Item {
             property int sprCount: 0;
             property int crActor: 0;
             property bool automatic: false;
+
+            property alias arenaSong: arenaSong
+            property alias abilitySnd: abilitySnd
 
             function beginTurn(target) {
                 arenaForm.crActor = arena.current;
@@ -107,6 +111,18 @@ Item {
                                 (i < arena.enemyIndex ? '_l_' : '_r_') +
                                 (arena.checkIfKO(i) ? 'fallen' : 'hit') +
                                 arenaForm.sprType;
+                        var s = arena.getLastAbilityAnim();
+                        if (s !== "") {
+                            arenaForm.sprCount++;
+                            arenaForm.abilityImg[i].source = 'qrc:/' + s + arenaForm.sprType;
+                            arenaForm.abilityImg[i].playing = true;
+                        }
+                        s = arena.getLastAbilityAudio();
+                        if (s !== "") {
+                            arenaForm.sprCount++;
+                            arenaForm.abilitySnd.source = 'qrc:/' + s;
+                            arenaForm.abilitySnd.play();
+                        }
                         arenaForm.actorImg[i].playing = true;
                     }
                 }
@@ -275,7 +291,30 @@ Item {
                 }
             }
 
+            Audio {
+                id: arenaSong
+                autoPlay: true;
+                loops: Audio.Infinite;
+            }
+
+            Audio {
+                id: abilitySnd
+                autoPlay: false
+                loops: 0
+                onPlaybackStateChanged: function() {
+                    if (abilitySnd.playbackState === Audio.StoppedState) {
+                        arenaForm.sprCountMod();
+                    }
+                }
+            }
+
             Component.onCompleted: {
+                var s = arena.getArenaSongFile();
+                if (s !== "") {
+                    arenaForm.arenaSong = 'qrc:/' + s;
+                    arenaForm.arenaSong.play();
+                }
+
                 var i, j = 1;
                 for (i = 0; i < 4 && i < arena.enemyIndex; i++) {
                     arenaForm.abilityImg.push(arenaForm.mainRct["btL" + (i + 1) + "Ability"]);
@@ -362,6 +401,47 @@ Item {
             }
             btR4.onPlayingChanged: {
                 if (!arenaForm.btR4.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+
+            btL1Ability.onPlayingChanged: {
+                if (!arenaForm.btL1Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btL2Ability.onPlayingChanged: {
+                if (!arenaForm.btL2Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btL3Ability.onPlayingChanged: {
+                if (!arenaForm.btL3Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btL4Ability.onPlayingChanged: {
+                if (!arenaForm.btL4Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btR1Ability.onPlayingChanged: {
+                if (!arenaForm.btR1Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btR2Ability.onPlayingChanged: {
+                if (!arenaForm.btR2Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btR3Ability.onPlayingChanged: {
+                if (!arenaForm.btR3Ability.playing) {
+                    arenaForm.sprCountMod();
+                }
+            }
+            btR4Ability.onPlayingChanged: {
+                if (!arenaForm.btR4Ability.playing) {
                     arenaForm.sprCountMod();
                 }
             }
