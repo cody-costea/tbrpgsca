@@ -101,7 +101,7 @@ Item {
                 arenaForm.actorImg[arenaForm.crActor].source =
                         'qrc:/' + arena.sprites[arenaForm.crActor] +
                         (arenaForm.crActor < arena.enemyIndex ? '_l_' : '_r_') +
-                        'act' + arenaForm.sprType;
+                        arena.getLastAbilityActorSpr() + arenaForm.sprType;
                 arenaForm.actorImg[arenaForm.crActor].playing = true;
                 for (var i = arena.firstTarget; i <= arena.lastTarget; i++) {
                     if (i != arenaForm.crActor) {

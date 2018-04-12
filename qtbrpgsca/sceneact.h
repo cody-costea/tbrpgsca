@@ -92,6 +92,8 @@ public:
 
     Q_INVOKABLE QString getLastAbilityAnim();
 
+    Q_INVOKABLE QString getLastAbilityActorSpr();
+
     Q_INVOKABLE QStringList getSprites();
 
     Q_INVOKABLE int getGuardianVsSkill(int target, int skill);
@@ -117,12 +119,13 @@ private:
     QVector<Ability>* crItems;
 
     QString arenaImage, arenaSong;
-    QString* abilityAnim,* abilityAudio;
     QStringList battlerNames, skillNames, itemNames, sprites;
 
     int battlerNr, status, current, enemyIndex, fTarget, lTarget;
 
     bool copyParty, copyEnemy;
+
+    Ability* lastAbility = NULL;
 
     QString executeAbility(Ability& skill, int target, QString ret);
 

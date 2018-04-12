@@ -212,8 +212,7 @@ QString SceneAct::executeAbility(Ability& skill, int target, QString ret)
             break;
     }
 
-    this->abilityAnim = &skill.anim;
-    this->abilityAudio = &skill.audio;
+    this->lastAbility = &skill;
 
     for (int i = this->fTarget; i <= this->lTarget; i++)
     {
@@ -560,14 +559,19 @@ bool SceneAct::checkIfReflects(int user, int skill, int target)
             && this->battler[target]->reflect && this->bSkills[user][skill].dmgtype == 2;
 }
 
+QString SceneAct::getLastAbilityActorSpr()
+{
+    return this->lastAbility->dmgtype == 2 || this->lastAbility->dmgtype == 3 ? "cast" : "act";
+}
+
 QString SceneAct::getLastAbilityAnim()
 {
-    return this->abilityAnim == NULL ? "" : *this->abilityAnim;
+    return this->lastAbility == NULL ? "" : this->lastAbility->anim;
 }
 
 QString SceneAct::getLastAbilityAudio()
 {
-    return this->abilityAudio == NULL ? "" : *this->abilityAudio;
+    return this->lastAbility == NULL ? "" : this->lastAbility->audio;
 }
 
 QString SceneAct::getArenaSongFile()
