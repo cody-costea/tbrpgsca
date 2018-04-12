@@ -36,6 +36,8 @@ Item {
             property var abilityImg: []
             property var selectorImg: []
 
+            property var activeActors: []
+
             property string sprType: ".gif";
             property int sprCount: 0;
             property int crActor: 0;
@@ -79,6 +81,7 @@ Item {
                             'qrc:/' + arena.sprites[arenaForm.crActor] +
                             (arenaForm.crActor < arena.enemyIndex ? '_l_' : '_r_') +
                             'fallen' + arenaForm.sprType;
+                    arenaForm.activeActors[arenaForm.crActor] = false;
                     arenaForm.actorImg[arenaForm.crActor].playing = true;
                 }
                 arenaForm.beginTurn(undefined);
@@ -97,6 +100,7 @@ Item {
             }
 
             function playAnim() {
+                var crStatus;
                 arenaForm.sprCount++;
                 arenaForm.actorImg[arenaForm.crActor].source =
                         'qrc:/' + arena.sprites[arenaForm.crActor] +
@@ -104,13 +108,15 @@ Item {
                         arena.getLastAbilityActorSpr() + arenaForm.sprType;
                 arenaForm.actorImg[arenaForm.crActor].playing = true;
                 for (var i = arena.firstTarget; i <= arena.lastTarget; i++) {
-                    if (i != arenaForm.crActor) {
+                    if (i != arenaForm.crActor && !((crStatus = arena.checkIfKO(i)) && !arenaForm.activeActors[i])) {
                         arenaForm.sprCount++;
+                        var sprName = !arenaForm.activeActors[i] ? "restored"
+                                    : (crStatus ? "fallen" : "hit");
                         arenaForm.actorImg[i].source =
                                 'qrc:/' + arena.sprites[i] +
                                 (i < arena.enemyIndex ? '_l_' : '_r_') +
-                                (arena.checkIfKO(i) ? 'fallen' : 'hit') +
-                                arenaForm.sprType;
+                                sprName + arenaForm.sprType;
+                        arenaForm.activeActors[i] = !crStatus;
                         var s = arena.getLastAbilityAnim();
                         if (s !== "") {
                             arenaForm.sprCount++;
@@ -321,20 +327,26 @@ Item {
 
                 var i, j = 1;
                 for (i = 0; i < 4 && i < arena.enemyIndex; i++) {
+                    arenaForm.activeActors.push(!arena.checkIfKO(i));
                     arenaForm.abilityImg.push(arenaForm.mainRct["btL" + (i + 1) + "Ability"]);
                     arenaForm.selectorImg.push(arenaForm.mainRct["btL" + (i + 1) + "Selector"]);
                     arenaForm.actorImg.push(arenaForm.mainRct["btL" + (i + 1)]);
                     arenaForm.actorImg[i].source =
-                            'qrc:/' + arena.sprites[i] + '_l_idle' + arenaForm.sprType;
+                            'qrc:/' + arena.sprites[i] + '_l_'
+                            + (arenaForm.activeActors[i] ? 'idle' : 'fallen')
+                            + arenaForm.sprType;
                     arenaForm.actorImg[i].playing = true;
                 }
                 //TODO: de revizuit
                 for (i = arena.enemyIndex; j <= 4 && i < arena.battlerNr; i++) {
+                    arenaForm.activeActors.push(!arena.checkIfKO(i));
                     arenaForm.abilityImg.push(arenaForm.mainRct["btR" + j + "Ability"]);
                     arenaForm.selectorImg.push(arenaForm.mainRct["btR" + j + "Selector"]);
                     arenaForm.actorImg.push(arenaForm.mainRct["btR" + j]);
                     arenaForm.actorImg[i].source =
-                            'qrc:/' + arena.sprites[i] + '_r_idle' + arenaForm.sprType;
+                            'qrc:/' + arena.sprites[i] + '_r_'
+                            + (arenaForm.activeActors[i] ? 'idle' : 'fallen')
+                            + arenaForm.sprType;
                     arenaForm.actorImg[i].playing = true;
                     j++;
                 }
