@@ -108,6 +108,18 @@ Item {
                         arena.getLastAbilityActorSpr() + arenaForm.sprType;
                 arenaForm.actorImg[arenaForm.crActor].playing = true;
                 for (var i = arena.firstTarget; i <= arena.lastTarget; i++) {
+                    var s = arena.getLastAbilityAnim();
+                    if (s !== "") {
+                        arenaForm.sprCount++;
+                        arenaForm.abilityImg[i].source = 'qrc:/' + s + arenaForm.sprType;
+                        arenaForm.abilityImg[i].playing = true;
+                    }
+                    s = arena.getLastAbilityAudio();
+                    if (s !== "") {
+                        arenaForm.sprCount++;
+                        arenaForm.abilitySnd.source = 'qrc:/' + s;
+                        arenaForm.abilitySnd.play();
+                    }
                     if (i != arenaForm.crActor && !((crStatus = arena.checkIfKO(i)) && !arenaForm.activeActors[i])) {
                         arenaForm.sprCount++;
                         var sprName = !arenaForm.activeActors[i] ? "restored"
@@ -117,18 +129,6 @@ Item {
                                 (i < arena.enemyIndex ? '_l_' : '_r_') +
                                 sprName + arenaForm.sprType;
                         arenaForm.activeActors[i] = !crStatus;
-                        var s = arena.getLastAbilityAnim();
-                        if (s !== "") {
-                            arenaForm.sprCount++;
-                            arenaForm.abilityImg[i].source = 'qrc:/' + s + arenaForm.sprType;
-                            arenaForm.abilityImg[i].playing = true;
-                        }
-                        s = arena.getLastAbilityAudio();
-                        if (s !== "") {
-                            arenaForm.sprCount++;
-                            arenaForm.abilitySnd.source = 'qrc:/' + s;
-                            arenaForm.abilitySnd.play();
-                        }
                         arenaForm.actorImg[i].playing = true;
                     }
                 }
