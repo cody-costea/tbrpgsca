@@ -391,7 +391,8 @@ QString SceneAct::setAItarget(Ability& ability, QString ret)
 {
     int f;
     int l;
-    if (this->current < this->enemyIndex && ability.hpdmg >= 0)
+    if ((this->current < this->enemyIndex && ability.hpdmg >= 0)
+            || (this->current >= this->enemyIndex && ability.hpdmg < 0))
     {
         f = this->enemyIndex;
         l = this->battlerNr;
