@@ -34,6 +34,7 @@ namespace qtbrpgsca
         {
             QVector<Ability>* items = new QVector<Ability>();
             items->append(Ability(1, "Potion", "", "", -25,0,0, 0,0, false, NULL, 0, NULL, 0));
+            items->operator [](0).qty = 10;
             return items;
         }
 
@@ -162,15 +163,15 @@ namespace qtbrpgsca
 
         Job* JOBS[4] =
         {
-            new Job(1, "Berserker",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
+            new Job(1, "Valkyrie",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
             new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6),
-            new Job(2, "Sorcerer",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{0,-1,1,1,1,1,1,-1},
+            new Job(2, "Sorceress",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{0,-1,1,1,1,1,1,-1},
             new Ability*[14]{SKILLS[23],SKILLS[24],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],
                             SKILLS[29],SKILLS[30],SKILLS[31],SKILLS[32],SKILLS[33],SKILLS[34],
                             SKILLS[35],SKILLS[38]}, 14),
-            new Job(3, "Monk",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
+            new Job(3, "Crusader",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
             new Ability*[6]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[6],SKILLS[7]}, 6),
-            new Job(4, "Rogue",0,0,1, 1,0,0,0,1, new int[Actor::RESN]{},
+            new Job(4, "Hero",0,0,1, 1,0,0,0,1, new int[Actor::RESN]{},
             new Ability*[6]{SKILLS[15],SKILLS[16],SKILLS[17],SKILLS[18],SKILLS[19],SKILLS[38]}, 6),
 
         };
@@ -180,17 +181,17 @@ namespace qtbrpgsca
         Actor PARTY[4] =
         {
             Actor(1, "Cody", RACES[1], JOBS[3], 1, 9, ITEMS),
-            Actor(2, "Victoria", RACES[0], JOBS[2], 1, 9, ITEMS),
+            Actor(2, "Victoria", RACES[0], JOBS[0], 1, 9, ITEMS),
             Actor(3, "Stephanie", RACES[3], JOBS[1], 1, 9, ITEMS),
-            Actor(4, "George", RACES[2], JOBS[0], 1, 9, ITEMS)
+            Actor(4, "George", RACES[2], JOBS[2], 1, 9, ITEMS)
         };
 
         Actor ENEMY[4] =
         {
-            Actor(5, "Goblin", RACES[3], JOBS[3], 1, 9, NULL),
-            Actor(7, "Lizard", RACES[0], JOBS[1], 1, 9, NULL),
-            Actor(8, "Troll", RACES[1], JOBS[0], 1, 9, NULL),
-            Actor(6, "Ogre", RACES[2], JOBS[0], 1, 9, NULL)
+            Actor(5, "Swashbuckler", RACES[3], JOBS[3], 1, 9, NULL),
+            Actor(7, "Witch", RACES[0], JOBS[1], 1, 9, NULL),
+            Actor(8, "Templar", RACES[1], JOBS[2], 1, 9, NULL),
+            Actor(6, "Amazon", RACES[2], JOBS[0], 1, 9, NULL)
         };
 
         ~DemoLib()

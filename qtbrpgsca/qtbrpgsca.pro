@@ -3,13 +3,14 @@ TEMPLATE = app
 QT += qml quick
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    race.cpp \
-    job.cpp \
-    actor.cpp \
+SOURCES += \
     ability.cpp \
-    state.cpp \
-    sceneact.cpp
+    actor.cpp \
+    job.cpp \
+    main.cpp \
+    race.cpp \
+    sceneact.cpp \
+    state.cpp
 
 RESOURCES += qml.qrc
 
@@ -20,10 +21,10 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    race.h \
-    job.h \
-    actor.h \
     ability.h \
-    state.h \
+    actor.h \
+    demolib.h \
+    job.h \
+    race.h \
     sceneact.h \
-    demolib.h
+    state.h

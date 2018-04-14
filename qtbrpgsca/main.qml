@@ -71,16 +71,16 @@ Item {
                                 target === undefined ? (arenaForm.targetBox.currentIndex >= arena.enemyIndex ? 0 : 1) : target);
                     arenaForm.checkCrSkillAct();
                     arenaForm.checkCrItemUse();
-                    arenaForm.selectorImg[arenaForm.crActor].source = 'qrc:/current.png';
+                    arenaForm.selectorImg[arenaForm.crActor].source = 'qrc:/sprites/current.png';
                 }
             }
 
             function sprCallback() {
                 if (arena.checkIfKO(arenaForm.crActor)) {
                     arenaForm.actorImg[arenaForm.crActor].source =
-                            'qrc:/' + arena.sprites[arenaForm.crActor] +
-                            (arenaForm.crActor < arena.enemyIndex ? '_l_' : '_r_') +
-                            'fallen' + arenaForm.sprType;
+                            'qrc:/sprites/' + arena.sprites[arenaForm.crActor] + '/bt_' +
+                            (arenaForm.crActor < arena.enemyIndex ? 'l' : 'r') +
+                            '_fallen' + arenaForm.sprType;
                     arenaForm.activeActors[arenaForm.crActor] = false;
                     arenaForm.actorImg[arenaForm.crActor].playing = true;
                 }
@@ -103,30 +103,30 @@ Item {
                 var crStatus;
                 arenaForm.sprCount++;
                 arenaForm.actorImg[arenaForm.crActor].source =
-                        'qrc:/' + arena.sprites[arenaForm.crActor] +
-                        (arenaForm.crActor < arena.enemyIndex ? '_l_' : '_r_') +
+                        'qrc:/sprites/' + arena.sprites[arenaForm.crActor] + '/bt_' +
+                        (arenaForm.crActor < arena.enemyIndex ? 'l' : 'r') +
                         arena.getLastAbilityActorSpr() + arenaForm.sprType;
                 arenaForm.actorImg[arenaForm.crActor].playing = true;
                 for (var i = arena.firstTarget; i <= arena.lastTarget; i++) {
                     var s = arena.getLastAbilityAnim();
                     if (s !== "") {
                         arenaForm.sprCount++;
-                        arenaForm.abilityImg[i].source = 'qrc:/' + s + arenaForm.sprType;
+                        arenaForm.abilityImg[i].source = 'qrc:/sprites/abilities/' + s + arenaForm.sprType;
                         arenaForm.abilityImg[i].playing = true;
                     }
                     s = arena.getLastAbilityAudio();
                     if (s !== "") {
                         arenaForm.sprCount++;
-                        arenaForm.abilitySnd.source = 'qrc:/' + s;
+                        arenaForm.abilitySnd.source = 'qrc:/audio/' + s;
                         arenaForm.abilitySnd.play();
                     }
                     if (i != arenaForm.crActor && !((crStatus = arena.checkIfKO(i)) && !arenaForm.activeActors[i])) {
                         arenaForm.sprCount++;
-                        var sprName = !arenaForm.activeActors[i] ? "restored"
-                                    : (crStatus ? "fallen" : "hit");
+                        var sprName = !arenaForm.activeActors[i] ? "_restored"
+                                    : (crStatus ? "_fallen" : "_hit");
                         arenaForm.actorImg[i].source =
-                                'qrc:/' + arena.sprites[i] +
-                                (i < arena.enemyIndex ? '_l_' : '_r_') +
+                                'qrc:/sprites/' + arena.sprites[i] + '/bt_' +
+                                (i < arena.enemyIndex ? 'l' : 'r') +
                                 sprName + arenaForm.sprType;
                         arenaForm.activeActors[i] = !crStatus;
                         arenaForm.actorImg[i].playing = true;
@@ -317,12 +317,12 @@ Item {
             Component.onCompleted: {
                 var s = arena.getArenaSongFile();
                 if (s !== "") {
-                    arenaForm.arenaSong.source = 'qrc:/' + s;
+                    arenaForm.arenaSong.source = 'qrc:/audio/' + s;
                     arenaForm.arenaSong.play();
                 }
                 s = arena.getArenaImageFile();
                 if (s !== "") {
-                    arenaForm.arenaImg.source = 'qrc:/' + s;
+                    arenaForm.arenaImg.source = 'qrc:/sprites/arena/' + s;
                 }
 
                 var i, j = 1;
@@ -332,8 +332,8 @@ Item {
                     arenaForm.selectorImg.push(arenaForm.mainRct["btL" + (i + 1) + "Selector"]);
                     arenaForm.actorImg.push(arenaForm.mainRct["btL" + (i + 1)]);
                     arenaForm.actorImg[i].source =
-                            'qrc:/' + arena.sprites[i] + '_l_'
-                            + (arenaForm.activeActors[i] ? 'idle' : 'fallen')
+                            'qrc:/sprites/' + arena.sprites[i] + '/bt_l'
+                            + (arenaForm.activeActors[i] ? '_idle' : '_ko')
                             + arenaForm.sprType;
                     arenaForm.actorImg[i].playing = true;
                 }
@@ -344,8 +344,8 @@ Item {
                     arenaForm.selectorImg.push(arenaForm.mainRct["btR" + j + "Selector"]);
                     arenaForm.actorImg.push(arenaForm.mainRct["btR" + j]);
                     arenaForm.actorImg[i].source =
-                            'qrc:/' + arena.sprites[i] + '_r_'
-                            + (arenaForm.activeActors[i] ? 'idle' : 'fallen')
+                            'qrc:/sprites/' + arena.sprites[i] + '/bt_r'
+                            + (arenaForm.activeActors[i] ? '_idle' : '_ko')
                             + arenaForm.sprType;
                     arenaForm.actorImg[i].playing = true;
                     j++;

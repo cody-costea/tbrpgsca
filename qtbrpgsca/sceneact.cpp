@@ -76,7 +76,7 @@ void SceneAct::setBattler(int i)
         this->bSkills[i].append(*this->battler[i]->extraSkills->operator [](j));
     }
     this->battlerNames.append(this->battler[i]->name);
-    this->sprites.append(/*this->battler[i]->jobName*/"hero");
+    this->sprites.append(this->battler[i]->jobName);
 }
 
 bool SceneAct::setCurrentActive(bool activate)
@@ -103,7 +103,7 @@ bool SceneAct::setCurrentActive(bool activate)
         {
             for (i = 0; i < this->crItems->size(); i++)
             {
-                this->itemNames.append((*this->crItems)[i].name);
+                this->itemNames.append(QString((*this->crItems)[i].name).append(" x ").append(QString::number((*this->crItems)[i].qty)));
             }
         }
         this->skillNames.clear();
@@ -561,7 +561,7 @@ bool SceneAct::checkIfReflects(int user, int skill, int target)
 
 QString SceneAct::getLastAbilityActorSpr()
 {
-    return this->lastAbility->dmgtype == 2 || this->lastAbility->dmgtype == 3 ? "cast" : "act";
+    return this->lastAbility->trg < 0 || this->lastAbility->dmgtype == 2 || this->lastAbility->dmgtype == 3 ? "_cast" : "_act";
 }
 
 QString SceneAct::getLastAbilityAnim()
