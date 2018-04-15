@@ -531,6 +531,12 @@ QStringList SceneAct::getSprites()
     return this->sprites;
 }
 
+bool SceneAct::escape()
+{
+    this->status == -1;
+    return true;
+}
+
 bool SceneAct::checkIfKO(int actor)
 {
     return actor > -1 && actor < this->battlerNr && this->battler != NULL

@@ -100,6 +100,8 @@ public:
 
     Q_INVOKABLE int getGuardianVsItem(int target, int item);
 
+    Q_INVOKABLE bool escape();
+
     Q_INVOKABLE bool checkIfKO(int actor);
 
     Q_INVOKABLE bool checkIfSkillHeals(int skill);

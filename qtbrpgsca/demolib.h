@@ -38,13 +38,6 @@ namespace qtbrpgsca
             return items;
         }
 
-    public:
-        DemoLib()
-        {
-
-        }
-
-
         State* stateRegen = new State(1, "Regen", false, false, false, -1, 10, 0, 0, 0,
                 2, 0, 0, 0, false);
         State* statePoison = new State(2, "Poison", false, false, false, 10, -7, 0, -2,
@@ -67,6 +60,12 @@ namespace qtbrpgsca
                 0, 0, -1, false);
         State* stateReflect = new State(11, "Reflect", false, false, false, 7, 0, 0, 0,
                 0, 0, 0, 0, 0, true);
+
+    public:
+        DemoLib()
+        {
+
+        }
 
         State* STATE_POISON[1] = { statePoison };
         State* STATE_REGEN[1] = { stateRegen };
@@ -161,37 +160,82 @@ namespace qtbrpgsca
             new Race(4, "Gnome", 40,15,20, 12,8,10,5,15, new int[Actor::RESN]{0,0,0,0,0,0,1,-1}, STD_SKILLS, 2)
         };
 
-        Job* JOBS[4] =
+        Job* JOBS[17] =
         {
-            new Job(1, "Valkyrie",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
-            new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6),
-            new Job(2, "Sorceress",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{0,-1,1,1,1,1,1,-1},
-            new Ability*[14]{SKILLS[23],SKILLS[24],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],
+            new Job(1, "Berserker",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
+                new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6),
+            new Job(2, "Wizard",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{0,-1,1,1,1,1,1,-1},
+                new Ability*[14]{SKILLS[23],SKILLS[24],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],
                             SKILLS[29],SKILLS[30],SKILLS[31],SKILLS[32],SKILLS[33],SKILLS[34],
                             SKILLS[35],SKILLS[38]}, 14),
-            new Job(3, "Crusader",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
+            new Job(3, "Monk",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
+                new Ability*[6]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[6],SKILLS[7]}, 6),
+            new Job(4, "Rogue",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
             new Ability*[6]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[6],SKILLS[7]}, 6),
-            new Job(4, "Hero",0,0,1, 1,0,0,0,1, new int[Actor::RESN]{},
-            new Ability*[6]{SKILLS[15],SKILLS[16],SKILLS[17],SKILLS[18],SKILLS[19],SKILLS[38]}, 6),
-
+            new Job(5, "Alchemist",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{}, new Ability*[15]
+                {SKILLS[23],SKILLS[24],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],SKILLS[30],
+                 SKILLS[31],SKILLS[32],SKILLS[33],SKILLS[15],SKILLS[16],SKILLS[17],SKILLS[18],
+                 SKILLS[20]}, 15),
+            new Job(6, "Dragoon",1,0,0, 1,0,1,0,0, new int[Actor::RESN]{0,0,1,1,1,1,0,-1},
+                new Ability*[19]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[23],SKILLS[24],
+                                 SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],SKILLS[30],SKILLS[31],
+                                 SKILLS[32],SKILLS[33],SKILLS[41],SKILLS[42],SKILLS[43],SKILLS[44],
+                                 SKILLS[50]}, 19),
+            new Job(7, "Knight",1,0,0, 0,1,0,1,0, new int[Actor::RESN]{0,1,-1,-1,-1,-1,-7,7},
+                new Ability*[9]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[8],SKILLS[9],SKILLS[10],
+                               SKILLS[11],SKILLS[13]}, 9),
+            new Job(8, "Ranger",0,0,1, 0,0,0,1,1, new int[Actor::RESN]{0,0,0,0,0,0,-2,2},
+                new Ability*[9]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[15],SKILLS[16],
+                                SKILLS[17],SKILLS[18],SKILLS[21]}, 9),
+            new Job(9, "Shaman",0,1,0, 0,0,1,1,0, new int[Actor::RESN]{0,0,0,0,0,0,7,-7},
+                new Ability*[9]{SKILLS[52],SKILLS[53],SKILLS[54],SKILLS[55],SKILLS[23],SKILLS[24],
+                               SKILLS[29],SKILLS[34],SKILLS[49]}, 9),
+            new Job(10, "Corsair",0,0,1, 1,0,0,0,1, new int[Actor::RESN]{},
+                new Ability*[9]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[15],SKILLS[16],SKILLS[17],
+                               SKILLS[18],SKILLS[22]}, 9),
+            new Job(11, "Reaver",1,0,0, 1,0,0,0,0, new int[Actor::RESN]{0,0,0,0,0,0,7,-7},
+                new  Ability*[11]{SKILLS[8],SKILLS[9],SKILLS[11],SKILLS[23],SKILLS[24],SKILLS[29],
+                                 SKILLS[15],SKILLS[16],SKILLS[18],SKILLS[45],SKILLS[46]}, 11),
+            new Job(12, "Ninja",0,0,1, 0,0,0,0,1, new int[Actor::RESN]{}, new Ability*[10]
+                {SKILLS[8],SKILLS[9],SKILLS[11],SKILLS[15],SKILLS[16],SKILLS[17],SKILLS[2],
+                 SKILLS[3],SKILLS[5],SKILLS[40]}, 10),
+            new Job(13, "Crusader",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
+                new Ability*[11]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[56],
+                                 SKILLS[36],SKILLS[51],SKILLS[37],SKILLS[47]}, 11),
+            new Job(14, "Druid",0,1,0, 0,0,1,0,0, new int[Actor::RESN]{0,0,1,1,1,1,-1,-1}, new Ability*[16]
+                {SKILLS[23],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],SKILLS[30],SKILLS[31],SKILLS[32],
+                 SKILLS[33],SKILLS[52],SKILLS[53],SKILLS[54],SKILLS[15],SKILLS[16],SKILLS[18],SKILLS[48]}, 16),
+            new Job(15, "Hero",0,0,1, 1,0,0,0,1, new int[Actor::RESN]{},
+                new Ability*[32]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[23],SKILLS[24],
+                                 SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],SKILLS[29],SKILLS[41],
+                                 SKILLS[42],SKILLS[43],SKILLS[44],SKILLS[45],SKILLS[30],SKILLS[31],
+                                 SKILLS[32],SKILLS[33],SKILLS[34],SKILLS[36],SKILLS[51],SKILLS[37],
+                                 SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[15],SKILLS[16],
+                                 SKILLS[17],SKILLS[18]}, 32),
+            new Job(16, "Sorceress",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{0,-1,1,1,1,1,1,-1},
+                new Ability*[14]{SKILLS[23],SKILLS[24],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],
+                            SKILLS[29],SKILLS[30],SKILLS[31],SKILLS[32],SKILLS[33],SKILLS[34],
+                            SKILLS[35],SKILLS[38]}, 14),
+            new Job(17, "Valkyrie",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
+                new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6)
         };
 
         QVector<Ability>* ITEMS = this->getItems();
 
         Actor PARTY[4] =
         {
-            Actor(1, "Cody", RACES[1], JOBS[3], 1, 9, ITEMS),
-            Actor(2, "Victoria", RACES[0], JOBS[0], 1, 9, ITEMS),
-            Actor(3, "Stephanie", RACES[3], JOBS[1], 1, 9, ITEMS),
-            Actor(4, "George", RACES[2], JOBS[2], 1, 9, ITEMS)
+            Actor(1, "Cody", RACES[1], JOBS[14], 1, 9, ITEMS),
+            Actor(2, "Victoria", RACES[0], JOBS[16], 1, 9, ITEMS),
+            Actor(3, "Stephanie", RACES[3], JOBS[15], 1, 9, ITEMS),
+            Actor(4, "George", RACES[2], JOBS[12], 1, 9, ITEMS)
         };
 
         Actor ENEMY[4] =
         {
-            Actor(5, "Swashbuckler", RACES[3], JOBS[3], 1, 9, NULL),
-            Actor(7, "Witch", RACES[0], JOBS[1], 1, 9, NULL),
-            Actor(8, "Templar", RACES[1], JOBS[2], 1, 9, NULL),
-            Actor(6, "Amazon", RACES[2], JOBS[0], 1, 9, NULL)
+            Actor(5, "Ninja", RACES[3], JOBS[11], 1, 9, NULL),
+            Actor(7, "Alchemist", RACES[0], JOBS[4], 1, 9, NULL),
+            Actor(8, "Ranger", RACES[1], JOBS[7], 1, 9, NULL),
+            Actor(6, "Dragoon", RACES[2], JOBS[5], 1, 9, NULL)
         };
 
         ~DemoLib()
@@ -202,7 +246,7 @@ namespace qtbrpgsca
                 delete this->RACES[i];
             }
 
-            for (i = 0; i < 4; i++)
+            for (i = 0; i < 17; i++)
             {
                 delete this->JOBS[i];
             }
@@ -211,6 +255,37 @@ namespace qtbrpgsca
             {
                 delete this->SKILLS[i];
             }
+
+            delete this->STATE_BERSERK;
+            delete this->STATE_CLARITY;
+            delete this->STATE_CONFCLARITY;
+            delete this->STATE_CONFSLEEP;
+            delete this->STATE_CONFTREGEN;
+            delete this->STATE_CONFUSION;
+            delete this->STATE_CURE;
+            delete this->STATE_DIZZINESS;
+            delete this->STATE_DIZZYSTUN;
+            delete this->STATE_MADNESS;
+            delete this->STATE_POISON;
+            delete this->STATE_REFLECT;
+            delete this->STATE_REGEN;
+            delete this->STATE_SLEEP;
+            delete this->STATE_STUN;
+            delete this->STATE_TPOISON;
+            delete this->STATE_TREGEN;
+            delete this->STATE_VIGOUR;
+            delete this->STATE_WEAKNESS;
+            delete this->stateWeakness;
+            delete this->stateVigour;
+            delete this->stateStun;
+            delete this->stateSleep;
+            delete this->stateRegen;
+            delete this->stateReflect;
+            delete this->statePoison;
+            delete this->stateDizziness;
+            delete this->stateConfusion;
+            delete this->stateClarity;
+            delete this->stateBerserk;
         }
 
     };

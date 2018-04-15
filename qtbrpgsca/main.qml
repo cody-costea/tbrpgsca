@@ -185,6 +185,19 @@ Item {
                 arenaForm.checkCrItemUse();
             }
 
+            runBtn.onClicked: {
+                if (arena.escape()) {
+                    arenaForm.skillBtn.enabled = false;
+                    arenaForm.itemBtn.enabled = false;
+                    arenaForm.skillBox.enabled = false;
+                    arenaForm.itemBox.enabled = false;
+                    arenaForm.targetBox.enabled = false;
+                    arenaForm.runBtn.enabled = false;
+                    arenaForm.autoBtn.enabled = false;
+                    arenaForm.textArea.append("The party has fled.");
+                }
+            }
+
             btL1Mouse.onClicked: {
                 if (arenaForm.targetBox.enabled) {
                     if (arenaForm.targetBox.currentIndex === 0) {
