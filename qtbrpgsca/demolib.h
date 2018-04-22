@@ -170,7 +170,7 @@ namespace qtbrpgsca
                             SKILLS[35],SKILLS[38]}, 14),
             new Job(3, "Monk",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
                 new Ability*[6]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[6],SKILLS[7]}, 6),
-            new Job(4, "Rogue",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
+            new Job(4, "Spy",0,1,0, 0,1,0,1,0, new int[Actor::RESN]{0,0,0,0,0,0,-7,7},
             new Ability*[6]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[6],SKILLS[7]}, 6),
             new Job(5, "Alchemist",0,1,0, 0,0,1,0,1, new int[Actor::RESN]{}, new Ability*[15]
                 {SKILLS[23],SKILLS[24],SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],SKILLS[30],
