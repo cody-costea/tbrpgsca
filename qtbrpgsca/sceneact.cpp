@@ -315,13 +315,13 @@ int SceneAct::checkAIheal(int ret) {
     int l;
     if (this->current < this->enemyIndex)
     {
-        f = this->enemyIndex;
-        l = this->battlerNr;
+        f = 0;
+        l = this->enemyIndex;
     }
     else
     {
-        f = 0;
-        l = this->enemyIndex;
+        f = this->enemyIndex;
+        l = this->battlerNr;
     }
     for (int i = f; i < l; i++)
     {

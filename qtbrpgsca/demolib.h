@@ -253,36 +253,36 @@ namespace qtbrpgsca
             {
                 delete this->RACES[i];
             }
-
+            delete[] this->RACES;
             for (i = 0; i < 19; i++)
             {
                 delete this->JOBS[i];
             }
-
+            delete[] this->JOBS;
             for (i = 0; i < 57; i++)
             {
                 delete this->SKILLS[i];
             }
-
-            delete this->STATE_BERSERK;
-            delete this->STATE_CLARITY;
-            delete this->STATE_CONFCLARITY;
-            delete this->STATE_CONFSLEEP;
-            delete this->STATE_CONFTREGEN;
-            delete this->STATE_CONFUSION;
-            delete this->STATE_CURE;
-            delete this->STATE_DIZZINESS;
-            delete this->STATE_DIZZYSTUN;
-            delete this->STATE_MADNESS;
-            delete this->STATE_POISON;
-            delete this->STATE_REFLECT;
-            delete this->STATE_REGEN;
-            delete this->STATE_SLEEP;
-            delete this->STATE_STUN;
-            delete this->STATE_TPOISON;
-            delete this->STATE_TREGEN;
-            delete this->STATE_VIGOUR;
-            delete this->STATE_WEAKNESS;
+            delete[] this->SKILLS;
+            delete[] this->STATE_BERSERK;
+            delete[] this->STATE_CLARITY;
+            delete[] this->STATE_CONFCLARITY;
+            delete[] this->STATE_CONFSLEEP;
+            delete[] this->STATE_CONFTREGEN;
+            delete[] this->STATE_CONFUSION;
+            delete[] this->STATE_CURE;
+            delete[] this->STATE_DIZZINESS;
+            delete[] this->STATE_DIZZYSTUN;
+            delete[] this->STATE_MADNESS;
+            delete[] this->STATE_POISON;
+            delete[] this->STATE_REFLECT;
+            delete[] this->STATE_REGEN;
+            delete[] this->STATE_SLEEP;
+            delete[] this->STATE_STUN;
+            delete[] this->STATE_TPOISON;
+            delete[] this->STATE_TREGEN;
+            delete[] this->STATE_VIGOUR;
+            delete[] this->STATE_WEAKNESS;
             delete this->stateWeakness;
             delete this->stateVigour;
             delete this->stateStun;
