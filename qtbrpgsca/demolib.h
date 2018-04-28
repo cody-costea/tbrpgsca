@@ -160,7 +160,7 @@ namespace qtbrpgsca
             new Race(4, "Gnome", 40,15,20, 12,8,10,5,15, new int[Actor::RESN]{0,0,0,0,0,0,1,-1}, STD_SKILLS, 2)
         };
 
-        Job* JOBS[17] =
+        Job* JOBS[19] =
         {
             new Job(1, "Berserker",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
                 new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6),
@@ -217,7 +217,15 @@ namespace qtbrpgsca
                             SKILLS[29],SKILLS[30],SKILLS[31],SKILLS[32],SKILLS[33],SKILLS[34],
                             SKILLS[35],SKILLS[38]}, 14),
             new Job(17, "Valkyrie",1,0,0, 1,0,0,0,1, new int[8]{0,1,-1,-1,-1,-1},
-                new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6)
+                new Ability*[6]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[12],SKILLS[14]}, 6),
+            new Job(18, "Bard",0,0,1, 0,0,0,1,1, new int[Actor::RESN]{0,0,0,0,0,0,-2,2},
+                new Ability*[9]{SKILLS[2],SKILLS[3],SKILLS[4],SKILLS[5],SKILLS[15],SKILLS[16],
+                                SKILLS[17],SKILLS[18],SKILLS[21]}, 9),
+            new Job(19, "Warmage",1,0,0, 1,0,1,0,0, new int[Actor::RESN]{0,0,1,1,1,1,0,-1},
+                new Ability*[19]{SKILLS[8],SKILLS[9],SKILLS[10],SKILLS[11],SKILLS[23],SKILLS[24],
+                                 SKILLS[25],SKILLS[26],SKILLS[27],SKILLS[28],SKILLS[30],SKILLS[31],
+                                 SKILLS[32],SKILLS[33],SKILLS[41],SKILLS[42],SKILLS[43],SKILLS[44],
+                                 SKILLS[50]}, 19)
         };
 
         QVector<Ability>* ITEMS = this->getItems();
@@ -246,7 +254,7 @@ namespace qtbrpgsca
                 delete this->RACES[i];
             }
 
-            for (i = 0; i < 17; i++)
+            for (i = 0; i < 19; i++)
             {
                 delete this->JOBS[i];
             }
