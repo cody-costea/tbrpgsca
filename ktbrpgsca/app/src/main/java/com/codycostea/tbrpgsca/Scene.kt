@@ -113,12 +113,12 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
 
                 if (noEnemy) {
                     this.status = 1
-                    ret += ""
+                    ret += "The party has won!"
                 }
 
                 if (noParty) {
                     this.status = -2
-                    ret += ""
+                    ret += "The party has fallen!"
                 }
             } while (this.status == 0 && this.Players[this.current].actions < 1)
         }
@@ -153,21 +153,21 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
         for (i in f until target) {
             if (this.Players[i].hp > 0 && this.Players[i].guards) {
                 if (guardF == target) {
-                    guardF = i;
+                    guardF = i
                 }
-                difF++;
+                difF++
             }
         }
         if (difF == 0) {
-            return target;
+            return target
         }
         else {
             for (i in l downTo target + 1) {
                 if (this.Players[i].hp > 0 && this.Players[i].guards) {
                     if (guardL == target) {
-                        guardL = i;
+                        guardL = i
                     }
-                    difL++;
+                    difL++
                 }
             }
             return if (difL == 0) target else (if (difF < difL) guardF else guardL)
@@ -180,12 +180,12 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
         when (skill.trg) {
              1 -> {
                  if (target < this.enIdx) {
-                     this.fTarget = 0;
-                     this.lTarget = this.enIdx-1;
+                     this.fTarget = 0
+                     this.lTarget = this.enIdx - 1
                  }
                  else {
                      this.fTarget = this.enIdx
-                     this.lTarget = this.Players.size - 1;
+                     this.lTarget = this.Players.size - 1
                  }
              }
             2 -> {
@@ -233,25 +233,25 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
     protected open fun checkAIheal(def : Int) : Int {
         var ret = def
         var nHeal = false
-        var f : Int
-        var l : Int
+        val f : Int
+        val l : Int
         if (this.current < this.enIdx) {
-            f = 0;
+            f = 0
             l = this.enIdx
         }
         else {
             f = this.enIdx
-            l = this.Players.size;
+            l = this.Players.size
         }
         for (i in f until l) {
             if (this.Players[i].hp < (this.Players[i].mHp / 3)) {
-                nHeal = true;
-                break;
+                nHeal = true
+                break
             }
         }
         if (nHeal) {
             for (i in 0 until this.Players[this.current].availableSkills.size) {
-                var s = this.Players[this.current].availableSkills[i]
+                val s = this.Players[this.current].availableSkills[i]
                 if (s.hpDmg < 0 && s.canPerform(this.Players[this.current])) {
                     ret = i
                     break
@@ -266,23 +266,23 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
 
     protected open fun getAIskill(defSkill : Int) : Int {
         val healSkill = if (defSkill < 0) 0 else defSkill
-        var ret = healSkill;
+        var ret = healSkill
         var s = this.Players[this.current].availableSkills[healSkill]
         for (i in healSkill + 1 until this.Players[this.current].availableSkills.size) {
-            var a = this.Players[this.current].availableSkills[i]
+            val a = this.Players[this.current].availableSkills[i]
             if (a.mpC <= this.Players[this.current].mp
             && a.hpC < this.Players[this.current].hp
             && a.spC <= this.Players[this.current].sp
             && this.Players[this.current].level >= a.lvRq) {
                 if (healSkill > 0) {
                     if (a.hpDmg < s.hpDmg && a.hpDmg < 0) {
-                        s = a;
-                        ret = i;
+                        s = a
+                        ret = i
                     }
                 }
                 else if (a.hpDmg > s.hpDmg) {
-                    s = a;
-                    ret = i;
+                    s = a
+                    ret = i
                 }
             }
         }
@@ -298,7 +298,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
             l = this.Players.size
         }
         else {
-            f = 0;
+            f = 0
             l = this.enIdx
         }
         var target = f

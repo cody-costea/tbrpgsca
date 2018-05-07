@@ -28,14 +28,12 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mRes, skills, states, mStRes) {
 
     open var race : Costume = race
-        get() = field
         set(value) {
             this.switchCostume(field, value)
             field = value
         }
 
     open var job : Costume = job
-        get() = field
         set(value) {
             this.switchCostume(field, value)
             field = value

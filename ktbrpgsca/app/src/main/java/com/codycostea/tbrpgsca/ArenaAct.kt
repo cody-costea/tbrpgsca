@@ -26,50 +26,60 @@ class AdActor(id : Int, val context : Context, name: String, sprites : Array<Arr
     : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi,
             mWis, mAgi, mRes, skills, states, mStRes) {
 
-    internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: arrayOf(
-            arrayOf(context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_idle", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_ko", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_hit", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_fallen", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_restored", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_act", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_cast", "drawable", context.packageName))
-                            as AnimationDrawable),
-            arrayOf(context.resources.getDrawable(
-                    context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_idle", "drawable", context.packageName))
-                    as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_ko", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_hit", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_fallen", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_restored", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_act", "drawable", context.packageName))
-                            as AnimationDrawable,
-                    context.resources.getDrawable(
-                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_cast", "drawable", context.packageName))
-                            as AnimationDrawable)
-    )
+    override var job : Costume = job
+        set(value) {
+            super.job = value
+            this.sprites = this.getSprites(value.name.toLowerCase())
+        }
+
+    internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: this.getSprites(job.name.toLowerCase())
+
+    private fun getSprites(sprName: String) : Array<Array<AnimationDrawable>> {
+        return arrayOf(
+                arrayOf(context.resources.getDrawable(
+                        context.resources.getIdentifier("spr_bt_" + sprName + "_l_idle", "drawable", context.packageName))
+                        as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_ko", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_hit", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_fallen", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_restored", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_act", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_cast", "drawable", context.packageName))
+                                as AnimationDrawable),
+                arrayOf(context.resources.getDrawable(
+                        context.resources.getIdentifier("spr_bt_" + sprName + "_r_idle", "drawable", context.packageName))
+                        as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_ko", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_hit", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_fallen", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_restored", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_act", "drawable", context.packageName))
+                                as AnimationDrawable,
+                        context.resources.getDrawable(
+                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_cast", "drawable", context.packageName))
+                                as AnimationDrawable)
+        )
+    }
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is Actor && other.id == this.id)

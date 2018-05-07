@@ -125,7 +125,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                             s += dmgsp.toString() + " RP"
                         }
                         if (dur > 0) {
-                            sDur[this] = dur - 1;
+                            sDur[this] = dur - 1
                         }
                     }
                     else if (actor.mActions > 0 && dur > 0 && dur == this.dur
