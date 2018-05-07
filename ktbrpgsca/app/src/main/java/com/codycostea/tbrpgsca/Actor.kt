@@ -178,7 +178,6 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     internal var skillsQty : MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn : MutableMap<Ability, Int>? = null
-    //internal var inactiveSkills : ArrayList<Ability>? = null
 
     open var items : SortedMap<Ability, Int>? = null
 
