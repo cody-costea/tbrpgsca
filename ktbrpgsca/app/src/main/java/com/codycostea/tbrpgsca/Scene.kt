@@ -15,12 +15,12 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
-open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int) {
+open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
     open var status : Int = 0
         protected set
 
-    val enIdx : Int = party.size
+    open val enIdx : Int = party.size
 
     open val Players : Array<Actor> = party + enemy
 
@@ -40,10 +40,30 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
     open var lTarget : Int = this.enIdx
         protected set
 
-    val aiTurn : Boolean
+    open var lastAbility : Ability? = null
+
+    open val aiTurn : Boolean
         get() {
             return this.Players[this.current].automatic != 0
         }
+
+    init {
+        if (this.surprise != 0) {
+            val l: Int
+            val f: Int
+            if (this.surprise < 0) {
+                f = 0
+                l = this.enIdx - 1
+            }
+            else {
+                f = this.enIdx
+                l = this.Players.size - 1
+            }
+            for (i in f..l) {
+                this.Players[i].actions = 0
+            }
+        }
+    }
 
     protected open fun setCurrentActive(activate : Boolean) : Boolean {
         val oldCr = this.current
@@ -57,7 +77,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
                 this.current = i
             }
         }
-        if (oldCr != this.current) {
+        if (!activate && oldCr != this.current) {
             this.Players[this.current].applyStates(false)
         }
         if (this.Players[this.current].actions > 0) {
@@ -229,6 +249,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
 
         this.Players[this.current].exp++
         this.Players[this.current].levelUp()
+
+        this.lastAbility = skill
 
         return ret
     }
