@@ -26,7 +26,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
         val trgStRes = actor.stRes
         if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + this.sRes) {
             var trgStates = actor.activeStates
-            if (trgStates == null) {
+            if (trgStates === null) {
                 trgStates = HashMap(1)
                 actor.activeStates = trgStates
             }
@@ -75,7 +75,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
     internal fun apply(actor: Actor, consume: Boolean): String {
         var s = ""
         val sDur = actor.stateDur
-        if (sDur != null) {
+        if (sDur !== null) {
             val dur = sDur[this]
             if (dur !== null && actor.hp > 0) {
                 if (dur == 0) {
@@ -128,22 +128,27 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                             sDur[this] = dur - 1
                         }
                     }
-                    else if (actor.mActions > 0 && dur > 0 && dur == this.dur
+                    /*else if (actor.actions > 0 && dur > 0 && dur == this.dur
                             && (this.inactivate || this.automate || this.confuse)) {
                         sDur[this] = dur - 1
-                    }
-                    if (this.inactivate) {
-                        actor.actions = 0
-                        actor.guards = false
-                    }
-                    if (this.reflect) {
-                        actor.reflect = true
-                    }
-                    if (this.automate && actor.automatic < 2) {
-                        actor.automatic = 1
-                    }
-                    if (this.confuse) {
-                        actor.automatic = if (actor.automatic < 2) -1 else -2
+                    }*/
+                    else {
+                        if (dur > 0 && (this.reflect || actor.actions > 0)) {
+                            sDur[this] = dur - 1
+                        }
+                        if (this.inactivate) {
+                            actor.actions = 0
+                            actor.guards = false
+                        }
+                        if (this.reflect) {
+                            actor.reflect = true
+                        }
+                        if (this.automate && actor.automatic < 2) {
+                            actor.automatic = 1
+                        }
+                        if (this.confuse) {
+                            actor.automatic = if (actor.automatic < 2) -1 else -2
+                        }
                     }
                 }
             }
@@ -161,7 +166,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
 
     open fun remove(actor: Actor, delete: Boolean, always: Boolean): Boolean {
         val sDur = actor.stateDur
-        if (sDur != null && (always || (sDur[this] ?: -2) != -2)) {
+        if (sDur !== null && (always || (sDur[this] ?: -2) != -2)) {
             if (delete) {
                 sDur.remove(this)
             }

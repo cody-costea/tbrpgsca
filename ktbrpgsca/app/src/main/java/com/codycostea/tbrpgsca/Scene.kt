@@ -28,7 +28,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
         protected set
     open var crItems : MutableMap<Int, Array<Ability>?>? = null
         get() {
-            if (field == null) {
+            if (field === null) {
                 field = HashMap()
             }
             return field
@@ -46,6 +46,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
         }
 
     protected open fun setCurrentActive(activate : Boolean) : Boolean {
+        val oldCr = this.current
         for (i in 0 until this.Players.size) {
             if (activate && this.Players[i].hp > 0) {
                 this.Players[i].actions = this.Players[i].mActions
@@ -56,11 +57,16 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
                 this.current = i
             }
         }
-        val crItems = this.Players[this.current].items
-        if (crItems != null) {
-            this.crItems!![this.current] = crItems.keys.toTypedArray()
+        if (oldCr != this.current) {
+            this.Players[this.current].applyStates(false)
         }
         if (this.Players[this.current].actions > 0) {
+            if (this.Players[this.current].automatic == 0) {
+                val crItems = this.Players[this.current].items
+                if (crItems !== null) {
+                    this.crItems!![this.current] = crItems.keys.toTypedArray()
+                }
+            }
             val recoverableSkills = this.Players[this.current].skillsQtyRgTurn
             if (recoverableSkills !== null) {
                 for (skill in recoverableSkills.keys) {
@@ -89,10 +95,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
             do {
                 this.Players[this.current].actions--
                 if (this.Players[this.current].actions < 1) {
+                    ret += this.Players[this.current].applyStates(true)
                     if (!this.setCurrentActive(false)) {
                         this.setCurrentActive(true)
                     }
-                    ret += this.Players[this.current].applyStates(true)
+                    //ret += this.Players[this.current].applyStates(true)
                 }
 
                 var i = 0
@@ -320,7 +327,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
 
     open fun useItem(index : Int, target : Int, ret : String) : String {
         val crItems = this.crItems!![this.current]
-        if (crItems != null) {
+        if (crItems !== null) {
             val item = crItems[index]
             return this.endTurn(this.executeAbility(item, target, ret))
         }

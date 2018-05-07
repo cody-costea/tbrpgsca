@@ -74,7 +74,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
                 user.sp -= this.spC
                 if (this.mQty > 0) {
                     var usrSkillsQty = user.skillsQty
-                    if (usrSkillsQty == null) {
+                    if (usrSkillsQty === null) {
                         usrSkillsQty = HashMap()
                         user.skillsQty = usrSkillsQty
                     }
@@ -104,13 +104,13 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
                 s += (-dmgsp).toString() + " RP"
             }
             val aStates = this.aStates
-            if (aStates != null) {
+            if (aStates !== null) {
                 for (state in aStates) state.inflict(trg, false)
             }
             val trgStates = trg.states
-            if (trgStates != null) {
+            if (trgStates !== null) {
                 val rStates = this.rStates
-                if (rStates != null) {
+                if (rStates !== null) {
                     for (i in 0 until rStates.size) {
                         for (aState in trgStates) {
                             if (aState == rStates[i]) {
@@ -138,9 +138,9 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
                     }
                     val stolen = iterator.next()
                     val trgItemQty = trgItems[stolen]
-                    if (trgItemQty != null && trgItemQty > 0) {
+                    if (trgItemQty !== null && trgItemQty > 0) {
                         var usrItems = user.items
-                        if (usrItems == null) {
+                        if (usrItems === null) {
                             usrItems = TreeMap()
                             user.items = usrItems
                         }

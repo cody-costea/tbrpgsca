@@ -205,8 +205,8 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         return r
     }
 
-    open  fun unequipPos(pos : Char) : Costume? {
-        var e = this.equipment
+    open fun unequipPos(pos : Char) : Costume? {
+        val e = this.equipment
         if (e == null) {
             return null
         }
