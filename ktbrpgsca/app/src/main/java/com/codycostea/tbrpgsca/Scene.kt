@@ -77,7 +77,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 this.current = i
             }
         }
-        if (!activate && oldCr != this.current) {
+        if (activate || oldCr != this.current) {
             this.Players[this.current].applyStates(false)
         }
         if (this.Players[this.current].actions > 0) {
