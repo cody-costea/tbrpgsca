@@ -20,7 +20,7 @@ import android.graphics.drawable.AnimationDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 
-class AdActor(id : Int, val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: Costume,
+class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: Costume,
               level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
               mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>, mStRes: MutableMap<State, Int>)
     : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi,
@@ -36,47 +36,47 @@ class AdActor(id : Int, val context : Context, name: String, sprites : Array<Arr
 
     private fun getSprites(sprName: String) : Array<Array<AnimationDrawable>> {
         return arrayOf(
-                arrayOf(context.resources.getDrawable(
-                        context.resources.getIdentifier("spr_bt_" + sprName + "_l_idle", "drawable", context.packageName))
-                        as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_ko", "drawable", context.packageName))
+                arrayOf(this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_idle", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_hit", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_ko", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_fallen", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_hit", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_restored", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_fallen", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_act", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_restored", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_l_cast", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_act", "drawable", this.context.packageName))
+                                as AnimationDrawable,
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_cast", "drawable", this.context.packageName))
                                 as AnimationDrawable),
-                arrayOf(context.resources.getDrawable(
-                        context.resources.getIdentifier("spr_bt_" + sprName + "_r_idle", "drawable", context.packageName))
-                        as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_ko", "drawable", context.packageName))
+                arrayOf(this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_idle", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_hit", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_ko", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_fallen", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_hit", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_restored", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_fallen", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_act", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_restored", "drawable", this.context.packageName))
                                 as AnimationDrawable,
-                        context.resources.getDrawable(
-                                context.resources.getIdentifier("spr_bt_" + sprName + "_r_cast", "drawable", context.packageName))
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_act", "drawable", this.context.packageName))
+                                as AnimationDrawable,
+                        this.context.resources.getDrawable(
+                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_cast", "drawable", this.context.packageName))
                                 as AnimationDrawable)
         )
     }
