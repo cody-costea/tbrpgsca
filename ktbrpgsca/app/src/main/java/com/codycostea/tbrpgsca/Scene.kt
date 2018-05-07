@@ -88,40 +88,37 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
         if (this.status == 0) {
             do {
                 this.Players[this.current].actions--
-                if (this.Players[this.current].actions > 0) {
-                    return ret
-                }
-                else {
+                if (this.Players[this.current].actions < 1) {
                     if (!this.setCurrentActive(false)) {
                         this.setCurrentActive(true)
                     }
                     ret += this.Players[this.current].applyStates(true)
+                }
 
-                    var i = 0
-                    var noParty = true
-                    var noEnemy = true
-                    while (i < this.Players.size) {
-                        if (this.Players[i].hp > 0) {
-                            if (i < this.enIdx) {
-                                noParty = false
-                                i = this.enIdx - 1
-                            } else {
-                                noEnemy = false
-                                break
-                            }
+                var i = 0
+                var noParty = true
+                var noEnemy = true
+                while (i < this.Players.size) {
+                    if (this.Players[i].hp > 0) {
+                        if (i < this.enIdx) {
+                            noParty = false
+                            i = this.enIdx - 1
+                        } else {
+                            noEnemy = false
+                            break
                         }
-                        i++
                     }
+                    i++
+                }
 
-                    if (noEnemy) {
-                        this.status = 1
-                        ret += ""
-                    }
+                if (noEnemy) {
+                    this.status = 1
+                    ret += ""
+                }
 
-                    if (noParty) {
-                        this.status = -2
-                        ret += ""
-                    }
+                if (noParty) {
+                    this.status = -2
+                    ret += ""
                 }
             } while (this.status == 0 && this.Players[this.current].actions < 1)
         }
