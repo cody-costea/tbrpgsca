@@ -15,17 +15,61 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
+import android.content.Context
 import android.graphics.drawable.AnimationDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 
-class AdActor(id : Int, name: String, race: Costume, job: Costume, level : Int, maxLv: Int, mActions : Int = 1,
-              mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mRes: MutableMap<Int, Int>? = null,
-              skills: Array<Ability>? = null, states: Array<State>, mStRes: MutableMap<State, Int>)
+class AdActor(id : Int, val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: Costume,
+              level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
+              mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>, mStRes: MutableMap<State, Int>)
     : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi,
             mWis, mAgi, mRes, skills, states, mStRes) {
 
-    internal var sprites : Array<Array<AnimationDrawable>>? = null
+    internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: arrayOf(
+            arrayOf(context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_idle", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_ko", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_hit", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_fallen", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_restored", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_act", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_l_cast", "drawable", context.packageName))
+                            as AnimationDrawable),
+            arrayOf(context.resources.getDrawable(
+                    context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_idle", "drawable", context.packageName))
+                    as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_ko", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_hit", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_fallen", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_restored", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_act", "drawable", context.packageName))
+                            as AnimationDrawable,
+                    context.resources.getDrawable(
+                            context.resources.getIdentifier("spr_bt_" + job.name.toLowerCase() + "_r_cast", "drawable", context.packageName))
+                            as AnimationDrawable)
+    )
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is Actor && other.id == this.id)

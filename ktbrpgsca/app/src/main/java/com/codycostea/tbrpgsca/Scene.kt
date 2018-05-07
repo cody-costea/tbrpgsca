@@ -40,9 +40,10 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
     open var lTarget : Int = this.enIdx
         protected set
 
-    init {
-
-    }
+    val aiTurn : Boolean
+        get() {
+            return this.Players[this.current].automatic != 0
+        }
 
     protected open fun setCurrentActive(activate : Boolean) : Boolean {
         for (i in 0 until this.Players.size) {
@@ -124,11 +125,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
                 }
             } while (this.status == 0 && this.Players[this.current].actions < 1)
         }
-
-        /*if (this->status == 0 && this->battler[this->current]->automatic)
-        {
-            ret += this->executeAI(ret);
-        }*/
 
         return ret
     }
@@ -221,15 +217,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
 
         }
 
-        //this->lastAbility = &skill;
-
         for (i in this.fTarget..this.lTarget) {
             if (skill.hpDmg < 0 || this.Players[i].hp > 0) {
                 ret += skill.execute(this.Players[this.current], this.Players[i], (i == this.fTarget))
             }
         }
-
-        //ret += this->endTurn(ret);
 
         this.Players[this.current].exp++
         this.Players[this.current].levelUp()
@@ -237,12 +229,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
         return ret
     }
 
-    open fun checkIfAI() : Boolean {
-        return this.Players[this.current].automatic != 0
-    }
-
     protected open fun executeAI(ret : String) : String {
-        return this.setAItarget(this.Players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret)
+        return this.endTurn(this.setAItarget(this.Players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret))
     }
 
     protected open fun checkAIheal(def : Int) : Int {
@@ -330,14 +318,14 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, val surprise : Int)
     }
 
     open fun performSkill(index : Int, target : Int, txt : String) : String {
-        return this.executeAbility(this.Players[this.current].availableSkills[index], target, txt)
+        return this.endTurn(this.executeAbility(this.Players[this.current].availableSkills[index], target, txt))
     }
 
     open fun useItem(index : Int, target : Int, ret : String) : String {
         val crItems = this.crItems!![this.current]
         if (crItems != null) {
             val item = crItems[index]
-            return this.executeAbility(item, target, ret)
+            return this.endTurn(this.executeAbility(item, target, ret))
         }
         else {
             return ret
