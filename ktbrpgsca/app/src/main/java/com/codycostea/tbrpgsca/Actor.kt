@@ -102,7 +102,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }
 
-    open var activeStates : MutableMap<State, Int>? = null
+    /*open var activeStates : MutableMap<State, Int>? = null
         get() {
             if (field == null) {
                 this.updateStates(false, this.race.states)
@@ -117,7 +117,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
             return field
         }
-        internal set
+        internal set*/
     open var stateDur : MutableMap<State, Int>? = null
         internal set
 
@@ -244,7 +244,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         if (states == null) {
             return
         }
-        val aStates = this.activeStates
+        val aStates = this.stateDur//this.activeStates
         if (remove) {
             if (aStates == null) {
                 return
@@ -376,7 +376,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 this.automatic = 2
             }
             if (this.hp > 0) {
-                if (consume) this.actions = this.mActions
+                //if (consume) this.actions = this.mActions
                 this.guards = true
             }
             this.reflect = false
@@ -455,6 +455,18 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
             if (stRes.isEmpty()) {
                 this.stRes = null
+            }
+        }
+    }
+
+    init {
+        this.updateStates(false, this.race.states)
+        this.updateStates(false, this.job.states)
+        this.updateStates(false, this.states)
+        val e = this.equipment
+        if (e != null) {
+            for (k in e.keys) {
+                this.updateStates(false, e[k]?.states)
             }
         }
     }

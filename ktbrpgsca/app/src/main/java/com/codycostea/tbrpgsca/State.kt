@@ -25,10 +25,10 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
     open fun inflict(actor: Actor, always: Boolean): String {
         val trgStRes = actor.stRes
         if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + this.sRes) {
-            var trgStates = actor.activeStates
+            var trgStates = actor.stateDur
             if (trgStates === null) {
                 trgStates = HashMap(1)
-                actor.activeStates = trgStates
+                actor.stateDur = trgStates
             }
             if ((trgStates[this] ?: this.dur) < this.dur) {
                 trgStates[this] = this.dur
