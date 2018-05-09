@@ -104,8 +104,14 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
                 s += (-dmgsp).toString() + " RP"
             }
             val aStates = this.aStates
+            var r : String
             if (aStates !== null) {
-                for (state in aStates) state.inflict(trg, false)
+                for (state in aStates) {
+                    r = state.inflict(trg, false)
+                    if (r.isNotEmpty()) {
+                        s += ", " + r
+                    }
+                }
             }
             val trgStates = trg.states
             if (trgStates !== null) {
@@ -155,7 +161,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
         else {
             s += ", but misses"
         }
-        s += trg.applyStates(false)
+        //s += trg.applyStates(false)
         s += user.checkStatus()
         return s
     }

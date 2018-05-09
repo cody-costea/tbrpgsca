@@ -130,7 +130,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                         if (i < this.enIdx) {
                             noParty = false
                             i = this.enIdx - 1
-                        } else {
+                        }
+                        else {
                             noEnemy = false
                             break
                         }
@@ -138,14 +139,15 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     i++
                 }
 
-                if (noEnemy) {
-                    this.status = 1
-                    ret += "The party has won!"
-                }
-
                 if (noParty) {
                     this.status = -2
                     ret += "The party has fallen!"
+                }
+                else {
+                    if (noEnemy) {
+                        this.status = 1
+                        ret += "The party has won!"
+                    }
                 }
             } while (this.status == 0 && this.Players[this.current].actions < 1)
         }

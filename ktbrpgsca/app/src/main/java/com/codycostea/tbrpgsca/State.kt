@@ -22,7 +22,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                  open val rSkills : Array<Ability>? = null, rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
     : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mRes, skills, rStates, mStRes) {
 
-    open fun inflict(actor: Actor, always: Boolean) {
+    open fun inflict(actor: Actor, always: Boolean): String {
         val trgStRes = actor.stRes
         if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + this.sRes) {
             var trgStates = actor.activeStates
@@ -39,7 +39,9 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
             actor.updateStates(false, this.states)
             actor.updateSkills(false, this.skills)
             this.disableSkills(actor, false)
+            return this.apply(actor, false)
         }
+        else return ""
     }
 
     private fun disableSkills(actor : Actor, remove : Boolean) {
@@ -133,10 +135,10 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                         sDur[this] = dur - 1
                     }*/
                     else {
-                        if (dur > 0 && (this.reflect || actor.actions > 0)) {
-                            sDur[this] = dur - 1
-                        }
                         if (this.inactivate) {
+                            if (dur > 0 && actor.actions > 0) {
+                                sDur[this] = dur - 1
+                            }
                             actor.actions = 0
                             actor.guards = false
                         }
