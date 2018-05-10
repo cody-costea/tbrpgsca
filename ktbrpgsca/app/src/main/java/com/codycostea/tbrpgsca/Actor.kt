@@ -463,12 +463,12 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         this.updateStates(false, this.race.states)
         this.updateStates(false, this.job.states)
         this.updateStates(false, this.states)
-        val e = this.equipment
+        /*val e = this.equipment
         if (e != null) {
             for (k in e.keys) {
                 this.updateStates(false, e[k]?.states)
             }
-        }
+        }*/
     }
 
 }

@@ -27,7 +27,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
         var s = ""
         var dmg = (Math.random() * 4).toInt()
         val trg : Actor
-        if (target.reflect && this.dmgType == 3) {
+        if (target.reflect && this.dmgType == 2) {
             s += ", reflected by " + target.name
             trg = user
         }
