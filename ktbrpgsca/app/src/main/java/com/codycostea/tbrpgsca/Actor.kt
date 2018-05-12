@@ -22,7 +22,7 @@ import kotlin.collections.HashMap
 
 open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int, open var maxLv: Int, var mActions : Int = 1,
                  mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mRes: MutableMap<Int, Int>? = null,
-                 skills: Array<Ability>? = null, states: Array<State>, mStRes: MutableMap<State, Int>)
+                 skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, mHp + race.mHp + job.mHp, mMp + race.mMp + job.mMp, mSp + race.mSp + job.mSp,
         mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi,
         mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mRes, skills, states, mStRes) {
@@ -407,9 +407,8 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     init {
-        val raceSkills = this.race.skills
-        val jobSkills = this.job.skills
-        val skills = this.skills
+        val raceSkills = race.skills
+        val jobSkills = job.skills
         val s : Int = (raceSkills?.size ?: 0)
         + (jobSkills?.size ?: 0)
         + (skills?.size ?: 0)
@@ -432,9 +431,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 this.availableSkills.add(a)
             }
         }
-        this.updateStates(false, this.race.states)
-        this.updateStates(false, this.job.states)
-        this.updateStates(false, this.states)
+        this.updateStates(false, race.states)
+        this.updateStates(false, job.states)
+        this.updateStates(false, states)
         /*val e = this.equipment
         if (e != null) {
             for (k in e.keys) {
