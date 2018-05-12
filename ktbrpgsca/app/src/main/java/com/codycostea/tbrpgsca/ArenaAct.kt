@@ -16,13 +16,15 @@ limitations under the License.
 package com.codycostea.tbrpgsca
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.Spinner
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.Animation
+import android.widget.*
 
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: Costume,
               level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
@@ -37,6 +39,13 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
         }
 
     internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: this.getSprites(job.name.toLowerCase())
+
+    internal var spritesDur = arrayOf(
+            arrayOf(this.sprites[0][0].fullDur, this.sprites[0][1].fullDur, this.sprites[0][2].fullDur, this.sprites[0][3].fullDur,
+                    this.sprites[0][4].fullDur, this.sprites[0][4].fullDur, this.sprites[0][5].fullDur, this.sprites[0][6].fullDur),
+            arrayOf(this.sprites[1][0].fullDur, this.sprites[1][1].fullDur, this.sprites[1][2].fullDur, this.sprites[1][3].fullDur,
+                    this.sprites[1][4].fullDur, this.sprites[1][4].fullDur, this.sprites[1][5].fullDur, this.sprites[1][6].fullDur)
+    )
 
     private fun getSprites(sprName: String) : Array<Array<AnimationDrawable>> {
         return arrayOf(
@@ -126,6 +135,15 @@ class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean,
     }
 }
 
+val AnimationDrawable.fullDur : Int
+get() {
+    var s = 0
+    for (i in 0 until this.numberOfFrames) {
+        s += getDuration(i)
+    }
+    return s
+}
+
 class ArenaAct : AppCompatActivity() {
 
     lateinit var scenePlay : Scene
@@ -138,6 +156,77 @@ class ArenaAct : AppCompatActivity() {
     lateinit var skillsSpn : Spinner
     lateinit var itemsSpn : Spinner
 
+    private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, val skills: List<Ability>)
+        : ArrayAdapter<Ability>(context, layoutRes) {
+
+        class ViewHolder(var abilityNameText : TextView) {
+            var usable : Boolean = true
+        }
+
+        var arenaAct = context
+
+        override fun getItem(position: Int): Ability {
+            return this.skills[position]
+        }
+
+        override fun getCount(): Int {
+            return this.skills.size
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            return this.getView(position, convertView, parent)
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view : View
+            val vHolder : ViewHolder
+            if (convertView === null || convertView.tag === null) {
+                view = (this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+                        .inflate(this.layoutRes, parent, false)
+                val txt = view.findViewById<TextView>(android.R.id.text1)
+                vHolder = ViewHolder(txt)
+                view.tag = vHolder
+            }
+            else {
+                view = convertView
+                vHolder = convertView.tag as ViewHolder
+            }
+
+            vHolder.abilityNameText.text = this.skills[position].name
+            vHolder.usable = this.skills[position].canPerform(arenaAct.scenePlay.players[arenaAct.scenePlay.current])
+            vHolder.abilityNameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
+            return view
+        }
+    }
+
+    private fun playSpr() {
+        val crActor = (this.scenePlay.players[this.scenePlay.current] as AdActor)
+        val actAnim = crActor.sprites[0][5]
+        var dur = crActor.spritesDur[0][5]
+        actAnim.stop()
+        this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
+        var htActor : AdActor
+        for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
+            if (trg != this.scenePlay.current) {
+                htActor = (this.scenePlay.players[this.scenePlay.enIdx] as AdActor)
+                val hitAnim = htActor.sprites[1][2]
+                hitAnim.stop()
+                if (htActor.spritesDur[1][2] > dur) {
+                    dur = htActor.spritesDur[1][2]
+                }
+                this.imgActor[this.scenePlay.enIdx].setBackgroundDrawable(hitAnim)
+                hitAnim.start()
+            }
+        }
+        actAnim.start()
+        this.imgActor[this.scenePlay.current].postDelayed(Runnable {
+            this.skillActBtn.isEnabled = true
+            this.skillsSpn.isEnabled = true
+            this.itemUseBtn.isEnabled = true
+            this.itemsSpn.isEnabled = true
+        }, dur.toLong())
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,7 +236,7 @@ class ArenaAct : AppCompatActivity() {
         val heroJob = Costume(1, "Hero")
 
         val skills : Array<Ability> = arrayOf(
-                AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
+                AdAbility(1, "Attack", 0, 0, false, false, 2, 0, 0, 1, 10, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null),
@@ -219,8 +308,30 @@ class ArenaAct : AppCompatActivity() {
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
         }
 
-        /*this.skillsSpn.adapter = ArrayAdapter<Ability>(this, android.R.layout.simple_spinner_dropdown_item,
-                this.scenePlay.players[this.scenePlay.current].availableSkills)*/
+        this.skillsSpn.adapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+                this.scenePlay.players[this.scenePlay.current].availableSkills)
+
+        this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                skillActBtn.isEnabled = false
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                skillActBtn.isEnabled = (view?.tag as AbilityArrayAdater.ViewHolder).usable
+            }
+
+        }
+
+        this.skillActBtn.setOnClickListener {
+            this.skillActBtn.isEnabled = false
+            this.skillsSpn.isEnabled = false
+            this.itemsSpn.isEnabled = false
+            this.itemUseBtn.isEnabled = false
+            this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition, this.scenePlay.enIdx, "")
+            this.playSpr()
+        }
 
     }
+
+
 }
