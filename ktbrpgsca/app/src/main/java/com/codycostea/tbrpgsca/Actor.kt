@@ -122,59 +122,6 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         internal set
 
     open val availableSkills : ArrayList<Ability> = ArrayList()
-        get() {
-            if (field.size == 0) {
-                val raceSkills = this.race.skills
-                val jobSkills = this.job.skills
-                val skills = this.skills
-                val s : Int = (raceSkills?.size ?: 0)
-                            + (jobSkills?.size ?: 0)
-                            + (skills?.size ?: 0)
-                field.ensureCapacity(s)
-                if (raceSkills != null) {
-                    for (a in raceSkills) {
-                        this.checkRegSkill(a)
-                        field.add(a)
-                    }
-                }
-                if (jobSkills != null) {
-                    for (a in jobSkills) {
-                        this.checkRegSkill(a)
-                        field.add(a)
-                    }
-                }
-                if (skills != null) {
-                    for (a in skills) {
-                        this.checkRegSkill(a)
-                        field.add(a)
-                    }
-                }
-                var l : Array<Ability>?
-                val e = this.equipment
-                if (e != null) {
-                    for (k in e.keys) {
-                        l = e[k]?.skills
-                        if (l != null) {
-                            this.updateSkills(false, l)
-                        }
-                    }
-                }
-                /*val t = this.activeStates
-                if (t != null) {
-                    for (k in t) {
-                        l = k.skills
-                        if (l != null) {
-                            this.updateSkills(false, l)
-                        }
-                        /*l = k.rSkills
-                        if (l != null) {
-                            this.updateSkills(true, l)
-                        }*/
-                    }
-                }*/
-            }
-            return field
-        }
 
     internal var skillsQty : MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn : MutableMap<Ability, Int>? = null
@@ -460,6 +407,31 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     init {
+        val raceSkills = this.race.skills
+        val jobSkills = this.job.skills
+        val skills = this.skills
+        val s : Int = (raceSkills?.size ?: 0)
+        + (jobSkills?.size ?: 0)
+        + (skills?.size ?: 0)
+        this.availableSkills.ensureCapacity(s)
+        if (raceSkills != null) {
+            for (a in raceSkills) {
+                this.checkRegSkill(a)
+                this.availableSkills.add(a)
+            }
+        }
+        if (jobSkills != null) {
+            for (a in jobSkills) {
+                this.checkRegSkill(a)
+                this.availableSkills.add(a)
+            }
+        }
+        if (skills != null) {
+            for (a in skills) {
+                this.checkRegSkill(a)
+                this.availableSkills.add(a)
+            }
+        }
         this.updateStates(false, this.race.states)
         this.updateStates(false, this.job.states)
         this.updateStates(false, this.states)
