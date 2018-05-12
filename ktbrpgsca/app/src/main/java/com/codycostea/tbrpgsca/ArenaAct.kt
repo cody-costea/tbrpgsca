@@ -209,7 +209,7 @@ class ArenaAct : AppCompatActivity() {
         }
         this.imgActor = imgViews.toTypedArray()
 
-        /*for (i in 0 until this.scenePlay.enIdx) {
+        for (i in 0 until this.scenePlay.enIdx) {
             this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[0]
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
         }
@@ -217,7 +217,7 @@ class ArenaAct : AppCompatActivity() {
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
             this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[1]
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
-        }*/
+        }
 
         /*this.skillsSpn.adapter = ArrayAdapter<Ability>(this, android.R.layout.simple_spinner_dropdown_item,
                 this.scenePlay.players[this.scenePlay.current].availableSkills)*/
