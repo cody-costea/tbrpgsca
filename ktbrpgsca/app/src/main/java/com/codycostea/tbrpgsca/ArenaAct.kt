@@ -156,6 +156,8 @@ class ArenaAct : AppCompatActivity() {
     lateinit var skillsSpn : Spinner
     lateinit var itemsSpn : Spinner
     lateinit var targetSpn : Spinner
+    lateinit var actionsTxt : TextView
+    lateinit var infoTxt : TextView
 
     private var partySide = 0
     private var otherSide = 1
@@ -254,7 +256,7 @@ class ArenaAct : AppCompatActivity() {
 
     private fun afterAct() {
         if (this.automatic || this.scenePlay.players[this.scenePlay.current].automatic != 0) {
-            this.scenePlay.executeAI("")
+            this.actionsTxt.append(this.scenePlay.executeAI(""))
             this.playSpr()
         }
         else {
@@ -284,7 +286,7 @@ class ArenaAct : AppCompatActivity() {
             }
         }
         actAnim.start()
-        this.scenePlay.endTurn("")
+        this.actionsTxt.append(this.scenePlay.endTurn(""))
         this.imgActor[this.scenePlay.current].postDelayed(Runnable {
             this.afterAct()
         }, dur.toLong())
@@ -300,7 +302,7 @@ class ArenaAct : AppCompatActivity() {
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
-                        0, 0, 1, 0, 0, 0, false, false, null, null),
+                        0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null),
                 AdAbility(3, "Heal", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
@@ -329,6 +331,16 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, null, skills, null, null)
         )
 
+        val surprised = 0
+        if (surprised < 0) {
+            this.partySide = 1
+            this.otherSide = 0
+        }
+        else {
+            this.partySide = 0
+            this.otherSide = 1
+        }
+
         this.scenePlay = Scene(party, enemy, 0)
 
         this.runBtn = this.findViewById(R.id.RunBt)
@@ -338,31 +350,33 @@ class ArenaAct : AppCompatActivity() {
         this.skillsSpn = this.findViewById(R.id.SkillBox)
         this.itemsSpn = this.findViewById(R.id.ItemBox)
         this.targetSpn = this.findViewById(R.id.TargetBox)
+        this.actionsTxt = this.findViewById(R.id.ItemCost)
+        this.infoTxt = this.findViewById(R.id.SkillCost)
 
         val imgViews = ArrayList<ImageView>(party.size + enemy.size)
         if (party.isNotEmpty()) {
-            imgViews.add(this.findViewById(R.id.ImgPlayer1))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy1 else R.id.ImgPlayer1))
         }
         if (party.size > 1) {
-            imgViews.add(this.findViewById(R.id.ImgPlayer2))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy2 else R.id.ImgPlayer2))
         }
         if (party.size > 2) {
-            imgViews.add(this.findViewById(R.id.ImgPlayer3))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy3 else R.id.ImgPlayer3))
         }
         if (party.size > 3) {
-            imgViews.add(this.findViewById(R.id.ImgPlayer4))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy4 else R.id.ImgPlayer4))
         }
         if (enemy.isNotEmpty()) {
-            imgViews.add(this.findViewById(R.id.ImgEnemy1))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer1 else R.id.ImgEnemy1))
         }
         if (enemy.size > 1) {
-            imgViews.add(this.findViewById(R.id.ImgEnemy2))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer2 else R.id.ImgEnemy2))
         }
         if (enemy.size > 2) {
-            imgViews.add(this.findViewById(R.id.ImgEnemy3))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer3 else R.id.ImgEnemy3))
         }
         if (enemy.size > 3) {
-            imgViews.add(this.findViewById(R.id.ImgEnemy4))
+            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer4 else R.id.ImgEnemy4))
         }
         this.imgActor = imgViews.toTypedArray()
 
@@ -409,7 +423,8 @@ class ArenaAct : AppCompatActivity() {
 
         this.skillActBtn.setOnClickListener {
             this.enableControls(false)
-            this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition, this.targetSpn.selectedItemPosition, "")
+            this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
+                    this.targetSpn.selectedItemPosition, ""))
             this.playSpr()
         }
 
