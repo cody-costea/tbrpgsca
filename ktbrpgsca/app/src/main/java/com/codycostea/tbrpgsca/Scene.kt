@@ -244,7 +244,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
 
         for (i in this.fTarget..this.lTarget) {
-            if (skill.hpDmg < 0 || this.players[i].hp > 0) {
+            if ((skill.hpDmg < 0 && skill.restoreKO) || this.players[i].hp > 0) {
                 ret += skill.execute(this.players[this.current], this.players[i], (i == this.fTarget))
             }
         }
@@ -258,7 +258,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     }
 
     open fun executeAI(ret : String) : String {
-        return this.endTurn(this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret))
+        return this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret)
     }
 
     protected open fun checkAIheal(def : Int) : Int {
@@ -346,14 +346,14 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     }
 
     open fun performSkill(index : Int, target : Int, txt : String) : String {
-        return this.endTurn(this.executeAbility(this.players[this.current].availableSkills[index], target, txt))
+        return this.executeAbility(this.players[this.current].availableSkills[index], target, txt)
     }
 
     open fun useItem(index : Int, target : Int, ret : String) : String {
         val crItems = this.crItems!![this.current]
         if (crItems !== null) {
             val item = crItems[index]
-            return this.endTurn(this.executeAbility(item, target, ret))
+            return this.executeAbility(item, target, ret)
         }
         else {
             return ret

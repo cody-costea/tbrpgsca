@@ -272,18 +272,19 @@ class ArenaAct : AppCompatActivity() {
         var htActor : AdActor
         for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
             if (trg != this.scenePlay.current) {
-                htActor = (this.scenePlay.players[this.scenePlay.enIdx] as AdActor)
+                htActor = (this.scenePlay.players[trg] as AdActor)
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
                 val hitAnim = if (htActor.hp > 0) htActor.sprites[trgSide][2] else htActor.sprites[trgSide][3]
                 hitAnim.stop()
                 if (htActor.spritesDur[trgSide][2] > dur) {
                     dur = htActor.spritesDur[trgSide][2]
                 }
-                this.imgActor[this.scenePlay.enIdx].setBackgroundDrawable(hitAnim)
+                this.imgActor[trg].setBackgroundDrawable(hitAnim)
                 hitAnim.start()
             }
         }
         actAnim.start()
+        this.scenePlay.endTurn("")
         this.imgActor[this.scenePlay.current].postDelayed(Runnable {
             this.afterAct()
         }, dur.toLong())
@@ -299,7 +300,7 @@ class ArenaAct : AppCompatActivity() {
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
-                        0, 0, 0, 0, 0, 0, false, false, null, null),
+                        0, 0, 1, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null),
                 AdAbility(3, "Heal", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
@@ -366,13 +367,13 @@ class ArenaAct : AppCompatActivity() {
         this.imgActor = imgViews.toTypedArray()
 
         for (i in 0 until this.scenePlay.enIdx) {
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[0]
+            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide]
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
         }
 
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
             this.scenePlay.players[i].automatic = 2
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[1]
+            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide]
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
         }
 
