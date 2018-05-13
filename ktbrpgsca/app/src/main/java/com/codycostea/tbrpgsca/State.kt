@@ -164,6 +164,9 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
         actor.updateStates(true, this.states)
         actor.updateSkills(true, this.skills)
         this.disableSkills(actor, true)
+        if (this.reflect) {
+            actor.applyStates(false)
+        }
     }
 
     open fun remove(actor: Actor, delete: Boolean, always: Boolean): Boolean {

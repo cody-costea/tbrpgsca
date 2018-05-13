@@ -159,7 +159,7 @@ class ArenaAct : AppCompatActivity() {
     lateinit var actionsTxt : TextView
     lateinit var infoTxt : TextView
 
-    var koActors = ArrayList<Actor>()
+    lateinit var koActors : Array<Boolean>
 
     private var partySide = 0
     private var otherSide = 1
@@ -253,7 +253,9 @@ class ArenaAct : AppCompatActivity() {
             }
 
             vHolder.nameText.text = this.actors[position].name
-            /*vHolder.usable = this.arenaAct.scenePlay.getGuardian(position, this.arenaAct.skillsSpn.selectedItem as Ability) == position
+            /*val crSkill =  this.arenaAct.skillsSpn.selectedItem as Ability
+            vHolder.usable = this.arenaAct.scenePlay.getGuardian(position, crSkill) == position
+                && (this.actors[position].hp > 0 || crSkill.restoreKO)
             vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)*/
             return view
         }
@@ -263,8 +265,14 @@ class ArenaAct : AppCompatActivity() {
 
     private lateinit var playersAdapter : ActorArrayAdater
 
+    private fun canTarget(target : Int, ability : Ability) : Boolean {
+        return this.scenePlay.getGuardian(target, ability) == target
+                && (this.scenePlay.players[target].hp > 0 || ability.restoreKO)
+    }
+
     private fun enableControls(enable : Boolean) {
-        this.skillActBtn.isEnabled = enable
+        this.skillActBtn.isEnabled = enable && (this.skillsSpn.selectedView.tag as ViewHolder).usable
+                && this.canTarget(this.targetSpn.selectedItemPosition, this.skillsSpn.selectedItem as Ability)
         this.skillsSpn.isEnabled = enable
         this.itemUseBtn.isEnabled = enable
         this.itemsSpn.isEnabled = enable
@@ -301,18 +309,18 @@ class ArenaAct : AppCompatActivity() {
                 htActor = (this.scenePlay.players[trg] as AdActor)
                 val trgAnim : Int
                 if (htActor.hp > 0) {
-                    if (koActors.contains(htActor)) {
+                    if (koActors[trg]) {
                         trgAnim = 4
-                        this.koActors.remove(htActor)
+                        this.koActors[trg] = false
                     }
                     else {
                         trgAnim = 2
                     }
                 }
                 else {
-                    if (this.koActors.contains(htActor)) continue
+                    if (this.koActors[trg]) continue
                     trgAnim = 3
-                    this.koActors.add(htActor)
+                    this.koActors[trg] = true
                 }
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
                 val hitAnim = htActor.sprites[trgSide][trgAnim]
@@ -325,12 +333,13 @@ class ArenaAct : AppCompatActivity() {
             }
         }
         actAnim.start()
-        this.imgActor[this.scenePlay.current].postDelayed(Runnable {
+        this.imgActor[this.scenePlay.current].postDelayed({
             if (crActor.hp < 0) {
-                val actAnim = crActor.sprites[usrSide][sprType]
-                actAnim.stop()
-                this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
-                actAnim.start()
+                this.koActors[this.scenePlay.current] = true
+                val fallAnim = crActor.sprites[usrSide][3]
+                fallAnim.stop()
+                this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
+                fallAnim.start()
             }
             this.actionsTxt.append(this.scenePlay.endTurn(""))
             this.afterAct()
@@ -398,6 +407,10 @@ class ArenaAct : AppCompatActivity() {
         this.actionsTxt = this.findViewById(R.id.ItemCost)
         this.infoTxt = this.findViewById(R.id.SkillCost)
 
+        this.koActors = this.scenePlay.players.map {
+            it.hp < 1
+        }.toTypedArray()
+
         val imgViews = ArrayList<ImageView>(party.size + enemy.size)
         if (party.isNotEmpty()) {
             imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy1 else R.id.ImgPlayer1))
@@ -426,24 +439,14 @@ class ArenaAct : AppCompatActivity() {
         this.imgActor = imgViews.toTypedArray()
 
         for (i in 0 until this.scenePlay.enIdx) {
-            if (this.scenePlay.players[i].hp > 0) {
-                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide][0])
-            }
-            else {
-                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide][1])
-                this.koActors.add(this.scenePlay.players[i])
-            }
+            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide]
+                    [if (this.koActors[i]) 1 else 0])
         }
 
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
             this.scenePlay.players[i].automatic = 2
-            if (this.scenePlay.players[i].hp > 0) {
-                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide][0])
-            }
-            else {
-                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide][1])
-                this.koActors.add(this.scenePlay.players[i])
-            }
+            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide]
+                    [if (this.koActors[i]) 1 else 0])
         }
 
         this.playersAdapter = ActorArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
@@ -453,13 +456,12 @@ class ArenaAct : AppCompatActivity() {
 
         this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                //skillActBtn.isEnabled = false
-                //itemUseBtn.isEnabled = false
+                skillActBtn.isEnabled = false
+                itemUseBtn.isEnabled = false
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                //skillActBtn.isEnabled = (view?.tag as ViewHolder).usable
-                //scenePlay.fTarget = position
+                skillActBtn.isEnabled = (view?.tag as ViewHolder).usable && canTarget(position, skillsSpn.selectedItem as Ability)
             }
 
         }
@@ -476,6 +478,7 @@ class ArenaAct : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 skillActBtn.isEnabled = (view?.tag as ViewHolder).usable
+                        && canTarget(targetSpn.selectedItemPosition, skillsSpn.selectedItem as Ability)
             }
 
         }

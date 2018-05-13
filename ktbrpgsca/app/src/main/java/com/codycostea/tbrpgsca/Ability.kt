@@ -34,6 +34,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
         else {
             trg = target
         }
+        val ko = trg.hp < 1
         val trgResMap = trg.res
         var res = if (trgResMap === null) 3 else (trgResMap[this.elm] ?: 3)
         if (res > 6) res = -1
@@ -49,6 +50,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
         }
         if (this.dmgType == 2
                 || this.dmgType == 3
+                || trg == user
                 //|| this.qty > 0 && this.mQty < 1
                 || this.dmgType != 4 && (Math.random() * 13 + user.agi / 5).toInt() > 2 + trg.agi / 4
                 || this.dmgType == 4 && (Math.random() * 13 + user.agi / 3).toInt() > 2 + trg.agi / 4) {
@@ -161,7 +163,9 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
         else {
             s += ", but misses"
         }
-        //s += trg.applyStates(false)
+        if (ko && trg.hp > 0) {
+            trg.applyStates(false)
+        }
         s += user.checkStatus()
         return s
     }
