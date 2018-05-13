@@ -155,13 +155,18 @@ class ArenaAct : AppCompatActivity() {
     lateinit var itemUseBtn : Button
     lateinit var skillsSpn : Spinner
     lateinit var itemsSpn : Spinner
+    lateinit var targetSpn : Spinner
+
+    private var partySide = 0
+    private var otherSide = 1
+    private var automatic = false
+
+    private class ViewHolder(var nameText : TextView) {
+        var usable : Boolean = true
+    }
 
     private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, val skills: List<Ability>)
         : ArrayAdapter<Ability>(context, layoutRes) {
-
-        class ViewHolder(var abilityNameText : TextView) {
-            var usable : Boolean = true
-        }
 
         var arenaAct = context
 
@@ -192,27 +197,87 @@ class ArenaAct : AppCompatActivity() {
                 vHolder = convertView.tag as ViewHolder
             }
 
-            vHolder.abilityNameText.text = this.skills[position].name
+            vHolder.nameText.text = this.skills[position].name
             vHolder.usable = this.skills[position].canPerform(arenaAct.scenePlay.players[arenaAct.scenePlay.current])
-            vHolder.abilityNameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
+            vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
             return view
         }
     }
 
+    private class ActorArrayAdater(context: ArenaAct, val layoutRes: Int, val actors: Array<Actor>)
+        : ArrayAdapter<Actor>(context, layoutRes) {
+
+        var arenaAct = context
+
+        override fun getItem(position: Int): Actor {
+            return this.actors[position]
+        }
+
+        override fun getCount(): Int {
+            return this.actors.size
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            return this.getView(position, convertView, parent)
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view : View
+            val vHolder : ViewHolder
+            if (convertView === null || convertView.tag === null) {
+                view = (this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+                        .inflate(this.layoutRes, parent, false)
+                val txt = view.findViewById<TextView>(android.R.id.text1)
+                vHolder = ViewHolder(txt)
+                view.tag = vHolder
+            }
+            else {
+                view = convertView
+                vHolder = convertView.tag as ViewHolder
+            }
+
+            vHolder.nameText.text = this.actors[position].name
+            /*vHolder.usable = this.arenaAct.scenePlay.getGuardian(position, this.arenaAct.skillsSpn.selectedItem as Ability) == position
+            vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)*/
+            return view
+        }
+    }
+
+    private fun enableControls(enable : Boolean) {
+        this.skillActBtn.isEnabled = enable
+        this.skillsSpn.isEnabled = enable
+        this.itemUseBtn.isEnabled = enable
+        this.itemsSpn.isEnabled = enable
+        this.runBtn.isEnabled = enable
+        //this.autoBtn.isEnabled = enable
+    }
+
+    private fun afterAct() {
+        if (this.automatic || this.scenePlay.players[this.scenePlay.current].automatic != 0) {
+            this.scenePlay.executeAI("")
+            this.playSpr()
+        }
+        else {
+            this.enableControls(true)
+        }
+    }
+
     private fun playSpr() {
+        val usrSide = if (this.scenePlay.current < this.scenePlay.enIdx) this.partySide else this.otherSide
         val crActor = (this.scenePlay.players[this.scenePlay.current] as AdActor)
-        val actAnim = crActor.sprites[0][5]
-        var dur = crActor.spritesDur[0][5]
+        val actAnim = crActor.sprites[usrSide][5]
+        var dur = crActor.spritesDur[usrSide][5]
         actAnim.stop()
         this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
         var htActor : AdActor
         for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
             if (trg != this.scenePlay.current) {
                 htActor = (this.scenePlay.players[this.scenePlay.enIdx] as AdActor)
-                val hitAnim = htActor.sprites[1][2]
+                val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
+                val hitAnim = if (htActor.hp > 0) htActor.sprites[trgSide][2] else htActor.sprites[trgSide][3]
                 hitAnim.stop()
-                if (htActor.spritesDur[1][2] > dur) {
-                    dur = htActor.spritesDur[1][2]
+                if (htActor.spritesDur[trgSide][2] > dur) {
+                    dur = htActor.spritesDur[trgSide][2]
                 }
                 this.imgActor[this.scenePlay.enIdx].setBackgroundDrawable(hitAnim)
                 hitAnim.start()
@@ -220,10 +285,7 @@ class ArenaAct : AppCompatActivity() {
         }
         actAnim.start()
         this.imgActor[this.scenePlay.current].postDelayed(Runnable {
-            this.skillActBtn.isEnabled = true
-            this.skillsSpn.isEnabled = true
-            this.itemUseBtn.isEnabled = true
-            this.itemsSpn.isEnabled = true
+            this.afterAct()
         }, dur.toLong())
     }
 
@@ -236,7 +298,7 @@ class ArenaAct : AppCompatActivity() {
         val heroJob = Costume(1, "Hero")
 
         val skills : Array<Ability> = arrayOf(
-                AdAbility(1, "Attack", 0, 0, false, false, 2, 0, 0, 1, 10, 0, 0,
+                AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null),
@@ -274,9 +336,12 @@ class ArenaAct : AppCompatActivity() {
         this.itemUseBtn = this.findViewById(R.id.UseBt)
         this.skillsSpn = this.findViewById(R.id.SkillBox)
         this.itemsSpn = this.findViewById(R.id.ItemBox)
+        this.targetSpn = this.findViewById(R.id.TargetBox)
 
         val imgViews = ArrayList<ImageView>(party.size + enemy.size)
-        imgViews.add(this.findViewById(R.id.ImgPlayer1))
+        if (party.isNotEmpty()) {
+            imgViews.add(this.findViewById(R.id.ImgPlayer1))
+        }
         if (party.size > 1) {
             imgViews.add(this.findViewById(R.id.ImgPlayer2))
         }
@@ -286,7 +351,9 @@ class ArenaAct : AppCompatActivity() {
         if (party.size > 3) {
             imgViews.add(this.findViewById(R.id.ImgPlayer4))
         }
-        imgViews.add(this.findViewById(R.id.ImgEnemy1))
+        if (enemy.isNotEmpty()) {
+            imgViews.add(this.findViewById(R.id.ImgEnemy1))
+        }
         if (enemy.size > 1) {
             imgViews.add(this.findViewById(R.id.ImgEnemy2))
         }
@@ -304,8 +371,25 @@ class ArenaAct : AppCompatActivity() {
         }
 
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
+            this.scenePlay.players[i].automatic = 2
             this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[1]
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
+        }
+
+        this.targetSpn.adapter = ActorArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+                this.scenePlay.players)
+
+        this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //skillActBtn.isEnabled = false
+                //itemUseBtn.isEnabled = false
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                //skillActBtn.isEnabled = (view?.tag as ViewHolder).usable
+                //scenePlay.fTarget = position
+            }
+
         }
 
         this.skillsSpn.adapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
@@ -317,17 +401,14 @@ class ArenaAct : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                skillActBtn.isEnabled = (view?.tag as AbilityArrayAdater.ViewHolder).usable
+                skillActBtn.isEnabled = (view?.tag as ViewHolder).usable
             }
 
         }
 
         this.skillActBtn.setOnClickListener {
-            this.skillActBtn.isEnabled = false
-            this.skillsSpn.isEnabled = false
-            this.itemsSpn.isEnabled = false
-            this.itemUseBtn.isEnabled = false
-            this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition, this.scenePlay.enIdx, "")
+            this.enableControls(false)
+            this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition, this.targetSpn.selectedItemPosition, "")
             this.playSpr()
         }
 

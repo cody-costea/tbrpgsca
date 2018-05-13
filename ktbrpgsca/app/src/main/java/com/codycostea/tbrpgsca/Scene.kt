@@ -155,7 +155,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    protected open fun getGuardian(target : Int, skill : Ability) : Int {
+    open fun getGuardian(target : Int, skill : Ability) : Int {
         if (skill.range) {
             return target
         }
@@ -257,7 +257,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    protected open fun executeAI(ret : String) : String {
+    open fun executeAI(ret : String) : String {
         return this.endTurn(this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret))
     }
 
