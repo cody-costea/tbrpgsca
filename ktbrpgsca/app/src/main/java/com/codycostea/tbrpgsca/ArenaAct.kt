@@ -167,10 +167,16 @@ class ArenaAct : AppCompatActivity() {
         var usable : Boolean = true
     }
 
-    private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, val skills: List<Ability>)
+    private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, skills: List<Ability>)
         : ArrayAdapter<Ability>(context, layoutRes) {
 
         var arenaAct = context
+
+        var skills = skills
+        set(value) {
+            field = value
+            this.notifyDataSetChanged()
+        }
 
         override fun getItem(position: Int): Ability {
             return this.skills[position]
@@ -206,10 +212,16 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private class ActorArrayAdater(context: ArenaAct, val layoutRes: Int, val actors: Array<Actor>)
+    private class ActorArrayAdater(context: ArenaAct, val layoutRes: Int, actors: Array<Actor>)
         : ArrayAdapter<Actor>(context, layoutRes) {
 
         var arenaAct = context
+
+        var actors = actors
+        set(value) {
+            field = value
+            this.notifyDataSetChanged()
+        }
 
         override fun getItem(position: Int): Actor {
             return this.actors[position]
@@ -245,6 +257,10 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
+    private lateinit var skillsAdapter : AbilityArrayAdater
+
+    private lateinit var playersAdapter : ActorArrayAdater
+
     private fun enableControls(enable : Boolean) {
         this.skillActBtn.isEnabled = enable
         this.skillsSpn.isEnabled = enable
@@ -256,38 +272,51 @@ class ArenaAct : AppCompatActivity() {
 
     private fun afterAct() {
         if (this.automatic || this.scenePlay.players[this.scenePlay.current].automatic != 0) {
+            this.enableControls(false)
             this.actionsTxt.append(this.scenePlay.executeAI(""))
             this.playSpr()
         }
         else {
+            this.skillsAdapter.skills = this.scenePlay.players[this.scenePlay.current].availableSkills
             this.enableControls(true)
         }
     }
 
     private fun playSpr() {
+        val lastAbility = this.scenePlay.lastAbility
+        val sprType = if (lastAbility == null || lastAbility.trg < 0
+                || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) 6 else 5
         val usrSide = if (this.scenePlay.current < this.scenePlay.enIdx) this.partySide else this.otherSide
         val crActor = (this.scenePlay.players[this.scenePlay.current] as AdActor)
-        val actAnim = crActor.sprites[usrSide][5]
-        var dur = crActor.spritesDur[usrSide][5]
+        val actAnim = crActor.sprites[usrSide][sprType]
+        var dur = crActor.spritesDur[usrSide][sprType]
         actAnim.stop()
         this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
         var htActor : AdActor
         for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
-            if (trg != this.scenePlay.current) {
+            if (trg != this.scenePlay.current && (lastAbility == null
+                    || !(lastAbility.dmgType == 2 && this.scenePlay.players[trg].reflect))) {
                 htActor = (this.scenePlay.players[trg] as AdActor)
+                val trgAnim = if (htActor.hp > 0) 2 else 3
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
-                val hitAnim = if (htActor.hp > 0) htActor.sprites[trgSide][2] else htActor.sprites[trgSide][3]
+                val hitAnim = htActor.sprites[trgSide][trgAnim]
                 hitAnim.stop()
-                if (htActor.spritesDur[trgSide][2] > dur) {
-                    dur = htActor.spritesDur[trgSide][2]
+                if (htActor.spritesDur[trgSide][trgAnim] > dur) {
+                    dur = htActor.spritesDur[trgSide][trgAnim]
                 }
                 this.imgActor[trg].setBackgroundDrawable(hitAnim)
                 hitAnim.start()
             }
         }
         actAnim.start()
-        this.actionsTxt.append(this.scenePlay.endTurn(""))
         this.imgActor[this.scenePlay.current].postDelayed(Runnable {
+            if (crActor.hp < 0) {
+                val actAnim = crActor.sprites[usrSide][sprType]
+                actAnim.stop()
+                this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
+                actAnim.start()
+            }
+            this.actionsTxt.append(this.scenePlay.endTurn(""))
             this.afterAct()
         }, dur.toLong())
     }
@@ -341,7 +370,7 @@ class ArenaAct : AppCompatActivity() {
             this.otherSide = 1
         }
 
-        this.scenePlay = Scene(party, enemy, 0)
+        this.scenePlay = Scene(party, enemy, surprised)
 
         this.runBtn = this.findViewById(R.id.RunBt)
         this.autoBtn = this.findViewById(R.id.AutoBt)
@@ -391,8 +420,10 @@ class ArenaAct : AppCompatActivity() {
                     [if (this.scenePlay.players[i].hp > 0) 0 else 1])
         }
 
-        this.targetSpn.adapter = ActorArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+        this.playersAdapter = ActorArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
                 this.scenePlay.players)
+
+        this.targetSpn.adapter = this.playersAdapter
 
         this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -407,8 +438,10 @@ class ArenaAct : AppCompatActivity() {
 
         }
 
-        this.skillsSpn.adapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+        this.skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
                 this.scenePlay.players[this.scenePlay.current].availableSkills)
+
+        this.skillsSpn.adapter = this.skillsAdapter
 
         this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -426,6 +459,12 @@ class ArenaAct : AppCompatActivity() {
             this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
                     this.targetSpn.selectedItemPosition, ""))
             this.playSpr()
+        }
+
+        this.targetSpn.setSelection(this.scenePlay.enIdx)
+
+        if (this.scenePlay.players[this.scenePlay.current].automatic != 0) {
+            this.afterAct()
         }
 
     }
