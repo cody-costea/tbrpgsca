@@ -159,6 +159,8 @@ class ArenaAct : AppCompatActivity() {
     lateinit var actionsTxt : TextView
     lateinit var infoTxt : TextView
 
+    var koActors = ArrayList<Actor>()
+
     private var partySide = 0
     private var otherSide = 1
     private var automatic = false
@@ -297,7 +299,21 @@ class ArenaAct : AppCompatActivity() {
             if (trg != this.scenePlay.current && (lastAbility == null
                     || !(lastAbility.dmgType == 2 && this.scenePlay.players[trg].reflect))) {
                 htActor = (this.scenePlay.players[trg] as AdActor)
-                val trgAnim = if (htActor.hp > 0) 2 else 3
+                val trgAnim : Int
+                if (htActor.hp > 0) {
+                    if (koActors.contains(htActor)) {
+                        trgAnim = 4
+                        this.koActors.remove(htActor)
+                    }
+                    else {
+                        trgAnim = 2
+                    }
+                }
+                else {
+                    if (this.koActors.contains(htActor)) continue
+                    trgAnim = 3
+                    this.koActors.add(htActor)
+                }
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
                 val hitAnim = htActor.sprites[trgSide][trgAnim]
                 hitAnim.stop()
@@ -410,14 +426,24 @@ class ArenaAct : AppCompatActivity() {
         this.imgActor = imgViews.toTypedArray()
 
         for (i in 0 until this.scenePlay.enIdx) {
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide]
-                    [if (this.scenePlay.players[i].hp > 0) 0 else 1])
+            if (this.scenePlay.players[i].hp > 0) {
+                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide][0])
+            }
+            else {
+                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide][1])
+                this.koActors.add(this.scenePlay.players[i])
+            }
         }
 
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
             this.scenePlay.players[i].automatic = 2
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide]
-                    [if (this.scenePlay.players[i].hp > 0) 0 else 1])
+            if (this.scenePlay.players[i].hp > 0) {
+                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide][0])
+            }
+            else {
+                this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide][1])
+                this.koActors.add(this.scenePlay.players[i])
+            }
         }
 
         this.playersAdapter = ActorArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,

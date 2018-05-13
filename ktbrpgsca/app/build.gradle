@@ -10,8 +10,8 @@ android {
         applicationId "com.codycostea.tbrpgsca"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 27
-        versionName "0.27 (alpha)"
+        versionCode 37
+        versionName "0.37 (alpha)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
