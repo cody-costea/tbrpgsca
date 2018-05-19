@@ -289,6 +289,7 @@ class ArenaAct : AppCompatActivity() {
         else {
             this.skillsAdapter.skills = this.scenePlay.players[this.scenePlay.current].availableSkills
             this.enableControls(true)
+            this.autoBtn.isEnabled = true
         }
     }
 
@@ -488,6 +489,16 @@ class ArenaAct : AppCompatActivity() {
             this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
                     this.targetSpn.selectedItemPosition, ""))
             this.playSpr()
+        }
+
+        this.autoBtn.setOnClickListener {
+            this.automatic = !this.automatic
+            if (this.automatic) {
+                this.afterAct()
+            }
+            else {
+                this.autoBtn.isEnabled = false
+            }
         }
 
         this.targetSpn.setSelection(this.scenePlay.enIdx)
