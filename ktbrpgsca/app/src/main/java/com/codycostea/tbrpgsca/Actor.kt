@@ -15,9 +15,9 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 
 
 open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int, open var maxLv: Int, var mActions : Int = 1,
@@ -126,7 +126,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     internal var skillsQty : MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn : MutableMap<Ability, Int>? = null
 
-    open var items : SortedMap<Ability, Int>? = null
+    open var items : LinkedHashMap<Ability, Int>? = null
 
     private var equipment : MutableMap<Char, Costume>? = null
 

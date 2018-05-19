@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.widget.*
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: Costume,
               level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
@@ -281,14 +282,9 @@ class ArenaAct : AppCompatActivity() {
             this.skillActBtn.isEnabled = false
             this.itemUseBtn.isEnabled = false
         }
-        //this.skillActBtn.isEnabled = enable && this.crCanPerform
-                //&& this.canTarget(this.targetSpn.selectedItemPosition, this.skillsSpn.selectedItem as Ability)
         this.skillsSpn.isEnabled = enable
-        //this.itemUseBtn.isEnabled = enable && this.crCanUse
-                //&& this.canTarget(this.targetSpn.selectedItemPosition, this.itemsSpn.selectedItem as Ability)
         this.itemsSpn.isEnabled = enable
         this.runBtn.isEnabled = enable
-        //this.autoBtn.isEnabled = enable
     }
 
     private fun setCrAutoSkill() {
@@ -383,11 +379,12 @@ class ArenaAct : AppCompatActivity() {
             }
         }
         else {
-            val itemsAdapter = this.itemsAdapter
+            var itemsAdapter = this.itemsAdapter
             if (itemsAdapter === null) {
-                this.itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+                itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
                         crItems)
-                this.itemsSpn.adapter = this.itemsAdapter
+                this.itemsAdapter = itemsAdapter
+                this.itemsSpn.adapter = itemsAdapter
 
                 /*this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -405,7 +402,7 @@ class ArenaAct : AppCompatActivity() {
                     this.enableControls(false)
                     this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
                             this.targetSpn.selectedItemPosition, ""))
-                    itemsAdapter?.notifyDataSetChanged()
+                    itemsAdapter.notifyDataSetChanged()
                     this.playSpr()
                 }
             }
@@ -441,11 +438,10 @@ class ArenaAct : AppCompatActivity() {
         val skills2 : Array<Ability> = arrayOf(
                 AdAbility(1, "Act", 0, 0, false, false, 1, 0, 0, 0, 10, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
-                AdAbility(1, "Hit", 0, 0, false, false, 1, 0, 45, 1, 30, 0, 0,
-                        0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Guard", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
-                        1, 0, -1, 0, 0, 0, false, false, null, null)
-        )
+                        1, 0, -1, 0, 0, 0, false, false, null, null),
+                AdAbility(1, "Hit", 0, 0, false, false, 1, 0, 45, 1, 30, 0, 0,
+                        0, 0, 0, 0, 0, 0, false, false, null, null))
 
         val party : Array<Actor> = arrayOf(
                 AdActor(1, this, "Cody", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
@@ -457,6 +453,11 @@ class ArenaAct : AppCompatActivity() {
                 AdActor(4, this, "George", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null)
         )
+        party[0].items = LinkedHashMap()
+        val potion = AdAbility(10, "Potion", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
+                3, 0, 0, 0, 0, 0, false, true, null, null)
+        party[0].items!![potion] = 3
+        party[1].items = party[0].items
 
         val enemy : Array<Actor> = arrayOf(
                 AdActor(8, this, "Goblin", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,

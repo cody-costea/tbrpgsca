@@ -16,6 +16,7 @@ limitations under the License.
 package com.codycostea.tbrpgsca
 
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 open class Ability(val id: Int, open val name: String, open val range: Boolean = false, open val steal: Boolean = false,
                    open val lvRq: Int, open val hpC: Int, open val mpC: Int, open val spC: Int, open val hpDmg: Int,
@@ -149,7 +150,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
                     if (trgItemQty !== null && trgItemQty > 0) {
                         var usrItems = user.items
                         if (usrItems === null) {
-                            usrItems = TreeMap()
+                            usrItems = LinkedHashMap()
                             user.items = usrItems
                         }
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
