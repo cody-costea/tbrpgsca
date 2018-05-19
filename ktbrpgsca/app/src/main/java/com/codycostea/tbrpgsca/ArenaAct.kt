@@ -161,7 +161,6 @@ class ArenaAct : AppCompatActivity() {
     lateinit var infoTxt : TextView
 
     lateinit var koActors : Array<Boolean>
-    lateinit var crItemsMap : SortedMap<Ability, Int>
 
     private var partySide = 0
     private var otherSide = 1
@@ -272,44 +271,36 @@ class ArenaAct : AppCompatActivity() {
             return this.scenePlay.players[this.scenePlay.current] as AdActor
         }
 
-    private val crCanPerform : Boolean
-        get() {
-            val crSkills = this.crActor.availableSkills
-            var crSkillPos = this.skillsSpn.selectedItemPosition
-            if (crSkillPos == Spinner.INVALID_POSITION || crSkillPos >= crSkills.size) {
-                this.skillsSpn.setSelection(0)
-                crSkillPos = 0
-            }
-            return (crSkills[crSkillPos]).canPerform(this.crActor)
-        }
-
-    private val crCanUse : Boolean
-        get() {
-            val itemsAdapter = this.itemsAdapter
-            if (itemsAdapter === null || itemsAdapter.count < 1) return false
-            var crItemPos = this.itemsSpn.selectedItemPosition
-            if (crItemPos == Spinner.INVALID_POSITION) return false
-            if (crItemPos >= itemsAdapter.count) {
-                this.itemsSpn.setSelection(0)
-                crItemPos = 0
-            }
-            return (itemsAdapter.getItem(crItemPos).canPerform(this.crActor))
-        }
-
     private fun canTarget(target : Int, ability : Ability) : Boolean {
         return this.scenePlay.getGuardian(target, ability) == target
                 && (this.scenePlay.players[target].hp > 0 || ability.restoreKO)
     }
 
     private fun enableControls(enable : Boolean) {
-        this.skillActBtn.isEnabled = enable && this.crCanPerform
-                && this.canTarget(this.targetSpn.selectedItemPosition, this.skillsSpn.selectedItem as Ability)
+        if (!enable) {
+            this.skillActBtn.isEnabled = false
+            this.itemUseBtn.isEnabled = false
+        }
+        //this.skillActBtn.isEnabled = enable && this.crCanPerform
+                //&& this.canTarget(this.targetSpn.selectedItemPosition, this.skillsSpn.selectedItem as Ability)
         this.skillsSpn.isEnabled = enable
-        this.itemUseBtn.isEnabled = enable && this.crCanUse
-                && this.canTarget(this.targetSpn.selectedItemPosition, this.itemsSpn.selectedItem as Ability)
+        //this.itemUseBtn.isEnabled = enable && this.crCanUse
+                //&& this.canTarget(this.targetSpn.selectedItemPosition, this.itemsSpn.selectedItem as Ability)
         this.itemsSpn.isEnabled = enable
         this.runBtn.isEnabled = enable
         //this.autoBtn.isEnabled = enable
+    }
+
+    private fun setCrAutoSkill() {
+        val autoSkill = this.scenePlay.getAIskill(
+                if (this.targetSpn.selectedItemPosition < this.scenePlay.enIdx) 1 else 0)
+        if (this.skillsSpn.selectedItemPosition == autoSkill) {
+            this.skillActBtn.isEnabled = (this.crActor.availableSkills[autoSkill]).canPerform(this.crActor)
+                    && canTarget(targetSpn.selectedItemPosition, this.crActor.availableSkills[autoSkill])
+        }
+        else {
+            this.skillsSpn.setSelection(autoSkill)
+        }
     }
 
     private fun afterAct() {
@@ -319,10 +310,13 @@ class ArenaAct : AppCompatActivity() {
             this.playSpr()
         }
         else {
-            this.setCrItems()
             this.skillsAdapter.skills = this.crActor.availableSkills
-            this.enableControls(true)
-            this.autoBtn.isEnabled = true
+            this.skillsSpn.post {
+                this.setCrItems()
+                this.autoBtn.isEnabled = true
+                this.enableControls(true)
+                this.setCrAutoSkill()
+            }
         }
     }
 
@@ -381,17 +375,21 @@ class ArenaAct : AppCompatActivity() {
     }
 
     private fun setCrItems() {
-        val crItems = this.crActor.items
-        if (crItems !== null && this.crItemsMap !== crItems) {
-            this.crItemsMap = crItems
-            //this.crItemsList = crItems.keys.toList()
+        val crItems = this.scenePlay.crItems!![this.scenePlay.current]
+        if (crItems === null || crItems.isEmpty()) {
+            if (this.itemsSpn.isEnabled) {
+                this.itemsSpn.setSelection(Spinner.INVALID_POSITION)
+                this.itemsSpn.isEnabled = false
+            }
+        }
+        else {
             val itemsAdapter = this.itemsAdapter
             if (itemsAdapter === null) {
                 this.itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
-                        crItems.keys.toList())
+                        crItems)
                 this.itemsSpn.adapter = this.itemsAdapter
 
-                this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+                /*this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         itemUseBtn.isEnabled = false
                     }
@@ -401,19 +399,25 @@ class ArenaAct : AppCompatActivity() {
                                 && canTarget(targetSpn.selectedItemPosition, itemsSpn.selectedItem as Ability)
                     }
 
-                }
+                }*/
 
                 this.itemUseBtn.setOnClickListener {
                     this.enableControls(false)
                     this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
                             this.targetSpn.selectedItemPosition, ""))
+                    itemsAdapter?.notifyDataSetChanged()
                     this.playSpr()
                 }
             }
-            else {
-                itemsAdapter.skills = crItems.keys.toList()
+            else if (itemsAdapter.skills !== crItems) {
+                itemsAdapter.skills = crItems
+
             }
-            //this.skillsAdapter.setNotifyOnChange(true)
+            if (!this.itemsSpn.isEnabled) {
+                this.itemsSpn.setSelection(0)
+                this.itemsSpn.isEnabled = true
+            }
+            this.itemUseBtn.isEnabled = true
         }
     }
 
@@ -435,7 +439,9 @@ class ArenaAct : AppCompatActivity() {
         )
 
         val skills2 : Array<Ability> = arrayOf(
-                AdAbility(1, "Hit", 0, 0, false, false, 1, 0, 45, 1, 10, 0, 0,
+                AdAbility(1, "Act", 0, 0, false, false, 1, 0, 0, 0, 10, 0, 0,
+                        0, 0, 0, 0, 0, 0, false, false, null, null),
+                AdAbility(1, "Hit", 0, 0, false, false, 1, 0, 45, 1, 30, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Guard", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null)
@@ -463,7 +469,7 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, null, skills, null, null)
         )
 
-        val surprised = 0
+        val surprised = -1
         if (surprised < 0) {
             this.partySide = 1
             this.otherSide = 0
@@ -532,6 +538,8 @@ class ArenaAct : AppCompatActivity() {
 
         this.targetSpn.adapter = this.playersAdapter
 
+        this.targetSpn.setSelection(this.scenePlay.enIdx)
+
         this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 skillActBtn.isEnabled = false
@@ -539,8 +547,9 @@ class ArenaAct : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                skillActBtn.isEnabled = crCanPerform && canTarget(position, skillsSpn.selectedItem as Ability)
-                itemUseBtn.isEnabled = crCanUse && canTarget(position, itemsSpn.selectedItem as Ability)
+                //skillActBtn.isEnabled = crCanPerform && canTarget(position, skillsSpn.selectedItem as Ability)
+                //itemUseBtn.isEnabled = crCanUse && canTarget(position, itemsSpn.selectedItem as Ability)
+                setCrAutoSkill()
             }
 
         }
@@ -556,8 +565,9 @@ class ArenaAct : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                skillActBtn.isEnabled = (view?.tag as ViewHolder).usable
-                        && canTarget(targetSpn.selectedItemPosition, skillsSpn.selectedItem as Ability)
+                skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
+                        || (view === null && crActor.availableSkills[position].canPerform(crActor)))
+                        && canTarget(targetSpn.selectedItemPosition, crActor.availableSkills[position])
             }
 
         }
@@ -570,6 +580,10 @@ class ArenaAct : AppCompatActivity() {
         }
 
         this.setCrItems()
+        if (this.itemsAdapter === null) {
+            this.itemsSpn.isEnabled = false
+            this.itemUseBtn.isEnabled = false
+        }
 
         this.autoBtn.setOnClickListener {
             this.automatic = !this.automatic
@@ -581,13 +595,12 @@ class ArenaAct : AppCompatActivity() {
             }
         }
 
-        this.targetSpn.setSelection(this.scenePlay.enIdx)
-
         if (this.crActor.automatic != 0) {
             this.afterAct()
         }
-
+        else {
+            this.enableControls(true)
+            this.setCrAutoSkill()
+        }
     }
-
-
 }

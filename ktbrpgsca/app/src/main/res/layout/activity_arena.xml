@@ -149,6 +149,7 @@
             android:layout_width="30dp"
             android:layout_height="0dp"
             android:layout_weight="0.5"
+            android:enabled="false"
             android:text="Run" />
 
     </LinearLayout>
@@ -178,7 +179,8 @@
             android:id="@+id/SkillBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:enabled="false" />
 
         <Button
             android:id="@+id/ActBt"
@@ -186,6 +188,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:enabled="false"
             android:text="Execute" />
 
         <Spinner
@@ -200,13 +203,15 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:enabled="false"
             android:text="Use" />
 
         <Spinner
             android:id="@+id/ItemBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:enabled="false" />
 
     </LinearLayout>
 

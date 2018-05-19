@@ -26,7 +26,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
     open var current : Int = if (this.surprise < 0) this.enIdx else 0
         protected set
-    open var crItems : MutableMap<Int, Array<Ability>?>? = null
+    open var crItems : MutableMap<Int, MutableList<Ability>?>? = null
         get() {
             if (field === null) {
                 field = HashMap()
@@ -84,7 +84,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             if (this.players[this.current].automatic == 0) {
                 val crItems = this.players[this.current].items
                 if (crItems !== null) {
-                    this.crItems!![this.current] = crItems.keys.toTypedArray()
+                    this.crItems!![this.current] = crItems.keys.toMutableList()
                 }
             }
             val recoverableSkills = this.players[this.current].skillsQtyRgTurn
@@ -242,10 +242,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
 
         }
-
+        var applyCosts = true
         for (i in this.fTarget..this.lTarget) {
             if ((skill.hpDmg < 0 && skill.restoreKO) || this.players[i].hp > 0) {
-                ret += skill.execute(this.players[this.current], this.players[i], (i == this.fTarget))
+                ret += skill.execute(this.players[this.current], this.players[i], applyCosts)
+                applyCosts = false
             }
         }
 
@@ -261,7 +262,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret)
     }
 
-    protected open fun checkAIheal(def : Int) : Int {
+    open fun checkAIheal(def : Int) : Int {
         var ret = def
         var nHeal = false
         val f : Int
@@ -295,7 +296,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    protected open fun getAIskill(defSkill : Int) : Int {
+    open fun getAIskill(defSkill : Int) : Int {
         val healSkill = if (defSkill < 0) 0 else defSkill
         var ret = healSkill
         var s = this.players[this.current].availableSkills[healSkill]
@@ -320,7 +321,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    protected open fun setAItarget(ability : Ability, ret : String) : String {
+    open fun setAItarget(ability : Ability, ret : String) : String {
         val f : Int
         val l : Int
         if ((this.current < this.enIdx && ability.hpDmg >= 0)
@@ -353,6 +354,17 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         val crItems = this.crItems!![this.current]
         if (crItems !== null) {
             val item = crItems[index]
+            val crItemsMap = this.players[this.current].items
+            if (crItemsMap !== null) {
+                val itemQty = (crItemsMap[item] ?: 1) - 1
+                if (itemQty > 0) {
+                    crItemsMap[item] = itemQty
+                }
+                else {
+                    crItems.remove(item)
+                    crItemsMap.remove(item)
+                }
+            }
             return this.executeAbility(item, target, ret)
         }
         else {
