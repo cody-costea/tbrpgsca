@@ -149,20 +149,20 @@ get() {
 
 class ArenaAct : Activity() {
 
-    lateinit var scenePlay : Scene
+    private lateinit var scenePlay : Scene
 
-    lateinit var imgActor : Array<ImageView>
-    lateinit var autoBtn : Button
-    lateinit var runBtn : Button
-    lateinit var skillActBtn : Button
-    lateinit var itemUseBtn : Button
-    lateinit var skillsSpn : Spinner
-    lateinit var itemsSpn : Spinner
-    lateinit var targetSpn : Spinner
-    lateinit var actionsTxt : TextView
-    lateinit var infoTxt : TextView
+    private lateinit var imgActor : Array<ImageView>
+    private lateinit var autoBtn : Button
+    private lateinit var runBtn : Button
+    private lateinit var skillActBtn : Button
+    private lateinit var itemUseBtn : Button
+    private lateinit var skillsSpn : Spinner
+    private lateinit var itemsSpn : Spinner
+    private lateinit var targetSpn : Spinner
+    private lateinit var actionsTxt : TextView
+    private lateinit var infoTxt : TextView
 
-    lateinit var koActors : Array<Boolean>
+    private lateinit var koActors : Array<Boolean>
 
     private var partySide = 0
     private var otherSide = 1
@@ -456,7 +456,8 @@ class ArenaAct : Activity() {
                         && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     this@ArenaAct.skillActBtn.callOnClick()
                 }
-            } else {
+            }
+            else {
                 this@ArenaAct.targetSpn.setSelection(targetPos)
             }
         }
@@ -675,7 +676,10 @@ class ArenaAct : Activity() {
         this.autoBtn.setOnClickListener {
             this.automatic = !this.automatic
             if (this.automatic) {
-                this.afterAct()
+                this.enableControls(false)
+                if (this.crActor.automatic == 0) {
+                    this.afterAct()
+                }
             }
             else {
                 this.autoBtn.isEnabled = false
