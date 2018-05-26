@@ -306,16 +306,12 @@ class ArenaAct : AppCompatActivity() {
             this.playSpr()
         }
         else {
-            var skillsAdapter = this.skillsAdapter
-            if (skillsAdapter === null) {
-                skillsAdapter = this.setSkillsAdapter()
-            }
-            skillsAdapter.skills = this.crActor.availableSkills
             this.skillsSpn.post {
                 this.setCrItems()
-                this.autoBtn.isEnabled = true
+                this.setCrSkills()
                 this.enableControls(true)
                 this.setCrAutoSkill()
+                this.autoBtn.isEnabled = true
             }
         }
     }
@@ -385,8 +381,7 @@ class ArenaAct : AppCompatActivity() {
         else {
             var itemsAdapter = this.itemsAdapter
             if (itemsAdapter === null) {
-                itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
-                        crItems)
+                itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item, crItems)
                 this.itemsAdapter = itemsAdapter
                 this.itemsSpn.adapter = itemsAdapter
 
@@ -422,17 +417,52 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private fun setSkillsAdapter() : AbilityArrayAdater {
-        val skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
-                this.crActor.availableSkills)
-        //this.skillsAdapter.setNotifyOnChange(true)
-        this.skillsSpn.adapter = skillsAdapter
-        this.skillsAdapter = skillsAdapter
-        return skillsAdapter
+    private fun setCrSkills() {
+        var skillsAdapter = this.skillsAdapter
+        if (skillsAdapter === null) {
+            skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+                    this.crActor.availableSkills)
+            //this.skillsAdapter.setNotifyOnChange(true)
+            this.skillsSpn.adapter = skillsAdapter
+            this.skillsAdapter = skillsAdapter
+
+            this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    this@ArenaAct.skillActBtn.isEnabled = false
+                }
+
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    this@ArenaAct.skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
+                            || (view === null && this@ArenaAct.crActor.availableSkills[position].canPerform(this@ArenaAct.crActor)))
+                            && canTarget(this@ArenaAct.targetSpn.selectedItemPosition, this@ArenaAct.crActor.availableSkills[position])
+                }
+
+            }
+
+            this.skillActBtn.setOnClickListener {
+                this.enableControls(false)
+                this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
+                        this.targetSpn.selectedItemPosition, ""))
+                this.playSpr()
+            }
+        }
+        else {
+            skillsAdapter.skills = this.crActor.availableSkills
+        }
     }
 
-    private fun getImgClickListener(targetPos : Int) : View.OnClickListener {
-        return View.OnClickListener { this@ArenaAct.targetSpn.setSelection(targetPos) }
+    private fun ImageView.setTargetClickListener(targetPos : Int) {
+        this.setOnClickListener {
+            if (targetPos == this@ArenaAct.targetSpn.selectedItemPosition) {
+                if (this@ArenaAct.crActor.automatic == 0 && this@ArenaAct.skillActBtn.isEnabled
+                        && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                    this@ArenaAct.skillActBtn.callOnClick()
+                }
+            }
+            else {
+                this@ArenaAct.targetSpn.setSelection(targetPos)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -513,30 +543,96 @@ class ArenaAct : AppCompatActivity() {
         }.toTypedArray()
 
         val imgViews = ArrayList<ImageView>(party.size + enemy.size)
-        if (party.isNotEmpty()) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy1 else R.id.ImgPlayer1))
+
+        var pos = 0
+        var imgView : ImageView?
+        if (surprised < 0) {
+            if (party.isNotEmpty()) {
+                imgView = this.findViewById(R.id.ImgEnemy1)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (party.size > 1) {
+                imgView = this.findViewById(R.id.ImgEnemy2)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (party.size > 2) {
+                imgView = this.findViewById(R.id.ImgEnemy3)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (party.size > 3) {
+                imgView = this.findViewById(R.id.ImgEnemy4)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.isNotEmpty()) {
+                imgView = this.findViewById(R.id.ImgPlayer1)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.size > 1) {
+                imgView = this.findViewById(R.id.ImgPlayer2)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.size > 2) {
+                imgView = this.findViewById(R.id.ImgPlayer3)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.size > 3) {
+                imgView = this.findViewById(R.id.ImgPlayer4)
+                imgView.setTargetClickListener(pos)
+                imgViews.add(imgView)
+            }
         }
-        if (party.size > 1) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy2 else R.id.ImgPlayer2))
+        else {
+            if (party.isNotEmpty()) {
+                imgView = this.findViewById(R.id.ImgPlayer1)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (party.size > 1) {
+                imgView = this.findViewById(R.id.ImgPlayer2)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (party.size > 2) {
+                imgView = this.findViewById(R.id.ImgPlayer3)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (party.size > 3) {
+                imgView = this.findViewById(R.id.ImgPlayer4)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.isNotEmpty()) {
+                imgView = this.findViewById(R.id.ImgEnemy1)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.size > 1) {
+                imgView = this.findViewById(R.id.ImgEnemy2)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.size > 2) {
+                imgView = this.findViewById(R.id.ImgEnemy3)
+                imgView.setTargetClickListener(pos++)
+                imgViews.add(imgView)
+            }
+            if (enemy.size > 3) {
+                imgView = this.findViewById(R.id.ImgEnemy4)
+                imgView.setTargetClickListener(pos)
+                imgViews.add(imgView)
+            }
+            this.setCrSkills()
+            this.setCrItems()
         }
-        if (party.size > 2) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy3 else R.id.ImgPlayer3))
-        }
-        if (party.size > 3) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgEnemy4 else R.id.ImgPlayer4))
-        }
-        if (enemy.isNotEmpty()) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer1 else R.id.ImgEnemy1))
-        }
-        if (enemy.size > 1) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer2 else R.id.ImgEnemy2))
-        }
-        if (enemy.size > 2) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer3 else R.id.ImgEnemy3))
-        }
-        if (enemy.size > 3) {
-            imgViews.add(this.findViewById(if (surprised < 0) R.id.ImgPlayer4 else R.id.ImgEnemy4))
-        }
+
         this.imgActor = imgViews.toTypedArray()
 
         for (i in 0 until this.scenePlay.enIdx) {
@@ -559,44 +655,18 @@ class ArenaAct : AppCompatActivity() {
 
         this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                skillActBtn.isEnabled = false
-                itemUseBtn.isEnabled = false
+                this@ArenaAct.skillActBtn.isEnabled = false
+                this@ArenaAct.itemUseBtn.isEnabled = false
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 //skillActBtn.isEnabled = crCanPerform && canTarget(position, skillsSpn.selectedItem as Ability)
                 //itemUseBtn.isEnabled = crCanUse && canTarget(position, itemsSpn.selectedItem as Ability)
-                setCrAutoSkill()
+                this@ArenaAct.setCrAutoSkill()
             }
 
         }
 
-        if (surprised > -1) {
-            this.setSkillsAdapter()
-        }
-
-
-        this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                skillActBtn.isEnabled = false
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
-                        || (view === null && crActor.availableSkills[position].canPerform(crActor)))
-                        && canTarget(targetSpn.selectedItemPosition, crActor.availableSkills[position])
-            }
-
-        }
-
-        this.skillActBtn.setOnClickListener {
-            this.enableControls(false)
-            this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
-                    this.targetSpn.selectedItemPosition, ""))
-            this.playSpr()
-        }
-
-        this.setCrItems()
         if (this.itemsAdapter === null) {
             this.itemsSpn.isEnabled = false
             this.itemUseBtn.isEnabled = false
