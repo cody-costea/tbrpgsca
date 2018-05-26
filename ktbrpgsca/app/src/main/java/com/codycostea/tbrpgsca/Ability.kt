@@ -71,19 +71,6 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
                 user.mp += dmgmp / 2
                 user.sp += dmgsp / 2
             }
-            if (applyCosts) {
-                user.hp -= this.hpC
-                user.mp -= this.mpC
-                user.sp -= this.spC
-                if (this.mQty > 0) {
-                    var usrSkillsQty = user.skillsQty
-                    if (usrSkillsQty === null) {
-                        usrSkillsQty = HashMap()
-                        user.skillsQty = usrSkillsQty
-                    }
-                    usrSkillsQty[this] = (usrSkillsQty[this] ?: this.mQty) - 1
-                }
-            }
             var c = false
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
                 s += ", " + trg.name + " suffers"
@@ -163,6 +150,19 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean =
         }
         else {
             s += ", but misses"
+        }
+        if (applyCosts) {
+            user.hp -= this.hpC
+            user.mp -= this.mpC
+            user.sp -= this.spC
+            if (this.mQty > 0) {
+                var usrSkillsQty = user.skillsQty
+                if (usrSkillsQty === null) {
+                    usrSkillsQty = HashMap()
+                    user.skillsQty = usrSkillsQty
+                }
+                usrSkillsQty[this] = (usrSkillsQty[this] ?: this.mQty) - 1
+            }
         }
         if (ko && trg.hp > 0) {
             trg.applyStates(false)

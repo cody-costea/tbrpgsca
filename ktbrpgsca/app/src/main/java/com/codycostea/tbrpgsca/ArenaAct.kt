@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
@@ -146,7 +147,7 @@ get() {
     return s
 }
 
-class ArenaAct : AppCompatActivity() {
+class ArenaAct : Activity() {
 
     lateinit var scenePlay : Scene
 
@@ -171,7 +172,7 @@ class ArenaAct : AppCompatActivity() {
         var usable : Boolean = true
     }
 
-    private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, skills: List<Ability>)
+    private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, skills: List<Ability>, val asItems : Boolean)
         : ArrayAdapter<Ability>(context, layoutRes) {
 
         var arenaAct = context
@@ -210,7 +211,7 @@ class ArenaAct : AppCompatActivity() {
             }
 
             vHolder.nameText.text = this.skills[position].name
-            vHolder.usable = this.skills[position].canPerform(arenaAct.crActor)
+            vHolder.usable = this.asItems || this.skills[position].canPerform(this.arenaAct.crActor)
             vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
             return view
         }
@@ -292,7 +293,7 @@ class ArenaAct : AppCompatActivity() {
                 if (this.targetSpn.selectedItemPosition < this.scenePlay.enIdx) 1 else 0)
         if (this.skillsSpn.selectedItemPosition == autoSkill) {
             this.skillActBtn.isEnabled = (this.crActor.availableSkills[autoSkill]).canPerform(this.crActor)
-                    && canTarget(targetSpn.selectedItemPosition, this.crActor.availableSkills[autoSkill])
+                    && this.canTarget(this.targetSpn.selectedItemPosition, this.crActor.availableSkills[autoSkill])
         }
         else {
             this.skillsSpn.setSelection(autoSkill)
@@ -301,18 +302,15 @@ class ArenaAct : AppCompatActivity() {
 
     private fun afterAct() {
         if (this.automatic || this.crActor.automatic != 0) {
-            //this.enableControls(false)
             this.actionsTxt.append(this.scenePlay.executeAI(""))
             this.playSpr()
         }
         else {
-            this.skillsSpn.post {
-                this.setCrItems()
-                this.setCrSkills()
-                this.enableControls(true)
-                this.setCrAutoSkill()
-                this.autoBtn.isEnabled = true
-            }
+            this.setCrSkills()
+            this.setCrItems()
+            this.enableControls(true)
+            this.autoBtn.isEnabled = true
+            this.setCrAutoSkill()
         }
     }
 
@@ -381,7 +379,7 @@ class ArenaAct : AppCompatActivity() {
         else {
             var itemsAdapter = this.itemsAdapter
             if (itemsAdapter === null) {
-                itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item, crItems)
+                itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item, crItems, true)
                 this.itemsAdapter = itemsAdapter
                 this.itemsSpn.adapter = itemsAdapter
 
@@ -421,7 +419,7 @@ class ArenaAct : AppCompatActivity() {
         var skillsAdapter = this.skillsAdapter
         if (skillsAdapter === null) {
             skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
-                    this.crActor.availableSkills)
+                    this.crActor.availableSkills, false)
             //this.skillsAdapter.setNotifyOnChange(true)
             this.skillsSpn.adapter = skillsAdapter
             this.skillsAdapter = skillsAdapter
@@ -458,8 +456,7 @@ class ArenaAct : AppCompatActivity() {
                         && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     this@ArenaAct.skillActBtn.callOnClick()
                 }
-            }
-            else {
+            } else {
                 this@ArenaAct.targetSpn.setSelection(targetPos)
             }
         }
@@ -653,7 +650,8 @@ class ArenaAct : AppCompatActivity() {
 
         this.targetSpn.setSelection(this.scenePlay.enIdx)
 
-        this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 this@ArenaAct.skillActBtn.isEnabled = false
                 this@ArenaAct.itemUseBtn.isEnabled = false
@@ -662,7 +660,9 @@ class ArenaAct : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 //skillActBtn.isEnabled = crCanPerform && canTarget(position, skillsSpn.selectedItem as Ability)
                 //itemUseBtn.isEnabled = crCanUse && canTarget(position, itemsSpn.selectedItem as Ability)
-                this@ArenaAct.setCrAutoSkill()
+                if (this@ArenaAct.crActor.automatic == 0 && this@ArenaAct.skillsSpn.isEnabled) {
+                    this@ArenaAct.setCrAutoSkill()
+                }
             }
 
         }
