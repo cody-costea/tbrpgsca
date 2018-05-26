@@ -263,7 +263,7 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private lateinit var skillsAdapter : AbilityArrayAdater
+    private var skillsAdapter : AbilityArrayAdater? = null
     private lateinit var playersAdapter : ActorArrayAdater
     private var itemsAdapter : AbilityArrayAdater? = null
 
@@ -281,9 +281,9 @@ class ArenaAct : AppCompatActivity() {
         if (!enable) {
             this.skillActBtn.isEnabled = false
             this.itemUseBtn.isEnabled = false
+            this.itemsSpn.isEnabled = false
         }
         this.skillsSpn.isEnabled = enable
-        this.itemsSpn.isEnabled = enable
         this.runBtn.isEnabled = enable
     }
 
@@ -301,12 +301,16 @@ class ArenaAct : AppCompatActivity() {
 
     private fun afterAct() {
         if (this.automatic || this.crActor.automatic != 0) {
-            this.enableControls(false)
+            //this.enableControls(false)
             this.actionsTxt.append(this.scenePlay.executeAI(""))
             this.playSpr()
         }
         else {
-            this.skillsAdapter.skills = this.crActor.availableSkills
+            var skillsAdapter = this.skillsAdapter
+            if (skillsAdapter === null) {
+                skillsAdapter = this.setSkillsAdapter()
+            }
+            skillsAdapter.skills = this.crActor.availableSkills
             this.skillsSpn.post {
                 this.setCrItems()
                 this.autoBtn.isEnabled = true
@@ -418,6 +422,18 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
+    private fun setSkillsAdapter() : AbilityArrayAdater {
+        val skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+                this.crActor.availableSkills)
+        //this.skillsAdapter.setNotifyOnChange(true)
+        this.skillsSpn.adapter = skillsAdapter
+        this.skillsAdapter = skillsAdapter
+        return skillsAdapter
+    }
+
+    private fun getImgClickListener(targetPos : Int) : View.OnClickListener {
+        return View.OnClickListener { this@ArenaAct.targetSpn.setSelection(targetPos) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -555,10 +571,10 @@ class ArenaAct : AppCompatActivity() {
 
         }
 
-        this.skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
-                this.crActor.availableSkills)
-        //this.skillsAdapter.setNotifyOnChange(true)
-        this.skillsSpn.adapter = this.skillsAdapter
+        if (surprised > -1) {
+            this.setSkillsAdapter()
+        }
+
 
         this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
