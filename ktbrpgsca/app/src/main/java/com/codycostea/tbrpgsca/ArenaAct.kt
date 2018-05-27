@@ -147,7 +147,7 @@ get() {
     return s
 }
 
-class ArenaAct : Activity() {
+class ArenaAct : AppCompatActivity() {
 
     private lateinit var scenePlay : Scene
 
@@ -206,7 +206,6 @@ class ArenaAct : Activity() {
                 vHolder = convertView.tag as ViewHolder
             }
 
-            vHolder.nameText.text = this.skills[position].name
             vHolder.usable = this.asItems || this.skills[position].canPerform(this.arenaAct.crActor)
             vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
             return view
@@ -218,16 +217,19 @@ class ArenaAct : Activity() {
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
             vHolder.nameText.text = skill.name +
-                    (if (this.asItems) " x " + this.arenaAct.crActor.items?.get(this.skills[position])
-                    else " (LvRq: " + skill.lvRq + ", HPc: " + skill.hpC + ", MPc: " + skill.mpC
-                            + ", RPc: " + skill.spC + ", QTY: " + (this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")
-                            + ", TRG: " + (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All")
-                            + ", RANGE: " + if (skill.range) "Yes" else "No") + ")"
+                    (if (this.asItems) " x ${this.arenaAct.crActor.items?.get(skill)}"
+                    else " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
+                            ", QTY: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, TRG: " +
+                            (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All") +
+                            ", RANGE: ${if (skill.range) "Yes" else "No"}")
             return view
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            return this.prepareView(position, convertView, parent)
+            val view = this.prepareView(position, convertView, parent)
+            val vHolder = view.tag as ViewHolder
+            vHolder.nameText.text = this.skills[position].name
+            return view
         }
     }
 
@@ -250,35 +252,35 @@ class ArenaAct : Activity() {
             return this.actors.size
         }
 
-        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            return this.getView(position, convertView, parent)
-        }
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        private fun prepareView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view : View
-            val vHolder : ViewHolder
             if (convertView === null || convertView.tag === null) {
                 view = (this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
                         .inflate(this.layoutRes, parent, false)
                 val txt = view.findViewById<TextView>(android.R.id.text1)
-                vHolder = ViewHolder(txt)
-                view.tag = vHolder
+                view.tag = ViewHolder(txt)
             }
             else {
                 view = convertView
-                vHolder = convertView.tag as ViewHolder
             }
+            return view
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = this.prepareView(position, convertView, parent)
+            val vHolder = view.tag as ViewHolder
+            vHolder.nameText.text = this.actors[position].name
+            return this.getView(position, convertView, parent)
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = this.prepareView(position, convertView, parent)
+            val vHolder = view.tag as ViewHolder
             val actor = this.actors[position]
-            vHolder.nameText.text = actor.name + " (HP: " +
-                    (if (position < this.arenaAct.scenePlay.enIdx)
-                        actor.hp.toString() + "/" + actor.mHp + ", MP: " + actor.mp + "/" + actor.mMp
-                                + ", RP: " + actor.sp + "/" + actor.mSp + ", XP: " + actor.exp + "/" + actor.mExp
-                    else "%.2f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%") +
-                    ", Level: " + actor.level + ")"
-            /*val crSkill =  this.arenaAct.skillsSpn.selectedItem as Ability
-            vHolder.usable = this.arenaAct.scenePlay.getGuardian(position, crSkill) == position
-                && (this.actors[position].hp > 0 || crSkill.restoreKO)
-            vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Colo r.GRAY)*/
+            vHolder.nameText.text = "${actor.name} (HP: " +
+                    ((if (position < this.arenaAct.scenePlay.enIdx)
+                        "${actor.hp}/${actor.mHp}, MP: ${actor.mp}/${actor.mMp}, RP: ${actor.sp}/${actor.mSp}"
+                    else "%.2f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%") + ")")
             return view
         }
     }
@@ -486,6 +488,9 @@ class ArenaAct : Activity() {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_arena)
 
+        val extra = this.intent.extras
+        val surprised = extra?.getInt("surprise", 0) ?: 0
+
         val humanRace = Costume(1, "Human")
         val heroJob = Costume(1, "Hero")
 
@@ -533,7 +538,6 @@ class ArenaAct : Activity() {
                         7, 7, 7, null, skills, null, null)
         )
 
-        val surprised = -1
         if (surprised < 0) {
             this.partySide = 1
             this.otherSide = 0
@@ -685,11 +689,6 @@ class ArenaAct : Activity() {
                 }
             }
 
-        }
-
-        if (this.itemsAdapter === null) {
-            this.itemsSpn.isEnabled = false
-            this.itemUseBtn.isEnabled = false
         }
 
         this.autoBtn.setOnClickListener {

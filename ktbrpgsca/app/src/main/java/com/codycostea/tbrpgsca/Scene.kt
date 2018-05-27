@@ -63,6 +63,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 this.players[i].actions = 0
             }
         }
+        this.setNextCurrent(false)
     }
 
     protected open fun setNextCurrent(activate : Boolean) : Boolean {

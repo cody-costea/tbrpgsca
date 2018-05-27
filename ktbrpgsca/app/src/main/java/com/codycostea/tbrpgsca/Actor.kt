@@ -70,7 +70,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             if (value > this.mHp) {
                 field = this.mHp
             }
-            if (value < -this.mHp) {
+            else if (value < -this.mHp) {
                 field = -this.mHp
             }
             else {
@@ -82,7 +82,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             if (value > this.mMp) {
                 field = this.mMp
             }
-            if (value < 0) {
+            else if (value < 0) {
                 field = 0
             }
             else {
@@ -94,7 +94,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             if (value > this.mSp) {
                 field = this.mSp
             }
-            if (value < 0) {
+            else if (value < 0) {
                 field = 0
             }
             else {
@@ -102,22 +102,6 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }
 
-    /*open var activeStates : MutableMap<State, Int>? = null
-        get() {
-            if (field == null) {
-                this.updateStates(false, this.race.states)
-                this.updateStates(false, this.job.states)
-                this.updateStates(false, this.states)
-                val e = this.equipment
-                if (e != null) {
-                    for (k in e.keys) {
-                        this.updateStates(false, e[k]?.states)
-                    }
-                }
-            }
-            return field
-        }
-        internal set*/
     open var stateDur : MutableMap<State, Int>? = null
         internal set
 
