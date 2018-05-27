@@ -191,11 +191,7 @@ class ArenaAct : Activity() {
             return this.skills.size
         }
 
-        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            return this.getView(position, convertView, parent)
-        }
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        private fun prepareView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view : View
             val vHolder : ViewHolder
             if (convertView === null || convertView.tag === null) {
@@ -215,12 +211,30 @@ class ArenaAct : Activity() {
             vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
             return view
         }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            //return this.getView(position, convertView, parent)
+            val view = this.prepareView(position, convertView, parent)
+            val vHolder = view.tag as ViewHolder
+            val skill = this.skills[position]
+            vHolder.nameText.text = skill.name +
+                    (if (this.asItems) " x " + this.arenaAct.crActor.items?.get(this.skills[position])
+                    else " (LvRq: " + skill.lvRq + ", HPc: " + skill.hpC + ", MPc: " + skill.mpC
+                            + ", RPc: " + skill.spC + ", QTY: " + (this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")
+                            + ", TRG: " + (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All")
+                            + ", RANGE: " + if (skill.range) "Yes" else "No") + ")"
+            return view
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            return this.prepareView(position, convertView, parent)
+        }
     }
 
     private class ActorArrayAdater(context: ArenaAct, val layoutRes: Int, actors: Array<Actor>)
         : ArrayAdapter<Actor>(context, layoutRes) {
 
-        //var arenaAct = context
+        var arenaAct = context
 
         var actors = actors
         set(value) {
@@ -254,12 +268,17 @@ class ArenaAct : Activity() {
                 view = convertView
                 vHolder = convertView.tag as ViewHolder
             }
-
-            vHolder.nameText.text = this.actors[position].name
+            val actor = this.actors[position]
+            vHolder.nameText.text = actor.name + " (HP: " +
+                    (if (position < this.arenaAct.scenePlay.enIdx)
+                        actor.hp.toString() + "/" + actor.mHp + ", MP: " + actor.mp + "/" + actor.mMp
+                                + ", RP: " + actor.sp + "/" + actor.mSp + ", XP: " + actor.exp + "/" + actor.mExp
+                    else "%.2f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%") +
+                    ", Level: " + actor.level + ")"
             /*val crSkill =  this.arenaAct.skillsSpn.selectedItem as Ability
             vHolder.usable = this.arenaAct.scenePlay.getGuardian(position, crSkill) == position
                 && (this.actors[position].hp > 0 || crSkill.restoreKO)
-            vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)*/
+            vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Colo r.GRAY)*/
             return view
         }
     }
