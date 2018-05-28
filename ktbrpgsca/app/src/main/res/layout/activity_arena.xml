@@ -106,12 +106,12 @@
             android:layout_alignParentBottom="true">
 
             <ImageView
-                android:id="@+id/ImgEnemy2"
+                android:id="@+id/ImgEnemy3"
                 android:layout_width="128dp"
                 android:layout_height="128dp" />
 
             <ImageView
-                android:id="@+id/ImgEnemy3"
+                android:id="@+id/ImgEnemy2"
                 android:layout_width="128dp"
                 android:layout_height="128dp" />
         </LinearLayout>

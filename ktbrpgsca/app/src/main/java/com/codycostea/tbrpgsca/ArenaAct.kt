@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
@@ -24,7 +23,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.widget.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -172,7 +170,7 @@ class ArenaAct : AppCompatActivity() {
         var usable : Boolean = true
     }
 
-    private class AbilityArrayAdater(context: ArenaAct, val layoutRes: Int, skills: List<Ability>, val asItems : Boolean)
+    private class AbilityArrayAdapter(context: ArenaAct, val layoutRes: Int, skills: List<Ability>, val asItems : Boolean)
         : ArrayAdapter<Ability>(context, layoutRes) {
 
         var arenaAct = context
@@ -219,9 +217,9 @@ class ArenaAct : AppCompatActivity() {
             vHolder.nameText.text = skill.name +
                     (if (this.asItems) " x ${this.arenaAct.crActor.items?.get(skill)}"
                     else " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
-                            ", QTY: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, TRG: " +
+                            ", Qty: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, Trg: " +
                             (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All") +
-                            ", RANGE: ${if (skill.range) "Yes" else "No"}")
+                            ", Range: ${if (skill.range) "Yes" else "No"})")
             return view
         }
 
@@ -233,7 +231,7 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private class ActorArrayAdater(context: ArenaAct, val layoutRes: Int, actors: Array<Actor>)
+    private class ActorArrayAdapter(context: ArenaAct, val layoutRes: Int, actors: Array<Actor>)
         : ArrayAdapter<Actor>(context, layoutRes) {
 
         var arenaAct = context
@@ -252,7 +250,7 @@ class ArenaAct : AppCompatActivity() {
             return this.actors.size
         }
 
-        private fun prepareView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        private fun prepareView(convertView: View?, parent: ViewGroup?): View {
             val view : View
             if (convertView === null || convertView.tag === null) {
                 view = (this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
@@ -267,14 +265,14 @@ class ArenaAct : AppCompatActivity() {
         }
 
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = this.prepareView(position, convertView, parent)
+            val view = this.prepareView(convertView, parent)
             val vHolder = view.tag as ViewHolder
             vHolder.nameText.text = this.actors[position].name
             return this.getView(position, convertView, parent)
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = this.prepareView(position, convertView, parent)
+            val view = this.prepareView(convertView, parent)
             val vHolder = view.tag as ViewHolder
             val actor = this.actors[position]
             vHolder.nameText.text = "${actor.name} (HP: " +
@@ -285,9 +283,9 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private var skillsAdapter : AbilityArrayAdater? = null
-    private lateinit var playersAdapter : ActorArrayAdater
-    private var itemsAdapter : AbilityArrayAdater? = null
+    private var skillsAdapter : AbilityArrayAdapter? = null
+    private lateinit var playersAdapter : ActorArrayAdapter
+    private var itemsAdapter : AbilityArrayAdapter? = null
 
     private val crActor : AdActor
         get() {
@@ -400,7 +398,7 @@ class ArenaAct : AppCompatActivity() {
         else {
             var itemsAdapter = this.itemsAdapter
             if (itemsAdapter === null) {
-                itemsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item, crItems, true)
+                itemsAdapter = AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, crItems, true)
                 this.itemsAdapter = itemsAdapter
                 this.itemsSpn.adapter = itemsAdapter
 
@@ -439,7 +437,7 @@ class ArenaAct : AppCompatActivity() {
     private fun setCrSkills() {
         var skillsAdapter = this.skillsAdapter
         if (skillsAdapter === null) {
-            skillsAdapter = AbilityArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+            skillsAdapter = AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
                     this.crActor.availableSkills, false)
             //this.skillsAdapter.setNotifyOnChange(true)
             this.skillsSpn.adapter = skillsAdapter
@@ -667,7 +665,7 @@ class ArenaAct : AppCompatActivity() {
                     [if (this.koActors[i]) 1 else 0])
         }
 
-        this.playersAdapter = ActorArrayAdater(this, android.R.layout.simple_spinner_dropdown_item,
+        this.playersAdapter = ActorArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
                 this.scenePlay.players)
 
         this.targetSpn.adapter = this.playersAdapter
