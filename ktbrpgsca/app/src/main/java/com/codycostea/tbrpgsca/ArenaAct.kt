@@ -267,18 +267,18 @@ class ArenaAct : AppCompatActivity() {
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view = this.prepareView(convertView, parent)
             val vHolder = view.tag as ViewHolder
-            vHolder.nameText.text = this.actors[position].name
-            return this.getView(position, convertView, parent)
-        }
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = this.prepareView(convertView, parent)
-            val vHolder = view.tag as ViewHolder
             val actor = this.actors[position]
             vHolder.nameText.text = "${actor.name} (HP: " +
                     ((if (position < this.arenaAct.scenePlay.enIdx)
                         "${actor.hp}/${actor.mHp}, MP: ${actor.mp}/${actor.mMp}, RP: ${actor.sp}/${actor.mSp}"
                     else "%.2f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%") + ")")
+            return view
+        }
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = this.prepareView(convertView, parent)
+            val vHolder = view.tag as ViewHolder
+            vHolder.nameText.text = this.actors[position].name
             return view
         }
     }

@@ -141,7 +141,7 @@
             android:layout_width="30dp"
             android:layout_height="0dp"
             android:layout_weight="0.5"
-            android:text="Auto" />
+            android:text="@string/bt_auto" />
 
         <Button
             android:id="@+id/RunBt"
@@ -150,7 +150,7 @@
             android:layout_height="0dp"
             android:layout_weight="0.5"
             android:enabled="false"
-            android:text="Run" />
+            android:text="@string/bt_run" />
 
     </LinearLayout>
 
@@ -161,7 +161,7 @@
         android:layout_below="@id/LayoutArena"
         android:layout_alignParentBottom="true"
         android:gravity="bottom"
-        android:maxLines="2"
+        android:maxLines="30"
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/linearLayout1"
@@ -171,7 +171,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="88dp"
+        android:layout_width="178dp"
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
@@ -189,7 +189,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:enabled="false"
-            android:text="Execute" />
+            android:text="@string/bt_act" />
 
         <Spinner
             android:id="@+id/TargetBox"
@@ -204,7 +204,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:enabled="false"
-            android:text="Use" />
+            android:text="@string/bt_use" />
 
         <Spinner
             android:id="@+id/ItemBox"

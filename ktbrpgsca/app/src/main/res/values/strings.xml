@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Turn-Based RPG Simple Combat Arena</string>
+    <string name="bt_auto">Auto</string>
+    <string name="bt_run">Run</string>
+    <string name="bt_act">Execute</string>
+    <string name="bt_use">Use</string>
 </resources>

@@ -11,7 +11,7 @@
         android:theme="@style/Theme.AppCompat">
         <activity
             android:name=".ArenaAct"
-            android:screenOrientation="landscape">
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
