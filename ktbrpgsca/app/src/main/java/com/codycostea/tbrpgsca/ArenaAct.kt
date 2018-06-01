@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
+import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -104,12 +105,63 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
     }
 }
 
-class AdAbility(id: Int, name: String, val sprId : Int, val sndId : Int, range: Boolean = false,
+class AdAbility(id: Int, name: String, private val sprId : Int, private val sndId : Int, range: Boolean = false,
                 steal: Boolean = false, lvRq: Int, hpC: Int, mpC: Int, spC: Int, hpDmg: Int, mpDmg: Int,
                 spDmg: Int, dmgType: Int, atkI: Int, trg : Int, elm: Int, mQty: Int, rQty: Int, absorb: Boolean,
                 restoreKO: Boolean, aStates: Array<State>? = null, rStates: Array<State>? = null)
     : Ability(id, name, range, steal, lvRq, hpC, mpC, spC, hpDmg, mpDmg, spDmg, dmgType, atkI, trg, elm, mQty,
               rQty, absorb, restoreKO, aStates, rStates) {
+
+    private var _context : Context? = null
+    private var _sndPlayer : MediaPlayer? = null
+    private var _sprAnim : AnimationDrawable? = null
+    var spriteDur : Int = 0
+
+    fun getSprite(context : Context) : AnimationDrawable? {
+        if (this.sprId < 1) return null
+        var sprAnim = this._sprAnim
+        if (this._context !== context) {
+            sprAnim = null
+            val sndPlayer = this._sndPlayer
+            if (sndPlayer !== null) {
+                sndPlayer.release()
+                this._sndPlayer = null
+            }
+        }
+        if (sprAnim === null) {
+            sprAnim = context.resources.getDrawable(this.sprId) as AnimationDrawable?
+            if (sprAnim === null) {
+                this.spriteDur = 0
+            }
+            else {
+                this.spriteDur = sprAnim.fullDur
+            }
+            this._sprAnim = sprAnim
+        }
+        return sprAnim
+    }
+
+    fun playSound(context : Context) : Int {
+        if (this.sndId < 1) return 0
+        var sndPlayer = this._sndPlayer
+        if (this._context !== context) {
+            this._sprAnim = null
+            this.spriteDur = 0
+            if (sndPlayer !== null) {
+                sndPlayer.release()
+                sndPlayer = null
+            }
+        }
+        if (sndPlayer === null) {
+            sndPlayer = MediaPlayer.create(context, this.sndId)
+            if (sndPlayer === null) return 0
+            this._context = context
+            sndPlayer.isLooping = false
+            this._sndPlayer = sndPlayer
+        }
+        sndPlayer.start()
+        return sndPlayer.duration
+    }
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is Ability && other.id == this.id)
@@ -159,6 +211,8 @@ class ArenaAct : AppCompatActivity() {
     private lateinit var targetSpn : Spinner
     private lateinit var actionsTxt : TextView
     private lateinit var infoTxt : TextView
+
+    private lateinit var songPlayer : MediaPlayer
 
     private lateinit var koActors : Array<Boolean>
 
@@ -334,8 +388,8 @@ class ArenaAct : AppCompatActivity() {
     }
 
     private fun playSpr() {
-        val lastAbility = this.scenePlay.lastAbility
-        val sprType = if (lastAbility == null || lastAbility.trg < 0
+        val lastAbility = this.scenePlay.lastAbility as AdAbility?
+        val sprType = if (lastAbility === null || lastAbility.trg < 0
                 || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) 6 else 5
         val usrSide = if (this.scenePlay.current < this.scenePlay.enIdx) this.partySide else this.otherSide
         val crActor = this.crActor
@@ -345,7 +399,7 @@ class ArenaAct : AppCompatActivity() {
         this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
         var htActor : AdActor
         for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
-            if (trg != this.scenePlay.current && (lastAbility == null
+            if (trg != this.scenePlay.current && (lastAbility === null
                     || !(lastAbility.dmgType == 2 && this.scenePlay.players[trg].reflect))) {
                 htActor = (this.scenePlay.players[trg] as AdActor)
                 val trgAnim : Int
@@ -362,6 +416,21 @@ class ArenaAct : AppCompatActivity() {
                     if (this.koActors[trg]) continue
                     trgAnim = 3
                     this.koActors[trg] = true
+                }
+                if (lastAbility !== null) {
+                    val abilitySpr = lastAbility.getSprite(this)
+                    if (abilitySpr !== null) {
+                        if (lastAbility.spriteDur > dur) {
+                            dur = lastAbility.spriteDur
+                        }
+                        abilitySpr.stop()
+                        this.imgActor[trg].setImageDrawable(abilitySpr)
+                        abilitySpr.start()
+                    }
+                    val soundDur = lastAbility.playSound(this)
+                    if (soundDur > dur) {
+                        dur = soundDur
+                    }
                 }
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
                 val hitAnim = htActor.sprites[trgSide][trgAnim]
@@ -487,7 +556,19 @@ class ArenaAct : AppCompatActivity() {
         this.setContentView(R.layout.activity_arena)
 
         val extra = this.intent.extras
-        val surprised = extra?.getInt("surprise", 0) ?: 0
+        val surprised : Int
+        if (extra !== null) {
+            surprised = extra.getInt("surprise", 0)
+            val songResId = extra.getInt("song", 0)
+            if (songResId > 0) {
+                this.songPlayer = MediaPlayer.create(this, songResId);
+                this.songPlayer.isLooping = true;
+                this.songPlayer.start();
+            }
+        }
+        else {
+            surprised = 0
+        }
 
         val humanRace = Costume(1, "Human")
         val heroJob = Costume(1, "Hero")
