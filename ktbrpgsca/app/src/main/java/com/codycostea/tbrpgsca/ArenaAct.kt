@@ -574,6 +574,7 @@ class ArenaAct : AppCompatActivity() {
         val heroJob = Costume(1, "Hero")
         val valkyrieJob = Costume(1, "Valkyrie")
         val crusaderJob = Costume(1, "Crusader")
+        val sorceressJob = Costume(1, "Sorceress")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
@@ -599,7 +600,7 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, null, skills, null, null),
                 AdActor(3, this, "Stephanie", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(4, this, "George", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(4, this, "George", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null)
         )
         party[0].items = LinkedHashMap()
@@ -613,7 +614,7 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, null, skills, null, null),
                 AdActor(7, this, "Troll", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(6, this, "Lizard", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(6, this, "Lizard", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
                 AdActor(5, this, "Ogre", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null)
