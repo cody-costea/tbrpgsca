@@ -181,7 +181,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="128dp"
+        android:layout_width="100dp"
         android:layout_height="match_parent"
         android:orientation="vertical" >
 

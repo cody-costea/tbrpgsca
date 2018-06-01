@@ -3,41 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
-        android:id="@+id/AutoRunLayer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        >
-
-        <Button
-            android:id="@+id/AutoBt"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="@string/bt_auto"
-            />
-
-        <Button
-            android:id="@+id/RunBt"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:enabled="false"
-            android:text="@string/bt_run"
-            />
-
-    </LinearLayout>
-
     <RelativeLayout
         android:id="@+id/LayoutArena"
         android:layout_width="wrap_content"
         android:layout_height="272dp"
-        android:layout_below="@id/AutoRunLayer"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true">
 
         <TextView
             android:id="@+id/SkillCost"
@@ -52,6 +23,46 @@
             android:layout_height="match_parent"
             android:layout_below="@id/SkillCost"
             />
+
+        <LinearLayout
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
+
+            <ImageView
+                android:id="@+id/ImgPlayer2"
+                android:layout_width="128dp"
+                android:layout_height="128dp"/>
+
+            <ImageView
+                android:id="@+id/ImgPlayer3"
+                android:layout_width="128dp"
+                android:layout_height="128dp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/ImgEnemy3"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+
+            <ImageView
+                android:id="@+id/ImgEnemy2"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/LayoutArenaCentre"
@@ -100,58 +111,7 @@
                     android:layout_height="128dp" />
             </LinearLayout>
         </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="128dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true">
-
-            <ImageView
-                android:id="@+id/ImgPlayer2"
-                android:layout_width="128dp"
-                android:layout_height="128dp"/>
-
-            <ImageView
-                android:id="@+id/ImgPlayer3"
-                android:layout_width="128dp"
-                android:layout_height="128dp"/>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="128dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true">
-
-            <ImageView
-                android:id="@+id/ImgEnemy3"
-                android:layout_width="128dp"
-                android:layout_height="128dp" />
-
-            <ImageView
-                android:id="@+id/ImgEnemy2"
-                android:layout_width="128dp"
-                android:layout_height="128dp" />
-        </LinearLayout>
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/ItemCost"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/LayoutArena"
-        android:layout_above="@id/ButtonsLayer"
-        android:gravity="bottom"
-        android:maxLines="30"
-        android:scrollbars="vertical"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <LinearLayout
         android:id="@+id/ButtonsLayer"
@@ -196,6 +156,34 @@
                 android:layout_height="50dp"
                 android:layout_weight="1" />
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/AutoBt"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_height="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/bt_auto"
+                    />
+
+                <Button
+                    android:id="@+id/RunBt"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_height="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:text="@string/bt_run"
+                    />
+
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -223,5 +211,16 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/ItemCost"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_above="@+id/ButtonsLayer"
+        android:layout_below="@id/LayoutArena"
+        android:gravity="bottom"
+        android:maxLines="8"
+        android:scrollbars="vertical"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
