@@ -598,9 +598,9 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, null, skills2, null, null),
                 AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(3, this, "Stephanie", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(4, this, "George", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(4, this, "George", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null)
         )
         party[0].items = LinkedHashMap()
