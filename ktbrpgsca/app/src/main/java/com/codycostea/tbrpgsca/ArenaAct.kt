@@ -572,6 +572,7 @@ class ArenaAct : AppCompatActivity() {
 
         val humanRace = Costume(1, "Human")
         val heroJob = Costume(1, "Hero")
+        val crusaderJob = Costume(1, "Crusader")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
@@ -593,11 +594,11 @@ class ArenaAct : AppCompatActivity() {
         val party : Array<Actor> = arrayOf(
                 AdActor(1, this, "Cody", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null),
-                AdActor(2, this, "Victoria", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(2, this, "Victoria", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
                 AdActor(3, this, "Stephanie", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(4, this, "George", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(4, this, "George", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null)
         )
         party[0].items = LinkedHashMap()
@@ -609,11 +610,11 @@ class ArenaAct : AppCompatActivity() {
         val enemy : Array<Actor> = arrayOf(
                 AdActor(8, this, "Goblin", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(7, this, "Troll", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(7, this, "Troll", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
                 AdActor(6, this, "Lizard", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(5, this, "Ogre", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(5, this, "Ogre", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null)
         )
 
