@@ -572,6 +572,7 @@ class ArenaAct : AppCompatActivity() {
 
         val humanRace = Costume(1, "Human")
         val heroJob = Costume(1, "Hero")
+        val valkyrieJob = Costume(1, "Valkyrie")
         val crusaderJob = Costume(1, "Crusader")
 
         val skills : Array<Ability> = arrayOf(
@@ -594,7 +595,7 @@ class ArenaAct : AppCompatActivity() {
         val party : Array<Actor> = arrayOf(
                 AdActor(1, this, "Cody", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null),
-                AdActor(2, this, "Victoria", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
                 AdActor(3, this, "Stephanie", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
@@ -614,7 +615,7 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, null, skills, null, null),
                 AdActor(6, this, "Lizard", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(5, this, "Ogre", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(5, this, "Ogre", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null)
         )
 
