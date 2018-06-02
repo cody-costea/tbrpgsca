@@ -575,6 +575,7 @@ class ArenaAct : AppCompatActivity() {
         val valkyrieJob = Costume(1, "Valkyrie")
         val crusaderJob = Costume(1, "Crusader")
         val sorceressJob = Costume(1, "Sorceress")
+        val ninjaJob = Costume(1, "Ninja")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
@@ -610,7 +611,7 @@ class ArenaAct : AppCompatActivity() {
         party[1].items = party[0].items
 
         val enemy : Array<Actor> = arrayOf(
-                AdActor(8, this, "Goblin", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(8, this, "Goblin", null, humanRace, ninjaJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
                 AdActor(7, this, "Troll", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
