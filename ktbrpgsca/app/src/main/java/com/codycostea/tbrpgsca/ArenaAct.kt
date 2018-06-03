@@ -577,6 +577,7 @@ class ArenaAct : AppCompatActivity() {
         val sorceressJob = Costume(1, "Sorceress")
         val ninjaJob = Costume(1, "Ninja")
         val dragoonJob = Costume(1, "Dragoon")
+        val hesychastJob = Costume(1, "Hesychast")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
@@ -599,11 +600,11 @@ class ArenaAct : AppCompatActivity() {
                 AdActor(1, this, "Cody", null, humanRace, heroJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills2, null, null),
                 AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null),
+                        7, 7, 7, null, skills2, null, null),
                 AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(4, this, "George", null, humanRace, crusaderJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills2, null, null)
+                AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                        7, 7, 7, null, skills, null, null)
         )
         party[0].items = LinkedHashMap()
         val potion = AdAbility(10, "Potion", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
