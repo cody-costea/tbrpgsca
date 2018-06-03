@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import kotlinx.android.synthetic.main.activity_arena.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
@@ -563,6 +564,10 @@ class ArenaAct : AppCompatActivity() {
                 this.songPlayer = MediaPlayer.create(this, songResId);
                 this.songPlayer.isLooping = true;
                 this.songPlayer.start();
+            }
+            val arenaResId = extra.getInt("arena", 0)
+            if (arenaResId > 0) {
+                this.ImgArena.setBackgroundResource(arenaResId)
             }
         }
         else {
