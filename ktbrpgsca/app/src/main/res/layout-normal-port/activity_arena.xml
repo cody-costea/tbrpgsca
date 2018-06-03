@@ -6,7 +6,7 @@
     <RelativeLayout
         android:id="@+id/LayoutArena"
         android:layout_width="wrap_content"
-        android:layout_height="272dp"
+        android:layout_height="288dp"
         android:orientation="horizontal"
         android:layout_alignParentTop="true">
 
@@ -45,29 +45,10 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="128dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true">
-
-            <ImageView
-                android:id="@+id/ImgEnemy3"
-                android:layout_width="128dp"
-                android:layout_height="128dp" />
-
-            <ImageView
-                android:id="@+id/ImgEnemy2"
-                android:layout_width="128dp"
-                android:layout_height="128dp" />
-        </LinearLayout>
-
         <RelativeLayout
             android:id="@+id/LayoutArenaCentre"
             android:layout_width="208dp"
-            android:layout_height="272dp"
+            android:layout_height="288dp"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
             android:layout_centerHorizontal="true">
@@ -110,7 +91,27 @@
                     android:layout_width="128dp"
                     android:layout_height="128dp" />
             </LinearLayout>
+
         </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/ImgEnemy3"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+
+            <ImageView
+                android:id="@+id/ImgEnemy2"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout

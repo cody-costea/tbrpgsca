@@ -540,8 +540,7 @@ class ArenaAct : AppCompatActivity() {
     private fun ImageView.setTargetClickListener(targetPos : Int) {
         this.setOnClickListener {
             if (targetPos == this@ArenaAct.targetSpn.selectedItemPosition) {
-                if (this@ArenaAct.crActor.automatic == 0 && this@ArenaAct.skillActBtn.isEnabled
-                        && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                if (this@ArenaAct.crActor.automatic == 0 && this@ArenaAct.skillActBtn.isEnabled) {
                     this@ArenaAct.skillActBtn.callOnClick()
                 }
             }
@@ -608,7 +607,7 @@ class ArenaAct : AppCompatActivity() {
         )
         party[0].items = LinkedHashMap()
         val potion = AdAbility(10, "Potion", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
-                3, 0, 0, 0, 0, 0, false, true, null, null)
+                3, 0, 0, 0, 0, 0, false, false, null, null)
         party[0].items!![potion] = 3
         party[1].items = party[0].items
 
