@@ -580,6 +580,7 @@ class ArenaAct : AppCompatActivity() {
         val shamanJob = Costume(1, "Shaman")
         val alchemistJob = Costume(1, "Alchemist")
         val reaverJob = Costume(1, "Reaver")
+        val rangerJob = Costume(1, "Hero")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
