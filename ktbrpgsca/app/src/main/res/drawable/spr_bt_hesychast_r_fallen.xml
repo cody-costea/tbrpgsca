@@ -10,5 +10,8 @@
     <item android:drawable="@drawable/frm_bt_hesychast_r_fall7" android:duration="87" />
     <item android:drawable="@drawable/frm_bt_hesychast_r_fall8" android:duration="87" />
     <item android:drawable="@drawable/frm_bt_hesychast_r_fall9" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_hesychast_r_fall10" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_hesychast_r_fall11" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_hesychast_r_fall12" android:duration="87" />
     <item android:drawable="@drawable/frm_bt_hesychast_r_ko" android:duration="1" />
 </animation-list>
