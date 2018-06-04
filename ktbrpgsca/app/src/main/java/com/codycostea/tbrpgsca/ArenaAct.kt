@@ -587,6 +587,7 @@ class ArenaAct : AppCompatActivity() {
         val reaverJob = Costume(1, "Reaver")
         val rangerJob = Costume(1, "Ranger")
         val corsairJob = Costume(1, "Corsair")
+        val druidJob = Costume(1, "Druid")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
@@ -624,7 +625,7 @@ class ArenaAct : AppCompatActivity() {
         val enemy : Array<Actor> = arrayOf(
                 AdActor(8, this, "Goblin", null, humanRace, ninjaJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
-                AdActor(7, this, "Troll", null, humanRace, shamanJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(7, this, "Troll", null, humanRace, druidJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
                 AdActor(6, this, "Lizard", null, humanRace, alchemistJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, null, skills, null, null),
