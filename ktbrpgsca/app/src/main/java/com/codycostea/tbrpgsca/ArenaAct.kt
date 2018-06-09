@@ -29,7 +29,11 @@ import kotlinx.android.synthetic.main.activity_arena.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: Costume,
+class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
+                spi: Int = 7, wis : Int = 7, agi : Int = 7, res : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null, states : Array<State>? = null,
+                stRes : MutableMap<State, Int>? = null) : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, res, skills, states, stRes)
+
+class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: AdCostume,
               level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
               mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>?, mStRes: MutableMap<State, Int>?)
     : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi,
@@ -38,10 +42,12 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
     override var job : Costume = job
         set(value) {
             super.job = value
-            this.sprites = this.getSprites(value.name.toLowerCase())
+            if (value is AdCostume) {
+                this.sprites = this.getSprites(value.sprName.toLowerCase())
+            }
         }
 
-    internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: this.getSprites(job.name.toLowerCase())
+    internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: this.getSprites(job.sprName.toLowerCase())
 
     internal var spritesDur = arrayOf(
             arrayOf(this.sprites[0][0].fullDur, this.sprites[0][1].fullDur, this.sprites[0][2].fullDur, this.sprites[0][3].fullDur,
@@ -575,20 +581,20 @@ class ArenaAct : AppCompatActivity() {
         }
 
         val humanRace = Costume(1, "Human")
-        val heroJob = Costume(1, "Hero")
-        val valkyrieJob = Costume(1, "Valkyrie")
-        val crusaderJob = Costume(1, "Crusader")
-        val sorceressJob = Costume(1, "Sorceress")
-        val ninjaJob = Costume(1, "Ninja")
-        val dragoonJob = Costume(1, "Dragoon")
-        val hesychastJob = Costume(1, "Hesychast")
-        val shamanJob = Costume(1, "Shaman")
-        val alchemistJob = Costume(1, "Alchemist")
-        val reaverJob = Costume(1, "Reaver")
-        val rangerJob = Costume(1, "Ranger")
-        val corsairJob = Costume(1, "Corsair")
-        val druidJob = Costume(1, "Druid")
-        val knightJob = Costume(1, "Knight")
+        val heroJob = AdCostume(1, "Hero", "hero")
+        val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
+        val crusaderJob = AdCostume(1, "Crusader", "crusader")
+        val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
+        val ninjaJob = AdCostume(1, "Ninja", "ninja")
+        val dragoonJob = AdCostume(1, "Dragoon", "dragoon")
+        val hesychastJob = AdCostume(1, "Hesychast", "hesychast")
+        val shamanJob = AdCostume(1, "Shaman", "shaman")
+        val alchemistJob = AdCostume(1, "Alchemist", "alchemist")
+        val reaverJob = AdCostume(1, "Reaver", "reaver")
+        val rangerJob = AdCostume(1, "Ranger", "ranger")
+        val corsairJob = AdCostume(1, "Corsair", "corsair")
+        val druidJob = AdCostume(1, "Druid", "druid")
+        val knightJob = AdCostume(1, "Knight", "knight")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
