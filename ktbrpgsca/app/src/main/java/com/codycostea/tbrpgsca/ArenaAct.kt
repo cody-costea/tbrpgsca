@@ -31,76 +31,119 @@ import kotlin.collections.LinkedHashMap
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, res : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null, states : Array<State>? = null,
-                stRes : MutableMap<State, Int>? = null) : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, res, skills, states, stRes)
+                stRes : MutableMap<State, Int>? = null) : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, res, skills, states, stRes) {
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other) || (other is Costume && other.id == this.id)
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+
+}
 
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: AdCostume,
               level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
               mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>?, mStRes: MutableMap<State, Int>?)
-    : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi,
-            mWis, mAgi, mRes, skills, states, mStRes) {
+    : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mRes, skills, states, mStRes) {
 
     override var job : Costume = job
         set(value) {
             super.job = value
-            if (value is AdCostume) {
-                this.sprites = this.getSprites(value.sprName.toLowerCase())
-            }
+            this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
+            this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
         }
 
-    internal var sprites : Array<Array<AnimationDrawable>> = sprites ?: this.getSprites(job.sprName.toLowerCase())
+    internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
+    private var sprites : Array<Array<AnimationDrawable?>> = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
+    //private var sprites : Array<Array<AnimationDrawable?>> = this.getAllBtSprites()
 
-    internal var spritesDur = arrayOf(
-            arrayOf(this.sprites[0][0].fullDur, this.sprites[0][1].fullDur, this.sprites[0][2].fullDur, this.sprites[0][3].fullDur,
-                    this.sprites[0][4].fullDur, this.sprites[0][4].fullDur, this.sprites[0][5].fullDur, this.sprites[0][6].fullDur),
-            arrayOf(this.sprites[1][0].fullDur, this.sprites[1][1].fullDur, this.sprites[1][2].fullDur, this.sprites[1][3].fullDur,
-                    this.sprites[1][4].fullDur, this.sprites[1][4].fullDur, this.sprites[1][5].fullDur, this.sprites[1][6].fullDur)
-    )
+    fun getBtSprite(side : Int, spr : Int) : AnimationDrawable? {
+        var sprAnim = this.sprites[side][spr]
+        if (sprAnim === null) {
+            val job = this.job
+            var sprName = "spr_bt_" + ((job as? AdCostume)?.sprName?.toLowerCase() ?: job.name.toLowerCase()) + if (side == 0) "_l_" else "_r_"
+            sprName += when (spr) {
+                0 -> "idle"
+                1 -> "ko"
+                2 -> "hit"
+                3 -> "fallen"
+                4 -> "restored"
+                5 -> "act"
+                6 -> "cast"
+                else -> return null
+            }
+            sprAnim = this.context.resources.getDrawable(
+                    this.context.resources.getIdentifier(sprName, "drawable", this.context.packageName))
+                    as AnimationDrawable?
+            this.sprites[side][spr] = sprAnim
+            this.spritesDur[side][spr] = sprAnim?.fullDur ?: 0
+        }
+        return sprAnim
+    }
 
-    private fun getSprites(sprName: String) : Array<Array<AnimationDrawable>> {
-        return arrayOf(
+    private fun getAllBtSprites(spriteName: String? = null) : Array<Array<AnimationDrawable?>> {
+        val sprName : String
+        if (spriteName === null) {
+            val job = this.job
+            sprName = (job as? AdCostume)?.sprName ?: job.name
+        }
+        else {
+            sprName = spriteName
+        }
+        val sprites = arrayOf(
                 arrayOf(this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_idle", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_ko", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_hit", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_fallen", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_restored", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_act", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_cast", "drawable", this.context.packageName))
-                                as AnimationDrawable),
+                                as AnimationDrawable?),
                 arrayOf(this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_idle", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_ko", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_hit", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_fallen", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_restored", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_act", "drawable", this.context.packageName))
-                                as AnimationDrawable,
+                                as AnimationDrawable?,
                         this.context.resources.getDrawable(
                                 this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_cast", "drawable", this.context.packageName))
-                                as AnimationDrawable)
+                                as AnimationDrawable?)
         )
+        this.sprites = sprites
+        this.spritesDur = arrayOf(
+                intArrayOf(sprites[0][0]?.fullDur ?: 0, sprites[0][1]?.fullDur ?: 0, sprites[0][2]?.fullDur ?: 0, sprites[0][3]?.fullDur ?: 0,
+                        sprites[0][4]?.fullDur ?: 0, sprites[0][4]?.fullDur ?: 0, sprites[0][5]?.fullDur ?: 0, sprites[0][6]?.fullDur ?: 0),
+                intArrayOf(sprites[1][0]?.fullDur ?: 0, sprites[1][1]?.fullDur ?: 0, sprites[1][2]?.fullDur ?: 0, sprites[1][3]?.fullDur ?: 0,
+                        sprites[1][4]?.fullDur ?: 0, sprites[1][4]?.fullDur ?: 0, sprites[1][5]?.fullDur ?: 0, sprites[1][6]?.fullDur ?: 0)
+        )
+        return sprites
     }
 
     override fun equals(other: Any?): Boolean {
@@ -400,9 +443,9 @@ class ArenaAct : AppCompatActivity() {
                 || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) 6 else 5
         val usrSide = if (this.scenePlay.current < this.scenePlay.enIdx) this.partySide else this.otherSide
         val crActor = this.crActor
-        val actAnim = crActor.sprites[usrSide][sprType]
+        val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
         var dur = crActor.spritesDur[usrSide][sprType]
-        actAnim.stop()
+        actAnim?.stop()
         this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
         var htActor : AdActor
         for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
@@ -440,23 +483,23 @@ class ArenaAct : AppCompatActivity() {
                     }
                 }
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
-                val hitAnim = htActor.sprites[trgSide][trgAnim]
-                hitAnim.stop()
+                val hitAnim = htActor.getBtSprite(trgSide, trgAnim)//htActor.sprites[trgSide][trgAnim]
+                hitAnim?.stop()
                 if (htActor.spritesDur[trgSide][trgAnim] > dur) {
                     dur = htActor.spritesDur[trgSide][trgAnim]
                 }
                 this.imgActor[trg].setBackgroundDrawable(hitAnim)
-                hitAnim.start()
+                hitAnim?.start()
             }
         }
-        actAnim.start()
+        actAnim?.start()
         this.imgActor[this.scenePlay.current].postDelayed({
             if (crActor.hp < 0) {
                 this.koActors[this.scenePlay.current] = true
-                val fallAnim = crActor.sprites[usrSide][3]
-                fallAnim.stop()
+                val fallAnim = crActor.getBtSprite(usrSide, 3)//crActor.sprites[usrSide][3]
+                fallAnim?.stop()
                 this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
-                fallAnim.start()
+                fallAnim?.start()
             }
             this.actionsTxt.append(this.scenePlay.endTurn(""))
             this.afterAct()
@@ -759,14 +802,16 @@ class ArenaAct : AppCompatActivity() {
         this.imgActor = imgViews.toTypedArray()
 
         for (i in 0 until this.scenePlay.enIdx) {
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide]
-                    [if (this.koActors[i]) 1 else 0])
+            /*this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide]
+                    [if (this.koActors[i]) 1 else 0])*/
+            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.partySide,
+                    if (this.koActors[i]) 1 else 0))
         }
 
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
             this.scenePlay.players[i].automatic = 2
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.otherSide]
-                    [if (this.koActors[i]) 1 else 0])
+            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.otherSide,
+                    if (this.koActors[i]) 1 else 0))
         }
 
         this.playersAdapter = ActorArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
