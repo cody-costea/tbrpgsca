@@ -25,7 +25,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import kotlinx.android.synthetic.main.activity_arena.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
@@ -87,10 +86,10 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
         val sprName : String
         sprName = if (spriteName === null) {
             val job = this.job
-            (job as? AdCostume)?.sprName ?: job.name
+            (job as? AdCostume)?.sprName?.toLowerCase() ?: job.name.toLowerCase()
         }
         else {
-            spriteName
+            spriteName.toLowerCase()
         }
         val sprites = arrayOf(
                 arrayOf(this.context.resources.getDrawable(
@@ -445,8 +444,11 @@ class ArenaAct : AppCompatActivity() {
         val crActor = this.crActor
         val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
         var dur = crActor.spritesDur[usrSide][sprType]
-        actAnim?.stop()
-        this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
+        if (actAnim !== null) {
+            actAnim.stop()
+            this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
+            actAnim.start()
+        }
         var htActor : AdActor
         for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
             if (trg != this.scenePlay.current && (lastAbility === null
@@ -484,22 +486,25 @@ class ArenaAct : AppCompatActivity() {
                 }
                 val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
                 val hitAnim = htActor.getBtSprite(trgSide, trgAnim)//htActor.sprites[trgSide][trgAnim]
-                hitAnim?.stop()
-                if (htActor.spritesDur[trgSide][trgAnim] > dur) {
-                    dur = htActor.spritesDur[trgSide][trgAnim]
+                if (hitAnim !== null) {
+                    hitAnim.stop()
+                    if (htActor.spritesDur[trgSide][trgAnim] > dur) {
+                        dur = htActor.spritesDur[trgSide][trgAnim]
+                    }
+                    this.imgActor[trg].setBackgroundDrawable(hitAnim)
+                    hitAnim.start()
                 }
-                this.imgActor[trg].setBackgroundDrawable(hitAnim)
-                hitAnim?.start()
             }
         }
-        actAnim?.start()
         this.imgActor[this.scenePlay.current].postDelayed({
             if (crActor.hp < 0) {
                 this.koActors[this.scenePlay.current] = true
                 val fallAnim = crActor.getBtSprite(usrSide, 3)//crActor.sprites[usrSide][3]
-                fallAnim?.stop()
-                this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
-                fallAnim?.start()
+                if (fallAnim !== null) {
+                    fallAnim.stop()
+                    this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
+                    fallAnim.start()
+                }
             }
             this.actionsTxt.append(this.scenePlay.endTurn(""))
             this.afterAct()
@@ -521,7 +526,7 @@ class ArenaAct : AppCompatActivity() {
                 this.itemsAdapter = itemsAdapter
                 this.itemsSpn.adapter = itemsAdapter
 
-                /*this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         itemUseBtn.isEnabled = false
                     }
@@ -531,7 +536,7 @@ class ArenaAct : AppCompatActivity() {
                                 && canTarget(targetSpn.selectedItemPosition, itemsSpn.selectedItem as Ability)
                     }
 
-                }*/
+                }
 
                 this.itemUseBtn.setOnClickListener {
                     this.enableControls(false)
@@ -616,7 +621,7 @@ class ArenaAct : AppCompatActivity() {
             }
             val arenaResId = extra.getInt("arena", 0)
             if (arenaResId > 0) {
-                this.ImgArena.setBackgroundResource(arenaResId)
+                this.findViewById<ImageView>(R.id.ImgArena).setBackgroundResource(arenaResId)
             }
         }
         else {
