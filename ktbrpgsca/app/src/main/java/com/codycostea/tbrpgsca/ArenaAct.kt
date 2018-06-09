@@ -34,7 +34,7 @@ class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, m
                 stRes : MutableMap<State, Int>? = null) : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, res, skills, states, stRes) {
 
     override fun equals(other: Any?): Boolean {
-        return super.equals(other) || (other is Costume && other.id == this.id)
+        return super.equals(other) || (other is AdCostume && other.id == this.id)
     }
 
     override fun hashCode(): Int {
@@ -57,7 +57,7 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
 
     internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
     private var sprites : Array<Array<AnimationDrawable?>> = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
-    //private var sprites : Array<Array<AnimationDrawable?>> = this.getAllBtSprites()
+    //private var sprites : Array<Array<AnimationDrawable?>> = this.setAllBtSprites()
 
     fun getBtSprite(side : Int, spr : Int) : AnimationDrawable? {
         var sprAnim = this.sprites[side][spr]
@@ -83,14 +83,14 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
         return sprAnim
     }
 
-    private fun getAllBtSprites(spriteName: String? = null) : Array<Array<AnimationDrawable?>> {
+    private fun setAllBtSprites(spriteName: String? = null) : Array<Array<AnimationDrawable?>> {
         val sprName : String
-        if (spriteName === null) {
+        sprName = if (spriteName === null) {
             val job = this.job
-            sprName = (job as? AdCostume)?.sprName ?: job.name
+            (job as? AdCostume)?.sprName ?: job.name
         }
         else {
-            sprName = spriteName
+            spriteName
         }
         val sprites = arrayOf(
                 arrayOf(this.context.resources.getDrawable(
@@ -147,7 +147,7 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
     }
 
     override fun equals(other: Any?): Boolean {
-        return super.equals(other) || (other is Actor && other.id == this.id)
+        return super.equals(other) || (other is AdActor && other.id == this.id)
     }
 
     override fun hashCode(): Int {
@@ -214,7 +214,7 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
     }
 
     override fun equals(other: Any?): Boolean {
-        return super.equals(other) || (other is Ability && other.id == this.id)
+        return super.equals(other) || (other is AdAbility && other.id == this.id)
     }
 
     override fun hashCode(): Int {
@@ -230,7 +230,7 @@ class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean,
             skills, rSkills, rStates, mStRes) {
 
     override fun equals(other: Any?): Boolean {
-        return super.equals(other) || (other is State && other.id == this.id)
+        return super.equals(other) || (other is AdState && other.id == this.id)
     }
 
     override fun hashCode(): Int {
