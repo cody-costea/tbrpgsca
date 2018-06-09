@@ -644,6 +644,7 @@ class ArenaAct : AppCompatActivity() {
         val druidJob = AdCostume(1, "Druid", "druid")
         val knightJob = AdCostume(1, "Knight", "knight")
         val spyJob = AdCostume(1, "Spy", "spy")
+        val wizardJob = AdCostume(1, "Wizard", "wizard")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
