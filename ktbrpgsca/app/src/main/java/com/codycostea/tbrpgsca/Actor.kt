@@ -108,17 +108,28 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open val availableSkills : ArrayList<Ability> = ArrayList()
 
+    private var ranged: Boolean? = null
     override var range: Boolean
         get() {
-            val equipment = this.equipment?.values
-            val states = this.stateDur
-            return super.range || this.job.range || this.race.range
-                    || (equipment != null && equipment.any { it.range }
-                    || (states != null && states.any { it.value != 0 && it.key.range }))
-
+            var ranged = this.ranged
+            if (ranged === null) {
+                val equipment = this.equipment?.values
+                val states = this.stateDur
+                ranged = super.range || this.job.range || this.race.range
+                        || (equipment != null && equipment.any { it.range }
+                        || (states != null && states.any { it.value != 0 && it.key.range }))
+                this.ranged = ranged
+            }
+            return ranged
         }
         set(value) {
             super.range = value
+            if (value) {
+                this.ranged = true
+            }
+            else {
+                this.ranged = null
+            }
         }
 
     internal var skillsQty : MutableMap<Ability, Int>? = null
@@ -245,7 +256,19 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     internal fun updateAttributes(remove : Boolean, role : Costume) {
-        val i = (if (remove) -1 else 1)
+        val i: Int
+        if (remove) {
+            i = -1
+            if (role.range) {
+                this.ranged = null
+            }
+        }
+        else {
+            if (role.range) {
+                this.ranged = true
+            }
+            i = 1
+        }
         this.mHp += i * role.mHp
         this.mMp += i * role.mMp
         this.mSp += i * role.mSp
