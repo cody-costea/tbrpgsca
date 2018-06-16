@@ -20,12 +20,12 @@ import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
 
-open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int, open var maxLv: Int, var mActions : Int = 1,
+open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int, open var maxLv: Int, mActions : Int = 1,
                  mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mRes: MutableMap<Int, Int>? = null,
                  skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, mHp + race.mHp + job.mHp, mMp + race.mMp + job.mMp, mSp + race.mSp + job.mSp,
         mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi,
-        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mRes, skills, states, mStRes) {
+        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, mRes, skills, states, mStRes) {
 
     open var race : Costume = race
         set(value) {
@@ -231,14 +231,16 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     internal fun updateAttributes(remove : Boolean, role : Costume) {
-        this.mHp += (if (remove) -1 else 1) * role.mHp
-        this.mMp += (if (remove) -1 else 1) * role.mMp
-        this.mSp += (if (remove) -1 else 1) * role.mSp
-        this.atk += (if (remove) -1 else 1) * role.atk
-        this.def += (if (remove) -1 else 1) * role.def
-        this.mSp += (if (remove) -1 else 1) * role.spi
-        this.wis += (if (remove) -1 else 1) * role.wis
-        this.agi += (if (remove) -1 else 1) * role.agi
+        val i = (if (remove) -1 else 1)
+        this.mHp += i * role.mHp
+        this.mMp += i * role.mMp
+        this.mSp += i * role.mSp
+        this.atk += i * role.atk
+        this.def += i * role.def
+        this.mSp += i * role.spi
+        this.wis += i * role.wis
+        this.agi += i * role.agi
+        this.mActions += i * role.mActions
     }
 
     internal fun updateResistance(remove : Boolean, resMap : Map<Int, Int>?, stResMap : Map<State, Int>?) {

@@ -15,12 +15,12 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
-open class State(id : Int, name : String, open var inactivate : Boolean, open var automate : Boolean,
-                 open var confuse : Boolean,  open var reflect : Boolean, open val dur : Int = 3,
-                 open val sRes : Int = 0, mHp : Int, mMp : Int, mSp : Int,  mAtk : Int, mDef: Int, mSpi: Int,
-                 mWis : Int, mAgi : Int, mRes : MutableMap<Int, Int>? = null,  skills : Array<Ability>? = null,
-                 open val rSkills : Array<Ability>? = null, rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
-    : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mRes, skills, rStates, mStRes) {
+open class State(id : Int, name : String, open var inactivate : Boolean, open var automate : Boolean, open var confuse : Boolean,
+                 open var reflect : Boolean, open val dur : Int = 3, open val sRes : Int = 0, mHp : Int, mMp : Int, mSp : Int,
+                 mAtk : Int, mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int, mRes : MutableMap<Int, Int>? = null,
+                 skills : Array<Ability>? = null, open val rSkills : Array<Ability>? = null, rStates : Array<State>? = null,
+                 mStRes : MutableMap<State, Int>? = null)
+    : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mRes, skills, rStates, mStRes) {
 
     open fun inflict(actor: Actor, always: Boolean): String {
         val trgStRes = actor.stRes

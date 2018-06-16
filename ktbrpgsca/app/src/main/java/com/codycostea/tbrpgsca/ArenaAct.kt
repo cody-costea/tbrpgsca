@@ -28,9 +28,10 @@ import android.widget.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
-                spi: Int = 7, wis : Int = 7, agi : Int = 7, res : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null, states : Array<State>? = null,
-                stRes : MutableMap<State, Int>? = null) : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, res, skills, states, stRes) {
+class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7,
+                def: Int = 7, spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, res : MutableMap<Int, Int>? = null,
+                skills : Array<Ability>? = null, states : Array<State>? = null, stRes : MutableMap<State, Int>? = null)
+    : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, res, skills, states, stRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdCostume && other.id == this.id)
@@ -223,10 +224,10 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
 
 class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean, confuse : Boolean, reflect : Boolean,
               dur : Int = 3, sRes : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int, mDef: Int, mSpi: Int, mWis : Int,
-              mAgi : Int, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null, rSkills : Array<Ability>? = null,
-              rStates : Array<State>? = null,mStRes : MutableMap<State, Int>? = null)
-    : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mRes,
-            skills, rSkills, rStates, mStRes) {
+              mAgi : Int, mActions : Int, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,
+              rSkills : Array<Ability>? = null, rStates : Array<State>? = null,mStRes : MutableMap<State, Int>? = null)
+    : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi,
+            mActions, mRes, skills, rSkills, rStates, mStRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdState && other.id == this.id)
