@@ -17,5 +17,5 @@ package com.codycostea.tbrpgsca
 
 open class Costume(val id : Int, open val name : String, open var mHp : Int = 30, open var mMp : Int = 10, open var mSp : Int = 10,
                    open var atk : Int = 7, open var def: Int = 7, open var spi: Int = 7, open var wis : Int = 7, open var agi : Int = 7,
-                   open var mActions: Int = 0,open var res : MutableMap<Int, Int>? = null, open var skills : Array<Ability>? = null,
-                   open var states : Array<State>? = null, open var stRes : MutableMap<State, Int>? = null)
+                   open var mActions : Int = 0, open var range : Boolean = false, open var res : MutableMap<Int, Int>? = null,
+                   open var skills : Array<Ability>? = null, open var states : Array<State>? = null, open var stRes : MutableMap<State, Int>? = null)

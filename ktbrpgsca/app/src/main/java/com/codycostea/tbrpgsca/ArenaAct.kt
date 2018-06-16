@@ -28,10 +28,10 @@ import android.widget.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7,
-                def: Int = 7, spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, res : MutableMap<Int, Int>? = null,
+class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
+                spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
                 skills : Array<Ability>? = null, states : Array<State>? = null, stRes : MutableMap<State, Int>? = null)
-    : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, res, skills, states, stRes) {
+    : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, range, res, skills, states, stRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdCostume && other.id == this.id)
@@ -45,8 +45,8 @@ class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, m
 
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: AdCostume,
               level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
-              mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>?, mStRes: MutableMap<State, Int>?)
-    : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mRes, skills, states, mStRes) {
+              range : Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>?, mStRes: MutableMap<State, Int>?)
+    : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
 
     override var job : Costume = job
         set(value) {
@@ -224,10 +224,10 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
 
 class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean, confuse : Boolean, reflect : Boolean,
               dur : Int = 3, sRes : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int, mDef: Int, mSpi: Int, mWis : Int,
-              mAgi : Int, mActions : Int, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,
+              mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,
               rSkills : Array<Ability>? = null, rStates : Array<State>? = null,mStRes : MutableMap<State, Int>? = null)
     : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi,
-            mActions, mRes, skills, rSkills, rStates, mStRes) {
+            mActions, range, mRes, skills, rSkills, rStates, mStRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdState && other.id == this.id)
@@ -631,7 +631,7 @@ class ArenaAct : AppCompatActivity() {
 
         val humanRace = Costume(1, "Human")
         val heroJob = AdCostume(1, "Hero", "hero")
-        val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
+        val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie", range = true)
         val crusaderJob = AdCostume(1, "Crusader", "crusader")
         val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
         val ninjaJob = AdCostume(1, "Ninja", "ninja")
@@ -667,13 +667,13 @@ class ArenaAct : AppCompatActivity() {
 
         val party : Array<Actor> = arrayOf(
                 AdActor(1, this, "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills2, null, null),
+                        7, 7, 7, false, null, skills2, null, null),
                 AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills2, null, null),
+                        7, 7, 7, false, null, skills2, null, null),
                 AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null),
+                        7, 7, 7, true, null, skills, null, null),
                 AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null)
+                        7, 7, 7, false, null, skills, null, null)
         )
         party[0].items = LinkedHashMap()
         val potion = AdAbility(10, "Potion", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
@@ -683,13 +683,13 @@ class ArenaAct : AppCompatActivity() {
 
         val enemy : Array<Actor> = arrayOf(
                 AdActor(8, this, "Goblin", null, humanRace, ninjaJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null),
+                        7, 7, 7, false, null, skills, null, null),
                 AdActor(7, this, "Troll", null, humanRace, druidJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null),
+                        7, 7, 7, false, null, skills, null, null),
                 AdActor(6, this, "Lizard", null, humanRace, alchemistJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null),
+                        7, 7, 7, false, null, skills, null, null),
                 AdActor(5, this, "Ogre", null, humanRace, dragoonJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, null, skills, null, null)
+                        7, 7, 7, false, null, skills, null, null)
         )
 
         if (surprised < 0) {

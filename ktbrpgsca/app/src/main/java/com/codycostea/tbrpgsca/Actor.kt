@@ -20,12 +20,13 @@ import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
 
-open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int, open var maxLv: Int, mActions : Int = 1,
-                 mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mRes: MutableMap<Int, Int>? = null,
+open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int = 1, open var maxLv: Int = 9,
+                 mActions : Int = 1, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, mAtk: Int = 7, mDef: Int = 7,
+                 mSpi: Int = 7, mWis: Int = 7, mAgi: Int = 7, range : Boolean = false, mRes: MutableMap<Int, Int>? = null,
                  skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, mHp + race.mHp + job.mHp, mMp + race.mMp + job.mMp, mSp + race.mSp + job.mSp,
         mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi,
-        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, mRes, skills, states, mStRes) {
+        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, range, mRes, skills, states, mStRes) {
 
     open var race : Costume = race
         set(value) {
@@ -107,6 +108,19 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open val availableSkills : ArrayList<Ability> = ArrayList()
 
+    override var range: Boolean
+        get() {
+            val equipment = this.equipment?.values
+            val states = this.stateDur
+            return super.range || this.job.range || this.race.range
+                    || (equipment != null && equipment.any { it.range }
+                    || (states != null && states.any { it.value != 0 && it.key.range }))
+
+        }
+        set(value) {
+            super.range = value
+        }
+
     internal var skillsQty : MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn : MutableMap<Ability, Int>? = null
 
@@ -116,11 +130,11 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open val equippedItems : Map<Char, Costume>?
         get() {
-            if (this.equipment == null) {
-                return null
+            return if (this.equipment == null) {
+                null
             }
             else {
-                return HashMap<Char, Costume>(this.equipment)
+                HashMap<Char, Costume>(this.equipment)
             }
         }
 
@@ -131,20 +145,20 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             e = HashMap()
             this.equipment = e
         }
-        e.put(pos, item)
+        e[pos] = item
         this.switchCostume(null, item)
         return r
     }
 
     open fun unequipPos(pos : Char) : Costume? {
         val e = this.equipment
-        if (e == null) {
-            return null
+        return if (e == null) {
+            null
         }
         else {
             val r: Costume? = e.get(pos)
             this.switchCostume(r, null)
-            return r
+            r
         }
     }
 
