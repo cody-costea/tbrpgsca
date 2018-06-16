@@ -18,7 +18,7 @@ package com.codycostea.tbrpgsca
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-open class Ability(val id: Int, open val name: String, open val range: Boolean = false, open val steal: Boolean = false,
+open class Ability(val id: Int, open val name: String, open val range: Boolean? = null, open val steal: Boolean = false,
                    open val lvRq: Int, open val hpC: Int, open val mpC: Int, open val spC: Int, open val hpDmg: Int,
                    open val mpDmg: Int, open val spDmg: Int, open val dmgType: Int, open val atkI: Int, open val trg : Int,
                    open val elm: Int, open val mQty: Int, open val rQty: Int, open val absorb: Boolean, open val restoreKO: Boolean,

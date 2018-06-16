@@ -157,7 +157,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     }
 
     open fun getGuardian(target : Int, skill : Ability) : Int {
-        if (skill.range || this.players[this.current].range) {
+        if (skill.range == true || (skill.range === null && this.players[this.current].range)) {
             return target
         }
         val f : Int

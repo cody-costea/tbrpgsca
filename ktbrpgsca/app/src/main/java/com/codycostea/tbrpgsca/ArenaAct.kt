@@ -155,7 +155,7 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
     }
 }
 
-class AdAbility(id: Int, name: String, private val sprId : Int, private val sndId : Int, range: Boolean = false,
+class AdAbility(id: Int, name: String, private val sprId : Int, private val sndId : Int, range: Boolean? = null,
                 steal: Boolean = false, lvRq: Int, hpC: Int, mpC: Int, spC: Int, hpDmg: Int, mpDmg: Int,
                 spDmg: Int, dmgType: Int, atkI: Int, trg : Int, elm: Int, mQty: Int, rQty: Int, absorb: Boolean,
                 restoreKO: Boolean, aStates: Array<State>? = null, rStates: Array<State>? = null)
@@ -323,7 +323,7 @@ class ArenaAct : AppCompatActivity() {
                     else " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
                             ", Qty: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, Trg: " +
                             (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All") +
-                            ", Range: ${if (skill.range) "Yes" else "No"})")
+                            ", Range: ${if (skill.range == true) "Yes" else "No"})")
             return view
         }
 
@@ -631,7 +631,7 @@ class ArenaAct : AppCompatActivity() {
 
         val humanRace = Costume(1, "Human")
         val heroJob = AdCostume(1, "Hero", "hero")
-        val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie", range = true)
+        val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
         val crusaderJob = AdCostume(1, "Crusader", "crusader")
         val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
         val ninjaJob = AdCostume(1, "Ninja", "ninja")
@@ -649,7 +649,7 @@ class ArenaAct : AppCompatActivity() {
         val berserkerJob = AdCostume(1, "Berserker", "berserker")
 
         val skills : Array<Ability> = arrayOf(
-                AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
+                AdAbility(1, "Attack", 0, 0, null, false, 1, 0, 0, 1, 10, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null),
@@ -658,7 +658,7 @@ class ArenaAct : AppCompatActivity() {
         )
 
         val skills2 : Array<Ability> = arrayOf(
-                AdAbility(1, "Act", 0, 0, false, false, 1, 0, 0, 0, 10, 0, 0,
+                AdAbility(1, "Act", 0, 0, null, false, 1, 0, 0, 0, 10, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Guard", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null),
@@ -671,7 +671,7 @@ class ArenaAct : AppCompatActivity() {
                 AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, false, null, skills2, null, null),
                 AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, true, null, skills, null, null),
+                        7, 7, 7, false, null, skills, null, null),
                 AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, false, null, skills, null, null)
         )
