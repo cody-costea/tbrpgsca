@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -27,6 +28,11 @@ import android.view.ViewGroup
 import android.widget.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+
+
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
@@ -74,9 +80,19 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
                 6 -> "cast"
                 else -> return null
             }
-            sprAnim = this.context.resources.getDrawable(
+            val drawable = this.context.resources.getDrawable(
                     this.context.resources.getIdentifier(sprName, "drawable", this.context.packageName))
-                    as AnimationDrawable?
+            when (drawable) {
+                is AnimationDrawable -> sprAnim = drawable
+                is BitmapDrawable -> {
+                    sprAnim = if (spr == 4) this.getBtSprite(side, 3)?.getInvertedSprite(true)
+                            else (drawable.getSprite(this.context,
+                            if (spr in 0..1) null
+                            else this.getBtSprite(side, 0)?.getFrame(0), spr in 2..3,
+                            if (spr < 2) null else (if (spr == 3) this.getBtSprite(side, 1)?.getFrame(0)
+                            else this.getBtSprite(side, 0)?.getFrame(0)), true))
+                }
+            }
             this.sprites[side][spr] = sprAnim
             this.spritesDur[side][spr] = sprAnim?.fullDur ?: 0
         }
@@ -179,7 +195,12 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
             }
         }
         if (sprAnim === null) {
-            sprAnim = context.resources.getDrawable(this.sprId) as AnimationDrawable?
+            val drawable = context.resources.getDrawable(this.sprId)
+            when (drawable) {
+                is AnimationDrawable -> sprAnim = drawable
+                is BitmapDrawable -> sprAnim = drawable.getSprite(context, null,
+                        false, null, false)
+            }
             if (sprAnim === null) {
                 this.spriteDur = 0
             }
@@ -245,6 +266,43 @@ get() {
         s += getDuration(i)
     }
     return s
+}
+
+fun AnimationDrawable.getInvertedSprite(firstFrameWait: Boolean) : AnimationDrawable {
+    val animSpr = AnimationDrawable()
+    animSpr.isOneShot = true
+    for (i in this.numberOfFrames - 1 downTo 0) {
+        animSpr.addFrame(this.getFrame(i), if (firstFrameWait && i == this.numberOfFrames - 1) 261 else 87)
+    }
+    return animSpr
+}
+
+fun BitmapDrawable.getSprite(context : Context, firstFrame : Drawable? = null, firstFrameWait : Boolean,
+                             lastFrame : Drawable? = null, addPlayback : Boolean) : AnimationDrawable {
+    val bmp: Bitmap = this.bitmap
+    val animSpr = AnimationDrawable()
+    animSpr.isOneShot = true
+    if (firstFrameWait && firstFrame !== null) {
+        animSpr.addFrame(firstFrame, 261)
+    }
+    val sprCount = bmp.width / bmp.height
+    val sprWidth = bmp.width / sprCount
+    val lastSprDur = if (addPlayback && sprCount < 7) 261 else 87
+    for (i in 0 until sprCount) {
+        animSpr.addFrame(BitmapDrawable(context.resources,
+                Bitmap.createBitmap(bmp, i * sprWidth, 0, sprWidth, bmp.height)),
+                if (i < sprCount - 1) 87 else lastSprDur)
+    }
+    if (lastSprDur == 261) {
+        for (i in sprCount - 2 downTo 1) {
+            animSpr.addFrame(animSpr.getFrame(i), 87)
+        }
+    }
+    if (lastFrame !== null) {
+        animSpr.addFrame(lastFrame, 1)
+    }
+    //bmp.recycle()
+    return animSpr
 }
 
 class ArenaAct : AppCompatActivity() {
