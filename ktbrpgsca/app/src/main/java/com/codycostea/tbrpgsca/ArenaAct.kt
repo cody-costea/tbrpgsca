@@ -502,72 +502,72 @@ class ArenaAct : AppCompatActivity() {
         val usrSide = if (this.scenePlay.current < this.scenePlay.enIdx) this.partySide else this.otherSide
         val crActor = this.crActor
         val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
-        var dur = crActor.spritesDur[usrSide][sprType]
+        var dur = crActor.spritesDur[usrSide][sprType] - 174
         if (actAnim !== null) {
             actAnim.stop()
             this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
             actAnim.start()
         }
-        var htActor : AdActor
-        for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
-            if (trg != this.scenePlay.current && (lastAbility === null
-                    || !(lastAbility.dmgType == 2 && this.scenePlay.players[trg].reflect))) {
-                htActor = (this.scenePlay.players[trg] as AdActor)
-                val trgAnim : Int
-                if (htActor.hp > 0) {
-                    if (koActors[trg]) {
-                        trgAnim = 4
-                        this.koActors[trg] = false
-                    }
-                    else {
-                        trgAnim = 2
-                    }
-                }
-                else {
-                    if (this.koActors[trg]) continue
-                    trgAnim = 3
-                    this.koActors[trg] = true
-                }
-                if (lastAbility !== null) {
-                    val abilitySpr = lastAbility.getSprite(this)
-                    if (abilitySpr !== null) {
-                        if (lastAbility.spriteDur > dur) {
-                            dur = lastAbility.spriteDur
-                        }
-                        abilitySpr.stop()
-                        this.imgActor[trg].setImageDrawable(abilitySpr)
-                        abilitySpr.start()
-                    }
-                    val soundDur = lastAbility.playSound(this)
-                    if (soundDur > dur) {
-                        dur = soundDur
-                    }
-                }
-                val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
-                val hitAnim = htActor.getBtSprite(trgSide, trgAnim)//htActor.sprites[trgSide][trgAnim]
-                if (hitAnim !== null) {
-                    hitAnim.stop()
-                    if (htActor.spritesDur[trgSide][trgAnim] > dur) {
-                        dur = htActor.spritesDur[trgSide][trgAnim]
-                    }
-                    this.imgActor[trg].setBackgroundDrawable(hitAnim)
-                    hitAnim.start()
-                }
-            }
-        }
         this.imgActor[this.scenePlay.current].postDelayed({
-            if (crActor.hp < 0) {
-                this.koActors[this.scenePlay.current] = true
-                val fallAnim = crActor.getBtSprite(usrSide, 3)//crActor.sprites[usrSide][3]
-                if (fallAnim !== null) {
-                    fallAnim.stop()
-                    this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
-                    fallAnim.start()
+            var htActor: AdActor
+            for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
+                if (trg != this.scenePlay.current && (lastAbility === null
+                                || !(lastAbility.dmgType == 2 && this.scenePlay.players[trg].reflect))) {
+                    htActor = (this.scenePlay.players[trg] as AdActor)
+                    val trgAnim: Int
+                    if (htActor.hp > 0) {
+                        if (koActors[trg]) {
+                            trgAnim = 4
+                            this.koActors[trg] = false
+                        } else {
+                            trgAnim = 2
+                        }
+                    } else {
+                        if (this.koActors[trg]) continue
+                        trgAnim = 3
+                        this.koActors[trg] = true
+                    }
+                    if (lastAbility !== null) {
+                        val abilitySpr = lastAbility.getSprite(this)
+                        if (abilitySpr !== null) {
+                            if (lastAbility.spriteDur > dur) {
+                                dur = lastAbility.spriteDur
+                            }
+                            abilitySpr.stop()
+                            this.imgActor[trg].setImageDrawable(abilitySpr)
+                            abilitySpr.start()
+                        }
+                        val soundDur = lastAbility.playSound(this)
+                        if (soundDur > dur) {
+                            dur = soundDur
+                        }
+                    }
+                    val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
+                    val hitAnim = htActor.getBtSprite(trgSide, trgAnim)//htActor.sprites[trgSide][trgAnim]
+                    if (hitAnim !== null) {
+                        hitAnim.stop()
+                        if (htActor.spritesDur[trgSide][trgAnim] > dur) {
+                            dur = htActor.spritesDur[trgSide][trgAnim]
+                        }
+                        this.imgActor[trg].setBackgroundDrawable(hitAnim)
+                        hitAnim.start()
+                    }
                 }
             }
-            this.actionsTxt.append(this.scenePlay.endTurn(""))
-            this.afterAct()
-        }, dur.toLong())
+            this.imgActor[this.scenePlay.current].postDelayed({
+                if (crActor.hp < 0) {
+                    this.koActors[this.scenePlay.current] = true
+                    val fallAnim = crActor.getBtSprite(usrSide, 3)//crActor.sprites[usrSide][3]
+                    if (fallAnim !== null) {
+                        fallAnim.stop()
+                        this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
+                        fallAnim.start()
+                    }
+                }
+                this.actionsTxt.append(this.scenePlay.endTurn(""))
+                this.afterAct()
+            }, dur.toLong())
+        }, 174)
     }
 
     private fun setCrItems() {
