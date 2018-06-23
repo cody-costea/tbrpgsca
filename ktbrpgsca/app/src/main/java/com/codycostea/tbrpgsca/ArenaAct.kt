@@ -29,10 +29,7 @@ import android.widget.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
-
-
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
@@ -613,8 +610,11 @@ class ArenaAct : AppCompatActivity() {
                 this.itemsSpn.setSelection(0)
                 this.itemsSpn.isEnabled = true
             }
-            this.itemUseBtn.isEnabled = ((this.itemsSpn.selectedView?.tag as? ViewHolder)?.usable ?: false)
-                    && this.canTarget(this.targetSpn.selectedItemPosition, this.itemsSpn.selectedItem as Ability)
+            this.targetSpn.selectedItemPosition
+            if (this.targetSpn.selectedItemPosition > -1) {
+                val item = this.itemsSpn.selectedItem as Ability
+                this.itemUseBtn.isEnabled = item.canPerform(this.crActor) && this.canTarget(this.targetSpn.selectedItemPosition, item)
+            }
         }
     }
 
