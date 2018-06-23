@@ -366,7 +366,7 @@ class ArenaAct : AppCompatActivity() {
                 vHolder = convertView.tag as ViewHolder
             }
 
-            vHolder.usable = this.asItems || this.skills[position].canPerform(this.arenaAct.crActor)
+            vHolder.usable = this.skills[position].canPerform(this.arenaAct.crActor)
             vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
             return view
         }
@@ -377,11 +377,11 @@ class ArenaAct : AppCompatActivity() {
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
             vHolder.nameText.text = skill.name +
-                    (if (this.asItems) " x ${this.arenaAct.crActor.items?.get(skill)}"
-                    else " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
-                            ", Qty: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, Trg: " +
+                    (if (this.asItems) " x ${this.arenaAct.crActor.items?.get(skill)}" else "") +
+                    " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
+                            ", Uses: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, Trg: " +
                             (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All") +
-                            ", Range: ${if (skill.range == true) "Yes" else "No"})")
+                            ", Range: ${if (skill.range == true) "Yes" else "No"})"
             return view
         }
 
@@ -587,12 +587,12 @@ class ArenaAct : AppCompatActivity() {
 
                 this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
-                        itemUseBtn.isEnabled = false
+                        this@ArenaAct.itemUseBtn.isEnabled = false
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        itemUseBtn.isEnabled = (view?.tag as ViewHolder).usable
-                                && canTarget(targetSpn.selectedItemPosition, itemsSpn.selectedItem as Ability)
+                        this@ArenaAct.itemUseBtn.isEnabled = (view?.tag as ViewHolder).usable
+                                && this@ArenaAct.canTarget(this@ArenaAct.targetSpn.selectedItemPosition, this@ArenaAct.itemsSpn.selectedItem as Ability)
                     }
 
                 }
@@ -613,7 +613,8 @@ class ArenaAct : AppCompatActivity() {
                 this.itemsSpn.setSelection(0)
                 this.itemsSpn.isEnabled = true
             }
-            this.itemUseBtn.isEnabled = true
+            this.itemUseBtn.isEnabled = ((this.itemsSpn.selectedView?.tag as? ViewHolder)?.usable ?: false)
+                    && this.canTarget(this.targetSpn.selectedItemPosition, this.itemsSpn.selectedItem as Ability)
         }
     }
 
@@ -634,7 +635,7 @@ class ArenaAct : AppCompatActivity() {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     this@ArenaAct.skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
                             || (view === null && this@ArenaAct.crActor.availableSkills[position].canPerform(this@ArenaAct.crActor)))
-                            && canTarget(this@ArenaAct.targetSpn.selectedItemPosition, this@ArenaAct.crActor.availableSkills[position])
+                            && this@ArenaAct.canTarget(this@ArenaAct.targetSpn.selectedItemPosition, this@ArenaAct.crActor.availableSkills[position])
                 }
 
             }
@@ -734,7 +735,7 @@ class ArenaAct : AppCompatActivity() {
                         7, 7, 7, false, null, skills, null, null)
         )
         party[0].items = LinkedHashMap()
-        val potion = AdAbility(10, "Potion", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
+        val potion = AdAbility(10, "Potion", 0, 0, false, false, 1, 0, 3, 0, -15, 0, 0,
                 3, 0, 0, 0, 0, 0, false, false, null, null)
         party[0].items!![potion] = 3
         party[1].items = party[0].items
@@ -897,9 +898,14 @@ class ArenaAct : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 //skillActBtn.isEnabled = crCanPerform && canTarget(position, skillsSpn.selectedItem as Ability)
-                //itemUseBtn.isEnabled = crCanUse && canTarget(position, itemsSpn.selectedItem as Ability)
-                if (this@ArenaAct.crActor.automatic == 0 && this@ArenaAct.skillsSpn.isEnabled) {
-                    this@ArenaAct.setCrAutoSkill()
+                if (this@ArenaAct.crActor.automatic == 0) {
+                    if (this@ArenaAct.itemsSpn.isEnabled) {
+                        this@ArenaAct.itemUseBtn.isEnabled = (this@ArenaAct.itemsSpn.selectedView.tag as ViewHolder).usable
+                                && this@ArenaAct.canTarget(position, this@ArenaAct.itemsSpn.selectedItem as Ability)
+                    }
+                    if (this@ArenaAct.skillsSpn.isEnabled) {
+                        this@ArenaAct.setCrAutoSkill()
+                    }
                 }
             }
 
