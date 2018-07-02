@@ -24,12 +24,19 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                    open val elm: Int, open val mQty: Int, open val rQty: Int, open val absorb: Boolean, open val restoreKO: Boolean,
                    open val aStates: Array<State>? = null, open val rStates: Array<State>? = null) {
 
+    companion object {
+        val reflectedTxt = ", reflected by %s"
+        val suffersTxt = ", %s suffers "
+        val stolenTxt = ", %s stolen"
+        val missesTxt = ", but misses"
+    }
+
     open fun execute(user: Actor, target: Actor, applyCosts: Boolean): String {
         var s = ""
         var dmg = (Math.random() * 4).toInt()
         val trg : Actor
         if (target.reflect && this.dmgType == 2) {
-            s += ", reflected by " + target.name
+            s += String.format(Ability.reflectedTxt, target.name)
             trg = user
         }
         else {
@@ -72,8 +79,9 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 user.sp += dmgsp / 2
             }
             var c = false
-            if (dmghp != 0 || dmgmp != 0 || dmgsp != 0)
-                s += ", " + trg.name + " suffers"
+            if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
+                s += String.format(Ability.suffersTxt, trg.name)
+            }
             if (dmghp != 0) {
                 s += " "
                 if (dmghp < 1) s += "+"
@@ -99,7 +107,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 for (state in aStates) {
                     r = state.inflict(trg, false)
                     if (r.isNotEmpty()) {
-                        s += ", " + r
+                        s += ", $r"
                     }
                 }
             }
@@ -142,14 +150,15 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                         }
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
                         trgItems[stolen] = trgItemQty - 1
-                        s += ", " + stolen.name + " stolen"
+                        s += String.format(Ability.stolenTxt, stolen.name)
                         if (trgItems[stolen] == 0) trgItems.remove(stolen)
                     }
                 }
             }
+            s += trg.checkStatus()
         }
         else {
-            s += ", but misses"
+            s += Ability.missesTxt
         }
         if (applyCosts) {
             user.hp -= this.hpC
@@ -168,7 +177,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
             trg.applyStates(false)
         }
         s += user.checkStatus()
-        return s
+        return "$s.\n"
     }
 
     open fun replenish(user: Actor) {

@@ -28,6 +28,10 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi,
         mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, range, mRes, skills, states, mStRes) {
 
+    companion object {
+        val koTxt = " (and falls unconcious)"
+    }
+
     open var race : Costume = race
         set(value) {
             this.switchCostume(field, value)
@@ -360,7 +364,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                     if (r.isNotEmpty()) {
                         if (c) s += ", "
                         if (consume && !c) {
-                            s += "\n"
+                            //s += "\n"
                             c = true
                         }
                         s += r
@@ -376,7 +380,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     fun checkStatus(): String {
         var s = ""
         if (this.hp < 1) {
-            s += " (and falls unconcious)"
+            s += Actor.koTxt
             this.actions = 0
             this.guards = false
             this.sp = 0

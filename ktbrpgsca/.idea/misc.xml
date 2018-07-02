@@ -1,23 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AndroidLayouts">
-    <shared>
-      <config>
-        <devices>
-          <device id="Nexus One" />
-          <device id="Nexus 4" />
-          <device id="Galaxy Nexus" />
-          <device id="Nexus S" />
-          <device id="Nexus 5" />
-          <device id="tv_1080p" />
-          <device id="Nexus 9" />
-          <device id="Nexus 7" />
-          <device id="Nexus 6" />
-          <device id="pixel_xl" />
-        </devices>
-      </config>
-    </shared>
-  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />

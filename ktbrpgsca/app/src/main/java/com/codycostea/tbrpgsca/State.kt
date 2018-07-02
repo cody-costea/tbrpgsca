@@ -21,6 +21,10 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                  skills : Array<Ability>? = null,open val rSkills : Array<Ability>? = null, rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
     : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, range, mRes, skills, rStates, mStRes) {
 
+    companion object {
+        val causesTxt : String = "%s causes %s"
+    }
+
     open fun inflict(actor: Actor, always: Boolean): String {
         val trgStRes = actor.stRes
         if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + this.sRes) {
@@ -94,7 +98,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                         actor.sp += dmgsp
                         var c = false
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += this.name + " causes " + actor.name
+                            s += String.format(State.causesTxt, this.name, actor.name)
                         }
                         if (dmghp != 0) {
                             s += " "

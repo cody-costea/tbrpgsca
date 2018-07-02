@@ -17,6 +17,12 @@ package com.codycostea.tbrpgsca
 
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
+    companion object {
+        val performsTxt = "%s performs %s"
+        val victoryTxt = "The party has won!"
+        val fallenTxt = "The party has fallen!"
+    }
+
     open var status : Int = 0
         protected set
 
@@ -142,12 +148,12 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
                 if (noParty) {
                     this.status = -2
-                    ret += "The party has fallen!"
+                    ret += Scene.fallenTxt
                 }
                 else {
                     if (noEnemy) {
                         this.status = 1
-                        ret += "The party has won!"
+                        ret += Scene.victoryTxt
                     }
                 }
             } while (this.status == 0 && this.players[this.current].actions < 1)
@@ -244,6 +250,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
         }
         var applyCosts = true
+        ret += String.format(Scene.performsTxt, this.players[this.current].name, skill.name)
         for (i in this.fTarget..this.lTarget) {
             if ((skill.hpDmg < 0 && skill.restoreKO) || this.players[i].hp > 0) {
                 ret += skill.execute(this.players[this.current], this.players[i], applyCosts)

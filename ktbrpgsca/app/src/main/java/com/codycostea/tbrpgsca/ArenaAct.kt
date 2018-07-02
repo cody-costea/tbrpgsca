@@ -30,6 +30,7 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.text.method.ScrollingMovementMethod
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
@@ -770,6 +771,7 @@ class ArenaAct : AppCompatActivity() {
         this.itemsSpn = this.findViewById(R.id.ItemBox)
         this.targetSpn = this.findViewById(R.id.TargetBox)
         this.actionsTxt = this.findViewById(R.id.ItemCost)
+        this.actionsTxt.movementMethod = ScrollingMovementMethod()
         this.infoTxt = this.findViewById(R.id.SkillCost)
 
         this.koActors = this.scenePlay.players.map {
