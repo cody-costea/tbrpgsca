@@ -468,8 +468,9 @@ class ArenaAct : AppCompatActivity() {
     }
 
     private fun setCrAutoSkill() {
-        val autoSkill = this.scenePlay.getAIskill(
-                if (this.targetSpn.selectedItemPosition < this.scenePlay.enIdx) 1 else 0)
+        val onPartySide = this.targetSpn.selectedItemPosition < this.scenePlay.enIdx
+        val autoSkill = this.scenePlay.getAIskill(if (onPartySide) 1 else 0,
+                onPartySide && this.scenePlay.players[this.targetSpn.selectedItemPosition].hp < 1)
         if (this.skillsSpn.selectedItemPosition == autoSkill) {
             this.skillActBtn.isEnabled = (this.crActor.availableSkills[autoSkill]).canPerform(this.crActor)
                     && this.canTarget(this.targetSpn.selectedItemPosition, this.crActor.availableSkills[autoSkill])

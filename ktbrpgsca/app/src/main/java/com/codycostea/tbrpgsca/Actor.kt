@@ -19,7 +19,6 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
-
 open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int = 1, open var maxLv: Int = 9,
                  mActions : Int = 1, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, mAtk: Int = 7, mDef: Int = 7,
                  mSpi: Int = 7, mWis: Int = 7, mAgi: Int = 7, range : Boolean = false, mRes: MutableMap<Int, Int>? = null,

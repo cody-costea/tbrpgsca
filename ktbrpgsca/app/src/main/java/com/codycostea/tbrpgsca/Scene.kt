@@ -267,15 +267,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     }
 
     open fun executeAI(ret : String) : String {
-        return this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal())], ret)
-    }
-
-    open fun checkAIheal() : Int {
-        var ret = 0
+        var skillIndex = 0
         var nHeal = false
         var nRestore = false
-        val f : Int
-        val l : Int
+        var f : Int
+        var l : Int
         if (this.current < this.enIdx) {
             f = 0
             l = this.enIdx
@@ -296,26 +292,46 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             for (i in 0 until this.players[this.current].availableSkills.size) {
                 val s = this.players[this.current].availableSkills[i]
                 if ((s.restoreKO || (nHeal && s.hpDmg < 0)) && s.canPerform(this.players[this.current])) {
-                    ret = this.getAIskill(i)
+                    skillIndex = i
                     break
                 }
             }
         }
-        return ret
+        val ability = this.players[this.current].availableSkills[this.getAIskill(skillIndex, nRestore)]
+        //if ((this.current < this.enIdx && ability.hpDmg >= 0)
+                //|| (this.current >= this.enIdx && ability.hpDmg < 0)) {
+        if (ability.hpDmg > -1) {
+            if (this.current < this.enIdx) {
+                f = this.enIdx
+                l = this.players.size
+            }
+            else {
+                f = 0
+                l = this.enIdx
+            }
+        }
+        var target = f
+        while (this.players[target].hp < 1 && (ability.hpDmg > 1 || !ability.restoreKO) && target < l) target++
+        for (i in target until l) {
+            if (this.players[i].hp < this.players[target].hp && (this.players[i].hp > 0 || ability.restoreKO)
+            /*&& ((this.players[i].hp > 0 && ability.hpDmg >= 0) || ability.hpDmg < 0)*/) {
+                target = i
+            }
+        }
+        return this.executeAbility(ability, target, ret)
     }
 
-    open fun getAIskill(defSkill : Int) : Int {
-        val healSkill = defSkill
-        var ret = healSkill
-        var s = this.players[this.current].availableSkills[healSkill]
-        for (i in healSkill + 1 until this.players[this.current].availableSkills.size) {
+    open fun getAIskill(defSkill : Int, nRestore : Boolean) : Int {
+        var ret = defSkill
+        var s = this.players[this.current].availableSkills[defSkill]
+        for (i in defSkill + 1 until this.players[this.current].availableSkills.size) {
             val a = this.players[this.current].availableSkills[i]
             if (a.mpC <= this.players[this.current].mp
-            && a.hpC < this.players[this.current].hp
-            && a.spC <= this.players[this.current].sp
-            && this.players[this.current].level >= a.lvRq) {
-                if (healSkill > 0) {
-                    if (a.hpDmg < s.hpDmg && (a.restoreKO || !s.restoreKO)) {
+                    && a.hpC < this.players[this.current].hp
+                    && a.spC <= this.players[this.current].sp
+                    && this.players[this.current].level >= a.lvRq) {
+                if (defSkill > 0) {
+                    if (a.hpDmg < s.hpDmg && (a.restoreKO || !nRestore)) {
                         s = a
                         ret = i
                     }
@@ -327,31 +343,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
         }
         return ret
-    }
-
-    open fun setAItarget(ability : Ability, ret : String) : String {
-        val f : Int
-        val l : Int
-        if ((this.current < this.enIdx && ability.hpDmg >= 0)
-        || (this.current >= this.enIdx && ability.hpDmg < 0)) {
-            f = this.enIdx
-            l = this.players.size
-        }
-        else {
-            f = 0
-            l = this.enIdx
-        }
-        var target = f
-
-        while (this.players[target].hp < 1 && (ability.hpDmg > 1 || !ability.restoreKO) && target < l) target++
-
-        for (i in target until l) {
-            if (this.players[i].hp < this.players[target].hp && (this.players[i].hp > 0 || ability.restoreKO)
-            /*&& ((this.players[i].hp > 0 && ability.hpDmg >= 0) || ability.hpDmg < 0)*/) {
-                target = i
-            }
-        }
-        return this.executeAbility(ability, target, ret)
     }
 
     open fun performSkill(index : Int, target : Int, txt : String) : String {
