@@ -563,7 +563,9 @@ class ArenaAct : AppCompatActivity() {
                     }
                 }
                 this.actionsTxt.append(this.scenePlay.endTurn(""))
-                this.afterAct()
+                if (this.scenePlay.status == 0) {
+                    this.afterAct()
+                }
             }, dur.toLong())
         }, 174)
     }

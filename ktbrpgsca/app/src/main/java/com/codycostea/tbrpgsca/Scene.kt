@@ -267,12 +267,13 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     }
 
     open fun executeAI(ret : String) : String {
-        return this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal(-1))], ret)
+        return this.setAItarget(this.players[this.current].availableSkills[this.getAIskill(this.checkAIheal())], ret)
     }
 
-    open fun checkAIheal(def : Int) : Int {
-        var ret = def
+    open fun checkAIheal() : Int {
+        var ret = 0
         var nHeal = false
+        var nRestore = false
         val f : Int
         val l : Int
         if (this.current < this.enIdx) {
@@ -284,28 +285,27 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             l = this.players.size
         }
         for (i in f until l) {
-            if (this.players[i].hp < (this.players[i].mHp / 3)) {
+            if (this.players[i].hp < 1) {
+                nRestore = true
+            }
+            else if (this.players[i].hp < (this.players[i].mHp / 3)) {
                 nHeal = true
-                break
             }
         }
-        if (nHeal) {
+        if (nRestore || nHeal) {
             for (i in 0 until this.players[this.current].availableSkills.size) {
                 val s = this.players[this.current].availableSkills[i]
-                if (s.hpDmg < 0 && s.canPerform(this.players[this.current])) {
-                    ret = i
+                if ((s.restoreKO || (nHeal && s.hpDmg < 0)) && s.canPerform(this.players[this.current])) {
+                    ret = this.getAIskill(i)
                     break
                 }
             }
-        }
-        else {
-            ret = 0
         }
         return ret
     }
 
     open fun getAIskill(defSkill : Int) : Int {
-        val healSkill = if (defSkill < 0) 0 else defSkill
+        val healSkill = defSkill
         var ret = healSkill
         var s = this.players[this.current].availableSkills[healSkill]
         for (i in healSkill + 1 until this.players[this.current].availableSkills.size) {
@@ -315,7 +315,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             && a.spC <= this.players[this.current].sp
             && this.players[this.current].level >= a.lvRq) {
                 if (healSkill > 0) {
-                    if (a.hpDmg < s.hpDmg && a.hpDmg < 0) {
+                    if (a.hpDmg < s.hpDmg && (a.restoreKO || !s.restoreKO)) {
                         s = a
                         ret = i
                     }
@@ -343,11 +343,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
         var target = f
 
-        while ((this.players[target].hp < 1) && (ability.hpDmg > 1) && target < l) target++
+        while (this.players[target].hp < 1 && (ability.hpDmg > 1 || !ability.restoreKO) && target < l) target++
 
         for (i in target until l) {
-            if (this.players[i].hp < this.players[target].hp
-            && ((this.players[i].hp > 0 && ability.hpDmg >= 0) || ability.hpDmg < 0)) {
+            if (this.players[i].hp < this.players[target].hp && (this.players[i].hp > 0 || ability.restoreKO)
+            /*&& ((this.players[i].hp > 0 && ability.hpDmg >= 0) || ability.hpDmg < 0)*/) {
                 target = i
             }
         }
