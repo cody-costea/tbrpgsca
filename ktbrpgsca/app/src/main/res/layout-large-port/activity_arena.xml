@@ -124,7 +124,7 @@
 	<RelativeLayout
 		android:id="@+id/LayoutArena"
 		android:layout_width="wrap_content"
-		android:layout_height="272dp"
+		android:layout_height="320dp"
 		android:layout_below="@id/SkillCost"
 		android:orientation="horizontal">
 
@@ -137,7 +137,7 @@
 		<RelativeLayout
 			android:id="@+id/LayoutArenaCentre"
 			android:layout_width="256dp"
-			android:layout_height="272dp"
+			android:layout_height="320dp"
 			android:orientation="horizontal"
 			android:gravity="center_horizontal"
 			android:layout_centerHorizontal="true">

@@ -25,10 +25,10 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                    open val aStates: Array<State>? = null, open val rStates: Array<State>? = null) {
 
     companion object {
-        val reflectedTxt = ", reflected by %s"
-        val suffersTxt = ", %s suffers "
-        val stolenTxt = ", %s stolen"
-        val missesTxt = ", but misses"
+        var reflectedTxt = ", reflected by %s"
+        var suffersTxt = ", %s suffers "
+        var stolenTxt = ", %s stolen"
+        var missesTxt = ", but misses"
     }
 
     open fun execute(user: Actor, target: Actor, applyCosts: Boolean): String {
@@ -176,8 +176,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         if (ko && trg.hp > 0) {
             trg.applyStates(false)
         }
-        s += user.checkStatus()
-        return "$s.\n"
+        return s + user.checkStatus() + "."
     }
 
     open fun replenish(user: Actor) {

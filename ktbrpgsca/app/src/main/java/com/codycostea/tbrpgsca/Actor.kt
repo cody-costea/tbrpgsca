@@ -28,7 +28,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, range, mRes, skills, states, mStRes) {
 
     companion object {
-        val koTxt = " (and falls unconcious)"
+        var koTxt = " (and falls unconcious)"
     }
 
     open var race : Costume = race

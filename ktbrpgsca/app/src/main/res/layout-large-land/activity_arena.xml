@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/LayoutArena"
         android:layout_width="wrap_content"
-        android:layout_height="272dp"
+        android:layout_height="304dp"
         android:layout_toRightOf="@+id/linearLayout1"
         android:layout_toEndOf="@+id/linearLayout1"
         android:layout_toLeftOf="@id/AutoRunLayout"
@@ -24,7 +24,7 @@
         <LinearLayout
             android:id="@+id/LayoutArenaCentre"
             android:layout_width="256dp"
-            android:layout_height="272dp"
+            android:layout_height="304dp"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
             android:layout_centerHorizontal="true">

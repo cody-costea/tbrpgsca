@@ -18,9 +18,9 @@ package com.codycostea.tbrpgsca
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
     companion object {
-        val performsTxt = "%s performs %s"
-        val victoryTxt = "The party has won!"
-        val fallenTxt = "The party has fallen!"
+        var performsTxt = "\n%s performs %s"
+        var victoryTxt = "\nThe party has won!"
+        var fallenTxt = "\nThe party has fallen!"
     }
 
     open var status : Int = 0
