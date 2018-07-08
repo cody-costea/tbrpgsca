@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/LayoutArena"
         android:layout_width="wrap_content"
-        android:layout_height="304dp"
+        android:layout_height="196dp"
         android:layout_toRightOf="@+id/linearLayout1"
         android:layout_toEndOf="@+id/linearLayout1"
         android:layout_toLeftOf="@id/AutoRunLayout"
@@ -23,8 +23,8 @@
 
         <LinearLayout
             android:id="@+id/LayoutArenaCentre"
-            android:layout_width="256dp"
-            android:layout_height="304dp"
+            android:layout_width="170dp"
+            android:layout_height="196dp"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
             android:layout_centerHorizontal="true">
@@ -43,13 +43,13 @@
 
                     <ImageView
                         android:id="@+id/ImgPlayer1"
-                        android:layout_width="128dp"
-                        android:layout_height="128dp" />
+                        android:layout_width="96dp"
+                        android:layout_height="96dp" />
 
                     <ImageView
                         android:id="@+id/ImgPlayer4"
-                        android:layout_width="128dp"
-                        android:layout_height="128dp" />
+                        android:layout_width="96dp"
+                        android:layout_height="96dp" />
 
 
                 </LinearLayout>
@@ -63,13 +63,13 @@
                     android:layout_alignParentEnd="true">
                     <ImageView
                         android:id="@+id/ImgEnemy4"
-                        android:layout_width="128dp"
-                        android:layout_height="128dp" />
+                        android:layout_width="96dp"
+                        android:layout_height="96dp" />
 
                     <ImageView
                         android:id="@+id/ImgEnemy1"
-                        android:layout_width="128dp"
-                        android:layout_height="128dp" />
+                        android:layout_width="96dp"
+                        android:layout_height="96dp" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -77,43 +77,41 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="128dp"
+            android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_toLeftOf="@id/LayoutArenaCentre"
-            android:layout_toStartOf="@id/LayoutArenaCentre"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true">
 
             <ImageView
                 android:id="@+id/ImgPlayer2"
-                android:layout_width="128dp"
-                android:layout_height="128dp"/>
+                android:layout_width="96dp"
+                android:layout_height="96dp"/>
 
             <ImageView
                 android:id="@+id/ImgPlayer3"
-                android:layout_width="128dp"
-                android:layout_height="128dp"/>
+                android:layout_width="96dp"
+                android:layout_height="96dp"/>
 
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="128dp"
+            android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_toRightOf="@id/LayoutArenaCentre"
-            android:layout_toEndOf="@id/LayoutArenaCentre"
+            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true">
 
             <ImageView
                 android:id="@+id/ImgEnemy3"
-                android:layout_width="128dp"
-                android:layout_height="128dp" />
+                android:layout_width="96dp"
+                android:layout_height="96dp" />
 
             <ImageView
                 android:id="@+id/ImgEnemy2"
-                android:layout_width="128dp"
-                android:layout_height="128dp" />
+                android:layout_width="96dp"
+                android:layout_height="96dp" />
         </LinearLayout>
 
         <TextView
@@ -171,7 +169,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="178dp"
+        android:layout_width="88dp"
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
