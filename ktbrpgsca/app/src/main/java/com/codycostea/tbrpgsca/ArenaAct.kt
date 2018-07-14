@@ -44,7 +44,6 @@ class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, m
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
-
 }
 
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: AdCostume,
@@ -326,6 +325,46 @@ class ArenaAct : AppCompatActivity() {
     private var otherSide = 1
     private var automatic = false
 
+    private var skillsAdapter : AbilityArrayAdapter? = null
+    private lateinit var playersAdapter : ActorArrayAdapter
+    private var itemsAdapter : AbilityArrayAdapter? = null
+
+    private val cAction = View.OnClickListener {
+        when (it.id) {
+            R.id.ActBt -> {
+                this.enableControls(false)
+                this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
+                        this.targetSpn.selectedItemPosition, ""))
+                this.playSpr()
+            }
+            R.id.AutoBt -> {
+                this.automatic = !this.automatic
+                if (this.automatic) {
+                    this.enableControls(false)
+                    if (this.crActor.automatic == 0) {
+                        this.afterAct()
+                    }
+                }
+                else {
+                    this.autoBtn.isEnabled = false
+                }
+            }
+            R.id.UseBt -> {
+                this.enableControls(false)
+                this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
+                        this.targetSpn.selectedItemPosition, ""))
+                val itemsAdapter = this.itemsAdapter
+                if (itemsAdapter !== null) {
+                    itemsAdapter.notifyDataSetChanged()
+                }
+                this.playSpr()
+            }
+            R.id.RunBt -> {
+
+            }
+        }
+    }
+
     private class ViewHolder(var nameText : TextView) {
         var usable : Boolean = true
     }
@@ -442,10 +481,6 @@ class ArenaAct : AppCompatActivity() {
             return view
         }
     }
-
-    private var skillsAdapter : AbilityArrayAdapter? = null
-    private lateinit var playersAdapter : ActorArrayAdapter
-    private var itemsAdapter : AbilityArrayAdapter? = null
 
     private val crActor : AdActor
         get() {
@@ -598,13 +633,7 @@ class ArenaAct : AppCompatActivity() {
 
                 }
 
-                this.itemUseBtn.setOnClickListener {
-                    this.enableControls(false)
-                    this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
-                            this.targetSpn.selectedItemPosition, ""))
-                    itemsAdapter.notifyDataSetChanged()
-                    this.playSpr()
-                }
+                this.itemUseBtn.setOnClickListener(this.cAction)
             }
             else if (itemsAdapter.skills !== crItems) {
                 itemsAdapter.skills = crItems
@@ -644,12 +673,7 @@ class ArenaAct : AppCompatActivity() {
 
             }
 
-            this.skillActBtn.setOnClickListener {
-                this.enableControls(false)
-                this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
-                        this.targetSpn.selectedItemPosition, ""))
-                this.playSpr()
-            }
+            this.skillActBtn.setOnClickListener(this.cAction)
         }
         else {
             skillsAdapter.skills = this.crActor.availableSkills
@@ -875,8 +899,6 @@ class ArenaAct : AppCompatActivity() {
         this.imgActor = imgViews.toTypedArray()
 
         for (i in 0 until this.scenePlay.enIdx) {
-            /*this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).sprites[this.partySide]
-                    [if (this.koActors[i]) 1 else 0])*/
             this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.partySide,
                     if (this.koActors[i]) 1 else 0))
         }
@@ -913,21 +935,10 @@ class ArenaAct : AppCompatActivity() {
                     }
                 }
             }
-
         }
 
-        this.autoBtn.setOnClickListener {
-            this.automatic = !this.automatic
-            if (this.automatic) {
-                this.enableControls(false)
-                if (this.crActor.automatic == 0) {
-                    this.afterAct()
-                }
-            }
-            else {
-                this.autoBtn.isEnabled = false
-            }
-        }
+        this.runBtn.setOnClickListener(this.cAction)
+        this.autoBtn.setOnClickListener(this.cAction)
 
         if (this.crActor.automatic != 0) {
             this.afterAct()

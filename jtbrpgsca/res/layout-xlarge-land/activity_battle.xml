@@ -10,15 +10,15 @@
         android:layout_height="464dp"
         android:layout_toRightOf="@+id/linearLayout1"
         android:layout_toEndOf="@+id/linearLayout1"
-        android:layout_toLeftOf="@id/AutoRunLayout"
+        android:layout_toLeftOf="@+id/AutoRunLayout"
         android:orientation="horizontal"
-        android:layout_toStartOf="@id/AutoRunLayout">
+        android:layout_toStartOf="@+id/AutoRunLayout">
 
         <ImageView
             android:id="@+id/ImgArena"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/SkillCost"
+            android:layout_below="@+id/SkillCost"
             />
 
         <LinearLayout
@@ -80,8 +80,8 @@
             android:layout_width="208dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_toLeftOf="@id/LayoutArenaCentre"
-            android:layout_toStartOf="@id/LayoutArenaCentre"
+            android:layout_toLeftOf="@+id/LayoutArenaCentre"
+            android:layout_toStartOf="@+id/LayoutArenaCentre"
             android:layout_alignParentTop="true">
 
             <ImageView
@@ -101,8 +101,8 @@
             android:layout_width="208dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_toRightOf="@id/LayoutArenaCentre"
-            android:layout_toEndOf="@id/LayoutArenaCentre"
+            android:layout_toRightOf="@+id/LayoutArenaCentre"
+            android:layout_toEndOf="@+id/LayoutArenaCentre"
             android:layout_alignParentBottom="true">
 
             <ImageView
@@ -149,7 +149,6 @@
             android:layout_width="30dp"
             android:layout_height="0dp"
             android:layout_weight="0.5"
-            android:enabled="false"
             android:text="@string/bt_run" />
 
     </LinearLayout>
@@ -158,16 +157,16 @@
         android:id="@+id/ItemCost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/LayoutArena"
+        android:layout_below="@+id/LayoutArena"
         android:layout_alignParentBottom="true"
         android:gravity="bottom"
         android:maxLines="30"
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_toRightOf="@id/linearLayout1"
-        android:layout_toEndOf="@id/linearLayout1"
-        android:layout_toLeftOf="@id/AutoRunLayout"
-        android:layout_toStartOf="@id/AutoRunLayout" />
+        android:layout_toRightOf="@+id/linearLayout1"
+        android:layout_toEndOf="@+id/linearLayout1"
+        android:layout_toLeftOf="@+id/AutoRunLayout"
+        android:layout_toStartOf="@+id/AutoRunLayout" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -179,8 +178,7 @@
             android:id="@+id/SkillBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:enabled="false" />
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/ActBt"
@@ -188,7 +186,6 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:enabled="false"
             android:text="@string/bt_act" />
 
         <Spinner
@@ -203,15 +200,13 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:enabled="false"
             android:text="@string/bt_use" />
 
         <Spinner
             android:id="@+id/ItemBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:enabled="false" />
+            android:layout_weight="1" />
 
     </LinearLayout>
 
