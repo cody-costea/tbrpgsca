@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
@@ -31,6 +32,8 @@ import kotlin.collections.LinkedHashMap
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.text.method.ScrollingMovementMethod
+import android.content.Intent
+import android.support.v7.app.AlertDialog
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
@@ -350,17 +353,25 @@ class ArenaAct : AppCompatActivity() {
                 }
             }
             R.id.UseBt -> {
-                this.enableControls(false)
-                this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
-                        this.targetSpn.selectedItemPosition, ""))
                 val itemsAdapter = this.itemsAdapter
                 if (itemsAdapter !== null) {
+                    this.enableControls(false)
+                    this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
+                            this.targetSpn.selectedItemPosition, ""))
                     itemsAdapter.notifyDataSetChanged()
+                    this.playSpr()
                 }
-                this.playSpr()
             }
             R.id.RunBt -> {
-
+                val escText = this.scenePlay.escape()
+                this.actionsTxt.append(this.scenePlay.endTurn(""))
+                if (this.scenePlay.status == -1) {
+                    this.actionsTxt.append("\n$escText")
+                    this.endingMsg("Escape", Scene.escapeTxt)
+                }
+                else {
+                    this.afterAct()
+                }
             }
         }
     }
@@ -516,16 +527,23 @@ class ArenaAct : AppCompatActivity() {
     }
 
     private fun afterAct() {
-        if (this.automatic || this.crActor.automatic != 0) {
-            this.actionsTxt.append(this.scenePlay.executeAI(""))
-            this.playSpr()
-        }
-        else {
-            this.setCrSkills()
-            this.setCrItems()
-            this.enableControls(true)
-            this.autoBtn.isEnabled = true
-            this.setCrAutoSkill()
+        when (this.scenePlay.status) {
+            0 -> {
+                if (this.automatic || this.crActor.automatic != 0) {
+                    this.actionsTxt.append(this.scenePlay.executeAI(""))
+                    this.playSpr()
+                }
+                else {
+                    this.setCrSkills()
+                    this.setCrItems()
+                    this.enableControls(true)
+                    this.autoBtn.isEnabled = true
+                    this.setCrAutoSkill()
+                }
+            }
+            1 -> this.endingMsg("Victory", Scene.victoryTxt)
+            -2 -> this.endingMsg("Defeat", Scene.fallenTxt)
+            //-1 -> this.endingMsg("Escape", Scene.escapeTxt)
         }
     }
 
@@ -599,9 +617,7 @@ class ArenaAct : AppCompatActivity() {
                     }
                 }
                 this.actionsTxt.append(this.scenePlay.endTurn(""))
-                if (this.scenePlay.status == 0) {
-                    this.afterAct()
-                }
+                this.afterAct()
             }, dur.toLong())
         }, 174)
     }
@@ -691,6 +707,23 @@ class ArenaAct : AppCompatActivity() {
                 this@ArenaAct.targetSpn.setSelection(targetPos)
             }
         }
+    }
+
+    private fun endingMsg(t: String, s: String) {
+        AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setMessage(s)
+                .setTitle(t).setPositiveButton("Exit") { arg0, arg1 ->
+                    val outcome = Intent()
+                    outcome.putExtra("Outcome", this.scenePlay.status)
+                    this.setResult(Activity.RESULT_OK, outcome)
+                    this.finish()
+                }.create().show()
+    }
+
+    override fun onBackPressed() {
+        this.scenePlay.status = -2
+        this.afterAct()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -924,7 +957,6 @@ class ArenaAct : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                //skillActBtn.isEnabled = crCanPerform && canTarget(position, skillsSpn.selectedItem as Ability)
                 if (this@ArenaAct.crActor.automatic == 0) {
                     if (this@ArenaAct.itemsSpn.isEnabled) {
                         this@ArenaAct.itemUseBtn.isEnabled = (this@ArenaAct.itemsSpn.selectedView.tag as ViewHolder).usable

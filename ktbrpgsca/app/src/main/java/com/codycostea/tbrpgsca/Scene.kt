@@ -18,13 +18,15 @@ package com.codycostea.tbrpgsca
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
     companion object {
-        var performsTxt = "\n%s performs %s"
-        var victoryTxt = "\nThe party has won!"
-        var fallenTxt = "\nThe party has fallen!"
+        var performsTxt = "%s performs %s"
+        var victoryTxt = "The party has won!"
+        var fallenTxt = "The party has fallen!"
+        var escapeTxt = "The party has escaped!"
+        var failTxt = "The party has failed to escape."
     }
 
     open var status : Int = 0
-        protected set
+        internal set
 
     open val enIdx : Int = party.size
 
@@ -148,12 +150,12 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
                 if (noParty) {
                     this.status = -2
-                    ret += Scene.fallenTxt
+                    ret += "\n${Scene.fallenTxt}"
                 }
                 else {
                     if (noEnemy) {
                         this.status = 1
-                        ret += Scene.victoryTxt
+                        ret += "\n${Scene.victoryTxt}"
                     }
                 }
             } while (this.status == 0 && this.players[this.current].actions < 1)
@@ -250,7 +252,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
         }
         var applyCosts = true
-        ret += String.format(Scene.performsTxt, this.players[this.current].name, skill.name)
+        ret += String.format("\n${Scene.performsTxt}", this.players[this.current].name, skill.name)
         for (i in this.fTarget..this.lTarget) {
             if ((skill.hpDmg < 0 && skill.restoreKO) || this.players[i].hp > 0) {
                 ret += skill.execute(this.players[this.current], this.players[i], applyCosts)
@@ -371,4 +373,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
     }
 
+    open fun escape() : String {
+        this.status = -1
+        return Scene.escapeTxt
+    }
 }
