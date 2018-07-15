@@ -365,8 +365,8 @@ class ArenaAct : AppCompatActivity() {
             R.id.RunBt -> {
                 val escText = this.scenePlay.escape()
                 this.actionsTxt.append(this.scenePlay.endTurn(""))
+                this.actionsTxt.append("\n$escText")
                 if (this.scenePlay.status == -1) {
-                    this.actionsTxt.append("\n$escText")
                     this.endingMsg("Escape", Scene.escapeTxt)
                 }
                 else {

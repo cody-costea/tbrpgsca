@@ -22,7 +22,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         var victoryTxt = "The party has won!"
         var fallenTxt = "The party has fallen!"
         var escapeTxt = "The party has escaped!"
-        var failTxt = "The party has failed to escape."
+        var failTxt = "The party attempted to escape, but failed."
     }
 
     open var status : Int = 0
@@ -374,7 +374,14 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     }
 
     open fun escape() : String {
-        this.status = -1
-        return Scene.escapeTxt
+        val pAgiSum = this.players.filterIndexed { i, _ ->  i < this.enIdx}.sumBy { it.agi } / this.enIdx
+        val eAgiSum = this.players.filterIndexed { i, _ ->  i >= this.enIdx}.sumBy { it.agi } / (this.players.size - this.enIdx)
+        return if (Math.random() * 10 + pAgiSum > Math.random() * 10 + eAgiSum) {
+            this.status = -1
+            Scene.escapeTxt
+        }
+        else {
+            Scene.failTxt
+        }
     }
 }
