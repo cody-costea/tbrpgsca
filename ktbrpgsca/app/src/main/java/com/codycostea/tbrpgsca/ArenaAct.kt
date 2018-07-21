@@ -33,6 +33,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.text.method.ScrollingMovementMethod
 import android.content.Intent
+import android.content.res.Resources
 import android.support.v7.app.AlertDialog
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
@@ -80,21 +81,31 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
                 6 -> "cast"
                 else -> return null
             }
-            val drawable = this.context.resources.getDrawable(
-                    this.context.resources.getIdentifier(sprName, "drawable", this.context.packageName))
-            when (drawable) {
-                is AnimationDrawable -> sprAnim = drawable
-                is BitmapDrawable -> {
-                    sprAnim = if (spr == 4) this.getBtSprite(side, 3)?.getInvertedSprite(true)
-                            else (drawable.getSprite(this.context,
-                            if (spr in 0..1) null
-                            else this.getBtSprite(side, 0)?.getFrame(0), spr in 2..3,
-                            if (spr < 2) null else (if (spr == 3) this.getBtSprite(side, 1)?.getFrame(0)
-                            else this.getBtSprite(side, 0)?.getFrame(0)), true))
+            try {
+                val drawable = this.context.resources.getDrawable(
+                        this.context.resources.getIdentifier(sprName, "drawable", this.context.packageName))
+                when (drawable) {
+                    is AnimationDrawable -> sprAnim = drawable
+                    is BitmapDrawable -> {
+                        sprAnim = (drawable.getSprite(this.context,
+                                if (spr in 0..1) null
+                                else this.getBtSprite(side, 0)?.getFrame(0), spr in 2..3,
+                                if (spr < 2) null else (if (spr == 3) this.getBtSprite(side, 1)?.getFrame(0)
+                                else this.getBtSprite(side, 0)?.getFrame(0)), true))
+                    }
                 }
             }
-            this.sprites[side][spr] = sprAnim
-            this.spritesDur[side][spr] = sprAnim?.fullDur ?: 0
+            catch (e : Resources.NotFoundException) {
+                sprAnim = when (spr) {
+                    4 -> this.getBtSprite(side, 3)?.getInvertedSprite(true)
+                    6 -> this.getBtSprite(side, 5)
+                    else -> null
+                }
+            }
+            finally {
+                this.sprites[side][spr] = sprAnim
+                this.spritesDur[side][spr] = sprAnim?.fullDur ?: 0
+            }
         }
         return sprAnim
     }
@@ -713,7 +724,7 @@ class ArenaAct : AppCompatActivity() {
         AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setMessage(s)
-                .setTitle(t).setPositiveButton("Exit") { arg0, arg1 ->
+                .setTitle(t).setPositiveButton("Exit") { _, _ ->
                     val outcome = Intent()
                     outcome.putExtra("Outcome", this.scenePlay.status)
                     this.setResult(Activity.RESULT_OK, outcome)
@@ -767,6 +778,10 @@ class ArenaAct : AppCompatActivity() {
         val spyJob = AdCostume(1, "Spy", "spy")
         val wizardJob = AdCostume(1, "Wizard", "wizard")
         val berserkerJob = AdCostume(1, "Berserker", "berserker")
+        val ogreJob = AdCostume(1, "Ogre", "ogre")
+        val lizardJob = AdCostume(1, "Lizard", "lizard")
+        val trollJob = AdCostume(1, "Troll", "troll")
+        val goblinJob = AdCostume(1, "Goblin", "goblin")
 
         val skills : Array<Ability> = arrayOf(
                 AdAbility(1, "Attack", 0, 0, null, false, 1, 0, 0, 1, 10, 0, 0,
@@ -802,13 +817,13 @@ class ArenaAct : AppCompatActivity() {
         party[1].items = party[0].items
 
         val enemy : Array<Actor> = arrayOf(
-                AdActor(8, this, "Goblin", null, humanRace, ninjaJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(8, this, "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, false, null, skills, null, null),
-                AdActor(7, this, "Troll", null, humanRace, druidJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(7, this, "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, false, null, skills, null, null),
-                AdActor(6, this, "Lizard", null, humanRace, alchemistJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(6, this, "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, false, null, skills, null, null),
-                AdActor(5, this, "Ogre", null, humanRace, dragoonJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                AdActor(5, this, "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
                         7, 7, 7, false, null, skills, null, null)
         )
 
