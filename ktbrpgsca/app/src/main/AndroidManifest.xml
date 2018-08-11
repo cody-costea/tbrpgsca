@@ -13,6 +13,10 @@
         <activity
             android:name=".ArenaAct"
             android:screenOrientation="nosensor">
+        </activity>
+        <activity
+            android:name=".DemoAct"
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

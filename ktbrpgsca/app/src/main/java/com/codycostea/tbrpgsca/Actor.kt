@@ -258,7 +258,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
     }
 
-    internal fun updateAttributes(remove : Boolean, role : Costume) {
+    internal open fun updateAttributes(remove : Boolean, role : Costume) {
         val i: Int
         if (remove) {
             i = -1

@@ -34,6 +34,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.text.method.ScrollingMovementMethod
 import android.content.Intent
 import android.content.res.Resources
+import android.os.Binder
 import android.support.v7.app.AlertDialog
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
@@ -50,9 +51,10 @@ class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, m
     }
 }
 
-class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume, job: AdCostume,
-              level : Int, maxLv: Int, mActions : Int = 1, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
-              range : Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, states: Array<State>?, mStRes: MutableMap<State, Int>?)
+class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume,
+              job: AdCostume, level : Int = 1, maxLv: Int = 9, mActions : Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5,
+              mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5, mAgi: Int = 5, range : Boolean = false, mRes: MutableMap<Int, Int>? = null,
+              skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
 
     override var job : Costume = job
@@ -60,6 +62,7 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
             super.job = value
             this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
             this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
+            field = value
         }
 
     internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
@@ -182,10 +185,10 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
     }
 }
 
-class AdAbility(id: Int, name: String, private val sprId : Int, private val sndId : Int, range: Boolean? = null,
-                steal: Boolean = false, lvRq: Int, hpC: Int, mpC: Int, spC: Int, hpDmg: Int, mpDmg: Int,
-                spDmg: Int, dmgType: Int, atkI: Int, trg : Int, elm: Int, mQty: Int, rQty: Int, absorb: Boolean,
-                restoreKO: Boolean, aStates: Array<State>? = null, rStates: Array<State>? = null)
+class AdAbility(id: Int, name: String, private val sprId : Int, private val sndId : Int, steal: Boolean = false,
+                range: Boolean? = null, lvRq: Int, hpC: Int, mpC: Int, spC: Int, dmgType: Int, atkI: Int, hpDmg: Int,
+                mpDmg: Int, spDmg: Int, trg : Int, elm: Int, mQty: Int, rQty: Int, absorb: Boolean, restoreKO: Boolean,
+                aStates: Array<State>? = null, rStates: Array<State>? = null)
     : Ability(id, name, range, steal, lvRq, hpC, mpC, spC, hpDmg, mpDmg, spDmg, dmgType, atkI, trg, elm, mQty,
               rQty, absorb, restoreKO, aStates, rStates) {
 
@@ -317,6 +320,22 @@ fun BitmapDrawable.getSprite(context : Context, firstFrame : Drawable? = null, f
 }
 
 class ArenaAct : AppCompatActivity() {
+
+    private class ActorArrayBinder(val actorArray : Array<Actor>) : Binder()
+
+    companion object {
+        fun Begin(activity: Activity, arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String>?) {
+            val actBundle = Bundle()
+            actBundle.putBinder("party", ActorArrayBinder(party))
+            actBundle.putBinder("enemy", ActorArrayBinder(enemy))
+            actBundle.putInt("surprise", surprise)
+            actBundle.putBoolean("escapable", escapable)
+            actBundle.putStringArray("scripts", scripts)
+            actBundle.putInt("arenaImg", arenaImgId)
+            actBundle.putInt("song", songId)
+            activity.startActivityForResult(Intent(activity, ArenaAct::class.java).putExtras(actBundle), 1)
+        }
+    }
 
     private lateinit var scenePlay : Scene
 
@@ -742,6 +761,8 @@ class ArenaAct : AppCompatActivity() {
         this.setContentView(R.layout.activity_arena)
 
         val extra = this.intent.extras
+        val party : Array<Actor>
+        val enemy : Array<Actor>
         val surprised : Int
         if (extra !== null) {
             surprised = extra.getInt("surprise", 0)
@@ -751,81 +772,83 @@ class ArenaAct : AppCompatActivity() {
                 this.songPlayer.isLooping = true;
                 this.songPlayer.start();
             }
-            val arenaResId = extra.getInt("arena", 0)
+            val arenaResId = extra.getInt("arenaImg", 0)
             if (arenaResId > 0) {
                 this.findViewById<ImageView>(R.id.ImgArena).setBackgroundResource(arenaResId)
             }
+            party = (extra.getBinder("party") as ActorArrayBinder).actorArray
+            enemy = (extra.getBinder("enemy") as ActorArrayBinder).actorArray
         }
         else {
             surprised = 0
+
+            val humanRace = Costume(1, "Human")
+            val heroJob = AdCostume(1, "Hero", "hero")
+            val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
+            val crusaderJob = AdCostume(1, "Crusader", "crusader")
+            val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
+            val ninjaJob = AdCostume(1, "Ninja", "ninja")
+            val dragoonJob = AdCostume(1, "Dragoon", "dragoon")
+            val hesychastJob = AdCostume(1, "Hesychast", "hesychast")
+            val shamanJob = AdCostume(1, "Shaman", "shaman")
+            val alchemistJob = AdCostume(1, "Alchemist", "alchemist")
+            val reaverJob = AdCostume(1, "Reaver", "reaver")
+            val rangerJob = AdCostume(1, "Ranger", "ranger")
+            val corsairJob = AdCostume(1, "Corsair", "corsair")
+            val druidJob = AdCostume(1, "Druid", "druid")
+            val knightJob = AdCostume(1, "Knight", "knight")
+            val spyJob = AdCostume(1, "Spy", "spy")
+            val wizardJob = AdCostume(1, "Wizard", "wizard")
+            val berserkerJob = AdCostume(1, "Berserker", "berserker")
+            val ogreJob = AdCostume(1, "Ogre", "ogre")
+            val lizardJob = AdCostume(1, "Lizard", "lizard")
+            val trollJob = AdCostume(1, "Troll", "troll")
+            val goblinJob = AdCostume(1, "Goblin", "goblin")
+
+            val skills: Array<Ability> = arrayOf(
+                    AdAbility(1, "Attack", 0, 0, false, null, 1, 0, 0, 1, 10, 0, 0,
+                            0, 0, 0, 0, 0, 0, false, false, null, null),
+                    AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
+                            1, 0, -1, 0, 0, 0, false, false, null, null),
+                    AdAbility(3, "Heal", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
+                            3, 0, 0, 0, 0, 0, false, true, null, null)
+            )
+
+            val skills2: Array<Ability> = arrayOf(
+                    AdAbility(1, "Act", 0, 0, false, null, 1, 0, 0, 0, 10, 0, 0,
+                            0, 0, 0, 0, 0, 0, false, false, null, null),
+                    AdAbility(2, "Guard", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
+                            1, 0, -1, 0, 0, 0, false, false, null, null),
+                    AdAbility(1, "Hit", 0, 0, false, false, 1, 0, 45, 1, 30, 0, 0,
+                            0, 0, 0, 0, 0, 0, false, false, null, null))
+
+            party = arrayOf(
+                    AdActor(1, this, "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills2, null, null),
+                    AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills2, null, null),
+                    AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills, null, null),
+                    AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills, null, null)
+            )
+            party[0].items = LinkedHashMap()
+            val potion = AdAbility(10, "Potion", 0, 0, false, false, 1, 0, 3, 0, -15, 0, 0,
+                    3, 0, 0, 0, 0, 0, false, false, null, null)
+            party[0].items!![potion] = 3
+            party[1].items = party[0].items
+
+            enemy = arrayOf(
+                    AdActor(8, this, "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills, null, null),
+                    AdActor(7, this, "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills, null, null),
+                    AdActor(6, this, "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills, null, null),
+                    AdActor(5, this, "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                            7, 7, 7, false, null, skills, null, null)
+            )
         }
-
-        val humanRace = Costume(1, "Human")
-        val heroJob = AdCostume(1, "Hero", "hero")
-        val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
-        val crusaderJob = AdCostume(1, "Crusader", "crusader")
-        val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
-        val ninjaJob = AdCostume(1, "Ninja", "ninja")
-        val dragoonJob = AdCostume(1, "Dragoon", "dragoon")
-        val hesychastJob = AdCostume(1, "Hesychast", "hesychast")
-        val shamanJob = AdCostume(1, "Shaman", "shaman")
-        val alchemistJob = AdCostume(1, "Alchemist", "alchemist")
-        val reaverJob = AdCostume(1, "Reaver", "reaver")
-        val rangerJob = AdCostume(1, "Ranger", "ranger")
-        val corsairJob = AdCostume(1, "Corsair", "corsair")
-        val druidJob = AdCostume(1, "Druid", "druid")
-        val knightJob = AdCostume(1, "Knight", "knight")
-        val spyJob = AdCostume(1, "Spy", "spy")
-        val wizardJob = AdCostume(1, "Wizard", "wizard")
-        val berserkerJob = AdCostume(1, "Berserker", "berserker")
-        val ogreJob = AdCostume(1, "Ogre", "ogre")
-        val lizardJob = AdCostume(1, "Lizard", "lizard")
-        val trollJob = AdCostume(1, "Troll", "troll")
-        val goblinJob = AdCostume(1, "Goblin", "goblin")
-
-        val skills : Array<Ability> = arrayOf(
-                AdAbility(1, "Attack", 0, 0, null, false, 1, 0, 0, 1, 10, 0, 0,
-                        0, 0, 0, 0, 0, 0, false, false, null, null),
-                AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
-                        1, 0, -1, 0, 0, 0, false, false, null, null),
-                AdAbility(3, "Heal", 0, 0, true, false, 1, 0, 3, 0, -15, 0, 0,
-                        3, 0, 0, 0, 0, 0, false, true, null, null)
-        )
-
-        val skills2 : Array<Ability> = arrayOf(
-                AdAbility(1, "Act", 0, 0, null, false, 1, 0, 0, 0, 10, 0, 0,
-                        0, 0, 0, 0, 0, 0, false, false, null, null),
-                AdAbility(2, "Guard", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
-                        1, 0, -1, 0, 0, 0, false, false, null, null),
-                AdAbility(1, "Hit", 0, 0, false, false, 1, 0, 45, 1, 30, 0, 0,
-                        0, 0, 0, 0, 0, 0, false, false, null, null))
-
-        val party : Array<Actor> = arrayOf(
-                AdActor(1, this, "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills2, null, null),
-                AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills2, null, null),
-                AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills, null, null),
-                AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills, null, null)
-        )
-        party[0].items = LinkedHashMap()
-        val potion = AdAbility(10, "Potion", 0, 0, false, false, 1, 0, 3, 0, -15, 0, 0,
-                3, 0, 0, 0, 0, 0, false, false, null, null)
-        party[0].items!![potion] = 3
-        party[1].items = party[0].items
-
-        val enemy : Array<Actor> = arrayOf(
-                AdActor(8, this, "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills, null, null),
-                AdActor(7, this, "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills, null, null),
-                AdActor(6, this, "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills, null, null),
-                AdActor(5, this, "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
-                        7, 7, 7, false, null, skills, null, null)
-        )
 
         if (surprised < 0) {
             this.partySide = 1
