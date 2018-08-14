@@ -22,7 +22,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
     : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, range, mRes, skills, rStates, mStRes) {
 
     companion object {
-        var causesTxt : String = "%s causes %s"
+        var causesTxt : String = " %s causes %s"
     }
 
     open fun inflict(actor: Actor, always: Boolean): String {
@@ -33,7 +33,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                 trgStates = HashMap(1)
                 actor.stateDur = trgStates
             }
-            if ((trgStates[this] ?: this.dur) < this.dur) {
+            if ((trgStates[this] ?: 0) < this.dur) {
                 trgStates[this] = this.dur
             }
             //actor.switchCostume(null, this)

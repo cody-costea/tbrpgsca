@@ -107,7 +107,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 for (state in aStates) {
                     r = state.inflict(trg, false)
                     if (r.isNotEmpty()) {
-                        s += ", $r"
+                        s += ",$r"
                     }
                 }
             }
