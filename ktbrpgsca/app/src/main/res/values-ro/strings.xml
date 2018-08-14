@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Turn-Based RPG Simple Combat Arena</string>
+    <string name="bt_auto">Auto</string>
+    <string name="bt_run">Fugi</string>
+    <string name="bt_act">Execută</string>
+    <string name="bt_use">Utilizează</string>
+    <string name="begin">Începe</string>
+    <string name="exit">Ieși</string>
+    <string name="about">Despre</string>
+    <string name="msg_about">Proiectul \"Turn-Based RPG Simple Combat Arena\" a fost început de Claudiu-Ștefan Costea, și este
+         distribuit sub termenii licenței Apache, Versiunea 2.0 (descrisă la http://www.apache.org/licenses/LICENSE-2.0), și
+         fără nicio garanție.\n\nProiectul include resurse grafice proiectate de Reiner \"Tiles\" Prokein, care au fost publicate
+         sub termenii descriși la http://www.reinerstilesets.de/lizenz.\n\nProiectul mai include și biblioteca \"Rhino\" de Java,
+         dezvoltată de Mozilla, publicată sub termenii descriși la https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/License.
+         Codul sursă al acesteia poate fi găsit la https://github.com/mozilla/rhino.\n\nVă mulțumesc pentru încercarea acestei aplicații.</string>
+</resources>

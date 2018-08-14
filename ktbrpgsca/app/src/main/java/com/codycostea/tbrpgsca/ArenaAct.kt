@@ -356,7 +356,9 @@ class ArenaAct : AppCompatActivity() {
 
     private var partySide = 0
     private var otherSide = 1
+
     private var automatic = false
+    private var escapable = true
 
     private var skillsAdapter : AbilityArrayAdapter? = null
     private lateinit var playersAdapter : ActorArrayAdapter
@@ -455,7 +457,7 @@ class ArenaAct : AppCompatActivity() {
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
             vHolder.nameText.text = skill.name +
-                    (if (this.asItems) " x ${this.arenaAct.crActor.items?.get(skill)}" else "") +
+                    (if (this.asItems) " x ${this.arenaAct.crActor._items?.get(skill)}" else "") +
                     " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
                             ", Uses: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, Trg: " +
                             (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All") +
@@ -540,7 +542,9 @@ class ArenaAct : AppCompatActivity() {
             this.itemsSpn.isEnabled = false
         }
         this.skillsSpn.isEnabled = enable
-        this.runBtn.isEnabled = enable
+        if (this.escapable) {
+            this.runBtn.isEnabled = enable
+        }
     }
 
     private fun setCrAutoSkill() {
@@ -766,6 +770,7 @@ class ArenaAct : AppCompatActivity() {
         val surprised : Int
         if (extra !== null) {
             surprised = extra.getInt("surprise", 0)
+            this.escapable = extra.getBoolean("escapable", true)
             val songResId = extra.getInt("song", 0)
             if (songResId > 0) {
                 this.songPlayer = MediaPlayer.create(this, songResId);
@@ -832,11 +837,11 @@ class ArenaAct : AppCompatActivity() {
                     AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
-            party[0].items = LinkedHashMap()
+            party[0]._items = LinkedHashMap()
             val potion = AdAbility(10, "Potion", 0, 0, false, false, 1, 0, 3, 0, -15, 0, 0,
                     3, 0, 0, 0, 0, 0, false, false, null, null)
-            party[0].items!![potion] = 3
-            party[1].items = party[0].items
+            party[0]._items!![potion] = 3
+            party[1]._items = party[0]._items
 
             enemy = arrayOf(
                     AdActor(8, this, "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
@@ -862,6 +867,7 @@ class ArenaAct : AppCompatActivity() {
         this.scenePlay = Scene(party, enemy, surprised)
 
         this.runBtn = this.findViewById(R.id.RunBt)
+        this.runBtn.isEnabled = this.escapable
         this.autoBtn = this.findViewById(R.id.AutoBt)
         this.skillActBtn = this.findViewById(R.id.ActBt)
         this.itemUseBtn = this.findViewById(R.id.UseBt)

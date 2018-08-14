@@ -125,10 +125,10 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                     }
                 }
             }
-            val trgItems = trg.items
+            val trgItems = trg._items
             if (this.steal
                     && trgItems !== null
-                    && trgItems !== user.items
+                    && trgItems !== user._items
                     && trgItems.isNotEmpty()
                     && (Math.random() * 12 + user.agi / 4).toInt() > 4 + trg.agi / 3) {
                 var itemId = (Math.random() * trgItems.size).toInt()
@@ -143,10 +143,10 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                     val stolen = iterator.next()
                     val trgItemQty = trgItems[stolen]
                     if (trgItemQty !== null && trgItemQty > 0) {
-                        var usrItems = user.items
+                        var usrItems = user._items
                         if (usrItems === null) {
                             usrItems = LinkedHashMap()
-                            user.items = usrItems
+                            user._items = usrItems
                         }
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
                         trgItems[stolen] = trgItemQty - 1

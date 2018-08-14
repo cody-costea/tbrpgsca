@@ -138,7 +138,16 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     internal var skillsQty : MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn : MutableMap<Ability, Int>? = null
 
-    open var items : LinkedHashMap<Ability, Int>? = null
+    open internal var _items : LinkedHashMap<Ability, Int>? = null
+    val items : LinkedHashMap<Ability, Int>
+        get() {
+            var items = this._items
+            if (items == null) {
+                items = LinkedHashMap()
+                this._items = items
+            }
+            return items
+        }
 
     private var equipment : MutableMap<Char, Costume>? = null
 
@@ -430,6 +439,12 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 this.stRes = null
             }
         }
+        val skillQty = this.skillsQty
+        if (skillQty !== null) {
+            for (ability in skillQty.keys) {
+                skillQty[ability] = ability.mQty
+            }
+        }
     }
 
     init {
@@ -467,5 +482,4 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }*/
     }
-
 }

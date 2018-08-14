@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2018 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ limitations under the License.
 package com.codycostea.tbrpgsca
 
 import java.util.ArrayList
-import java.util.Arrays
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -25,7 +24,6 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.SpannableString
 import android.text.util.Linkify
-import android.view.Menu
 import android.view.View.OnClickListener
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -34,28 +32,28 @@ import android.widget.Spinner
 
 class DemoAct : AppCompatActivity() {
 
-    private var Skill: Array<Ability>? = null
-    private var Item: ArrayList<Ability>? = null
-    private var pcRace: Array<Costume>? = null
-    private var pcJob: Array<Costume>? = null
-    private var Player: Array<Actor>? = null
-    private var Party: Array<Actor>? = null
-    private var Enemy: Array<Array<Actor>>? = null
+    private lateinit var Skill: Array<Ability>
+    private lateinit var Item: ArrayList<Ability>
+    private lateinit var pcRace: Array<Costume>
+    private lateinit var pcJob: Array<Costume>
+    private lateinit var Player: Array<Actor>
+    private lateinit var Party: Array<Actor>
+    private lateinit var Enemy: Array<Array<Actor>>
 
-    private val name = arrayOfNulls<EditText>(3)
-    private val jobBox = arrayOfNulls<Spinner>(3)
-    private val raceBox = arrayOfNulls<Spinner>(3)
-    private var jobList: ArrayAdapter<String>? = null
-    private var raceList: ArrayAdapter<String>? = null
-    private var Begin: Button? = null
-    private var About: Button? = null
-    private var Exit: Button? = null
+    private lateinit var name: Array<EditText>
+    private lateinit var jobBox: Array<Spinner>
+    private lateinit var raceBox: Array<Spinner>
+    private lateinit var jobList: ArrayAdapter<String>
+    private lateinit var raceList: ArrayAdapter<String>
+    private lateinit var Begin: Button
+    private lateinit var About: Button
+    private lateinit var Exit: Button
     private var level = 0
 
     private val cAction = OnClickListener { v ->
         when (v.id) {
             R.id.StartBt -> this@DemoAct.beginBt()
-            //R.id.InfoBt -> this@DemoAct.displayMsg("About", getString(R.string.msg_about))
+            R.id.InfoBt -> this@DemoAct.displayMsg("About", this@DemoAct.getString(R.string.msg_about))
             R.id.QuitBt -> this@DemoAct.finish()
         }
     }
@@ -81,72 +79,82 @@ class DemoAct : AppCompatActivity() {
 
         this.raceList = ArrayAdapter(this, android.R.layout.simple_spinner_item)
         this.jobList = ArrayAdapter(this, android.R.layout.simple_spinner_item)
-        this.raceBox[0] = findViewById(R.id.RaceBox1) as Spinner
-        this.raceBox[1] = findViewById(R.id.RaceBox2) as Spinner
-        this.raceBox[2] = findViewById(R.id.RaceBox3) as Spinner
-        for (i in pcRace.indices)
-            this.raceList!!.add(pcRace[i].name)
-        for (i in 0..2)
-            this.raceBox[i]!!.setAdapter(this.raceList)
-        this.raceBox[0]!!.setSelection(1)
-        this.raceBox[1]!!.setSelection(0)
-        this.raceBox[2]!!.setSelection(2)
-        this.jobBox[0] = findViewById(R.id.JobBox1) as Spinner
-        this.jobBox[1] = findViewById(R.id.JobBox2) as Spinner
-        this.jobBox[2] = findViewById(R.id.JobBox3) as Spinner
-        for (i in pcJob.indices)
-            this.jobList!!.add(pcJob[i].name)
-        for (i in 0..2)
-            this.jobBox[i]!!.setAdapter(this.jobList)
-        this.jobBox[0]!!.setSelection(0)
-        this.jobBox[1]!!.setSelection(5)
-        this.jobBox[2]!!.setSelection(3)
-        this.name[0] = findViewById(R.id.NameField1) as EditText
-        this.name[1] = findViewById(R.id.NameField2) as EditText
-        this.name[2] = findViewById(R.id.NameField3) as EditText
-        this.Begin = findViewById(R.id.StartBt) as Button
-        this.About = findViewById(R.id.InfoBt) as Button
-        this.Exit = findViewById(R.id.QuitBt) as Button
-        this.Begin!!.setOnClickListener(this.cAction)
-        this.About!!.setOnClickListener(this.cAction)
-        this.Exit!!.setOnClickListener(this.cAction)
-        this.Party = arrayOf(
-            this.Player!![0],
-            this.Player!![1],
-            this.Player!![2]
+        this.raceBox = arrayOf(
+            this.findViewById(R.id.RaceBox1),
+            this.findViewById(R.id.RaceBox2),
+            this.findViewById(R.id.RaceBox3)
         )
-        //this.Party!![3] = null
-        /*for (i in this.Item!!.indices)
-            this.Item!![i].setQty(5)*/
+        for (i in pcRace.indices) {
+            this.raceList.add(pcRace[i].name)
+        }
+        for (i in 0..2) {
+            this.raceBox[i].setAdapter(this.raceList)
+        }
+        this.raceBox[0].setSelection(1)
+        this.raceBox[1].setSelection(0)
+        this.raceBox[2].setSelection(2)
+        this.jobBox = arrayOf(
+            this.findViewById(R.id.JobBox1),
+            this.findViewById(R.id.JobBox2),
+            this.findViewById(R.id.JobBox3)
+        )
+        for (i in pcJob.indices) {
+            this.jobList.add(pcJob[i].name)
+        }
+        for (i in 0..2) {
+            this.jobBox[i].setAdapter(this.jobList)
+        }
+        this.jobBox[0].setSelection(0)
+        this.jobBox[1].setSelection(5)
+        this.jobBox[2].setSelection(3)
+        this.name = arrayOf(
+            this.findViewById(R.id.NameField1) as EditText,
+            this.findViewById(R.id.NameField2) as EditText,
+            this.findViewById(R.id.NameField3) as EditText
+        )
+        this.Begin = this.findViewById(R.id.StartBt) as Button
+        this.About = this.findViewById(R.id.InfoBt) as Button
+        this.Exit = this.findViewById(R.id.QuitBt) as Button
+        this.Begin.setOnClickListener(this.cAction)
+        this.About.setOnClickListener(this.cAction)
+        this.Exit.setOnClickListener(this.cAction)
+        this.Party = arrayOf(this.Player[0], this.Player[2], this.Player[1])
+        for (i in this.Item.indices) {
+            this.Party[0].items[this.Item[i]] = 5
+            this.Party[1].items[this.Item[i]] = 5
+            this.Party[2].items[this.Item[i]] = 5
+        }
     }
 
     private fun setPlayer(p: Int) {
-        var n = this.name[p]!!.getText().toString()
+        var n = this.name[p].getText().toString()
         if (n == "")
             when (p) {
                 1 -> n = "Cody"
                 2 -> n = "George"
                 3 -> n = "Stephen"
             }
-        this.Player!![p].name = n
-        if (this.raceBox[p]!!.isEnabled())
-            this.Player!![p].race = this.pcRace!![this.raceBox[p]!!.getSelectedItemPosition()]
-        this.Player!![p].job = this.pcJob!![this.jobBox[p]!!.getSelectedItemPosition()]
-        this.raceBox[p]!!.setEnabled(false)
+        this.Player[p].name = n
+        if (this.raceBox[p].isEnabled()) {
+            this.Player[p].race = this.pcRace[this.raceBox[p].getSelectedItemPosition()]
+        }
+        this.Player[p].job = this.pcJob[this.jobBox[p].getSelectedItemPosition()]
+        this.raceBox[p].setEnabled(false)
     }
 
     private fun beginBt() {
-        for (i in 0..2)
+        for (i in 0..2) {
             this.setPlayer(i)
-        var surprise = 0
-        if (this.level % 2 == 1)
-            surprise = -1
-        if (this.level == 2)
-            surprise = 1
-        for (i in 0 until this.Player!!.size)
-            this.Player!![i].recover()
-        //BattleAct.PlayDemo(this);
-        ArenaAct.Begin(this, 0, 0, this.Party!!, this.Enemy!![this.level], surprise, this.level % 2 == 0, null)
+        }
+        val surprise = when {
+            this.level % 2 == 1 -> -1
+            this.level == 2 -> 1
+            else -> 0
+        }
+        for (i in 0 until this.Player.size) {
+            this.Player[i].recover()
+        }
+        ArenaAct.Begin(this, 0, 0, this.Party, this.Enemy[this.level], surprise, this.level % 2 == 0, null)
     }
 
     private fun displayMsg(t: String, s: String) {
@@ -165,11 +173,11 @@ class DemoAct : AppCompatActivity() {
         if (requestCode >= 0) {
             if (resultCode == Activity.RESULT_OK) {
                 val extra = data.extras
-                /*if (extra!!.containsKey("Party")) {
-                    System.arraycopy(extra.getParcelableArray("Party")!!, 0, this.Party!!, 0, 4)
-                    this.Player!![1] = this.Party!![0]
-                    this.Player!![2] = this.Party!![1]
-                    this.Player!![3] = this.Party!![2]
+                /*if (extra.containsKey("Party")) {
+                    System.arraycopy(extra.getParcelableArray("Party"), 0, this.Party, 0, 4)
+                    this.Player[1] = this.Party[0]
+                    this.Player[2] = this.Party[1]
+                    this.Player[3] = this.Party[2]
                 }
                 if (extra.containsKey("Item"))
                     this.Item = extra.getParcelableArrayList<AdAbility>("Item")*/
@@ -208,7 +216,7 @@ class DemoAct : AppCompatActivity() {
     private fun AddRaces(): Array<Costume> {
 
         val skills: Array<Ability> = arrayOf(
-                AdAbility(1, "Attack", 0, 0, false, null, 1, 0, 0, 1, 10, 0, 0,
+                AdAbility(1, "Attack", 0, 0, false, null, 1, 0, 0, 0, 10, 0, 0,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 0, -2, -3,
                         1, 0, -1, 0, 0, 0, false, false, null, null)
@@ -365,12 +373,12 @@ class DemoAct : AppCompatActivity() {
     private fun AddEnemies(actors: Array<Actor>): Array<Array<Actor>> {
 
         return arrayOf(
-                arrayOf(actors[5], actors[3]),
+                arrayOf(actors[3], actors[5]),
                 arrayOf(actors[4], actors[6]),
-                arrayOf(actors[4], actors[3], actors[5]),
+                arrayOf(actors[3], actors[4], actors[5]),
                 arrayOf(actors[4], actors[6], actors[3]),
-                arrayOf(actors[4], actors[5], actors[3], actors[6]),
-                arrayOf(actors[4], actors[3], actors[5], actors[6])
+                arrayOf(actors[3], actors[6], actors[4], actors[5]),
+                arrayOf(actors[5], actors[4], actors[6], actors[3])
         )
     }
 

@@ -91,7 +91,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
         if (this.players[this.current].actions > 0) {
             if (this.players[this.current].automatic == 0) {
-                val crItems = this.players[this.current].items
+                val crItems = this.players[this.current]._items
                 if (crItems !== null) {
                     this.crItems!![this.current] = crItems.keys.toMutableList()
                 }
@@ -328,10 +328,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         var s = this.players[this.current].availableSkills[defSkill]
         for (i in defSkill + 1 until this.players[this.current].availableSkills.size) {
             val a = this.players[this.current].availableSkills[i]
-            if (a.mpC <= this.players[this.current].mp
-                    && a.hpC < this.players[this.current].hp
-                    && a.spC <= this.players[this.current].sp
-                    && this.players[this.current].level >= a.lvRq) {
+            if (a.canPerform(this.players[this.current])) {
                 if (defSkill > 0) {
                     if (a.hpDmg < s.hpDmg && (a.restoreKO || !nRestore)) {
                         s = a
@@ -355,7 +352,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         val crItems = this.crItems!![this.current]
         if (crItems !== null) {
             val item = crItems[index]
-            val crItemsMap = this.players[this.current].items
+            val crItemsMap = this.players[this.current]._items
             if (crItemsMap !== null) {
                 val itemQty = (crItemsMap[item] ?: 1) - 1
                 if (itemQty > 0) {
