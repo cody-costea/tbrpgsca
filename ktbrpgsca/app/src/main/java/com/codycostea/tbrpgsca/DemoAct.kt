@@ -69,7 +69,7 @@ class DemoAct : AppCompatActivity() {
                 AdAbility(1, "Attack", 0, 0, false, null, 1, 0, 0, 0, 0, 1, 10,
                         0, 0, 0, 0, 0, 0, false, false, null, null),
                 AdAbility(2, "Defend", 0, 0, false, false, 1, 0, 0, 0, 1, 1,
-                        0, -2, -3, 0, 0, 0, 0, false, false, null)
+                        0, -2, -3, -1, 0, 0, 0, false, false, null)
         )
 
         return arrayOf(
