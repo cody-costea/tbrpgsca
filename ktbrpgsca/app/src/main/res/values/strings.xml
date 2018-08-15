@@ -13,4 +13,5 @@
          released under the terms described at http://www.reinerstilesets.de/lizenz.\n\nThe project also includes the \"Rhino\" Java
          library, developed by Mozilla, released under the terms described at https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/License.
          Its source code can be found at https://github.com/mozilla/rhino.\n\nThank you for trying this application.</string>
+    <string name="ok">Ok</string>
 </resources>

@@ -14,4 +14,5 @@
          sub termenii descriși la http://www.reinerstilesets.de/lizenz.\n\nProiectul mai include și biblioteca \"Rhino\" de Java,
          dezvoltată de Mozilla, publicată sub termenii descriși la https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/License.
          Codul sursă al acesteia poate fi găsit la https://github.com/mozilla/rhino.\n\nVă mulțumesc pentru încercarea acestei aplicații.</string>
+    <string name="ok">Ok</string>
 </resources>
