@@ -102,15 +102,22 @@ class DemoAct : AppCompatActivity() {
         val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]), null, null)
         val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false,  null, arrayOf(skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]), null, null)
 
-        return arrayOf(
+        val actors: Array<Actor> = arrayOf(
                 AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, maxLv = maxlv),
                 AdActor(2, this, this.getString(R.string.name_george), null, race[0], lizardJob, maxLv = maxlv),
                 AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, maxLv = maxlv),
-                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, maxLv = maxlv),
-                AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, maxLv = maxlv),
+                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, maxLv = maxlv, states = arrayOf(state[10])),
+                AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, maxLv = maxlv, mRes = mutableMapOf(2 to 7, 3 to 1)),
                 AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, maxLv = maxlv),
-                AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, maxLv = maxlv)
+                AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, maxLv = maxlv, states = arrayOf(state[0]))
         )
+        /*var stateDur = HashMap<State, Int>()
+        stateDur[state[10]] = -2
+        actors[3].stateDur = stateDur
+        stateDur = HashMap()
+        stateDur[state[0]] = -2
+        actors[6].stateDur = stateDur*/
+        return actors
     }
 
     private fun getSkills(state: Array<State>): Array<Ability> {

@@ -25,7 +25,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
         var causesTxt : String = " %s causes %s"
     }
 
-    open fun inflict(actor: Actor, always: Boolean): String {
+    open fun inflict(actor: Actor, always: Boolean, indefinite: Boolean): String {
         val trgStRes = actor.stRes
         if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + this.sRes) {
             var trgStates = actor.stateDur
@@ -33,8 +33,9 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                 trgStates = HashMap(1)
                 actor.stateDur = trgStates
             }
-            if ((trgStates[this] ?: 0) < this.dur) {
-                trgStates[this] = this.dur
+            val crDur = (trgStates[this] ?: 0)
+            if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
+                trgStates[this] = if (indefinite) -2 else this.dur
             }
             //actor.switchCostume(null, this)
             actor.updateAttributes(false, this)
@@ -174,7 +175,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
 
     open fun remove(actor: Actor, delete: Boolean, always: Boolean): Boolean {
         val sDur = actor.stateDur
-        if (sDur !== null && (always || (sDur[this] ?: -2) != -2)) {
+        return if (sDur !== null && (always || (sDur[this] ?: -2) != -2)) {
             if (delete) {
                 sDur.remove(this)
             }
@@ -182,10 +183,10 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                 sDur[this] = -3
             }
             this.disable(actor)
-            return true
+            true
         }
         else {
-            return false
+            false
         }
     }
 }

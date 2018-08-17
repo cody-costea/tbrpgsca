@@ -119,8 +119,8 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 val equipment = this.equipment?.values
                 val states = this.stateDur
                 ranged = super.range || this.job.range || this.race.range
-                        || (equipment != null && equipment.any { it.range }
-                        || (states != null && states.any { it.value != 0 && it.key.range }))
+                        || (equipment !== null && equipment.any { it.range }
+                        || (states !== null && states.any { it.value != 0 && it.key.range }))
                 this.ranged = ranged
             }
             return ranged
@@ -142,7 +142,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     val items : LinkedHashMap<Ability, Int>
         get() {
             var items = this._items
-            if (items == null) {
+            if (items === null) {
                 items = LinkedHashMap()
                 this._items = items
             }
@@ -153,7 +153,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open val equippedItems : Map<Char, Costume>?
         get() {
-            return if (this.equipment == null) {
+            return if (this.equipment === null) {
                 null
             }
             else {
@@ -164,7 +164,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     open fun equipItem(pos: Char, item : Costume) : Costume? {
         val r : Costume? = this.unequipPos(pos)
         var e = this.equipment
-        if (e == null) {
+        if (e === null) {
             e = HashMap()
             this.equipment = e
         }
@@ -175,7 +175,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open fun unequipPos(pos : Char) : Costume? {
         val e = this.equipment
-        return if (e == null) {
+        return if (e === null) {
             null
         }
         else {
@@ -187,7 +187,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open fun unequipItem(item : Costume) : Char? {
         val e = this.equipment
-        if (e != null) {
+        if (e !== null) {
             for (k in e.keys) {
                 if (this.unequipPos(k) == item) {
                     return k
@@ -209,12 +209,12 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     internal fun updateStates(remove : Boolean, states : Array<State>?) {
-        if (states == null) {
+        if (states === null) {
             return
         }
         val aStates = this.stateDur//this.activeStates
         if (remove) {
-            if (aStates == null) {
+            if (aStates === null) {
                 return
             }
             for (k in states) {
@@ -223,13 +223,13 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
         else {
             for (k in states) {
-                k.inflict(this, true)
+                k.inflict(this, true, true)
             }
         }
     }
 
     internal fun updateSkills(remove : Boolean, abilities : Array<Ability>?) {
-        if (abilities == null) {
+        if (abilities === null) {
             return
         }
         if (remove) {
@@ -253,13 +253,13 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     protected open fun switchCostume(oldRole : Costume?, newRole : Costume?) {
-        if (oldRole != null) {
+        if (oldRole !== null) {
             this.updateSkills(true, oldRole.skills)
             this.updateAttributes(true, oldRole)
             this.updateResistance(true, oldRole.res, oldRole.stRes)
             this.updateStates(true, oldRole.states)
         }
-        if (newRole != null) {
+        if (newRole !== null) {
             this.updateStates(false, newRole.states)
             this.updateResistance(false, newRole.res, newRole.stRes)
             this.updateAttributes(false, newRole)
@@ -293,9 +293,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     internal fun updateResistance(remove : Boolean, resMap : Map<Int, Int>?, stResMap : Map<State, Int>?) {
-        if (resMap != null) {
+        if (resMap !== null) {
             var r = this.res
-            if (r == null) {
+            if (r === null) {
                 if (remove) {
                     return
                 }
@@ -312,9 +312,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 }
             }
         }
-        if (stResMap != null) {
+        if (stResMap !== null) {
             var rs = this.stRes
-            if (rs == null) {
+            if (rs === null) {
                 if (remove) {
                     return
                 }
@@ -365,9 +365,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
         var c = false
         val sDur = this.stateDur
-        if (sDur != null) {
+        if (sDur !== null) {
             for (state in sDur) {
-                if (state.value != 0 && this.hp > 0) {
+                if (state.value > -3 && this.hp > 0) {
                     val r = state.key.apply(this, consume)
                     if (r.isNotEmpty()) {
                         if (c) s += ", "
@@ -393,7 +393,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             this.guards = false
             this.sp = 0
             val sDur = this.stateDur
-            if (sDur != null) {
+            if (sDur !== null) {
                 for (state in sDur.keys) {
                     state.remove(this, false, false)
                 }
@@ -408,7 +408,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         this.sp = 0
         this.actions = this.mActions
         val sDur = this.stateDur
-        if (sDur != null) {
+        if (sDur !== null) {
             for (state in sDur.keys) {
                 state.remove(this, true, false)
             }
@@ -418,7 +418,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
         this.applyStates(false)
         val res = this.res
-        if (res != null) {
+        if (res !== null) {
             for (r in res) {
                 if (r.value == 3) {
                     res.remove(r.key)
@@ -429,7 +429,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }
         val stRes = this.stRes
-        if (stRes != null) {
+        if (stRes !== null) {
             for (r in stRes) {
                 if (r.value == 0) {
                     stRes.remove(r.key)
@@ -454,19 +454,19 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         + (jobSkills?.size ?: 0)
         + (skills?.size ?: 0)
         this.availableSkills.ensureCapacity(s)
-        if (raceSkills != null) {
+        if (raceSkills !== null) {
             for (a in raceSkills) {
                 this.checkRegSkill(a)
                 this.availableSkills.add(a)
             }
         }
-        if (jobSkills != null) {
+        if (jobSkills !== null) {
             for (a in jobSkills) {
                 this.checkRegSkill(a)
                 this.availableSkills.add(a)
             }
         }
-        if (skills != null) {
+        if (skills !== null) {
             for (a in skills) {
                 this.checkRegSkill(a)
                 this.availableSkills.add(a)
