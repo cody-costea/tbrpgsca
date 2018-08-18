@@ -43,7 +43,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             field = value
         }
 
-    private var _lv : Int = level
+    private var _lv : Int = 1
     open var level : Int
         get() = this._lv
         set(value) {
@@ -71,38 +71,26 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open var hp : Int = this.mHp
         set(value) {
-            if (value > this.mHp) {
-                field = this.mHp
-            }
-            else if (value < -this.mHp) {
-                field = -this.mHp
-            }
-            else {
-                field = value
+            field = when {
+                value > this.mHp -> this.mHp
+                value < 0 -> 0
+                else -> value
             }
         }
     open var mp : Int = this.mMp
         set(value) {
-            if (value > this.mMp) {
-                field = this.mMp
-            }
-            else if (value < 0) {
-                field = 0
-            }
-            else {
-                field = value
+            field = when {
+                value > this.mMp -> this.mMp
+                value < 0 -> 0
+                else -> value
             }
         }
     open var sp : Int = this.mSp
         set(value) {
-            if (value > this.mSp) {
-                field = this.mSp
-            }
-            else if (value < 0) {
-                field = 0
-            }
-            else {
-                field = value
+            field = when {
+                value > this.mSp -> this.mSp
+                value < 0 -> 0
+                else -> value
             }
         }
 
@@ -481,5 +469,8 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 this.updateStates(false, e[k]?.states)
             }
         }*/
+        if (level > 1) {
+            this.level = level
+        }
     }
 }

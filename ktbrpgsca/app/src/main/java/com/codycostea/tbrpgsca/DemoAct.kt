@@ -38,28 +38,28 @@ class DemoAct : AppCompatActivity() {
     private val states: Array<State>
     get() {
         return arrayOf(
-                AdState(1, this.getString(R.string.skill_regen), false, false, false, false,-1, 0, 10, 0, 0, 0,
-                        2, 0, 0, 0, 0, false, null, null, null),
+                AdState(1, this.getString(R.string.skill_regen), false, false, false, false,-1, 0, 10, 0, 0,
+                        0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
                 AdState(2, this.getString(R.string.skill_poison), false, false, false, false, 10, 0, -7, 0, -2,
-                        0, -2, 0, 0, 0, 0, false, null, null, null),
-                AdState(3, this.getString(R.string.skill_clarity), false, false, false, false,-1, 0, 0, 7, 0, 0,
-                        0, 1, 1, 0, 0, false, null, null, null),
+                        0, 0, 0,0, -2, 0, 0, 0, 0, false, null, null, null),
+                AdState(3, this.getString(R.string.skill_clarity), false, false, false, false,-1, 0, 0, 7, 0,
+                        0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
                 AdState(4, this.getString(R.string.state_dizziness), false, false, false, false, 3, 0, 0, -7, 0,
-                        0, 0, -1, -1, 0, 0, false, null, null, null),
-                AdState(5, this.getString(R.string.state_vigour), false, false, false, false, -1, 0, 0, 0, 7, 1,
-                        0, 0, 0, 1, 0, false, null, null, null),
+                        0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
+                AdState(5, this.getString(R.string.state_vigour), false, false, false, false, -1, 0, 0, 0, 7,
+                        0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
                 AdState(6, this.getString(R.string.state_weakness), false, false, false, false, 5, 0, 0, 0, -7,
-                        -1, 0, 0, 0, -1, 0, false, null, null, null),
-                AdState(7, this.getString(R.string.skill_berserk), false, true, false, false, 7, 0, 0, 0, 0, 5,
-                        -3, 0, 0, 3, 0, false, null, null, null),
-                AdState(8, this.getString(R.string.skill_confusion), false, false, true, false, 3, 2, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, false, null, null, null),
-                AdState(9, this.getString(R.string.skill_sleep), true, false, false, false, 5, 1, 0, 0, 0, 0, -3,
-                        0, 0, -3, 0, false, null, null, null),
-                AdState(10, this.getString(R.string.state_stun), true, false, false, false, 1, 0, 0, 0, 0, 0, -1,
-                        0, 0, -1, 0, false, null, null, null),
+                        0, 0, 0,-1, 0, 0, 0, -1, 0, false, null, null, null),
+                AdState(7, this.getString(R.string.skill_berserk), false, true, false, false, 7, 0, 0, 0, 0,
+                        0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
+                AdState(8, this.getString(R.string.skill_confusion), false, false, true, false, 3, 2, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
+                AdState(9, this.getString(R.string.skill_sleep), true, false, false, false, 5, 1, 0, 0, 0,
+                        0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null),
+                AdState(10, this.getString(R.string.state_stun), true, false, false, false, 1, 0, 0, 0, 0,
+                        0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null),
                 AdState(11, this.getString(R.string.skill_reflect), false, false, false, true, 7, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, false, null, null, null)
+                        0, 0, 0,0, 0, 0, 0, 0, 0, false, null, null, null)
         )
     }
 
@@ -102,22 +102,15 @@ class DemoAct : AppCompatActivity() {
         val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]), null, null)
         val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false,  null, arrayOf(skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]), null, null)
 
-        val actors: Array<Actor> = arrayOf(
+        return arrayOf(
                 AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, maxLv = maxlv),
                 AdActor(2, this, this.getString(R.string.name_george), null, race[0], lizardJob, maxLv = maxlv),
                 AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, maxLv = maxlv),
-                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, maxLv = maxlv, states = arrayOf(state[10])),
-                AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, maxLv = maxlv, mRes = mutableMapOf(2 to 7, 3 to 1)),
-                AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, maxLv = maxlv),
-                AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, maxLv = maxlv, states = arrayOf(state[0]))
+                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, level = 3,  maxLv = 3, states = arrayOf(state[10])),
+                AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, level = 3,  maxLv = 3, mRes = mutableMapOf(2 to 7, 3 to 1)),
+                AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, level = 3,  maxLv = 3),
+                AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3,  maxLv = 3, states = arrayOf(state[0]))
         )
-        /*var stateDur = HashMap<State, Int>()
-        stateDur[state[10]] = -2
-        actors[3].stateDur = stateDur
-        stateDur = HashMap()
-        stateDur[state[0]] = -2
-        actors[6].stateDur = stateDur*/
-        return actors
     }
 
     private fun getSkills(state: Array<State>): Array<Ability> {
@@ -294,15 +287,15 @@ class DemoAct : AppCompatActivity() {
                         var n = nameEdit[p].text.toString()
                         if (n == "")
                             when (p) {
-                                1 -> n = this@DemoAct.getString(R.string.name_cody)
-                                2 -> n = this@DemoAct.getString(R.string.name_george)
-                                3 -> n = this@DemoAct.getString(R.string.name_stephen)
+                                0 -> n = this@DemoAct.getString(R.string.name_cody)
+                                1 -> n = this@DemoAct.getString(R.string.name_george)
+                                2 -> n = this@DemoAct.getString(R.string.name_stephen)
                             }
                         player[p].name = n
                         if (raceBox[p].isEnabled) {
-                            player[p].race = pcRace[raceBox[p].getSelectedItemPosition()]
+                            player[p].race = pcRace[raceBox[p].selectedItemPosition]
                         }
-                        player[p].job = pcJob[jobBox[p].getSelectedItemPosition()]
+                        player[p].job = pcJob[jobBox[p].selectedItemPosition]
                         raceBox[p].isEnabled = false
                     }
                     val surprise = when {

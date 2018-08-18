@@ -258,11 +258,12 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
 }
 
 class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean, confuse : Boolean, reflect : Boolean,
-              dur : Int = 3, sRes : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int, mDef: Int, mSpi: Int, mWis : Int,
-              mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,
-              rSkills : Array<Ability>? = null, rStates : Array<State>? = null,mStRes : MutableMap<State, Int>? = null)
-    : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi,
-            mActions, range, mRes, skills, rSkills, rStates, mStRes) {
+              dur : Int = 3, sRes : Int = 0, dmgHp : Int, dmgMp : Int, dmgSp : Int, mHp : Int, mMp : Int, mSp : Int, mAtk : Int,
+              mDef: Int, mSpi: Int, mWis : Int,  mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null,
+              skills : Array<Ability>? = null, rSkills : Array<Ability>? = null, rStates : Array<State>? = null,
+              mStRes : MutableMap<State, Int>? = null)
+    : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef, mSpi,
+        mWis, mAgi, mActions, range, mRes, skills, rSkills, rStates, mStRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdState && other.id == this.id)
@@ -564,10 +565,16 @@ class ArenaAct : AppCompatActivity() {
         when (this.scenePlay.status) {
             0 -> {
                 if (this.automatic || this.crActor.automatic != 0) {
+                    if (this.infoTxt.text.isNotEmpty()) {
+                        this.infoTxt.text = ""
+                    }
                     this.actionsTxt.append(this.scenePlay.executeAI(""))
                     this.playSpr()
                 }
                 else {
+                    val actor = this.crActor
+                    this.infoTxt.text = String.format(this.getString(R.string.cr_actor_info), actor.name, actor.level,
+                            actor.exp, actor.mExp, actor.hp, actor.mHp, actor.mp, actor.mMp, actor.sp, actor.mSp)
                     this.setCrSkills()
                     this.setCrItems()
                     this.enableControls(true)
@@ -575,8 +582,8 @@ class ArenaAct : AppCompatActivity() {
                     this.setCrAutoSkill()
                 }
             }
-            1 -> this.endingMsg("Victory", Scene.victoryTxt)
-            -2 -> this.endingMsg("Defeat", Scene.fallenTxt)
+            1 -> this.endingMsg(this.getString(R.string.victory), Scene.victoryTxt)
+            -2 -> this.endingMsg(this.getString(R.string.defeat), Scene.fallenTxt)
             //-1 -> this.endingMsg("Escape", Scene.escapeTxt)
         }
     }

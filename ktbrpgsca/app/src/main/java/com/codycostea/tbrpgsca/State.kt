@@ -16,9 +16,10 @@ limitations under the License.
 package com.codycostea.tbrpgsca
 
 open class State(id : Int, name : String, open var inactivate : Boolean, open var automate : Boolean, open var confuse : Boolean,
-                 open var reflect : Boolean, open val dur : Int = 3, open val sRes : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int,
-                 mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null,
-                 skills : Array<Ability>? = null,open val rSkills : Array<Ability>? = null, rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
+                 open var reflect : Boolean, open val dur : Int = 3, open val sRes : Int = 0, open val dmgHp : Int = 0, open val dmgMp : Int = 0,
+                 open val dmgSp : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int, mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int,
+                 range: Boolean, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,open val rSkills : Array<Ability>? = null,
+                 rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
     : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, range, mRes, skills, rStates, mStRes) {
 
     companion object {
@@ -91,9 +92,9 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                 else if (dur > -3) {
                     if (consume) {
                         val rnd = (Math.random() * 3).toInt()
-                        val dmghp = (actor.mHp + rnd) * this.mHp / 100
-                        val dmgmp = (actor.mMp + rnd) * this.mMp / 100
-                        val dmgsp = (actor.mSp + rnd) * this.mSp / 100
+                        val dmghp = (actor.mHp + rnd) * this.dmgHp / 100
+                        val dmgmp = (actor.mMp + rnd) * this.dmgMp / 100
+                        val dmgsp = (actor.mSp + rnd) * this.dmgSp / 100
                         actor.hp += dmghp
                         actor.mp += dmgmp
                         actor.sp += dmgsp
@@ -176,13 +177,15 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
     open fun remove(actor: Actor, delete: Boolean, always: Boolean): Boolean {
         val sDur = actor.stateDur
         return if (sDur !== null && (always || (sDur[this] ?: -2) != -2)) {
+            if (sDur[this] ?: -3 > -3) {
+                this.disable(actor)
+            }
             if (delete) {
                 sDur.remove(this)
             }
             else {
                 sDur[this] = -3
             }
-            this.disable(actor)
             true
         }
         else {
