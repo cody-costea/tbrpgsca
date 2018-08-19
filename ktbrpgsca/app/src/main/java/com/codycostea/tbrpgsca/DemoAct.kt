@@ -15,8 +15,6 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
-import java.util.ArrayList
-
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -29,6 +27,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import java.util.*
 
 class DemoAct : AppCompatActivity() {
 
@@ -321,6 +320,19 @@ class DemoAct : AppCompatActivity() {
             this.party[0].items[item[i]] = 5
             this.party[1].items[item[i]] = 5
             this.party[2].items[item[i]] = 5
+        }
+        if (Locale.getDefault().language != "en") {
+            Scene.victoryTxt = this.getString(R.string.scene_victory)
+            Scene.fallenTxt = this.getString(R.string.scene_defeat)
+            Scene.escapeTxt = this.getString(R.string.scene_escape)
+            Scene.performsTxt = this.getString(R.string.scene_performs)
+            Scene.failTxt = this.getString(R.string.scene_fail)
+            Actor.koTxt = this.getString(R.string.actor_ko)
+            Ability.reflectedTxt = this.getString(R.string.ability_reflected)
+            Ability.suffersTxt = this.getString(R.string.ability_suffers)
+            Ability.stolenTxt = this.getString(R.string.ability_stolen)
+            Ability.missesTxt = this.getString(R.string.ability_misses)
+            State.causesTxt = this.getString(R.string.state_causes)
         }
     }
 

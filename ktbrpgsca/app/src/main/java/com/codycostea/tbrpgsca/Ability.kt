@@ -176,7 +176,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         if (ko && trg.hp > 0) {
             trg.applyStates(false)
         }
-        return s + user.checkStatus() + "."
+        return s + user.checkStatus()
     }
 
     open fun replenish(user: Actor) {
