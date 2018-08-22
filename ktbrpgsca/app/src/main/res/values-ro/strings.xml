@@ -116,8 +116,8 @@
     <string name="scene_performs">%s efetcuează %s</string>
     <string name="actor_ko">, %s cade inconștient</string>
     <string name="ability_reflected">, reflectă %s</string>
-    <string name="ability_suffers">, suferă %s</string>
+    <string name="ability_suffers">, %s suferă</string>
     <string name="ability_stolen">, %s a fost furat</string>
     <string name="ability_misses">, dar ratează</string>
-    <string name="state_causes">%s cauează %s</string>
+    <string name="state_causes"> %s cauează %s</string>
 </resources>

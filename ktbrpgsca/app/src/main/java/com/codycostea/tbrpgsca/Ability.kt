@@ -192,7 +192,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
 
     open fun canPerform(actor : Actor) : Boolean {
         val skillsQty = actor.skillsQty
-        return this.mpC <= actor.mp && this.hpC <= actor.hp && this.spC <= actor.sp && actor.level >= this.lvRq
+        return this.mpC <= actor.mp && this.hpC < actor.hp && this.spC <= actor.sp && actor.level >= this.lvRq
                 && /*(this.mQty < 1 && skillsQty === null) || */(skillsQty === null || (skillsQty[this] ?: 1) > 0)
     }
 }
