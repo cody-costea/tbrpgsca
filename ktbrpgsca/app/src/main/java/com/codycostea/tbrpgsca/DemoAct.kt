@@ -199,12 +199,12 @@ class DemoAct : AppCompatActivity() {
                 AdAbility(1, this.getString(R.string.item_potion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(2, this.getString(R.string.item_ether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(3, this.getString(R.string.item_tonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, -1, -1, false, false, null, null),
+                AdAbility(9, this.getString(R.string.item_hipotion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(4, this.getString(R.string.item_antidote), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, arrayOf<State>(state[1])),
                 AdAbility(5, this.getString(R.string.item_hiether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -25, 0, 0, 0, -1, -1, false, false, null, arrayOf<State>(state[3])),
                 AdAbility(6, this.getString(R.string.item_hitonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, -1, -1, false, false, arrayOf<State>(state[4]), arrayOf<State>(state[5])),
                 AdAbility(7, this.getString(R.string.item_panacea), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, arrayOf<State>(state[1], state[3], state[5], state[6], state[7], state[8], state[9])),
-                AdAbility(8, this.getString(R.string.item_elixir), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, 0, 0, -1, -1, false, false, null, null),
-                AdAbility(9, this.getString(R.string.item_hipotion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, 0, 0, -1, -1, false, false, null, null)
+                AdAbility(8, this.getString(R.string.item_elixir), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, 0, 0, -1, -1, false, false, null, null)
         )
     }
 

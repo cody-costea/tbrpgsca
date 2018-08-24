@@ -4,16 +4,22 @@
     <string name="bt_run">Run</string>
     <string name="bt_act">Execute</string>
     <string name="bt_use">Use</string>
+    <string name="skill_info">(Lv: %s, HP: %s, MP: %s, RP: %s, Nr: %s, Trg: %s, Rng: %s)</string>
+    <string name="one">One</string>
+    <string name="self">Self</string>
+    <string name="all">All</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="begin">Begin</string>
     <string name="exit">Exit</string>
     <string name="about">About</string>
+    <string name="ok">Okay</string>
     <string name="msg_about">The \"Turn-Based RPG Simple Combat Arena\" project is authored by Claudiu-Ștefan Costea, and it is
          distributed under the terms of the Apache License, Version 2.0 (described at http://www.apache.org/licenses/LICENSE-2.0),
          and without any warranty.\n\nThe project includes graphic resources designed by Reiner \"Tiles\" Prokein, which have been
          released under the terms described at http://www.reinerstilesets.de/lizenz.\n\nThe project also includes the \"Rhino\" Java
          library, developed by Mozilla, released under the terms described at https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/License.
          Its source code can be found at https://github.com/mozilla/rhino.\n\nThank you for trying this application.</string>
-    <string name="ok">Okay</string>
     <string name="name_cody">Cody</string>
     <string name="name_george">George</string>
     <string name="name_stephen">Stephen</string>
@@ -108,4 +114,5 @@
     <string name="cr_actor_info">Current: %s (Level: %s, Exp: %s/%s)</string>
     <string name="victory">Victory</string>
     <string name="defeat">Defeat</string>
+    <string name="escape">Escape</string>
 </resources>

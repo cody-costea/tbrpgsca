@@ -400,7 +400,7 @@ class ArenaAct : AppCompatActivity() {
                 this.actionsTxt.append(this.scenePlay.endTurn(""))
                 this.actionsTxt.append("\n$escText")
                 if (this.scenePlay.status == -1) {
-                    this.endingMsg("Escape", Scene.escapeTxt)
+                    this.endingMsg(this.getString(R.string.escape), Scene.escapeTxt)
                 }
                 else {
                     this.afterAct()
@@ -458,18 +458,24 @@ class ArenaAct : AppCompatActivity() {
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
             vHolder.nameText.text = skill.name +
-                    (if (this.asItems) " x ${this.arenaAct.crActor._items?.get(skill)}" else "") +
-                    " (LvRq: ${skill.lvRq}, HPc: ${skill.hpC}, MPc: ${skill.mpC}, RPc: ${skill.spC}" +
-                            ", Uses: ${(this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞")}, Trg: " +
-                            (if (skill.trg == 0) "One" else if (skill.trg == -1) "Self" else "All") +
-                            ", Range: ${if (skill.range == true) "Yes" else "No"})"
+                    (if (this.asItems) " x ${this.arenaAct.crActor._items?.get(skill)} " else " ") +
+                    String.format(this.context.getString(R.string.skill_info), skill.lvRq, skill.hpC,
+                            skill.mpC, skill.spC, (this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞"),
+                            (when {
+                                skill.trg == 0 -> this.context.getString(R.string.one)
+                                skill.trg == -1 -> this.context.getString(R.string.self)
+                                else -> this.context.getString(R.string.all)
+                            }),
+                            if (skill.range == true) this.context.getString(R.string.yes)
+                            else this.context.getString(R.string.no))
             return view
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view = this.prepareView(position, convertView, parent)
             val vHolder = view.tag as ViewHolder
-            vHolder.nameText.text = this.skills[position].name
+            val skill = this.skills[position]
+            vHolder.nameText.text = if (this.asItems) "${skill.name} x ${this.arenaAct.crActor._items?.get(skill)} " else skill.name
             return view
         }
     }
@@ -583,7 +589,6 @@ class ArenaAct : AppCompatActivity() {
             }
             1 -> this.endingMsg(this.getString(R.string.victory), Scene.victoryTxt)
             -2 -> this.endingMsg(this.getString(R.string.defeat), Scene.fallenTxt)
-            //-1 -> this.endingMsg("Escape", Scene.escapeTxt)
         }
     }
 
@@ -712,7 +717,6 @@ class ArenaAct : AppCompatActivity() {
         if (skillsAdapter === null) {
             skillsAdapter = AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
                     this.crActor.availableSkills, false)
-            //this.skillsAdapter.setNotifyOnChange(true)
             this.skillsSpn.adapter = skillsAdapter
             this.skillsAdapter = skillsAdapter
 
