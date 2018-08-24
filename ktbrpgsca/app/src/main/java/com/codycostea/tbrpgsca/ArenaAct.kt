@@ -564,21 +564,18 @@ class ArenaAct : AppCompatActivity() {
     private fun afterAct() {
         when (this.scenePlay.status) {
             0 -> {
-                this.infoTxt.text = if (this.scenePlay.current < this.scenePlay.enIdx) {
-                    val actor = this.crActor
-                    String.format(this.getString(R.string.cr_actor_info), actor.name, actor.level,
-                            actor.exp, actor.mExp, actor.hp, actor.mHp, actor.mp, actor.mMp, actor.sp, actor.mSp)
-                }
-                else  {
-                    ""
-                }
                 if (this.automatic || this.crActor.automatic != 0) {
+                    if (this.infoTxt.text.isNotEmpty()) {
+                        this.infoTxt.text = ""
+                    }
                     this.actionsTxt.append(this.scenePlay.executeAI(""))
                     this.playSpr()
                 }
                 else {
                     this.setCrSkills()
                     this.setCrItems()
+                    val actor = this.crActor
+                    this.infoTxt.text = String.format(this.getString(R.string.cr_actor_info), actor.name, actor.level, actor.exp, actor.mExp)
                     this.enableControls(true)
                     this.autoBtn.isEnabled = true
                     this.setCrAutoSkill()

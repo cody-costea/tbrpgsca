@@ -26,8 +26,8 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
 
     companion object {
         var reflectedTxt = ", reflected by %s"
-        var suffersTxt = ", %s suffers "
-        var stolenTxt = ", %s stolen"
+        var suffersTxt = ", %s suffers"
+        var stolenTxt = ", obtaining %s"
         var missesTxt = ", but misses"
     }
 

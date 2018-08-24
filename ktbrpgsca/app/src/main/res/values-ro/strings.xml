@@ -106,7 +106,7 @@
     <string name="item_panacea">Panacea</string>
     <string name="item_elixir">Elixir</string>
     <string name="item_hipotion">Super poțiune</string>
-    <string name="cr_actor_info">%s, Nivel: %s, Exp: %s/%s, HP: %s/%s, MP: %s/%s, RP: %s/%s</string>
+    <string name="cr_actor_info">Curent: %s (Nivel: %s, Exp: %s/%s)</string>
     <string name="victory">Victorie</string>
     <string name="defeat">Înfrângere</string>
     <string name="scene_victory">Echipa a învins!</string>
@@ -117,7 +117,7 @@
     <string name="actor_ko">, %s cade inconștient</string>
     <string name="ability_reflected">, reflectă %s</string>
     <string name="ability_suffers">, %s suferă</string>
-    <string name="ability_stolen">, %s a fost furat</string>
+    <string name="ability_stolen">, obținând %s</string>
     <string name="ability_misses">, dar ratează</string>
-    <string name="state_causes"> %s cauează %s</string>
+    <string name="state_causes">\u0020%s cauzează lui %s</string>
 </resources>
