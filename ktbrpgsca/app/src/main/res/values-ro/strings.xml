@@ -5,7 +5,7 @@
     <string name="bt_run">Fugi</string>
     <string name="bt_act">Execută</string>
     <string name="bt_use">Utilizează</string>
-    <string name="skill_info">(Nv: %s, HP: %s, MP: %s, RP: %s, Nr: %s, Țnt: %s, Dst: %s)</string>
+    <string name="skill_info">(Nv: %s, PS: %s, PM: %s, PF: %s, Nr: %s, Țnt: %s, Dst: %s)</string>
     <string name="one">Unu</string>
     <string name="self">Sine</string>
     <string name="all">Toți</string>
@@ -124,7 +124,10 @@
     <string name="actor_ko">, %s cade inconștient</string>
     <string name="ability_reflected">, reflectă %s</string>
     <string name="ability_suffers">, %s suferă</string>
-    <string name="ability_stolen">, obținând %s</string>
+    <string name="ability_stolen">, obținând %s de la %s</string>
     <string name="ability_misses">, dar ratează</string>
     <string name="state_causes">\u0020%s cauzează lui %s</string>
+    <string name="costume_hp">PS</string>
+    <string name="costume_mp">PM</string>
+    <string name="costume_sp">PF</string>
 </resources>

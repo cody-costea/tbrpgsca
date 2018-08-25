@@ -517,9 +517,9 @@ class ArenaAct : AppCompatActivity() {
             val view = this.prepareView(convertView, parent)
             val vHolder = view.tag as ViewHolder
             val actor = this.actors[position]
-            vHolder.nameText.text = "${actor.name} (HP: " +
+            vHolder.nameText.text = "${actor.name} (${Costume.hpText}: " +
                     ((if (position < this.arenaAct.scenePlay.enIdx)
-                        "${actor.hp}/${actor.mHp}, MP: ${actor.mp}/${actor.mMp}, RP: ${actor.sp}/${actor.mSp}"
+                        "${actor.hp}/${actor.mHp}, ${Costume.mpText}: ${actor.mp}/${actor.mMp}, ${Costume.spText}: ${actor.sp}/${actor.mSp}"
                     else "%.2f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%") + ")")
             return view
         }

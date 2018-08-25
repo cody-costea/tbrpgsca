@@ -37,17 +37,17 @@ class DemoAct : AppCompatActivity() {
     private val states: Array<State>
     get() {
         return arrayOf(
-                AdState(1, this.getString(R.string.skill_regen), false, false, false, false,-1, 0, 10, 0, 0,
+                AdState(1, this.getString(R.string.skill_regen), false, false, false, false,-1, 0, -10, 0, 0,
                         0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
-                AdState(2, this.getString(R.string.skill_poison), false, false, false, false, 10, 0, -7, 0, -2,
+                AdState(2, this.getString(R.string.skill_poison), false, false, false, false, 10, 0, 7, 0, 2,
                         0, 0, 0,0, -2, 0, 0, 0, 0, false, null, null, null),
-                AdState(3, this.getString(R.string.skill_clarity), false, false, false, false,-1, 0, 0, 7, 0,
+                AdState(3, this.getString(R.string.skill_clarity), false, false, false, false,-1, 0, 0, -7, 0,
                         0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
-                AdState(4, this.getString(R.string.state_dizziness), false, false, false, false, 3, 0, 0, -7, 0,
+                AdState(4, this.getString(R.string.state_dizziness), false, false, false, false, 3, 0, 0, 7, 0,
                         0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                AdState(5, this.getString(R.string.state_vigour), false, false, false, false, -1, 0, 0, 0, 7,
+                AdState(5, this.getString(R.string.state_vigour), false, false, false, false, -1, 0, 0, 0, -7,
                         0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
-                AdState(6, this.getString(R.string.state_weakness), false, false, false, false, 5, 0, 0, 0, -7,
+                AdState(6, this.getString(R.string.state_weakness), false, false, false, false, 5, 0, 0, 0, 7,
                         0, 0, 0,-1, 0, 0, 0, -1, 0, false, null, null, null),
                 AdState(7, this.getString(R.string.skill_berserk), false, true, false, false, 7, 0, 0, 0, 0,
                         0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
@@ -96,10 +96,10 @@ class DemoAct : AppCompatActivity() {
     private fun getCharacters(state: Array<State>, skill : Array<Ability>, race : Array<Costume>): Array<Actor> {
         val maxlv = 5
 
-        val ogreJob = AdCostume(1, this.getString(R.string.race_ogre), "ogre", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]), null, null)
-        val lizardJob = AdCostume(2, this.getString(R.string.race_lizard), "lizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false,  mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1), arrayOf(skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]), null, null)
-        val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]), null, null)
-        val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false,  null, arrayOf(skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]), null, null)
+        val ogreJob = AdCostume(1, this.getString(R.string.race_ogre), "ogre", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[11]), null, null)
+        val lizardJob = AdCostume(2, this.getString(R.string.race_lizard), "lizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false,  mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1), arrayOf(skill[30]), null, null)
+        val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2]), null, null)
+        val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false,  null, arrayOf(skill[15]), null, null)
 
         return arrayOf(
                 AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, maxLv = maxlv),
@@ -136,7 +136,7 @@ class DemoAct : AppCompatActivity() {
         return arrayOf(
                 AdAbility(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, 0, 1, 10, 0, -3, 0, 1, -1, -1, false, false, null, confsleep),
                 AdAbility(2, this.getString(R.string.skill_defend), 0, 0, false, true, 0, 0, 0, 0, 3, 1, 0, -1, -2, -1, 0, -1, -1, false, false, null, null),
-                AdAbility(3, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, 3, 1, -25, 0, 0, 0, 6, -1, -1, false, true, null, null),
+                AdAbility(3, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, 3, 1, -25, 0, 0, 0, 6, -1, -1, false, false, null, null),
                 AdAbility(4, this.getString(R.string.skill_mediatate), 0, 0, false, true, 1, 0, 0, 0, 3, 1, -1, -7, 10, -1, 6, -1, -1, false, false, null, dizziness),
                 AdAbility(5, this.getString(R.string.skill_cure), 0, 0, false, true, 3, 0, 7, 0, 3, 1, -17, 0, 0, 0, 7, -1, -1, false, true, null, cure),
                 AdAbility(6, this.getString(R.string.skill_clarity), 0, 0, false, true, 3, 0, 0, 7, 3, 1, 0, -3, 0, 0, 6, -1, -1, false, false, clarity, madness),
@@ -186,7 +186,7 @@ class DemoAct : AppCompatActivity() {
                 AdAbility(50, this.getString(R.string.skill_syphon), 0, 0, false, true, 4, 0, 15, 0, 2, 1, 13, 0, -3, 1, 6, -1, -1, true, false, null, null),
                 AdAbility(51, this.getString(R.string.skill_dragon_breath), 0, 0, false, false, 4, 0, 13, 7, 5, 1, 15, 0, -11, 1, 1, -1, -1, false, false, null, confsleep),
                 AdAbility(52, this.getString(R.string.skill_light_wpn), 0, 0, false, false, 2, 0, 3, 2, 7, 1, 17, 0, -5, 0, 7, -1, -1, false, false, null, confsleep),
-                AdAbility(53, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, 2, 1, -25, 0, 0, 0, 7, -1, -1, false, true, null, null),
+                AdAbility(53, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, 2, 1, -25, 0, 0, 0, 7, -1, -1, false, false, null, null),
                 AdAbility(54, this.getString(R.string.skill_mediatate), 0, 0, false, true, 1, 0, 0, 2, 2, 1, -3, -7, 0, -1, 7, -1, -1, false, false, null, dizziness),
                 AdAbility(55, this.getString(R.string.skill_cure), 0, 0, false, true, 3, 0, 7, 0, 2, 1, -17, 0, 0, 0, 7, -1, -1, false, true, null, cure),
                 AdAbility(56, this.getString(R.string.skill_clarity), 0, 0, false, true, 3, 0, 0, 7, 2, 1, 0, -3, 0, 0, 7, -1, -1, false, false, clarity, madness),
@@ -199,12 +199,12 @@ class DemoAct : AppCompatActivity() {
                 AdAbility(1, this.getString(R.string.item_potion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(2, this.getString(R.string.item_ether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(3, this.getString(R.string.item_tonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, -1, -1, false, false, null, null),
-                AdAbility(9, this.getString(R.string.item_hipotion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(4, this.getString(R.string.item_antidote), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, arrayOf<State>(state[1])),
+                AdAbility(9, this.getString(R.string.item_hipotion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(5, this.getString(R.string.item_hiether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -25, 0, 0, 0, -1, -1, false, false, null, arrayOf<State>(state[3])),
                 AdAbility(6, this.getString(R.string.item_hitonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, -1, -1, false, false, arrayOf<State>(state[4]), arrayOf<State>(state[5])),
                 AdAbility(7, this.getString(R.string.item_panacea), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, arrayOf<State>(state[1], state[3], state[5], state[6], state[7], state[8], state[9])),
-                AdAbility(8, this.getString(R.string.item_elixir), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, 0, 0, -1, -1, false, false, null, null)
+                AdAbility(8, this.getString(R.string.item_elixir), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, 0, 0, -1, -1, false, true, null, null)
         )
     }
 
@@ -333,6 +333,9 @@ class DemoAct : AppCompatActivity() {
             Ability.stolenTxt = this.getString(R.string.ability_stolen)
             Ability.missesTxt = this.getString(R.string.ability_misses)
             State.causesTxt = this.getString(R.string.state_causes)
+            Costume.hpText = this.getString(R.string.costume_hp)
+            Costume.mpText = this.getString(R.string.costume_mp)
+            Costume.spText = this.getString(R.string.costume_sp)
         }
     }
 

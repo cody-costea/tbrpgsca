@@ -27,7 +27,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
     companion object {
         var reflectedTxt = ", reflected by %s"
         var suffersTxt = ", %s suffers"
-        var stolenTxt = ", obtaining %s"
+        var stolenTxt = ", obtaining %s from %s"
         var missesTxt = ", but misses"
     }
 
@@ -59,7 +59,6 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         if (this.dmgType == 2
                 || this.dmgType == 3
                 || trg == user
-                //|| this.qty > 0 && this.mQty < 1
                 || this.dmgType != 4 && (Math.random() * 13 + user.agi / 5).toInt() > 2 + trg.agi / 4
                 || this.dmgType == 4 && (Math.random() * 13 + user.agi / 3).toInt() > 2 + trg.agi / 4) {
             var dmghp = if (this.hpDmg != 0) (if (this.hpDmg < 0) -1 else 1) * dmg + this.hpDmg else 0
@@ -78,28 +77,8 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 user.mp += dmgmp / 2
                 user.sp += dmgsp / 2
             }
-            var c = false
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                s += String.format(Ability.suffersTxt, trg.name)
-            }
-            if (dmghp != 0) {
-                s += " "
-                if (dmghp < 1) s += "+"
-                s += (-dmghp).toString() + " HP"
-                c = true
-            }
-            if (dmgmp != 0) {
-                if (c) s += ","
-                s += " "
-                if (dmgmp < 1) s += "+"
-                s += (-dmgmp).toString() + " MP"
-                c = true
-            }
-            if (dmgsp != 0) {
-                if (c) s += ","
-                s += " "
-                if (dmgsp < 1) s += "+"
-                s += (-dmgsp).toString() + " RP"
+                s += String.format(Ability.suffersTxt, trg.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
             }
             val aStates = this.aStates
             var r : String
@@ -150,7 +129,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                         }
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
                         trgItems[stolen] = trgItemQty - 1
-                        s += String.format(Ability.stolenTxt, stolen.name)
+                        s += String.format(Ability.stolenTxt, stolen.name, trg.name)
                         if (trgItems[stolen] == 0) trgItems.remove(stolen)
                     }
                 }

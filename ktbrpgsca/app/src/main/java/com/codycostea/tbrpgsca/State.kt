@@ -38,7 +38,6 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
             if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
                 trgStates[this] = if (indefinite) -2 else this.dur
             }
-            //actor.switchCostume(null, this)
             actor.updateAttributes(false, this)
             actor.updateResistance(false, this.res, this.stRes)
             actor.updateStates(false, this.states)
@@ -95,50 +94,13 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                         val dmghp = (actor.mHp + rnd) * this.dmgHp / 100
                         val dmgmp = (actor.mMp + rnd) * this.dmgMp / 100
                         val dmgsp = (actor.mSp + rnd) * this.dmgSp / 100
-                        actor.hp += dmghp
-                        actor.mp += dmgmp
-                        actor.sp += dmgsp
-                        var c = false
+                        actor.hp -= dmghp
+                        actor.mp -= dmgmp
+                        actor.sp -= dmgsp
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += String.format(State.causesTxt, this.name, actor.name)
-                        }
-                        if (dmghp != 0) {
-                            s += " "
-                            if (dmghp >= 0) {
-                                s += "+"
-                            }
-                            s += dmghp.toString() + " HP"
-                            c = true
-                        }
-                        if (dmgmp != 0) {
-                            if (c) {
-                                s += ","
-                            }
-                            s += " "
-                            if (dmgmp >= 0) {
-                                s += "+"
-                            }
-                            s += dmgmp.toString() + " MP"
-                            c = true
-                        }
-                        if (dmgsp != 0) {
-                            if (c) {
-                                s += ","
-                            }
-                            s += " "
-                            if (dmgsp >= 0) {
-                                s += "+"
-                            }
-                            s += dmgsp.toString() + " RP"
-                        }
-                        if (dur > 0) {
-                            sDur[this] = dur - 1
+                            s += String.format(State.causesTxt, this.name, actor.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
                         }
                     }
-                    /*else if (actor.actions > 0 && dur > 0 && dur == this.dur
-                            && (this.inactivate || this.automate || this.confuse)) {
-                        sDur[this] = dur - 1
-                    }*/
                     else {
                         if (this.inactivate) {
                             if (dur > 0 && actor.actions > 0) {
