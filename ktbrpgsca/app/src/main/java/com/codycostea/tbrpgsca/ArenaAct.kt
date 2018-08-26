@@ -36,6 +36,8 @@ import android.content.Intent
 import android.content.res.Resources
 import android.os.Binder
 import android.support.v7.app.AlertDialog
+import android.util.Log
+import org.mozilla.javascript.Scriptable
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
@@ -338,7 +340,29 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private lateinit var scenePlay : Scene
+    private inner class AdScene(party : Array<Actor>, enemy : Array<Actor>, surprise: Int) : Scene(party, enemy, surprise) {
+        override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
+            val jScripts = this@ArenaAct.jScripts
+            if (jScripts !== null && jScripts.size > 1 && jScripts[1] !== null) {
+                val jsContext = this@ArenaAct.jsContext
+                val jsScope = this@ArenaAct.jsScope
+                if (jsContext !== null && jsScope !== null) {
+                    jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.current, jsScope))
+                    jsScope.put("Target", jsScope, org.mozilla.javascript.Context.javaToJS(defTarget, jsScope))
+                    jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(skill, jsScope))
+                    try {
+                        jsContext.evaluateString(jsScope, jScripts[1], "BeforeAct", 1, null)
+                    }
+                    catch (e: Exception) {
+                        Log.e("Rhino", e.message)
+                    }
+                }
+            }
+            return super.executeAbility(skill, defTarget, txt)
+        }
+    }
+
+    private lateinit var scenePlay : AdScene
 
     private lateinit var imgActor : Array<ImageView>
     private lateinit var autoBtn : Button
@@ -364,6 +388,10 @@ class ArenaAct : AppCompatActivity() {
     private var skillsAdapter : AbilityArrayAdapter? = null
     private lateinit var playersAdapter : ActorArrayAdapter
     private var itemsAdapter : AbilityArrayAdapter? = null
+
+    private var jScripts : Array<String?>? = null
+    private var jsContext : org.mozilla.javascript.Context? = null
+    private var jsScope : Scriptable? = null
 
     private val cAction = View.OnClickListener {
         when (it.id) {
@@ -568,6 +596,24 @@ class ArenaAct : AppCompatActivity() {
     }
 
     private fun afterAct() {
+        val jScripts = this.jScripts
+        if (jScripts !== null && jScripts.size > 2 && jScripts[2] !== null) {
+            val jsContext = this.jsContext
+            val jsScope = this.jsScope
+            if (jsContext !== null && jsScope !== null) {
+                jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.current, jsScope))
+                jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.fTarget, jsScope))
+                jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.lTarget, jsScope))
+                jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.lastAbility, jsScope))
+                jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.status, jsScope))
+                try {
+                    jsContext.evaluateString(jsScope, jScripts[2], "AfterAct", 1, null)
+                }
+                catch (e: Exception) {
+                    Log.e("Rhino", e.message)
+                }
+            }
+        }
         when (this.scenePlay.status) {
             0 -> {
                 if (this.automatic || this.crActor.automatic != 0) {
@@ -758,6 +804,22 @@ class ArenaAct : AppCompatActivity() {
                 .setCancelable(false)
                 .setMessage(s)
                 .setTitle(t).setPositiveButton("Exit") { _, _ ->
+                    val jScripts = this.jScripts
+                    if (jScripts !== null && jScripts.size > 3 && jScripts[3] !== null) {
+                        val jsContext = this.jsContext
+                        val jsScope = this.jsScope
+                        if (jsContext !== null && jsScope !== null) {
+                            jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.current, jsScope))
+                            jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.status, jsScope))
+                            try {
+                                jsContext.evaluateString(jsScope, jScripts[3], "OnStop", 1, null)
+                            }
+                            catch (e: Exception) {
+                                Log.e("Rhino", e.message)
+                            }
+                            org.mozilla.javascript.Context.exit()
+                        }
+                    }
                     val outcome = Intent()
                     outcome.putExtra("Outcome", this.scenePlay.status)
                     this.setResult(Activity.RESULT_OK, outcome)
@@ -778,6 +840,9 @@ class ArenaAct : AppCompatActivity() {
         val party : Array<Actor>
         val enemy : Array<Actor>
         val surprised : Int
+        var jScripts : Array<String?>? = null
+        var jsContext : org.mozilla.javascript.Context? = null
+        var jsScope : Scriptable? = null
         if (extra !== null) {
             surprised = extra.getInt("surprise", 0)
             this.escapable = extra.getBoolean("escapable", true)
@@ -793,6 +858,16 @@ class ArenaAct : AppCompatActivity() {
             }
             party = (extra.getBinder("party") as ActorArrayBinder).actorArray
             enemy = (extra.getBinder("enemy") as ActorArrayBinder).actorArray
+            jScripts = extra.getStringArray("scripts")
+            if (jScripts !== null) {
+                this.jScripts = jScripts
+                jsContext = org.mozilla.javascript.Context.enter()
+                jsContext.optimizationLevel = -1
+                jsScope = jsContext.initSafeStandardObjects()
+                jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
+                this.jsContext = jsContext
+                this.jsScope = jsScope
+            }
         }
         else {
             surprised = 0
@@ -874,7 +949,7 @@ class ArenaAct : AppCompatActivity() {
             this.otherSide = 1
         }
 
-        this.scenePlay = Scene(party, enemy, surprised)
+        this.scenePlay = AdScene(party, enemy, surprised)
 
         this.runBtn = this.findViewById(R.id.RunBt)
         this.runBtn.isEnabled = this.escapable
@@ -1025,6 +1100,17 @@ class ArenaAct : AppCompatActivity() {
 
         this.runBtn.setOnClickListener(this.cAction)
         this.autoBtn.setOnClickListener(this.cAction)
+
+        if (jScripts !== null && jScripts.isNotEmpty() && jScripts[0] !== null
+                && jsContext !== null && jsScope !== null) {
+            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay, jsScope))
+            jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.players, jsScope))
+            try {
+                jsContext.evaluateString(jsScope, jScripts[0], "OnStart", 1, null)
+            } catch (e: Exception) {
+                Log.e("Rhino", e.message)
+            }
+        }
 
         if (this.crActor.automatic != 0) {
             this.afterAct()
