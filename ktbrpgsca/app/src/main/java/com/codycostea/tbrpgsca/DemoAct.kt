@@ -28,6 +28,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 class DemoAct : AppCompatActivity() {
 
@@ -315,12 +316,16 @@ class DemoAct : AppCompatActivity() {
         (this.findViewById(R.id.StartBt) as Button).setOnClickListener(cAction)
         (this.findViewById(R.id.InfoBt) as Button).setOnClickListener(cAction)
         (this.findViewById(R.id.QuitBt) as Button).setOnClickListener(cAction)
-        this.party = arrayOf(player[0], player[2], player[1])
+        val items = LinkedHashMap<Ability, Int>()
         for (i in item.indices) {
-            this.party[0].items[item[i]] = 5
-            this.party[1].items[item[i]] = 5
-            this.party[2].items[item[i]] = 5
+            items[item[i]] = 5
+            items[item[i]] = 5
+            items[item[i]] = 5
         }
+        this.party = arrayOf(player[0], player[2], player[1])
+        this.party[0].items = items
+        this.party[1].items = items
+        this.party[2].items = items
         if (Locale.getDefault().language != "en") {
             Scene.victoryTxt = this.getString(R.string.scene_victory)
             Scene.fallenTxt = this.getString(R.string.scene_defeat)

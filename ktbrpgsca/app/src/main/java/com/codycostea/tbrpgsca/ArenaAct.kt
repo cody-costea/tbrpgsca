@@ -327,7 +327,7 @@ class ArenaAct : AppCompatActivity() {
     private class ActorArrayBinder(val actorArray : Array<Actor>) : Binder()
 
     companion object {
-        fun Begin(activity: Activity, arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String>?) {
+        fun Begin(activity: Activity, arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String?>?) {
             val actBundle = Bundle()
             actBundle.putBinder("party", ActorArrayBinder(party))
             actBundle.putBinder("enemy", ActorArrayBinder(enemy))
@@ -347,6 +347,9 @@ class ArenaAct : AppCompatActivity() {
                 val jsContext = this@ArenaAct.jsContext
                 val jsScope = this@ArenaAct.jsScope
                 if (jsContext !== null && jsScope !== null) {
+                    jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
+                    jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay, jsScope))
+                    jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.players, jsScope))
                     jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.current, jsScope))
                     jsScope.put("Target", jsScope, org.mozilla.javascript.Context.javaToJS(defTarget, jsScope))
                     jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(skill, jsScope))
@@ -601,6 +604,9 @@ class ArenaAct : AppCompatActivity() {
             val jsContext = this.jsContext
             val jsScope = this.jsScope
             if (jsContext !== null && jsScope !== null) {
+                jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
+                jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay, jsScope))
+                jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.players, jsScope))
                 jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.current, jsScope))
                 jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.fTarget, jsScope))
                 jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.lTarget, jsScope))
@@ -809,6 +815,9 @@ class ArenaAct : AppCompatActivity() {
                         val jsContext = this.jsContext
                         val jsScope = this.jsScope
                         if (jsContext !== null && jsScope !== null) {
+                            jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
+                            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay, jsScope))
+                            jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.players, jsScope))
                             jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.current, jsScope))
                             jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.status, jsScope))
                             try {
@@ -864,7 +873,6 @@ class ArenaAct : AppCompatActivity() {
                 jsContext = org.mozilla.javascript.Context.enter()
                 jsContext.optimizationLevel = -1
                 jsScope = jsContext.initSafeStandardObjects()
-                jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
                 this.jsContext = jsContext
                 this.jsScope = jsScope
             }
@@ -1103,6 +1111,7 @@ class ArenaAct : AppCompatActivity() {
 
         if (jScripts !== null && jScripts.isNotEmpty() && jScripts[0] !== null
                 && jsContext !== null && jsScope !== null) {
+            jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
             jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay, jsScope))
             jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.players, jsScope))
             try {
