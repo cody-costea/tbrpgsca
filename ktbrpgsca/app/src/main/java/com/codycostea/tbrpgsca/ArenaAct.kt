@@ -341,27 +341,64 @@ class ArenaAct : AppCompatActivity() {
     }
 
     private inner class AdScene(party : Array<Actor>, enemy : Array<Actor>, surprise: Int) : Scene(party, enemy, surprise) {
+        init {
+
+        }
+
         override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
             val jScripts = this@ArenaAct.jScripts
-            if (jScripts !== null && jScripts.size > 1 && jScripts[1] !== null) {
+            if (jScripts !== null) {
                 val jsContext = this@ArenaAct.jsContext
                 val jsScope = this@ArenaAct.jsScope
                 if (jsContext !== null && jsScope !== null) {
-                    jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
-                    jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay, jsScope))
-                    jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.players, jsScope))
-                    jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.current, jsScope))
                     jsScope.put("Target", jsScope, org.mozilla.javascript.Context.javaToJS(defTarget, jsScope))
                     jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(skill, jsScope))
-                    try {
-                        jsContext.evaluateString(jsScope, jScripts[1], "BeforeAct", 1, null)
-                    }
-                    catch (e: Exception) {
-                        Log.e("Rhino", e.message)
+                    if (jScripts.size > 2 && jScripts[2] !== null) {
+                        try {
+                            jsContext.evaluateString(jsScope, jScripts[2], "BeforeAct", 1, null)
+                        } catch (e: Exception) {
+                            Log.e("Rhino", e.message)
+                        }
                     }
                 }
             }
             return super.executeAbility(skill, defTarget, txt)
+        }
+
+        override fun setNextCurrent(activate: Boolean): Boolean {
+            val jScripts = this@ArenaAct.jScripts
+            if (jScripts !== null && jScripts.isNotEmpty()) {
+                var jsContext = this@ArenaAct.jsContext
+                var jsScope = this@ArenaAct.jsScope
+                if (jsContext === null || jsScope === null) {
+                    jsContext = org.mozilla.javascript.Context.enter()
+                    jsContext.optimizationLevel = -1
+                    jsScope = jsContext.initSafeStandardObjects()
+                    jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct, jsScope))
+                    jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
+                    jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.players, jsScope))
+                    jsScope.put("EnemyIndex", jsScope, org.mozilla.javascript.Context.javaToJS(this.enIdx, jsScope))
+                    if (jScripts[0] !== null) {
+                        try {
+                            jsContext.evaluateString(jsScope, jScripts[0], "OnStart", 1, null)
+                        } catch (e: Exception) {
+                            Log.e("Rhino", e.message)
+                        }
+                    }
+                    this@ArenaAct.jsContext = jsContext
+                    this@ArenaAct.jsScope = jsScope
+                }
+                jsScope!!.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.current, jsScope))
+                if (jScripts.size > 1 && jScripts[1] !== null) {
+                    jsScope.put("Reset", jsScope, org.mozilla.javascript.Context.javaToJS(activate, jsScope))
+                    try {
+                        jsContext!!.evaluateString(jsScope, jScripts[1], "OnBeginTurn", 1, null)
+                    } catch (e: Exception) {
+                        Log.e("Rhino", e.message)
+                    }
+                }
+            }
+            return super.setNextCurrent(activate)
         }
     }
 
@@ -600,23 +637,19 @@ class ArenaAct : AppCompatActivity() {
 
     private fun afterAct() {
         val jScripts = this.jScripts
-        if (jScripts !== null && jScripts.size > 2 && jScripts[2] !== null) {
+        if (jScripts !== null) {
             val jsContext = this.jsContext
             val jsScope = this.jsScope
             if (jsContext !== null && jsScope !== null) {
-                jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
-                jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay, jsScope))
-                jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.players, jsScope))
-                jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.current, jsScope))
                 jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.fTarget, jsScope))
                 jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.lTarget, jsScope))
-                jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.lastAbility, jsScope))
                 jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.status, jsScope))
-                try {
-                    jsContext.evaluateString(jsScope, jScripts[2], "AfterAct", 1, null)
-                }
-                catch (e: Exception) {
-                    Log.e("Rhino", e.message)
+                if ( jScripts.size > 3 && jScripts[3] !== null) {
+                    try {
+                        jsContext.evaluateString(jsScope, jScripts[3], "AfterAct", 1, null)
+                    } catch (e: Exception) {
+                        Log.e("Rhino", e.message)
+                    }
                 }
             }
         }
@@ -811,17 +844,13 @@ class ArenaAct : AppCompatActivity() {
                 .setMessage(s)
                 .setTitle(t).setPositiveButton("Exit") { _, _ ->
                     val jScripts = this.jScripts
-                    if (jScripts !== null && jScripts.size > 3 && jScripts[3] !== null) {
+                    if (jScripts !== null && jScripts.size > 4 && jScripts[4] !== null) {
                         val jsContext = this.jsContext
                         val jsScope = this.jsScope
                         if (jsContext !== null && jsScope !== null) {
-                            jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
-                            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay, jsScope))
-                            jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct.scenePlay.players, jsScope))
-                            jsScope.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.current, jsScope))
-                            jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.status, jsScope))
+                            jsScope.delete("Arena")
                             try {
-                                jsContext.evaluateString(jsScope, jScripts[3], "OnStop", 1, null)
+                                jsContext.evaluateString(jsScope, jScripts[4], "OnStop", 1, null)
                             }
                             catch (e: Exception) {
                                 Log.e("Rhino", e.message)
@@ -849,9 +878,7 @@ class ArenaAct : AppCompatActivity() {
         val party : Array<Actor>
         val enemy : Array<Actor>
         val surprised : Int
-        var jScripts : Array<String?>? = null
-        var jsContext : org.mozilla.javascript.Context? = null
-        var jsScope : Scriptable? = null
+        val jScripts : Array<String?>?
         if (extra !== null) {
             surprised = extra.getInt("surprise", 0)
             this.escapable = extra.getBoolean("escapable", true)
@@ -870,16 +897,11 @@ class ArenaAct : AppCompatActivity() {
             jScripts = extra.getStringArray("scripts")
             if (jScripts !== null) {
                 this.jScripts = jScripts
-                jsContext = org.mozilla.javascript.Context.enter()
-                jsContext.optimizationLevel = -1
-                jsScope = jsContext.initSafeStandardObjects()
-                this.jsContext = jsContext
-                this.jsScope = jsScope
             }
         }
         else {
             surprised = 0
-
+            jScripts = null
             val humanRace = Costume(1, "Human")
             val heroJob = AdCostume(1, "Hero", "hero")
             val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
@@ -1108,18 +1130,6 @@ class ArenaAct : AppCompatActivity() {
 
         this.runBtn.setOnClickListener(this.cAction)
         this.autoBtn.setOnClickListener(this.cAction)
-
-        if (jScripts !== null && jScripts.isNotEmpty() && jScripts[0] !== null
-                && jsContext !== null && jsScope !== null) {
-            jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
-            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay, jsScope))
-            jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.players, jsScope))
-            try {
-                jsContext.evaluateString(jsScope, jScripts[0], "OnStart", 1, null)
-            } catch (e: Exception) {
-                Log.e("Rhino", e.message)
-            }
-        }
 
         if (this.crActor.automatic != 0) {
             this.afterAct()

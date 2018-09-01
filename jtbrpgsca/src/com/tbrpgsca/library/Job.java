@@ -175,8 +175,7 @@ public class Job extends Race {
 			if (i == 2) {
 				bmp = getBmpSpr(1, pos, p, context);
 				this.bSprite[x].addFrame(
-						new BitmapDrawable(context.getResources(), Bitmap
-								.createBitmap(bmp, 0, 0, p[1], p[0])), 261);
+						new BitmapDrawable(Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])), 261);
 				this.sprWait[x] += 261;
 			}
 			bmp = getBmpSpr(i, pos, p, context);
@@ -184,15 +183,13 @@ public class Job extends Race {
 				int t = (i != 1 || j != 0) ? 87 : 261;
 				this.bSprite[x]
 						.addFrame(
-								new BitmapDrawable(context.getResources(),
-										Bitmap.createBitmap(bmp, j * p[1], 0,
+								new BitmapDrawable(Bitmap.createBitmap(bmp, j * p[1], 0,
 												p[1], p[0])), t);
 				this.sprWait[x] += t;
 			}
 			for (int j = p[2] - 2; p[2] < 7 && j > (i == 1 ? 0 : -1); j--) {
 				this.bSprite[x].addFrame(
-						new BitmapDrawable(context.getResources(), Bitmap
-								.createBitmap(bmp, j * p[1], 0, p[1], p[0])),
+						new BitmapDrawable(Bitmap.createBitmap(bmp, j * p[1], 0, p[1], p[0])),
 						87);
 				this.sprWait[x] += 87;
 			}
@@ -200,14 +197,12 @@ public class Job extends Race {
 		if (i != 2 && i >= 0) {
 			if (i != 1)
 				bmp = getBmpSpr(1, pos, p, context);
-			this.bSprite[x].addFrame(new BitmapDrawable(context.getResources(),
-					Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])), 0);
+			this.bSprite[x].addFrame(new BitmapDrawable(Bitmap.createBitmap(bmp, 0, 0, p[1], p[0])), 0);
 		}
 		if (i < 0) {
 			bmp = getBmpSpr(2, pos, p, context);
 			this.bSprite[x].addFrame(
-					new BitmapDrawable(context.getResources(),
-							Bitmap.createBitmap(bmp, (p[2] - 1) * p[1], 0,
+					new BitmapDrawable(Bitmap.createBitmap(bmp, (p[2] - 1) * p[1], 0,
 									p[1], p[0])), 0);
 		}
 		bmp.recycle();

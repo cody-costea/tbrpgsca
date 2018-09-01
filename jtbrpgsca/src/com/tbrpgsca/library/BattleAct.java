@@ -109,19 +109,19 @@ public class BattleAct extends Activity {
 				act = (surprised) ? BattleAct.this.imgClick(5) : BattleAct.this
 						.imgClick(3);
 				break;
-			case R.id.ImgEnemy2:
+			case R.id.ImgEnemy3:
 				act = (surprised) ? BattleAct.this.imgClick(1) : BattleAct.this
 						.imgClick(4);
 				break;
 			case R.id.ImgEnemy1:
-				act = (surprised) ? BattleAct.this.imgClick(3) : BattleAct.this
+				act = (surprised) ? BattleAct.this.imgClick(0) : BattleAct.this
 						.imgClick(5);
 				break;
 			case R.id.ImgEnemy4:
-				act = (surprised) ? BattleAct.this.imgClick(0) : BattleAct.this
+				act = (surprised) ? BattleAct.this.imgClick(3) : BattleAct.this
 						.imgClick(6);
 				break;
-			case R.id.ImgEnemy3:
+			case R.id.ImgEnemy2:
 				act = (surprised) ? BattleAct.this.imgClick(2) : BattleAct.this
 						.imgClick(7);
 				break;
@@ -322,10 +322,10 @@ public class BattleAct extends Activity {
 				.setEnabled((extra != null && extra.containsKey("Escape")) ? extra
 						.getBoolean("Escape") : true);
 		if (BattleAct.this.surprise < 0) {
-			this.imgActor[0] = (ImageView) findViewById(R.id.ImgEnemy4);
-			this.imgActor[1] = (ImageView) findViewById(R.id.ImgEnemy2);
-			this.imgActor[2] = (ImageView) findViewById(R.id.ImgEnemy3);
-			this.imgActor[3] = (ImageView) findViewById(R.id.ImgEnemy1);
+			this.imgActor[0] = (ImageView) findViewById(R.id.ImgEnemy1);
+			this.imgActor[1] = (ImageView) findViewById(R.id.ImgEnemy3);
+			this.imgActor[2] = (ImageView) findViewById(R.id.ImgEnemy2);
+			this.imgActor[3] = (ImageView) findViewById(R.id.ImgEnemy4);
 			this.imgActor[4] = (ImageView) findViewById(R.id.ImgPlayer2);
 			this.imgActor[5] = (ImageView) findViewById(R.id.ImgPlayer4);
 			this.imgActor[6] = (ImageView) findViewById(R.id.ImgPlayer1);
@@ -335,10 +335,10 @@ public class BattleAct extends Activity {
 			this.imgActor[1] = (ImageView) findViewById(R.id.ImgPlayer3);
 			this.imgActor[2] = (ImageView) findViewById(R.id.ImgPlayer2);
 			this.imgActor[3] = (ImageView) findViewById(R.id.ImgPlayer4);
-			this.imgActor[4] = (ImageView) findViewById(R.id.ImgEnemy2);
+			this.imgActor[4] = (ImageView) findViewById(R.id.ImgEnemy3);
 			this.imgActor[5] = (ImageView) findViewById(R.id.ImgEnemy1);
 			this.imgActor[6] = (ImageView) findViewById(R.id.ImgEnemy4);
-			this.imgActor[7] = (ImageView) findViewById(R.id.ImgEnemy3);
+			this.imgActor[7] = (ImageView) findViewById(R.id.ImgEnemy2);
 		}
 		for (int i = 0; i < this.imgActor.length; i++) {
 			this.imgActor[i].setOnClickListener(this.cAction);
