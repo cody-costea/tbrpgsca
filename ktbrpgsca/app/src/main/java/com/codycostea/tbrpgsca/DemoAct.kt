@@ -94,7 +94,7 @@ class DemoAct : AppCompatActivity() {
         )
     }
 
-    private fun getCharacters(state: Array<State>, skill : Array<Ability>, race : Array<Costume>): Array<Actor> {
+    private fun getCharacters(state: Array<State>, skill : Array<Ability>, race : Array<Costume>, item: Array<Ability>): Array<Actor> {
         val maxlv = 5
 
         val ogreJob = AdCostume(1, this.getString(R.string.race_ogre), "ogre", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[11]), null, null)
@@ -102,15 +102,21 @@ class DemoAct : AppCompatActivity() {
         val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2]), null, null)
         val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false,  null, arrayOf(skill[15]), null, null)
 
-        return arrayOf(
+        val characters = arrayOf<Actor>(
                 AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, maxLv = maxlv),
                 AdActor(2, this, this.getString(R.string.name_george), null, race[0], lizardJob, maxLv = maxlv),
                 AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, maxLv = maxlv),
-                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, level = 3,  maxLv = 3, states = arrayOf(state[10])),
+                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, level = 3, maxLv = 3, states = arrayOf(state[10])),
                 AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, level = 3,  maxLv = 3, mRes = mutableMapOf(2 to 7, 3 to 1)),
                 AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, level = 3,  maxLv = 3),
                 AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3,  maxLv = 3, states = arrayOf(state[0]))
         )
+        characters[3].items = (mutableMapOf(item[0] to 2, item[2] to 2)) as LinkedHashMap<Ability, Int>
+        characters[4].items =  (mutableMapOf(item[1] to 2, item[5] to 1)) as LinkedHashMap<Ability, Int>
+        characters[5].items = (mutableMapOf(item[3] to 2, item[7] to 1)) as LinkedHashMap<Ability, Int>
+        characters[6].items = (mutableMapOf(item[4] to 1, item[8] to 1)) as LinkedHashMap<Ability, Int>
+
+        return characters
     }
 
     private fun getSkills(state: Array<State>): Array<Ability> {
@@ -195,8 +201,8 @@ class DemoAct : AppCompatActivity() {
         )
     }
 
-    private fun getItems(state: Array<State>): ArrayList<Ability> {
-        return arrayListOf(
+    private fun getItems(state: Array<State>): Array<Ability> {
+        return arrayOf(
                 AdAbility(1, this.getString(R.string.item_potion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(2, this.getString(R.string.item_ether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, -1, -1, false, false, null, null),
                 AdAbility(3, this.getString(R.string.item_tonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, -1, -1, false, false, null, null),
@@ -241,7 +247,7 @@ class DemoAct : AppCompatActivity() {
         val item = this.getItems(state)
         val pcRace = this.getRaces(skill)
         val pcJob = this.getJobs(skill)
-        val player = this.getCharacters(state, skill, pcRace)
+        val player = this.getCharacters(state, skill, pcRace, item)
         val enemy = this.getEnemies(player)
 
         val raceList = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item)

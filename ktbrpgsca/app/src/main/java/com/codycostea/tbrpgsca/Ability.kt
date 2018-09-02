@@ -110,16 +110,16 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                     && trgItems !== user._items
                     && trgItems.isNotEmpty()
                     && (Math.random() * 12 + user.agi / 4).toInt() > 4 + trg.agi / 3) {
-                var itemId = (Math.random() * trgItems.size).toInt()
+                val itemId = (Math.random() * trgItems.size).toInt()
                 if (itemId < trgItems.size) {
-                    val iterator = trgItems.keys.iterator()
+                    /*val iterator = trgItems.keys.iterator()
                     if (itemId > 1) {
                         itemId--
                     }
                     for (i in 0..itemId) {
                         iterator.next()
-                    }
-                    val stolen = iterator.next()
+                    }*/
+                    val stolen = trgItems.keys.elementAt(itemId)//if (iterator.hasNext()) iterator.next() else trgItems.keys.first()
                     val trgItemQty = trgItems[stolen]
                     if (trgItemQty !== null && trgItemQty > 0) {
                         var usrItems = user._items
