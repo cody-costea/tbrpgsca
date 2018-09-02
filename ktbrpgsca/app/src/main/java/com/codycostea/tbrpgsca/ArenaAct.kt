@@ -324,27 +324,7 @@ fun BitmapDrawable.getSprite(context : Context, firstFrame : Drawable? = null, f
 
 class ArenaAct : AppCompatActivity() {
 
-    private class ActorArrayBinder(val actorArray : Array<Actor>) : Binder()
-
-    companion object {
-        fun Begin(activity: Activity, arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String?>?) {
-            val actBundle = Bundle()
-            actBundle.putBinder("party", ActorArrayBinder(party))
-            actBundle.putBinder("enemy", ActorArrayBinder(enemy))
-            actBundle.putInt("surprise", surprise)
-            actBundle.putBoolean("escapable", escapable)
-            actBundle.putStringArray("scripts", scripts)
-            actBundle.putInt("arenaImg", arenaImgId)
-            actBundle.putInt("song", songId)
-            activity.startActivityForResult(Intent(activity, ArenaAct::class.java).putExtras(actBundle), 1)
-        }
-    }
-
     private inner class AdScene(party : Array<Actor>, enemy : Array<Actor>, surprise: Int) : Scene(party, enemy, surprise) {
-        init {
-
-        }
-
         override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
             val jScripts = this@ArenaAct.jScripts
             if (jScripts !== null) {
@@ -389,8 +369,8 @@ class ArenaAct : AppCompatActivity() {
                     this@ArenaAct.jsScope = jsScope
                 }
                 jsScope!!.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.current, jsScope))
+                jsScope.put("Reset", jsScope, org.mozilla.javascript.Context.javaToJS(activate, jsScope))
                 if (jScripts.size > 1 && jScripts[1] !== null) {
-                    jsScope.put("Reset", jsScope, org.mozilla.javascript.Context.javaToJS(activate, jsScope))
                     try {
                         jsContext!!.evaluateString(jsScope, jScripts[1], "OnBeginTurn", 1, null)
                     } catch (e: Exception) {
@@ -399,6 +379,22 @@ class ArenaAct : AppCompatActivity() {
                 }
             }
             return super.setNextCurrent(activate)
+        }
+    }
+
+    private class ActorArrayBinder(val actorArray : Array<Actor>) : Binder()
+
+    companion object {
+        fun begin(activity: Activity, arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String?>?) {
+            val actBundle = Bundle()
+            actBundle.putBinder("party", ActorArrayBinder(party))
+            actBundle.putBinder("enemy", ActorArrayBinder(enemy))
+            actBundle.putInt("surprise", surprise)
+            actBundle.putBoolean("escapable", escapable)
+            actBundle.putStringArray("scripts", scripts)
+            actBundle.putInt("arenaImg", arenaImgId)
+            actBundle.putInt("song", songId)
+            activity.startActivityForResult(Intent(activity, ArenaAct::class.java).putExtras(actBundle), 1)
         }
     }
 
@@ -817,7 +813,6 @@ class ArenaAct : AppCompatActivity() {
                 }
 
             }
-
             this.skillActBtn.setOnClickListener(this.cAction)
         }
         else {
@@ -842,7 +837,7 @@ class ArenaAct : AppCompatActivity() {
         AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setMessage(s)
-                .setTitle(t).setPositiveButton("Exit") { _, _ ->
+                .setTitle(t).setPositiveButton(this.resources.getString(R.string.exit)) { _, _ ->
                     val jScripts = this.jScripts
                     if (jScripts !== null && jScripts.size > 4 && jScripts[4] !== null) {
                         val jsContext = this.jsContext
@@ -878,7 +873,6 @@ class ArenaAct : AppCompatActivity() {
         val party : Array<Actor>
         val enemy : Array<Actor>
         val surprised : Int
-        val jScripts : Array<String?>?
         if (extra !== null) {
             surprised = extra.getInt("surprise", 0)
             this.escapable = extra.getBoolean("escapable", true)
@@ -894,14 +888,14 @@ class ArenaAct : AppCompatActivity() {
             }
             party = (extra.getBinder("party") as ActorArrayBinder).actorArray
             enemy = (extra.getBinder("enemy") as ActorArrayBinder).actorArray
-            jScripts = extra.getStringArray("scripts")
+            val jScripts = extra.getStringArray("scripts")
             if (jScripts !== null) {
                 this.jScripts = jScripts
             }
         }
         else {
             surprised = 0
-            jScripts = null
+
             val humanRace = Costume(1, "Human")
             val heroJob = AdCostume(1, "Hero", "hero")
             val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
@@ -1084,8 +1078,8 @@ class ArenaAct : AppCompatActivity() {
                 imgView.setTargetClickListener(pos)
                 imgViews.add(imgView)
             }
-            this.setCrSkills()
-            this.setCrItems()
+            //this.setCrSkills()
+            //this.setCrItems()
         }
 
         this.imgActor = imgViews.toTypedArray()
@@ -1131,12 +1125,13 @@ class ArenaAct : AppCompatActivity() {
         this.runBtn.setOnClickListener(this.cAction)
         this.autoBtn.setOnClickListener(this.cAction)
 
-        if (this.crActor.automatic != 0) {
+        /*if (this.crActor.automatic != 0) {
             this.afterAct()
         }
         else {
             this.enableControls(true)
             this.setCrAutoSkill()
-        }
+        }*/
+        this.afterAct()
     }
 }

@@ -306,7 +306,7 @@ class DemoAct : AppCompatActivity() {
                     for (i in 0 until player.size) {
                         player[i].recover()
                     }
-                    ArenaAct.Begin(this, 0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
+                    ArenaAct.begin(this, 0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
                 }
                 R.id.InfoBt -> this@DemoAct.displayMsg(this@DemoAct.getString(R.string.about), this@DemoAct.getString(R.string.msg_about), null)
                 R.id.QuitBt -> this@DemoAct.finish()

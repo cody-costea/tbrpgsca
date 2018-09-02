@@ -255,11 +255,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         ret += String.format("\n${Scene.performsTxt}", this.players[this.current].name, skill.name)
         for (i in this.fTarget..this.lTarget) {
             if ((skill.hpDmg < 0 && skill.restoreKO) || this.players[i].hp > 0) {
-                ret += skill.execute(this.players[this.current], this.players[i], applyCosts) + "."
+                ret += skill.execute(this.players[this.current], this.players[i], applyCosts)
                 applyCosts = false
             }
         }
-
+        ret += "."
         this.players[this.current].exp++
         this.players[this.current].levelUp()
 
