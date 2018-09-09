@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
         <activity
-            android:name=".ArenaAct"
+            android:name=".Arena"
             android:screenOrientation="nosensor">
         </activity>
         <activity

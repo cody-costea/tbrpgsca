@@ -19,9 +19,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.text.SpannableString
 import android.text.util.Linkify
+import android.view.View
 import android.view.View.OnClickListener
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -30,9 +32,12 @@ import android.widget.Spinner
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-class DemoAct : AppCompatActivity() {
+class DemoAct : AppCompatActivity(), ArenaStager {
 
+    private lateinit var fragment: View
+    private lateinit var partyLayout: View
     private lateinit var party: Array<Actor>
+    private lateinit var arena: Arena
     private var level = 0
 
     private val states: Array<State>
@@ -242,6 +247,9 @@ class DemoAct : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_demo)
 
+        this.fragment = this.findViewById(R.id.Fragment)
+        this.partyLayout = this.findViewById(R.id.PartyLayout)
+
         val state = this.states
         val skill = this.getSkills(state)
         val item = this.getItems(state)
@@ -312,7 +320,9 @@ class DemoAct : AppCompatActivity() {
                     for (i in 0 until player.size) {
                         player[i].recover()
                     }
-                    ArenaAct.begin(this, 0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
+                    this.arena = this.stage(this, R.id.Fragment,0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
+                    this.partyLayout.visibility = View.GONE
+                    this.fragment.visibility = View.VISIBLE
                 }
                 R.id.InfoBt -> this@DemoAct.displayMsg(this@DemoAct.getString(R.string.about), this@DemoAct.getString(R.string.msg_about), null)
                 R.id.QuitBt -> this@DemoAct.finish()
@@ -350,18 +360,20 @@ class DemoAct : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode >= 0) {
-            if (resultCode == Activity.RESULT_OK) {
-                val extra = data.extras
-                /*if (extra.containsKey("party")) {
-                    System.arraycopy(extra.getParcelableArray("party"), 0, this.party, 0, 4)
-                    this.Player[1] = this.party[0]
-                    this.Player[2] = this.party[1]
-                    this.Player[3] = this.party[2]
-                }*/
-                if (extra.getInt("Outcome") > 0 && this@DemoAct.level < 5) this@DemoAct.level++
-            }
+    override fun onArenaConclusion(outcome: Int) {
+        this.fragment.visibility = View.GONE
+        this.partyLayout.visibility = View.VISIBLE
+        this.supportFragmentManager.beginTransaction().remove(this.arena).commit()
+        if (outcome > 0 && this@DemoAct.level < 5) this@DemoAct.level++
+    }
+
+    override fun onBackPressed() {
+        if (this.fragment.visibility == View.GONE) {
+            super.onBackPressed()
+        }
+        else {
+            this.arena.renounce()
         }
     }
+
 }

@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
@@ -32,9 +31,12 @@ import kotlin.collections.LinkedHashMap
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.text.method.ScrollingMovementMethod
-import android.content.Intent
 import android.content.res.Resources
 import android.os.Binder
+import android.support.annotation.DrawableRes
+import android.support.annotation.IdRes
+import android.support.annotation.RawRes
+import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import org.mozilla.javascript.Scriptable
@@ -51,6 +53,7 @@ class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, m
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
+
 }
 
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume,
@@ -185,6 +188,7 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
+
 }
 
 class AdAbility(id: Int, name: String, private val sprId : Int, private val sndId : Int, steal: Boolean = false,
@@ -228,7 +232,7 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
         return sprAnim
     }
 
-    fun playSound(context : Context) : Int {
+    fun playSound(context: Context): Int {
         if (this.sndId < 1) return 0
         var sndPlayer = this._sndPlayer
         if (this._context !== context) {
@@ -257,6 +261,7 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
+
 }
 
 class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean, confuse : Boolean, reflect : Boolean,
@@ -274,6 +279,7 @@ class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean,
     override fun hashCode(): Int {
         return javaClass.hashCode()
     }
+
 }
 
 val AnimationDrawable.fullDur : Int
@@ -322,14 +328,14 @@ fun BitmapDrawable.getSprite(context : Context, firstFrame : Drawable? = null, f
     return animSpr
 }
 
-class ArenaAct : AppCompatActivity() {
+class Arena : Fragment() {
 
     private inner class AdScene(party : Array<Actor>, enemy : Array<Actor>, surprise: Int) : Scene(party, enemy, surprise) {
         override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
-            val jScripts = this@ArenaAct.jScripts
+            val jScripts = this@Arena.jScripts
             if (jScripts !== null) {
-                val jsContext = this@ArenaAct.jsContext
-                val jsScope = this@ArenaAct.jsScope
+                val jsContext = this@Arena.jsContext
+                val jsScope = this@Arena.jsScope
                 if (jsContext !== null && jsScope !== null) {
                     jsScope.put("Target", jsScope, org.mozilla.javascript.Context.javaToJS(defTarget, jsScope))
                     jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(skill, jsScope))
@@ -346,15 +352,15 @@ class ArenaAct : AppCompatActivity() {
         }
 
         override fun setNextCurrent(activate: Boolean): Boolean {
-            val jScripts = this@ArenaAct.jScripts
+            val jScripts = this@Arena.jScripts
             if (jScripts !== null && jScripts.isNotEmpty()) {
-                var jsContext = this@ArenaAct.jsContext
-                var jsScope = this@ArenaAct.jsScope
+                var jsContext = this@Arena.jsContext
+                var jsScope = this@Arena.jsScope
                 if (jsContext === null || jsScope === null) {
                     jsContext = org.mozilla.javascript.Context.enter()
                     jsContext.optimizationLevel = -1
                     jsScope = jsContext.initSafeStandardObjects()
-                    jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this@ArenaAct, jsScope))
+                    jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this@Arena, jsScope))
                     jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
                     jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.players, jsScope))
                     jsScope.put("EnemyIndex", jsScope, org.mozilla.javascript.Context.javaToJS(this.enIdx, jsScope))
@@ -365,8 +371,8 @@ class ArenaAct : AppCompatActivity() {
                             Log.e("Rhino", e.message)
                         }
                     }
-                    this@ArenaAct.jsContext = jsContext
-                    this@ArenaAct.jsScope = jsScope
+                    this@Arena.jsContext = jsContext
+                    this@Arena.jsScope = jsScope
                 }
                 jsScope!!.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.current, jsScope))
                 jsScope.put("Reset", jsScope, org.mozilla.javascript.Context.javaToJS(activate, jsScope))
@@ -385,7 +391,8 @@ class ArenaAct : AppCompatActivity() {
     private class ActorArrayBinder(val actorArray : Array<Actor>) : Binder()
 
     companion object {
-        fun begin(activity: Activity, arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String?>?) {
+        fun prepare(arenaImgId : Int, songId : Int, party : Array<Actor>, enemy : Array<Actor>, surprise : Int, escapable: Boolean, scripts: Array<String?>?): Arena {
+            val arena = Arena()
             val actBundle = Bundle()
             actBundle.putBinder("party", ActorArrayBinder(party))
             actBundle.putBinder("enemy", ActorArrayBinder(enemy))
@@ -394,7 +401,9 @@ class ArenaAct : AppCompatActivity() {
             actBundle.putStringArray("scripts", scripts)
             actBundle.putInt("arenaImg", arenaImgId)
             actBundle.putInt("song", songId)
-            activity.startActivityForResult(Intent(activity, ArenaAct::class.java).putExtras(actBundle), 1)
+            //activity.startActivityForResult(Intent(activity, Arena::class.java).putExtras(actBundle), 1)
+            arena.arguments = actBundle
+            return arena
         }
     }
 
@@ -477,8 +486,8 @@ class ArenaAct : AppCompatActivity() {
         var usable : Boolean = true
     }
 
-    private class AbilityArrayAdapter(context: ArenaAct, val layoutRes: Int, skills: List<Ability>, val asItems : Boolean)
-        : ArrayAdapter<Ability>(context, layoutRes) {
+    private class AbilityArrayAdapter(context: Arena, val layoutRes: Int, skills: List<Ability>, val asItems : Boolean)
+        : ArrayAdapter<Ability>(context.requireContext(), layoutRes) {
 
         var arenaAct = context
 
@@ -544,8 +553,8 @@ class ArenaAct : AppCompatActivity() {
         }
     }
 
-    private class ActorArrayAdapter(context: ArenaAct, val layoutRes: Int, actors: Array<Actor>)
-        : ArrayAdapter<Actor>(context, layoutRes) {
+    private class ActorArrayAdapter(context: Arena, val layoutRes: Int, actors: Array<Actor>)
+        : ArrayAdapter<Actor>(context.requireContext(), layoutRes) {
 
         var arenaAct = context
 
@@ -706,7 +715,7 @@ class ArenaAct : AppCompatActivity() {
                         this.koActors[trg] = true
                     }
                     if (lastAbility !== null) {
-                        val abilitySpr = lastAbility.getSprite(this)
+                        val abilitySpr = lastAbility.getSprite(this.requireContext())
                         if (abilitySpr !== null) {
                             if (lastAbility.spriteDur > dur) {
                                 dur = lastAbility.spriteDur
@@ -715,7 +724,7 @@ class ArenaAct : AppCompatActivity() {
                             this.imgActor[trg].setImageDrawable(abilitySpr)
                             abilitySpr.start()
                         }
-                        val soundDur = lastAbility.playSound(this)
+                        val soundDur = lastAbility.playSound(this.requireContext())
                         if (soundDur > dur) {
                             dur = soundDur
                         }
@@ -765,12 +774,12 @@ class ArenaAct : AppCompatActivity() {
 
                 this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
-                        this@ArenaAct.itemUseBtn.isEnabled = false
+                        this@Arena.itemUseBtn.isEnabled = false
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        this@ArenaAct.itemUseBtn.isEnabled = (view?.tag as ViewHolder).usable
-                                && this@ArenaAct.canTarget(this@ArenaAct.targetSpn.selectedItemPosition, this@ArenaAct.itemsSpn.selectedItem as Ability)
+                        this@Arena.itemUseBtn.isEnabled = (view?.tag as ViewHolder).usable
+                                && this@Arena.canTarget(this@Arena.targetSpn.selectedItemPosition, this@Arena.itemsSpn.selectedItem as Ability)
                     }
 
                 }
@@ -803,13 +812,13 @@ class ArenaAct : AppCompatActivity() {
 
             this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-                    this@ArenaAct.skillActBtn.isEnabled = false
+                    this@Arena.skillActBtn.isEnabled = false
                 }
 
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    this@ArenaAct.skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
-                            || (view === null && this@ArenaAct.crActor.availableSkills[position].canPerform(this@ArenaAct.crActor)))
-                            && this@ArenaAct.canTarget(this@ArenaAct.targetSpn.selectedItemPosition, this@ArenaAct.crActor.availableSkills[position])
+                    this@Arena.skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
+                            || (view === null && this@Arena.crActor.availableSkills[position].canPerform(this@Arena.crActor)))
+                            && this@Arena.canTarget(this@Arena.targetSpn.selectedItemPosition, this@Arena.crActor.availableSkills[position])
                 }
 
             }
@@ -822,54 +831,60 @@ class ArenaAct : AppCompatActivity() {
 
     private fun ImageView.setTargetClickListener(targetPos : Int) {
         this.setOnClickListener {
-            if (targetPos == this@ArenaAct.targetSpn.selectedItemPosition) {
-                if (this@ArenaAct.crActor.automatic == 0 && this@ArenaAct.skillActBtn.isEnabled) {
-                    this@ArenaAct.skillActBtn.callOnClick()
+            if (targetPos == this@Arena.targetSpn.selectedItemPosition) {
+                if (this@Arena.crActor.automatic == 0 && this@Arena.skillActBtn.isEnabled) {
+                    this@Arena.skillActBtn.callOnClick()
                 }
             }
             else {
-                this@ArenaAct.targetSpn.setSelection(targetPos)
+                this@Arena.targetSpn.setSelection(targetPos)
             }
         }
     }
 
     private fun endingMsg(t: String, s: String) {
-        AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setMessage(s)
-                .setTitle(t).setPositiveButton(this.resources.getString(R.string.exit)) { _, _ ->
-                    val jScripts = this.jScripts
-                    if (jScripts !== null && jScripts.size > 4 && jScripts[4] !== null) {
-                        val jsContext = this.jsContext
-                        val jsScope = this.jsScope
-                        if (jsContext !== null && jsScope !== null) {
-                            jsScope.delete("Arena")
-                            try {
-                                jsContext.evaluateString(jsScope, jScripts[4], "OnStop", 1, null)
+        val context = this.context
+        if (context !== null) {
+            AlertDialog.Builder(context)
+                    .setCancelable(false)
+                    .setMessage(s)
+                    .setTitle(t).setPositiveButton(this.resources.getString(R.string.exit)) { _, _ ->
+                        val jScripts = this.jScripts
+                        if (jScripts !== null && jScripts.size > 4 && jScripts[4] !== null) {
+                            val jsContext = this.jsContext
+                            val jsScope = this.jsScope
+                            if (jsContext !== null && jsScope !== null) {
+                                jsScope.delete("Arena")
+                                try {
+                                    jsContext.evaluateString(jsScope, jScripts[4], "OnStop", 1, null)
+                                } catch (e: Exception) {
+                                    Log.e("Rhino", e.message)
+                                }
+                                org.mozilla.javascript.Context.exit()
                             }
-                            catch (e: Exception) {
-                                Log.e("Rhino", e.message)
-                            }
-                            org.mozilla.javascript.Context.exit()
                         }
-                    }
-                    val outcome = Intent()
-                    outcome.putExtra("Outcome", this.scenePlay.status)
-                    this.setResult(Activity.RESULT_OK, outcome)
-                    this.finish()
-                }.create().show()
+                        //val outcome = Intent()
+                        //outcome.putExtra("Outcome", this.scenePlay.status)
+                        //this.requireActivity().setResult(Activity.RESULT_OK, outcome)
+                        //this.requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
+                        if (context is ArenaStager) {
+                            context.onArenaConclusion(this.scenePlay.status)
+                        }
+                    }.create().show()
+        }
     }
 
-    override fun onBackPressed() {
+    fun renounce() {
         this.scenePlay.status = -2
         this.afterAct()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        this.setContentView(R.layout.activity_arena)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        //super.onCreateView(inflater, container, savedInstanceState)
+        //this.setContentView(R.layout.activity_arena)
+        val view = inflater.inflate(R.layout.activity_arena, container, false)
 
-        val extra = this.intent.extras
+        val extra = this.arguments
         val party : Array<Actor>
         val enemy : Array<Actor>
         val surprised : Int
@@ -878,13 +893,13 @@ class ArenaAct : AppCompatActivity() {
             this.escapable = extra.getBoolean("escapable", true)
             val songResId = extra.getInt("song", 0)
             if (songResId > 0) {
-                this.songPlayer = MediaPlayer.create(this, songResId);
+                this.songPlayer = MediaPlayer.create(this.context, songResId);
                 this.songPlayer.isLooping = true;
                 this.songPlayer.start();
             }
             val arenaResId = extra.getInt("arenaImg", 0)
             if (arenaResId > 0) {
-                this.findViewById<ImageView>(R.id.ImgArena).setBackgroundResource(arenaResId)
+                view.findViewById<ImageView>(R.id.ImgArena).setBackgroundResource(arenaResId)
             }
             party = (extra.getBinder("party") as ActorArrayBinder).actorArray
             enemy = (extra.getBinder("enemy") as ActorArrayBinder).actorArray
@@ -937,13 +952,13 @@ class ArenaAct : AppCompatActivity() {
                             0, 0, 0, 0, 0, 0, false, false, null, null))
 
             party = arrayOf(
-                    AdActor(1, this, "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(1, this.requireContext(), "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills2, null, null),
-                    AdActor(2, this, "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(2, this.requireContext(), "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills2, null, null),
-                    AdActor(3, this, "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(3, this.requireContext(), "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(4, this, "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(4, this.requireContext(), "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
             party[0]._items = LinkedHashMap()
@@ -953,13 +968,13 @@ class ArenaAct : AppCompatActivity() {
             party[1]._items = party[0]._items
 
             enemy = arrayOf(
-                    AdActor(8, this, "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(8, this.requireContext(), "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(7, this, "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(7, this.requireContext(), "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(6, this, "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(6, this.requireContext(), "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(5, this, "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(5, this.requireContext(), "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
         }
@@ -975,17 +990,17 @@ class ArenaAct : AppCompatActivity() {
 
         this.scenePlay = AdScene(party, enemy, surprised)
 
-        this.runBtn = this.findViewById(R.id.RunBt)
+        this.runBtn = view.findViewById(R.id.RunBt)
         this.runBtn.isEnabled = this.escapable
-        this.autoBtn = this.findViewById(R.id.AutoBt)
-        this.skillActBtn = this.findViewById(R.id.ActBt)
-        this.itemUseBtn = this.findViewById(R.id.UseBt)
-        this.skillsSpn = this.findViewById(R.id.SkillBox)
-        this.itemsSpn = this.findViewById(R.id.ItemBox)
-        this.targetSpn = this.findViewById(R.id.TargetBox)
-        this.actionsTxt = this.findViewById(R.id.ItemCost)
+        this.autoBtn = view.findViewById(R.id.AutoBt)
+        this.skillActBtn = view.findViewById(R.id.ActBt)
+        this.itemUseBtn = view.findViewById(R.id.UseBt)
+        this.skillsSpn = view.findViewById(R.id.SkillBox)
+        this.itemsSpn = view.findViewById(R.id.ItemBox)
+        this.targetSpn = view.findViewById(R.id.TargetBox)
+        this.actionsTxt = view.findViewById(R.id.ItemCost)
         this.actionsTxt.movementMethod = ScrollingMovementMethod()
-        this.infoTxt = this.findViewById(R.id.SkillCost)
+        this.infoTxt = view.findViewById(R.id.SkillCost)
 
         this.koActors = this.scenePlay.players.map {
             it.hp < 1
@@ -997,84 +1012,84 @@ class ArenaAct : AppCompatActivity() {
         var imgView : ImageView?
         if (surprised < 0) {
             if (party.isNotEmpty()) {
-                imgView = this.findViewById(R.id.ImgEnemy1)
+                imgView = view.findViewById(R.id.ImgEnemy1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (party.size > 1) {
-                imgView = this.findViewById(R.id.ImgEnemy2)
+                imgView = view.findViewById(R.id.ImgEnemy2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (party.size > 2) {
-                imgView = this.findViewById(R.id.ImgEnemy3)
+                imgView = view.findViewById(R.id.ImgEnemy3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (party.size > 3) {
-                imgView = this.findViewById(R.id.ImgEnemy4)
+                imgView = view.findViewById(R.id.ImgEnemy4)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.isNotEmpty()) {
-                imgView = this.findViewById(R.id.ImgPlayer1)
+                imgView = view.findViewById(R.id.ImgPlayer1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.size > 1) {
-                imgView = this.findViewById(R.id.ImgPlayer2)
+                imgView = view.findViewById(R.id.ImgPlayer2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.size > 2) {
-                imgView = this.findViewById(R.id.ImgPlayer3)
+                imgView = view.findViewById(R.id.ImgPlayer3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.size > 3) {
-                imgView = this.findViewById(R.id.ImgPlayer4)
+                imgView = view.findViewById(R.id.ImgPlayer4)
                 imgView.setTargetClickListener(pos)
                 imgViews.add(imgView)
             }
         }
         else {
             if (party.isNotEmpty()) {
-                imgView = this.findViewById(R.id.ImgPlayer1)
+                imgView = view.findViewById(R.id.ImgPlayer1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (party.size > 1) {
-                imgView = this.findViewById(R.id.ImgPlayer2)
+                imgView = view.findViewById(R.id.ImgPlayer2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (party.size > 2) {
-                imgView = this.findViewById(R.id.ImgPlayer3)
+                imgView = view.findViewById(R.id.ImgPlayer3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (party.size > 3) {
-                imgView = this.findViewById(R.id.ImgPlayer4)
+                imgView = view.findViewById(R.id.ImgPlayer4)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.isNotEmpty()) {
-                imgView = this.findViewById(R.id.ImgEnemy1)
+                imgView = view.findViewById(R.id.ImgEnemy1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.size > 1) {
-                imgView = this.findViewById(R.id.ImgEnemy2)
+                imgView = view.findViewById(R.id.ImgEnemy2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.size > 2) {
-                imgView = this.findViewById(R.id.ImgEnemy3)
+                imgView = view.findViewById(R.id.ImgEnemy3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
             if (enemy.size > 3) {
-                imgView = this.findViewById(R.id.ImgEnemy4)
+                imgView = view.findViewById(R.id.ImgEnemy4)
                 imgView.setTargetClickListener(pos)
                 imgViews.add(imgView)
             }
@@ -1105,18 +1120,18 @@ class ArenaAct : AppCompatActivity() {
         this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                this@ArenaAct.skillActBtn.isEnabled = false
-                this@ArenaAct.itemUseBtn.isEnabled = false
+                this@Arena.skillActBtn.isEnabled = false
+                this@Arena.itemUseBtn.isEnabled = false
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (this@ArenaAct.crActor.automatic == 0) {
-                    if (this@ArenaAct.itemsSpn.isEnabled) {
-                        this@ArenaAct.itemUseBtn.isEnabled = (this@ArenaAct.itemsSpn.selectedView.tag as ViewHolder).usable
-                                && this@ArenaAct.canTarget(position, this@ArenaAct.itemsSpn.selectedItem as Ability)
+                if (this@Arena.crActor.automatic == 0) {
+                    if (this@Arena.itemsSpn.isEnabled) {
+                        this@Arena.itemUseBtn.isEnabled = (this@Arena.itemsSpn.selectedView.tag as ViewHolder).usable
+                                && this@Arena.canTarget(position, this@Arena.itemsSpn.selectedItem as Ability)
                     }
-                    if (this@ArenaAct.skillsSpn.isEnabled) {
-                        this@ArenaAct.setCrAutoSkill()
+                    if (this@Arena.skillsSpn.isEnabled) {
+                        this@Arena.setCrAutoSkill()
                     }
                 }
             }
@@ -1132,6 +1147,25 @@ class ArenaAct : AppCompatActivity() {
             this.enableControls(true)
             this.setCrAutoSkill()
         }*/
+        return view
+    }
+
+    override fun onStart() {
+        super.onStart()
         this.afterAct()
     }
+
+}
+
+interface ArenaStager {
+
+    fun onArenaConclusion(outcome: Int)
+
+    fun stage(activity: AppCompatActivity, @IdRes fragmentResId: Int, @DrawableRes arenaImgId: Int, @RawRes songId: Int,
+              party: Array<Actor>, enemy: Array<Actor>, surprise: Int, escapable: Boolean, scripts: Array<String?>?): Arena {
+        val arena = Arena.prepare(arenaImgId, songId, party, enemy, surprise, escapable, scripts)
+        activity.supportFragmentManager.beginTransaction().add(fragmentResId, arena).commit()
+        return arena
+    }
+
 }
