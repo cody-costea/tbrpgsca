@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.codycostea.tbrpgsca
+package com.codycostea.tbrpgsca.demo
 
 import android.content.Context
 import android.graphics.Color
@@ -39,6 +39,8 @@ import android.support.annotation.RawRes
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.util.Log
+import com.codycostea.tbrpgsca.R
+import com.codycostea.tbrpgsca.library.*
 import org.mozilla.javascript.Scriptable
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
@@ -266,7 +268,7 @@ class AdAbility(id: Int, name: String, private val sprId : Int, private val sndI
 
 class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean, confuse : Boolean, reflect : Boolean,
               dur : Int = 3, sRes : Int = 0, dmgHp : Int, dmgMp : Int, dmgSp : Int, mHp : Int, mMp : Int, mSp : Int, mAtk : Int,
-              mDef: Int, mSpi: Int, mWis : Int,  mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null,
+              mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null,
               skills : Array<Ability>? = null, rSkills : Array<Ability>? = null, rStates : Array<State>? = null,
               mStRes : MutableMap<State, Int>? = null)
     : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef, mSpi,
@@ -476,6 +478,7 @@ class Arena : Fragment() {
                     this.endingMsg(this.getString(R.string.escape), Scene.escapeTxt)
                 }
                 else {
+                    this.enableControls(false)
                     this.afterAct()
                 }
             }
@@ -893,9 +896,9 @@ class Arena : Fragment() {
             this.escapable = extra.getBoolean("escapable", true)
             val songResId = extra.getInt("song", 0)
             if (songResId > 0) {
-                this.songPlayer = MediaPlayer.create(this.context, songResId);
-                this.songPlayer.isLooping = true;
-                this.songPlayer.start();
+                this.songPlayer = MediaPlayer.create(this.context, songResId)
+                this.songPlayer.isLooping = true
+                this.songPlayer.start()
             }
             val arenaResId = extra.getInt("arenaImg", 0)
             if (arenaResId > 0) {
@@ -1152,6 +1155,9 @@ class Arena : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        if (this.scenePlay.players[this.scenePlay.current].automatic != 0) {
+            this.enableControls(false)
+        }
         this.afterAct()
     }
 

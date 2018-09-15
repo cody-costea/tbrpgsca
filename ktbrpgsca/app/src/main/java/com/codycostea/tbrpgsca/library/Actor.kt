@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.codycostea.tbrpgsca
+package com.codycostea.tbrpgsca.library
 
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -379,7 +379,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     fun checkStatus(): String {
         var s = ""
         if (this.hp < 1) {
-            s += String.format(Actor.koTxt, this.name)
+            s += String.format(koTxt, this.name)
             this.actions = 0
             this.guards = false
             this.sp = 0

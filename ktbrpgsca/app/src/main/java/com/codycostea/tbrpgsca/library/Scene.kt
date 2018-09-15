@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.codycostea.tbrpgsca
+package com.codycostea.tbrpgsca.library
 
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
@@ -150,12 +150,12 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
                 if (noParty) {
                     this.status = -2
-                    ret += "\n${Scene.fallenTxt}"
+                    ret += "\n$fallenTxt"
                 }
                 else {
                     if (noEnemy) {
                         this.status = 1
-                        ret += "\n${Scene.victoryTxt}"
+                        ret += "\n$victoryTxt"
                     }
                 }
             } while (this.status == 0 && this.players[this.current].actions < 1)
@@ -252,7 +252,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
         }
         var applyCosts = true
-        ret += String.format("\n${Scene.performsTxt}", this.players[this.current].name, skill.name)
+        ret += String.format("\n$performsTxt", this.players[this.current].name, skill.name)
         for (i in this.fTarget..this.lTarget) {
             if ((skill.hpDmg < 0 && skill.restoreKO) || this.players[i].hp > 0) {
                 ret += skill.execute(this.players[this.current], this.players[i], applyCosts)
@@ -373,11 +373,14 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     open fun escape() : String {
         val pAgiSum = this.players.filterIndexed { i, _ ->  i < this.enIdx}.sumBy { it.agi } / this.enIdx
         val eAgiSum = this.players.filterIndexed { i, _ ->  i >= this.enIdx}.sumBy { it.agi } / (this.players.size - this.enIdx)
-        return if (Math.random() * 10 + pAgiSum > Math.random() * 10 + eAgiSum) {
+        return if (Math.random() * 10 + pAgiSum > eAgiSum) {
             this.status = -1
             Scene.escapeTxt
         }
         else {
+            for (i in 0 until this.enIdx) {
+                this.players[i].actions = 0
+            }
             Scene.failTxt
         }
     }

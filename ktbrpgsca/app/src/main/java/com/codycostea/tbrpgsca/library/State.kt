@@ -13,12 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.codycostea.tbrpgsca
+package com.codycostea.tbrpgsca.library
 
 open class State(id : Int, name : String, open var inactivate : Boolean, open var automate : Boolean, open var confuse : Boolean,
                  open var reflect : Boolean, open val dur : Int = 3, open val sRes : Int = 0, open val dmgHp : Int = 0, open val dmgMp : Int = 0,
                  open val dmgSp : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int, mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int,
-                 range: Boolean, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,open val rSkills : Array<Ability>? = null,
+                 range: Boolean, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null, open val rSkills : Array<Ability>? = null,
                  rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
     : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, range, mRes, skills, rStates, mStRes) {
 
@@ -98,7 +98,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                         actor.mp -= dmgmp
                         actor.sp -= dmgsp
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += String.format(State.causesTxt, this.name, actor.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
+                            s += String.format(causesTxt, this.name, actor.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
                         }
                     }
                     else {

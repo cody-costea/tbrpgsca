@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.codycostea.tbrpgsca
+package com.codycostea.tbrpgsca.library
 
 open class Costume(val id : Int, open var name : String, open var mHp : Int = 30, open var mMp : Int = 10, open var mSp : Int = 10,
                    open var atk : Int = 7, open var def: Int = 7, open var spi: Int = 7, open var wis : Int = 7, open var agi : Int = 7,

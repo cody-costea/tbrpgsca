@@ -11,11 +11,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
         <activity
-            android:name=".Arena"
+            android:name=".demo.Arena"
             android:screenOrientation="nosensor">
         </activity>
         <activity
-            android:name=".DemoAct"
+            android:name=".demo.DemoAct"
             android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

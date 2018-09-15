@@ -2,16 +2,14 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
-
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.codycostea.tbrpgsca"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 74
-        versionName "0.74 (beta)"
+        versionCode 75
+        versionName "0.75 (beta)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

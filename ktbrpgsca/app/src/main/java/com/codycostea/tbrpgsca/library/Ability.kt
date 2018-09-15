@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.codycostea.tbrpgsca
+package com.codycostea.tbrpgsca.library
 
 import java.util.*
 import kotlin.collections.LinkedHashMap
@@ -36,7 +36,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         var dmg = (Math.random() * 4).toInt()
         val trg : Actor
         if (target.reflect && this.dmgType == 2) {
-            s += String.format(Ability.reflectedTxt, target.name)
+            s += String.format(reflectedTxt, target.name)
             trg = user
         }
         else {
@@ -78,7 +78,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 user.sp += dmgsp / 2
             }
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                s += String.format(Ability.suffersTxt, trg.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
+                s += String.format(suffersTxt, trg.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
             }
             val aStates = this.aStates
             var r : String
@@ -129,7 +129,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                         }
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
                         trgItems[stolen] = trgItemQty - 1
-                        s += String.format(Ability.stolenTxt, stolen.name, trg.name)
+                        s += String.format(stolenTxt, stolen.name, trg.name)
                         if (trgItems[stolen] == 0) trgItems.remove(stolen)
                     }
                 }
@@ -137,7 +137,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
             s += trg.checkStatus()
         }
         else {
-            s += Ability.missesTxt
+            s += missesTxt
         }
         if (applyCosts) {
             user.hp -= this.hpC
