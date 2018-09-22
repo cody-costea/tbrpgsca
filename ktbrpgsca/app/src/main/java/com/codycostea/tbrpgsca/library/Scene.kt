@@ -373,15 +373,10 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     open fun escape() : String {
         val pAgiSum = this.players.filterIndexed { i, _ ->  i < this.enIdx}.sumBy { it.agi } / this.enIdx
         val eAgiSum = this.players.filterIndexed { i, _ ->  i >= this.enIdx}.sumBy { it.agi } / (this.players.size - this.enIdx)
-        return if (Math.random() * 10 + pAgiSum > eAgiSum) {
+        return if ((Math.random() * 10) + pAgiSum > (Math.random() * 5) + eAgiSum) {
             this.status = -1
             Scene.escapeTxt
         }
-        else {
-            for (i in 0 until this.enIdx) {
-                this.players[i].actions = 0
-            }
-            Scene.failTxt
-        }
+        else Scene.failTxt
     }
 }
