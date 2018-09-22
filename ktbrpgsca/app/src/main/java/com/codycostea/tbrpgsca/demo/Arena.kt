@@ -45,8 +45,8 @@ import org.mozilla.javascript.Scriptable
 
 class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, mMp : Int = 10, mSp : Int = 10, atk : Int = 7, def: Int = 7,
                 spi: Int = 7, wis : Int = 7, agi : Int = 7, mActions: Int = 1, range: Boolean = false, res : MutableMap<Int, Int>? = null,
-                skills : Array<Ability>? = null, states : Array<State>? = null, stRes : MutableMap<State, Int>? = null)
-    : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, range, res, skills, states, stRes) {
+                skills : Array<Ability>? = null, states : Array<State>? = null, stRes : MutableMap<State, Int>? = null, mInit: Int = 0)
+    : Costume(id, name, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, mInit, range, res, skills, states, stRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdCostume && other.id == this.id)
@@ -61,8 +61,8 @@ class AdCostume(id : Int, name : String, var sprName : String, mHp : Int = 30, m
 class AdActor(id : Int, private val context : Context, name: String, sprites : Array<Array<AnimationDrawable>>? = null, race: Costume,
               job: AdCostume, level : Int = 1, maxLv: Int = 9, mActions : Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5,
               mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5, mAgi: Int = 5, range : Boolean = false, mRes: MutableMap<Int, Int>? = null,
-              skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
-    : Actor(id, name, race, job, level, maxLv, mActions, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
+              skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
+    : Actor(id, name, race, job, level, maxLv, mActions, mInit, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
 
     override var job : Costume = job
         set(value) {
@@ -270,9 +270,9 @@ class AdState(id : Int, name : String, inactivate : Boolean, automate : Boolean,
               dur : Int = 3, sRes : Int = 0, dmgHp : Int, dmgMp : Int, dmgSp : Int, mHp : Int, mMp : Int, mSp : Int, mAtk : Int,
               mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int, range: Boolean, mRes : MutableMap<Int, Int>? = null,
               skills : Array<Ability>? = null, rSkills : Array<Ability>? = null, rStates : Array<State>? = null,
-              mStRes : MutableMap<State, Int>? = null)
+              mStRes : MutableMap<State, Int>? = null, mInit: Int = 0)
     : State(id, name, inactivate, automate, confuse, reflect, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef, mSpi,
-        mWis, mAgi, mActions, range, mRes, skills, rSkills, rStates, mStRes) {
+        mWis, mAgi, mActions, mInit, range, mRes, skills, rSkills, rStates, mStRes) {
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) || (other is AdState && other.id == this.id)
@@ -353,7 +353,7 @@ class Arena : Fragment() {
             return super.executeAbility(skill, defTarget, txt)
         }
 
-        override fun setNextCurrent(activate: Boolean): Boolean {
+        override fun setNextCurrent(activate: Boolean): String {
             val jScripts = this@Arena.jScripts
             if (jScripts !== null && jScripts.isNotEmpty()) {
                 var jsContext = this@Arena.jsContext

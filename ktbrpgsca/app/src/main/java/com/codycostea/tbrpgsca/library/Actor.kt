@@ -19,13 +19,13 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
-open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int = 1, open var maxLv: Int = 9,
-                 mActions : Int = 1, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, mAtk: Int = 7, mDef: Int = 7,
-                 mSpi: Int = 7, mWis: Int = 7, mAgi: Int = 7, range : Boolean = false, mRes: MutableMap<Int, Int>? = null,
-                 skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
+open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int = 1, open var maxLv: Int = 9, mActions : Int = 1,
+                 mInit: Int = 0, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, mAtk: Int = 7, mDef: Int = 7, mSpi: Int = 7, mWis: Int = 7,
+                 mAgi: Int = 7, range : Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+                 states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, mHp + race.mHp + job.mHp, mMp + race.mMp + job.mMp, mSp + race.mSp + job.mSp,
         mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi,
-        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, range, mRes, skills, states, mStRes) {
+        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, mInit, range, mRes, skills, states, mStRes) {
 
     companion object {
         var koTxt = ", %s falls unconscious"
@@ -64,6 +64,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
     open var mExp : Int = level * 15
 
+    open var init : Int = 0
     open var actions : Int = this.mActions
     open var guards : Boolean = true
     open var reflect : Boolean = false
@@ -281,6 +282,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         this.wis += i * role.wis
         this.agi += i * role.agi
         this.mActions += i * role.mActions
+        this.mInit += i * role.mInit
     }
 
     internal fun updateResistance(remove : Boolean, resMap : Map<Int, Int>?, stResMap : Map<State, Int>?) {
@@ -382,6 +384,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             s += String.format(koTxt, this.name)
             this.actions = 0
             this.guards = false
+            this.init = 0
             this.sp = 0
             val sDur = this.stateDur
             if (sDur !== null) {
@@ -476,4 +479,5 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             this.level = level
         }
     }
+
 }

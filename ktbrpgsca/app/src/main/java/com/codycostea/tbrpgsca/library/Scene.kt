@@ -57,39 +57,71 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
     init {
         if (this.surprise != 0) {
-            val l: Int
-            val f: Int
             if (this.surprise < 0) {
-                f = 0
-                l = this.enIdx - 1
+                for (i in 0 until this.enIdx) {
+                    this.players[i].init = 0
+                }
+                for (i in this.enIdx until this.players.size) {
+                    this.players[i].init = this.players.size
+                }
             }
             else {
-                f = this.enIdx
-                l = this.players.size - 1
+                for (i in enIdx until this.players.size) {
+                    this.players[i].init = 0
+                }
+                for (i in 0 until this.enIdx) {
+                    this.players[i].init = this.players.size
+                }
             }
-            for (i in f..l) {
-                this.players[i].actions = 0
+        }
+        else {
+            for (i in 0 until this.players.size) {
+                this.players[i].init = this.players.size
             }
         }
         this.setNextCurrent(false)
     }
 
-    protected open fun setNextCurrent(activate : Boolean) : Boolean {
+    protected open fun setNextCurrent(activate : Boolean) : String {
+        var ret = ""
         val oldCr = this.current
         for (i in 0 until this.players.size) {
-            if (activate && this.players[i].hp > 0) {
-                this.players[i].actions = this.players[i].mActions
-            }
-
-            if (this.current != i && (this.players[i].actions > 0 && (this.players[this.current].actions < 1
-                            || this.players[i].agi > this.players[this.current].agi))) {
-                this.current = i
+            if (this.players[i].hp > 0) {
+                if (activate) {
+                    this.players[i].init += this.players.size
+                }
+                if (this.current != i) {
+                    val nInit = this.players[i].init + this.players[i].mInit
+                    if (nInit >= this.players.size) {
+                        val cInit = this.players[this.current].init + this.players[this.current].mInit
+                        if (cInit < nInit || (cInit == nInit && this.players[i].agi > this.players[this.current].agi)) {
+                            this.players[i].actions = this.players[i].mActions
+                            this.players[i].applyStates(false)
+                            if (this.players[i].actions > 0) {
+                                this.current = i
+                            }
+                            else {
+                                this.players[i].init = 0
+                                if (ret.isNotEmpty()) {
+                                    ret += "\n"
+                                }
+                                ret += this.players[i].applyStates(true)
+                            }
+                            continue
+                        }
+                    }
+                    this.players[i].init++
+                }
             }
         }
-        if (activate || oldCr != this.current) {
-            this.players[this.current].applyStates(false)
+        if (oldCr == this.current) {
+            return if (activate) {
+                this.players[oldCr].actions = this.players[oldCr].mActions
+                this.players[oldCr].applyStates(false)
+                "1$ret"
+            } else "0$ret"
         }
-        if (this.players[this.current].actions > 0) {
+        else {
             if (this.players[this.current].automatic == 0) {
                 val crItems = this.players[this.current]._items
                 if (crItems !== null) {
@@ -111,10 +143,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     }
                 }
             }
-            return true
-        }
-        else {
-            return false
+            return "1$ret"
         }
     }
 
@@ -124,13 +153,16 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             do {
                 this.players[this.current].actions--
                 if (this.players[this.current].actions < 1) {
+                    this.players[this.current].init = 0//-= this.players.size
                     ret += this.players[this.current].applyStates(true)
-                    if (!this.setNextCurrent(false)) {
-                        this.setNextCurrent(true)
+                    var nxt = this.setNextCurrent(false)
+                    if (nxt[0] == '0') {
+                        nxt += this.setNextCurrent(true).substring(1)
                     }
-                    //ret += this.players[this.current].applyStates(true)
+                    if (nxt.length > 1) {
+                        ret += nxt.substring(1)
+                    }
                 }
-
                 var i = 0
                 var noParty = true
                 var noEnemy = true
@@ -147,7 +179,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     }
                     i++
                 }
-
                 if (noParty) {
                     this.status = -2
                     ret += "\n$fallenTxt"
@@ -160,7 +191,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 }
             } while (this.status == 0 && this.players[this.current].actions < 1)
         }
-
         return ret
     }
 
@@ -196,8 +226,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 difF++
             }
         }
-        if (difF == 0) {
-            return target
+        return if (difF == 0) {
+            target
         }
         else {
             for (i in l downTo target + 1) {
@@ -208,7 +238,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     difL++
                 }
             }
-            return if (difL == 0) target else (if (difF < difL) guardF else guardL)
+            if (difL == 0) target else (if (difF < difL) guardF else guardL)
         }
     }
 
@@ -249,7 +279,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 this.fTarget = target
                 this.lTarget = target
             }
-
         }
         var applyCosts = true
         ret += String.format("\n$performsTxt", this.players[this.current].name, skill.name)
@@ -262,9 +291,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         ret += "."
         this.players[this.current].exp++
         this.players[this.current].levelUp()
-
         this.lastAbility = skill
-
         return ret
     }
 
@@ -300,8 +327,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
         }
         val ability = this.players[this.current].availableSkills[this.getAIskill(skillIndex, nRestore)]
-        //if ((this.current < this.enIdx && ability.hpDmg >= 0)
-                //|| (this.current >= this.enIdx && ability.hpDmg < 0)) {
         if (ability.hpDmg > -1) {
             if (this.current < this.enIdx) {
                 f = this.enIdx
@@ -315,8 +340,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         var target = f
         while (this.players[target].hp < 1 && (ability.hpDmg > 1 || !ability.restoreKO) && target < l) target++
         for (i in target until l) {
-            if (this.players[i].hp < this.players[target].hp && (this.players[i].hp > 0 || ability.restoreKO)
-            /*&& ((this.players[i].hp > 0 && ability.hpDmg >= 0) || ability.hpDmg < 0)*/) {
+            if (this.players[i].hp < this.players[target].hp && (this.players[i].hp > 0 || ability.restoreKO)) {
                 target = i
             }
         }
@@ -373,10 +397,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     open fun escape() : String {
         val pAgiSum = this.players.filterIndexed { i, _ ->  i < this.enIdx}.sumBy { it.agi } / this.enIdx
         val eAgiSum = this.players.filterIndexed { i, _ ->  i >= this.enIdx}.sumBy { it.agi } / (this.players.size - this.enIdx)
-        return if ((Math.random() * 10) + pAgiSum > (Math.random() * 5) + eAgiSum) {
+        return if (this.surprise > 0 || (Math.random() * 7) + pAgiSum > eAgiSum) {
             this.status = -1
             Scene.escapeTxt
         }
         else Scene.failTxt
     }
+
 }
