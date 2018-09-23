@@ -333,6 +333,7 @@ fun BitmapDrawable.getSprite(context : Context, firstFrame : Drawable? = null, f
 class Arena : Fragment() {
 
     private inner class AdScene(party : Array<Actor>, enemy : Array<Actor>, surprise: Int) : Scene(party, enemy, surprise) {
+
         override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
             val jScripts = this@Arena.jScripts
             if (jScripts !== null) {
@@ -353,7 +354,7 @@ class Arena : Fragment() {
             return super.executeAbility(skill, defTarget, txt)
         }
 
-        override fun setNextCurrent(activate: Boolean): String {
+        override fun setNextCurrent(): String {
             val jScripts = this@Arena.jScripts
             if (jScripts !== null && jScripts.isNotEmpty()) {
                 var jsContext = this@Arena.jsContext
@@ -377,7 +378,6 @@ class Arena : Fragment() {
                     this@Arena.jsScope = jsScope
                 }
                 jsScope!!.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.current, jsScope))
-                jsScope.put("Reset", jsScope, org.mozilla.javascript.Context.javaToJS(activate, jsScope))
                 if (jScripts.size > 1 && jScripts[1] !== null) {
                     try {
                         jsContext!!.evaluateString(jsScope, jScripts[1], "OnBeginTurn", 1, null)
@@ -386,8 +386,9 @@ class Arena : Fragment() {
                     }
                 }
             }
-            return super.setNextCurrent(activate)
+            return super.setNextCurrent()
         }
+
     }
 
     private class ActorArrayBinder(val actorArray : Array<Actor>) : Binder()

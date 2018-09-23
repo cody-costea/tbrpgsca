@@ -56,70 +56,60 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
 
     init {
-        if (this.surprise != 0) {
-            if (this.surprise < 0) {
-                for (i in 0 until this.enIdx) {
-                    this.players[i].init = 0
-                }
-                for (i in this.enIdx until this.players.size) {
-                    this.players[i].init = this.players.size
-                }
+        for (i in 0 until this.players.size) {
+            this.players[i].init = this.enIdx + (if ((this.surprise < 0 && i < this.enIdx)
+                    || (this.surprise > 0 && i >= this.enIdx)) 0 else this.players.size)
+            if (i == 0) {
+                continue
             }
             else {
-                for (i in enIdx until this.players.size) {
-                    this.players[i].init = 0
-                }
-                for (i in 0 until this.enIdx) {
-                    this.players[i].init = this.players.size
+                for (j in 0 until i) {
+                    if (this.players[i].agi > this.players[j].agi) {
+                        this.players[j].init--
+                    }
                 }
             }
         }
-        else {
-            for (i in 0 until this.players.size) {
-                this.players[i].init = this.players.size
-            }
-        }
-        this.setNextCurrent(false)
+        this.setNextCurrent()
     }
 
-    protected open fun setNextCurrent(activate : Boolean) : String {
+    protected open fun setNextCurrent() : String {
         var ret = ""
         val oldCr = this.current
-        for (i in 0 until this.players.size) {
-            if (this.players[i].hp > 0) {
-                if (activate) {
-                    this.players[i].init += this.players.size
-                }
-                if (this.current != i) {
+        var repeat = true
+        do {
+            for (i in 0 until this.players.size) {
+                if (this.players[i].hp > 0) {
+                    this.players[i].init++
                     val nInit = this.players[i].init + this.players[i].mInit
-                    if (nInit >= this.players.size) {
-                        val cInit = this.players[this.current].init + this.players[this.current].mInit
-                        if (cInit < nInit || (cInit == nInit && this.players[i].agi > this.players[this.current].agi)) {
-                            this.players[i].actions = this.players[i].mActions
-                            this.players[i].applyStates(false)
-                            if (this.players[i].actions > 0) {
-                                this.current = i
-                            }
-                            else {
-                                this.players[i].init = 0//-= this.players.size
-                                if (ret.isNotEmpty()) {
-                                    ret += "\n"
+                    if (nInit > this.players.size) {
+                        if (repeat) repeat = false
+                        if (this.current != i) {
+                            val cInit = this.players[this.current].init + this.players[this.current].mInit
+                            if (cInit < nInit || (cInit == nInit && this.players[i].agi > this.players[this.current].agi)) {
+                                this.players[i].actions = this.players[i].mActions
+                                this.players[i].applyStates(false)
+                                if (this.players[i].actions > 0) {
+                                    this.current = i
                                 }
-                                ret += this.players[i].applyStates(true)
+                                else {
+                                    this.players[i].init -= this.players.size
+                                    if (ret.isNotEmpty()) {
+                                        ret += "\n"
+                                    }
+                                    ret += this.players[i].applyStates(true)
+                                }
+                                continue
                             }
-                            continue
                         }
                     }
-                    this.players[i].init++
                 }
             }
-        }
+        } while (repeat)
         if (oldCr == this.current) {
-            return if (activate) {
-                this.players[oldCr].actions = this.players[oldCr].mActions
-                this.players[oldCr].applyStates(false)
-                "1$ret"
-            } else "0$ret"
+            this.players[oldCr].actions = this.players[oldCr].mActions
+            this.players[oldCr].applyStates(false)
+            return ret
         }
         else {
             if (this.players[this.current].automatic == 0) {
@@ -143,7 +133,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     }
                 }
             }
-            return "1$ret"
+            return ret
         }
     }
 
@@ -153,15 +143,9 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             do {
                 this.players[this.current].actions--
                 if (this.players[this.current].actions < 1) {
-                    this.players[this.current].init = 0//-= this.players.size
+                    this.players[this.current].init -= this.players.size
                     ret += this.players[this.current].applyStates(true)
-                    var nxt = this.setNextCurrent(false)
-                    if (nxt[0] == '0') {
-                        nxt += this.setNextCurrent(true).substring(1)
-                    }
-                    if (nxt.length > 1) {
-                        ret += nxt.substring(1)
-                    }
+                    ret += this.setNextCurrent()
                 }
                 var i = 0
                 var noParty = true
