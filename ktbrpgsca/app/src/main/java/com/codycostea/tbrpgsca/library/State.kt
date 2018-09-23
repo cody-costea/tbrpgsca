@@ -100,10 +100,13 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
                             s += String.format(causesTxt, this.name, actor.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
                         }
+                        if (dur > 0) {
+                            sDur[this] = dur - 1
+                        }
                     }
                     else {
                         if (this.inactivate) {
-                            if (dur > 0 && actor.actions > 0) {
+                            if (dur > 0 && dur == this.dur && actor.actions > 0) {
                                 sDur[this] = dur - 1
                             }
                             actor.actions = 0

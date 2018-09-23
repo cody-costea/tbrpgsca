@@ -101,7 +101,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                 this.current = i
                             }
                             else {
-                                this.players[i].init = 0
+                                this.players[i].init = 0//-= this.players.size
                                 if (ret.isNotEmpty()) {
                                     ret += "\n"
                                 }
