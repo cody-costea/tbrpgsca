@@ -57,16 +57,14 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
     init {
         for (i in 0 until this.players.size) {
-            this.players[i].init = this.enIdx + this.players[i].mInit + (if ((this.surprise < 0 && i < this.enIdx)
-                    || (this.surprise > 0 && i >= this.enIdx)) 0 else this.players.size)
-            if (i == 0) {
-                continue
-            }
-            else {
-                for (j in 0 until i) {
-                    if (this.players[i].agi > this.players[j].agi) {
-                        this.players[j].init--
-                    }
+            this.players[i].init = (if ((this.surprise < 0 && i < this.enIdx)
+                    || (this.surprise > 0 && i >= this.enIdx)) this.players[i].mInit else this.players.size)
+            for (j in 0 until this.players.size) {
+                if (j == i) {
+                    continue
+                }
+                else if (this.players[i].agi > this.players[j].agi) {
+                    this.players[j].init--
                 }
             }
         }
@@ -82,7 +80,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 if (this.players[i].hp > 0) {
                     this.players[i].init++
                     val nInit = this.players[i].init
-                    if (nInit > this.players.size /*- this.players[i].mInit*/) {
+                    if (nInit > this.players.size) {
                         if (repeat) repeat = false
                         if (this.current != i) {
                             val cInit = this.players[this.current].init
@@ -93,7 +91,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                     this.current = i
                                 }
                                 else {
-                                    this.players[i].init -= (this.players.size - this.players[i].mInit) //= this.players[i].mInit
+                                    this.players[i].init = this.players[i].mInit
                                     if (ret.isNotEmpty()) {
                                         ret += "\n"
                                     }
@@ -143,7 +141,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             do {
                 this.players[this.current].actions--
                 if (this.players[this.current].actions < 1) {
-                    this.players[this.current].init -= (this.players.size - this.players[this.current].mInit) //= this.players[this.current].mInit
+                    this.players[this.current].init = this.players[this.current].mInit
                     ret += this.players[this.current].applyStates(true)
                     ret += this.setNextCurrent()
                 }
