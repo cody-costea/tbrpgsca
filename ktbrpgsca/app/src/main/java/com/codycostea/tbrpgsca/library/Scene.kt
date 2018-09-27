@@ -57,7 +57,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
     init {
         for (i in 0 until this.players.size) {
-            this.players[i].init = this.enIdx + (if ((this.surprise < 0 && i < this.enIdx)
+            this.players[i].init = this.enIdx + this.players[i].mInit + (if ((this.surprise < 0 && i < this.enIdx)
                     || (this.surprise > 0 && i >= this.enIdx)) 0 else this.players.size)
             if (i == 0) {
                 continue
@@ -82,7 +82,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 if (this.players[i].hp > 0) {
                     this.players[i].init++
                     val nInit = this.players[i].init
-                    if (nInit > this.players.size) {
+                    if (nInit > this.players.size /*- this.players[i].mInit*/) {
                         if (repeat) repeat = false
                         if (this.current != i) {
                             val cInit = this.players[this.current].init
@@ -93,7 +93,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                     this.current = i
                                 }
                                 else {
-                                    this.players[i].init -= (this.players.size - this.players[i].mInit)
+                                    this.players[i].init -= (this.players.size - this.players[i].mInit) //= this.players[i].mInit
                                     if (ret.isNotEmpty()) {
                                         ret += "\n"
                                     }
@@ -143,7 +143,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             do {
                 this.players[this.current].actions--
                 if (this.players[this.current].actions < 1) {
-                    this.players[this.current].init -= (this.players.size - this.players[this.current].mInit)
+                    this.players[this.current].init -= (this.players.size - this.players[this.current].mInit) //= this.players[this.current].mInit
                     ret += this.players[this.current].applyStates(true)
                     ret += this.setNextCurrent()
                 }
