@@ -112,7 +112,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                 AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, maxLv = maxlv),
                 AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, level = 3, maxLv = 3, states = arrayOf(state[10])),
                 AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, level = 3, maxLv = 3, mRes = mutableMapOf(2 to 7, 3 to 1)),
-                AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, mInit = 1, level = 3, maxLv = 3),
+                AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, mInit = 3, level = 3, maxLv = 3),
                 AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3, maxLv = 3, states = arrayOf(state[0]))
         )
         characters[3].items = (mutableMapOf(item[0] to 2, item[2] to 2)) as LinkedHashMap<Ability, Int>

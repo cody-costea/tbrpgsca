@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
+import kotlin.math.absoluteValue
+
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
     companion object {
@@ -58,7 +60,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
     init {
         for (i in 0 until this.players.size) {
             this.players[i].init = (if ((this.surprise < 0 && i < this.enIdx)
-                    || (this.surprise > 0 && i >= this.enIdx)) this.players[i].mInit else this.players.size)
+                    || (this.surprise > 0 && i >= this.enIdx)) 0 else
+                (if (this.players[i].mInit < 2) this.players.size else this.players[i].mInit))
             for (j in 0 until this.players.size) {
                 if (j == i) {
                     continue
@@ -73,25 +76,33 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
 
     protected open fun setNextCurrent() : String {
         var ret = ""
+        var initInc: Int
         val oldCr = this.current
+        var minInit = 1
         var repeat = true
         do {
+            initInc = minInit
             for (i in 0 until this.players.size) {
                 if (this.players[i].hp > 0) {
-                    this.players[i].init++
-                    val nInit = this.players[i].init
-                    if (nInit > this.players.size) {
-                        if (repeat) repeat = false
+                    var nInit = this.players[i].init
+                    val mInit = if (this.players[i].mInit < 2) this.players.size else this.players[i].mInit
+                    //if (i !== this.current || this.players[i].init < mInit) {
+                        this.players[i].init += initInc
+                    //}
+                    if (nInit >= mInit) {
+                        nInit -= mInit
                         if (this.current != i) {
-                            val cInit = this.players[this.current].init
+                            val cInit= (this.players[this.current].init
+                                    - (if (this.players[this.current].mInit < 2) this.players.size else this.players[this.current].mInit))
                             if (cInit < nInit || (cInit == nInit && this.players[i].agi > this.players[this.current].agi)) {
                                 this.players[i].actions = this.players[i].mActions
                                 this.players[i].applyStates(false)
                                 if (this.players[i].actions > 0) {
+                                    if (repeat) repeat = false
                                     this.current = i
                                 }
                                 else {
-                                    this.players[i].init = this.players[i].mInit
+                                    this.players[i].init = 0
                                     if (ret.isNotEmpty()) {
                                         ret += "\n"
                                     }
@@ -101,9 +112,22 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                             }
                         }
                     }
+                    if (repeat && minInit > mInit) {
+                        minInit = mInit
+                    }
+                    /*else {
+                        this.players[i].init += initInc
+                    }*/
                 }
             }
-        } while (repeat)
+            if (repeat) {
+                repeat = false
+                continue
+            }
+            else {
+                break
+            }
+        } while (true)
         if (oldCr == this.current) {
             this.players[oldCr].actions = this.players[oldCr].mActions
             this.players[oldCr].applyStates(false)
@@ -141,7 +165,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             do {
                 this.players[this.current].actions--
                 if (this.players[this.current].actions < 1) {
-                    this.players[this.current].init = this.players[this.current].mInit
+                    this.players[this.current].init = 0 //this.players[this.current].mInit
                     ret += this.players[this.current].applyStates(true)
                     ret += this.setNextCurrent()
                 }
