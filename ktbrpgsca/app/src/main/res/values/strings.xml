@@ -115,4 +115,18 @@
     <string name="victory">Victory</string>
     <string name="defeat">Defeat</string>
     <string name="escape">Escape</string>
+    <string name="scene_victory"/>
+    <string name="scene_defeat"/>
+    <string name="scene_escape"/>
+    <string name="scene_fail"/>
+    <string name="scene_performs"/>
+    <string name="actor_ko"/>
+    <string name="ability_reflected"/>
+    <string name="ability_suffers"/>
+    <string name="ability_stolen"/>
+    <string name="ability_misses"/>
+    <string name="state_causes"/>
+    <string name="costume_hp"/>
+    <string name="costume_mp"/>
+    <string name="costume_sp"/>
 </resources>
