@@ -15,8 +15,6 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
-import kotlin.math.absoluteValue
-
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
     companion object {
@@ -84,7 +82,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         var ret = ""
         var initInc: Int
         val oldCr = this.current
-        var minInit = if (this.useInit) 1 else this.players.size
+        var minInit = 1//if (this.useInit) 1 else this.players.size
         var repeat = true
         do {
             if (minInit != 1) {
@@ -93,38 +91,61 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             initInc = minInit
             for (i in 0 until this.players.size) {
                 if (this.players[i].hp > 0) {
-                    var nInit = this.players[i].init
-                    val mInit = if (this.players[i].mInit < 2) this.players.size else this.players[i].mInit
-                    if (!repeat || i != this.current) {
-                        this.players[i].init += initInc
-                    }
-                    if (nInit >= mInit) {
-                        nInit -= mInit
-                        if (this.current != i) {
-                            val cInit= (this.players[this.current].init
-                                    - (if (this.players[this.current].mInit < 2) this.players.size else this.players[this.current].mInit))
-                            if (cInit < nInit || (cInit == nInit && this.players[i].agi > this.players[this.current].agi)) {
-                                this.players[i].actions = this.players[i].mActions
-                                this.players[i].applyStates(false)
-                                if (this.players[i].actions > 0) {
-                                    if (repeat) repeat = false
-                                    this.current = i
-                                }
-                                else {
-                                    this.players[i].init = 0
-                                    if (ret.isNotEmpty()) {
-                                        ret += "\n"
+                    if (this.useInit) {
+                        var nInit = this.players[i].init
+                        val mInit = if (this.players[i].mInit < 1) this.players.size else this.players[i].mInit
+                        if (!repeat || i != this.current) {
+                            this.players[i].init += initInc
+                        }
+                        if (nInit >= mInit) {
+                            nInit -= mInit
+                            if (this.current != i) {
+                                val cInit = (this.players[this.current].init
+                                        - (if (this.players[this.current].mInit < 1) this.players.size else this.players[this.current].mInit))
+                                if (cInit < nInit || (cInit == nInit && this.players[i].agi > this.players[this.current].agi)) {
+                                    this.players[i].actions = this.players[i].mActions
+                                    this.players[i].applyStates(false)
+                                    if (this.players[i].actions > 0) {
+                                        if (repeat) repeat = false
+                                        this.current = i
                                     }
-                                    ret += this.players[i].applyStates(true)
+                                    else {
+                                        this.players[i].init = 0
+                                        if (ret.isNotEmpty()) {
+                                            ret += "\n"
+                                        }
+                                        ret += this.players[i].applyStates(true)
+                                    }
+                                    //continue
                                 }
-                                continue
+                            }
+                        }
+                        if (repeat && minInit < mInit) {
+                            minInit = mInit
+                        }
+                    }
+                    else if (this.current != i) {
+                        if (initInc != 1) {
+                            this.players[i].actions = this.players[i].mActions
+                        }
+                        if (this.players[i].actions > 0 && (this.players[this.current].actions < 1 || this.players[i].agi > this.players[this.current].agi)) {
+                            this.players[i].applyStates(false)
+                            if (this.players[i].actions > 0) {
+                                if (repeat) repeat = false
+                                this.current = i
+                            }
+                            else {
+                                if (ret.isNotEmpty()) {
+                                    ret += "\n"
+                                }
+                                ret += this.players[i].applyStates(true)
                             }
                         }
                     }
-                    if (repeat && minInit < mInit) {
-                        minInit = mInit
-                    }
                 }
+            }
+            if (repeat && !this.useInit) {
+                minInit = 0
             }
         } while (repeat)
         if (oldCr == this.current) {
