@@ -65,13 +65,13 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
             val iInit = if (this.players[i].mInit > 0) this.players[i].mInit else this.players.size
             this.players[i].init = (if ((this.surprise < 0 && i < this.enIdx)
-                    || (this.surprise > 0 && i >= this.enIdx)) iInit / 2 else iInit)
+                    || (this.surprise > 0 && i >= this.enIdx)) 0 else iInit)
             for (j in 0 until this.players.size) {
                 if (j == i) {
                     continue
                 }
                 else {
-                    val jInit = if (this.players[j].mInit > 2) this.players[j].mInit else this.players.size
+                    val jInit = if (this.players[j].mInit > 0) this.players[j].mInit else this.players.size
                     if (iInit > jInit || (iInit == jInit && this.players[i].agi > this.players[j].agi)) {
                         this.players[j].init -= (1 + (iInit - jInit))
                     }
