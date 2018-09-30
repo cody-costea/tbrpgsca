@@ -63,14 +63,18 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             if (!useInit && this.players[i].mInit != 0) {
                 useInit = true
             }
-            this.players[i].init = this.players[i].mInit + (if ((this.surprise < 0 && i < this.enIdx)
-                    || (this.surprise > 0 && i >= this.enIdx)) 0 else this.players[i].mInit)
+            val iInit = if (this.players[i].mInit > 1) this.players[i].mInit else this.players.size
+            this.players[i].init = (if ((this.surprise < 0 && i < this.enIdx)
+                    || (this.surprise > 0 && i >= this.enIdx)) iInit / 2 else iInit)
             for (j in 0 until this.players.size) {
                 if (j == i) {
                     continue
                 }
-                else if (this.players[i].agi > this.players[j].agi) {
-                    this.players[j].init--
+                else {
+                    val jInit = if (this.players[j].mInit > 1) this.players[j].mInit else this.players.size
+                    if (iInit > jInit || (iInit == jInit && this.players[i].agi > this.players[j].agi)) {
+                        this.players[j].init -= (1 + (iInit - jInit))
+                    }
                 }
             }
         }
@@ -82,19 +86,18 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         var ret = ""
         var initInc: Int
         val oldCr = this.current
-        var minInit = 1//if (this.useInit) 1 else this.players.size
+        var minInit = 1
         do {
             initInc = minInit
             for (i in 0 until this.players.size) {
                 if (this.players[i].hp > 0) {
                     if (this.useInit) {
-                        if (initInc != 1 || i != this.current)  {
-                            this.players[i].init += initInc
-                        }
+                        this.players[i].init += initInc
                         var nInit = this.players[i].init
                         val mInit = if (this.players[i].mInit < 1) this.players.size else this.players[i].mInit
                         if (nInit > mInit) {
                             nInit -= mInit
+                            if (initInc == 1) minInit = -1
                             if (this.current != i) {
                                 val cInit = (this.players[this.current].init
                                         - (if (this.players[this.current].mInit < 1) this.players.size else this.players[this.current].mInit))
@@ -102,9 +105,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                     this.players[i].actions = this.players[i].mActions
                                     this.players[i].applyStates(false)
                                     if (this.players[i].actions > 0) {
-                                        if (initInc == 1) {
-                                            minInit = -1
-                                        }
                                         this.current = i
                                     }
                                     else {
@@ -117,7 +117,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                 }
                             }
                         }
-                        if (minInit in 1..(mInit - 1)) {
+                        if (minInit > 0 && minInit > mInit) {
                             minInit = mInit
                         }
                     }
@@ -182,7 +182,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             do {
                 this.players[this.current].actions--
                 if (this.players[this.current].actions < 1) {
-                    this.players[this.current].init = 0 //this.players[this.current].mInit
+                    this.players[this.current].init = 0
                     ret += this.players[this.current].applyStates(true)
                     ret += this.setNextCurrent()
                 }
