@@ -72,8 +72,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 }
                 else {
                     val jInit = if (this.players[j].mInit > 0) this.players[j].mInit else this.players.size
-                    if (iInit < jInit || (iInit == jInit && this.players[i].agi > this.players[j].agi)) {
-                        this.players[j].init-- //-= (1 + (iInit - jInit))
+                    if (iInit < jInit /*|| (iInit == jInit && this.players[i].agi > this.players[j].agi)*/) {
+                        this.players[j].init -= (jInit - iInit) //+ 1
                     }
                 }
             }
