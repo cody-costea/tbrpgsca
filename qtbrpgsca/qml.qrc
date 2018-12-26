@@ -571,10 +571,6 @@
         <file>sprites/Santa/bt_r_ko.mng</file>
         <file>sprites/Santa/bt_r_restored.gif</file>
         <file>sprites/Santa/bt_r_restored.mng</file>
-        <file>sprites/Santa/idle_l.png</file>
-        <file>sprites/Santa/idle_r.png</file>
-        <file>sprites/Santa/ko_l.png</file>
-        <file>sprites/Santa/ko_r.png</file>
         <file>ability.cpp</file>
         <file>ability.h</file>
         <file>actor.cpp</file>
