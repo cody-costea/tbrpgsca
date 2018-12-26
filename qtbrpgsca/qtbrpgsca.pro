@@ -2,6 +2,7 @@ TEMPLATE = app
 
 QT += qml quick
 CONFIG += c++11
+CONFIG += resources_big
 
 SOURCES += \
     ability.cpp \
