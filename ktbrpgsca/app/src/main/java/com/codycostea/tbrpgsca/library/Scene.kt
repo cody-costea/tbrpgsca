@@ -148,7 +148,9 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         if (oldCr == this.current) {
             this.players[oldCr].actions = this.players[oldCr].mActions
             this.players[oldCr].applyStates(false)
-            return if (this.players[this.current].actions < 1) ret + this.setNextCurrent() else ret
+            if (this.players[this.current].actions < 1) {
+                return ret + this.setNextCurrent()
+            }
         }
         else {
             if (this.players[this.current].automatic == 0) {
@@ -157,23 +159,23 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     this.crItems!![this.current] = crItems.keys.toMutableList()
                 }
             }
-            val recoverableSkills = this.players[this.current].skillsQtyRgTurn
-            if (recoverableSkills !== null) {
-                for (skill in recoverableSkills.keys) {
-                    val skillsQty = this.players[this.current].skillsQty
-                    if (skillsQty !== null && (skillsQty[skill] ?: skill.mQty) < skill.mQty) {
-                        if (recoverableSkills[skill] == skill.rQty) {
-                            skillsQty[skill] = (skillsQty[skill] ?: 0) + 1
-                            recoverableSkills[skill] = 0
-                        }
-                        else {
-                            recoverableSkills[skill] = (recoverableSkills[skill] ?: 0) + 1
-                        }
+        }
+        val recoverableSkills = this.players[this.current].skillsQtyRgTurn
+        if (recoverableSkills !== null) {
+            for (skill in recoverableSkills.keys) {
+                val skillsQty = this.players[this.current].skillsQty
+                if (skillsQty !== null && (skillsQty[skill] ?: skill.mQty) < skill.mQty) {
+                    if (recoverableSkills[skill] == skill.rQty) {
+                        skillsQty[skill] = (skillsQty[skill] ?: 0) + 1
+                        recoverableSkills[skill] = 0
+                    }
+                    else {
+                        recoverableSkills[skill] = (recoverableSkills[skill] ?: 0) + 1
                     }
                 }
             }
-            return ret
         }
+        return ret
     }
 
     open fun endTurn(txt : String) : String {
@@ -426,5 +428,4 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
         else Scene.failTxt
     }
-
 }
