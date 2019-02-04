@@ -232,6 +232,12 @@ class ArenaState extends State<ArenaStage> {
 
   List<Actor> _koActors;
 
+  Performance _crSkill;
+  Performance _crItem;
+
+  List<Performance> _crSkills;
+  List<Performance> _crItems;
+
   bool _automatic = false;
   bool _activeBtn = true;
   bool get activeBtn {
@@ -330,9 +336,21 @@ class ArenaState extends State<ArenaStage> {
                         Expanded(
                           child: MaterialButton(
                             onPressed: this._activeBtn ? () {
-                              this._execAI();
+                              this._execSkill(this._crSkill);
                             } : null,
                             child: Text('Execute'),
+                          )
+                        ),
+                        Expanded(
+                          child: DropdownButton(
+                            items: this._crSkillsOptions,
+                            onChanged: ((final Performance value) {
+                                this.setState(() {
+                                  this._crSkill = value;
+                                });
+                              }
+                            ),
+                            value: this._crSkill
                           )
                         )
                       ]
@@ -357,15 +375,37 @@ class ArenaState extends State<ArenaStage> {
     );
   }
 
+  List<DropdownMenuItem<Performance>> get _crSkillsOptions {
+    final List<Performance> crSkills = this._crSkills;
+    final List<DropdownMenuItem<Performance>> ret = new List();
+    if (crSkills != null) {
+      for (Performance ability in crSkills) {
+        if (ability.canPerform(this._sceneAct.players[this._sceneAct.current])) {
+          ret.add(new DropdownMenuItem(
+              value: ability,
+              child: Text(ability.name)
+          )
+          );
+        }
+      }
+    }
+    return ret;
+  }
+
   void _execAI() {
     this._sceneAct.executeAI("");
+    this._afterAct();
+  }
+
+  void _execSkill(final Performance ability) {
+    this._sceneAct.executeAbility(ability, this._sceneAct.enemyIndex, "");
     this._afterAct();
   }
 
   void _afterAct() {
     this.activeBtn = false;
     final List<Actor> koActors = this._koActors;
-    final int crt = this._sceneAct.current;
+    int crt = this._sceneAct.current;
     Performance lastAbility;
     this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
@@ -401,10 +441,14 @@ class ArenaState extends State<ArenaStage> {
       }
       if (this._sceneAct.status != 0) {
         //TODO:
-      } else if (this._automatic || players[this._sceneAct.current].automatic != 0) {
+      } else if (this._automatic || players[(crt = this._sceneAct.current)].automatic != 0) {
         this._execAI();
       } else {
         this.activeBtn = true;
+        this.setState(() {
+          this._crSkills = players[crt].availableSkills;
+          this._crItems = this._sceneAct.crItems[crt];
+        });
       }
     });
   }
@@ -413,8 +457,12 @@ class ArenaState extends State<ArenaStage> {
     for (int i = 0; i < enemy.length; i++) {
       enemy[i].automatic = 2;
     }
-    this._sceneAct = SceneAct(party, enemy, surprise);
-    final List<Actor> players = this._sceneAct.players;
+    final SceneAct sceneAct = this._sceneAct = SceneAct(party, enemy, surprise);
+    final List<Actor> players = sceneAct.players;
+    final int current = sceneAct.current;
+    this._crSkills = players[current].availableSkills;
+    //this._crItems = sceneAct.crItems[current];
+    this._crSkill = this._crSkills[0];
     this._koActors = new List()..length = players.length;
     this._actorSprites = surprise < 0 ? [
         SpriteState(players[4], "l", true),
