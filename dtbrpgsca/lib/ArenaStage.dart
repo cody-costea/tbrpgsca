@@ -235,8 +235,11 @@ class ArenaState extends State<ArenaStage> {
   Performance _crSkill;
   Performance _crItem;
 
-  List<Performance> _crSkills;
-  List<Performance> _crItems;
+  List<DropdownMenuItem<Performance>> _crSkills;
+  List<DropdownMenuItem<Performance>> _crItems;
+  List<DropdownMenuItem<int>> _players;
+
+  int _target;
 
   bool _automatic = false;
   bool _activeBtn = true;
@@ -343,7 +346,7 @@ class ArenaState extends State<ArenaStage> {
                         ),
                         Expanded(
                           child: DropdownButton(
-                            items: this._crSkillsOptions,
+                            items: this._crSkills,
                             onChanged: ((final Performance value) {
                                 this.setState(() {
                                   this._crSkill = value;
@@ -354,6 +357,21 @@ class ArenaState extends State<ArenaStage> {
                           )
                         )
                       ]
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: DropdownButton(
+                              items: this._players,
+                              onChanged: ((final int value) {
+                                this.setState(() {
+                                  this._target = value;
+                                });
+                              }),
+                              value: this._target
+                          )
+                        )
+                      ],
                     ),
                     Row(
                       children: <Widget>[
@@ -375,11 +393,34 @@ class ArenaState extends State<ArenaStage> {
     );
   }
 
-  List<DropdownMenuItem<Performance>> get _crSkillsOptions {
-    final List<Performance> crSkills = this._crSkills;
+  void _execAI() {
+    this._sceneAct.executeAI("");
+    this._afterAct();
+  }
+
+  void _execSkill(final Performance ability) {
+    this._sceneAct.executeAbility(ability, this._target, "");
+    this._afterAct();
+  }
+
+  List<DropdownMenuItem<int>> _preparePlayers(final List<Actor> players) {
+    final List<DropdownMenuItem<int>> ret = new List();
+    if (players != null) {
+      for (int i = 0; i < players.length; i++) {
+        ret.add(new DropdownMenuItem(
+            value: i,
+            child: Text(players[i].name)
+        )
+        );
+      }
+    }
+    return ret;
+  }
+
+  List<DropdownMenuItem<Performance>> _prepareAbilities(final Iterable<Performance> abilities, final int crt) {
     final List<DropdownMenuItem<Performance>> ret = new List();
-    if (crSkills != null) {
-      for (Performance ability in crSkills) {
+    if (abilities != null) {
+      for (Performance ability in abilities) {
         if (ability.canPerform(this._sceneAct.players[this._sceneAct.current])) {
           ret.add(new DropdownMenuItem(
               value: ability,
@@ -390,16 +431,6 @@ class ArenaState extends State<ArenaStage> {
       }
     }
     return ret;
-  }
-
-  void _execAI() {
-    this._sceneAct.executeAI("");
-    this._afterAct();
-  }
-
-  void _execSkill(final Performance ability) {
-    this._sceneAct.executeAbility(ability, this._sceneAct.enemyIndex, "");
-    this._afterAct();
   }
 
   void _afterAct() {
@@ -446,8 +477,10 @@ class ArenaState extends State<ArenaStage> {
       } else {
         this.activeBtn = true;
         this.setState(() {
-          this._crSkills = players[crt].availableSkills;
-          this._crItems = this._sceneAct.crItems[crt];
+          this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
+          final Map<int, List<Performance>> items = this._sceneAct.crItems;
+          this._crItems = (items == null || items[crt] == null)
+              ? null : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
         });
       }
     });
@@ -460,9 +493,13 @@ class ArenaState extends State<ArenaStage> {
     final SceneAct sceneAct = this._sceneAct = SceneAct(party, enemy, surprise);
     final List<Actor> players = sceneAct.players;
     final int current = sceneAct.current;
-    this._crSkills = players[current].availableSkills;
-    //this._crItems = sceneAct.crItems[current];
-    this._crSkill = this._crSkills[0];
+    this._crSkills = this._prepareAbilities(players[current].availableSkills, current);
+    final Map<int, List<Performance>> items = this._sceneAct.crItems;
+    this._crItems = (items == null || items[current] == null)
+        ? null : this._prepareAbilities(this._sceneAct.crItems[current], current);
+    this._crSkill = this._crSkills[0].value;
+    this._target = this._sceneAct.enemyIndex;
+    this._players = this._preparePlayers(players);
     this._koActors = new List()..length = players.length;
     this._actorSprites = surprise < 0 ? [
         SpriteState(players[4], "l", true),
