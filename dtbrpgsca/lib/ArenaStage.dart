@@ -258,6 +258,19 @@ class ArenaState extends State<ArenaStage> {
     });
   }
 
+  List<DropdownMenuItem<Performance>> _emptyAbilities;
+  List<DropdownMenuItem<Performance>> get emptyAbilities {
+    List<DropdownMenuItem<Performance>> emptyAbilities = this._emptyAbilities;
+    if (emptyAbilities == null) {
+      emptyAbilities = new List();
+      emptyAbilities.add(new DropdownMenuItem(
+        child: new Text(''),
+      ));
+      this._emptyAbilities = emptyAbilities;
+    }
+    return emptyAbilities;
+  }
+
   @override
   Widget build(final BuildContext context) {
     return new MaterialApp(
@@ -271,28 +284,6 @@ class ArenaState extends State<ArenaStage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: MaterialButton(
-                            onPressed: this._activeBtn ? () {
-                              this._automatic = true;
-                              this._execAI();
-                              //this._actorSprites[0].sprite = 'cast';
-                            } : () {
-                              this._automatic = false;
-                            },
-                            child: Text('Auto'),
-                          )
-                        ),
-                        Expanded(
-                          child: MaterialButton(
-                            onPressed: null, //TODO
-                            child: Text('Run')
-                          )
-                        )
-                      ],
-                    ),
                     Expanded(
                       child: Center(
                         child: Stack(
@@ -367,31 +358,64 @@ class ArenaState extends State<ArenaStage> {
                     Row(
                       children: <Widget>[
                         Expanded(
-                          child: DropdownButton(
-                              items: this._players,
-                              onChanged: ((final int value) {
-                                this.setState(() {
-                                  this._target = value;
-                                });
-                              }),
-                              value: this._target
+                            child: DropdownButton(
+                                items: this._players,
+                                onChanged: ((final int value) {
+                                  this.setState(() {
+                                    this._target = value;
+                                  });
+                                }),
+                                value: this._target
+                            )
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                  child: MaterialButton(
+                                    onPressed: this._activeBtn ? () {
+                                      this._automatic = true;
+                                      this._execAI();
+                                    } : () {
+                                      this._automatic = false;
+                                    },
+                                    child: Text(this._automatic ? 'Manual' : 'Auto'),
+                                  )
+                              ),
+                              Expanded(
+                                  child: MaterialButton(
+                                      onPressed: null, //TODO
+                                      child: Text('Run')
+                                  )
+                              )
+                            ],
                           )
                         )
                       ],
                     ),
                     Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: MaterialButton(
-                            onPressed: this._activeBtn ? () {
-                              this._sceneAct.executeAbility(this._sceneAct.players[this._sceneAct.current].availableSkills[2], this._sceneAct.enemyIndex, "");
-                              this._afterAct();
-                            } : null,
-                            child: Text('Use'),
+                        children: <Widget>[
+                          Expanded(
+                              child: MaterialButton(
+                                onPressed: this._activeBtn && this._crItem != null ? () {
+                                  this._execSkill(this._crItem);
+                                } : null,
+                                child: Text('Use'),
+                              )
+                          ),
+                          Expanded(
+                              child: DropdownButton(
+                                  items: this._crItems,
+                                  onChanged: ((final Performance value) {
+                                    this.setState(() {
+                                      this._crItem = value;
+                                    });
+                                  }),
+                                  value: this._crItem
+                              )
                           )
-                        )
-                      ],
-                    )
+                        ]
+                    ),
                   ],
                 )
             )
@@ -416,8 +440,7 @@ class ArenaState extends State<ArenaStage> {
         ret.add(new DropdownMenuItem(
             value: i,
             child: Text(players[i].name)
-        )
-        );
+        ));
       }
     }
     return ret;
@@ -486,7 +509,7 @@ class ArenaState extends State<ArenaStage> {
           this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
           final Map<int, List<Performance>> items = this._sceneAct.crItems;
           this._crItems = (items == null || items[crt] == null)
-              ? null : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
+              ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
         });
       }
     });
@@ -502,7 +525,7 @@ class ArenaState extends State<ArenaStage> {
     this._crSkills = this._prepareAbilities(players[current].availableSkills, current);
     final Map<int, List<Performance>> items = this._sceneAct.crItems;
     this._crItems = (items == null || items[current] == null)
-        ? null : this._prepareAbilities(this._sceneAct.crItems[current], current);
+        ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[current], current);
     this._crSkill = this._crSkills[0].value;
     this._target = this._sceneAct.enemyIndex;
     this._players = this._preparePlayers(players);
@@ -516,8 +539,7 @@ class ArenaState extends State<ArenaStage> {
         SpriteState(players[1], "r", true),
         SpriteState(players[2], "r", true),
         SpriteState(players[3], "r", true)
-      ]
-        : [
+      ] : [
       SpriteState(players[0], "l", true),
       SpriteState(players[1], "l", true),
       SpriteState(players[2], "l", true),
