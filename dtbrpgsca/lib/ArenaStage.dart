@@ -22,6 +22,12 @@ import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/SceneAct.dart';
 import 'package:dtbrpgsca/Performance.dart';
 
+const int SPR_HIT = 0;
+const int SPR_FALLEN = 1;
+const int SPR_RISEN = 2;
+const int SPR_ACT = 3;
+const int SPR_CAST = 4;
+
 int _waitTime = 0;
 
 class ActorSprite extends StatefulWidget {
@@ -39,14 +45,14 @@ class ActorSprite extends StatefulWidget {
 class SpriteState extends State<ActorSprite> {
 
   String _name;
-  String _sprite;
   String _pos;
+  int _sprite;
 
   Actor _player;
 
-  Map<String, List<int>> _sprTime;
-  Map<String, List<String>> _sprFiles;
-  Map<String, int> _sprFullTime;
+  Map<int, List<int>> _sprTime;
+  Map<int, List<String>> _sprFiles;
+  Map<int, int> _sprFullTime;
 
   String _idleSpr;
   String _koSpr;
@@ -77,12 +83,12 @@ class SpriteState extends State<ActorSprite> {
     return this._name;
   }
 
-  set sprite(final String value) {
+  set sprite(final int value) {
     this._sprite = value;
     this._prepareSpr(value, true);
   }
 
-  String get sprite {
+  int get sprite {
     return this._sprite;
   }
 
@@ -118,11 +124,11 @@ class SpriteState extends State<ActorSprite> {
     return koSpr;
   }
 
-  Future<String> _readSprInfo(final String spr) async {
+  Future<String> _readSprInfo(final int spr) async {
     return await rootBundle.loadString('assets/sprites/$_name/spr_${_pos}_$spr.txt');
   }
   
-  void _prepareSpr(final String crSprite, final bool play) {
+  void _prepareSpr(final int crSprite, final bool play) {
     if (crSprite != null && this._sprFiles[crSprite] == null) {
       this._readSprInfo(crSprite).then((sprInfo) {
         final List<String> sprites = sprInfo.split("\\");
@@ -165,7 +171,7 @@ class SpriteState extends State<ActorSprite> {
   Widget build(final BuildContext context) {
     List<String> crSprList;
     final int counter = this._counter;
-    final String crSprite = this._sprite;
+    final int crSprite = this._sprite;
     if (crSprite != null && (crSprList = this._sprFiles[crSprite]) != null && counter < crSprList.length) {
       new Timer(Duration(milliseconds: this._sprTime[crSprite][counter]), () {
         this.setState(() {
@@ -201,11 +207,11 @@ class SpriteState extends State<ActorSprite> {
     this._sprFullTime = new Map();
     this._sprTime = new Map();
     if (aot) {
-      this._prepareSpr("hit", false);
-      this._prepareSpr("fallen", false);
-      this._prepareSpr("risen", false);
-      this._prepareSpr("act", false);
-      this._prepareSpr("cast", false);
+      this._prepareSpr(SPR_HIT, false);
+      this._prepareSpr(SPR_FALLEN, false);
+      this._prepareSpr(SPR_RISEN, false);
+      this._prepareSpr(SPR_ACT, false);
+      this._prepareSpr(SPR_CAST, false);
     }
   }
 }
@@ -440,7 +446,7 @@ class ArenaState extends State<ArenaStage> {
     Performance lastAbility;
     this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
-            || lastAbility.dmgType == Performance.DmgTypeWis) ? 'cast' : 'act') : 'fallen';
+            || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
     for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
       if (trg != crt) {
         final SpriteState trgSprite = this._actorSprites[trg];
@@ -448,13 +454,13 @@ class ArenaState extends State<ArenaStage> {
         final bool ko = koActors.contains(trgActor);
         if (trgActor.hp > 0) {
           if (ko) {
-            trgSprite.sprite = 'risen';
+            trgSprite.sprite = SPR_RISEN;
             koActors.remove(trgActor);
           } else {
-            trgSprite.sprite = 'hit';
+            trgSprite.sprite = SPR_HIT;
           }
         } else {
-          trgSprite.sprite = 'fallen';
+          trgSprite.sprite = SPR_FALLEN;
           if (!ko) {
             koActors.add(trgActor);
           }
@@ -467,7 +473,7 @@ class ArenaState extends State<ArenaStage> {
       final List<Actor> players = this._sceneAct.players;
       if (players[crt].hp < 1) {
         koActors.add(players[crt]);
-        this._actorSprites[crt].sprite = 'fallen';
+        this._actorSprites[crt].sprite = SPR_FALLEN;
         //TODO: text
       }
       if (this._sceneAct.status != 0) {
