@@ -31,9 +31,9 @@ const int SPR_CAST = 4;
 int _waitTime = 0;
 
 class ActorSprite extends StatefulWidget {
-  
+
   final SpriteState spriteState;
-  
+
   @override
   State<StatefulWidget> createState() {
     return this.spriteState;
@@ -127,7 +127,7 @@ class SpriteState extends State<ActorSprite> {
   Future<String> _readSprInfo(final int spr) async {
     return await rootBundle.loadString('assets/sprites/$_name/spr_${_pos}_$spr.txt');
   }
-  
+
   void _prepareSpr(final int crSprite, final bool play) {
     if (crSprite != null && this._sprFiles[crSprite] == null) {
       this._readSprInfo(crSprite).then((sprInfo) {
@@ -180,7 +180,7 @@ class SpriteState extends State<ActorSprite> {
       });
     }
     return Image (
-        //fit: BoxFit.fill,
+      //fit: BoxFit.fill,
         image: AssetImage('assets/sprites/$_name/${crSprList == null || counter >= crSprList.length
             ? (this.actor == null || this.actor.hp > 0 ? this.idleSpr : this.koSpr)
             : crSprList[counter]}'),
@@ -245,6 +245,8 @@ class ArenaState extends State<ArenaStage> {
   List<DropdownMenuItem<Performance>> _crItems;
   List<DropdownMenuItem<int>> _players;
 
+  StringBuffer _actionsTxt = new StringBuffer();
+
   int _target;
 
   bool _automatic = false;
@@ -285,75 +287,78 @@ class ArenaState extends State<ArenaStage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Expanded(
-                      child: Center(
-                        child: Stack(
-                          children: <Widget>[
-                            Align(
-                                alignment: Alignment(-0.3, -0.7),
-                                child: ActorSprite(spriteState: this._actorSprites[0])
-                            ),
-                            Align(
-                                alignment: Alignment(-0.7, -1),
-                                child: ActorSprite(spriteState: this._actorSprites[1])
-                            ),
-                            Align(
-                                alignment: Alignment(-0.9, -0.5),
-                                child: ActorSprite(spriteState: this._actorSprites[2])
-                            ),
-                            Align(
-                                alignment: Alignment(-0.5, -0.2),
-                                child: ActorSprite(spriteState: this._actorSprites[3])
-                            ),
-                            Align(
-                                alignment: Alignment(0.9, -0.7),
-                                child: ActorSprite(spriteState: this._actorSprites[6])
-                            ),
-                            Align(
-                                alignment: Alignment(0.5, -1),
-                                child: ActorSprite(spriteState: this._actorSprites[7])
-                            ),
-                            Align(
-                                alignment: Alignment(0.3, -0.5),
-                                child: ActorSprite(spriteState: this._actorSprites[4])
-                            ),
-                            Align(
-                                alignment: Alignment(0.7, -0.2),
-                                child: ActorSprite(spriteState: this._actorSprites[5])
-                            ),
-                            Align(
+                        child: Center(
+                          child: Stack(
+                            children: <Widget>[
+                              Align(
+                                  alignment: Alignment(-0.3, -0.7),
+                                  child: ActorSprite(spriteState: this._actorSprites[0])
+                              ),
+                              Align(
+                                  alignment: Alignment(-0.7, -1),
+                                  child: ActorSprite(spriteState: this._actorSprites[1])
+                              ),
+                              Align(
+                                  alignment: Alignment(-0.9, -0.5),
+                                  child: ActorSprite(spriteState: this._actorSprites[2])
+                              ),
+                              Align(
+                                  alignment: Alignment(-0.5, -0.2),
+                                  child: ActorSprite(spriteState: this._actorSprites[3])
+                              ),
+                              Align(
+                                  alignment: Alignment(0.9, -0.7),
+                                  child: ActorSprite(spriteState: this._actorSprites[6])
+                              ),
+                              Align(
+                                  alignment: Alignment(0.5, -1),
+                                  child: ActorSprite(spriteState: this._actorSprites[7])
+                              ),
+                              Align(
+                                  alignment: Alignment(0.3, -0.5),
+                                  child: ActorSprite(spriteState: this._actorSprites[4])
+                              ),
+                              Align(
+                                  alignment: Alignment(0.7, -0.2),
+                                  child: ActorSprite(spriteState: this._actorSprites[5])
+                              ),
+                              Align(
                                 alignment: Alignment(0, 0.1),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text("Test!!!"),
+                                  child: Text(
+                                    this._actionsTxt.toString(),
+                                    textAlign: TextAlign.start,
+                                  )
                                 )
-                            )
-                          ],
-                        ),
-                      )
+                              )
+                            ],
+                          ),
+                        )
                     ),
                     Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: MaterialButton(
-                            onPressed: this._activeBtn ? () {
-                              this._execSkill(this._crSkill);
-                            } : null,
-                            child: Text('Execute'),
+                        children: <Widget>[
+                          Expanded(
+                              child: MaterialButton(
+                                onPressed: this._activeBtn ? () {
+                                  this._execSkill(this._crSkill);
+                                } : null,
+                                child: Text('Execute'),
+                              )
+                          ),
+                          Expanded(
+                              child: DropdownButton(
+                                  items: this._crSkills,
+                                  onChanged: ((final Performance value) {
+                                    this.setState(() {
+                                      this._crSkill = value;
+                                    });
+                                  }
+                                  ),
+                                  value: this._crSkill
+                              )
                           )
-                        ),
-                        Expanded(
-                          child: DropdownButton(
-                            items: this._crSkills,
-                            onChanged: ((final Performance value) {
-                                this.setState(() {
-                                  this._crSkill = value;
-                                });
-                              }
-                            ),
-                            value: this._crSkill
-                          )
-                        )
-                      ]
+                        ]
                     ),
                     Row(
                       children: <Widget>[
@@ -369,27 +374,27 @@ class ArenaState extends State<ArenaStage> {
                             )
                         ),
                         Expanded(
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                  child: MaterialButton(
-                                    onPressed: this._activeBtn ? () {
-                                      this._automatic = true;
-                                      this._execAI();
-                                    } : () {
-                                      this._automatic = false;
-                                    },
-                                    child: Text(this._automatic ? 'Manual' : 'Auto'),
-                                  )
-                              ),
-                              Expanded(
-                                  child: MaterialButton(
-                                      onPressed: null, //TODO
-                                      child: Text('Run')
-                                  )
-                              )
-                            ],
-                          )
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                    child: MaterialButton(
+                                      onPressed: this._activeBtn ? () {
+                                        this._automatic = true;
+                                        this._execAI();
+                                      } : () {
+                                        this._automatic = false;
+                                      },
+                                      child: Text(this._automatic ? 'Manual' : 'Auto'),
+                                    )
+                                ),
+                                Expanded(
+                                    child: MaterialButton(
+                                        onPressed: null, //TODO
+                                        child: Text('Run')
+                                    )
+                                )
+                              ],
+                            )
                         )
                       ],
                     ),
@@ -405,13 +410,13 @@ class ArenaState extends State<ArenaStage> {
                           ),
                           Expanded(
                               child: DropdownButton(
-                                  items: this._crItems,
-                                  onChanged: ((final Performance value) {
-                                    this.setState(() {
-                                      this._crItem = value;
-                                    });
-                                  }),
-                                  value: this._crItem
+                                items: this._crItems,
+                                onChanged: ((final Performance value) {
+                                  this.setState(() {
+                                    this._crItem = value;
+                                  });
+                                }),
+                                value: this._crItem
                               )
                           )
                         ]
@@ -424,13 +429,11 @@ class ArenaState extends State<ArenaStage> {
   }
 
   void _execAI() {
-    this._sceneAct.executeAI("");
-    this._afterAct();
+    this._afterAct("\n${this._sceneAct.executeAI("")}");
   }
 
   void _execSkill(final Performance ability) {
-    this._sceneAct.executeAbility(ability, this._target, "");
-    this._afterAct();
+    this._afterAct("\n${this._sceneAct.executeAbility(ability, this._target, "")}");
   }
 
   List<DropdownMenuItem<int>> _preparePlayers(final List<Actor> players) {
@@ -462,14 +465,14 @@ class ArenaState extends State<ArenaStage> {
     return ret;
   }
 
-  void _afterAct() {
+  void _afterAct(final String ret) {
     this.activeBtn = false;
     final List<Actor> koActors = this._koActors;
     int crt = this._sceneAct.current;
     Performance lastAbility;
     this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
-            || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
+        || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
     for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
       if (trg != crt) {
         final SpriteState trgSprite = this._actorSprites[trg];
@@ -506,9 +509,10 @@ class ArenaState extends State<ArenaStage> {
       } else {
         this.activeBtn = true;
         this.setState(() {
+          this._actionsTxt.write(ret);
           this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
           final Map<int, List<Performance>> items = this._sceneAct.crItems;
-          this._crItems = (items == null || items[crt] == null)
+          this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
               ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
         });
       }
@@ -524,22 +528,22 @@ class ArenaState extends State<ArenaStage> {
     final int current = sceneAct.current;
     this._crSkills = this._prepareAbilities(players[current].availableSkills, current);
     final Map<int, List<Performance>> items = this._sceneAct.crItems;
-    this._crItems = (items == null || items[current] == null)
+    this._crItems = (items == null || items[current] == null || items[current].length == 0)
         ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[current], current);
     this._crSkill = this._crSkills[0].value;
     this._target = this._sceneAct.enemyIndex;
     this._players = this._preparePlayers(players);
     this._koActors = new List()..length = players.length;
     this._actorSprites = surprise < 0 ? [
-        SpriteState(players[4], "l", true),
-        SpriteState(players[5], "l", true),
-        SpriteState(players[6], "l", true),
-        SpriteState(players[7], "l", true),
-        SpriteState(players[0], "r", true),
-        SpriteState(players[1], "r", true),
-        SpriteState(players[2], "r", true),
-        SpriteState(players[3], "r", true)
-      ] : [
+      SpriteState(players[4], "l", true),
+      SpriteState(players[5], "l", true),
+      SpriteState(players[6], "l", true),
+      SpriteState(players[7], "l", true),
+      SpriteState(players[0], "r", true),
+      SpriteState(players[1], "r", true),
+      SpriteState(players[2], "r", true),
+      SpriteState(players[3], "r", true)
+    ] : [
       SpriteState(players[0], "l", true),
       SpriteState(players[1], "l", true),
       SpriteState(players[2], "l", true),
