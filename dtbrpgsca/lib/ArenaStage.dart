@@ -50,9 +50,9 @@ class SpriteState extends State<ActorSprite> {
 
   Actor _player;
 
-  Map<int, List<int>> _sprTime;
-  Map<int, List<String>> _sprFiles;
-  Map<int, int> _sprFullTime;
+  List<List<int>> _sprTime;
+  List<List<String>> _sprFiles;
+  List<int> _sprFullTime;
 
   String _idleSpr;
   String _koSpr;
@@ -72,9 +72,9 @@ class SpriteState extends State<ActorSprite> {
     this._name = value;
     this._idleSpr = null;
     this._koSpr = null;
-    this._sprFiles = new Map();
-    this._sprFullTime = new Map();
-    this._sprTime = new Map();
+    this._sprFiles = new List(5);
+    this._sprFullTime = new List(5);
+    this._sprTime = new List(5);
     this._prepareSpr(this._sprite, true);
 
   }
@@ -96,9 +96,9 @@ class SpriteState extends State<ActorSprite> {
     this._pos = value;
     this._idleSpr = null;
     this._koSpr = null;
-    this._sprFiles = new Map();
-    this._sprFullTime = new Map();
-    this._sprTime = new Map();
+    this._sprFiles = new List(5);
+    this._sprFullTime = new List(5);
+    this._sprTime = new List(5);
     this._prepareSpr(this._sprite, true);
   }
 
@@ -203,9 +203,9 @@ class SpriteState extends State<ActorSprite> {
     this._pos = pos;
     this._player = actor;
     this._name = actor.job.name.toLowerCase();
-    this._sprFiles = new Map();
-    this._sprFullTime = new Map();
-    this._sprTime = new Map();
+    this._sprFiles = new List(5);
+    this._sprFullTime = new List(5);
+    this._sprTime = new List(5);
     if (aot) {
       this._prepareSpr(SPR_HIT, false);
       this._prepareSpr(SPR_FALLEN, false);
@@ -321,7 +321,7 @@ class ArenaState extends State<ArenaStage> {
                               Align(
                                   alignment: Alignment(0.7, -0.2),
                                   child: ActorSprite(spriteState: this._actorSprites[5])
-                              ),
+                              )/*,
                               Align(
                                 alignment: Alignment(0, 0.1),
                                 child: SingleChildScrollView(
@@ -331,7 +331,7 @@ class ArenaState extends State<ArenaStage> {
                                     textAlign: TextAlign.start,
                                   )
                                 )
-                              )
+                              )*/
                             ],
                           ),
                         )
@@ -443,7 +443,8 @@ class ArenaState extends State<ArenaStage> {
         ret.add(new DropdownMenuItem(
             value: i,
             child: Text(players[i].name)
-        ));
+          )
+        );
       }
     }
     return ret;
@@ -457,7 +458,7 @@ class ArenaState extends State<ArenaStage> {
           ret.add(new DropdownMenuItem(
               value: ability,
               child: Text(ability.name)
-          )
+            )
           );
         }
       }
