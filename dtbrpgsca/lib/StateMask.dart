@@ -155,7 +155,7 @@ class StateMask extends Costume {
             final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp, final int hp, final int mp, final int sp,
             final int atk, final int def, final int spi, final int wis, final int agi, final int mInit, final bool range, final Map<int, int> res,
             final List<Performance> aSkills, final List<Performance> rSkills, final List<StateMask> states, final Map<StateMask, int> stRes)
-      : super(id, name, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes) {
+      : super(id, name, null, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes) {
     this.inactivate = inactivate;
     this.automate = automate;
     this.confuse = confuse;
