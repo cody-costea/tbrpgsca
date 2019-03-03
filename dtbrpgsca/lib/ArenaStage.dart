@@ -245,7 +245,8 @@ class ArenaState extends State<ArenaStage> {
   List<DropdownMenuItem<Performance>> _crItems;
   List<DropdownMenuItem<int>> _players;
 
-  StringBuffer _actionsTxt = new StringBuffer();
+  TextEditingController _actionsTxt = new TextEditingController();
+  ScrollController _scrollController = new ScrollController();
 
   int _target;
 
@@ -321,17 +322,27 @@ class ArenaState extends State<ArenaStage> {
                               Align(
                                   alignment: Alignment(0.7, -0.2),
                                   child: ActorSprite(spriteState: this._actorSprites[5])
-                              )/*,
+                              ),
                               Align(
-                                alignment: Alignment(0, 0.1),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Text(
-                                    this._actionsTxt.toString(),
-                                    textAlign: TextAlign.start,
-                                  )
-                                )
-                              )*/
+                                alignment: Alignment(0, 1),
+                                child: FractionallySizedBox(
+                                  widthFactor: 1,
+                                  heightFactor: 0.5,
+                                  child: SingleChildScrollView(
+                                    controller: this._scrollController,
+                                    scrollDirection: Axis.vertical,
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none
+                                      ),
+                                      controller: this._actionsTxt,
+                                      textAlign: TextAlign.start,
+                                      maxLines: null,
+                                      enabled: false
+                                    )
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         )
@@ -353,8 +364,7 @@ class ArenaState extends State<ArenaStage> {
                                     this.setState(() {
                                       this._crSkill = value;
                                     });
-                                  }
-                                  ),
+                                  }),
                                   value: this._crSkill
                               )
                           )
@@ -510,7 +520,9 @@ class ArenaState extends State<ArenaStage> {
       } else {
         this.activeBtn = true;
         this.setState(() {
-          this._actionsTxt.write(ret);
+          this._actionsTxt.text = "${this._actionsTxt.text}\n$ret";
+          this._scrollController.animateTo(this._scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 178), curve: Curves.linear);
           this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
           final Map<int, List<Performance>> items = this._sceneAct.crItems;
           this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
