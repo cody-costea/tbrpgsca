@@ -42,13 +42,21 @@ flutter:
    - assets/sprites/
    - assets/sprites/hero/
    - assets/sprites/crusader/
+   - assets/sprites/hesychast/
    - assets/sprites/valkyrie/
    - assets/sprites/sorceress/
-   - assets/sprites/hesychast/
    - assets/sprites/alchemist/
+   - assets/sprites/knight/
    - assets/sprites/dragoon/
+   - assets/sprites/berserker/
    - assets/sprites/wizard/
    - assets/sprites/spy/
+   - assets/sprites/ninja/
+   - assets/sprites/reaver/
+   - assets/sprites/shaman/
+   - assets/sprites/druid/
+   - assets/sprites/ranger/
+   - assets/sprites/corsair/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
