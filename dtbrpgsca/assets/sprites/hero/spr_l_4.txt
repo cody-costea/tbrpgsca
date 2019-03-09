@@ -1,1 +1,1 @@
-frm_bt_hero_l_cast1.png\frm_bt_hero_l_cast2.png\frm_bt_hero_l_cast3.png\frm_bt_hero_l_cast4.png:261\frm_bt_hero_l_cast3.png\frm_bt_hero_l_cast2.png\frm_bt_hero_l_cast1.png\frm_bt_hero_l_idle.png
+frm_bt_hero_l_cast1.png\frm_bt_hero_l_cast2.png\frm_bt_hero_l_cast3.png\frm_bt_hero_l_cast4.png:261\frm_bt_hero_l_cast3.png\frm_bt_hero_l_cast2.png\frm_bt_hero_l_cast1.png

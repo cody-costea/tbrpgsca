@@ -1,7 +1,5 @@
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/Costume.dart';
-import 'package:dtbrpgsca/Costume.dart';
-import 'package:dtbrpgsca/Costume.dart';
 import 'package:dtbrpgsca/Performance.dart';
 import 'package:dtbrpgsca/StateMask.dart';
 import 'package:flutter/material.dart';
@@ -115,10 +113,10 @@ final List<Performance> skill = [
 final List<Performance> skills = [skill[0], skill[1]];
 
 final List<Costume> race = [
-  Costume(1, "Elf", null, 40, 25, 10, 7, 5, 15, 12, 11, 0, false,null, skills, null, null),
-  Costume(2, "Human", null, 47, 15, 13, 9, 11, 9, 11, 10, 0, false, null, skills, null, null),
-  Costume(3, "Half-Orc", null, 55, 7, 13, 17, 12, 5, 7, 9, 0, false, null, skills, null, null),
-  Costume(4, "Gnome", null, 40, 15, 20, 12, 8, 10, 5, 15, 0, false, null, skills, null, null)
+  Costume(1, "Elf", null, 40, 25, 10, 7, 5, 15, 12, 11, 0, false, {1 : -1, 2 : 1, 3 : 1, 4 : 1, 5 : 1}, skills, null, null),
+  Costume(2, "Human", null, 47, 15, 13, 9, 11, 9, 11, 10, 0, false, {6 : -1, 7 : 1}, skills, null, null),
+  Costume(3, "Half-Orc", null, 55, 7, 13, 17, 12, 5, 7, 9, 0, false, {1 : 1, 2 : -1, 3 : -1, 4 : -1, 5 : -1}, skills, null, null),
+  Costume(4, "Gnome", null, 40, 15, 20, 12, 8, 10, 5, 15, 0, false, {6 : 1, 7 : -1}, skills, null, null)
 ];
 
 final List<Costume> job = [
@@ -136,21 +134,23 @@ final List<Costume> job = [
   Costume(11, "Reaver", "reaver", 1, 0, 0, 1, 0, 0, 0, 0, 0, false, {6 : 7, 7 : -7}, [skill[8], skill[9], skill[11], skill[23], skill[24], skill[29], skill[15], skill[16], skill[18], skill[45], skill[46]], null, null),
   Costume(12, "Ninja", "ninja", 0, 0, 1, 0, 0, 0, 0, 1, 0, false, null, [skill[8], skill[9], skill[11], skill[15], skill[16], skill[17], skill[2], skill[3], skill[5], skill[40]], null, null),
   Costume(13, "Crusader", "crusader", 1, 0, 0, 0, 0, 0, 1, 0, 0, false, {6 : -7, 7 : 7}, [skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]], null, null),
-  Costume(14, "Druid", "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, false, {2 : 1, 3 : 1, 4 : 1, 5 : 1, 6 : -1, 7 : -1}, [skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]], null, null)
+  Costume(14, "Druid", "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, false, {2 : 1, 3 : 1, 4 : 1, 5 : 1, 6 : -1, 7 : -1}, [skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]], null, null),
+  Costume(16, "Sorceress", "sorceress", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, {1 : -1, 2 : 1, 3 : 1, 4 : 1, 5 : 1, 6 : -1}, [skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]], null, null),
+  Costume(17, "Valkyrie", "valkyrie", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, {1 : 1, 2 : -1, 3 : -1, 4 : -1, 5 : -1}, [skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]], null, null)
 ];
 
 final List<Actor> party = [
-  Actor(15, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(15, "Victoria", race[0], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(15, "Stephanie", race[3], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(15, "George", race[1], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
+  Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
+  Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
+  Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
+  Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
 ];
 
 final List<Actor> enemy = [
-  Actor(15, "Goblin", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(15, "Lizard", race[0], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(15, "Troll", race[3], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(15, "Ogre", race[1], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
+  Actor(2, "Goblin", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
+  Actor(4, "Lizard", race[0], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
+  Actor(6, "Troll", race[3], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
+  Actor(8, "Ogre", race[1], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
 ];
 
 void main() => runApp(new ArenaStage(party: party, enemy: enemy, surprise: 0));
@@ -161,6 +161,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: new ThemeData(
         // This is the theme of your application.
         //

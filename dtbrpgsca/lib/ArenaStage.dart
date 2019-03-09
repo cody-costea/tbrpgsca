@@ -279,6 +279,7 @@ class ArenaState extends State<ArenaStage> {
     return new MaterialApp(
         title: 'Turn-Based RPG Simple Combat Arena',
         theme: ThemeData.dark(),
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
             body: Container(
                 height: double.infinity,
