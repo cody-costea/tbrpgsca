@@ -27,6 +27,8 @@ const int SPR_RISEN = 2;
 const int SPR_ACT = 3;
 const int SPR_CAST = 4;
 
+List<Actor> _koActors;
+
 int _waitTime = 0;
 
 class ActorSprite extends StatefulWidget {
@@ -178,10 +180,11 @@ class SpriteState extends State<ActorSprite> {
         });
       });
     }
+    final List<Actor> koActors = _koActors;
     return Image (
       //fit: BoxFit.fill,
         image: AssetImage('assets/sprites/$_name/${crSprList == null || counter >= crSprList.length
-            ? (this.actor == null || this.actor.hp > 0 ? this.idleSpr : this.koSpr)
+            ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
             : crSprList[counter]}'),
         gaplessPlayback: true,
         width: 128,
@@ -234,8 +237,6 @@ class ArenaState extends State<ArenaStage> {
   SceneAct _sceneAct;
 
   List<SpriteState> _actorSprites;
-
-  List<Actor> _koActors;
 
   Performance _crSkill;
   Performance _crItem;
@@ -478,15 +479,14 @@ class ArenaState extends State<ArenaStage> {
 
   void _afterAct(final String ret) {
     this.activeBtn = false;
-    final List<Actor> koActors = this._koActors;
+    final List<Actor> koActors = _koActors;
     int crt = this._sceneAct.current;
     Performance lastAbility;
     this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
         || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
     new Timer(Duration(milliseconds: 174), () {
-      for (int trg = this._sceneAct.firstTarget; trg <=
-          this._sceneAct.lastTarget; trg++) {
+      for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
         if (trg != crt) {
           final SpriteState trgSprite = this._actorSprites[trg];
           final Actor trgActor = trgSprite.actor;
@@ -554,7 +554,7 @@ class ArenaState extends State<ArenaStage> {
     this._crSkill = this._crSkills[0].value;
     this._target = this._sceneAct.enemyIndex;
     this._players = this._preparePlayers(players);
-    this._koActors = new List()..length = players.length;
+    _koActors = new List()..length = players.length;
     this._actorSprites = surprise < 0 ? [
       SpriteState(players[4], "l", true),
       SpriteState(players[5], "l", true),
