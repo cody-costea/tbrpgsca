@@ -15,7 +15,6 @@ limitations under the License.
 */
 import 'dart:async';
 
-import 'package:dtbrpgsca/Costume.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dtbrpgsca/Actor.dart';
@@ -485,51 +484,59 @@ class ArenaState extends State<ArenaStage> {
     this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
         || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
-    for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
-      if (trg != crt) {
-        final SpriteState trgSprite = this._actorSprites[trg];
-        final Actor trgActor = trgSprite.actor;
-        final bool ko = koActors.contains(trgActor);
-        if (trgActor.hp > 0) {
-          if (ko) {
-            trgSprite.sprite = SPR_RISEN;
-            koActors.remove(trgActor);
+    new Timer(Duration(milliseconds: 174), () {
+      for (int trg = this._sceneAct.firstTarget; trg <=
+          this._sceneAct.lastTarget; trg++) {
+        if (trg != crt) {
+          final SpriteState trgSprite = this._actorSprites[trg];
+          final Actor trgActor = trgSprite.actor;
+          final bool ko = koActors.contains(trgActor);
+          if (trgActor.hp > 0) {
+            if (ko) {
+              trgSprite.sprite = SPR_RISEN;
+              koActors.remove(trgActor);
+            } else {
+              trgSprite.sprite = SPR_HIT;
+            }
           } else {
-            trgSprite.sprite = SPR_HIT;
-          }
-        } else {
-          trgSprite.sprite = SPR_FALLEN;
-          if (!ko) {
-            koActors.add(trgActor);
+            trgSprite.sprite = SPR_FALLEN;
+            if (!ko) {
+              koActors.add(trgActor);
+            }
           }
         }
       }
-    }
-    new Timer(Duration(milliseconds: _waitTime), () {
-      _waitTime = 0;
-      this._sceneAct.endTurn("");
-      final List<Actor> players = this._sceneAct.players;
-      if (players[crt].hp < 1) {
-        koActors.add(players[crt]);
-        this._actorSprites[crt].sprite = SPR_FALLEN;
-        //TODO: text
-      }
-      if (this._sceneAct.status != 0) {
-        //TODO:
-      } else if (this._automatic || players[(crt = this._sceneAct.current)].automatic != 0) {
-        this._execAI();
-      } else {
-        this.activeBtn = true;
-        this.setState(() {
-          this._actionsTxt.text = "${this._actionsTxt.text}\n$ret";
-          this._scrollController.animateTo(this._scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 178), curve: Curves.linear);
-          this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
-          final Map<int, List<Performance>> items = this._sceneAct.crItems;
-          this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
-              ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
-        });
-      }
+      new Timer(Duration(milliseconds: _waitTime), () {
+        _waitTime = 0;
+        this._sceneAct.endTurn("");
+        final List<Actor> players = this._sceneAct.players;
+        if (players[crt].hp < 1) {
+          koActors.add(players[crt]);
+          this._actorSprites[crt].sprite = SPR_FALLEN;
+          //TODO: text
+        }
+        if (this._sceneAct.status != 0) {
+          //TODO:
+        } else if (this._automatic ||
+            players[(crt = this._sceneAct.current)].automatic != 0) {
+          this._execAI();
+        } else {
+          this.activeBtn = true;
+          this.setState(() {
+            this._actionsTxt.text = "${this._actionsTxt.text}\n$ret";
+            this._scrollController.animateTo(
+                this._scrollController.position.maxScrollExtent,
+                duration: Duration(milliseconds: 178), curve: Curves.linear);
+            this._crSkills =
+                this._prepareAbilities(players[crt].availableSkills, crt);
+            final Map<int, List<Performance>> items = this._sceneAct.crItems;
+            this._crItems =
+            (items == null || items[crt] == null || items[crt].length == 0)
+                ? this.emptyAbilities : this._prepareAbilities(
+                this._sceneAct.crItems[crt], crt);
+          });
+        }
+      });
     });
   }
 
