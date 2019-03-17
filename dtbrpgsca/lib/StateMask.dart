@@ -18,8 +18,13 @@ import 'dart:math';
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/Costume.dart';
 import 'package:dtbrpgsca/Performance.dart';
+import 'package:dtbrpgsca/RolePlay.dart';
+import 'package:sprintf/sprintf.dart';
 
 class StateMask extends Costume {
+
+  static String causesTxt = " %s causes %s";
+
   List<Performance> rSkills;
   bool automate, confuse, inactivate, reflect;
   int dur, sRes, dmgHp, dmgMp, dmgSp;
@@ -96,7 +101,7 @@ class StateMask extends Costume {
             actor.mp -= dmgmp;
             actor.sp -= dmgsp;
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-              s += ""; //TODO: state damage text
+              s += sprintf(StateMask.causesTxt, [this.name, actor.name]) + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
             }
           }
           else {

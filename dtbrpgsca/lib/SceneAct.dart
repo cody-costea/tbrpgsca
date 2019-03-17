@@ -15,8 +15,16 @@ limitations under the License.
 */
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/Performance.dart';
+import 'package:sprintf/sprintf.dart';
 
 class SceneAct {
+
+  static String performsTxt = "%s performs %s";
+  static String victoryTxt = "The party has won!";
+  static String fallenTxt = "The party has fallen!";
+  static String escapeTxt = "The party has escaped!";
+  static String failTxt = "The party attempted to escape, but failed.";
+
   bool _useInit;
   int _status = 0;
   int _enIdx;
@@ -281,7 +289,7 @@ class SceneAct {
         this._lTarget = target;
     }
     bool applyCosts = true;
-    ret += ""; //performs text;
+    ret += sprintf("\n${SceneAct.performsTxt}", [this.players[this.current].name, skill.name]);
     for (int i = this._fTarget; i <= this._lTarget; i++) {
       if ((skill.mHp < 0 && skill.restore) || this._players[i].hp > 0) {
         ret += skill.execute(this._players[this._current], this._players[i], applyCosts);

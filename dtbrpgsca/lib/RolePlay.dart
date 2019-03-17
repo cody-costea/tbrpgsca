@@ -16,6 +16,11 @@ limitations under the License.
 import 'package:dtbrpgsca/StateMask.dart';
 
 abstract class RolePlay {
+
+  static String hpText = "HP";
+  static String mpText = "MP";
+  static String spText = "RP";
+
   String name;
   int id, mHp, mMp, mSp, mInit;
   List<StateMask> aStates;
@@ -39,6 +44,41 @@ abstract class RolePlay {
     this.mInit = mInit;
     this._range = range;
     this.aStates = states;
+  }
+
+  static String getDmgText(final int dmghp, final int dmgmp, final int dmgsp) {
+    final StringBuffer s = new StringBuffer();
+    bool c = false;
+    if (dmghp != 0) {
+      s.write(" ");
+      if (dmghp < 0) {
+        s.write("+");
+      }
+      s.write("${-dmghp} ${RolePlay.hpText}");
+      c = true;
+    }
+    if (dmgmp != 0) {
+      if (c) {
+        s.write(",");
+      }
+      s.write(" ");
+      if (dmgmp < 0) {
+        s.write("+");
+      }
+      s.write("${-dmgmp} ${RolePlay.mpText}");
+      c = true;
+    }
+    if (dmgsp != 0) {
+      if (c) {
+        s.write(",");
+      }
+      s.write(" ");
+      if (dmgsp < 0) {
+        s.write("+");
+      }
+      s.write("${-dmgsp} ${RolePlay.spText}");
+    }
+    return s.toString();
   }
 
 }

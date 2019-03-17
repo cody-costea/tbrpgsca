@@ -16,10 +16,13 @@ limitations under the License.
 import 'package:dtbrpgsca/Costume.dart';
 import 'package:dtbrpgsca/Performance.dart';
 import 'package:dtbrpgsca/StateMask.dart';
+import 'package:sprintf/sprintf.dart';
 
 class Actor extends Costume {
+  static String koTxt = ", %s falls unconscious";
+
   Costume _race, _job;
-  int _lv = 1, maxLv, _hp, _mp, _sp, _xp, maxp, automatic, init;
+  int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
   bool active, reflects, guards, _ranged;
   Map<Performance, int> _items, skillsQty, skillsQtyRgTurn;
   Map<StateMask, int> stateDur;
@@ -55,7 +58,7 @@ class Actor extends Costume {
   set level(final int lv) {
     final int nLv = lv > this.maxLv ? this.maxLv : (lv < 1 ? 1 : lv);
     while (this._lv < nLv) {
-      this._xp = this.maxp;
+      this._xp = this._maxp;
       this.levelUp();
     }
   }
@@ -67,6 +70,15 @@ class Actor extends Costume {
   set exp(final int xp) {
     this._xp = xp;
     this.levelUp();
+  }
+
+  int get mExp {
+    return this._maxp;
+  }
+
+  set mExp(final int xp) {
+    //TODO: levels might be changed;
+    this._maxp = xp;
   }
 
   int get hp {
@@ -147,8 +159,8 @@ class Actor extends Costume {
   }
 
   void levelUp() {
-    while (this.maxp <= this._xp && this._lv < this.maxLv) {
-      this.maxp *= 2;
+    while (this._maxp <= this._xp && this._lv < this.maxLv) {
+      this._maxp *= 2;
       this._lv++;
       this.mHp += 3;
       this.mMp += 2;
@@ -298,7 +310,7 @@ class Actor extends Costume {
   String checkStatus() {
     String s = "";
     if (this.hp < 1) {
-      s += ""; //ko text;
+      s += sprintf(Actor.koTxt, [this.name]);
       this.active = false;
       this.guards = false;
       this.sp = 0;
@@ -436,7 +448,7 @@ class Actor extends Costume {
         final List<StateMask> states, final Map<StateMask, int> stRes)
       : super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes) {
     this._xp = 0;
-    this.maxp = 15;
+    this._maxp = 15;
     this.active = true;
     this.range = range;
     this.guards = true;

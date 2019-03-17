@@ -77,7 +77,6 @@ class SpriteState extends State<ActorSprite> {
     this._sprFullTime = new List(5);
     this._sprTime = new List(5);
     this._prepareSpr(this._sprite, true);
-
   }
 
   String get name {
@@ -182,7 +181,6 @@ class SpriteState extends State<ActorSprite> {
     }
     final List<Actor> koActors = _koActors;
     return Image (
-      //fit: BoxFit.fill,
         image: AssetImage('assets/sprites/$_name/${crSprList == null || counter >= crSprList.length
             ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
             : crSprList[counter]}'),
@@ -288,6 +286,7 @@ class ArenaState extends State<ArenaStage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
+                    Text(""),
                     Expanded(
                         child: Center(
                           child: Stack(
@@ -485,7 +484,7 @@ class ArenaState extends State<ArenaStage> {
     this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
         || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
-    new Timer(Duration(milliseconds: 174), () {
+    new Timer(Duration(milliseconds: 435), () {
       for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
         if (trg != crt) {
           final SpriteState trgSprite = this._actorSprites[trg];
@@ -517,24 +516,25 @@ class ArenaState extends State<ArenaStage> {
         }
         if (this._sceneAct.status != 0) {
           //TODO:
-        } else if (this._automatic ||
-            players[(crt = this._sceneAct.current)].automatic != 0) {
-          this._execAI();
         } else {
-          this.activeBtn = true;
-          this.setState(() {
-            this._actionsTxt.text = "${this._actionsTxt.text}\n$ret";
-            this._scrollController.animateTo(
-                this._scrollController.position.maxScrollExtent,
-                duration: Duration(milliseconds: 178), curve: Curves.linear);
-            this._crSkills =
-                this._prepareAbilities(players[crt].availableSkills, crt);
-            final Map<int, List<Performance>> items = this._sceneAct.crItems;
-            this._crItems =
-            (items == null || items[crt] == null || items[crt].length == 0)
-                ? this.emptyAbilities : this._prepareAbilities(
-                this._sceneAct.crItems[crt], crt);
-          });
+          this._actionsTxt.text = "$ret${this._actionsTxt.text}";
+          /*this._scrollController.animateTo(
+              this._scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 178), curve: Curves.linear);*/
+          if (this._automatic || players[(crt = this._sceneAct.current)].automatic != 0) {
+            this._execAI();
+          } else {
+            this.activeBtn = true;
+            this.setState(() {
+              this._crSkills =
+                  this._prepareAbilities(players[crt].availableSkills, crt);
+              final Map<int, List<Performance>> items = this._sceneAct.crItems;
+              this._crItems =
+              (items == null || items[crt] == null || items[crt].length == 0)
+                  ? this.emptyAbilities : this._prepareAbilities(
+                  this._sceneAct.crItems[crt], crt);
+            });
+          }
         }
       });
     });

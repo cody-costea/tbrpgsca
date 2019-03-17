@@ -17,6 +17,7 @@ import 'dart:math';
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/RolePlay.dart';
 import 'package:dtbrpgsca/StateMask.dart';
+import 'package:sprintf/sprintf.dart';
 
 class Performance extends RolePlay {
   static const int DmgTypeAtk = 1;
@@ -24,6 +25,11 @@ class Performance extends RolePlay {
   static const int DmgTypeSpi = 4;
   static const int DmgTypeWis = 8;
   static const int DmgTypeAgi = 16;
+
+  static String reflectedTxt = ", reflected by %s";
+  static String suffersTxt = ", %s suffers";
+  static String stolenTxt = ", obtaining %s from %s";
+  static String missesTxt = ", but misses";
 
   bool steal, absorb, restore;
   int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg, elm; //dmgType could be used as a bitwise int, including element types;
@@ -34,7 +40,7 @@ class Performance extends RolePlay {
     final Random rnd = new Random();
     int dmg = rnd.nextInt(4);
     if (target.reflects && (this.dmgType & DmgTypeWis == DmgTypeWis)) {
-      s += ", reflected"; //TODO: reflected text;
+      s += sprintf(Performance.reflectedTxt, [target.name]);
       target = user;
     }
     final bool ko = target.hp < 1;
@@ -96,12 +102,16 @@ class Performance extends RolePlay {
         user.sp += spDmg ~/ 2;
       }
       if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
-        s += ""; //TODO: damage text;
+        s += sprintf(Performance.suffersTxt, [target.name]) + RolePlay.getDmgText(hpDmg, mpDmg, spDmg);
       }
+      String r;
       final List<StateMask> aStates = this.aStates;
       if (aStates != null) {
         for (int j = 0; j < aStates.length; j++) {
-          s += aStates[j].inflict(target, false, false);
+          r = aStates[j].inflict(target, false, false);
+          if (r.isNotEmpty) {
+            s += r;
+          }
         }
       }
       final Map<StateMask, int> trgStateMap = target.stateDur;
@@ -132,7 +142,7 @@ class Performance extends RolePlay {
           }
           usrItems[stolen] = (usrItems[stolen] ?? 0) + 1;
           trgItemMap[stolen] = trgItemQty - 1;
-          s += ""; //TODO: stolen text
+          s += sprintf(Performance.stolenTxt, [stolen.name, target.name]);
           if (trgItemMap[stolen] == 0) {
             trgItemMap.remove(stolen);
           }
@@ -141,7 +151,7 @@ class Performance extends RolePlay {
       s += target.checkStatus();
     }
     else {
-      s += ""; //TODO: miss text
+      s += Performance.missesTxt;
     }
     if (applyCosts) {
       user.hp -= this.hpC;
