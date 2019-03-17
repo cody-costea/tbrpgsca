@@ -236,6 +236,7 @@ class ArenaState extends State<ArenaStage> {
 
   List<SpriteState> _actorSprites;
 
+  Actor _crActor;
   Performance _crSkill;
   Performance _crItem;
 
@@ -286,7 +287,11 @@ class ArenaState extends State<ArenaStage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Text(""),
+                    Text(this._crActor.automatic == 0 ? "   ${this._crActor.name}: "
+                      "${this._crActor.hp}/${this._crActor.mHp} HP, "
+                      "${this._crActor.mp}/${this._crActor.mMp} MP, "
+                      "${this._crActor.sp}/${this._crActor.mSp} RP"
+                    : ""),
                     Expanded(
                         child: Center(
                           child: Stack(
@@ -327,7 +332,7 @@ class ArenaState extends State<ArenaStage> {
                                 alignment: Alignment(0, 1),
                                 child: FractionallySizedBox(
                                   widthFactor: 1,
-                                  heightFactor: 0.5,
+                                  heightFactor: 0.42,
                                   child: SingleChildScrollView(
                                     controller: this._scrollController,
                                     scrollDirection: Axis.vertical,
@@ -439,11 +444,11 @@ class ArenaState extends State<ArenaStage> {
   }
 
   void _execAI() {
-    this._afterAct("\n${this._sceneAct.executeAI("")}");
+    this._afterAct(this._sceneAct.executeAI(""));
   }
 
   void _execSkill(final Performance ability) {
-    this._afterAct("\n${this._sceneAct.executeAbility(ability, this._target, "")}");
+    this._afterAct(this._sceneAct.executeAbility(ability, this._target, ""));
   }
 
   List<DropdownMenuItem<int>> _preparePlayers(final List<Actor> players) {
@@ -476,12 +481,20 @@ class ArenaState extends State<ArenaStage> {
     return ret;
   }
 
-  void _afterAct(final String ret) {
+  void _afterAct(String ret) {
     this.activeBtn = false;
-    final List<Actor> koActors = _koActors;
-    int crt = this._sceneAct.current;
     Performance lastAbility;
-    this._actorSprites[crt].sprite = this._sceneAct.players[crt].hp > 0
+    int crt = this._sceneAct.current;
+    final List<Actor> koActors = _koActors;
+    final List<Actor> players = this._sceneAct.players;
+    final Actor crActor = players[crt];
+    final Actor trgActor = players[this._sceneAct.firstTarget];
+    if (crActor.automatic != 0 && trgActor.automatic == 0) {
+      this.setState(() {
+        this._crActor = trgActor;
+      });
+    }
+    this._actorSprites[crt].sprite = crActor.hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
         || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
     new Timer(Duration(milliseconds: 435), () {
@@ -507,8 +520,8 @@ class ArenaState extends State<ArenaStage> {
       }
       new Timer(Duration(milliseconds: _waitTime), () {
         _waitTime = 0;
-        this._sceneAct.endTurn("");
-        final List<Actor> players = this._sceneAct.players;
+        ret = this._sceneAct.endTurn(ret);
+        //final List<Actor> players = this._sceneAct.players;
         if (players[crt].hp < 1) {
           koActors.add(players[crt]);
           this._actorSprites[crt].sprite = SPR_FALLEN;
@@ -518,21 +531,16 @@ class ArenaState extends State<ArenaStage> {
           //TODO:
         } else {
           this._actionsTxt.text = "$ret${this._actionsTxt.text}";
-          /*this._scrollController.animateTo(
-              this._scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 178), curve: Curves.linear);*/
           if (this._automatic || players[(crt = this._sceneAct.current)].automatic != 0) {
             this._execAI();
           } else {
             this.activeBtn = true;
             this.setState(() {
-              this._crSkills =
-                  this._prepareAbilities(players[crt].availableSkills, crt);
+              this._crActor = players[crt];
+              this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
               final Map<int, List<Performance>> items = this._sceneAct.crItems;
-              this._crItems =
-              (items == null || items[crt] == null || items[crt].length == 0)
-                  ? this.emptyAbilities : this._prepareAbilities(
-                  this._sceneAct.crItems[crt], crt);
+              this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
+                  ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
             });
           }
         }
@@ -547,6 +555,7 @@ class ArenaState extends State<ArenaStage> {
     final SceneAct sceneAct = this._sceneAct = SceneAct(party, enemy, surprise);
     final List<Actor> players = sceneAct.players;
     final int current = sceneAct.current;
+    final Actor crActor = this._crActor = players[current];
     this._crSkills = this._prepareAbilities(players[current].availableSkills, current);
     final Map<int, List<Performance>> items = this._sceneAct.crItems;
     this._crItems = (items == null || items[current] == null || items[current].length == 0)
@@ -574,6 +583,9 @@ class ArenaState extends State<ArenaStage> {
       SpriteState(players[6], "r", true),
       SpriteState(players[7], "r", true)
     ];
+    if (crActor.automatic != 0) {
+      this._execAI();
+    }
   }
 
 }
