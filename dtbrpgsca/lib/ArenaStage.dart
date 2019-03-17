@@ -525,12 +525,11 @@ class ArenaState extends State<ArenaStage> {
         if (players[crt].hp < 1) {
           koActors.add(players[crt]);
           this._actorSprites[crt].sprite = SPR_FALLEN;
-          //TODO: text
         }
+        this._actionsTxt.text = "$ret${this._actionsTxt.text}";
         if (this._sceneAct.status != 0) {
           //TODO:
         } else {
-          this._actionsTxt.text = "$ret${this._actionsTxt.text}";
           if (this._automatic || players[(crt = this._sceneAct.current)].automatic != 0) {
             this._execAI();
           } else {

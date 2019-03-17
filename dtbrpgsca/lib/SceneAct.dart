@@ -71,141 +71,142 @@ class SceneAct {
     return this._crItems;
 }
 
-  String setNextCurrent() {
-    String ret = "";
-    int initInc;
-    int minInit = 1;
-    final Actor oldActor = this._players[this._current];
-    Actor crActor = oldActor;
-    Actor nxActor;
-    do {
-      initInc = minInit;
-      for (int i = 0; i < this._players.length; i++) {
-        nxActor = this._players[i];
-        if (nxActor.hp > 0) {
-          if (this._useInit) {
-            nxActor.init += initInc;
-            int nInit = nxActor.init;
-            final int mInit = nxActor.mInit < 1 ? this._players.length : nxActor.mInit;
-            if (nInit < mInit) {
-              nInit -= mInit;
-              if (initInc == 1) {
-                minInit = -1;
+  String endTurn(String ret) {
+    if (this._status == 0) {
+      int initInc;
+      int minInit = 1;
+      final Actor oldActor = this._players[this._current];
+      Actor crActor = oldActor;
+      crActor.active = false;
+      if (this._useInit) {
+        crActor.init = 0;
+      }
+      ret += crActor.applyStates(true);
+      Actor nxActor;
+      do {
+        bool noParty = true;
+        bool noEnemy = true;
+        initInc = minInit;
+        for (int i = 0; i < this._players.length; i++) {
+          nxActor = this._players[i];
+          if (nxActor.hp > 0) {
+            if (i < this._enIdx) {
+              if (noParty) {
+                noParty = false;
               }
-              if (nxActor != crActor) {
-                final int cInit = crActor.init - (crActor.mInit < 1 ? this._players.length : crActor.mInit);
-                if (cInit < nInit || (cInit == nInit && nxActor.agi > crActor.agi)) {
-                  nxActor.active = true;
-                  nxActor.applyStates(false);
-                  if (nxActor.active) {
-                    this._current = i;
-                    crActor = nxActor;
-                  } else {
-                    nxActor.init = 0;
-                    if (ret.length > 0) {
-                      ret += "\n";
+            } else {
+              if (noEnemy) {
+                noEnemy = false;
+              }
+            }
+            if (this._useInit) {
+              nxActor.init += initInc;
+              int nInit = nxActor.init;
+              final int mInit = nxActor.mInit < 1
+                  ? this._players.length
+                  : nxActor.mInit;
+              if (nInit < mInit) {
+                nInit -= mInit;
+                if (initInc == 1) {
+                  minInit = -1;
+                }
+                if (nxActor != crActor) {
+                  final int cInit = crActor.init -
+                      (crActor.mInit < 1 ? this._players.length : crActor.mInit);
+                  if (cInit < nInit ||
+                      (cInit == nInit && nxActor.agi > crActor.agi)) {
+                    nxActor.active = true;
+                    nxActor.applyStates(false);
+                    if (nxActor.active) {
+                      this._current = i;
+                      crActor = nxActor;
+                    } else {
+                      nxActor.init = 0;
+                      if (ret.length > 0) {
+                        ret += "\n";
+                      }
+                      ret += nxActor.applyStates(true);
                     }
-                    ret += nxActor.applyStates(true);
                   }
                 }
               }
-            }
-            if (minInit > 0 && minInit > mInit) {
-              minInit = mInit;
-            }
-          } else if (crActor != nxActor) {
-            if (minInit != 1) {
-              nxActor.active = true;
-            }
-            if (nxActor.active && (!crActor.active || nxActor.agi > crActor.agi)) {
-              nxActor.applyStates(false);
-              if (nxActor.active) {
-                if (initInc > 0) {
-                  initInc = 0;
+              if (minInit > 0 && minInit > mInit) {
+                minInit = mInit;
+              }
+            } else if (crActor != nxActor) {
+              if (minInit != 1) {
+                nxActor.active = true;
+              }
+              if (nxActor.active && (!crActor.active || nxActor.agi > crActor.agi)) {
+                nxActor.applyStates(false);
+                if (nxActor.active) {
+                  if (initInc > 0) {
+                    initInc = 0;
+                  }
+                  crActor = nxActor;
+                  this._current = i;
+                } else {
+                  if (ret.length > 0) {
+                    ret += "\n";
+                  }
+                  ret += nxActor.applyStates(true);
                 }
-                crActor = nxActor;
-                this._current = i;
-              } else {
-                if (ret.length > 0) {
-                  ret += "\n";
-                }
-                ret += nxActor.applyStates(true);
               }
             }
           }
         }
-      }
-      if (minInit != 0 && !this._useInit) {
-        minInit = 0;
-      }
-    } while (initInc == 1 && minInit > -1);
-    if (oldActor == crActor) {
-      oldActor.active = true;
-      oldActor.applyStates(false);
-      if (!oldActor.active) {
-        return ret + this.setNextCurrent();
-      }
-    } else {
-      if (crActor.automatic == 0) {
-        final Map<Performance, int> crItems = crActor.items;
-        if (crItems != null) {
-          Map<int, List<Performance>> crItemsMap = this._crItems;
-          if (crItemsMap == null) {
-            crItemsMap = new Map();
-            this._crItems = crItemsMap;
-          }
-          crItemsMap[this._current] = crItems.keys.toList();
-        }
-      }
-    }
-    final Map<Performance, int> regSkills = crActor.skillsQtyRgTurn;
-    if (regSkills != null) {
-      for (Performance skill in regSkills.keys) {
-        final Map<Performance, int> skillsQty = crActor.skillsQty;
-        if (skillsQty != null && (skillsQty[skill] ?? skill.mQty) < skill.mQty) {
-          if (regSkills[skill] == skill.rQty) {
-            skillsQty[skill] = (skillsQty[skill] ?? 0) + 1;
-            regSkills[skill] = 0;
-          } else {
-            regSkills[skill] = (regSkills[skill] ?? 0) + 1;
-          }
-        }
-      }
-    }
-    return ret;
-  }
-
-  String endTurn(String ret) {
-    if (this._status == 0) {
-      Actor crActor = this._players[this._current];
-      crActor.active = false;
-      do {
-        if (this._useInit) {
-          crActor.init = 0;
-        }
-        ret += crActor.applyStates(true);
-        ret += this.setNextCurrent();
-        int i = 0;
-        bool noParty = true;
-        bool noEnemy = true;
-        while (i < this._players.length) {
-          if (this._players[i].hp > 0) {
-            if (i < this._enIdx) {
-              noParty = false;
-              i = this._enIdx - 1;
-            } else {
-              noEnemy = false;
-              break;
-            }
-          }
-          i++;
-        }
         if (noParty) {
           this._status = -2;
+          if (ret.length > 0) {
+            ret += "\n";
+          }
+          ret += SceneAct.fallenTxt;
+          return ret;
         } else if (noEnemy) {
           this._status = 1;
+          if (ret.length > 0) {
+            ret += "\n";
+          }
+          ret += SceneAct.victoryTxt;
+          return ret;
+        } else if (minInit != 0 && !this._useInit) {
+          minInit = 0;
         }
-      } while (this._status == 0 && !(crActor = this._players[this._current]).active);
+      } while (initInc == 1 && minInit > -1);
+      if (oldActor == crActor) {
+        oldActor.active = true;
+        oldActor.applyStates(false);
+        if (!oldActor.active) {
+          return this.endTurn(ret);
+        }
+      } else {
+        if (crActor.automatic == 0) {
+          final Map<Performance, int> crItems = crActor.items;
+          if (crItems != null) {
+            Map<int, List<Performance>> crItemsMap = this._crItems;
+            if (crItemsMap == null) {
+              crItemsMap = new Map();
+              this._crItems = crItemsMap;
+            }
+            crItemsMap[this._current] = crItems.keys.toList();
+          }
+        }
+      }
+      final Map<Performance, int> regSkills = crActor.skillsQtyRgTurn;
+      if (regSkills != null) {
+        for (Performance skill in regSkills.keys) {
+          final Map<Performance, int> skillsQty = crActor.skillsQty;
+          if (skillsQty != null &&
+              (skillsQty[skill] ?? skill.mQty) < skill.mQty) {
+            if (regSkills[skill] == skill.rQty) {
+              skillsQty[skill] = (skillsQty[skill] ?? 0) + 1;
+              regSkills[skill] = 0;
+            } else {
+              regSkills[skill] = (regSkills[skill] ?? 0) + 1;
+            }
+          }
+        }
+      }
     }
     return ret;
   }
@@ -399,7 +400,8 @@ class SceneAct {
   }
 
   String escape() {
-    return '';
+    this._status = -1;
+    return SceneAct.escapeTxt;
   }
 
   SceneAct(final List<Actor> party, final List<Actor> enemy, final int surprise) {
@@ -425,6 +427,7 @@ class SceneAct {
       }
     }
     this._useInit = useInit;
-    this.setNextCurrent();
+    this.endTurn("");
   }
+
 }
