@@ -149,6 +149,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             this.players[oldCr].actions = this.players[oldCr].mActions
             this.players[oldCr].applyStates(false)
             if (this.players[this.current].actions < 1) {
+                ret += this.players[this.current].applyStates(true)
                 return ret + this.setNextCurrent()
             }
         }
@@ -160,6 +161,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 }
             }
         }
+        //TODO: analyze if recoverableSkills should be moved before oldCrr == this.current if;
         val recoverableSkills = this.players[this.current].skillsQtyRgTurn
         if (recoverableSkills !== null) {
             for (skill in recoverableSkills.keys) {
