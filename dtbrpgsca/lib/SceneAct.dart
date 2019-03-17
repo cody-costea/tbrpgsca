@@ -123,9 +123,9 @@ class SceneAct {
                     } else {
                       nxActor.init = 0;
                       if (ret.length > 0) {
-                        ret += "\n";
+                        ret = "\n" + ret;
                       }
-                      ret += nxActor.applyStates(true);
+                      ret = nxActor.applyStates(true) + ret;
                     }
                   }
                 }
@@ -147,9 +147,9 @@ class SceneAct {
                   this._current = i;
                 } else {
                   if (ret.length > 0) {
-                    ret += "\n";
+                    ret = "\n" + ret;
                   }
-                  ret += nxActor.applyStates(true);
+                  ret = nxActor.applyStates(true) + ret;
                 }
               }
             }
@@ -157,17 +157,11 @@ class SceneAct {
         }
         if (noParty) {
           this._status = -2;
-          if (ret.length > 0) {
-            ret += "\n";
-          }
-          ret += SceneAct.fallenTxt;
+          ret = SceneAct.fallenTxt + ret;
           return ret;
         } else if (noEnemy) {
           this._status = 1;
-          if (ret.length > 0) {
-            ret += "\n";
-          }
-          ret += SceneAct.victoryTxt;
+          ret = SceneAct.victoryTxt + ret;
           return ret;
         } else if (minInit != 0 && !this._useInit) {
           minInit = 0;

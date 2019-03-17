@@ -448,7 +448,9 @@ class ArenaState extends State<ArenaStage> {
   }
 
   void _execSkill(final Performance ability) {
-    this._afterAct(this._sceneAct.executeAbility(ability, this._target, ""));
+    if (ability != null) {
+      this._afterAct(this._sceneAct.executeAbility(ability, this._target, ""));
+    }
   }
 
   List<DropdownMenuItem<int>> _preparePlayers(final List<Actor> players) {
@@ -457,7 +459,7 @@ class ArenaState extends State<ArenaStage> {
       for (int i = 0; i < players.length; i++) {
         ret.add(new DropdownMenuItem(
             value: i,
-            child: Text(players[i].name)
+            child: Text(" ${players[i].name}")
           )
         );
       }
@@ -482,7 +484,14 @@ class ArenaState extends State<ArenaStage> {
   }
 
   void _afterAct(String ret) {
-    this.activeBtn = false;
+    final List<DropdownMenuItem<Performance>> emptyAbilities = this.emptyAbilities;
+    this.setState(() {
+      this._activeBtn = false;
+      this._crSkills = emptyAbilities;
+      this._crItems = emptyAbilities;
+      this._crSkill = emptyAbilities[0].value;
+      this._crItem = emptyAbilities[0].value;
+    });
     Performance lastAbility;
     int crt = this._sceneAct.current;
     final List<Actor> koActors = _koActors;
@@ -536,7 +545,9 @@ class ArenaState extends State<ArenaStage> {
             this.activeBtn = true;
             this.setState(() {
               this._crActor = players[crt];
+              final List<Performance> skills = players[crt].availableSkills;
               this._crSkills = this._prepareAbilities(players[crt].availableSkills, crt);
+              this._crSkill = skills[0];
               final Map<int, List<Performance>> items = this._sceneAct.crItems;
               this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
                   ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
