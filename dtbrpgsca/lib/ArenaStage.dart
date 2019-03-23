@@ -529,7 +529,7 @@ class ArenaState extends State<ArenaStage> {
       }
       new Timer(Duration(milliseconds: _waitTime), () {
         _waitTime = 0;
-        ret = this._sceneAct.endTurn(ret);
+        ret = this._sceneAct.setNext(ret, true);
         //final List<Actor> players = this._sceneAct.players;
         if (players[crt].hp < 1) {
           koActors.add(players[crt]);

@@ -71,17 +71,20 @@ class SceneAct {
     return this._crItems;
 }
 
-  String endTurn(String ret) {
+  String setNext(String ret, final bool endTurn) {
     if (this._status == 0) {
       int initInc;
       int minInit = 1;
+      final bool useInit = this._useInit;
       final Actor oldActor = this._players[this._current];
       Actor crActor = oldActor;
-      crActor.active = false;
-      if (this._useInit) {
-        crActor.init = 0;
+      if (endTurn) {
+        crActor.active = false;
+        if (useInit) {
+          crActor.init = 0;
+        }
+        ret += crActor.applyStates(true);
       }
-      ret += crActor.applyStates(true);
       Actor nxActor;
       do {
         bool noParty = true;
@@ -99,7 +102,7 @@ class SceneAct {
                 noEnemy = false;
               }
             }
-            if (this._useInit) {
+            if (useInit) {
               nxActor.init += initInc;
               int nInit = nxActor.init;
               final int mInit = nxActor.mInit < 1
@@ -133,11 +136,11 @@ class SceneAct {
               if (minInit > 0 && minInit > mInit) {
                 minInit = mInit;
               }
-            } else if (crActor != nxActor) {
+            } else {
               if (minInit != 1) {
                 nxActor.active = true;
               }
-              if (nxActor.active && (!crActor.active || nxActor.agi > crActor.agi)) {
+              if (crActor != nxActor && nxActor.active && (!crActor.active || nxActor.agi > crActor.agi)) {
                 nxActor.applyStates(false);
                 if (nxActor.active) {
                   if (initInc > 0) {
@@ -163,15 +166,15 @@ class SceneAct {
           this._status = 1;
           ret = SceneAct.victoryTxt + ret;
           return ret;
-        } else if (minInit != 0 && !this._useInit) {
+        } else if (minInit != 0 && !useInit) {
           minInit = 0;
         }
       } while (initInc == 1 && minInit > -1);
       if (oldActor == crActor) {
-        oldActor.active = true;
+        //oldActor.active = true;
         oldActor.applyStates(false);
         if (!oldActor.active) {
-          return this.endTurn(ret);
+          return this.setNext(ret, true);
         }
       } else {
         if (crActor.automatic == 0) {
@@ -421,7 +424,7 @@ class SceneAct {
       }
     }
     this._useInit = useInit;
-    this.endTurn("");
+    this.setNext("", false);
   }
 
 }
