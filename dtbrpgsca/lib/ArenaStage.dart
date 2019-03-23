@@ -60,6 +60,8 @@ class SpriteState extends State<ActorSprite> {
 
   int _counter = 0;
 
+  Function _onClick;
+
   set actor(final Actor value) {
     this._player = value;
     this.name = value.job.name.toLowerCase();
@@ -180,13 +182,16 @@ class SpriteState extends State<ActorSprite> {
       });
     }
     final List<Actor> koActors = _koActors;
-    return Image (
+    return GestureDetector(
+      onTap: _onClick,
+      child: Image(
         image: AssetImage('assets/sprites/$_name/${crSprList == null || counter >= crSprList.length
             ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
             : crSprList[counter]}'),
         gaplessPlayback: true,
         width: 128,
         height: 128
+      )
     );
   }
 
@@ -196,7 +201,7 @@ class SpriteState extends State<ActorSprite> {
 
   }
 
-  SpriteState(final Actor actor, final String pos, final bool aot) {
+  SpriteState(final Actor actor, final String pos, final bool aot, final Function onClick) {
     if (actor == null || pos == null) {
       throw Exception("Null parameters cannot be accepted.");
     }
@@ -213,6 +218,7 @@ class SpriteState extends State<ActorSprite> {
       this._prepareSpr(SPR_ACT, false);
       this._prepareSpr(SPR_CAST, false);
     }
+    this._onClick = onClick;
   }
 }
 
@@ -558,6 +564,18 @@ class ArenaState extends State<ArenaStage> {
     });
   }
 
+  Function _getOnClick(final int trgIndex) {
+    return () {
+      if (this._target == trgIndex) {
+        this._execSkill(this._crSkill);
+      } else {
+        this.setState(() {
+          this._target = trgIndex;
+        });
+      }
+    };
+  }
+
   ArenaState(final List<Actor> party, final List<Actor> enemy, final int surprise) {
     for (int i = 0; i < enemy.length; i++) {
       enemy[i].automatic = 2;
@@ -575,23 +593,23 @@ class ArenaState extends State<ArenaStage> {
     this._players = this._preparePlayers(players);
     _koActors = new List()..length = players.length;
     this._actorSprites = surprise < 0 ? [
-      SpriteState(players[4], "l", true),
-      SpriteState(players[5], "l", true),
-      SpriteState(players[6], "l", true),
-      SpriteState(players[7], "l", true),
-      SpriteState(players[0], "r", true),
-      SpriteState(players[1], "r", true),
-      SpriteState(players[2], "r", true),
-      SpriteState(players[3], "r", true)
+      SpriteState(players[4], "l", true, this._getOnClick(4)),
+      SpriteState(players[5], "l", true, this._getOnClick(5)),
+      SpriteState(players[6], "l", true, this._getOnClick(6)),
+      SpriteState(players[7], "l", true, this._getOnClick(7)),
+      SpriteState(players[0], "r", true, this._getOnClick(0)),
+      SpriteState(players[1], "r", true, this._getOnClick(1)),
+      SpriteState(players[2], "r", true, this._getOnClick(2)),
+      SpriteState(players[3], "r", true, this._getOnClick(3))
     ] : [
-      SpriteState(players[0], "l", true),
-      SpriteState(players[1], "l", true),
-      SpriteState(players[2], "l", true),
-      SpriteState(players[3], "l", true),
-      SpriteState(players[4], "r", true),
-      SpriteState(players[5], "r", true),
-      SpriteState(players[6], "r", true),
-      SpriteState(players[7], "r", true)
+      SpriteState(players[0], "l", true, this._getOnClick(0)),
+      SpriteState(players[1], "l", true, this._getOnClick(1)),
+      SpriteState(players[2], "l", true, this._getOnClick(2)),
+      SpriteState(players[3], "l", true, this._getOnClick(3)),
+      SpriteState(players[4], "r", true, this._getOnClick(4)),
+      SpriteState(players[5], "r", true, this._getOnClick(5)),
+      SpriteState(players[6], "r", true, this._getOnClick(6)),
+      SpriteState(players[7], "r", true, this._getOnClick(7))
     ];
     if (crActor.automatic != 0) {
       this._execAI();
