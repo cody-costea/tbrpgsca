@@ -557,11 +557,20 @@ class ArenaState extends State<ArenaStage> {
               final Map<int, List<Performance>> items = this._sceneAct.crItems;
               this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
                   ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[crt], crt);
+              this._setCrAutoSkill();
             });
           }
         }
       });
     });
+  }
+
+  void _setCrAutoSkill() {
+    final int target = this._target;
+    final SceneAct sceneAct = this._sceneAct;
+    final bool onPartySide = target < sceneAct.enemyIndex;
+    this._crSkill = this._crActor.availableSkills[sceneAct.getAIskill(onPartySide ? 1 : 0,
+        onPartySide && sceneAct.players[target].hp < 1)];
   }
 
   Function _getOnClick(final int trgIndex) {
@@ -571,6 +580,7 @@ class ArenaState extends State<ArenaStage> {
       } else {
         this.setState(() {
           this._target = trgIndex;
+          this._setCrAutoSkill();
         });
       }
     };
@@ -613,6 +623,8 @@ class ArenaState extends State<ArenaStage> {
     ];
     if (crActor.automatic != 0) {
       this._execAI();
+    } else {
+      this._setCrAutoSkill();
     }
   }
 
