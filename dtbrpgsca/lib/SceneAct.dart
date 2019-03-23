@@ -116,8 +116,7 @@ class SceneAct {
                 if (nxActor != crActor) {
                   final int cInit = crActor.init -
                       (crActor.mInit < 1 ? this._players.length : crActor.mInit);
-                  if (cInit < nInit ||
-                      (cInit == nInit && nxActor.agi > crActor.agi)) {
+                  if (cInit < nInit || (cInit == nInit && nxActor.agi > crActor.agi)) {
                     nxActor.active = true;
                     nxActor.applyStates(false);
                     if (nxActor.active) {
@@ -171,7 +170,9 @@ class SceneAct {
         }
       } while (initInc == 1 && minInit > -1);
       if (oldActor == crActor) {
-        //oldActor.active = true;
+        if (useInit) {
+          oldActor.active = true;
+        }
         oldActor.applyStates(false);
         if (!oldActor.active) {
           return this.setNext(ret, true);
