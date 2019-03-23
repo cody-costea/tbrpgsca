@@ -116,7 +116,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                 AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3, maxLv = 3, mInit = 8, states = arrayOf(state[0]))
         )
         characters[3].items = (mutableMapOf(item[0] to 2, item[2] to 2)) as LinkedHashMap<Ability, Int>
-        characters[4].items =  (mutableMapOf(item[1] to 2, item[5] to 1)) as LinkedHashMap<Ability, Int>
+        characters[4].items = (mutableMapOf(item[1] to 2, item[5] to 1)) as LinkedHashMap<Ability, Int>
         characters[5].items = (mutableMapOf(item[3] to 2, item[7] to 1)) as LinkedHashMap<Ability, Int>
         characters[6].items = (mutableMapOf(item[4] to 1, item[8] to 1)) as LinkedHashMap<Ability, Int>
 

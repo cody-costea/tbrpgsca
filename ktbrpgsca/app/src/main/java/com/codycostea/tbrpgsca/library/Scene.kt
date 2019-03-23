@@ -121,11 +121,13 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                             minInit = mInit
                         }
                     }
-                    else if (this.current != i) {
+                    else {
                         if (minInit != 1) {
                             this.players[i].actions = this.players[i].mActions
                         }
-                        if (this.players[i].actions > 0 && (this.players[this.current].actions < 1 || this.players[i].agi > this.players[this.current].agi)) {
+                        if (this.current != i && this.players[i].actions > 0
+                                && (this.players[this.current].actions < 1
+                                        || this.players[i].agi > this.players[this.current].agi)) {
                             this.players[i].applyStates(false)
                             if (this.players[i].actions > 0) {
                                 if (initInc > 0) initInc = 0
@@ -146,7 +148,9 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
         } while (initInc == 1 && minInit > -1)
         if (oldCr == this.current) {
-            this.players[oldCr].actions = this.players[oldCr].mActions
+            if (this.useInit) {
+                this.players[oldCr].actions = this.players[oldCr].mActions
+            }
             this.players[oldCr].applyStates(false)
             if (this.players[this.current].actions < 1) {
                 ret += this.players[this.current].applyStates(true)
