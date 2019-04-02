@@ -595,7 +595,7 @@ class ArenaState extends State<ArenaStage> {
           final SpriteState trgSprite = this._actorSprites[trg];
           final Actor trgActor = trgSprite.actor;
           final bool ko = koActors.contains(trgActor);
-          trgSprite.skillSprite = lastAbility.name.toLowerCase();
+          //trgSprite.skillSprite = lastAbility.name.toLowerCase();
           if (trgActor.hp > 0) {
             if (ko) {
               trgSprite.sprite = SPR_RISEN;
