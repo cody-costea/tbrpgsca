@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +29,12 @@ const int SPR_ACT = 3;
 const int SPR_CAST = 4;
 
 List<Actor> _koActors;
+
+Map<String, List<int>> _skillSprTime = new Map();
+Map<String, List<String>> _skillSprFiles = new Map();
+Map<String, int> _skillSprFullTime = new Map();
+
+final MemoryImage emptyImage = new MemoryImage(new Uint8List(0));
 
 int _waitTime = 0;
 
@@ -55,10 +62,13 @@ class SpriteState extends State<ActorSprite> {
   List<List<String>> _sprFiles;
   List<int> _sprFullTime;
 
+  String _skillName;
+
   String _idleSpr;
   String _koSpr;
 
   int _counter = 0;
+  int _skillCnt = 0;
 
   Function _onClick;
 
@@ -108,6 +118,16 @@ class SpriteState extends State<ActorSprite> {
     return this._pos;
   }
 
+  String get skillSprite {
+    return this._skillName;
+  }
+
+  set skillSprite(final String value) {
+    this._skillName = value;
+    this._skillCnt = 0;
+    this._prepareSkillSpr(value, false);
+  }
+
   String get idleSpr {
     String idleSpr = this._idleSpr;
     if (idleSpr == null) {
@@ -128,6 +148,10 @@ class SpriteState extends State<ActorSprite> {
 
   Future<String> _readSprInfo(final int spr) async {
     return await rootBundle.loadString('assets/sprites/$_name/spr_${_pos}_$spr.txt');
+  }
+
+  Future<String> _readSkillSprInfo(final String spr) async {
+    return await rootBundle.loadString('assets/sprites/skills/$spr/spr.txt');
   }
 
   void _prepareSpr(final int crSprite, final bool play) {
@@ -159,38 +183,91 @@ class SpriteState extends State<ActorSprite> {
     }
   }
 
+  void _prepareSkillSpr(final String crSkillSpr, final bool play) {
+    if (crSkillSpr != null && _skillSprFiles[crSkillSpr] == null) {
+      this._readSkillSprInfo(crSkillSpr).then((sprInfo) {
+        final List<String> sprites = sprInfo.split("\\");
+        _skillSprTime[crSkillSpr] = new List();
+        _skillSprFiles[crSkillSpr] = new List();
+        int sprFullTime = 0;
+        int sprTime;
+        for (int i = 0; i < sprites.length; i++) {
+          final List<String> sprLine = sprites[i].split(":");
+          _skillSprFiles[crSkillSpr].add(sprLine[0]);
+          try {
+            sprTime = sprLine.length > 1 ? int.parse(sprLine[1]) : 87;
+          } catch (_) {
+            sprTime = 87;
+          }
+          _skillSprTime[crSkillSpr].add(sprTime);
+          sprFullTime += sprTime;
+        }
+        _skillSprFullTime[crSkillSpr] = sprFullTime;
+        if (play) {
+          this._playSpr();
+        }
+      });
+    } else if (play) {
+      this._playSpr();
+    }
+  }
+
   void _playSpr() {
-    final int sprFullTime = this._sprFullTime[this._sprite];
+    final int actorSpr = this._sprite;
+    final String skillSpr = this._skillName;
+    final int actorWait = actorSpr == null ? 0 : this._sprFullTime[actorSpr];
+    final int skillWait = skillSpr == null ? 0 : _skillSprFullTime[skillSpr];
+    final int sprFullTime = actorWait > skillWait ? actorWait : skillWait;
     if (sprFullTime > _waitTime) {
       _waitTime = sprFullTime;
     }
     this.setState(() {
       this._counter = 0;
+      //this._skillCnt = 0;
+      // this._skillCnt++;
     });
   }
 
   @override
   Widget build(final BuildContext context) {
-    List<String> crSprList;
-    final int counter = this._counter;
+    final int actorCnt = this._counter;
+    final int skillCnt = this._skillCnt;
     final int crSprite = this._sprite;
-    if (crSprite != null && (crSprList = this._sprFiles[crSprite]) != null && counter < crSprList.length) {
-      new Timer(Duration(milliseconds: this._sprTime[crSprite][counter]), () {
+    final String crSkillSpr = this._skillName;
+    final List<String> crSprList = crSprite == null ? null : this._sprFiles[crSprite];
+    final List<String> crSkSprList = crSkillSpr == null ? null : _skillSprFiles[crSkillSpr];
+    final int actorWait = crSprList != null && actorCnt < crSprList.length ? this._sprTime[crSprite][actorCnt] : 0;
+    final int skillWait = crSkSprList != null && skillCnt < crSkSprList.length ? _skillSprTime[crSkillSpr][skillCnt] : 0;
+    final int waitTime = actorWait > skillWait ? actorWait : skillWait;
+    if (waitTime > 0) {
+      new Timer(Duration(milliseconds: waitTime), () {
         this.setState(() {
           this._counter++;
+          this._skillCnt++;
         });
       });
     }
     final List<Actor> koActors = _koActors;
     return GestureDetector(
-      onTap: _onClick,
-      child: Image(
-        image: AssetImage('assets/sprites/$_name/${crSprList == null || counter >= crSprList.length
-            ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
-            : crSprList[counter]}'),
-        gaplessPlayback: true,
-        width: 128,
-        height: 128
+      onTap: this._onClick,
+      child: Stack(
+        children: <Widget>[
+          Image(
+              image: AssetImage('assets/sprites/$_name/${actorWait == 0
+                  ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
+                  : crSprList[actorCnt]}'),
+              gaplessPlayback: true,
+              width: 128,
+              height: 128
+          ),
+          Image(
+            image: skillWait == 0 ? emptyImage
+                : AssetImage('assets/sprites/skills/$_skillName/${crSkSprList[skillCnt]}'),
+            gaplessPlayback: true,
+            width: 128,
+            height: 128
+          )
+        ],
       )
     );
   }
@@ -338,7 +415,7 @@ class ArenaState extends State<ArenaStage> {
                                 alignment: Alignment(0, 1),
                                 child: FractionallySizedBox(
                                   widthFactor: 1,
-                                  heightFactor: 0.42,
+                                  heightFactor: 0.31,
                                   child: SingleChildScrollView(
                                     controller: this._scrollController,
                                     scrollDirection: Axis.vertical,
@@ -518,6 +595,7 @@ class ArenaState extends State<ArenaStage> {
           final SpriteState trgSprite = this._actorSprites[trg];
           final Actor trgActor = trgSprite.actor;
           final bool ko = koActors.contains(trgActor);
+          trgSprite.skillSprite = lastAbility.name.toLowerCase();
           if (trgActor.hp > 0) {
             if (ko) {
               trgSprite.sprite = SPR_RISEN;
