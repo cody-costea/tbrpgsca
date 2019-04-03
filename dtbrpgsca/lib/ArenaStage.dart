@@ -14,15 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/SceneAct.dart';
 import 'package:dtbrpgsca/Performance.dart';
 
-const int FRAME_TIME = 87;
+const int FRAME_TIME = 71;//87;
 
 const int SPR_HIT = 0;
 const int SPR_FALLEN = 1;
@@ -35,8 +33,6 @@ List<Actor> _koActors;
 Map<String, List<int>> _skillSprTime = new Map();
 Map<String, List<String>> _skillSprFiles = new Map();
 Map<String, int> _skillSprFullTime = new Map();
-
-final MemoryImage emptyImage = new MemoryImage(new Uint8List(0));
 
 int _waitTime = 0;
 
@@ -127,7 +123,6 @@ class SpriteState extends State<ActorSprite> {
   set skillSprite(final String value) {
     this._skillName = value;
     this._skillCnt = 0;
-    this._prepareSkillSpr(value, false);
   }
 
   String get idleSpr {
@@ -149,11 +144,11 @@ class SpriteState extends State<ActorSprite> {
   }
 
   Future<String> _readSprInfo(final int spr) async {
-    return await rootBundle.loadString('assets/sprites/$_name/spr_${_pos}_$spr.txt');
+    return await rootBundle.loadString('assets/sprites/actors/$_name/spr_${_pos}_$spr.txt');
   }
 
   Future<String> _readSkillSprInfo(final String spr) async {
-    return await rootBundle.loadString('assets/sprites/skills/$spr/spr.txt');
+    return await rootBundle.loadString('assets/sprites/abilities/$spr/spr.txt');
   }
 
   void _prepareSpr(final int crSprite, final bool play) {
@@ -179,12 +174,10 @@ class SpriteState extends State<ActorSprite> {
           sprFullTime += sprTime;
         }
         this._sprFullTime[crSprite] = sprFullTime;
-        if (play) {
-          this._playSpr();
-        }
+        this._prepareSkillSpr(this._skillName, play);
       });
-    } else if (play) {
-      this._playSpr();
+    } else {
+      this._prepareSkillSpr(this._skillName, play);
     }
   }
 
@@ -201,6 +194,9 @@ class SpriteState extends State<ActorSprite> {
           _skillSprFiles[crSkillSpr].add(sprLine[0]);
           try {
             sprTime = sprLine.length > 1 ? int.parse(sprLine[1]) : FRAME_TIME;
+            if (sprTime < 10) {
+              sprTime *= FRAME_TIME;
+            }
           } catch (_) {
             sprTime = FRAME_TIME;
           }
@@ -262,16 +258,15 @@ class SpriteState extends State<ActorSprite> {
       child: Stack(
         children: <Widget>[
           Image(
-              image: AssetImage('assets/sprites/$_name/${actorWait == 0
+              image: AssetImage('assets/sprites/actors/$_name/${actorWait == 0
                   ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
                   : crSprList[actorCnt]}'),
               gaplessPlayback: true,
               width: 128,
               height: 128
           ),
-          Image(
-            image: skillWait == 0 ? emptyImage
-                : AssetImage('assets/sprites/skills/$_skillName/${crSkSprList[skillCnt]}'),
+          skillWait == 0 ? SizedBox() : Image(
+            image:  AssetImage('assets/sprites/abilities/$_skillName/${crSkSprList[skillCnt]}'),
             gaplessPlayback: true,
             width: 128,
             height: 128
@@ -399,11 +394,11 @@ class ArenaState extends State<ArenaStage> {
                                 child: FractionallySizedBox(
                                   widthFactor: 1,
                                   heightFactor: 0.69,
-                                  child: Image(
-                                    image: this._arenaImg == null || this._arenaImg.length == 0 ? emptyImage
-                                        : AssetImage('assets/sprites/arena/$_arenaImg}'),
-                                    gaplessPlayback: true,
+                                  child: this._arenaImg == null || this._arenaImg.length == 0 ? SizedBox() : Image(
+                                    image: AssetImage('assets/sprites/arena/$_arenaImg'),
                                     fit: BoxFit.fill,
+                                    height: null,
+                                    width: null
                                   )
                                 )
                               ),
@@ -642,7 +637,6 @@ class ArenaState extends State<ArenaStage> {
       new Timer(Duration(milliseconds: _waitTime), () {
         _waitTime = 0;
         ret = this._sceneAct.setNext(ret, true);
-        //final List<Actor> players = this._sceneAct.players;
         if (players[crt].hp < 1) {
           koActors.add(players[crt]);
           this._actorSprites[crt].sprite = SPR_FALLEN;

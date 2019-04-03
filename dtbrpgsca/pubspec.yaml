@@ -7,7 +7,7 @@ description: Turn-Based RPG Simple Combat Arena
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 0.6.2
+version: 0.6.3
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -41,23 +41,26 @@ flutter:
   assets:
    - assets/
    - assets/sprites/
-   - assets/sprites/hero/
-   - assets/sprites/crusader/
-   - assets/sprites/hesychast/
-   - assets/sprites/valkyrie/
-   - assets/sprites/sorceress/
-   - assets/sprites/alchemist/
-   - assets/sprites/knight/
-   - assets/sprites/dragoon/
-   - assets/sprites/berserker/
-   - assets/sprites/wizard/
-   - assets/sprites/spy/
-   - assets/sprites/ninja/
-   - assets/sprites/reaver/
-   - assets/sprites/shaman/
-   - assets/sprites/druid/
-   - assets/sprites/ranger/
-   - assets/sprites/corsair/
+   - assets/sprites/arena/
+   - assets/sprites/abilities/
+   - assets/sprites/actors/
+   - assets/sprites/actors/hero/
+   - assets/sprites/actors/crusader/
+   - assets/sprites/actors/hesychast/
+   - assets/sprites/actors/valkyrie/
+   - assets/sprites/actors/sorceress/
+   - assets/sprites/actors/alchemist/
+   - assets/sprites/actors/knight/
+   - assets/sprites/actors/dragoon/
+   - assets/sprites/actors/berserker/
+   - assets/sprites/actors/wizard/
+   - assets/sprites/actors/spy/
+   - assets/sprites/actors/ninja/
+   - assets/sprites/actors/reaver/
+   - assets/sprites/actors/shaman/
+   - assets/sprites/actors/druid/
+   - assets/sprites/actors/ranger/
+   - assets/sprites/actors/corsair/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
