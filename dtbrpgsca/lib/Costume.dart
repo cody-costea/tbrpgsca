@@ -26,7 +26,7 @@ class Costume extends RolePlay {
   Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp, final int atk,
           final int def, final int spi, final int wis, final int agi, final int mInit, final bool range, final Map<int, int> res,
           final List<Performance> skills, final List<StateMask> states, final Map<StateMask, int> stRes)
-      : super(id, name, hp, mp, sp, mInit, range, states) {
+      : super(id, name, sprite, hp, mp, sp, mInit, range, states) {
     this.atk = atk;
     this.def = def;
     this.spi = spi;

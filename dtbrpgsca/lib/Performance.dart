@@ -31,6 +31,7 @@ class Performance extends RolePlay {
   static String stolenTxt = ", obtaining %s from %s";
   static String missesTxt = ", but misses";
 
+  String sound;
   bool steal, absorb, restore;
   int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg, elm; //dmgType could be used as a bitwise int, including element types;
   List<StateMask> rStates;
@@ -194,7 +195,8 @@ class Performance extends RolePlay {
               final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final int elm,
               final int mQty, final int rQty, final bool absorb, final bool restoreKO, final List<StateMask> aStates,
               final List<StateMask> rStates)
-      : super(id, name, hpDmg, mpDmg, spDmg, atkI, range, aStates) {
+      : super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates) {
+    this.sound = sound;
     this.steal = steal;
     this.lvRq = lvRq;
     this.hpC = hpC;

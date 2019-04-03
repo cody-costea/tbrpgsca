@@ -22,6 +22,8 @@ import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/SceneAct.dart';
 import 'package:dtbrpgsca/Performance.dart';
 
+const int FRAME_TIME = 87;
+
 const int SPR_HIT = 0;
 const int SPR_FALLEN = 1;
 const int SPR_RISEN = 2;
@@ -74,7 +76,7 @@ class SpriteState extends State<ActorSprite> {
 
   set actor(final Actor value) {
     this._player = value;
-    this.name = value.job.name.toLowerCase();
+    this.name = value.job.sprite;
   }
 
   Actor get actor {
@@ -166,9 +168,12 @@ class SpriteState extends State<ActorSprite> {
           final List<String> sprLine = sprites[i].split(":");
           this._sprFiles[crSprite].add(sprLine[0]);
           try {
-            sprTime = sprLine.length > 1 ? int.parse(sprLine[1]) : 87;
+            sprTime = sprLine.length > 1 ? int.parse(sprLine[1]) : FRAME_TIME;
+            if (sprTime < 10) {
+              sprTime *= FRAME_TIME;
+            }
           } catch (_) {
-            sprTime = 87;
+            sprTime = FRAME_TIME;
           }
           this._sprTime[crSprite].add(sprTime);
           sprFullTime += sprTime;
@@ -195,9 +200,9 @@ class SpriteState extends State<ActorSprite> {
           final List<String> sprLine = sprites[i].split(":");
           _skillSprFiles[crSkillSpr].add(sprLine[0]);
           try {
-            sprTime = sprLine.length > 1 ? int.parse(sprLine[1]) : 87;
+            sprTime = sprLine.length > 1 ? int.parse(sprLine[1]) : FRAME_TIME;
           } catch (_) {
-            sprTime = 87;
+            sprTime = FRAME_TIME;
           }
           _skillSprTime[crSkillSpr].add(sprTime);
           sprFullTime += sprTime;
@@ -242,8 +247,12 @@ class SpriteState extends State<ActorSprite> {
     if (waitTime > 0) {
       new Timer(Duration(milliseconds: waitTime), () {
         this.setState(() {
-          this._counter++;
-          this._skillCnt++;
+          if (actorWait > 0) {
+            this._counter++;
+          }
+          if (skillWait > 0) {
+            this._skillCnt++;
+          }
         });
       });
     }
@@ -284,7 +293,7 @@ class SpriteState extends State<ActorSprite> {
     }
     this._pos = pos;
     this._player = actor;
-    this._name = actor.job.name.toLowerCase();
+    this._name = actor.job.sprite;
     this._sprFiles = new List(5);
     this._sprFullTime = new List(5);
     this._sprTime = new List(5);
@@ -303,14 +312,17 @@ class ArenaStage extends StatefulWidget {
 
   final List<Actor> party;
   final List<Actor> enemy;
+  final String arenaImg;
+  final String arenaSnd;
   final int surprise;
+
 
   @override
   State<StatefulWidget> createState() {
-    return new ArenaState(this.party, this.enemy, this.surprise);
+    return new ArenaState(this.party, this.enemy, this.arenaImg, this.arenaSnd, this.surprise);
   }
 
-  ArenaStage({Key key, this.party, this.enemy, this.surprise}) : super(key: key);
+  ArenaStage({Key key, this.party, this.enemy, this.arenaImg, this.arenaSnd, this.surprise}) : super(key: key);
 }
 
 class ArenaState extends State<ArenaStage> {
@@ -322,6 +334,9 @@ class ArenaState extends State<ArenaStage> {
   Actor _crActor;
   Performance _crSkill;
   Performance _crItem;
+
+  String _arenaImg;
+  String _arenaSnd;
 
   List<DropdownMenuItem<Performance>> _crSkills;
   List<DropdownMenuItem<Performance>> _crItems;
@@ -379,6 +394,19 @@ class ArenaState extends State<ArenaStage> {
                         child: Center(
                           child: Stack(
                             children: <Widget>[
+                              Align(
+                                alignment: Alignment(-1, -1),
+                                child: FractionallySizedBox(
+                                  widthFactor: 1,
+                                  heightFactor: 0.69,
+                                  child: Image(
+                                    image: this._arenaImg == null || this._arenaImg.length == 0 ? emptyImage
+                                        : AssetImage('assets/sprites/arena/$_arenaImg}'),
+                                    gaplessPlayback: true,
+                                    fit: BoxFit.fill,
+                                  )
+                                )
+                              ),
                               Align(
                                   alignment: Alignment(-0.3, -0.7),
                                   child: ActorSprite(spriteState: this._actorSprites[0])
@@ -589,13 +617,13 @@ class ArenaState extends State<ArenaStage> {
     this._actorSprites[crt].sprite = crActor.hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
         || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
-    new Timer(Duration(milliseconds: 435), () {
+    new Timer(Duration(milliseconds: FRAME_TIME * 5), () {
       for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
         if (trg != crt) {
           final SpriteState trgSprite = this._actorSprites[trg];
           final Actor trgActor = trgSprite.actor;
           final bool ko = koActors.contains(trgActor);
-          //trgSprite.skillSprite = lastAbility.name.toLowerCase();
+          trgSprite.skillSprite = lastAbility.sprite;
           if (trgActor.hp > 0) {
             if (ko) {
               trgSprite.sprite = SPR_RISEN;
@@ -654,17 +682,21 @@ class ArenaState extends State<ArenaStage> {
   Function _getOnClick(final int trgIndex) {
     return () {
       if (this._target == trgIndex) {
-        this._execSkill(this._crSkill);
+        if (this._activeBtn) {
+          this._execSkill(this._crSkill);
+        }
       } else {
         this.setState(() {
           this._target = trgIndex;
-          this._setCrAutoSkill();
+          if (this._activeBtn) {
+            this._setCrAutoSkill();
+          }
         });
       }
     };
   }
 
-  ArenaState(final List<Actor> party, final List<Actor> enemy, final int surprise) {
+  ArenaState(final List<Actor> party, final List<Actor> enemy, this._arenaImg, this._arenaSnd, final int surprise) {
     for (int i = 0; i < enemy.length; i++) {
       enemy[i].automatic = 2;
     }

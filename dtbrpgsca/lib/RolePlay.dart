@@ -21,7 +21,7 @@ abstract class RolePlay {
   static String mpText = "MP";
   static String spText = "RP";
 
-  String name;
+  String name, sprite;
   int id, mHp, mMp, mSp, mInit;
   List<StateMask> aStates;
   bool _range;
@@ -34,10 +34,11 @@ abstract class RolePlay {
     this._range = range;
   }
 
-  RolePlay(final int id, final String name, final int hp, final int mp, final int sp,
-       final int mInit, final bool range, final List<StateMask> states) {
+  RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
+      final int sp, final int mInit, final bool range, final List<StateMask> states) {
     this.id = id;
     this.name = name;
+    this.sprite = sprite;
     this.mHp = hp;
     this.mMp = mp;
     this.mSp = sp;
