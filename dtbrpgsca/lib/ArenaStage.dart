@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/SceneAct.dart';
 import 'package:dtbrpgsca/Performance.dart';
+import 'package:audioplayers/audio_cache.dart';
 
 const int FRAME_TIME = 71;//87;
 
@@ -353,6 +354,16 @@ class ArenaState extends State<ArenaStage> {
     });
   }
 
+  AudioCache _flutterSound;
+  AudioCache get flutterSound {
+    AudioCache flutterSound = this._flutterSound;
+    if (flutterSound == null) {
+      flutterSound = new AudioCache(prefix: 'audio/');
+      this._flutterSound = flutterSound;
+    }
+    return flutterSound;
+  }
+
   List<DropdownMenuItem<Performance>> _emptyAbilities;
   List<DropdownMenuItem<Performance>> get emptyAbilities {
     List<DropdownMenuItem<Performance>> emptyAbilities = this._emptyAbilities;
@@ -609,6 +620,10 @@ class ArenaState extends State<ArenaStage> {
         this._crActor = trgActor;
       });
     }
+    final String skillSnd = (lastAbility = this._sceneAct.lastAbility).sound;
+    if (skillSnd != null && skillSnd.length > 0) {
+      this.flutterSound.play(skillSnd);
+    }
     this._actorSprites[crt].sprite = crActor.hp > 0
         ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
         || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
@@ -690,7 +705,7 @@ class ArenaState extends State<ArenaStage> {
     };
   }
 
-  ArenaState(final List<Actor> party, final List<Actor> enemy, this._arenaImg, this._arenaSnd, final int surprise) {
+  ArenaState(final List<Actor> party, final List<Actor> enemy, this._arenaImg, final String arenaSnd, final int surprise) {
     for (int i = 0; i < enemy.length; i++) {
       enemy[i].automatic = 2;
     }
@@ -725,6 +740,9 @@ class ArenaState extends State<ArenaStage> {
       SpriteState(players[6], "r", true, this._getOnClick(6)),
       SpriteState(players[7], "r", true, this._getOnClick(7))
     ];
+    if (arenaSnd != null && arenaSnd.length > 0) {
+      this.flutterSound.loop(arenaSnd);
+    }
     if (crActor.automatic != 0) {
       this._execAI();
     } else {
