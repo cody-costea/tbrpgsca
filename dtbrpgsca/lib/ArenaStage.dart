@@ -342,6 +342,7 @@ class ArenaState extends State<ArenaStage> {
   ScrollController _scrollController = new ScrollController();
 
   int _target;
+  int _surprise;
 
   bool _automatic = false;
   bool _activeBtn = true;
@@ -379,6 +380,8 @@ class ArenaState extends State<ArenaStage> {
 
   @override
   Widget build(final BuildContext context) {
+    final List<SpriteState> actorSprites = this._actorSprites;
+    final bool surprised = this._surprise < 0;
     return new MaterialApp(
         title: 'Turn-Based RPG Simple Combat Arena',
         theme: ThemeData.dark(),
@@ -415,35 +418,35 @@ class ArenaState extends State<ArenaStage> {
                               ),
                               Align(
                                   alignment: Alignment(-0.3, -0.7),
-                                  child: ActorSprite(spriteState: this._actorSprites[0])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 7 : 0])
                               ),
                               Align(
                                   alignment: Alignment(-0.7, -1),
-                                  child: ActorSprite(spriteState: this._actorSprites[1])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 6 : 1])
                               ),
                               Align(
                                   alignment: Alignment(-0.9, -0.5),
-                                  child: ActorSprite(spriteState: this._actorSprites[2])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 5 : 2])
                               ),
                               Align(
                                   alignment: Alignment(-0.5, -0.2),
-                                  child: ActorSprite(spriteState: this._actorSprites[3])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 4 : 3])
                               ),
                               Align(
                                   alignment: Alignment(0.9, -0.7),
-                                  child: ActorSprite(spriteState: this._actorSprites[6])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 1 : 6])
                               ),
                               Align(
                                   alignment: Alignment(0.5, -1),
-                                  child: ActorSprite(spriteState: this._actorSprites[7])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 0 : 7])
                               ),
                               Align(
                                   alignment: Alignment(0.3, -0.5),
-                                  child: ActorSprite(spriteState: this._actorSprites[4])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 3 : 4])
                               ),
                               Align(
                                   alignment: Alignment(0.7, -0.2),
-                                  child: ActorSprite(spriteState: this._actorSprites[5])
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 2 : 5])
                               ),
                               Align(
                                 alignment: Alignment(0, 1),
@@ -709,6 +712,7 @@ class ArenaState extends State<ArenaStage> {
     for (int i = 0; i < enemy.length; i++) {
       enemy[i].automatic = 2;
     }
+    this._surprise = surprise;
     final SceneAct sceneAct = this._sceneAct = SceneAct(party, enemy, surprise);
     final List<Actor> players = sceneAct.players;
     final int current = sceneAct.current;
@@ -718,28 +722,16 @@ class ArenaState extends State<ArenaStage> {
     this._crItems = (items == null || items[current] == null || items[current].length == 0)
         ? this.emptyAbilities : this._prepareAbilities(this._sceneAct.crItems[current], current);
     this._crSkill = this._crSkills[0].value;
-    this._target = this._sceneAct.enemyIndex;
     this._players = this._preparePlayers(players);
+    final int enemyIndex = this._target = sceneAct.enemyIndex;
     _koActors = new List()..length = players.length;
-    this._actorSprites = surprise < 0 ? [
-      SpriteState(players[4], "l", true, this._getOnClick(4)),
-      SpriteState(players[5], "l", true, this._getOnClick(5)),
-      SpriteState(players[6], "l", true, this._getOnClick(6)),
-      SpriteState(players[7], "l", true, this._getOnClick(7)),
-      SpriteState(players[0], "r", true, this._getOnClick(0)),
-      SpriteState(players[1], "r", true, this._getOnClick(1)),
-      SpriteState(players[2], "r", true, this._getOnClick(2)),
-      SpriteState(players[3], "r", true, this._getOnClick(3))
-    ] : [
-      SpriteState(players[0], "l", true, this._getOnClick(0)),
-      SpriteState(players[1], "l", true, this._getOnClick(1)),
-      SpriteState(players[2], "l", true, this._getOnClick(2)),
-      SpriteState(players[3], "l", true, this._getOnClick(3)),
-      SpriteState(players[4], "r", true, this._getOnClick(4)),
-      SpriteState(players[5], "r", true, this._getOnClick(5)),
-      SpriteState(players[6], "r", true, this._getOnClick(6)),
-      SpriteState(players[7], "r", true, this._getOnClick(7))
-    ];
+    final List<SpriteState> actorSprites = new List(players.length);
+    for (int i = 0; i < players.length; i++) {
+      actorSprites[i] = SpriteState(players[i],
+          (surprise < 0 && i >= enemyIndex) || (surprise > - 1 && i < enemyIndex) ? "l" : "r",
+          true, this._getOnClick(i));
+    }
+    this._actorSprites = actorSprites;
     if (arenaSnd != null && arenaSnd.length > 0) {
       this.flutterSound.loop(arenaSnd);
     }

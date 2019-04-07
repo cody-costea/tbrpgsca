@@ -412,7 +412,13 @@ class SceneAct {
         useInit = true;
       }
       final int iInit = players[i].mInit > 0 ? players[i].mInit : players.length;
-      players[i].init = (surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx) ? 0 : iInit;
+      if ((surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx)) {
+        players[i].init = 0;
+        players[i].active = false;
+      } else {
+        players[i].init = iInit;
+        players[i].active = true;
+      }
       for (int j = 0; j < players.length; j++) {
         if (j == i) {
           continue;
