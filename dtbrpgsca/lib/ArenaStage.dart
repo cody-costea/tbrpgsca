@@ -20,6 +20,7 @@ import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/SceneAct.dart';
 import 'package:dtbrpgsca/Performance.dart';
 import 'package:audioplayers/audio_cache.dart';
+import 'package:flutter/scheduler.dart';
 
 const int FRAME_TIME = 71;//87;
 
@@ -725,21 +726,25 @@ class ArenaState extends State<ArenaStage> {
     this._players = this._preparePlayers(players);
     final int enemyIndex = this._target = sceneAct.enemyIndex;
     _koActors = new List()..length = players.length;
-    final List<SpriteState> actorSprites = new List(players.length);
-    for (int i = 0; i < players.length; i++) {
-      actorSprites[i] = SpriteState(players[i],
-          (surprise < 0 && i >= enemyIndex) || (surprise > - 1 && i < enemyIndex) ? "l" : "r",
-          true, this._getOnClick(i));
+    final List<SpriteState> actorSprites = new List(8);
+    for (int i = 0; i < 4 && i < party.length; i++) {
+      actorSprites[i] = SpriteState(players[i], (surprise < 0 ? "r" : "l"), true, this._getOnClick(i));
+    }
+    for (int i = 0, j = enemyIndex; i < 4 && i < enemy.length; i++, j++) {
+      actorSprites[i + 4] = SpriteState(players[j], (surprise < 0 ? "l" : "r"), true, this._getOnClick(j));
     }
     this._actorSprites = actorSprites;
     if (arenaSnd != null && arenaSnd.length > 0) {
       this.flutterSound.loop(arenaSnd);
     }
-    if (crActor.automatic != 0) {
-      this._execAI();
-    } else {
-      this._setCrAutoSkill();
-    }
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (crActor.automatic != 0) {
+        this._execAI();
+      } else {
+        this._setCrAutoSkill();
+      }
+
+    });
   }
 
 }

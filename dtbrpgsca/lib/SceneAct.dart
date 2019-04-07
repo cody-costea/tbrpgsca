@@ -417,7 +417,7 @@ class SceneAct {
         players[i].active = false;
       } else {
         players[i].init = iInit;
-        players[i].active = true;
+        players[i].active = players[i].hp > 0;
       }
       for (int j = 0; j < players.length; j++) {
         if (j == i) {
