@@ -167,7 +167,7 @@ final List<Actor> enemy = [
   Actor(2, "Goblin", race[2], job[12], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
   Actor(4, "Lizard", race[0], job[6], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
   Actor(6, "Troll", race[3], job[9], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
+  //Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
 ];
 
-void main() => runApp(new ArenaStage(party: party, enemy: enemy, arenaImg: null, arenaSnd: null, surprise: 0));
+void main() => runApp(new ArenaStage(party: party, enemy: enemy, arenaImg: null, arenaSnd: null, surprise: -1));

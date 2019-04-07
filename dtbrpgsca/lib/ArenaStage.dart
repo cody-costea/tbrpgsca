@@ -233,6 +233,10 @@ class SpriteState extends State<ActorSprite> {
 
   @override
   Widget build(final BuildContext context) {
+    final Actor actor = this._player;
+    if (actor == null) {
+      return SizedBox();
+    }
     final int actorCnt = this._counter;
     final int skillCnt = this._skillCnt;
     final int crSprite = this._sprite;
@@ -261,7 +265,7 @@ class SpriteState extends State<ActorSprite> {
         children: <Widget>[
           Image(
               image: AssetImage('assets/sprites/actors/$_name/${actorWait == 0
-                  ? (koActors == null || this.actor == null || !koActors.contains(this.actor) ? this.idleSpr : this.koSpr)
+                  ? (koActors == null || !koActors.contains(actor) ? this.idleSpr : this.koSpr)
                   : crSprList[actorCnt]}'),
               gaplessPlayback: true,
               width: 128,
@@ -286,7 +290,7 @@ class SpriteState extends State<ActorSprite> {
 
   SpriteState(final Actor actor, final String pos, final bool aot, final Function onClick) {
     if (actor == null || pos == null) {
-      throw Exception("Null parameters cannot be accepted.");
+      return;
     }
     this._pos = pos;
     this._player = actor;
@@ -477,7 +481,9 @@ class ArenaState extends State<ArenaStage> {
                         children: <Widget>[
                           Expanded(
                               child: MaterialButton(
-                                onPressed: this._activeBtn ? () {
+                                onPressed: this._activeBtn
+                                    && this._crSkill.canPerform(this._crActor)
+                                    && this._target == this._sceneAct.getGuardian(this._target, this._crSkill) ? () {
                                   this._execSkill(this._crSkill);
                                 } : null,
                                 child: Text('Execute'),
@@ -538,7 +544,9 @@ class ArenaState extends State<ArenaStage> {
                         children: <Widget>[
                           Expanded(
                               child: MaterialButton(
-                                onPressed: this._activeBtn && this._crItem != null ? () {
+                                onPressed: this._activeBtn && this._crItem != null
+                                    && this._crItem.canPerform(this._crActor)
+                                    && this._target == this._sceneAct.getGuardian(this._target, this._crItem) ? () {
                                   this._execSkill(this._crItem);
                                 } : null,
                                 child: Text('Use'),
@@ -695,8 +703,10 @@ class ArenaState extends State<ArenaStage> {
   Function _getOnClick(final int trgIndex) {
     return () {
       if (this._target == trgIndex) {
-        if (this._activeBtn) {
-          this._execSkill(this._crSkill);
+        final Performance crSkill = this._crSkill;
+        if (this._activeBtn && this._crSkill.canPerform(this._crActor)
+            && trgIndex == this._sceneAct.getGuardian(trgIndex, crSkill)) {
+          this._execSkill(crSkill);
         }
       } else {
         this.setState(() {
@@ -727,11 +737,19 @@ class ArenaState extends State<ArenaStage> {
     final int enemyIndex = this._target = sceneAct.enemyIndex;
     _koActors = new List()..length = players.length;
     final List<SpriteState> actorSprites = new List(8);
-    for (int i = 0; i < 4 && i < party.length; i++) {
-      actorSprites[i] = SpriteState(players[i], (surprise < 0 ? "r" : "l"), true, this._getOnClick(i));
+    for (int i = 0; i < 4; i++) {
+      if (i < party.length) {
+        actorSprites[i] = SpriteState(players[i], (surprise < 0 ? "r" : "l"), true, this._getOnClick(i));
+      } else {
+        actorSprites[i] = SpriteState(null, null, false, null);
+      }
     }
-    for (int i = 0, j = enemyIndex; i < 4 && i < enemy.length; i++, j++) {
-      actorSprites[i + 4] = SpriteState(players[j], (surprise < 0 ? "l" : "r"), true, this._getOnClick(j));
+    for (int i = 0, j = enemyIndex; i < 4; i++, j++) {
+      if (i < enemy.length) {
+        actorSprites[i + 4] = SpriteState(players[j], (surprise < 0 ? "l" : "r"), true, this._getOnClick(j));
+      } else {
+        actorSprites[i + 4] = SpriteState(null, null, false, null);
+      }
     }
     this._actorSprites = actorSprites;
     if (arenaSnd != null && arenaSnd.length > 0) {
@@ -743,7 +761,6 @@ class ArenaState extends State<ArenaStage> {
       } else {
         this._setCrAutoSkill();
       }
-
     });
   }
 
