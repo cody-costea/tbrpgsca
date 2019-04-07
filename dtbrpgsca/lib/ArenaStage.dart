@@ -387,6 +387,9 @@ class ArenaState extends State<ArenaStage> {
   Widget build(final BuildContext context) {
     final List<SpriteState> actorSprites = this._actorSprites;
     final bool surprised = this._surprise < 0;
+    final bool activeBtn = this._activeBtn;
+    final Performance crSkill = this._crSkill;
+    final Performance crItem = this._crItem;
     return new MaterialApp(
         title: 'Turn-Based RPG Simple Combat Arena',
         theme: ThemeData.dark(),
@@ -481,10 +484,8 @@ class ArenaState extends State<ArenaStage> {
                         children: <Widget>[
                           Expanded(
                               child: MaterialButton(
-                                onPressed: this._activeBtn
-                                    && this._crSkill.canPerform(this._crActor)
-                                    && this._target == this._sceneAct.getGuardian(this._target, this._crSkill) ? () {
-                                  this._execSkill(this._crSkill);
+                                onPressed: activeBtn && this._canPerform(crSkill) ? () {
+                                  this._execSkill(crSkill);
                                 } : null,
                                 child: Text('Execute'),
                               )
@@ -520,7 +521,7 @@ class ArenaState extends State<ArenaStage> {
                               children: <Widget>[
                                 Expanded(
                                     child: MaterialButton(
-                                      onPressed: this._activeBtn ? () {
+                                      onPressed: activeBtn ? () {
                                         this._automatic = true;
                                         this._execAI();
                                       } : () {
@@ -544,10 +545,9 @@ class ArenaState extends State<ArenaStage> {
                         children: <Widget>[
                           Expanded(
                               child: MaterialButton(
-                                onPressed: this._activeBtn && this._crItem != null
-                                    && this._crItem.canPerform(this._crActor)
-                                    && this._target == this._sceneAct.getGuardian(this._target, this._crItem) ? () {
-                                  this._execSkill(this._crItem);
+                                onPressed: activeBtn && crItem != null
+                                    && this._canPerform(crItem) ? () {
+                                  this._execSkill(crItem);
                                 } : null,
                                 child: Text('Use'),
                               )
@@ -580,6 +580,15 @@ class ArenaState extends State<ArenaStage> {
     if (ability != null) {
       this._afterAct(this._sceneAct.executeAbility(ability, this._target, ""));
     }
+  }
+
+  bool _canPerform(final Performance ability) {
+    final int trgIndex = this._target;
+    final SceneAct sceneAct = this._sceneAct;
+    final Actor trgActor = sceneAct.players[trgIndex];
+    return ability.canPerform(this._crActor)
+        && trgIndex == sceneAct.getGuardian(trgIndex, ability)
+        && (trgActor.hp > 0 || ability.mHp < 0);
   }
 
   List<DropdownMenuItem<int>> _preparePlayers(final List<Actor> players) {
@@ -704,8 +713,7 @@ class ArenaState extends State<ArenaStage> {
     return () {
       if (this._target == trgIndex) {
         final Performance crSkill = this._crSkill;
-        if (this._activeBtn && this._crSkill.canPerform(this._crActor)
-            && trgIndex == this._sceneAct.getGuardian(trgIndex, crSkill)) {
+        if (this._activeBtn && this._canPerform(crSkill)) {
           this._execSkill(crSkill);
         }
       } else {
