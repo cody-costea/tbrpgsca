@@ -262,7 +262,15 @@ class Actor extends Costume {
       //this.availableSkills.ensureCapacity(this.availableSkills.size + abilities.size)
       for (Performance k in abilities) {
         this.availableSkills.add(k);
-        this.checkRegSkill(k);
+        if (k.mQty > 0) {
+          Map<Performance, int> skillsQty = this.skillsQty;
+          if (skillsQty == null) {
+            skillsQty = new Map();
+            this.skillsQty = skillsQty;
+          }
+          skillsQty[k] = k.mQty;
+          this.checkRegSkill(k);
+        }
       }
     }
   }
