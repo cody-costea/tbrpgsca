@@ -629,17 +629,18 @@ class ArenaState extends State<ArenaStage> {
 
   void _afterAct(String ret) {
     final List<DropdownMenuItem<Performance>> emptyAbilities = this.emptyAbilities;
+    final List<Actor> players = this._sceneAct.players;
     this.setState(() {
       this._activeBtn = false;
       this._crSkills = emptyAbilities;
       this._crItems = emptyAbilities;
       this._crSkill = emptyAbilities[0].value;
       this._crItem = emptyAbilities[0].value;
+      this._players = this._preparePlayers(players);
     });
     Performance lastAbility;
     int crt = this._sceneAct.current;
     final List<Actor> koActors = _koActors;
-    final List<Actor> players = this._sceneAct.players;
     final Actor crActor = players[crt];
     final Actor trgActor = players[this._sceneAct.firstTarget];
     if (crActor.automatic != 0 && trgActor.automatic == 0) {

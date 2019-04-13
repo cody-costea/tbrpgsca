@@ -326,12 +326,16 @@ class SceneAct {
     final Actor crActor = this._players[this._current];
     if (nRestore || nHeal) {
       for (int i = 0; i < crActor.availableSkills.length; i++) {
-        skillIndex = i;
+        final Performance s = crActor.availableSkills[i];
+        if ((s.restore || (nHeal && s.mHp < 0)) && s.canPerform(this.players[this.current])) {
+          skillIndex = i;
+        }
         break;
       }
     }
     final Performance ability = crActor.availableSkills[this.getAIskill(skillIndex, nRestore)];
-    if (ability.mHp > -1) {
+    final bool atkSkill = ability.mHp > -1;
+    if (atkSkill) {
       if (party) {
         f = this._enIdx;
         l = this._players.length;
@@ -341,7 +345,7 @@ class SceneAct {
       }
     }
     int target = f;
-    while (this._players[target].hp < 1 && (ability.mHp > 1 || !ability.restore) && target < l) {
+    while (this._players[target].hp < 1 && (atkSkill || !ability.restore) && target < l) {
       target++;
     }
     for (int i = target; i < l; i++) {
