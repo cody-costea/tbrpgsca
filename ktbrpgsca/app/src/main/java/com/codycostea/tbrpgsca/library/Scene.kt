@@ -29,7 +29,6 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         internal set
 
     open val enIdx : Int = party.size
-
     open val players : Array<Actor> = party + enemy
 
     open var current : Int = if (this.surprise < 0) this.enIdx else 0
@@ -358,7 +357,8 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
         }
         val ability = this.players[this.current].availableSkills[this.getAIskill(skillIndex, nRestore)]
-        if (ability.hpDmg > -1) {
+        val atkSkill = ability.hpDmg > -1
+        if (atkSkill) {
             if (this.current < this.enIdx) {
                 f = this.enIdx
                 l = this.players.size
@@ -369,7 +369,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
         }
         var target = f
-        while (this.players[target].hp < 1 && (ability.hpDmg > 1 || !ability.restoreKO) && target < l) target++
+        while (this.players[target].hp < 1 && (atkSkill || !ability.restoreKO) && target < l) target++
         for (i in target until l) {
             if (this.players[i].hp < this.players[target].hp && (this.players[i].hp > 0 || ability.restoreKO)) {
                 target = i
