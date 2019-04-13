@@ -239,7 +239,15 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             this.availableSkills.ensureCapacity(this.availableSkills.size + abilities.size)
             for (k in abilities) {
                 this.availableSkills.add(k)
-                this.checkRegSkill(k)
+                if (k.mQty > 0) {
+                    var skillsQty = this.skillsQty;
+                    if (skillsQty == null) {
+                        skillsQty = HashMap()
+                        this.skillsQty = skillsQty
+                    }
+                    skillsQty[k] = k.mQty
+                    this.checkRegSkill(k)
+                }
             }
         }
     }
