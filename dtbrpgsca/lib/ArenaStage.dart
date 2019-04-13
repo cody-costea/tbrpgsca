@@ -21,6 +21,7 @@ import 'package:dtbrpgsca/SceneAct.dart';
 import 'package:dtbrpgsca/Performance.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:sprintf/sprintf.dart';
 
 const int FRAME_TIME = 71;//87;
 
@@ -595,9 +596,12 @@ class ArenaState extends State<ArenaStage> {
     final List<DropdownMenuItem<int>> ret = new List();
     if (players != null) {
       for (int i = 0; i < players.length; i++) {
+        final Actor actor = players[i];
         ret.add(new DropdownMenuItem(
             value: i,
-            child: Text(" ${players[i].name}")
+            child: Text("${actor.name} (${i < this._sceneAct.enemyIndex
+                ? "HP: ${actor.hp}/${actor.mHp}, MP: ${actor.mp}/${actor.mMp}, RP: ${actor.sp}/${actor.mSp}"
+                : sprintf("HP: %.2f%%", [(actor.hp / actor.mHp) * 100.0])})")
           )
         );
       }
@@ -610,9 +614,11 @@ class ArenaState extends State<ArenaStage> {
     if (abilities != null) {
       for (Performance ability in abilities) {
         if (ability.canPerform(this._sceneAct.players[this._sceneAct.current])) {
+          final String trg = ability.trg == 0 ? "One" : (ability.trg < 0 ? "Self" : "All");
           ret.add(new DropdownMenuItem(
               value: ability,
-              child: Text(ability.name)
+              child: Text(" ${ability.name} (Lv: ${ability.lvRq}, HP: ${ability.hpC}, MP: ${ability.mpC}, "
+                  "RP: ${ability.spC}, Nr: ${ability.mQty}, Trg: $trg, Range: ${ability.range ? "Yes" : "No"})")
             )
           );
         }
@@ -763,13 +769,13 @@ class ArenaState extends State<ArenaStage> {
     if (arenaSnd != null && arenaSnd.length > 0) {
       this.flutterSound.loop(arenaSnd);
     }
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (crActor.automatic != 0) {
+    if (crActor.automatic != 0) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         this._execAI();
-      } else {
-        this._setCrAutoSkill();
-      }
-    });
+      });
+    } else {
+      this._setCrAutoSkill();
+    }
   }
 
 }

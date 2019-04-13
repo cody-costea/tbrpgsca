@@ -190,8 +190,8 @@ class Performance extends RolePlay {
         && (skillsQty == null || (skillsQty[this] ?? 1) > 0);
   }
 
-  Performance(final int id, final String name, final String sprite, final String sound, final bool range,
-              final bool steal, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
+  Performance(final int id, final String name, final String sprite, final String sound, final bool steal,
+              final bool range, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
               final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final int elm,
               final int mQty, final int rQty, final bool absorb, final bool restoreKO, final List<StateMask> aStates,
               final List<StateMask> rStates)
