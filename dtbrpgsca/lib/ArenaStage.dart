@@ -546,7 +546,7 @@ class ArenaState extends State<ArenaStage> {
                               child: MaterialButton(
                                 onPressed: activeBtn && crItem != null
                                     && this._canPerform(crItem) ? () {
-                                  this._execSkill(crItem);
+                                  this._afterAct(this._sceneAct.useItem(crItem, this._target, ""));
                                 } : null,
                                 child: Text('Use', overflow: TextOverflow.fade),
                               )

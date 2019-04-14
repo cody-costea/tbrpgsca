@@ -381,24 +381,18 @@ class SceneAct {
     return this.executeAbility(this._players[this._current].availableSkills[index], target, ret);
   }
 
-  String useItem(final int index, final int target, final String ret) {
-    final List<Performance> crItems = this._crItems[this._current];
-    if (crItems != null) {
-      final Performance item = crItems[index];
-      final Map<Performance, int> crItemsMap = this._players[this._current].items;
-      if (crItemsMap != null) {
-        final int itemQty = (crItemsMap[item] ?? 1) - 1;
-        if (itemQty > 0) {
-          crItemsMap[item] = itemQty;
-        } else {
-          crItems.remove(item);
-          crItemsMap.remove(item);
-        }
+  String useItem(final Performance item, final int target, final String ret) {
+    final Map<Performance, int> crItemsMap = this._players[this._current].items;
+    if (crItemsMap != null) {
+      final int itemQty = (crItemsMap[item] ?? 1) - 1;
+      if (itemQty > 0) {
+        crItemsMap[item] = itemQty;
+      } else {
+        crItems.remove(item);
+        crItemsMap.remove(item);
       }
-      return this.executeAbility(item, target, ret);
-    } else {
-      return ret;
     }
+    return this.executeAbility(item, target, ret);
   }
 
   String escape() {
