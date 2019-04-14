@@ -127,7 +127,31 @@ final List<Performance> skill = [
   Performance(57, "Absorb", null, null, false, true, 1, 0, 0, 3, Performance.DmgTypeSpi, 1, 0, 7, -3, 0, 7, -1, -1, true, false, null, null)
 ];
 
+final List<Performance> items = [
+  Performance(1, "Potion", null, null, false, true, 1, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, -1, -1, false, false, null, null),
+  Performance(2, "Ether", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, -10, 0, 0, 0, -1, -1, false, false, null, null),
+  Performance(3, "Tonic", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0, -1, -1, false, false, null, null),
+  Performance(4, "Antidote", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, poison),
+  Performance(9, "Hi-Potion", null, null, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, 0, 0, -1, -1, false, false, null, null),
+  Performance(5, "Hi-Ether", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, -25, 0, 0, 0, -1, -1, false, false, null, dizziness),
+  Performance(6, "Hi-Tonic", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, -1, -1, false, false, vigour, weakness),
+  Performance(7, "Panacea", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, cure),
+  Performance(8, "Elixir", null, null, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, 0, 0, -1, -1, false, true, null, null)
+];
+
 final List<Performance> skills = [skill[0], skill[1]];
+
+final Map<Performance, int> partyItems = {
+  items[0] : 30,
+  items[1] : 20,
+  items[2] : 20,
+  items[3] : 15,
+  items[4] : 15,
+  items[5] : 10,
+  items[6] : 10,
+  items[7] : 7,
+  items[8] : 5
+};
 
 final List<Costume> race = [
   Costume(1, "Elf", null, 40, 25, 10, 7, 5, 15, 12, 11, 0, false, {1 : -1, 2 : 1, 3 : 1, 4 : 1, 5 : 1}, skills, null, null),
@@ -157,17 +181,17 @@ final List<Costume> job = [
 ];
 
 final List<Actor> party = [
-  Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
+  Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, partyItems),
+  Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, partyItems),
+  Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, partyItems),
+  Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, partyItems)
 ];
 
 final List<Actor> enemy = [
-  Actor(2, "Goblin", race[2], job[12], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(4, "Lizard", race[0], job[6], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(6, "Troll", race[3], job[9], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null),
-  Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null)
+  Actor(2, "Goblin", race[2], job[12], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, {items[0] : 2, items[4] : 1}),
+  Actor(4, "Lizard", race[0], job[6], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, {items[3] : 1, items[2] : 1, items[5] : 1}),
+  Actor(6, "Troll", race[3], job[9], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, {items[8] : 1, items[7] : 1}),
+  Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, {items[2] : 2, items[6] : 1})
 ];
 
 void main() => runApp(new ArenaStage(party: party, enemy: enemy, arenaImg: null, arenaSnd: null, surprise: 0));

@@ -453,7 +453,7 @@ class Actor extends Costume {
   Actor(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
         final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
         final int wis, final int agi, final bool range, final Map<int, int> res, final List<Performance> skills,
-        final List<StateMask> states, final Map<StateMask, int> stRes)
+        final List<StateMask> states, final Map<StateMask, int> stRes, final Map<Performance, int> items)
       : super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes) {
     this._xp = 0;
     this._maxp = 15;
@@ -473,5 +473,6 @@ class Actor extends Costume {
     this.hp = this.mHp;
     this.mp = this.mMp;
     this.sp = this.mSp;
+    this._items = items;
   }
 }

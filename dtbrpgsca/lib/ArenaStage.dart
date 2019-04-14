@@ -32,11 +32,9 @@ const int SPR_ACT = 3;
 const int SPR_CAST = 4;
 
 List<Actor> _koActors;
-
 Map<String, List<int>> _skillSprTime = new Map();
 Map<String, List<String>> _skillSprFiles = new Map();
 Map<String, int> _skillSprFullTime = new Map();
-
 int _waitTime = 0;
 
 class ActorSprite extends StatefulWidget {
@@ -49,6 +47,7 @@ class ActorSprite extends StatefulWidget {
   }
 
   ActorSprite({Key key, this.spriteState}) : super(key: key);
+
 }
 
 class SpriteState extends State<ActorSprite> {
@@ -56,23 +55,17 @@ class SpriteState extends State<ActorSprite> {
   String _name;
   String _pos;
   int _sprite;
-
-  Actor _player;
-
   List<List<int>> _sprTime;
   List<List<String>> _sprFiles;
   List<int> _sprFullTime;
-
   String _skillName;
-
   String _idleSpr;
   String _koSpr;
-
   int _counter = 0;
-  int _skillCnt = 0;
-
+  int _skillCnt = -1;
   Function _onClick;
 
+  Actor _player;
   set actor(final Actor value) {
     this._player = value;
     this.name = value.job.sprite;
@@ -125,7 +118,7 @@ class SpriteState extends State<ActorSprite> {
 
   set skillSprite(final String value) {
     this._skillName = value;
-    this._skillCnt = 0;
+    this._skillCnt = -1;
   }
 
   String get idleSpr {
@@ -227,8 +220,7 @@ class SpriteState extends State<ActorSprite> {
     }
     this.setState(() {
       this._counter = 0;
-      //this._skillCnt = 0;
-      // this._skillCnt++;
+      this._skillCnt++;
     });
   }
 
@@ -308,6 +300,7 @@ class SpriteState extends State<ActorSprite> {
     }
     this._onClick = onClick;
   }
+
 }
 
 class ArenaStage extends StatefulWidget {
@@ -318,39 +311,32 @@ class ArenaStage extends StatefulWidget {
   final String arenaSnd;
   final int surprise;
 
-
   @override
   State<StatefulWidget> createState() {
     return new ArenaState(this.party, this.enemy, this.arenaImg, this.arenaSnd, this.surprise);
   }
 
   ArenaStage({Key key, this.party, this.enemy, this.arenaImg, this.arenaSnd, this.surprise}) : super(key: key);
+
 }
 
 class ArenaState extends State<ArenaStage> {
 
   SceneAct _sceneAct;
-
   List<SpriteState> _actorSprites;
-
   Actor _crActor;
   Performance _crSkill;
   Performance _crItem;
-
   String _arenaImg;
-  String _arenaSnd;
-
   List<DropdownMenuItem<Performance>> _crSkills;
   List<DropdownMenuItem<Performance>> _crItems;
   List<DropdownMenuItem<int>> _players;
-
   TextEditingController _actionsTxt = new TextEditingController();
   ScrollController _scrollController = new ScrollController();
-
   int _target;
   int _surprise;
-
   bool _automatic = false;
+
   bool _activeBtn = true;
   bool get activeBtn {
     return this._activeBtn;
@@ -410,7 +396,7 @@ class ArenaState extends State<ArenaStage> {
                       "MP: ${crActor.mp}/${crActor.mMp}, "
                       "RP: ${crActor.sp}/${crActor.mSp}, "
                       "XP: ${crActor.exp}/${crActor.mExp}"
-                    : ""),
+                    : "", overflow: TextOverflow.ellipsis),
                     Expanded(
                         child: Center(
                           child: Stack(
@@ -491,7 +477,7 @@ class ArenaState extends State<ArenaStage> {
                                 onPressed: activeBtn && this._canPerform(crSkill) ? () {
                                   this._execSkill(crSkill);
                                 } : null,
-                                child: Text('Execute'),
+                                child: Text('Execute', overflow: TextOverflow.fade),
                               )
                           ),
                           Expanded(
@@ -538,13 +524,13 @@ class ArenaState extends State<ArenaStage> {
                                       } : () {
                                         this._automatic = false;
                                       },
-                                      child: Text(this._automatic ? 'Manual' : 'Auto'),
+                                      child: Text(this._automatic ? 'Manual' : 'Auto', overflow: TextOverflow.fade),
                                     )
                                 ),
                                 Expanded(
                                     child: MaterialButton(
                                         onPressed: null, //TODO
-                                        child: Text('Run')
+                                        child: Text('Run', overflow: TextOverflow.fade)
                                     )
                                 )
                               ],
@@ -560,7 +546,7 @@ class ArenaState extends State<ArenaStage> {
                                     && this._canPerform(crItem) ? () {
                                   this._execSkill(crItem);
                                 } : null,
-                                child: Text('Use'),
+                                child: Text('Use', overflow: TextOverflow.fade),
                               )
                           ),
                           Expanded(
@@ -612,7 +598,8 @@ class ArenaState extends State<ArenaStage> {
             value: i,
             child: Text("${actor.name} (${i < enIdx ? "HP: ${actor.hp}/${actor.mHp}, "
                 "MP: ${actor.mp}/${actor.mMp}, RP: ${actor.sp}/${actor.mSp}"
-                : sprintf("HP: %.2f%%", [(actor.hp / actor.mHp) * 100.0])})")
+                : sprintf("HP: %.2f%%", [(actor.hp / actor.mHp) * 100.0])})",
+                overflow: TextOverflow.ellipsis)
           )
         );
       }
@@ -632,9 +619,11 @@ class ArenaState extends State<ArenaStage> {
               || (!crActor.skillsQty.containsKey(ability)) ? "∞" : crActor.skillsQty[ability].toString());
           ret.add(new DropdownMenuItem(
               value: ability,
-              child: Text(" ${ability.name} ${items == null || (!items.containsKey(ability)) ? ""
-                  : " x ${items[ability].toString()}"} (Lv: ${ability.lvRq}, HP: ${ability.hpC}, MP: ${ability.mpC}, "
-                  "RP: ${ability.spC}, Nr: $qty, Trg: $trg, Range: ${ability.range ? "Yes" : "No"})")
+              child: Text("${ability.name} ${items == null || (!items.containsKey(ability)) ?
+                  "(Lv: ${ability.lvRq}, HP: ${ability.hpC}, MP: ${ability.mpC}, "
+                  "RP: ${ability.spC}, Nr: $qty, Trg: $trg, Range: ${ability.range ? "Yes" : "No"})"
+                  : " x ${items[ability].toString()}"}",
+                  overflow: TextOverflow.ellipsis)
             )
           );
         }
@@ -714,8 +703,9 @@ class ArenaState extends State<ArenaStage> {
               this._crSkills = this._prepareAbilities(skills, null, crt);
               this._crSkill = skills[0];
               final Map<int, List<Performance>> items = this._sceneAct.crItems;
-              this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
+              final List<DropdownMenuItem<Performance>> crItemsView = this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
                   ? this.emptyAbilities : this._prepareAbilities(items[crt], crActor.items, crt);
+              this._crItem = crItemsView[0].value;
               this._setCrAutoSkill();
             });
           }
@@ -764,6 +754,7 @@ class ArenaState extends State<ArenaStage> {
     this._crItems = (items == null || items[current] == null || items[current].length == 0)
         ? this.emptyAbilities : this._prepareAbilities(items[current], crActor.items, current);
     this._crSkill = this._crSkills[0].value;
+    this._crItem = this._crItems[0].value;
     this._players = this._preparePlayers(players);
     final int enemyIndex = this._target = sceneAct.enemyIndex;
     _koActors = new List()..length = players.length;
