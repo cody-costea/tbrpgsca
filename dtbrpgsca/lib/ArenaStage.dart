@@ -62,7 +62,7 @@ class SpriteState extends State<ActorSprite> {
   String _idleSpr;
   String _koSpr;
   int _counter = 0;
-  int _skillCnt = -1;
+  int _skillCnt = 0;
   Function _onClick;
 
   Actor _player;
@@ -220,7 +220,9 @@ class SpriteState extends State<ActorSprite> {
     }
     this.setState(() {
       this._counter = 0;
-      this._skillCnt++;
+      if (this._skillCnt < 0) {
+        this._skillCnt++;
+      }
     });
   }
 
@@ -585,7 +587,7 @@ class ArenaState extends State<ArenaStage> {
     final Actor trgActor = sceneAct.players[trgIndex];
     return ability.canPerform(this._crActor)
         && trgIndex == sceneAct.getGuardian(trgIndex, ability)
-        && (trgActor.hp > 0 || ability.mHp < 0);
+        && (trgActor.hp > 0 || (ability.mHp < 0 && ability.restore));
   }
 
   List<DropdownMenuItem<int>> _preparePlayers(final List<Actor> players) {
