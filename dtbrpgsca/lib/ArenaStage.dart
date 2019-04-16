@@ -531,7 +531,9 @@ class ArenaState extends State<ArenaStage> {
                                 ),
                                 Expanded(
                                     child: MaterialButton(
-                                        onPressed: null, //TODO
+                                        onPressed: this._surprise < 0 ? null : () {
+                                          this._afterAct("\n${this._sceneAct.escape()}");
+                                        },
                                         child: Text('Run', overflow: TextOverflow.fade)
                                     )
                                 )
@@ -645,75 +647,95 @@ class ArenaState extends State<ArenaStage> {
       this._crItem = emptyAbilities[0].value;
       this._players = this._preparePlayers(players);
     });
-    Performance lastAbility;
-    int crt = this._sceneAct.current;
-    final List<Actor> koActors = _koActors;
-    final Actor crActor = players[crt];
-    final Actor trgActor = players[this._sceneAct.firstTarget];
-    if (crActor.automatic != 0 && trgActor.automatic == 0) {
-      this.setState(() {
-        this._crActor = trgActor;
-      });
-    }
-    final String skillSnd = (lastAbility = this._sceneAct.lastAbility).sound;
-    if (skillSnd != null && skillSnd.length > 0) {
-      this.flutterSound.play(skillSnd);
-    }
-    this._actorSprites[crt].sprite = crActor.hp > 0
-        ? (((lastAbility = this._sceneAct.lastAbility).dmgType & Performance.DmgTypeSpi == Performance.DmgTypeSpi
-        || lastAbility.dmgType == Performance.DmgTypeWis) ? SPR_CAST : SPR_ACT) : SPR_FALLEN;
-    new Timer(Duration(milliseconds: FRAME_TIME * 5), () {
-      for (int trg = this._sceneAct.firstTarget; trg <= this._sceneAct.lastTarget; trg++) {
-        if (trg != crt) {
-          final SpriteState trgSprite = this._actorSprites[trg];
-          final Actor trgActor = trgSprite.actor;
-          final bool ko = koActors.contains(trgActor);
-          trgSprite.skillSprite = lastAbility.sprite;
-          if (trgActor.hp > 0) {
-            if (ko) {
-              trgSprite.sprite = SPR_RISEN;
-              koActors.remove(trgActor);
-            } else {
-              trgSprite.sprite = SPR_HIT;
-            }
-          } else {
-            trgSprite.sprite = SPR_FALLEN;
-            if (!ko) {
-              koActors.add(trgActor);
-            }
-          }
-        }
+    final Performance lastAbility = this._sceneAct.lastAbility;
+    if (lastAbility == null) {
+      this._endTurn(ret);
+    } else {
+      int crt = this._sceneAct.current;
+      final List<Actor> koActors = _koActors;
+      final Actor crActor = players[crt];
+      final Actor trgActor = players[this._sceneAct.firstTarget];
+      if (crActor.automatic != 0 && trgActor.automatic == 0) {
+        this.setState(() {
+          this._crActor = trgActor;
+        });
       }
-      new Timer(Duration(milliseconds: _waitTime), () {
-        _waitTime = 0;
-        ret = this._sceneAct.setNext(ret, true);
-        if (players[crt].hp < 1) {
-          koActors.add(players[crt]);
-          this._actorSprites[crt].sprite = SPR_FALLEN;
-        }
-        this._actionsTxt.text = "$ret${this._actionsTxt.text}";
-        if (this._sceneAct.status != 0) {
-          //TODO:
-        } else {
-          if (this._automatic || players[(crt = this._sceneAct.current)].automatic != 0) {
-            this._execAI();
-          } else {
-            this.activeBtn = true;
-            this.setState(() {
-              final Actor crActor = this._crActor = players[crt];
-              final List<Performance> skills = crActor.availableSkills;
-              this._crSkills = this._prepareAbilities(skills, null, crt);
-              this._crSkill = skills[0];
-              final Map<int, List<Performance>> items = this._sceneAct.crItems;
-              final List<DropdownMenuItem<Performance>> crItemsView = this._crItems = (items == null || items[crt] == null || items[crt].length == 0)
-                  ? this.emptyAbilities : this._prepareAbilities(items[crt], crActor.items, crt);
-              this._crItem = crItemsView[0].value;
-              this._setCrAutoSkill();
-            });
+      final String skillSnd = lastAbility.sound;
+      if (skillSnd != null && skillSnd.length > 0) {
+        this.flutterSound.play(skillSnd);
+      }
+      this._actorSprites[crt].sprite = crActor.hp > 0
+          ? ((lastAbility.dmgType & Performance.DmgTypeSpi ==
+          Performance.DmgTypeSpi
+          || lastAbility.dmgType == Performance.DmgTypeWis)
+          ? SPR_CAST
+          : SPR_ACT) : SPR_FALLEN;
+      new Timer(Duration(milliseconds: FRAME_TIME * 5), () {
+        for (int trg = this._sceneAct.firstTarget; trg <=
+            this._sceneAct.lastTarget; trg++) {
+          if (trg != crt) {
+            final SpriteState trgSprite = this._actorSprites[trg];
+            final Actor trgActor = trgSprite.actor;
+            final bool ko = koActors.contains(trgActor);
+            trgSprite.skillSprite = lastAbility.sprite;
+            if (trgActor.hp > 0) {
+              if (ko) {
+                trgSprite.sprite = SPR_RISEN;
+                koActors.remove(trgActor);
+              } else {
+                trgSprite.sprite = SPR_HIT;
+              }
+            } else {
+              trgSprite.sprite = SPR_FALLEN;
+              if (!ko) {
+                koActors.add(trgActor);
+              }
+            }
           }
         }
+        new Timer(Duration(milliseconds: _waitTime), () {
+          this._endTurn(ret);
+        });
       });
-    });
+    }
+  }
+
+  void _endTurn(String ret) {
+    _waitTime = 0;
+    int crt = this._sceneAct.current;
+    final List<Actor> players = this._sceneAct.players;
+    final List<Actor> koActors = _koActors;
+    ret = this._sceneAct.setNext(ret, true);
+    if (players[crt].hp < 1) {
+      koActors.add(players[crt]);
+      this._actorSprites[crt].sprite = SPR_FALLEN;
+    }
+    this._actionsTxt.text = "$ret${this._actionsTxt.text}";
+    if (this._sceneAct.status != 0) {
+      //TODO:
+    } else {
+      if (this._automatic ||
+          players[(crt = this._sceneAct.current)].automatic != 0) {
+        this._execAI();
+      } else {
+        this.activeBtn = true;
+        this.setState(() {
+          final Actor crActor = this._crActor = players[crt];
+          final List<Performance> skills = crActor.availableSkills;
+          this._crSkills = this._prepareAbilities(skills, null, crt);
+          this._crSkill = skills[0];
+          final Map<int, List<Performance>> items = this._sceneAct
+              .crItems;
+          final List<DropdownMenuItem<Performance>> crItemsView =
+          this._crItems =
+          (items == null || items[crt] == null || items[crt].length == 0)
+              ? this.emptyAbilities : this._prepareAbilities(
+              items[crt], crActor.items, crt);
+          this._crItem = crItemsView[0].value;
+          this._setCrAutoSkill();
+        });
+      }
+    }
   }
 
   void _setCrAutoSkill() {

@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import 'dart:math';
+
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/Performance.dart';
 import 'package:sprintf/sprintf.dart';
@@ -28,6 +30,7 @@ class SceneAct {
   bool _useInit;
   int _status = 0;
   int _enIdx;
+  int _surprise;
   int _current;
   int _fTarget;
   int _lTarget;
@@ -396,8 +399,28 @@ class SceneAct {
   }
 
   String escape() {
-    this._status = -1;
-    return SceneAct.escapeTxt;
+    final int enIdx = this._enIdx;
+    final List<Actor> players = this._players;
+    final int surprise = this._surprise;
+    int pAgiSum = 0;
+    int eAgiSum = 0;
+    if (surprise < 1) {
+      for (int i = 0; i < enIdx; i++) {
+        pAgiSum += players[i].agi;
+      }
+      pAgiSum ~/= enIdx;
+      for (int i = enIdx; i < players.length; i++) {
+        eAgiSum += players[i].agi;
+      }
+      eAgiSum ~/= (players.length - enIdx);
+    }
+    this._lastAbility = null;
+    if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
+      this._status = -1;
+      return SceneAct.escapeTxt;
+    } else {
+      return SceneAct.failTxt;
+    }
   }
 
   SceneAct(final List<Actor> party, final List<Actor> enemy, final int surprise) {
@@ -428,6 +451,7 @@ class SceneAct {
         }
       }
     }
+    this._surprise = surprise;
     this._useInit = useInit;
     this.setNext("", false);
   }
