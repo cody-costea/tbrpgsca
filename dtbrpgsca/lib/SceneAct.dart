@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import 'dart:math';
-
 import 'package:dtbrpgsca/Actor.dart';
 import 'package:dtbrpgsca/Performance.dart';
 import 'package:sprintf/sprintf.dart';
@@ -27,49 +26,52 @@ class SceneAct {
   static String escapeTxt = "The party has escaped!";
   static String failTxt = "The party attempted to escape, but failed.";
 
-  bool _useInit;
-  int _status = 0;
-  int _enIdx;
   int _surprise;
-  int _current;
-  int _fTarget;
-  int _lTarget;
-  List<Actor> _players;
-  Map<int, List<Performance>> _crItems;
-  Performance _lastAbility;
+  int get surprise {
+    return this._surprise;
+  }
 
+  int _status = 0;
   int get status {
     return this._status;
   }
 
+  int _current;
   int get current {
     return this._current;
   }
 
+  int _fTarget;
   int get firstTarget {
     return this._fTarget;
   }
 
+  int _lTarget;
   int get lastTarget {
     return this._lTarget;
   }
 
+  int _enIdx;
   int get enemyIndex {
     return this._enIdx;
   }
 
+  Performance _lastAbility;
   Performance get lastAbility {
     return this._lastAbility;
   }
 
+  List<Actor> _players;
   List<Actor> get players {
     return this._players;
   }
 
+  bool _useInit;
   bool get useInit {
     return this._useInit;
   }
 
+  Map<int, List<Performance>> _crItems;
   Map<int, List<Performance>> get crItems {
     return this._crItems;
 }
@@ -384,7 +386,7 @@ class SceneAct {
     return this.executeAbility(this._players[this._current].availableSkills[index], target, ret);
   }
 
-  String useItem(final Performance item, final int target, final String ret) {
+  String useAbility(final Performance item, final int target, final String ret) {
     final Map<Performance, int> crItemsMap = this._players[this._current].items;
     if (crItemsMap != null) {
       final int itemQty = (crItemsMap[item] ?? 1) - 1;
@@ -398,23 +400,41 @@ class SceneAct {
     return this.executeAbility(item, target, ret);
   }
 
+  String useItem(final int index, final int target, final String ret) {
+    final List<Performance> crItems = this._crItems[this._current];
+    if (crItems != null && index < crItems.length) {
+      return this.useAbility(crItems[index], target, ret);
+    } else {
+      return ret;
+    }
+  }
+
   String escape() {
+    this._lastAbility = null;
+    final int surprise = this._surprise;
+    if (surprise < 0) {
+      return SceneAct.failTxt;
+    }
     final int enIdx = this._enIdx;
     final List<Actor> players = this._players;
-    final int surprise = this._surprise;
     int pAgiSum = 0;
     int eAgiSum = 0;
     if (surprise < 1) {
       for (int i = 0; i < enIdx; i++) {
-        pAgiSum += players[i].agi;
+        final Actor actor = players[i];
+        if (actor.hp > 0) {
+          pAgiSum += actor.agi;
+        }
       }
       pAgiSum ~/= enIdx;
       for (int i = enIdx; i < players.length; i++) {
-        eAgiSum += players[i].agi;
+        final Actor actor = players[i];
+        if (actor.hp > 0) {
+          eAgiSum += actor.agi;
+        }
       }
       eAgiSum ~/= (players.length - enIdx);
     }
-    this._lastAbility = null;
     if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
       this._status = -1;
       return SceneAct.escapeTxt;

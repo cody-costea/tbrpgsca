@@ -64,8 +64,8 @@ class SpriteState extends State<ActorSprite> {
   int _counter = 0;
   int _skillCnt = 0;
   Function _onClick;
-
   Actor _player;
+
   set actor(final Actor value) {
     this._player = value;
     this.name = value.job.sprite;
@@ -324,6 +324,8 @@ class ArenaStage extends StatefulWidget {
 
 class ArenaState extends State<ArenaStage> {
 
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   SceneAct _sceneAct;
   List<SpriteState> _actorSprites;
   Actor _crActor;
@@ -381,6 +383,7 @@ class ArenaState extends State<ArenaStage> {
     final Performance crItem = this._crItem;
     final Actor crActor = this._crActor;
     return new MaterialApp(
+        navigatorKey: this.navigatorKey,
         title: 'Turn-Based RPG Simple Combat Arena',
         theme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
@@ -548,7 +551,7 @@ class ArenaState extends State<ArenaStage> {
                               child: MaterialButton(
                                 onPressed: activeBtn && crItem != null
                                     && this._canPerform(crItem) ? () {
-                                  this._afterAct(this._sceneAct.useItem(crItem, this._target, ""));
+                                  this._afterAct(this._sceneAct.useAbility(crItem, this._target, ""));
                                 } : null,
                                 child: Text('Use', overflow: TextOverflow.fade),
                               )
@@ -712,7 +715,18 @@ class ArenaState extends State<ArenaStage> {
     }
     this._actionsTxt.text = "$ret${this._actionsTxt.text}";
     if (this._sceneAct.status != 0) {
-      //TODO:
+      final context = this.navigatorKey.currentState.overlay.context;
+      showDialog<void>(context: context, barrierDismissible: false,
+          builder: (final BuildContext context) {
+            return AlertDialog(title: Text('Result'), content: Text(ret),
+              actions: <Widget>[
+                FlatButton(child: Text("Ok"),
+                  onPressed: () {
+                    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                  }
+                )
+              ]);
+          });
     } else {
       if (this._automatic ||
           players[(crt = this._sceneAct.current)].automatic != 0) {

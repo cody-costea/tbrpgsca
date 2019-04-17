@@ -19,6 +19,7 @@ import 'package:dtbrpgsca/StateMask.dart';
 import 'package:sprintf/sprintf.dart';
 
 class Actor extends Costume {
+
   static String koTxt = ", %s falls unconscious";
 
   Costume _race, _job;
@@ -240,7 +241,6 @@ class Actor extends Costume {
     this.mSp += i * role.spi;
     this.wis += i * role.wis;
     this.agi += i * role.agi;
-    //this.mActions += i * role.mActions
   }
 
   void updateSkills(final bool remove, final List<Performance> abilities) {
@@ -475,4 +475,5 @@ class Actor extends Costume {
     this.sp = this.mSp;
     this._items = items;
   }
+
 }

@@ -20,6 +20,7 @@ import 'package:dtbrpgsca/StateMask.dart';
 import 'package:sprintf/sprintf.dart';
 
 class Performance extends RolePlay {
+
   static const int DmgTypeAtk = 1;
   static const int DmgTypeDef = 2;
   static const int DmgTypeSpi = 4;
@@ -211,4 +212,5 @@ class Performance extends RolePlay {
     this.restore = restoreKO;
     this.rStates = rStates;
   }
+
 }

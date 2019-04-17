@@ -172,4 +172,5 @@ class StateMask extends Costume {
     this.dmgSp = dmgSp;
     this.rSkills = rSkills;
   }
+
 }
