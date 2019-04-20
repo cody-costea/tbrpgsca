@@ -116,9 +116,7 @@ class Actor extends Costume {
     if (ranged == null) {
       final Map<int, Costume> equipment = this.equipment;
       final Map<StateMask, int> states = this.stateDur;
-      ranged = super.range || this.job.range || this.race.range;
-      /*|| (equipment != null && equipment. { it.range }
-          || (states !== null && states.any { it.value != 0 && it.key.range }))*/
+      ranged = super.range || this._job.range || this._race.range;
       if (!ranged && equipment != null) {
         for (Costume c in equipment.values) {
           if (c.range) {

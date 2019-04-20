@@ -708,7 +708,8 @@ class ArenaState extends State<ArenaStage> {
     int crt = this._sceneAct.current;
     final List<Actor> players = this._sceneAct.players;
     final List<Actor> koActors = _koActors;
-    ret = this._sceneAct.setNext(ret, true);
+    final String r = this._sceneAct.setNext("", true);
+    ret = r + ret;
     if (players[crt].hp < 1) {
       koActors.add(players[crt]);
       this._actorSprites[crt].sprite = SPR_FALLEN;
@@ -718,7 +719,7 @@ class ArenaState extends State<ArenaStage> {
       final context = this.navigatorKey.currentState.overlay.context;
       showDialog<void>(context: context, barrierDismissible: false,
           builder: (final BuildContext context) {
-            return AlertDialog(title: Text('Result'), content: Text(ret),
+            return AlertDialog(title: Text('Result'), content: Text(r),
               actions: <Widget>[
                 FlatButton(child: Text("Ok"),
                   onPressed: () {
@@ -738,8 +739,7 @@ class ArenaState extends State<ArenaStage> {
           final List<Performance> skills = crActor.availableSkills;
           this._crSkills = this._prepareAbilities(skills, null, crt);
           this._crSkill = skills[0];
-          final Map<int, List<Performance>> items = this._sceneAct
-              .crItems;
+          final Map<int, List<Performance>> items = this._sceneAct.crItems;
           final List<DropdownMenuItem<Performance>> crItemsView =
           this._crItems =
           (items == null || items[crt] == null || items[crt].length == 0)

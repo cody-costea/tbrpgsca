@@ -18,6 +18,7 @@ import 'package:dtbrpgsca/RolePlay.dart';
 import 'package:dtbrpgsca/StateMask.dart';
 
 class Costume extends RolePlay {
+
   int atk, def, spi, wis, agi;
   List<Performance> aSkills;
   Map<StateMask, int> stRes;
