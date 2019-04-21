@@ -478,7 +478,7 @@ public final class Actor extends Costume {
   Costume equipItem(final Object pos, final Costume item) {
     final Costume r = this.unequipPos(pos);
     Hashtable e = this.equipment;
-    if (equipment == null) {
+    if (e == null) {
       e = new Hashtable();
       this.equipment = e;
     }
