@@ -719,7 +719,7 @@ class ArenaState extends State<ArenaStage> {
       final context = this.navigatorKey.currentState.overlay.context;
       showDialog<void>(context: context, barrierDismissible: false,
           builder: (final BuildContext context) {
-            return AlertDialog(title: Text('Result'), content: Text(r),
+            return AlertDialog(title: Text('Result'), content: Text(r.length > 0 ? r : ret),
               actions: <Widget>[
                 FlatButton(child: Text("Ok"),
                   onPressed: () {
