@@ -19,7 +19,6 @@ package mtbrpgsca;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Vector;
 
 public final class Performance extends RolePlay {
     
@@ -33,7 +32,7 @@ public final class Performance extends RolePlay {
   protected boolean steal, absorb, restore;
   protected int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg;
   protected Integer elm;
-  protected Vector rStates;
+  protected StateMask[] rStates;
 
   public String execute(final Actor user, Actor target, final boolean applyCosts) {
     String s = "";
@@ -107,10 +106,10 @@ public final class Performance extends RolePlay {
         s += ", " + target.name + " suffers" + RolePlay.getDmgText(hpDmg, mpDmg, spDmg);
       }
       String r;
-      final Vector aStates = this.aStates;
+      final StateMask[] aStates = this.aStates;
       if (aStates != null) {
-        for (int j = 0; j < aStates.size(); j++) {
-          r = ((StateMask)aStates.elementAt(j)).inflict(target, false, false);
+        for (int j = 0; j < aStates.length; j++) {
+          r = aStates[j].inflict(target, false, false);
           if (r.length() > 0) {
             s += r;
           }
@@ -118,13 +117,13 @@ public final class Performance extends RolePlay {
       }
       final Hashtable trgStateMap = target.stateDur;
       if (trgStateMap != null) {
-        final Vector rStates = this.rStates;
+        final StateMask[] rStates = this.rStates;
         if (rStates != null) {
-          for (int j = 0; j < rStates.size(); j++) {
+          for (int j = 0; j < rStates.length; j++) {
             final Enumeration trgStates = trgStateMap.keys();
             while (trgStates.hasMoreElements()) {
               final StateMask state = (StateMask)trgStates.nextElement();
-              if (rStates.elementAt(j).equals(state)) {
+              if (rStates[j].equals(state)) {
                 state.remove(target, false, false);
               }
             }
@@ -209,8 +208,8 @@ public final class Performance extends RolePlay {
   Performance(final int id, final String name, final String sprite, final String sound, final boolean steal,
               final boolean range, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
               final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final Integer elm,
-              final int mQty, final int rQty, final boolean absorb, final boolean restoreKO, final Vector aStates,
-              final Vector rStates) {
+              final int mQty, final int rQty, final boolean absorb, final boolean restoreKO, final StateMask[] aStates,
+              final StateMask[] rStates) {
     super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates);
     this.sound = sound;
     this.steal = steal;

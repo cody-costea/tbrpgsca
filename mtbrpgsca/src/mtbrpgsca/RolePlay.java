@@ -16,13 +16,11 @@ limitations under the License.
 
 package mtbrpgsca;
 
-import java.util.Vector;
-
 public abstract class RolePlay {
 
   protected String name, sprite;
   protected int id, mHp, mMp, mSp, mInit;
-  protected Vector aStates;
+  protected StateMask[] aStates;
   protected boolean _range;
 
   public boolean getRange() {
@@ -35,7 +33,7 @@ public abstract class RolePlay {
   }
 
   RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
-           final int sp, final int mInit, final boolean range, final Vector states) {
+           final int sp, final int mInit, final boolean range, final StateMask[] states) {
     this.id = id;
     this.name = name;
     this.sprite = sprite;

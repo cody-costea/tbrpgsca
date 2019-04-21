@@ -212,24 +212,21 @@ public final class Actor extends Costume {
     }
   }
 
-  void updateStates(final boolean remove, final Vector states) {
+  void updateStates(final boolean remove, final StateMask[] states) {
     if (states == null) {
       return;
     }
     final Hashtable aStates = this.stateDur;
-    final Enumeration sMasks;
     if (remove) {
       if (aStates == null) {
         return;
       }
-      sMasks = states.elements();
-      while (sMasks.hasMoreElements()) {
-        ((StateMask)sMasks.nextElement()).remove(this, true, true);
+      for (int i = 0; i < states.length; i++) {
+        states[i].remove(this, true, true);
       }
     } else {
-      sMasks = states.elements();
-      while (sMasks.hasMoreElements()) {
-        ((StateMask)sMasks.nextElement()).inflict(this, true, true);
+      for (int i = 0; i < states.length; i++) {
+        states[i].inflict(this, true, true);
       }
     }
   }
@@ -257,14 +254,14 @@ public final class Actor extends Costume {
     this.agi += i * role.agi;
   }
 
-  void updateSkills(final boolean remove, final Vector abilities) {
+  void updateSkills(final boolean remove, final Performance[] abilities) {
     if (abilities == null) {
       return;
     }
     final Vector skills = this.getAvailableSkills();
     if (remove) {
-      for (int i = 0; i < abilities.size(); i++) {
-        Performance k = (Performance)abilities.elementAt(i);
+      for (int i = 0; i < abilities.length; i++) {
+        Performance k = abilities[i];
         skills.removeElement(k);
         if (k.rQty > 0) {
           Hashtable regSkills = this.skillsQtyRgTurn;
@@ -274,9 +271,9 @@ public final class Actor extends Costume {
         }
       }
     } else {
-      skills.setSize(skills.size() + abilities.size());
-      for (int i = 0; i < abilities.size(); i++) {
-        Performance k = (Performance)abilities.elementAt(i);
+      skills.setSize(skills.size() + abilities.length);
+      for (int i = 0; i < abilities.length; i++) {
+        Performance k = (Performance)abilities[i];
         skills.addElement(k);
         if (k.mQty > 0) {
           Hashtable skillsQty = this.skillsQty;
@@ -492,8 +489,8 @@ public final class Actor extends Costume {
 
   Actor(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
         final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
-        final int wis, final int agi, final boolean range, final Hashtable res, final Vector skills, final Vector states,
-        final Hashtable stRes, final Hashtable items) {
+        final int wis, final int agi, final boolean range, final Hashtable res, final Performance[] skills,
+        final StateMask[] states, final Hashtable stRes, final Hashtable items) {
     super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes);
     this._xp = 0;
     this._maxp = 15;

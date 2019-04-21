@@ -17,18 +17,18 @@ limitations under the License.
 package mtbrpgsca;
 
 import java.util.Hashtable;
-import java.util.Vector;
 
 public class Costume extends RolePlay {
     
   protected int atk, def, spi, wis, agi;
-  protected Vector aSkills;
+  protected Performance[] aSkills;
   protected Hashtable stRes;
   protected Hashtable res;
 
   Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp,
           final int atk, final int def, final int spi, final int wis, final int agi, final int mInit,
-          final boolean range, final Hashtable res, final Vector skills, final Vector states, final Hashtable stRes) {
+          final boolean range, final Hashtable res, final Performance[] skills, final StateMask[] states,
+          final Hashtable stRes) {
     super(id, name, sprite, hp, mp, sp, mInit, range, states);
     this.atk = atk;
     this.def = def;

@@ -18,11 +18,10 @@ package mtbrpgsca;
 
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Vector;
 
 public final class StateMask extends Costume {
     
-  protected Vector rSkills;
+  protected Performance[] rSkills;
   protected boolean automate, confuse, inactivate, reflect;
   protected int dur, sRes, dmgHp, dmgMp, dmgSp;
 
@@ -52,7 +51,7 @@ public final class StateMask extends Costume {
   }
 
   void disableSkills(final Actor actor, final boolean remove) {
-    final Vector rSkills = this.rSkills;
+    final Performance[] rSkills = this.rSkills;
     if (rSkills == null) {
       return;
     }
@@ -62,8 +61,8 @@ public final class StateMask extends Costume {
       if (iSkills == null) {
         return;
       } else {
-        for (int i = 0; i < rSkills.size(); i++) {
-          Performance k = (Performance)rSkills.elementAt(i);
+        for (int i = 0; i < rSkills.length; i++) {
+          Performance k = rSkills[i];
           if (k.mQty > 0) {
             iSkills.put(k, new Integer((q = iSkills.get(k)) == null ? 0 : -1 * ((Integer)q).intValue()));
           } else {
@@ -76,8 +75,8 @@ public final class StateMask extends Costume {
         iSkills = new Hashtable();
         actor.skillsQty = iSkills;
       }
-      for (int i = 0; i < rSkills.size(); i++) {
-        Performance k = (Performance)rSkills.elementAt(i);
+      for (int i = 0; i < rSkills.length; i++) {
+        Performance k = rSkills[i];
         iSkills.put(k, new Integer(k.mQty > 0 ? -1 * ((q = iSkills.get(k)) == null ? 0 : ((Integer)q).intValue()) : 0));
       }
     }
@@ -163,8 +162,8 @@ public final class StateMask extends Costume {
   StateMask(final int id, final String name, final boolean inactivate, final boolean automate, final boolean confuse,
             final boolean reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp,
             final int hp, final int mp, final int sp, final int atk, final int def, final int spi, final int wis,
-            final int agi, final int mInit, final boolean range, final Hashtable res, final Vector aSkills,
-            final Vector rSkills, final Vector states, final Hashtable stRes) {
+            final int agi, final int mInit, final boolean range, final Hashtable res, final Performance[] aSkills,
+            final Performance[] rSkills, final StateMask[] states, final Hashtable stRes) {
     super(id, name, null, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
     this.inactivate = inactivate;
     this.automate = automate;
