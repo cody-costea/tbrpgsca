@@ -197,8 +197,8 @@ class SceneAct {
       }
       final Map<Performance, int> regSkills = crActor.skillsQtyRgTurn;
       if (regSkills != null) {
+        final Map<Performance, int> skillsQty = crActor.skillsQty;
         for (Performance skill in regSkills.keys) {
-          final Map<Performance, int> skillsQty = crActor.skillsQty;
           if (skillsQty != null &&
               (skillsQty[skill] ?? skill.mQty) < skill.mQty) {
             if (regSkills[skill] == skill.rQty) {
@@ -293,16 +293,17 @@ class SceneAct {
         this._lTarget = target;
     }
     bool applyCosts = true;
-    ret += sprintf("\n${SceneAct.performsTxt}", [this.players[this.current].name, skill.name]);
+    final Actor crActor = this._players[this._current];
+    ret += sprintf("\n${SceneAct.performsTxt}", [crActor.name, skill.name]);
     for (int i = this._fTarget; i <= this._lTarget; i++) {
       if ((skill.mHp < 0 && skill.restore) || this._players[i].hp > 0) {
-        ret += skill.execute(this._players[this._current], this._players[i], applyCosts);
+        ret += skill.execute(crActor, this._players[i], applyCosts);
         applyCosts = false;
       }
     }
     ret += ".";
-    this._players[this._current].exp++;
-    this._players[this._current].levelUp();
+    crActor.exp++;
+    crActor.levelUp();
     this._lastAbility = skill;
     return ret;
   }
@@ -329,16 +330,17 @@ class SceneAct {
       }
     }
     final Actor crActor = this._players[this._current];
+    final List<Performance> crSkills = crActor.availableSkills;
     if (nRestore || nHeal) {
-      for (int i = 0; i < crActor.availableSkills.length; i++) {
-        final Performance s = crActor.availableSkills[i];
-        if ((s.restore || (nHeal && s.mHp < 0)) && s.canPerform(this.players[this.current])) {
+      for (int i = 0; i < crSkills.length; i++) {
+        final Performance s = crSkills[i];
+        if ((s.restore || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
           skillIndex = i;
         }
         break;
       }
     }
-    final Performance ability = crActor.availableSkills[this.getAIskill(skillIndex, nRestore)];
+    final Performance ability = crSkills[this.getAIskill(skillIndex, nRestore)];
     final bool atkSkill = ability.mHp > -1;
     if (atkSkill) {
       if (party) {
@@ -364,9 +366,10 @@ class SceneAct {
   int getAIskill(final int defSkill, final bool nRestore) {
     int ret = defSkill;
     final Actor crActor = this._players[this._current];
-    Performance s = crActor.availableSkills[defSkill];
-    for (int i = defSkill + 1; i < crActor.availableSkills.length; i++) {
-      final Performance a = crActor.availableSkills[i];
+    final List<Performance> crSkills = crActor.availableSkills;
+    Performance s = crSkills[defSkill];
+    for (int i = defSkill + 1; i < crSkills.length; i++) {
+      final Performance a = crSkills[i];
       if (a.canPerform(crActor)) {
         if (defSkill > 0) {
           if (a.mHp < s.mHp && (a.restore || !nRestore)) {
@@ -393,7 +396,6 @@ class SceneAct {
       if (itemQty > 0) {
         crItemsMap[item] = itemQty;
       } else {
-        crItems.remove(item);
         crItemsMap.remove(item);
       }
     }
@@ -449,24 +451,26 @@ class SceneAct {
     final List<Actor> players = this._players = party + enemy;
     this._current = surprise < 0 ? enIdx : 0;
     for (int i = 0; i < players.length; i++) {
-      if (!useInit && players[i].mInit != 0) {
+      final Actor iPlayer = players[i];
+      if (!useInit && iPlayer.mInit != 0) {
         useInit = true;
       }
-      final int iInit = players[i].mInit > 0 ? players[i].mInit : players.length;
+      final int iInit = iPlayer.mInit > 0 ? iPlayer.mInit : players.length;
       if ((surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx)) {
-        players[i].init = 0;
-        players[i].active = false;
+        iPlayer.init = 0;
+        iPlayer.active = false;
       } else {
-        players[i].init = iInit;
-        players[i].active = players[i].hp > 0;
+        iPlayer.init = iInit;
+        iPlayer.active = iPlayer.hp > 0;
       }
       for (int j = 0; j < players.length; j++) {
         if (j == i) {
           continue;
         } else {
-          final int jInit = players[j].mInit > 0 ? players[j].mInit : players.length;
+          final Actor jPlayer = players[j];
+          final int jInit = jPlayer.mInit > 0 ? jPlayer.mInit : players.length;
           if (iInit < jInit) {
-            players[j].init -= (jInit - iInit);
+            jPlayer.init -= (jInit - iInit);
           }
         }
       }

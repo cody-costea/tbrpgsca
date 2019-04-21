@@ -439,7 +439,7 @@ class Actor extends Costume {
   Costume equipItem(final int pos, final Costume item) {
     final Costume r = this.unequipPos(pos);
     Map<int, Costume> e = this.equipment;
-    if (equipment == null) {
+    if (e == null) {
       e = new Map();
       this.equipment = e;
     }
