@@ -315,11 +315,11 @@ class Actor extends Costume {
 
   String checkStatus() {
     String s = "";
-    if (this.hp < 1) {
+    if (this._hp < 1) {
       s += sprintf(Actor.koTxt, [this.name]);
       this.active = false;
       this.guards = false;
-      this.sp = 0;
+      this._sp = 0;
       final Map<StateMask, int> sDur = this.stateDur;
       if (sDur != null) {
         for (StateMask state in sDur.keys) {
@@ -339,7 +339,7 @@ class Actor extends Costume {
       else {
         this.automatic = 2;
       }
-      if (this.hp > 0) {
+      if (this._hp > 0) {
         //if (consume) this.actions = this.mActions
         this.guards = true;
       }
@@ -349,7 +349,7 @@ class Actor extends Costume {
     final Map<StateMask, int> sDur = this.stateDur;
     if (sDur != null) {
       for (MapEntry<StateMask, int> state in sDur.entries) {
-        if (state.value > -3 && this.hp > 0) {
+        if (state.value > -3 && this._hp > 0) {
           final String r = state.key.apply(this, consume);
           if (r.length > 0) {
             if (c) s += ", ";

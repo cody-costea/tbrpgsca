@@ -135,7 +135,7 @@ class Performance extends RolePlay {
           && (rnd.nextInt(12) + user.agi ~/ 4) > 4 + target.agi ~/ 3) {
         //final List<Performance> trgItems = trgItemMap.keys.toList();
         final Performance stolen = trgItemMap.keys.toList()[rnd.nextInt(trgItemMap.length - 1)];
-        final int trgItemQty = trgItemMap[stolen];
+        int trgItemQty = trgItemMap[stolen];
         if (trgItemQty != null && trgItemQty > 0) {
           Map<Performance, int> usrItems = user.items;
           if (usrItems == null) {
@@ -143,11 +143,12 @@ class Performance extends RolePlay {
             user.items = usrItems;
           }
           usrItems[stolen] = (usrItems[stolen] ?? 0) + 1;
-          trgItemMap[stolen] = trgItemQty - 1;
-          s += sprintf(Performance.stolenTxt, [stolen.name, target.name]);
-          if (trgItemMap[stolen] == 0) {
+          if ((--trgItemQty) == 0) {
             trgItemMap.remove(stolen);
+          } else {
+            trgItemMap[stolen] = trgItemQty;
           }
+          s += sprintf(Performance.stolenTxt, [stolen.name, target.name]);
         }
       }
       s += target.checkStatus();
