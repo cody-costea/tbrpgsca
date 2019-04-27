@@ -17,182 +17,228 @@ limitations under the License.
 package mtbrpgsca;
 
 import java.io.IOException;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.GameCanvas;
+import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
-public class ArenaStage extends Form {
+public class ArenaStage extends GameCanvas implements Runnable {
     
-    private static class SceneImage implements Runnable {
-        static final int FRM_TIME = 87;
-        static final int FRM_WIDTH = 80;
-        static final int FRM_HEIGHT = 80;
-        static final int SPR_HIT = 0;
-        static final int SPR_FALL_= 1;
-        static final int SPR_ACT = 2;
-        static final int SPR_RISE = 3;
-        
-        private ArenaStage arenaStage;
-        private SceneAct sceneAct;
-        private int width;
-        private int height;
-        
-        private Image img;
-        private Graphics gpc;
-        
-        private Thread thr;
-        
-        private SpriteImage[] sprites;
-        
-        private static class SpriteImage {
-            protected final Actor actor;
-            
-            private final Sprite spr;
-            private final Image[] img;
-            private final int[][] seq;
-            
-            protected volatile int frm = 0;            
-            protected volatile int crt = -1;
-            
-            protected Sprite setCurrent(final int crt) {
+    static final int FRM_TIME = 87;
+    static final int FRM_WIDTH = 80;
+    static final int FRM_HEIGHT = 80;
+    static final int SPR_HIT = 0;
+    static final int SPR_FALL_= 1;
+    static final int SPR_ACT = 2;
+    static final int SPR_RISE = 3;
+
+    private final SceneAct sceneAct;
+    private final int width;
+    private final int height;
+    
+    //private final LayerManager layer;
+
+    private Thread thr;
+
+    private SpriteImage[] sprites;
+
+    private static class SpriteImage {
+        protected final Actor actor;
+
+        private final Sprite spr;
+        private final Image[] img;
+        private final int[][] seq;
+
+        protected volatile int crt = -1;
+
+        protected Sprite setCurrent(final int crt) {
+            final Sprite spr;
+            int old = this.crt;
+            if (old == crt) {
+                spr = this.spr;
+            } else {
                 this.crt = crt;
                 final boolean rise = crt > 2;
-                final Sprite spr = this.prepareSpr(crt < 0 ? (-1 * crt) - 1 : (rise ? 1 : crt), rise);
-                this.frm = crt < -1 ? spr.getFrameSequenceLength() - 1 : 0;
-                return spr;
-            }
-        
-            public void drawFrame(final Graphics gpc) {
-                final Sprite spr = this.spr;
-                spr.paint(gpc);
-                if (this.crt > -1) {
-                    spr.setFrame(++this.frm);
-                }
-            }
-            
-            private Sprite prepareSpr(final int i, final boolean invert) {
-                Sprite spr = this.spr;
-                if (spr == null) {
-                    spr = new Sprite(this.img[i], SceneImage.FRM_WIDTH, SceneImage.FRM_HEIGHT);
-                } else {
-                    spr.setImage(this.img[i], SceneImage.FRM_WIDTH, SceneImage.FRM_HEIGHT);
-                }
-                final int frameCount = spr.getRawFrameCount();
-                if (frameCount < 7) {
-                    int[] seq = this.seq[i];
-                    if (seq == null) {
-                        seq = this.seq[i] = new int[(frameCount * 2) + 1];
-                        int j;
-                        for (j = 0; j < frameCount; j++) {
-                            seq[j] = j;
-                        }
-                        int k = frameCount - 1;
-                        seq[j++] = k;
-                        for (; k > -1; k--) {
-                            seq[j++] = k;
-                        }
+                final int i = rise ? 1 : (crt < 0 ? (-1 * crt) - 1 : crt);
+                if (old < 0) {
+                    old = (-1 * old) - 1;
+                    if (old == i) {
+                        spr = this.spr;
+                    } else {
+                        spr = this.prepareSpr(i, rise);
                     }
-                    spr.setFrameSequence(seq);
-                } else if (invert) {
-                    int[] seq = this.seq[i];
-                    if (seq == null) {
-                        seq = this.seq[i] = new int[frameCount];
-                        int j = 0;
-                        for (int k = frameCount - 1; k > -1; k--) {
-                            seq[j++] = k;
-                        }
-                    }                    
-                    spr.setFrameSequence(seq);
                 } else {
-                    spr.setFrameSequence(null);
+                    spr = this.prepareSpr(i, rise);
                 }
-                return spr;
             }
-        
-            public SpriteImage(final Actor actor, final int x, final int y, final boolean mirror) throws IOException {
-                this.actor = actor;
-                this.seq = new int[2][];
-                final Image[] img = this.img = new Image[3];
-                for (int i = 0; i < 3; i++) {
-                    img[i] = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + ".png");
-                }
-                final Sprite spr = this.spr = this.prepareSpr(0, false);
-                spr.setRefPixelPosition(x, y);
-                spr.setTransform(mirror ? Sprite.TRANS_MIRROR : Sprite.TRANS_NONE);
-            }
-        }
-        
-        public Image getImage() {
-            Image img = this.img;
-            if (img == null) {
-                img = Image.createImage(this.width, this.height);
-                this.gpc = img.getGraphics();
-                this.img = img;
-                final Thread thr = this.thr = new Thread(this);
-                thr.start();
-            }
-            return this.img;
+            spr.setFrame(crt < -1 ? spr.getFrameSequenceLength() - 1 : 0);
+            return spr;
         }
 
-        public void run() {
-            final SpriteImage[] sprites = this.sprites;
-            while (true) {
-                for (int i = 0; i < sprites.length; i++) {
-                    this.arenaStage.append(String.valueOf(i));
-                    final SpriteImage sprImage = this.sprites[i];
-                    if (sprImage.crt > -1) {
-                        if (sprImage.frm < sprImage.spr.getFrameSequenceLength()) {                        
-                            sprImage.drawFrame(this.gpc);
-                        } else {
-                            sprImage.setCurrent(sprImage.actor._hp < 0 ? -2 : -1);
-                            sprImage.drawFrame(this.gpc);
-                        }
-                    }
-                }
-                try {
-                    Thread.sleep(SceneImage.FRM_TIME);
-                } catch (final InterruptedException ex) {
-                    this.arenaStage.append(ex.getMessage());
-                    ex.printStackTrace();
-                }
+        public int drawFrame(final Graphics gpc) {
+            final Sprite spr = this.spr;
+            spr.paint(gpc);
+            if (this.crt > -1) {
+                spr.nextFrame();
+                return spr.getFrame();
+            } else {
+                return -1;
             }
         }
-        
-        public SceneImage(final ArenaStage arenaStage, final SceneAct sceneAct, final int width, final int height) throws IOException {
-            this.sceneAct = sceneAct;
-            this.arenaStage = arenaStage;
-            this.width = width;
-            this.height = height;
-            final int enIdx = sceneAct._enIdx;
-            final Actor[] players = sceneAct._players;
-            final int len = sceneAct._players.length;
-            final SpriteImage[] sprImages = this.sprites = new SpriteImage[len];
-            int i = 0;
-            sprImages[i] = new SpriteImage(players[i], 50, 50, i++ >= enIdx);
-            /*if (i < len) {
-                sprImages[i] = new SpriteImage(players[i], 40, 40, i++ >= enIdx);
+
+        private Sprite prepareSpr(final int i, final boolean invert) {
+            Sprite spr = this.spr;
+            if (spr == null) {
+                spr = new Sprite(this.img[i], ArenaStage.FRM_WIDTH, ArenaStage.FRM_HEIGHT);
+            } else {
+                spr.setImage(this.img[i], ArenaStage.FRM_WIDTH, ArenaStage.FRM_HEIGHT);
             }
-            if (i < len) {
-                sprImages[i] = new SpriteImage(players[i], 40, 40, i++ >= enIdx);
-            }*/
+            final int frameCount = spr.getRawFrameCount();
+            if (frameCount < 7) {
+                int[] seq = this.seq[i];
+                if (seq == null) {
+                    seq = this.seq[i] = new int[(frameCount * 2) + 1];
+                    int j;
+                    for (j = 0; j < frameCount; j++) {
+                        seq[j] = j;
+                    }                    
+                    int k = frameCount - 1;
+                    seq[j++] = k;
+                    for (; k > -1; k--) {
+                        seq[j++] = k;
+                    }
+                }
+                spr.setFrameSequence(seq);
+            } else if (invert) {
+                int[] seq = this.seq[i];
+                if (seq == null) {
+                    seq = this.seq[i] = new int[frameCount];
+                    int j = 0;
+                    for (int k = frameCount - 1; k > -1; k--) {
+                        seq[j++] = k;
+                    }
+                }                    
+                spr.setFrameSequence(seq);
+            } else {
+                spr.setFrameSequence(null);
+            }
+            return spr;
+        }
+
+        public SpriteImage(final Actor actor, final int x, final int y, final boolean mirror) throws IOException {
+            this.actor = actor;
+            this.seq = new int[3][];
+            final Image[] img = this.img = new Image[3];
+            for (int i = 0; i < 3; i++) {
+                img[i] = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + ".png");
+            }
+            final Sprite spr = this.spr = this.prepareSpr(0, false);
+            spr.setTransform(mirror ? Sprite.TRANS_MIRROR : Sprite.TRANS_NONE);
+            spr.setRefPixelPosition(x, y);
+        }
+    }
+
+    public void playSpr() {
+        Thread thr = this.thr;
+        if (thr == null) {
+            thr = this.thr = new Thread(this);
+            thr.start();
+        }
+    }
+
+    public void run() {
+        final Graphics g = this.getGraphics();
+        final SpriteImage[] sprites = this.sprites;
+        while (true) {
+            g.setClip(0, 0, getWidth(), getHeight());
+            g.setColor(0x000000); // Colour to clear with
+            g.fillRect(0, 0, getWidth(), getHeight());
+            for (int i = 0; i < sprites.length; i++) {
+                final SpriteImage sprImage = this.sprites[i];
+                final Sprite spr = sprImage.spr;
+                /*g.setColor(0xFFFFFF); // Colour to clear with
+                g.drawString(String.valueOf(sprImage.spr.getFrameSequenceLength()), 5, 5, Graphics.TOP|Graphics.LEFT);
+                g.drawString(String.valueOf(sprImage.spr.getRawFrameCount()), 15, 15, Graphics.TOP|Graphics.LEFT);
+                g.drawString(String.valueOf(sprImage.spr.getFrame()), 25, 25, Graphics.TOP|Graphics.LEFT);*/
+                if (spr.getFrame() < spr.getFrameSequenceLength()) {
+                    if (sprImage.drawFrame(g) == 0) {
+                        sprImage.setCurrent(sprImage.actor._hp < 0 ? -2 : -1);
+                    }
+                }
+            }
+            //this.flushGraphics(50, 50, 130, 130);
+            //this.layer.paint(g, 0, 0);
+            this.flushGraphics();
+            try {
+                Thread.sleep(ArenaStage.FRM_TIME);
+            } catch (final InterruptedException ex) {
+                g.drawString(ex.getMessage(), 5, 105, Graphics.BOTTOM|Graphics.LEFT);
+                ex.printStackTrace();
+            }
         }
     }
 
     public ArenaStage(final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
-        super(string);
-        final SceneAct sceneAct = new SceneAct(party, enemy, surprise);
-        final int height = this.getHeight();
-        final int width = this.getWidth();
+        super(true);
+        final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
+        final int height = this.height = this.getHeight();
+        final int width = this.width = this.getWidth();
+        final int enIdx = sceneAct._enIdx;
+        final Actor[] players = sceneAct._players;
+        final int len = sceneAct._players.length;
+        //final LayerManager layer = this.layer = new LayerManager();
+        final SpriteImage[] sprImages = this.sprites = new SpriteImage[len];
         try {
-            final SceneImage sceneImg = new SceneImage(this, sceneAct, 200, 200);
-            this.append(sceneImg.getImage());
-            sceneImg.sprites[0].setCurrent(0);
+            Actor[] team = surprise < 0 ? enemy : party;
+            int i;
+            for (i = 0; i < team.length; i++) {
+                switch (i) {
+                    case 0:
+                        sprImages[i] = new SpriteImage(team[i], 55 , 60, false);
+                        break;
+                    case 1:
+                        sprImages[i] = new SpriteImage(team[i], 0 , 30, false);
+                        break;
+                    case 2:
+                        sprImages[i] = new SpriteImage(team[i], 0 , 90, false);
+                        break;
+                    case 3:
+                        sprImages[i] = new SpriteImage(team[i], 55 , 120, false);
+                        break;
+                }
+                
+            //layer.append(sprImages[0].spr);
+            }
+            team = surprise < 0 ? party : enemy;
+            for (int j = 0; j < team.length; j++) {
+                switch (j) {
+                    case 0:
+                        sprImages[i++] = new SpriteImage(team[j], 195, 30, true);
+                        break;
+                    case 1:
+                        sprImages[i++] = new SpriteImage(team[j], 250, 60, true);
+                        break;
+                    case 2:
+                        sprImages[i++] = new SpriteImage(team[j], 250, 120, true);
+                        break;
+                    case 3:
+                        sprImages[i++] = new SpriteImage(team[j], 195, 90, true);
+                        break;
+                }
+            }
         } catch (IOException ex) {
-            this.append(ex.getMessage());
             ex.printStackTrace();
         }
+        sprImages[0].setCurrent(3);
+        sprImages[1].setCurrent(2);
+        sprImages[3].setCurrent(0);
+        sprImages[4].setCurrent(1);
+        sprImages[5].setCurrent(0);
+        sprImages[6].setCurrent(0);
+        sprImages[7].setCurrent(2);
+        
+        this.playSpr();
     }
     
 }
