@@ -162,10 +162,10 @@ public class Midlet extends MIDlet {
             new Costume(7, "Knight", "knight", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[8], skill[9], skill[10], skill[11], skill[13]}, null, null),
             new Costume(8, "Ranger", "ranger", 0, 0, 1, 0, 0, 0, 1, 1, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18], skill[21]}, null, null),
             new Costume(9, "Shaman", "shaman", 0, 1, 0, 0, 0, 1, 1, 0, 0, false, null, new Performance[] {skill[52], skill[53], skill[54], skill[55], skill[23], skill[24], skill[29], skill[34], skill[49]}, null, null),
-            new Costume(10, "Corsair", "corsair", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[15], skill[16], skill[17], skill[18], skill[22]}, null, null),
+            new Costume(10, "Corsair", "swashbuckler", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[15], skill[16], skill[17], skill[18], skill[22]}, null, null),
             new Costume(11, "Reaver", "reaver", 1, 0, 0, 1, 0, 0, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[11], skill[23], skill[24], skill[29], skill[15], skill[16], skill[18], skill[45], skill[46]}, null, null),
             new Costume(12, "Ninja", "ninja", 0, 0, 1, 0, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[11], skill[15], skill[16], skill[17], skill[2], skill[3], skill[5], skill[40]}, null, null),
-            new Costume(13, "Crusader", "crusader", 1, 0, 0, 0, 0, 0, 1, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]}, null, null),
+            new Costume(13, "Crusader", "templar", 1, 0, 0, 0, 0, 0, 1, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]}, null, null),
             new Costume(14, "Druid", "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, false, null, new Performance[] {skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]}, null, null),
             new Costume(16, "Sorceress", "sorceress", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]}, null, null),
             new Costume(17, "Valkyrie", "valkyrie", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]}, null, null)
@@ -173,16 +173,16 @@ public class Midlet extends MIDlet {
 
         final Actor[] party = new Actor[] {
             new Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(3, "Victoria", race[0], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(5, "Stephanie", race[3], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(7, "George", race[1], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+            new Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+            new Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+            new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
         };
 
         final Actor[] enemy = new Actor[] {
-            new Actor(2, "Goblin", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(4, "Lizard", race[0], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(6, "Troll", race[3], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(8, "Ogre", race[1], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+            new Actor(2, "Goblin", race[2], job[12], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+            new Actor(4, "Lizard", race[0], job[6], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+            new Actor(6, "Troll", race[3], job[9], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+            new Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
         };
         
         final Display display = Display.getDisplay(this);

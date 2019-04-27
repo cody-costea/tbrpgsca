@@ -21,7 +21,7 @@ import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
 
-public class SceneAct {
+public final class SceneAct {
     
   protected int _surprise;
   public int getSurprise() {

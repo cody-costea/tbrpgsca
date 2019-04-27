@@ -23,7 +23,7 @@ import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
-public class ArenaStage extends GameCanvas implements Runnable {
+public final class ArenaStage extends GameCanvas implements Runnable {
     
     static final int FRM_TIME = 87;
     static final int FRM_WIDTH = 80;
@@ -34,8 +34,9 @@ public class ArenaStage extends GameCanvas implements Runnable {
     static final int SPR_RISE = 3;
 
     private final SceneAct sceneAct;
-    private final int width;
-    private final int height;
+    
+    //private final int width;
+    //private final int height;
     
     //private final LayerManager layer;
 
@@ -131,7 +132,7 @@ public class ArenaStage extends GameCanvas implements Runnable {
             this.seq = new int[3][];
             final Image[] img = this.img = new Image[3];
             for (int i = 0; i < 3; i++) {
-                img[i] = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + ".png");
+                img[i] = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + "_l.png");
             }
             final Sprite spr = this.spr = this.prepareSpr(0, false);
             spr.setTransform(mirror ? Sprite.TRANS_MIRROR : Sprite.TRANS_NONE);
@@ -151,28 +152,23 @@ public class ArenaStage extends GameCanvas implements Runnable {
         final Graphics g = this.getGraphics();
         final SpriteImage[] sprites = this.sprites;
         while (true) {
+            g.setColor(0x000000);
             g.setClip(0, 0, getWidth(), getHeight());
-            g.setColor(0x000000); // Colour to clear with
             g.fillRect(0, 0, getWidth(), getHeight());
             for (int i = 0; i < sprites.length; i++) {
                 final SpriteImage sprImage = this.sprites[i];
                 final Sprite spr = sprImage.spr;
-                /*g.setColor(0xFFFFFF); // Colour to clear with
-                g.drawString(String.valueOf(sprImage.spr.getFrameSequenceLength()), 5, 5, Graphics.TOP|Graphics.LEFT);
-                g.drawString(String.valueOf(sprImage.spr.getRawFrameCount()), 15, 15, Graphics.TOP|Graphics.LEFT);
-                g.drawString(String.valueOf(sprImage.spr.getFrame()), 25, 25, Graphics.TOP|Graphics.LEFT);*/
                 if (spr.getFrame() < spr.getFrameSequenceLength()) {
                     if (sprImage.drawFrame(g) == 0) {
                         sprImage.setCurrent(sprImage.actor._hp < 0 ? -2 : -1);
                     }
                 }
             }
-            //this.flushGraphics(50, 50, 130, 130);
-            //this.layer.paint(g, 0, 0);
             this.flushGraphics();
             try {
                 Thread.sleep(ArenaStage.FRM_TIME);
             } catch (final InterruptedException ex) {
+                g.setColor(0xFFFFFF);
                 g.drawString(ex.getMessage(), 5, 105, Graphics.BOTTOM|Graphics.LEFT);
                 ex.printStackTrace();
             }
@@ -182,8 +178,8 @@ public class ArenaStage extends GameCanvas implements Runnable {
     public ArenaStage(final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
         super(true);
         final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
-        final int height = this.height = this.getHeight();
-        final int width = this.width = this.getWidth();
+        final int height = this.getHeight();
+        final int width = this.getWidth();
         final int enIdx = sceneAct._enIdx;
         final Actor[] players = sceneAct._players;
         final int len = sceneAct._players.length;
