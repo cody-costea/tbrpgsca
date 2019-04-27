@@ -474,7 +474,7 @@ public class SceneAct {
         } else {
           Actor jPlayer = players[j];
           if (jPlayer == null) {
-            jPlayer = players[j] = j < enIdx ? party[j] : enemy[j + enIdx];
+            jPlayer = players[j] = j < enIdx ? party[j] : enemy[j - enIdx];
           }
           final int jInit = jPlayer.mInit > 0 ? jPlayer.mInit : players.length;
           if (iInit < jInit) {

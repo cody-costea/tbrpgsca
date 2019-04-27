@@ -207,7 +207,7 @@ public final class Performance extends RolePlay {
 
   Performance(final int id, final String name, final String sprite, final String sound, final boolean steal,
               final boolean range, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
-              final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final Integer elm,
+              final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final int elm, //TODO: int elm to integer
               final int mQty, final int rQty, final boolean absorb, final boolean restoreKO, final StateMask[] aStates,
               final StateMask[] rStates) {
     super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates);
@@ -219,7 +219,7 @@ public final class Performance extends RolePlay {
     this.spC = spC;
     this.dmgType = dmgType;
     this.trg = trg;
-    this.elm = elm;
+    this.elm = new Integer(elm);
     this.mQty = mQty;
     this.rQty = rQty;
     this.absorb = absorb;
