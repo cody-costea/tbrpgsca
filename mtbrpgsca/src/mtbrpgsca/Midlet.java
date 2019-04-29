@@ -19,7 +19,7 @@ package mtbrpgsca;
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.*;
 
-public class Midlet extends MIDlet {
+public final class Midlet extends MIDlet {
 
     public void startApp() {
         
