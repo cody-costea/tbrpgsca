@@ -17,6 +17,7 @@ limitations under the License.
 package mtbrpgsca;
 
 import java.io.IOException;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.GameCanvas;
@@ -25,9 +26,9 @@ import javax.microedition.lcdui.game.Sprite;
 
 public final class ArenaStage extends GameCanvas implements Runnable {
     
-    static final int FRM_TIME = 87;
-    static final int FRM_WIDTH = 80;
-    static final int FRM_HEIGHT = 80;
+    static final int FRM_TIME = 87;    
+    static final int FRM_KO = -2;
+    static final int FRM_IDLE = -1;
     static final int SPR_HIT = 0;
     static final int SPR_FALL_= 1;
     static final int SPR_ACT = 2;
@@ -93,10 +94,11 @@ public final class ArenaStage extends GameCanvas implements Runnable {
 
         private Sprite prepareSpr(final int i, final boolean invert) {
             Sprite spr = this.spr;
+            final Image img = this.img[i];
             if (spr == null) {
-                spr = new Sprite(this.img[i], ArenaStage.FRM_WIDTH, ArenaStage.FRM_HEIGHT);
+                spr = new Sprite(img, img.getHeight(), img.getHeight());
             } else {
-                spr.setImage(this.img[i], ArenaStage.FRM_WIDTH, ArenaStage.FRM_HEIGHT);
+                spr.setImage(img, img.getHeight(), img.getHeight());
             }
             final int frameCount = spr.getRawFrameCount();
             if (frameCount < 7) {
@@ -153,16 +155,20 @@ public final class ArenaStage extends GameCanvas implements Runnable {
 
     public void run() {
         final Graphics g = this.getGraphics();
+        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM));
         final SpriteImage[] sprites = this.sprites;
         final int yPos = this.sceneYbegin;
         final int width = this.totalWidth;
-        final int height = this.totalHeight - (yPos * 2);
+        final int yEnd = this.sceneYend;
+        int height = this.totalHeight;
+        height = height - (height - yEnd) - yPos;
         while (true) {
             g.setColor(0x000000);
-            g.drawString("width = " + this.totalWidth, 15, 0, Graphics.TOP|Graphics.LEFT);
-            g.drawString("height = " + this.totalHeight, 15, 15, Graphics.TOP|Graphics.LEFT);
-            g.drawString("sceneYbegin = " + this.sceneYbegin, 20, height + yPos, Graphics.TOP|Graphics.LEFT);
-            g.drawString("sceneYend = " + this.sceneYend, 15, height + yPos + 10, Graphics.TOP|Graphics.LEFT);
+            g.drawString("yPos = " + yPos, 15, -3, Graphics.TOP|Graphics.LEFT);            
+            g.drawString("width = " + width, 15, 7, Graphics.TOP|Graphics.LEFT);
+            g.drawString("height = " + height, 15, 17, Graphics.TOP|Graphics.LEFT);
+            g.drawString("sceneYbegin = " + this.sceneYbegin, 15, yEnd - 3, Graphics.TOP|Graphics.LEFT);
+            g.drawString("sceneYend = " + this.sceneYend, 15, yEnd + 7, Graphics.TOP|Graphics.LEFT);
             g.setClip(0, yPos, width, height);
             g.fillRect(0, yPos, width, height);
             for (int i = 0; i < sprites.length; i++) {
@@ -170,7 +176,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Sprite spr = sprImage.spr;
                 if (spr.getFrame() < spr.getFrameSequenceLength()) {
                     if (sprImage.drawFrame(g) == 0) {
-                        sprImage.setCurrent(sprImage.actor._hp < 0 ? -2 : -1);
+                        sprImage.setCurrent(sprImage.actor._hp < 0 ? FRM_KO : FRM_IDLE);
                     }
                 }
             }
@@ -179,7 +185,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 Thread.sleep(ArenaStage.FRM_TIME);
             } catch (final InterruptedException ex) {
                 //g.setColor(0xFFFFFF);
-                g.drawString(ex.getMessage(), 5, 105, Graphics.BOTTOM|Graphics.LEFT);
+                g.drawString(ex.getMessage(), 5, 105, Graphics.TOP|Graphics.LEFT);
                 ex.printStackTrace();
             }
         }
@@ -193,9 +199,10 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final int xFactor = ((width / 4) + (width / (width / 10))) + (width % 30) / 3;
         final int xFraction = xFactor / ((width / 30) / 2);
         final int xCentre = width / 2;
-        final int yFactor = height / 10;
-        final int sceneYbegin = this.sceneYbegin = 32;
-        final int sceneYend = this.sceneYend = sceneYbegin + (yFactor * 3);
+        final int sceneYbegin = this.sceneYbegin = 34;
+        final int sceneYend = this.sceneYend = height - 20; //+ (yFactor * 3);        
+        final int yCentre = ((sceneYend) / 2) - sceneYbegin;
+        final int yFactor = (yCentre / 2);
         final int enIdx = sceneAct._enIdx;
         final Actor[] players = sceneAct._players;
         final int len = sceneAct._players.length;
@@ -207,16 +214,16 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             for (i = 0; i < team.length; i++) {
                 switch (i) {
                     case 0:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, sceneYbegin + yFactor, false);
+                        sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, yCentre - yFactor / 5, false);
                         break;
                     case 1:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2 - xFraction) , sceneYbegin, false);
+                        sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2 - xFraction), yCentre - yFactor, false);
                         break;
                     case 2:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2 - xFraction) , sceneYend - yFactor , false);
+                        sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2 - xFraction), yCentre + (yFactor - yFactor / 3), false);
                         break;
                     case 3:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, sceneYend, false);
+                        sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, yCentre + yFactor + yFactor / 2, false);
                         break;
                 }
                 
@@ -226,16 +233,16 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             for (int j = 0; j < team.length; j++) {
                 switch (j) {
                     case 0:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + xFactor, sceneYbegin, true);
+                        sprImages[i++] = new SpriteImage(team[j], xCentre + xFactor, yCentre - yFactor, true);
                         break;
                     case 1:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2 - xFraction), sceneYbegin + yFactor, true);
+                        sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2 - xFraction), yCentre - yFactor / 5, true);
                         break;
                     case 2:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2 - xFraction), sceneYend, true);
+                        sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2 - xFraction), yCentre + yFactor + yFactor / 2, true);
                         break;
                     case 3:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + xFactor, sceneYend - yFactor, true);
+                        sprImages[i++] = new SpriteImage(team[j], xCentre + xFactor, yCentre + (yFactor - yFactor / 3), true);
                         break;
                 }
             }
