@@ -94,13 +94,13 @@ public final class Performance extends RolePlay {
         mpDmg = -mpDmg;
         spDmg = -spDmg;
       }
-      target._hp -= hpDmg;
-      target._mp -= mpDmg;
-      target._sp -= spDmg;
+      target.setHp(target._hp - hpDmg);
+      target.setMp(target._mp - mpDmg);
+      target.setSp(target._sp - spDmg);
       if (this.absorb) {
-        user._hp += hpDmg / 2;
-        user._mp += mpDmg / 2;
-        user._sp += spDmg / 2;
+        user.setHp(user._hp + hpDmg / 2);
+        user.setMp(user._mp + mpDmg / 2);
+        user.setSp(user._sp + spDmg / 2);
       }
       if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
         s += ", " + target.name + " suffers" + RolePlay.getDmgText(hpDmg, mpDmg, spDmg);

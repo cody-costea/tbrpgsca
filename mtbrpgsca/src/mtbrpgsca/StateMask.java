@@ -99,9 +99,9 @@ public final class StateMask extends Costume {
             final int dmghp = (actor.mHp + rnd) * this.dmgHp / 100;
             final int dmgmp = (actor.mMp + rnd) * this.dmgMp / 100;
             final int dmgsp = (actor.mSp + rnd) * this.dmgSp / 100;
-            actor._hp -= dmghp;
-            actor._mp -= dmgmp;
-            actor._sp -= dmgsp;
+            actor.setHp(actor._hp - dmghp);
+            actor.setMp(actor._mp - dmgmp);
+            actor.setSp(actor._sp - dmgsp);
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
               s += " " + this.name + " causes " + actor.name + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
             }

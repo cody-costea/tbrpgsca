@@ -199,12 +199,17 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                         sprPlay = 1;
                         for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
                             if (i != sceneAct._current) {
-                                final int koBit = (i + 1) * 2;
+                                final int koBit = this.pow(2, i + 1);
                                 if (sceneAct._players[i]._hp > 0) {
-                                    sprites[i].crt = (koActors & koBit) == koBit ? SPR_RISE : SPR_HIT;
+                                    if ((koActors & koBit) == koBit) {
+                                        sprites[i].crt = SPR_RISE;
+                                        koActors -= koBit;
+                                    } else {                                    
+                                        sprites[i].crt = SPR_HIT;
+                                    }
                                 } else {
                                     sprites[i].crt = SPR_FALL;
-                                    koActors |= koBit;
+                                    koActors += koBit;
                                 }
                                 sprPlay++;
                             }
@@ -321,7 +326,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                                         sprPlay--;
                                         break;
                                     case 0:
-                                        sprImage.crt = sprImage.actor._hp < 0 ? SPR_KO : SPR_IDLE;
+                                        sprImage.crt = sprImage.actor._hp < 1 ? SPR_KO : SPR_IDLE;
                                         break;
                                 }
                             }
@@ -387,6 +392,14 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     g.drawString(ex.getMessage(), 0, 50, Graphics.TOP|Graphics.LEFT);
                     ex.printStackTrace();
         }
+    }
+    
+    int pow(final int x, final int y) {
+        int z = 1;
+        for (int i = 0; i < y; i++) {
+            z *= x;
+        }
+        return z;
     }
 
     public ArenaStage(final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
