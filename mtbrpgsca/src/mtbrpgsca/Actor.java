@@ -258,7 +258,7 @@ public final class Actor extends Costume {
     if (abilities == null) {
       return;
     }
-    final Vector skills = this.getAvailableSkills();
+    final Vector skills = this._skills;
     if (remove) {
       for (int i = 0; i < abilities.length; i++) {
         Performance k = abilities[i];
@@ -271,9 +271,8 @@ public final class Actor extends Costume {
         }
       }
     } else {
-      skills.setSize(skills.size() + abilities.length);
       for (int i = 0; i < abilities.length; i++) {
-        Performance k = (Performance)abilities[i];
+        Performance k = abilities[i];
         skills.addElement(k);
         if (k.mQty > 0) {
           Hashtable skillsQty = this.skillsQty;

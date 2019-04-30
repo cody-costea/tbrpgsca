@@ -176,53 +176,72 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final int scnHeight = yEnd - yPos;
         boolean updSprites = true;
         boolean updSkillInfo = true;
-        boolean updActorInfo = false;
+        boolean updActorInfo = true;
         boolean updTargetInfo = true;
         boolean updActions = true;
+        Actor crActor = sceneAct._players[sceneAct._current];
         int target = sceneAct._enIdx;
         int koActors = 0; //bitwise int;
         int crAbility = 0;
+        Performance crPrf = (Performance)crActor.getAvailableSkills().elementAt(0);
         int sprPlay = sceneAct._players.length;
         int sprWait = 7;
-        while (true) {
-            
+        while (true) {            
             if (updActions) {
-                
+                g.setColor(0x0080FF);
+                g.setClip(0, yEnd, width, height - yEnd);
+                g.fillRect(0, yEnd, width, height - yEnd);
+                g.setColor(0xFFFF00);
+                //TODO: draw string
+                this.flushGraphics(0, yEnd, width, height - yEnd);
                 updActions = false;
             }
             if (updActorInfo) {
-                g.setColor(0x000000);
-                g.setClip(0, -3, width, 11);
-                g.fillRect(0, -3, width, 11);
-                final Actor crActor = sceneAct._players[sceneAct._current];
+                g.setColor(0x0080FF);
+                g.setClip(0, -2, width, 13);
+                g.fillRect(0, -2, width, 13);
                 final String actText = crActor.name + "(HP:" + crActor._hp + "/" + crActor.mHp + ",MP:"
                         + crActor._mp + "/" + crActor.mMp + ",RP:" + crActor._sp + "/" + crActor.mSp + ")";
-                g.setColor(0xFFFFFF);
-                g.drawString(actText, 3, -3, Graphics.TOP|Graphics.LEFT);
-                this.flushGraphics(0, -3, width, 11);
+                g.setColor(0xFFFF00);
+                g.drawString(actText, 5, -1, Graphics.TOP|Graphics.LEFT);
+                this.flushGraphics(0, -2, width, 13);
                 updActorInfo = false;
             }
             if (updSkillInfo) {
-                final String prfText;
+                String prfText = "←" + crPrf.name;
                 if (crAbility < 0) {
-                    //TODO: item;
+                    prfText = "";//TODO: item;
                 } else {
-                    
+                    crPrf = (Performance)crActor.getAvailableSkills().elementAt(0);
+                    prfText += "(Lv:" + crPrf.lvRq + ",HPc:" + crPrf.mHp + ",MPc:" + crPrf.mMp
+                            + ",RPc:" + crPrf.mSp + ",Nr:" + 0;
                 }
+                prfText += ")→";
+                g.setColor(0x0080FF);
+                g.setClip(0, 11, width, 25);
+                g.fillRect(0, 11, width, 25);
+                g.setColor(crPrf.canPerform(crActor) ? 0xFFFF00 : 0xC0C0C0);
+                g.drawString(prfText, 0, 10, Graphics.TOP|Graphics.LEFT);
+                this.flushGraphics(0, 11, width, 23);
                 updSkillInfo = false;
             }
             if (updTargetInfo) {
-                final String trgText;
                 final Actor trgActor = sceneAct._players[target];
+                String trgText = "↓" + trgActor.name + "(HP:";
                 if (target < sceneAct._enIdx) {
-                    
+                    trgText = "";
                 } else {
-                    trgText = trgActor.name + "(HP: " + trgActor._hp + "/" + trgActor.mHp + ", MP: " + trgActor._mp
-                            + "/" + trgActor.mMp + ", RP: " + trgActor._sp + "/" + trgActor.mSp + ")";
+                    trgText += trgActor._hp + "/" + trgActor.mHp + ",MP:" + trgActor._mp
+                            + "/" + trgActor.mMp + ",RP:" + trgActor._sp + "/" + trgActor.mSp;
                 }
-                //TODO: draw;
+                trgText += ")↑";
+                g.setColor(0x0080FF);
+                g.setClip(0, 23, width, yPos);
+                g.fillRect(0, 23, width, yPos);
+                g.setColor(sceneAct.getGuardian(target, crPrf) == target ? 0xFFFF00 : 0xC0C0C0);
+                g.drawString(trgText, 2, 21, Graphics.TOP|Graphics.LEFT);
+                this.flushGraphics(0, 23, width, yPos);
                 updTargetInfo = false;
-                
             }
             while (updSprites) {
                 /*g.setColor(0xFFFFFF);
@@ -246,7 +265,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     this.afterAct();
                     updActorInfo = true;
                 } else {
-                    g.setColor(0x000000);
+                    g.setColor(0x007F00);
                     g.setClip(0, yPos, width, scnHeight);
                     g.fillRect(0, yPos, width, scnHeight);
                     for (int i = 0; i < sprites.length; i++) {
