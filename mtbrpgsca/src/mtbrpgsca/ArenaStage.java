@@ -26,11 +26,12 @@ import javax.microedition.lcdui.game.Sprite;
 
 public final class ArenaStage extends GameCanvas implements Runnable {
     
-    static final int FRM_TIME = 87;    
-    static final int FRM_KO = -2;
-    static final int FRM_IDLE = -1;
+    static final int FRM_TIME = 87;
+    static final int SPR_DONE = -3;
+    static final int SPR_KO = -2;
+    static final int SPR_IDLE = -1;
     static final int SPR_HIT = 0;
-    static final int SPR_FALL_= 1;
+    static final int SPR_FALL = 1;
     static final int SPR_ACT = 2;
     static final int SPR_RISE = 3;
 
@@ -45,7 +46,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     //private final LayerManager layer;
 
     private Thread thr;
-
     private SpriteImage[] sprites;
 
     private final static class SpriteImage {
@@ -55,15 +55,17 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         private final Image[] img;
         private final int[][] seq;
 
-        protected volatile int crt = -1;
+        protected volatile int crt;
+        private int old = -7;
 
-        protected Sprite setCurrent(final int crt) {
+        protected Sprite setCurrent() {
             final Sprite spr;
-            int old = this.crt;
+            final int crt = this.crt;
+            int old = this.old;
             if (old == crt) {
                 spr = this.spr;
             } else {
-                this.crt = crt;
+                this.old = crt;
                 final boolean rise = crt > 2;
                 final int i = rise ? 1 : (crt < 0 ? (-1 * crt) - 1 : crt);
                 if (old < 0) {
@@ -77,6 +79,10 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     spr = this.prepareSpr(i, rise);
                 }
             }
+            /*this.old = crt;
+            final boolean rise = crt > 2;
+            final int i = rise ? 1 : (crt < 0 ? (-1 * crt) - 1 : crt);
+            spr = this.prepareSpr(i, rise);*/
             spr.setFrame(crt < -1 ? spr.getFrameSequenceLength() - 1 : 0);
             return spr;
         }
@@ -84,7 +90,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         public int drawFrame(final Graphics gpc) {
             final Sprite spr = this.spr;
             spr.paint(gpc);
-            if (this.crt > -1) {
+            if (this.old > -1) {
                 spr.nextFrame();
                 return spr.getFrame();
             } else {
@@ -94,11 +100,14 @@ public final class ArenaStage extends GameCanvas implements Runnable {
 
         private Sprite prepareSpr(final int i, final boolean invert) {
             Sprite spr = this.spr;
-            final Image img = this.img[i];
-            if (spr == null) {
-                spr = new Sprite(img, img.getHeight(), img.getHeight());
-            } else {
-                spr.setImage(img, img.getHeight(), img.getHeight());
+            {
+                final Image img = this.img[i];
+                final int imgHeight = img.getHeight();
+                if (spr == null) {
+                    spr = new Sprite(img, imgHeight, imgHeight);
+                } else {
+                    spr.setImage(img, imgHeight, imgHeight);
+                }
             }
             final int frameCount = spr.getRawFrameCount();
             if (frameCount < 7) {
@@ -139,55 +148,144 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             for (int i = 0; i < 3; i++) {
                 img[i] = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + "_l.png");
             }
-            final Sprite spr = this.spr = this.prepareSpr(0, false);
+            final boolean ko = actor._hp < 1;
+            final Sprite spr = this.spr = this.prepareSpr(ko ? SPR_FALL : SPR_HIT, false);
             spr.setTransform(mirror ? Sprite.TRANS_MIRROR : Sprite.TRANS_NONE);
             spr.setRefPixelPosition(x, y);
+            this.crt = ko ? SPR_KO : SPR_IDLE;
         }
     }
 
     public void playSpr() {
-        Thread thr = this.thr;
-        if (thr == null) {
-            thr = this.thr = new Thread(this);
-            thr.start();
-        }
+        
+    }
+    
+    public void afterAct() {
+        
     }
 
     public void run() {
         final Graphics g = this.getGraphics();
-        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM));
+        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         final SpriteImage[] sprites = this.sprites;
+        final SceneAct sceneAct = this.sceneAct;
         final int yPos = this.sceneYbegin;
         final int width = this.totalWidth;
         final int yEnd = this.sceneYend;
-        int height = this.totalHeight;
-        height = height - (height - yEnd) - yPos;
+        final int height = this.totalHeight;
+        final int scnHeight = yEnd - yPos;
+        boolean updSprites = true;
+        boolean updSkillInfo = true;
+        boolean updActorInfo = false;
+        boolean updTargetInfo = true;
+        boolean updActions = true;
+        int target = sceneAct._enIdx;
+        int koActors = 0; //bitwise int;
+        int crAbility = 0;
+        int sprPlay = sceneAct._players.length;
+        int sprWait = 7;
         while (true) {
-            g.setColor(0x000000);
-            g.drawString("yPos = " + yPos, 15, -3, Graphics.TOP|Graphics.LEFT);            
-            g.drawString("width = " + width, 15, 7, Graphics.TOP|Graphics.LEFT);
-            g.drawString("height = " + height, 15, 17, Graphics.TOP|Graphics.LEFT);
-            g.drawString("sceneYbegin = " + this.sceneYbegin, 15, yEnd - 3, Graphics.TOP|Graphics.LEFT);
-            g.drawString("sceneYend = " + this.sceneYend, 15, yEnd + 7, Graphics.TOP|Graphics.LEFT);
-            g.setClip(0, yPos, width, height);
-            g.fillRect(0, yPos, width, height);
-            for (int i = 0; i < sprites.length; i++) {
-                final SpriteImage sprImage = this.sprites[i];
-                final Sprite spr = sprImage.spr;
-                if (spr.getFrame() < spr.getFrameSequenceLength()) {
-                    if (sprImage.drawFrame(g) == 0) {
-                        sprImage.setCurrent(sprImage.actor._hp < 0 ? FRM_KO : FRM_IDLE);
+            
+            if (updActions) {
+                
+                updActions = false;
+            }
+            if (updActorInfo) {
+                g.setColor(0x000000);
+                g.setClip(0, -3, width, 11);
+                g.fillRect(0, -3, width, 11);
+                final Actor crActor = sceneAct._players[sceneAct._current];
+                final String actText = crActor.name + "(HP:" + crActor._hp + "/" + crActor.mHp + ",MP:"
+                        + crActor._mp + "/" + crActor.mMp + ",RP:" + crActor._sp + "/" + crActor.mSp + ")";
+                g.setColor(0xFFFFFF);
+                g.drawString(actText, 3, -3, Graphics.TOP|Graphics.LEFT);
+                this.flushGraphics(0, -3, width, 11);
+                updActorInfo = false;
+            }
+            if (updSkillInfo) {
+                final String prfText;
+                if (crAbility < 0) {
+                    //TODO: item;
+                } else {
+                    
+                }
+                updSkillInfo = false;
+            }
+            if (updTargetInfo) {
+                final String trgText;
+                final Actor trgActor = sceneAct._players[target];
+                if (target < sceneAct._enIdx) {
+                    
+                } else {
+                    trgText = trgActor.name + "(HP: " + trgActor._hp + "/" + trgActor.mHp + ", MP: " + trgActor._mp
+                            + "/" + trgActor.mMp + ", RP: " + trgActor._sp + "/" + trgActor.mSp + ")";
+                }
+                //TODO: draw;
+                updTargetInfo = false;
+                
+            }
+            while (updSprites) {
+                /*g.setColor(0xFFFFFF);
+                g.setClip(0, -3, width, yPos);
+                g.fillRect(0, -3, width, yPos);
+                g.setColor(0x000000);
+                g.drawString("sprWait = " + sprWait, 15, -3, Graphics.TOP|Graphics.LEFT);
+                g.drawString("sprPlay = " + sprPlay, 15, 8, Graphics.TOP|Graphics.LEFT);
+                g.drawString("crSpr = " + sprites[1].crt, 15, 19, Graphics.TOP|Graphics.LEFT);
+                this.flushGraphics(0, -3, width, yPos);
+                g.setColor(0xFFFFFF);
+                g.setClip(0, yEnd, width, height - yEnd);
+                g.fillRect(0, yEnd, width, height - yEnd);
+                g.setColor(0x000000);
+                g.drawString("oldSprite = " + oldSprite, 15, yEnd - 3, Graphics.TOP|Graphics.LEFT);
+                g.drawString("sprFrame = " + sprFrm2, 15, yEnd + 8, Graphics.TOP|Graphics.LEFT);
+                this.flushGraphics(0, yEnd, width, height - yEnd);*/
+                if (sprPlay < 1) {
+                    sprWait = 5;
+                    updSprites = false;
+                    this.afterAct();
+                    updActorInfo = true;
+                } else {
+                    g.setColor(0x000000);
+                    g.setClip(0, yPos, width, scnHeight);
+                    g.fillRect(0, yPos, width, scnHeight);
+                    for (int i = 0; i < sprites.length; i++) {
+                        final SpriteImage sprImage = sprites[i];
+                        final int crtSprite = sprImage.crt;
+                        if (crtSprite != SPR_DONE && (crtSprite == SPR_ACT || sprWait == 0)) {
+                            if (sprImage.old != crtSprite) {
+                                sprImage.setCurrent();
+                            }
+                            final Sprite spr = sprImage.spr;
+                            if (spr.getFrame() < spr.getFrameSequenceLength()) {
+                                switch (sprImage.drawFrame(g)) {
+                                    case -1:
+                                        sprImage.crt = SPR_DONE;
+                                        sprPlay--;
+                                        break;
+                                    case 0:
+                                        sprImage.crt = sprImage.actor._hp < 0 ? SPR_KO : SPR_IDLE;
+                                        break;
+                                }
+                            }
+                        } else {
+                            sprImage.drawFrame(g);
+                        }
+                    }
+                    if (sprWait > 0) {
+                        sprWait--;
+                    }
+                    this.flushGraphics(0, yPos, width, scnHeight);
+                    try {
+                        Thread.sleep(ArenaStage.FRM_TIME);
+                    } catch (final InterruptedException ex) {
+                        //g.setColor(0xFFFFFF);
+                        g.drawString(ex.getMessage(), 5, 105, Graphics.TOP|Graphics.LEFT);
+                        ex.printStackTrace();
                     }
                 }
             }
-            this.flushGraphics();
-            try {
-                Thread.sleep(ArenaStage.FRM_TIME);
-            } catch (final InterruptedException ex) {
-                //g.setColor(0xFFFFFF);
-                g.drawString(ex.getMessage(), 5, 105, Graphics.TOP|Graphics.LEFT);
-                ex.printStackTrace();
-            }
+            
         }
     }
 
@@ -199,8 +297,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final int xFactor = ((width / 4) + (width / (width / 10))) + (width % 30) / 3;
         final int xFraction = xFactor / ((width / 30) / 2);
         final int xCentre = width / 2;
-        final int sceneYbegin = this.sceneYbegin = 34;
-        final int sceneYend = this.sceneYend = height - 20; //+ (yFactor * 3);        
+        final int sceneYbegin = this.sceneYbegin = 35;
+        final int sceneYend = this.sceneYend = height - 21; //+ (yFactor * 3);        
         final int yCentre = ((sceneYend) / 2) - sceneYbegin;
         final int yFactor = (yCentre / 2);
         final int enIdx = sceneAct._enIdx;
@@ -249,15 +347,15 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         } catch (final IOException ex) {
             ex.printStackTrace();
         }
-        sprImages[0].setCurrent(3);
-        sprImages[1].setCurrent(2);
-        sprImages[3].setCurrent(0);
-        sprImages[4].setCurrent(1);
-        sprImages[5].setCurrent(0);
-        sprImages[6].setCurrent(0);
-        sprImages[7].setCurrent(2);
+        sprImages[0].crt = 3;
+        sprImages[1].crt = SPR_ACT;
+        sprImages[3].crt = 0;
+        sprImages[4].crt = 1;
+        sprImages[5].crt = 0;
+        sprImages[6].crt = 0;
+        sprImages[7].crt = 2;
         
-        this.playSpr();
+        (this.thr = new Thread(this)).start();
     }
     
 }
