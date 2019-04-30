@@ -71,7 +71,7 @@ public final class Midlet extends MIDlet {
         final Performance[] skill = new Performance[] {
             new Performance(1, "Attack", null, null, false, false, 0, 0, 0, 0, Performance.DmgTypeAtk, 1, 10, 0, -3, 0, 1, -1, -1, false, false, null, confsleep),
             new Performance(2, "Defend", null, null, false, true, 0, 0, 0, 0, Performance.DmgTypeSpi, 1, 0, -1, -2, -1, 0, -1, -1, false, false, null, null),
-            new Performance(3, "Heal", null, null, false, true, 1, 0, 3, 0, Performance.DmgTypeSpi, 1, -25, 0, 0, 0, 6, -1, -1, false, false, null, null),
+            new Performance(3, "Heal", null, null, false, true, 1, 0, 3, 0, Performance.DmgTypeSpi, 1, -25, 0, 0, 0, 6, -1, -1, false, true, null, null),
             new Performance(4, "Meditate", null, null, false, true, 1, 0, 0, 0, Performance.DmgTypeSpi, 1, -1, -7, 10, -1, 6, -1, -1, false, false, null, dizziness),
             new Performance(5, "Cure", null, null, false, true, 3, 0, 7, 0, Performance.DmgTypeSpi, 1, -17, 0, 0, 0, 7, -1, -1, false, true, null, cure),
             new Performance(6, "Clariy", null, null, false, true, 3, 0, 0, 7, Performance.DmgTypeSpi, 1, 0, -3, 0, 0, 6, -1, -1, false, false, clarity, madness),
