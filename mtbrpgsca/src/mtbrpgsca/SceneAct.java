@@ -33,47 +33,47 @@ public final class SceneAct {
     return this._status;
   }
 
-  protected int _current;
+  protected volatile int _current;
   public int getCurrent() {
     return this._current;
   }
 
-  int _fTarget;
-  int getFirstTarget() {
+  protected volatile int _fTarget;
+  public int getFirstTarget() {
     return this._fTarget;
   }
 
-  int _lTarget;
-  int getLastTarget() {
+  protected volatile int _lTarget;
+  public int getLastTarget() {
     return this._lTarget;
   }
 
-  int _enIdx;
-  int getEnemyIndex() {
+  protected volatile int _enIdx;
+  public int getEnemyIndex() {
     return this._enIdx;
   }
 
-  Performance _lastAbility;
-  Performance getLastAbility() {
+  protected volatile Performance _lastAbility;
+  public Performance getLastAbility() {
     return this._lastAbility;
   }
 
   Actor[] _players;
-  Actor[] getPlayers() {
+  public Actor[] getPlayers() {
     return this._players;
   }
 
   boolean _useInit;
-  boolean getUseInit() {
+  public boolean getUseInit() {
     return this._useInit;
   }
 
   Enumeration[] _crItems;
-  Enumeration[] getCrItems() {
+  public Enumeration[] getCrItems() {
     return this._crItems;
 }
 
-  String setNext(String ret, final boolean endTurn) {
+  public String setNext(String ret, final boolean endTurn) {
     if (this._status == 0) {
       int initInc;
       int minInit = 1;

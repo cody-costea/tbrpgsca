@@ -71,7 +71,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final int i = rise ? 1 : (crt < 0 ? (-1 * crt) - 1 : crt);
                 if (old < 0) {
                     old = (-1 * old) - 1;
-                    if (old == i) {
+                    if (old == i && !rise) {
                         spr = this.spr;
                     } else {
                         spr = this.prepareSpr(i, rise);
@@ -191,39 +191,32 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         Performance crPrf = (Performance)crActor.getAvailableSkills().elementAt(0);
         int sprPlay = sceneAct._players.length;
         int sprWait = 0;
-        int keysState;
         while (true) {
             if (updActions) {
                 if (afterAct) {
-                        sprites[sceneAct._current].crt = SPR_ACT;
-                        sprPlay = 1;
-                        for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
-                            if (i != sceneAct._current) {
-                                final int koBit = this.pow(2, i + 1);
-                                if (sceneAct._players[i]._hp > 0) {
-                                    if ((koActors & koBit) == koBit) {
-                                        sprites[i].crt = SPR_RISE;
-                                        koActors -= koBit;
-                                    } else {                                    
-                                        sprites[i].crt = SPR_HIT;
-                                    }
-                                } else {
-                                    sprites[i].crt = SPR_FALL;
-                                    koActors += koBit;
+                    afterAct = false;
+                    sprites[sceneAct._current].crt = SPR_ACT;
+                    sprPlay = 1;
+                    for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
+                        if (i != sceneAct._current) {
+                            final int koBit = this.pow(2, i + 1);
+                            if (sceneAct._players[i]._hp > 0) {
+                                if ((koActors & koBit) == koBit) {
+                                    sprites[i].crt = SPR_RISE;
+                                    koActors -= koBit;
+                                } else {                                    
+                                    sprites[i].crt = SPR_HIT;
                                 }
-                                sprPlay++;
+                            } else {
+                                sprites[i].crt = SPR_FALL;
+                                koActors += koBit;
                             }
+                            sprPlay++;
                         }
-                        updSprites = true;
-                        afterAct = false;
-                }
-                g.setColor(0x0080FF);
-                g.setClip(0, yEnd, width, height - yEnd);
-                g.fillRect(0, yEnd, width, height - yEnd);
-                g.setColor(0xFFFF00);
-                //TODO: draw string
-                this.flushGraphics(0, yEnd, width, height - yEnd);
-                if (newTurn) {
+                    }
+                    updSprites = true;
+                } else if (newTurn) {
+                    newTurn = false;
                     if (sceneAct._players[sceneAct._current].automatic == 0) {
                         crActor = sceneAct._players[sceneAct._current];
                         crPrf = (Performance)crActor.getAvailableSkills().elementAt(0);
@@ -236,8 +229,13 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                         sceneAct.executeAI("");
                         afterAct = true;
                     }
-                    newTurn = false;
-                }
+                }                
+                g.setColor(0x0080FF);
+                g.setClip(0, yEnd, width, height - yEnd);
+                g.fillRect(0, yEnd, width, height - yEnd);
+                g.setColor(0xFFFF00);
+                //TODO: draw string
+                this.flushGraphics(0, yEnd, width, height - yEnd);
             }
             if (updActorInfo) {
                 g.setColor(0x0080FF);
@@ -347,6 +345,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     }
                 }
             }
+            final int keysState;
             if (!updActions && !updSprites && (keysState = this.getKeyStates()) > 0) {
                 if ((keysState & UP_PRESSED) != 0) {
                     if (target > 0) {
