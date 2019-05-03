@@ -533,7 +533,7 @@ QStringList SceneAct::getSprites()
 
 bool SceneAct::escape()
 {
-    this->status == -1;
+    this->status = -1;
     return true;
 }
 

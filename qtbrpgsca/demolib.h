@@ -253,17 +253,17 @@ namespace qtbrpgsca
             {
                 delete this->RACES[i];
             }
-            delete[] this->RACES;
+            //delete[] this->RACES;
             for (i = 0; i < 19; i++)
             {
                 delete this->JOBS[i];
             }
-            delete[] this->JOBS;
+            //delete[] this->JOBS;
             for (i = 0; i < 57; i++)
             {
                 delete this->SKILLS[i];
             }
-            delete[] this->SKILLS;
+            /*delete[] this->SKILLS;
             delete[] this->STATE_BERSERK;
             delete[] this->STATE_CLARITY;
             delete[] this->STATE_CONFCLARITY;
@@ -282,7 +282,7 @@ namespace qtbrpgsca
             delete[] this->STATE_TPOISON;
             delete[] this->STATE_TREGEN;
             delete[] this->STATE_VIGOUR;
-            delete[] this->STATE_WEAKNESS;
+            delete[] this->STATE_WEAKNESS;*/
             delete this->stateWeakness;
             delete this->stateVigour;
             delete this->stateStun;
