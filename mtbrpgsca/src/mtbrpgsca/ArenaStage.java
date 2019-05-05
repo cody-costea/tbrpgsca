@@ -277,7 +277,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Actor trgActor = sceneAct._players[target];
                 String trgText = "↓" + trgActor.name + "(HP:";
                 if (target >= sceneAct._enIdx) {
-                    trgText += "";
+                    trgText += ((int)(trgActor._hp / ((float)trgActor.mHp) * 100.0)) + "%";
                 } else {
                     trgText += trgActor._hp + "/" + trgActor.mHp + ",MP:" + trgActor._mp
                             + "/" + trgActor.mMp + ",RP:" + trgActor._sp + "/" + trgActor.mSp;
@@ -376,9 +376,11 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     }
                 }
                 if (prfCanPerform && (keysState & FIRE_PRESSED) != 0) {
-                    ret = sceneAct.executeAbility(crPrf, target, "");
-                    updActions = true;
-                    afterAct = true;
+                    if (crPrf.restore || sceneAct._players[target]._hp > 0) {
+                        ret = sceneAct.executeAbility(crPrf, target, "");
+                        updActions = true;
+                        afterAct = true;
+                    }
                 }
                 try {
                     Thread.sleep(500);
