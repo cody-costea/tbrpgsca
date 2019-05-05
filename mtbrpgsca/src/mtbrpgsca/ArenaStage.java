@@ -167,7 +167,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
 
     public void run() {
         final Graphics g = this.getGraphics();
-        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        final Font f = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
+        g.setFont(f);
         final SpriteImage[] sprites = this.sprites;
         final SceneAct sceneAct = this.sceneAct;
         final int yPos = this.sceneYbegin;
@@ -191,6 +192,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         Performance crPrf = (Performance)crActor.getAvailableSkills().elementAt(0);
         int sprPlay = sceneAct._players.length;
         int sprWait = 0;
+        String prev = "";
+        String ret = "";
         while (true) {
             if (updActions) {
                 if (afterAct) {
@@ -226,15 +229,19 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                         updActions = false;
                         crAbility = 0;
                     } else {
-                        sceneAct.executeAI("");
+                        ret = sceneAct.executeAI("");
                         afterAct = true;
                     }
-                }                
-                g.setColor(0x0080FF);
-                g.setClip(0, yEnd, width, height - yEnd);
-                g.fillRect(0, yEnd, width, height - yEnd);
-                g.setColor(0xFFFF00);
-                //TODO: draw string
+                }
+                if (ret.length() > 0) {
+                    g.setColor(0x0080FF);
+                    g.setClip(0, yEnd, width, height - yEnd);
+                    g.fillRect(0, yEnd, width, height - yEnd);
+                    g.setColor(0xFFFF00);
+                    g.drawString(prev, 0, yEnd - 3, Graphics.TOP|Graphics.LEFT);
+                    g.drawString(prev = ret, 0, yEnd + 8, Graphics.TOP|Graphics.LEFT);
+                    ret = "";
+                }
                 this.flushGraphics(0, yEnd, width, height - yEnd);
             }
             if (updActorInfo) {
@@ -284,25 +291,10 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 updTargetInfo = false;
             }
             while (updSprites) {
-                /*g.setColor(0xFFFFFF);
-                g.setClip(0, -3, width, yPos);
-                g.fillRect(0, -3, width, yPos);
-                g.setColor(0x000000);
-                g.drawString("sprWait = " + sprWait, 15, -3, Graphics.TOP|Graphics.LEFT);
-                g.drawString("sprPlay = " + sprPlay, 15, 8, Graphics.TOP|Graphics.LEFT);
-                g.drawString("crSpr = " + sprites[1].crt, 15, 19, Graphics.TOP|Graphics.LEFT);
-                this.flushGraphics(0, -3, width, yPos);
-                g.setColor(0xFFFFFF);
-                g.setClip(0, yEnd, width, height - yEnd);
-                g.fillRect(0, yEnd, width, height - yEnd);
-                g.setColor(0x000000);
-                g.drawString("oldSprite = " + oldSprite, 15, yEnd - 3, Graphics.TOP|Graphics.LEFT);
-                g.drawString("sprFrame = " + sprFrm2, 15, yEnd + 8, Graphics.TOP|Graphics.LEFT);
-                this.flushGraphics(0, yEnd, width, height - yEnd);*/
                 if (sprPlay < 1) {
                     sprWait = 5;
                     updSprites = false;
-                    final String ret = sceneAct.setNext("", true);
+                    ret = sceneAct.setNext("", true);
                     updActions = true;
                     newTurn = true;
                 } else {
@@ -373,7 +365,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     }
                 }
                 if (prfCanPerform && (keysState & FIRE_PRESSED) != 0) {
-                    final String ret = sceneAct.executeAbility(crPrf, target, "");
+                    ret = sceneAct.executeAbility(crPrf, target, "");
                     updActions = true;
                     afterAct = true;
                 }
@@ -402,7 +394,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     }
 
     public ArenaStage(final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
-        super(true);
+        super(false);
         final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
         final int height = this.totalHeight = this.getHeight();
         final int width = this.totalWidth = this.getWidth();
