@@ -202,7 +202,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     sprPlay = 1;
                     for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
                         if (i != sceneAct._current) {
-                            final int koBit = this.pow(2, i + 1);
+                            final int koBit = 1 << i;
                             if (sceneAct._players[i]._hp > 0) {
                                 if ((koActors & koBit) == koBit) {
                                     sprites[i].crt = SPR_RISE;
@@ -343,7 +343,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 if ((keysState & UP_PRESSED) != 0) {
                     if (target > 0) {
                         final int enIdx = sceneAct._enIdx;
-                        if (/*target >= enIdx &&*/ (--target) < enIdx) {
+                        if ((--target) < enIdx) {
                             crAbility = sceneAct.getAIskill(1, sceneAct._players[target]._hp < 1);
                             crPrf = (Performance)crActor.getAvailableSkills().elementAt(crAbility);
                             updSkillInfo = true;
@@ -396,14 +396,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     g.drawString(ex.getMessage(), 0, 50, Graphics.TOP|Graphics.LEFT);
                     ex.printStackTrace();
         }
-    }
-    
-    int pow(final int x, final int y) {
-        int z = 1;
-        for (int i = 0; i < y; i++) {
-            z *= x;
-        }
-        return z;
     }
 
     public ArenaStage(final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
