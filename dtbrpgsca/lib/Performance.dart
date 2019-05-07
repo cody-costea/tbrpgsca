@@ -41,7 +41,7 @@ class Performance extends RolePlay {
     String s = "";
     final Random rnd = new Random();
     int dmg = rnd.nextInt(4);
-    if (target.reflects && (this.dmgType & DmgTypeWis == DmgTypeWis)) {
+    if (target.reflects && (this.dmgType == DmgTypeWis)) {
       s += sprintf(Performance.reflectedTxt, [target.name]);
       target = user;
     }
@@ -53,15 +53,14 @@ class Performance extends RolePlay {
     }
     int i = 0;
     int def = 0;
-    bool canMiss = false;
+    int canMiss = 0;
     if (this.dmgType & DmgTypeAtk == DmgTypeAtk) {
-      canMiss = true;
+      canMiss = 2;
       dmg += user.atk;
       def += target.def;
       i++;
     }
     if (this.dmgType & DmgTypeDef == DmgTypeDef) {
-      canMiss = true;
       dmg += user.def;
       def += target.def;
       i++;
@@ -77,16 +76,13 @@ class Performance extends RolePlay {
       i++;
     }
     if (this.dmgType & DmgTypeAgi == DmgTypeAgi) {
-      canMiss = true;
+      canMiss = -canMiss + 4;
       dmg += user.agi;
       def += target.agi;
       i++;
     }
-    if (i == 0) {
-      i = 1;
-    }
-    dmg = (this.mInit + (dmg / i)) ~/ (def ~/ i * res + 1);
-    if (!canMiss || ((rnd.nextInt(13) + user.agi ~/ 4)) > 2 + target.agi ~/ 4) {
+    dmg = i == 0 ? 0 : (this.mInit + (dmg / i)) ~/ (def ~/ i * res + 1);
+    if (canMiss == 0 || ((rnd.nextInt(13) + user.agi ~/ canMiss)) > 2 + target.agi ~/ 4) {
       int hpDmg = this.mHp == 0 ? 0 : ((this.mHp < 0 ? -1 : 1) * dmg + this.mHp);
       int mpDmg = this.mMp == 0 ? 0 : ((this.mMp < 0 ? -1 : 1) * dmg + this.mMp);
       int spDmg = this.mSp == 0 ? 0 : ((this.mSp < 0 ? -1 : 1) * dmg + this.mSp);

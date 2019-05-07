@@ -31,7 +31,7 @@ const int SPR_RISEN = 2;
 const int SPR_ACT = 3;
 const int SPR_CAST = 4;
 
-List<Actor> _koActors;
+int _koActors = 0;
 Map<String, List<int>> _skillSprTime = new Map();
 Map<String, List<String>> _skillSprFiles = new Map();
 Map<String, int> _skillSprFullTime = new Map();
@@ -54,6 +54,7 @@ class SpriteState extends State<ActorSprite> {
 
   String _name;
   String _pos;
+  int _koBit;
   int _sprite;
   List<List<int>> _sprTime;
   List<List<String>> _sprFiles;
@@ -253,14 +254,14 @@ class SpriteState extends State<ActorSprite> {
         });
       });
     }
-    final List<Actor> koActors = _koActors;
+    final int koBit = this._koBit;
     return GestureDetector(
       onTap: this._onClick,
       child: Stack(
         children: <Widget>[
           Image(
               image: AssetImage('assets/sprites/actors/$_name/${actorWait == 0
-                  ? (koActors == null || !koActors.contains(actor) ? this.idleSpr : this.koSpr)
+                  ? (_koActors & koBit == koBit ? this.koSpr : this.idleSpr)
                   : crSprList[actorCnt]}'),
               gaplessPlayback: true,
               width: 128,
@@ -283,7 +284,7 @@ class SpriteState extends State<ActorSprite> {
 
   }
 
-  SpriteState(final Actor actor, final String pos, final bool aot, final Function onClick) {
+  SpriteState(final Actor actor, final int index, final String pos, final bool aot, final Function onClick) {
     if (actor == null || pos == null) {
       return;
     }
@@ -293,6 +294,7 @@ class SpriteState extends State<ActorSprite> {
     this._sprFiles = new List(5);
     this._sprFullTime = new List(5);
     this._sprTime = new List(5);
+    this._koBit = 1 << index;
     if (aot) {
       this._prepareSpr(SPR_HIT, false);
       this._prepareSpr(SPR_FALLEN, false);
@@ -655,7 +657,7 @@ class ArenaState extends State<ArenaStage> {
       this._endTurn(ret);
     } else {
       int crt = this._sceneAct.current;
-      final List<Actor> koActors = _koActors;
+      final int koActors = _koActors;
       final Actor crActor = players[crt];
       final Actor trgActor = players[this._sceneAct.firstTarget];
       if (crActor.automatic != 0 && trgActor.automatic == 0) {
@@ -677,21 +679,22 @@ class ArenaState extends State<ArenaStage> {
         for (int trg = this._sceneAct.firstTarget; trg <=
             this._sceneAct.lastTarget; trg++) {
           if (trg != crt) {
+            final int koBit = 1 << trg;
             final SpriteState trgSprite = this._actorSprites[trg];
             final Actor trgActor = trgSprite.actor;
-            final bool ko = koActors.contains(trgActor);
+            final bool ko = koActors & koBit == koBit;
             trgSprite.skillSprite = lastAbility.sprite;
             if (trgActor.hp > 0) {
               if (ko) {
                 trgSprite.sprite = SPR_RISEN;
-                koActors.remove(trgActor);
+                _koActors = koActors - koBit;
               } else {
                 trgSprite.sprite = SPR_HIT;
               }
             } else {
               trgSprite.sprite = SPR_FALLEN;
               if (!ko) {
-                koActors.add(trgActor);
+                _koActors = koActors + koBit;
               }
             }
           }
@@ -705,17 +708,17 @@ class ArenaState extends State<ArenaStage> {
 
   void _endTurn(String ret) {
     _waitTime = 0;
-    int crt = this._sceneAct.current;
-    final List<Actor> players = this._sceneAct.players;
-    final List<Actor> koActors = _koActors;
-    final String r = this._sceneAct.setNext("", true);
-    ret = r + ret;
+    final SceneAct sceneAct = this._sceneAct;
+    int crt = sceneAct.current;
+    final List<Actor> players = sceneAct.players;
+    final String r = sceneAct.setNext("", true);
     if (players[crt].hp < 1) {
-      koActors.add(players[crt]);
+      _koActors += 1 << crt;
       this._actorSprites[crt].sprite = SPR_FALLEN;
     }
+    ret = r + ret;
     this._actionsTxt.text = "$ret${this._actionsTxt.text}";
-    if (this._sceneAct.status != 0) {
+    if (sceneAct.status != 0) {
       final context = this.navigatorKey.currentState.overlay.context;
       showDialog<void>(context: context, barrierDismissible: false,
           builder: (final BuildContext context) {
@@ -729,8 +732,7 @@ class ArenaState extends State<ArenaStage> {
               ]);
           });
     } else {
-      if (this._automatic ||
-          players[(crt = this._sceneAct.current)].automatic != 0) {
+      if (this._automatic || players[(crt = sceneAct.current)].automatic != 0) {
         this._execAI();
       } else {
         this.activeBtn = true;
@@ -739,7 +741,7 @@ class ArenaState extends State<ArenaStage> {
           final List<Performance> skills = crActor.availableSkills;
           this._crSkills = this._prepareAbilities(skills, null, crt);
           this._crSkill = skills[0];
-          final Map<int, List<Performance>> items = this._sceneAct.crItems;
+          final Map<int, List<Performance>> items = sceneAct.crItems;
           final List<DropdownMenuItem<Performance>> crItemsView =
           this._crItems =
           (items == null || items[crt] == null || items[crt].length == 0)
@@ -795,20 +797,19 @@ class ArenaState extends State<ArenaStage> {
     this._crItem = this._crItems[0].value;
     this._players = this._preparePlayers(players);
     final int enemyIndex = this._target = sceneAct.enemyIndex;
-    _koActors = new List()..length = players.length;
     final List<SpriteState> actorSprites = new List(8);
     for (int i = 0; i < 4; i++) {
       if (i < party.length) {
-        actorSprites[i] = SpriteState(players[i], (surprise < 0 ? "r" : "l"), true, this._getOnClick(i));
+        actorSprites[i] = SpriteState(players[i], i, (surprise < 0 ? "r" : "l"), true, this._getOnClick(i));
       } else {
-        actorSprites[i] = SpriteState(null, null, false, null);
+        actorSprites[i] = SpriteState(null, -1, null, false, null);
       }
     }
     for (int i = 0, j = enemyIndex; i < 4; i++, j++) {
       if (i < enemy.length) {
-        actorSprites[i + 4] = SpriteState(players[j], (surprise < 0 ? "l" : "r"), true, this._getOnClick(j));
+        actorSprites[i + 4] = SpriteState(players[j], j, (surprise < 0 ? "l" : "r"), true, this._getOnClick(j));
       } else {
-        actorSprites[i + 4] = SpriteState(null, null, false, null);
+        actorSprites[i + 4] = SpriteState(null, -1, null, false, null);
       }
     }
     this._actorSprites = actorSprites;
