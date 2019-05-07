@@ -751,7 +751,7 @@ class Arena : Fragment() {
                 }
             }
             imgActor[current].postDelayed({
-                if (crActor.hp < 0) {
+                if (crActor.hp < 1) {
                     this.koActors += (1 shl current)
                     val fallAnim = crActor.getBtSprite(usrSide, 3)//crActor.sprites[usrSide][3]
                     if (fallAnim !== null) {
