@@ -33,13 +33,24 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         var stolenTxt = ", obtaining %s from %s"
         @JvmStatic
         var missesTxt = ", but misses"
+        @JvmStatic
+        val DmgTypeAtk : Int = 1
+        @JvmStatic
+        val DmgTypeDef : Int = 2
+        @JvmStatic
+        val DmgTypeSpi : Int = 4
+        @JvmStatic
+        val DmgTypeWis : Int = 8
+        @JvmStatic
+        val DmgTypeAgi : Int = 16
     }
 
     open fun execute(user: Actor, target: Actor, applyCosts: Boolean): String {
         var s = ""
         var dmg = (Math.random() * 4).toInt()
         val trg : Actor
-        if (target.reflect && this.dmgType == 2) {
+        val dmgType = this.dmgType
+        if (target.reflect && dmgType == DmgTypeWis) {
             s += String.format(reflectedTxt, target.name)
             trg = user
         }
@@ -50,21 +61,41 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         val trgResMap = trg.res
         var res = if (trgResMap === null) 3 else (trgResMap[this.elm] ?: 3)
         if (res > 6) res = -1
-        dmg += when (this.dmgType) {
-            1 -> (this.atkI + (user.def + user.atk) / 2) / (trg.def * res + 1)
-            2 -> (this.atkI + user.wis) / (trg.spi * res + 1)
-            3 -> (this.atkI + user.spi) / (trg.wis * res + 1)
-            4 -> (this.atkI + (user.agi + user.atk) / 2) / ((trg.agi + trg.def) / 2 * res + 1)
-            5 -> (this.atkI + (user.wis + user.atk) / 2) / ((trg.spi + trg.def) / 2 * res + 1)
-            6 -> (this.atkI + (user.agi + user.wis + user.atk) / 3) / ((trg.agi + trg.spi) / 2 * res + 1)
-            7 -> (this.atkI + (user.spi + user.atk + user.def) / 3) / ((trg.wis + trg.def) / 2 * res + 1)
-            else -> (this.atkI + user.atk) / (trg.def * res + 1)
+        var canMiss = 0
+        var def = 0
+        var i = 0
+        when {
+            dmgType and DmgTypeAtk == DmgTypeAtk -> {
+                dmg += user.atk
+                def += target.def
+                canMiss = 2
+                i++
+            }
+            dmgType and DmgTypeDef == DmgTypeDef -> {
+                dmg += user.def
+                def += target.def
+                i++
+            }
+            dmgType and DmgTypeSpi == DmgTypeSpi -> {
+                dmg += user.spi
+                def += target.wis
+                i++
+            }
+            dmgType and DmgTypeWis == DmgTypeWis -> {
+                dmg += user.wis
+                def += target.spi
+                i++
+            }
+            dmgType and DmgTypeAgi == DmgTypeAgi -> {
+                dmg += user.agi
+                def += target.agi
+                canMiss = -canMiss + 4
+                i++
+            }
         }
-        if (this.dmgType == 2
-                || this.dmgType == 3
-                || trg == user
-                || this.dmgType != 4 && (Math.random() * 13 + user.agi / 5).toInt() > 2 + trg.agi / 4
-                || this.dmgType == 4 && (Math.random() * 13 + user.agi / 3).toInt() > 2 + trg.agi / 4) {
+        dmg = if (i == 0) 0 else (this.atkI + (dmg / i)) / (def / i * res + 1)
+        if (canMiss == 0 || trg == user
+                || (Math.random() * 13 + user.agi / canMiss).toInt() > 2 + trg.agi / 4) {
             var dmghp = if (this.hpDmg != 0) (if (this.hpDmg < 0) -1 else 1) * dmg + this.hpDmg else 0
             var dmgmp = if (this.mpDmg != 0) (if (this.mpDmg < 0) -1 else 1) * dmg + this.mpDmg else 0
             var dmgsp = if (this.spDmg != 0) (if (this.spDmg < 0) -1 else 1) * dmg + this.spDmg else 0
@@ -178,4 +209,5 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         return this.mpC <= actor.mp && this.hpC < actor.hp && this.spC <= actor.sp && actor.level >= this.lvRq
                 && /*(this.mQty < 1 && skillsQty === null) || */(skillsQty === null || (skillsQty[this] ?: 1) > 0)
     }
+
 }

@@ -158,4 +158,5 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
             false
         }
     }
+
 }

@@ -63,4 +63,5 @@ open class Costume(val id : Int, open var name : String, open var mHp : Int = 30
             return s
         }
     }
+
 }

@@ -8,9 +8,10 @@ android {
         applicationId "com.codycostea.tbrpgsca"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 76
-        versionName "0.76 (beta)"
+        versionCode 77
+        versionName "0.77 (beta)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
