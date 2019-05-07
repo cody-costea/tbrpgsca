@@ -79,10 +79,7 @@ public final class Performance extends RolePlay {
       def += target.agi;
       i++;
     }
-    if (i == 0) {
-      i = 1;
-    }
-    dmg = (this.mInit + (dmg / i)) / (def / i * res + 1);
+    dmg = i == 0 ? 0 : (this.mInit + (dmg / i)) / (def / i * res + 1);
     if (canMiss == 0 || ((rnd.nextInt(13) + user.agi / canMiss)) > 2 + target.agi / 4) {
       int hpDmg = this.mHp == 0 ? 0 : ((this.mHp < 0 ? -1 : 1) * dmg + this.mHp);
       int mpDmg = this.mMp == 0 ? 0 : ((this.mMp < 0 ? -1 : 1) * dmg + this.mMp);
