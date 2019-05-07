@@ -18,10 +18,15 @@ package com.codycostea.tbrpgsca.library
 open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
 
     companion object {
+        @JvmStatic
         var performsTxt = "%s performs %s"
+        @JvmStatic
         var victoryTxt = "The party has won!"
+        @JvmStatic
         var fallenTxt = "The party has fallen!"
+        @JvmStatic
         var escapeTxt = "The party has escaped!"
+        @JvmStatic
         var failTxt = "The party attempted to escape, but failed."
     }
 

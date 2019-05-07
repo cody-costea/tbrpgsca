@@ -28,6 +28,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, mInit, range, mRes, skills, states, mStRes) {
 
     companion object {
+        @JvmStatic
         var koTxt = ", %s falls unconscious"
     }
 

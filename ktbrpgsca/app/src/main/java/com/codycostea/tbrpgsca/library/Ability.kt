@@ -25,9 +25,13 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                    open val aStates: Array<State>? = null, open val rStates: Array<State>? = null) {
 
     companion object {
+        @JvmStatic
         var reflectedTxt = ", reflected by %s"
+        @JvmStatic
         var suffersTxt = ", %s suffers"
+        @JvmStatic
         var stolenTxt = ", obtaining %s from %s"
+        @JvmStatic
         var missesTxt = ", but misses"
     }
 

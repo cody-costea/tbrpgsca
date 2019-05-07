@@ -21,8 +21,11 @@ open class Costume(val id : Int, open var name : String, open var mHp : Int = 30
                    open var skills : Array<Ability>? = null, open var states : Array<State>? = null, open var stRes : MutableMap<State, Int>? = null) {
 
     companion object {
+        @JvmStatic
         var hpText = "HP"
+        @JvmStatic
         var mpText = "MP"
+        @JvmStatic
         var spText = "RP"
 
         fun getDmgText(dmghp: Int, dmgmp: Int, dmgsp: Int): String {

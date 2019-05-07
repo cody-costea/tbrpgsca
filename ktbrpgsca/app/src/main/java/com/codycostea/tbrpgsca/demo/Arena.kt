@@ -425,7 +425,7 @@ class Arena : Fragment() {
 
     private lateinit var songPlayer : MediaPlayer
 
-    private lateinit var koActors : Array<Boolean>
+    private var koActors : Int = 0
 
     private var partySide = 0
     private var otherSide = 1
@@ -687,36 +687,41 @@ class Arena : Fragment() {
     }
 
     private fun playSpr() {
-        val lastAbility = this.scenePlay.lastAbility as AdAbility?
+        val scenePlay = this.scenePlay
+        val imgActor = this.imgActor
+        val current = scenePlay.current
+        val lastAbility = scenePlay.lastAbility as AdAbility?
         val sprType = if (lastAbility === null || lastAbility.trg < 0
                 || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) 6 else 5
-        val usrSide = if (this.scenePlay.current < this.scenePlay.enIdx) this.partySide else this.otherSide
+        val usrSide = if (current < scenePlay.enIdx) this.partySide else this.otherSide
         val crActor = this.crActor
         val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
         var dur = crActor.spritesDur[usrSide][sprType] - 174
         if (actAnim !== null) {
             actAnim.stop()
-            this.imgActor[this.scenePlay.current].setBackgroundDrawable(actAnim)
+            imgActor[current].setBackgroundDrawable(actAnim)
             actAnim.start()
         }
-        this.imgActor[this.scenePlay.current].postDelayed({
+        imgActor[current].postDelayed({
             var htActor: AdActor
-            for (trg in this.scenePlay.fTarget..this.scenePlay.lTarget) {
-                if (trg != this.scenePlay.current && (lastAbility === null
-                                || !(lastAbility.dmgType == 2 && this.scenePlay.players[trg].reflect))) {
-                    htActor = (this.scenePlay.players[trg] as AdActor)
+            for (trg in scenePlay.fTarget..scenePlay.lTarget) {
+                if (trg != current && (lastAbility === null
+                                || !(lastAbility.dmgType == 2 && scenePlay.players[trg].reflect))) {
+                    htActor = (scenePlay.players[trg] as AdActor)
                     val trgAnim: Int
+                    val koActors = this.koActors
+                    val koBit = 1 shl trg
                     if (htActor.hp > 0) {
-                        if (koActors[trg]) {
+                        if (koActors and koBit == koBit) {
                             trgAnim = 4
-                            this.koActors[trg] = false
+                            this.koActors = koActors - koBit
                         } else {
                             trgAnim = 2
                         }
                     } else {
-                        if (this.koActors[trg]) continue
+                        if (koActors and koBit == koBit) continue
                         trgAnim = 3
-                        this.koActors[trg] = true
+                        this.koActors = koActors + koBit
                     }
                     if (lastAbility !== null) {
                         val abilitySpr = lastAbility.getSprite(this.requireContext())
@@ -725,7 +730,7 @@ class Arena : Fragment() {
                                 dur = lastAbility.spriteDur
                             }
                             abilitySpr.stop()
-                            this.imgActor[trg].setImageDrawable(abilitySpr)
+                            imgActor[trg].setImageDrawable(abilitySpr)
                             abilitySpr.start()
                         }
                         val soundDur = lastAbility.playSound(this.requireContext())
@@ -733,29 +738,29 @@ class Arena : Fragment() {
                             dur = soundDur
                         }
                     }
-                    val trgSide = if (trg < this.scenePlay.enIdx) this.partySide else this.otherSide
+                    val trgSide = if (trg < scenePlay.enIdx) this.partySide else this.otherSide
                     val hitAnim = htActor.getBtSprite(trgSide, trgAnim)//htActor.sprites[trgSide][trgAnim]
                     if (hitAnim !== null) {
                         hitAnim.stop()
                         if (htActor.spritesDur[trgSide][trgAnim] > dur) {
                             dur = htActor.spritesDur[trgSide][trgAnim]
                         }
-                        this.imgActor[trg].setBackgroundDrawable(hitAnim)
+                        imgActor[trg].setBackgroundDrawable(hitAnim)
                         hitAnim.start()
                     }
                 }
             }
-            this.imgActor[this.scenePlay.current].postDelayed({
+            imgActor[current].postDelayed({
                 if (crActor.hp < 0) {
-                    this.koActors[this.scenePlay.current] = true
+                    this.koActors += (1 shl current)
                     val fallAnim = crActor.getBtSprite(usrSide, 3)//crActor.sprites[usrSide][3]
                     if (fallAnim !== null) {
                         fallAnim.stop()
-                        this.imgActor[this.scenePlay.current].setBackgroundDrawable(fallAnim)
+                        imgActor[current].setBackgroundDrawable(fallAnim)
                         fallAnim.start()
                     }
                 }
-                this.actionsTxt.append(this.scenePlay.endTurn(""))
+                this.actionsTxt.append(scenePlay.endTurn(""))
                 this.afterAct()
             }, dur.toLong())
         }, 174)
@@ -1006,9 +1011,13 @@ class Arena : Fragment() {
         this.actionsTxt.movementMethod = ScrollingMovementMethod()
         this.infoTxt = view.findViewById(R.id.SkillCost)
 
-        this.koActors = this.scenePlay.players.map {
-            it.hp < 1
-        }.toTypedArray()
+        var koActors = this.koActors
+        this.scenePlay.players.forEachIndexed { i, actor ->
+            if (actor.hp < 1) {
+                koActors += 1 shl i
+            }
+        }
+        this.koActors = koActors
 
         val imgViews = ArrayList<ImageView>(party.size + enemy.size)
 
@@ -1105,13 +1114,13 @@ class Arena : Fragment() {
 
         for (i in 0 until this.scenePlay.enIdx) {
             this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.partySide,
-                    if (this.koActors[i]) 1 else 0))
+                    if (koActors and (1 shl i) == 1 shl i) 1 else 0))
         }
 
         for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
             this.scenePlay.players[i].automatic = 2
             this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.otherSide,
-                    if (this.koActors[i]) 1 else 0))
+                    if (koActors and (1 shl i) == 1 shl i) 1 else 0))
         }
 
         this.playersAdapter = ActorArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,

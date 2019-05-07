@@ -23,6 +23,7 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
     : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rStates, mStRes) {
 
     companion object {
+        @JvmStatic
         var causesTxt : String = " %s causes %s"
     }
 
