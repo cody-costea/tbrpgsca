@@ -51,9 +51,9 @@ public final class Performance extends RolePlay {
     }
     int i = 0;
     int def = 0;
-    boolean canMiss = false;
+    int canMiss = 0;
     if ((this.dmgType & DmgTypeAtk) == DmgTypeAtk) {
-      canMiss = true;
+      canMiss = 2;
       dmg += user.atk;
       def += target.def;
       i++;
@@ -74,9 +74,7 @@ public final class Performance extends RolePlay {
       i++;
     }
     if ((this.dmgType & DmgTypeAgi) == DmgTypeAgi) {
-      if (!canMiss) {
-        canMiss = true;
-      }
+      canMiss = -canMiss + 4;
       dmg += user.agi;
       def += target.agi;
       i++;
@@ -85,7 +83,7 @@ public final class Performance extends RolePlay {
       i = 1;
     }
     dmg = (this.mInit + (dmg / i)) / (def / i * res + 1);
-    if (!canMiss || ((rnd.nextInt(13) + user.agi / 4)) > 2 + target.agi / 4) {
+    if (canMiss == 0 || ((rnd.nextInt(13) + user.agi / canMiss)) > 2 + target.agi / 4) {
       int hpDmg = this.mHp == 0 ? 0 : ((this.mHp < 0 ? -1 : 1) * dmg + this.mHp);
       int mpDmg = this.mMp == 0 ? 0 : ((this.mMp < 0 ? -1 : 1) * dmg + this.mMp);
       int spDmg = this.mSp == 0 ? 0 : ((this.mSp < 0 ? -1 : 1) * dmg + this.mSp);
