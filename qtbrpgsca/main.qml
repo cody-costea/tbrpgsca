@@ -34,7 +34,7 @@ Window {
         property var abilityImg: []
         property var selectorImg: []
 
-        property var activeActors: []
+        property int koActors: 0
 
         property string sprType: ".gif";
         property int sprCount: 0;
@@ -75,12 +75,13 @@ Window {
 
         function sprCallback() {
             if (arena.checkIfKO(arenaForm.crActor)) {
-                arenaForm.actorImg[arenaForm.crActor].source =
-                        'qrc:/sprites/' + arena.sprites[arenaForm.crActor] + '/bt_' +
-                        (arenaForm.crActor < arena.enemyIndex ? 'l' : 'r') +
+                var crActor = arenaForm.crActor;
+                arenaForm.actorImg[crActor].source =
+                        'qrc:/sprites/' + arena.sprites[crActor] + '/bt_' +
+                        (crActor < arena.enemyIndex ? 'l' : 'r') +
                         '_fallen' + arenaForm.sprType;
-                arenaForm.activeActors[arenaForm.crActor] = false;
-                arenaForm.actorImg[arenaForm.crActor].playing = true;
+                arenaForm.koActors += 1 << (crActor + 1);
+                arenaForm.actorImg[crActor].playing = true;
             }
             arenaForm.beginTurn(undefined);
         }
@@ -98,7 +99,6 @@ Window {
         }
 
         function playAnim() {
-            var crStatus;
             arenaForm.sprCount++;
             arenaForm.actorImg[arenaForm.crActor].source =
                     'qrc:/sprites/' + arena.sprites[arenaForm.crActor] + '/bt_' +
@@ -118,16 +118,29 @@ Window {
                     arenaForm.abilitySnd.source = 'qrc:/audio/' + s;
                     arenaForm.abilitySnd.play();
                 }
-                if (i != arenaForm.crActor && !((crStatus = arena.checkIfKO(i)) && !arenaForm.activeActors[i])) {
-                    arenaForm.sprCount++;
-                    var sprName = !arenaForm.activeActors[i] ? "_restored"
-                                : (crStatus ? "_fallen" : "_hit");
-                    arenaForm.actorImg[i].source =
-                            'qrc:/sprites/' + arena.sprites[i] + '/bt_' +
-                            (i < arena.enemyIndex ? 'l' : 'r') +
-                            sprName + arenaForm.sprType;
-                    arenaForm.activeActors[i] = !crStatus;
-                    arenaForm.actorImg[i].playing = true;
+                if (i != arenaForm.crActor) {
+                    var koActors = arenaForm.koActors;
+                    var crStatus = arena.checkIfKO(i);
+                    var koBit = 1 << i;
+                    var ko = (koActors & koBit) === koBit;
+                    if (!(crStatus && ko)) {
+                        arenaForm.sprCount++;
+                        var sprName;
+                        if (ko) {
+                            sprName = "_restored";
+                            arenaForm.koActors = koActors - koBit;
+                        } else if (crStatus) {
+                            sprName = "_fallen";
+                            arenaForm.koActors = koActors + koBit;
+                        } else {
+                            sprName = "_hit";
+                        }
+                        arenaForm.actorImg[i].source =
+                                'qrc:/sprites/' + arena.sprites[i] + '/bt_' +
+                                (i < arena.enemyIndex ? 'l' : 'r') +
+                                sprName + arenaForm.sprType;
+                        arenaForm.actorImg[i].playing = true;
+                    }
                 }
             }
         }
@@ -336,30 +349,35 @@ Window {
                 arenaForm.arenaImg.source = 'qrc:/sprites/arena/' + s;
             }
 
-            var i, j = 1;
+            var i, j, koBit;
             for (i = 0; i < 4 && i < arena.enemyIndex; i++) {
-                arenaForm.activeActors.push(!arena.checkIfKO(i));
+                koBit = 1 << i;
+                if (arena.checkIfKO(i)) {
+                    arenaForm.koActors += koBit;
+                }
                 arenaForm.abilityImg.push(arenaForm.mainRct["btL" + (i + 1) + "Ability"]);
                 arenaForm.selectorImg.push(arenaForm.mainRct["btL" + (i + 1) + "Selector"]);
                 arenaForm.actorImg.push(arenaForm.mainRct["btL" + (i + 1)]);
                 arenaForm.actorImg[i].source =
                         'qrc:/sprites/' + arena.sprites[i] + '/bt_l'
-                        + (arenaForm.activeActors[i] ? '_idle' : '_ko')
+                        + ((arenaForm.koActors & koBit) === koBit ? '_ko' : '_idle')
                         + arenaForm.sprType;
                 arenaForm.actorImg[i].playing = true;
             }
             //TODO: de revizuit
-            for (i = arena.enemyIndex; j <= 4 && i < arena.battlerNr; i++) {
-                arenaForm.activeActors.push(!arena.checkIfKO(i));
+            for (i = arena.enemyIndex, j = 1; j <= 4 && i < arena.battlerNr; i++, j++) {
+                koBit = 1 << i;
+                if (arena.checkIfKO(i)) {
+                    arenaForm.koActors += (1 << i);
+                }
                 arenaForm.abilityImg.push(arenaForm.mainRct["btR" + j + "Ability"]);
                 arenaForm.selectorImg.push(arenaForm.mainRct["btR" + j + "Selector"]);
                 arenaForm.actorImg.push(arenaForm.mainRct["btR" + j]);
                 arenaForm.actorImg[i].source =
                         'qrc:/sprites/' + arena.sprites[i] + '/bt_r'
-                        + (arenaForm.activeActors[i] ? '_idle' : '_ko')
+                        + ((arenaForm.koActors & koBit) === koBit ? '_ko' : '_idle')
                         + arenaForm.sprType;
                 arenaForm.actorImg[i].playing = true;
-                j++;
             }
 
             arenaForm.beginTurn(arena.enemyIndex);
