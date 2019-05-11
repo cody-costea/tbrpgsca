@@ -186,7 +186,7 @@ public final class Midlet extends MIDlet {
         };
         
         final Display display = Display.getDisplay(this);
-        final ArenaStage form = new ArenaStage("", party, enemy, 0);
+        final ArenaStage form = new ArenaStage(this, "", party, enemy, 0);
         display.setCurrent(form);
     }
     

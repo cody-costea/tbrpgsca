@@ -35,6 +35,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     static final int SPR_FALL = 1;
     static final int SPR_ACT = 2;
     static final int SPR_RISE = 3;
+    
+    private final Midlet app;
 
     private final SceneAct sceneAct;
     
@@ -53,6 +55,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     private volatile Actor crActor;
     private volatile int crAbility;
     private volatile Performance crPrf;
+    private volatile boolean automatic = false;
     private volatile boolean updSkillInfo = true;
     private volatile boolean updTargetInfo = true;
     private volatile boolean updActions = true;
@@ -175,6 +178,16 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     public void afterAct() {
         
     }
+    
+    public int setAutoSkill() {
+        final int target = this.target;
+        final SceneAct sceneAct = this.sceneAct;
+        final boolean onPartySide = target < sceneAct._enIdx;
+        final int crAbility = this.crAbility = sceneAct.getAIskill(onPartySide ? 1 : 0, onPartySide && sceneAct._players[target]._hp < 1);
+        this.crPrf = (Performance)this.crActor.getAvailableSkills().elementAt(crAbility);
+        this.prfCanPerform = true;
+        return crAbility;
+    }
 
     public void run() {
         final Graphics g = this.getGraphics();
@@ -199,40 +212,45 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             if (updActions) {
                 if (afterAct) {
                     afterAct = false;
-                    sprites[sceneAct._current].crt = SPR_ACT;
-                    sprPlay = 1;
-                    for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
-                        if (i != sceneAct._current) {
-                            final int koBit = 1 << i;
-                            if (sceneAct._players[i]._hp > 0) {
-                                if ((koActors & koBit) == koBit) {
-                                    sprites[i].crt = SPR_RISE;
-                                    koActors -= koBit;
-                                } else {                                    
-                                    sprites[i].crt = SPR_HIT;
+                    if (sceneAct._lastAbility != null) {
+                        final int current = sceneAct._current;
+                        final SpriteImage crSprite = sprites[current];
+                        crSprite.crt = crSprite.actor._hp > 0 ? SPR_ACT : SPR_FALL;
+                        sprPlay = 1;
+                        for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
+                            if (i != current) {
+                                final int koBit = 1 << i;
+                                if (sceneAct._players[i]._hp > 0) {
+                                    if ((koActors & koBit) == koBit) {
+                                        sprites[i].crt = SPR_RISE;
+                                        koActors -= koBit;
+                                    } else {                                    
+                                        sprites[i].crt = SPR_HIT;
+                                    }
+                                } else {
+                                    sprites[i].crt = SPR_FALL;
+                                    koActors += koBit;
                                 }
-                            } else {
-                                sprites[i].crt = SPR_FALL;
-                                koActors += koBit;
+                                sprPlay++;
                             }
-                            sprPlay++;
                         }
                     }
                     updSprites = true;
                 } else if (newTurn) {
+                    if (sceneAct._status != 0) {
+                        break;
+                    }
                     newTurn = false;
-                    if (sceneAct._players[sceneAct._current].automatic == 0) {
+                    if (this.automatic || sceneAct._players[sceneAct._current].automatic != 0) {
+                        ret = sceneAct.executeAI("");
+                        afterAct = true;
+                    } else {
                         crActor = sceneAct._players[sceneAct._current];
-                        final boolean onPartySide = target < sceneAct._enIdx;
-                        crAbility = sceneAct.getAIskill(onPartySide ? 1 : 0, onPartySide && sceneAct._players[target]._hp < 1);
-                        crPrf = (Performance)crActor.getAvailableSkills().elementAt(crAbility);
+                        this.setAutoSkill();
                         updTargetInfo = true;
                         updSkillInfo = true;
                         updActorInfo = true;
                         updActions = false;
-                    } else {
-                        ret = sceneAct.executeAI("");
-                        afterAct = true;
                     }
                 }
                 if (ret.length() > 0) {
@@ -350,61 +368,94 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     protected void keyReleased(final int keyCode) {
     //protected void keyPressed(final int keyCode) {
         final SceneAct sceneAct = this.sceneAct;
-        final int gameAction = getGameAction(keyCode);
-         if (gameAction == FIRE || keyCode == KEY_NUM5) {
-            final Performance crPrf;
-            final int target = this.target;
-            if ((crPrf = this.crPrf).restore || sceneAct._players[target]._hp > 0) {
-                this.ret = sceneAct.executeAbility(crPrf, target, "");
+        if (sceneAct._status == 0) {
+            final int gameAction = getGameAction(keyCode);
+            if (gameAction == FIRE || keyCode == KEY_NUM5 || keyCode == KEY_NUM0) {
+                final Performance crPrf;
+                final int target = this.target;
+                if ((crPrf = this.crPrf).restore || sceneAct._players[target]._hp > 0) {
+                    this.ret = sceneAct.executeAbility(crPrf, target, "");
+                    this.updActions = true;
+                    this.afterAct = true;
+                }
+            } else if (gameAction == UP || keyCode == KEY_NUM2) {
+                int target;
+                if ((target = this.target) > 0) {
+                    final int enIdx = sceneAct._enIdx;
+                    if ((this.target = --target) < enIdx) {
+                        final int crAbility = this.crAbility = sceneAct.getAIskill(1, sceneAct._players[target]._hp < 1);
+                        this.crPrf = (Performance)this.crActor.getAvailableSkills().elementAt(crAbility);
+                        this.updSkillInfo = true;
+                    }
+                    this.updTargetInfo = true;
+                }
+            } else if (gameAction == DOWN || keyCode == KEY_NUM8) {
+                if (this.target < sceneAct._players.length - 1) {
+                    final int enIdx = sceneAct._enIdx;
+                    final int target;
+                    if (this.target++ < enIdx && (target = this.target) >= enIdx) {
+                        final int crAbility = this.crAbility = sceneAct.getAIskill(0, false);
+                        this.crPrf = (Performance)this.crActor.getAvailableSkills().elementAt(crAbility);
+                        this.updSkillInfo = true;
+                    }
+                    this.updTargetInfo = true;
+                }
+            } else if (gameAction == LEFT || keyCode == KEY_NUM4) {
+                final Actor crActor = this.crActor;
+                final Hashtable items = crActor._items;
+                int crAbility = this.crAbility;
+                if (crAbility > 0 || (items != null && crAbility > -1 * items.size() - 1)) {
+                    final Performance crPrf = this.crPrf = (this.crAbility = --crAbility) < 0 ? null
+                            : (Performance)crActor.getAvailableSkills().elementAt(crAbility);
+                    this.prfCanPerform = crPrf.canPerform(crActor);
+                    this.updSkillInfo = true;
+                }
+            } else if (gameAction == RIGHT || keyCode == KEY_NUM6) {
+                final Actor crActor = this.crActor;
+                int crAbility = this.crAbility;
+                if (crAbility < crActor._skills.size() - 1) {
+                    final Performance crPrf = this.crPrf = (this.crAbility = ++crAbility) < 0 ? null
+                            : (Performance)crActor.getAvailableSkills().elementAt(crAbility);
+                    this.prfCanPerform = crPrf.canPerform(crActor);
+                    this.updSkillInfo = true;
+                }
+            } else if (gameAction == GAME_A || keyCode == KEY_NUM1 || keyCode == KEY_STAR) {
+                final Actor actor = sceneAct._players[sceneAct._current];
+                final boolean automatic = this.automatic = !this.automatic;
+                if (automatic && crActor.automatic == 0) {
+                    this.setAutoSkill();
+                    this.ret = sceneAct.executeAbility(this.crPrf, this.target, "");
+                    this.updActions = true;
+                    this.afterAct = true;
+                }
+            } else if (gameAction == GAME_C || keyCode == KEY_NUM7) {
+                final int crAbility = this.crAbility;
+                if (crAbility == this.setAutoSkill()) {                
+                    this.ret = sceneAct.executeAbility(this.crPrf, this.target, "");
+                    this.updActions = true;
+                    this.afterAct = true;
+                } else {
+                    this.updSkillInfo = true;
+                }
+            } else if (gameAction == GAME_B || keyCode == KEY_NUM3 || keyCode == KEY_POUND) {
+                this.ret = sceneAct.escape();
+                this.updActions = true;
+                this.afterAct = true;
+            } else if (gameAction == GAME_D || keyCode == KEY_NUM9) {
+                this.ret = "The party has given up!";
+                sceneAct._lastAbility = null;
+                sceneAct._status = -2;
                 this.updActions = true;
                 this.afterAct = true;
             }
-        } else if (gameAction == UP || keyCode == KEY_NUM2) {
-            int target;
-            if ((target = this.target) > 0) {
-                final int enIdx = sceneAct._enIdx;
-                if ((this.target = --target) < enIdx) {
-                    final int crAbility = this.crAbility = sceneAct.getAIskill(1, sceneAct._players[target]._hp < 1);
-                    this.crPrf = (Performance)this.crActor.getAvailableSkills().elementAt(crAbility);
-                    this.updSkillInfo = true;
-                }
-                this.updTargetInfo = true;
-            }
-        } else if (gameAction == DOWN || keyCode == KEY_NUM8) {
-            if (this.target < sceneAct._players.length - 1) {
-                final int enIdx = sceneAct._enIdx;
-                final int target;
-                if (this.target++ < enIdx && (target = this.target) >= enIdx) {
-                    final int crAbility = this.crAbility = sceneAct.getAIskill(0, false);
-                    this.crPrf = (Performance)this.crActor.getAvailableSkills().elementAt(crAbility);
-                    this.updSkillInfo = true;
-                }
-                this.updTargetInfo = true;
-            }
-        } else if (gameAction == LEFT || keyCode == KEY_NUM4) {
-            final Actor crActor = this.crActor;
-            final Hashtable items = crActor._items;
-            int crAbility = this.crAbility;
-            if (crAbility > 0 || (items != null && crAbility > -1 * items.size() - 1)) {
-                final Performance crPrf = this.crPrf = (this.crAbility = --crAbility) < 0 ? null
-                        : (Performance)crActor.getAvailableSkills().elementAt(crAbility);
-                this.prfCanPerform = crPrf.canPerform(crActor);
-                this.updSkillInfo = true;
-            }
-        } else if (gameAction == RIGHT || keyCode == KEY_NUM6) {
-            final Actor crActor = this.crActor;
-            int crAbility = this.crAbility;
-            if (crAbility < crActor._skills.size() - 1) {
-                final Performance crPrf = this.crPrf = (this.crAbility = ++crAbility) < 0 ? null
-                        : (Performance)crActor.getAvailableSkills().elementAt(crAbility);
-                this.prfCanPerform = crPrf.canPerform(crActor);
-                this.updSkillInfo = true;
-            }
+        } else {
+            this.app.notifyDestroyed();
         }
     }
 
-    public ArenaStage(final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
+    public ArenaStage(final Midlet app, final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
         super(false);
+        this.app = app;
         final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
         final int height = this.totalHeight = this.getHeight();
         final int width = this.totalWidth = this.getWidth();
