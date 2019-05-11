@@ -27,7 +27,7 @@ import javax.microedition.lcdui.game.Sprite;
 
 public final class ArenaStage extends GameCanvas implements Runnable {
     
-    static final int FRM_TIME = 87;
+    static final int FRM_TIME = 71;
     static final int SPR_DONE = -3;
     static final int SPR_KO = -2;
     static final int SPR_IDLE = -1;
@@ -371,10 +371,10 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 this.updTargetInfo = true;
             }
         } else if (gameAction == DOWN || keyCode == KEY_NUM8) {
-            int target;
-            if ((target = this.target) < sceneAct._players.length - 1) {
+            if (this.target < sceneAct._players.length - 1) {
                 final int enIdx = sceneAct._enIdx;
-                if ((target++) < enIdx && (this.target = target) >= enIdx) {
+                final int target;
+                if (this.target++ < enIdx && (target = this.target) >= enIdx) {
                     final int crAbility = this.crAbility = sceneAct.getAIskill(0, false);
                     this.crPrf = (Performance)this.crActor.getAvailableSkills().elementAt(crAbility);
                     this.updSkillInfo = true;
