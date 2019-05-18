@@ -58,18 +58,18 @@ public final class SceneAct {
     return this._lastAbility;
   }
 
-  Actor[] _players;
+  protected Actor[] _players;
   public Actor[] getPlayers() {
     return this._players;
   }
 
-  boolean _useInit;
+  protected boolean _useInit;
   public boolean getUseInit() {
     return this._useInit;
   }
 
-  Enumeration[] _crItems;
-  public Enumeration[] getCrItems() {
+  protected Performance[] _crItems;
+  public Performance[] getCrItems() {
     return this._crItems;
 }
 
@@ -181,12 +181,16 @@ public final class SceneAct {
       } else {
         if (crActor.automatic == 0) {
           final Hashtable crItems = crActor._items;
-          if (crItems != null) {
-            Enumeration[] crItemsMap = this._crItems;
-            if (crItemsMap == null) {
-              crItemsMap = this._crItems = new Enumeration[this._players.length];
-            }
-            crItemsMap[this._current] = crItems.keys();
+          if (crItems == null) {
+              this._crItems = null;
+          } else {
+              int i = 0;
+              final int len = crItems.size();
+              final Performance[] items = new Performance[len];
+              final Enumeration itemsEnum = crItems.keys();
+              while (itemsEnum.hasMoreElements()) {
+                  items[i++] = (Performance)itemsEnum.nextElement();
+              }
           }
         }
       }

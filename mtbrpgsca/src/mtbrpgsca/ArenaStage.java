@@ -209,9 +209,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         int sprWait = 0;
         String prev = "";
         while (true) {
-            if (updActions) {
-                if (afterAct) {
-                    afterAct = false;
+            if (this.updActions) {
+                if (this.afterAct) {
+                    this.afterAct = false;
                     if (sceneAct._lastAbility != null) {
                         final int current = sceneAct._current;
                         final SpriteImage crSprite = sprites[current];
@@ -243,14 +243,14 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     newTurn = false;
                     if (this.automatic || sceneAct._players[sceneAct._current].automatic != 0) {
                         ret = sceneAct.executeAI("");
-                        afterAct = true;
+                        this.afterAct = true;
                     } else {
-                        crActor = sceneAct._players[sceneAct._current];
+                        this.crActor = sceneAct._players[sceneAct._current];
                         this.setAutoSkill();
-                        updTargetInfo = true;
-                        updSkillInfo = true;
+                        this.updTargetInfo = true;
+                        this.updSkillInfo = true;
                         updActorInfo = true;
-                        updActions = false;
+                        this.updActions = false;
                     }
                 }
                 if (ret.length() > 0) {
@@ -268,6 +268,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 g.setColor(0x0080FF);
                 g.setClip(0, -2, width, 13);
                 g.fillRect(0, -2, width, 13);
+                final Actor crActor = this.crActor;
                 final String actText = crActor.name + "(HP:" + crActor._hp + "/" + crActor.mHp + ",MP:"
                         + crActor._mp + "/" + crActor.mMp + ",RP:" + crActor._sp + "/" + crActor.mSp + ")";
                 g.setColor(0xFFFF00);
@@ -275,10 +276,11 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 this.flushGraphics(0, -2, width, 13);
                 updActorInfo = false;
             }
-            if (updSkillInfo) {
+            if (this.updSkillInfo) {
+                final Performance crPrf = this.crPrf;
                 String prfText = "←" + crPrf.name;
-                if (crAbility < 0) {
-                    prfText += "";//TODO: item;
+                if (this.crAbility < 0) {
+                    prfText += "*" + this.crActor.getItems().get(crPrf);//TODO: item;
                 } else {
                     prfText += "(Lv:" + crPrf.lvRq + ",HPc:" + crPrf.hpC + ",MPc:" + crPrf.mpC
                             + ",RPc:" + crPrf.spC + ",Nr:" + 0;
@@ -287,12 +289,13 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 g.setColor(0x0080FF);
                 g.setClip(0, 11, width, 12);
                 g.fillRect(0, 11, width, 12);
-                g.setColor(prfCanPerform ? 0xFFFF00 : 0xC0C0C0);
+                g.setColor(this.prfCanPerform ? 0xFFFF00 : 0xC0C0C0);
                 g.drawString(prfText, 0, 9, Graphics.TOP|Graphics.LEFT);
                 this.flushGraphics(0, 11, width, 12);
-                updSkillInfo = false;
+                this.updSkillInfo = false;
             }
-            if (updTargetInfo) {
+            if (this.updTargetInfo) {
+                final int target = this.target;
                 final Actor trgActor = sceneAct._players[target];
                 String trgText = "↓" + trgActor.name + "(HP:";
                 if (target >= sceneAct._enIdx) {
@@ -305,17 +308,17 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 g.setColor(0x0080FF);
                 g.setClip(0, 23, width, 12);
                 g.fillRect(0, 23, width, 12);
-                g.setColor(sceneAct.getGuardian(target, crPrf) == target ? 0xFFFF00 : 0xC0C0C0);
+                g.setColor(sceneAct.getGuardian(target, this.crPrf) == target ? 0xFFFF00 : 0xC0C0C0);
                 g.drawString(trgText, 2, 21, Graphics.TOP|Graphics.LEFT);
                 this.flushGraphics(0, 23, width, 12);
-                updTargetInfo = false;
+                this.updTargetInfo = false;
             }
             while (updSprites) {
                 if (sprPlay < 1) {
                     sprWait = 5;
                     updSprites = false;
                     ret = sceneAct.setNext("", true);
-                    updActions = true;
+                    this.updActions = true;
                     newTurn = true;
                 } else {
                     g.setColor(0x007F00);
@@ -405,7 +408,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Hashtable items = crActor._items;
                 int crAbility = this.crAbility;
                 if (crAbility > 0 || (items != null && crAbility > -1 * items.size() - 1)) {
-                    final Performance crPrf = this.crPrf = (this.crAbility = --crAbility) < 0 ? null
+                    final Performance crPrf = this.crPrf = (this.crAbility = --crAbility) < 0
+                            ? sceneAct._crItems[(crAbility * -1) - 1]
                             : (Performance)crActor.getAvailableSkills().elementAt(crAbility);
                     this.prfCanPerform = crPrf.canPerform(crActor);
                     this.updSkillInfo = true;
@@ -414,15 +418,16 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Actor crActor = this.crActor;
                 int crAbility = this.crAbility;
                 if (crAbility < crActor._skills.size() - 1) {
-                    final Performance crPrf = this.crPrf = (this.crAbility = ++crAbility) < 0 ? null
+                    final Performance crPrf = this.crPrf = (this.crAbility = ++crAbility) < 0
+                            ? sceneAct._crItems[(crAbility * -1) - 1]
                             : (Performance)crActor.getAvailableSkills().elementAt(crAbility);
                     this.prfCanPerform = crPrf.canPerform(crActor);
                     this.updSkillInfo = true;
                 }
             } else if (gameAction == GAME_A || keyCode == KEY_NUM1 || keyCode == KEY_STAR) {
-                final Actor actor = sceneAct._players[sceneAct._current];
+                //final Actor actor = this.crActor;//sceneAct._players[sceneAct._current];
                 final boolean automatic = this.automatic = !this.automatic;
-                if (automatic && crActor.automatic == 0) {
+                if (automatic && this.crActor.automatic == 0) {
                     this.setAutoSkill();
                     this.ret = sceneAct.executeAbility(this.crPrf, this.target, "");
                     this.updActions = true;
