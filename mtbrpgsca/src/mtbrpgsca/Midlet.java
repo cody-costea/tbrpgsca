@@ -16,6 +16,7 @@ limitations under the License.
 
 package mtbrpgsca;
 
+import java.util.Hashtable;
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.*;
 
@@ -141,6 +142,12 @@ public final class Midlet extends MIDlet {
             new Performance(7, "Panacea", null, null, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, false, false, null, cure),
             new Performance(8, "Elixir", null, null, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, 0, 0, -1, -1, false, true, null, null)
         };
+        
+        final Integer itemsNr = new Integer(15);
+        final Hashtable itemsMap = new Hashtable(items.length);
+        for (int i = 0; i < items.length; i++) {
+            itemsMap.put(items[i], itemsNr);
+        }
 
         final Performance[] skills = new Performance[] {skill[0], skill[1]};
         
@@ -172,10 +179,10 @@ public final class Midlet extends MIDlet {
         };
 
         final Actor[] party = new Actor[] {
-            new Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+            new Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+            new Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+            new Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+            new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap)
         };
 
         final Actor[] enemy = new Actor[] {

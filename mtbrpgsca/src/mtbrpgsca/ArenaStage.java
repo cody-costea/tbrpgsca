@@ -203,7 +203,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         boolean updSprites = true;
         boolean updActorInfo = true;
         boolean newTurn = false;
-        //try {
+        try {
         int koActors = 0; //bitwise int;
         int sprPlay = sceneAct._players.length;
         int sprWait = 0;
@@ -280,11 +280,13 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Performance crPrf = this.crPrf;
                 String prfText = "←" + crPrf.name;
                 if (this.crAbility < 0) {
-                    prfText += "*" + this.crActor.getItems().get(crPrf);//TODO: item;
-                } else {
+                    final Object objPrfQty = this.crActor.getItems().get(crPrf);
+                    prfText += "*" + (objPrfQty == null ? '0'
+                            : ((Integer)this.crActor.getItems().get(crPrf)).intValue());//TODO: item;
+                } //else {
                     prfText += "(Lv:" + crPrf.lvRq + ",HPc:" + crPrf.hpC + ",MPc:" + crPrf.mpC
                             + ",RPc:" + crPrf.spC + ",Nr:" + 0;
-                }
+                //}
                 prfText += ")→";
                 g.setColor(0x0080FF);
                 g.setClip(0, 11, width, 12);
@@ -361,11 +363,11 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 }
             }
         }
-        /*} catch (final Exception ex) {
+        } catch (final Exception ex) {
                     g.setColor(0xFFFFFF);
                     g.drawString(ex.getMessage(), 0, 50, Graphics.TOP|Graphics.LEFT);
                     ex.printStackTrace();
-        }*/
+        }
     }
     
     protected void keyReleased(final int keyCode) {
@@ -377,7 +379,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Performance crPrf;
                 final int target = this.target;
                 if ((crPrf = this.crPrf).restore || sceneAct._players[target]._hp > 0) {
-                    this.ret = sceneAct.executeAbility(crPrf, target, "");
+                    this.ret = this.crAbility < 0
+                            ? sceneAct.useAbility(crPrf, target, "")
+                            : sceneAct.executeAbility(crPrf, target, "");
                     this.updActions = true;
                     this.afterAct = true;
                 }
@@ -407,7 +411,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Actor crActor = this.crActor;
                 final Hashtable items = crActor._items;
                 int crAbility = this.crAbility;
-                if (crAbility > 0 || (items != null && crAbility > -1 * items.size() - 1)) {
+                if (crAbility > 0 || (items != null && crAbility > -1 * items.size())) {
                     final Performance crPrf = this.crPrf = (this.crAbility = --crAbility) < 0
                             ? sceneAct._crItems[(crAbility * -1) - 1]
                             : (Performance)crActor.getAvailableSkills().elementAt(crAbility);

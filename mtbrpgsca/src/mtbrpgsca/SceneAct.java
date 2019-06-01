@@ -191,6 +191,7 @@ public final class SceneAct {
               while (itemsEnum.hasMoreElements()) {
                   items[i++] = (Performance)itemsEnum.nextElement();
               }
+              this._crItems = items;
           }
         }
       }
