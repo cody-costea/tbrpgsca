@@ -46,10 +46,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     private final int sceneYbegin;
     private final int sceneYend;
     
-    //private final LayerManager layer;
-
     private final Thread thr;
     private final SpriteImage[] sprites;
+    private Hashtable prfSprMap; //<Performance, Image>
     
     private volatile int target;
     private volatile Actor crActor;
@@ -65,13 +64,17 @@ public final class ArenaStage extends GameCanvas implements Runnable {
 
     private final static class SpriteImage {
         protected final Actor actor;
-
+        
         private final Sprite spr;
         private final Image[] img;
         private final int[][] seq;
 
-        protected volatile int crt;
+        private Sprite perfSpr = null;
+        private Image lastPrfImg = null;
+        private boolean prfSprPlay = false;
+
         private int old = -7;
+        protected volatile int crt;
 
         protected Sprite setCurrent() {
             final Sprite spr;
@@ -111,6 +114,32 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             } else {
                 return -1;
             }
+        }
+        
+        public int drawSkillFrame(final Graphics gpc) {
+            final Sprite spr = this.perfSpr;
+            spr.paint(gpc);
+            spr.nextFrame();
+            return spr.getFrame();
+        }
+        
+        public Sprite setSkillSprite(final Image img) {
+            if (img != this.lastPrfImg) {
+                final int imgHeight = img.getHeight();
+                Sprite spr = this.perfSpr;
+                if (spr == null) {
+                    final Sprite actorSpr = this.spr;
+                    spr = this.perfSpr = new Sprite(img, imgHeight, imgHeight);
+                    spr.setRefPixelPosition(actorSpr.getRefPixelX(), actorSpr.getRefPixelY());
+                } else {
+                    spr.setImage(img, imgHeight, imgHeight);
+                }
+                this.lastPrfImg = img;
+                spr.setFrameSequence(null);
+                spr.setFrame(0);
+            }
+            this.prfSprPlay = true;
+            return spr;
         }
 
         private Sprite prepareSpr(final int i, final boolean invert) {
@@ -212,10 +241,12 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             if (this.updActions) {
                 if (this.afterAct) {
                     this.afterAct = false;
-                    if (sceneAct._lastAbility != null) {
+                    final Performance lastAbility = sceneAct._lastAbility;
+                    if (lastAbility != null) {
                         final int current = sceneAct._current;
                         final SpriteImage crSprite = sprites[current];
                         crSprite.crt = crSprite.actor._hp > 0 ? SPR_ACT : SPR_FALL;
+                        final boolean hasPrfSpr = lastAbility.sprite != null;
                         sprPlay = 1;
                         for (int i = sceneAct._fTarget; i <= sceneAct._lTarget; i++) {
                             if (i != current) {
@@ -232,6 +263,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                                     koActors += koBit;
                                 }
                                 sprPlay++;
+                            }
+                            if (hasPrfSpr) {
+                                sprites[i].setSkillSprite(this.getAbilityImage(lastAbility));
                             }
                         }
                     }
@@ -348,6 +382,14 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                         } else {
                             sprImage.drawFrame(g);
                         }
+                        if (sprImage.prfSprPlay) {
+                            final Sprite perfSpr = sprImage.perfSpr;
+                            if (perfSpr.getFrame() < perfSpr.getFrameSequenceLength()) {
+                                if (sprImage.drawSkillFrame(g) == 0) {
+                                    sprImage.prfSprPlay = false;
+                                }
+                            }
+                        }
                     }
                     if (sprWait > 0) {
                         sprWait--;
@@ -371,7 +413,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     }
     
     protected void keyReleased(final int keyCode) {
-    //protected void keyPressed(final int keyCode) {
         final SceneAct sceneAct = this.sceneAct;
         if (sceneAct._status == 0) {
             final int gameAction = getGameAction(keyCode);
@@ -429,7 +470,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     this.updSkillInfo = true;
                 }
             } else if (gameAction == GAME_A || keyCode == KEY_NUM1 || keyCode == KEY_STAR) {
-                //final Actor actor = this.crActor;//sceneAct._players[sceneAct._current];
                 final boolean automatic = this.automatic = !this.automatic;
                 if (automatic && this.crActor.automatic == 0) {
                     this.setAutoSkill();
@@ -461,6 +501,19 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             this.app.notifyDestroyed();
         }
     }
+    
+    private Image getAbilityImage(final Performance ability) throws IOException {
+        Hashtable prfSprMap = this.prfSprMap;
+        if (prfSprMap == null) {
+            prfSprMap = this.prfSprMap = new Hashtable();
+        }
+        Object img = prfSprMap.get(ability);
+        if (img == null) {
+            img = Image.createImage("/bt_" + ability.sprite + ".png");
+            prfSprMap.put(ability, img);
+        }
+        return (Image)img;
+    }
 
     public ArenaStage(final Midlet app, final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
         super(false);
@@ -478,7 +531,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final int enIdx = sceneAct._enIdx;
         final Actor[] players = sceneAct._players;
         final int len = sceneAct._players.length;
-        //final LayerManager layer = this.layer = new LayerManager();
         for (int i = enIdx; i < len; i++) {
             players[i].automatic = 2;
         }
@@ -502,7 +554,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                         break;
                 }
                 
-            //layer.append(sprImages[0].spr);
             }
             team = surprise < 0 ? party : enemy;
             for (int j = 0; j < team.length; j++) {
