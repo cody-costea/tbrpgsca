@@ -22,7 +22,6 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.GameCanvas;
-import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
 public final class ArenaStage extends GameCanvas implements Runnable {
@@ -39,6 +38,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     private final Midlet app;
 
     private final SceneAct sceneAct;
+        
+    private Image arenaImg = null;
     
     private final int totalWidth;
     private final int totalHeight;
@@ -222,6 +223,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final Graphics g = this.getGraphics();
         final Font f = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         g.setFont(f);
+        final Image arenaImg = this.arenaImg;
         final SpriteImage[] sprites = this.sprites;
         final SceneAct sceneAct = this.sceneAct;
         final int yPos = this.sceneYbegin;
@@ -317,10 +319,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     final Object objPrfQty = this.crActor.getItems().get(crPrf);
                     prfText += "*" + (objPrfQty == null ? '0'
                             : ((Integer)this.crActor.getItems().get(crPrf)).intValue());//TODO: item;
-                } //else {
-                    prfText += "(Lv:" + crPrf.lvRq + ",HPc:" + crPrf.hpC + ",MPc:" + crPrf.mpC
-                            + ",RPc:" + crPrf.spC + ",Nr:" + 0;
-                //}
+                }
+                prfText += "(Lv:" + crPrf.lvRq + ",HPc:" + crPrf.hpC + ",MPc:" + crPrf.mpC
+                        + ",RPc:" + crPrf.spC + ",Nr:" + 0;
                 prfText += ")→";
                 g.setColor(0x0080FF);
                 g.setClip(0, 11, width, 12);
@@ -357,9 +358,13 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     this.updActions = true;
                     newTurn = true;
                 } else {
-                    g.setColor(0x007F00);
                     g.setClip(0, yPos, width, scnHeight);
-                    g.fillRect(0, yPos, width, scnHeight);
+                    if (arenaImg == null) {
+                        g.setColor(0x007F00);
+                        g.fillRect(0, yPos, width, scnHeight);
+                    } else {
+                        g.drawImage(arenaImg, 0, yPos, Graphics.TOP | Graphics.LEFT);
+                    }
                     for (int i = 0; i < sprites.length; i++) {
                         final SpriteImage sprImage = sprites[i];
                         final int crtSprite = sprImage.crt;
@@ -515,7 +520,8 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         return (Image)img;
     }
 
-    public ArenaStage(final Midlet app, final String string, final Actor[] party, final Actor[] enemy, final int surprise) {
+    public ArenaStage(final Midlet app, final Actor[] party, final Actor[] enemy,
+            final int surprise, final String arenaImg, final String arenaSnd) {
         super(false);
         this.app = app;
         final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
@@ -536,6 +542,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         }
         final SpriteImage[] sprImages = this.sprites = new SpriteImage[len];
         try {
+            if (arenaImg != null && arenaImg.length() > 0) {
+                this.arenaImg = Image.createImage("/bg_" + arenaImg + ".png");
+            }
             Actor[] team = surprise < 0 ? enemy : party;
             int i;
             for (i = 0; i < team.length; i++) {
@@ -552,8 +561,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     case 3:
                         sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, yCentre + yFactor + yFactor / 2, false);
                         break;
-                }
-                
+                }               
             }
             team = surprise < 0 ? party : enemy;
             for (int j = 0; j < team.length; j++) {
@@ -574,13 +582,11 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             }
         } catch (final IOException ex) {
             ex.printStackTrace();
-        }        
-        
+        }
         this.target = sceneAct._enIdx;
         this.crActor = sceneAct._players[sceneAct._current];
         final int crAbility = this.crAbility = sceneAct.getAIskill(0, false);
         this.crPrf = (Performance)crActor.getAvailableSkills().elementAt(crAbility);
-        
         (this.thr = new Thread(this)).start();
     }
     

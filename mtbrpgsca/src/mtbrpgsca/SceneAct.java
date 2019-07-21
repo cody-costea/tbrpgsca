@@ -409,14 +409,14 @@ public final class SceneAct {
     return this.executeAbility(item, target, ret);
   }
 
-  /*String useItem(final int index, final int target, final String ret) {
-    final Enumeration crItems = this._crItems[this._current];
-    if (crItems != null && index < crItems.size()) {
-      return this.useAbility((Performance)crItems.elementAt(index), target, ret);
+  String useItem(final int index, final int target, final String ret) {
+    final Performance[] crItems = this._crItems;
+    if (crItems != null && index < crItems.length) {
+      return this.useAbility((Performance)crItems[index], target, ret);
     } else {
       return ret;
     }
-  }*/
+  }
 
   String escape() {
     this._lastAbility = null;
