@@ -25,12 +25,18 @@ public final class Performance extends RolePlay {
   protected final static int FLAG_STEAL = 2;
   protected final static int FLAG_ABSORB = 4;
   protected final static int FLAG_RESTORE = 8;
+  
+  public final static int TRG_ONE = 0;
+  public final static int TRG_SELF = -1;
+  public final static int TRG_ENEMY = 1;
+  public final static int TRG_PARTY = -2;
+  public final static int TRG_ALL = 2;
     
-  public static final int DmgTypeAtk = 1;
-  public static final int DmgTypeDef = 2;
-  public static final int DmgTypeSpi = 4;
-  public static final int DmgTypeWis = 8;
-  public static final int DmgTypeAgi = 16;
+  public static final int DMG_TYPE_ATK = 1;
+  public static final int DMG_TYPE_DEF = 2;
+  public static final int DMG_TYPE_SPI = 4;
+  public static final int DMG_TYPE_WIS = 8;
+  public static final int DMG_TYPE_AGI = 16;
 
   protected String sound;
   protected int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg;
@@ -191,7 +197,7 @@ public final class Performance extends RolePlay {
     String s = "";
     final Random rnd = new Random();
     int dmg = rnd.nextInt(4);
-    if (target.isRefelcting() && ((this.dmgType & DmgTypeWis) == DmgTypeWis)) {
+    if (target.isRefelcting() && ((this.dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)) {
       s += ", reflected by " + target.name;
       target = user;
     }
@@ -205,28 +211,28 @@ public final class Performance extends RolePlay {
     int i = 0;
     int def = 0;
     int canMiss = 0;
-    if ((this.dmgType & DmgTypeAtk) == DmgTypeAtk) {
+    if ((this.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) {
       canMiss = 2;
       dmg += user.atk;
       def += target.def;
       i++;
     }
-    if ((this.dmgType & DmgTypeDef) == DmgTypeDef) {
+    if ((this.dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF) {
       dmg += user.def;
       def += target.def;
       i++;
     }
-    if ((this.dmgType & DmgTypeSpi) == DmgTypeSpi) {
+    if ((this.dmgType & DMG_TYPE_SPI) == DMG_TYPE_SPI) {
       dmg += user.spi;
       def += target.wis;
       i++;
     }
-    if ((this.dmgType & DmgTypeWis) == DmgTypeWis) {
+    if ((this.dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS) {
       dmg += user.wis;
       def += target.spi;
       i++;
     }
-    if ((this.dmgType & DmgTypeAgi) == DmgTypeAgi) {
+    if ((this.dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI) {
       canMiss = -canMiss + 4;
       dmg += user.agi;
       def += target.agi;

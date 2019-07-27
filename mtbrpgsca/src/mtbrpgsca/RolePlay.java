@@ -21,7 +21,7 @@ public abstract class RolePlay {
   protected final static int FLAG_RANGE = 1;
 
   protected String name, sprite;
-  protected int id, mHp, mMp, mSp, mInit, flags;
+  protected int id, mHp, mMp, mSp, mInit, flags = 0;
   protected StateMask[] aStates;
   
   public int getId() {

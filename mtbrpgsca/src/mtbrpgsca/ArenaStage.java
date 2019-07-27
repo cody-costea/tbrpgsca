@@ -284,7 +284,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                         break;
                     }
                     newTurn = false;
-                    if (this.automatic || sceneAct._players[sceneAct._current].automatic != 0) {
+                    if (this.automatic || sceneAct._players[sceneAct._current].automatic != Actor.AUTO_NONE) {
                         ret = sceneAct.executeAI("");
                         this.afterAct = true;
                     } else {
@@ -545,7 +545,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final Actor[] players = sceneAct._players;
         final int len = sceneAct._players.length;
         for (int i = enIdx; i < len; i++) {
-            players[i].automatic = 2;
+            players[i].automatic = Actor.AUTO_ALLY;
         }
         final SpriteImage[] sprImages = this.sprites = new SpriteImage[len];
         try {

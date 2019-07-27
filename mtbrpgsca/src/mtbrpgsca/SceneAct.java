@@ -179,7 +179,7 @@ public final class SceneAct {
           return this.setNext(ret, true);
         }
       } else {
-        if (crActor.automatic == 0) {
+        if (crActor.automatic == Actor.AUTO_NONE) {
           final Hashtable crItems = crActor._items;
           if (crItems == null) {
               this._crItems = null;
@@ -267,7 +267,7 @@ public final class SceneAct {
 
   String executeAbility(final Performance skill, int target, String ret) {
     switch (skill.trg) {
-      case 1:
+      case Performance.TRG_ENEMY:
         if (target < this._enIdx) {
           this._fTarget = 0;
           this._lTarget = this._enIdx - 1;
@@ -276,11 +276,11 @@ public final class SceneAct {
           this._lTarget = this._players.length - 1;
         }
         break;
-      case 2:
+      case Performance.TRG_ALL:
         this._fTarget = 0;
         this._lTarget = this._players.length - 1;
         break;
-      case -2:
+      case Performance.TRG_PARTY:
         if (this._current < this._enIdx) {
           this._fTarget = 0;
           this._lTarget = this._enIdx - 1;
@@ -289,7 +289,7 @@ public final class SceneAct {
           this._lTarget = this._players.length - 1;
         }
         break;
-      case -1:
+      case Performance.TRG_SELF:
         this._fTarget = this._lTarget = this._current;
         break;
       default:

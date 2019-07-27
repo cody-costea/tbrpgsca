@@ -25,6 +25,12 @@ public final class Actor extends Costume {
   protected final static int FLAG_ACTIVE = 2;
   protected final static int FLAG_REFLECTS = 4;
   protected final static int FLAG_GUARDS = 8;
+  
+  public final static int AUTO_NONE = 0;
+  public final static int AUTO_CONFUSED = -1;
+  public final static int AUTO_ENRAGED = 1;
+  public final static int AUTO_ENEMY = -2;
+  public final static int AUTO_ALLY = 2;
     
   protected Costume _race, _job;
   protected int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
@@ -439,11 +445,11 @@ public final class Actor extends Costume {
   String applyStates(final boolean consume) {
     String s = "";
     if (!consume) {
-      if (this.automatic < 2 && this.automatic > -2) {
-        this.automatic = 0;
+      if (this.automatic < AUTO_ALLY && this.automatic > AUTO_ENEMY) {
+        this.automatic = AUTO_NONE;
       }
       else {
-        this.automatic = 2;
+        this.automatic = AUTO_ALLY;
       }
       if (this._hp > 0) {
         this.setGuarding(true);
@@ -573,8 +579,7 @@ public final class Actor extends Costume {
     this._xp = 0;
     this._maxp = 15;
     this.flags |= FLAG_ACTIVE | FLAG_GUARDS;
-    //this.setRange(range);
-    this.automatic = 0;
+    this.automatic = AUTO_NONE;
     this.mInit = mInit;
     this.mHp = mHp;
     this.mMp = mMp;

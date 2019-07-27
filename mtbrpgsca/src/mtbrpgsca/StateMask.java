@@ -243,11 +243,11 @@ public final class StateMask extends Costume {
             if (this.isRefelcting()) {
               actor.setReflecting(true);
             }
-            if (this.isAutomating() && actor.automatic < 2) {
-              actor.automatic = 1;
+            if (this.isAutomating() && actor.automatic < Actor.AUTO_ALLY) {
+              actor.automatic = Actor.AUTO_ENRAGED;
             }
             if (this.isConfusing()) {
-              actor.automatic = actor.automatic < 2 ? -1 : -2;
+              actor.automatic = actor.automatic < Actor.AUTO_ALLY ? Actor.AUTO_CONFUSED : Actor.AUTO_ENEMY;
             }
           }
         }
