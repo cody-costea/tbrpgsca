@@ -218,12 +218,27 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         this.prfCanPerform = true;
         return crAbility;
     }
+    
+    private Image resizeImg(final Image original, final int nWidth, final int nHeight) {
+        final int oHeight = original.getHeight();
+        final int oWidth = original.getWidth();
+        final int[] oPixels = new int[oHeight * oWidth];
+        original.getRGB(oPixels, 0, oWidth, 0, 0, oWidth, oHeight);
+        final int[] nPixels = new int[nHeight * nWidth];
+        for (int i = 0; i < nHeight; i++) {
+            int y = i * oHeight / nHeight;
+            for (int j = 0; j < nWidth; j++) {
+                int x = j * oWidth / nWidth;
+                nPixels[i * nWidth + j] = oPixels[y * oWidth + x];
+            }
+        }
+        return Image.createRGBImage(nPixels, nWidth, nHeight, true);
+    }
 
     public void run() {
         final Graphics g = this.getGraphics();
         final Font f = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         g.setFont(f);
-        final Image arenaImg = this.arenaImg;
         final SpriteImage[] sprites = this.sprites;
         final SceneAct sceneAct = this.sceneAct;
         final int yPos = this.sceneYbegin;
@@ -231,6 +246,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final int yEnd = this.sceneYend;
         final int height = this.totalHeight;
         final int scnHeight = yEnd - yPos;
+        final Image arenaImg = this.arenaImg = this.resizeImg(this.arenaImg, width, scnHeight);
         boolean updSprites = true;
         boolean updActorInfo = true;
         boolean newTurn = false;
