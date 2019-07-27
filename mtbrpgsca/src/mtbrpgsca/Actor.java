@@ -24,10 +24,8 @@ public final class Actor extends Costume {
     
   protected Costume _race, _job;
   protected int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
+  protected Hashtable _items, skillsQty, skillsQtyRgTurn, stateDur, equipment;
   protected boolean active, reflects, guards;
-  protected Hashtable _items, skillsQty, skillsQtyRgTurn;
-  protected Hashtable stateDur;
-  protected Hashtable equipment;
   protected Boolean _ranged;
 
   protected final Vector _skills = new Vector();
@@ -55,11 +53,11 @@ public final class Actor extends Costume {
     return this;
   }
 
-  public int getLevel() {
+  public int getCurrentLevel() {
     return this._lv;
   }
 
-  public Actor setLevel(final int lv) {
+  public Actor setCurrentLevel(final int lv) {
     final int nLv = lv > this.maxLv ? this.maxLv : (lv < 1 ? 1 : lv);
     while (this._lv < nLv) {
       this._xp = this._maxp;
@@ -67,64 +65,73 @@ public final class Actor extends Costume {
     }
     return this;
   }
+  
+  public int getMaxLevel() {
+      return this.maxLv;
+  }
+  
+  public Actor setMaxLevel(final int lv) {
+      this.maxLv = lv;
+      return this;
+  }
 
-  public int getExp() {
+  public int getExperience() {
     return this._xp;
   }
 
-  Actor setExp(final int xp) {
+  public Actor setExperience(final int xp) {
     this._xp = xp;
     this.levelUp();
     return this;
   }
 
-  int getMexp() {
+  public int getExpLimit() {
     return this._maxp;
   }
 
-  Actor setMexp(final int xp) {
+  public Actor setExpLimit(final int xp) {
     //TODO: levels might be changed;
     this._maxp = xp;
     return this;
   }
 
-  int getHp() {
+  public int getCurrentHp() {
     return this._hp;
   }
 
-  int getMp() {
+  public int getCurrentMp() {
     return this._mp;
   }
 
-  int getSp() {
+  public int getCurrentSp() {
     return this._sp;
   }
 
-  Actor setHp(final int hp) {
+  public Actor setCurrentHp(final int hp) {
     this._hp = hp > this.mHp ? this.mHp : (hp < 0 ? 0 : hp);
     return this;
   }
 
-  Actor setMp(final int mp) {
+  public Actor setCurrentMp(final int mp) {
     this._mp = mp > this.mMp ? this.mMp : (mp < 0 ? 0 : mp);
     return this;
   }
 
-  Actor setSp(final int sp) {
+  public Actor setCurrentSp(final int sp) {
     this._sp = sp > this.mSp ? this.mSp : (sp < 0 ? 0 : sp);
     return this;
   }
 
-  public Boolean getRanged() {
+  public Boolean isRanged() {
     return this._ranged;
   }
 
-  public boolean getRange() {
+  public boolean hasRange() {
     Boolean ranged = this._ranged;
     if (ranged == null) {
       final Hashtable equipment = this.equipment;
       final Hashtable states = this.stateDur;
-      boolean r = super.getRange() || this._job._range || this._race._range;
+      boolean r = super.hasRange() || this._job._range || this._race._range;
       if (!r && equipment != null) {
         final Enumeration vEquip = equipment.elements();
         while (vEquip.hasMoreElements()) {
@@ -157,7 +164,7 @@ public final class Actor extends Costume {
     return this;
   }
 
-  Hashtable getItems() {
+  public Hashtable getItems() {
     Hashtable items = this._items;
     if (items == null) {
       items = new Hashtable();
@@ -166,12 +173,57 @@ public final class Actor extends Costume {
     return items;
   }
 
-  Actor setItems(final Hashtable items) {
+  public Actor setItems(final Hashtable items) {
     this._items = items;
     return this;
   }
+  
+  public boolean isActive() {
+      return this.active;
+  }
+  
+  public Actor setActive(final boolean active) {
+      this.active = active;
+      return this;
+  }
+  
+  public boolean isRefelcting() {
+      return this.reflects;
+  }
+  
+  public Actor setReflecting(final boolean reflects) {
+      this.reflects = reflects;
+      return this;
+  }
+  
+  public boolean isGuarding() {
+      return this.guards;
+  }
+  
+  public Actor setGuarding(final boolean guards) {
+     this.guards = guards;
+     return this;
+  }
+  
+  public int getAutoMode() {
+      return this.automatic;
+  }
+  
+  public Actor setAudoMode(final int auto) {
+      this.automatic = auto;
+      return this;
+  }
+  
+  public int getInitiative() {
+      return this.init;
+  }
+  
+  public Actor setInitiative(final int init) {
+      this.init = init;
+      return this;
+  }
 
-  void levelUp() {
+  public void levelUp() {
     while (this._maxp <= this._xp && this._lv < this.maxLv) {
       this._maxp *= 2;
       this._lv++;
@@ -505,7 +557,7 @@ public final class Actor extends Costume {
     this.maxLv = maxLv;
     this.setRace(race);
     this.setJob(job);
-    this.setLevel(level);
+    this.setCurrentLevel(level);
     this._hp = this.mHp;
     this._mp = this.mMp;
     this._sp = this.mSp;

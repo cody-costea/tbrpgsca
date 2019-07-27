@@ -24,6 +24,96 @@ public final class StateMask extends Costume {
   protected Performance[] rSkills;
   protected boolean automate, confuse, inactivate, reflect;
   protected int dur, sRes, dmgHp, dmgMp, dmgSp;
+  
+  public int getDuration() {
+      return this.dur;
+  }
+  
+  public StateMask setDuration(final int value) {
+      this.dur = value;
+      return this;
+  }
+  
+  public int getResistance() {
+      return this.sRes;
+  }
+  
+  public StateMask setResistance(final int value) {
+      this.sRes = value;
+      return this;
+  }
+  
+  public int getHpDamage() {
+      return this.dmgHp;
+  }
+  
+  public StateMask setHpDamage(final int value) {
+      this.dmgHp = value;
+      return this;
+  }
+  
+  public int getMpDamage() {
+      return this.dmgMp;
+  }
+  
+  public StateMask setMpDamage(final int value) {
+      this.dmgMp = value;
+      return this;
+  }
+  
+  public int getSpDamage() {
+      return this.dmgHp;
+  }
+  
+  public StateMask setSpDamage(final int value) {
+      this.dmgHp = value;
+      return this;
+  }
+  
+  public Performance[] getRemovedSkills() {
+      return this.rSkills;
+  }
+  
+  public StateMask setRemovedSkills(final Performance[] value) {
+      this.rSkills = value;
+      return this;
+  }
+  
+  public boolean isAutomating() {
+      return this.automate;
+  }
+  
+  public StateMask setAutomating(final boolean value) {
+      this.automate = value;
+      return this;
+  }
+  
+  public boolean isConfusing() {
+      return this.confuse;
+  }
+  
+  public StateMask setConfusing(final boolean value) {
+      this.confuse = value;
+      return this;
+  }
+  
+  public boolean isInactivating() {
+      return this.inactivate;
+  }
+  
+  public StateMask setInactivating(final boolean value) {
+      this.inactivate = value;
+      return this;
+  }
+  
+  public boolean isRefelcting() {
+      return this.reflect;
+  }
+  
+  public StateMask setReflecting(final boolean value) {
+      this.reflect = value;
+      return this;
+  }
 
   String inflict(final Actor actor, final boolean always, final boolean indefinite) {
     final Hashtable trgStRes = actor.stRes;
@@ -99,9 +189,9 @@ public final class StateMask extends Costume {
             final int dmghp = (actor.mHp + rnd) * this.dmgHp / 100;
             final int dmgmp = (actor.mMp + rnd) * this.dmgMp / 100;
             final int dmgsp = (actor.mSp + rnd) * this.dmgSp / 100;
-            actor.setHp(actor._hp - dmghp);
-            actor.setMp(actor._mp - dmgmp);
-            actor.setSp(actor._sp - dmgsp);
+            actor.setCurrentHp(actor._hp - dmghp);
+            actor.setCurrentMp(actor._mp - dmgmp);
+            actor.setCurrentSp(actor._sp - dmgsp);
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
               s += " " + this.name + " causes " + actor.name + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
             }

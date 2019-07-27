@@ -418,9 +418,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             }
         }
         } catch (final Exception ex) {
-                    g.setColor(0xFFFFFF);
-                    g.drawString(ex.getMessage(), 0, 50, Graphics.TOP|Graphics.LEFT);
-                    ex.printStackTrace();
+            g.setColor(0xFFFFFF);
+            g.drawString(ex.getMessage(), 0, 50, Graphics.TOP|Graphics.LEFT);
+            ex.printStackTrace();
         }
     }
     

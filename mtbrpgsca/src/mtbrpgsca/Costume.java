@@ -22,8 +22,79 @@ public class Costume extends RolePlay {
     
   protected int atk, def, spi, wis, agi;
   protected Performance[] aSkills;
-  protected Hashtable stRes;
-  protected Hashtable res;
+  protected Hashtable stRes, res;
+  
+  public int getAttack() {
+      return this.atk;
+  }
+  
+  public Costume setAttack(final int value) {
+      this.atk = value;
+      return this;
+  }
+  
+  public int getDefense() {
+      return this.def;
+  }
+  
+  public Costume setDefense(final int value) {
+      this.def = value;
+      return this;
+  }
+  
+  public int getSpirit() {
+      return this.spi;
+  }
+  
+  public Costume setSpirit(final int value) {
+      this.spi = value;
+      return this;
+  }
+  
+  public int getWisdom() {
+      return this.wis;
+  }
+  
+  public Costume setWisdom(final int value) {
+      this.wis = value;
+      return this;
+  }
+  
+  public int getAgility() {
+      return this.agi;
+  }
+  
+  public Costume setAgility(final int value) {
+      this.agi = value;
+      return this;
+  }
+  
+  public Performance[] getAddedSkills() {
+      return this.aSkills;
+  }
+  
+  public Costume setAddedSkills(final Performance[] value) {
+      this.aSkills = value;
+      return this;
+  }
+  
+  public Hashtable getStateResistance() {
+      return this.stRes;
+  }
+  
+  public Costume setStateResistance(final Hashtable value) {
+      this.stRes = value;
+      return this;
+  }
+  
+  public Hashtable getElementalResistance() {
+      return this.res;
+  }
+  
+  public Costume setElementalResistance(final Hashtable value) {
+      this.res = value;
+      return this;
+  }
 
   Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp,
           final int atk, final int def, final int spi, final int wis, final int agi, final int mInit,

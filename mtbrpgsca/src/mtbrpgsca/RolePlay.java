@@ -22,14 +22,85 @@ public abstract class RolePlay {
   protected int id, mHp, mMp, mSp, mInit;
   protected StateMask[] aStates;
   protected boolean _range;
+  
+  public int getId() {
+      return this.id;
+  }
+  
+  public String getName() {
+      return this.name;
+  }
+  
+  public RolePlay setName(final String value) {
+      this.name = value;
+      return this;
+  }
+  
+  public String getSprite() {
+      return this.sprite;
+  }
+  
+  public RolePlay setSprite(final String value) {
+      this.sprite = value;
+      return this;
+  }
+  
+  public int getMaxHpMod() {
+      return this.mHp;
+  }
+  
+  public RolePlay setMaxHpMod(final int value) {
+      this.mHp = value;
+      return this;
+  }
+  
+  public int getMaxMpMod() {
+      return this.mMp;
+  }
+  
+  public RolePlay setMaxMpMod(final int value) {
+      this.mMp = value;
+      return this;
+  }
+  
+  public int getMaxSpMod() {
+      return this.mSp;
+  }
+  
+  public RolePlay setMaxSpMod(final int value) {
+      this.mSp = value;
+      return this;
+  }
+  
+  public int getMaxInitMod() {
+      return this.mInit;
+  }
+  
+  public RolePlay setMaxInitMod(final int value) {
+      this.mInit = value;
+      return this;
+  }
 
-  public boolean getRange() {
+  public boolean hasRange() {
     return this._range;
   }
 
   public RolePlay setRange(final boolean range) {
     this._range = range;
     return this;
+  }
+  
+  public StateMask[] getAddedStates() {
+      return this.aStates;
+  }
+  
+  public RolePlay setAddedStates(final StateMask[] value) {
+      this.aStates = value;
+      return this;
+  }
+  
+  public boolean equals(final Object object) {
+      return object != null && object instanceof RolePlay && ((RolePlay)object).id == this.id;
   }
 
   RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,

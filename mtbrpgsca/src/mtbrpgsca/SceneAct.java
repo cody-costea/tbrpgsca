@@ -220,7 +220,7 @@ public final class SceneAct {
   }
 
   int getGuardian(final int target, final Performance skill) {
-    if (skill._range || (/*skill._range == null &&*/ this._players[this._current].getRange())) {
+    if (skill._range || (/*skill._range == null &&*/ this._players[this._current].hasRange())) {
       return target;
     }
     int f;

@@ -31,8 +31,134 @@ public final class Performance extends RolePlay {
   protected String sound;
   protected boolean steal, absorb, restore;
   protected int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg;
-  protected Integer elm;
   protected StateMask[] rStates;
+  protected Integer elm;
+  
+  public String getSound() {
+      return this.sound;
+  }
+  
+  public Performance setSound(final String value) {
+      this.sound = value;
+      return this;
+  }
+  
+  public int getRequiredLevel() {
+      return this.lvRq;
+  }
+  
+  public Performance setRequiredLevel(final int value) {
+      this.lvRq = value;
+      return this;
+  }
+  
+  public int getHpCost() {
+      return this.hpC;
+  }
+  
+  public Performance setHpCost(final int value) {
+      this.hpC = value;
+      return this;
+  }
+  
+  public int getMpCost() {
+      return this.mpC;
+  }
+  
+  public Performance setMpCost(final int value) {
+      this.mpC = value;
+      return this;
+  }
+  
+  public int getSpCost() {
+      return this.spC;
+  }
+  
+  public Performance setSpCost(final int value) {
+      this.spC = value;
+      return this;
+  }
+  
+  public int getMaxUsesQty() {
+      return this.mQty;
+  }
+  
+  public Performance setMaxUsesQty(final int value) {
+      this.mQty = value;
+      return this;
+  }
+  
+  public int getUsesQtyRegen() {
+      return this.rQty;
+  }
+  
+  public Performance setUsesQtyRegen(final int value) {
+      this.rQty = value;
+      return this;
+  }
+  
+  public int getDamageType() {
+      return this.dmgType;
+  }
+  
+  public Performance setDamageType(final int value) {
+      this.dmgType = value;
+      return this;
+  }
+  
+  public int getTargetRange() {
+      return this.trg;
+  }
+  
+  public Performance setTargetRange(final int value) {
+      this.trg = value;
+      return this;
+  }
+  
+  public Integer getElement() {
+      return this.elm;
+  }
+  
+  public Performance setElement(final Integer value) {
+      this.elm = value;
+      return this;
+  }
+  
+  public StateMask[] getRemovedStates() {
+      return this.rStates;
+  }
+  
+  public Performance setRemovedStates(final StateMask[] value) {
+      this.rStates = value;
+      return this;
+  }
+  
+  public boolean isStealing() {
+      return this.steal;
+  }
+  
+  public Performance setStealing(final boolean value) {
+      this.steal = value;
+      return this;
+  }
+  
+  public boolean isAbsorbing() {
+      return this.absorb;
+  }
+  
+  public Performance setAbsorbing(final boolean value) {
+      this.absorb = value;
+      return this;
+  }
+  
+  public boolean isRestoring() {
+      return this.restore;
+  }
+  
+  public Performance setRestoring(final boolean value) {
+      this.restore = value;
+      return this;
+  }
 
   public String execute(final Actor user, Actor target, final boolean applyCosts) {
     String s = "";
@@ -89,13 +215,13 @@ public final class Performance extends RolePlay {
         mpDmg = -mpDmg;
         spDmg = -spDmg;
       }
-      target.setHp(target._hp - hpDmg);
-      target.setMp(target._mp - mpDmg);
-      target.setSp(target._sp - spDmg);
+      target.setCurrentHp(target._hp - hpDmg);
+      target.setCurrentMp(target._mp - mpDmg);
+      target.setCurrentSp(target._sp - spDmg);
       if (this.absorb) {
-        user.setHp(user._hp + hpDmg / 2);
-        user.setMp(user._mp + mpDmg / 2);
-        user.setSp(user._sp + spDmg / 2);
+        user.setCurrentHp(user._hp + hpDmg / 2);
+        user.setCurrentMp(user._mp + mpDmg / 2);
+        user.setCurrentSp(user._sp + spDmg / 2);
       }
       if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
         s += ", " + target.name + " suffers" + RolePlay.getDmgText(hpDmg, mpDmg, spDmg);
