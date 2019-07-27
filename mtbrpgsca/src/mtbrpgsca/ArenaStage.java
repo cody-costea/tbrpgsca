@@ -98,10 +98,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     spr = this.prepareSpr(i, rise);
                 }
             }
-            /*this.old = crt;
-            final boolean rise = crt > 2;
-            final int i = rise ? 1 : (crt < 0 ? (-1 * crt) - 1 : crt);
-            spr = this.prepareSpr(i, rise);*/
             spr.setFrame(crt < -1 ? spr.getFrameSequenceLength() - 1 : 0);
             return spr;
         }
@@ -200,14 +196,6 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             this.crt = ko ? SPR_KO : SPR_IDLE;
         }
     }
-
-    public void playSpr() {
-        
-    }
-    
-    public void afterAct() {
-        
-    }
     
     public int setAutoSkill() {
         final int target = this.target;
@@ -220,6 +208,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     }
     
     private Image resizeImg(final Image original, final int nWidth, final int nHeight) {
+        if (original == null) {
+            return null;
+        }
         final int oHeight = original.getHeight();
         final int oWidth = original.getWidth();
         final int[] oPixels = new int[oHeight * oWidth];
