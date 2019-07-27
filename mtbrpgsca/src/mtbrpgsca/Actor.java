@@ -22,10 +22,13 @@ import java.util.Vector;
 
 public final class Actor extends Costume {
     
+  protected final static int FLAG_ACTIVE = 2;
+  protected final static int FLAG_REFLECTS = 4;
+  protected final static int FLAG_GUARDS = 8;
+    
   protected Costume _race, _job;
   protected int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
   protected Hashtable _items, skillsQty, skillsQtyRgTurn, stateDur, equipment;
-  protected boolean active, reflects, guards;
   protected Boolean _ranged;
 
   protected final Vector _skills = new Vector();
@@ -131,12 +134,12 @@ public final class Actor extends Costume {
     if (ranged == null) {
       final Hashtable equipment = this.equipment;
       final Hashtable states = this.stateDur;
-      boolean r = super.hasRange() || this._job._range || this._race._range;
+      boolean r = super.hasRange() || this._job.hasRange() || this._race.hasRange();
       if (!r && equipment != null) {
         final Enumeration vEquip = equipment.elements();
         while (vEquip.hasMoreElements()) {
           Costume c = (Costume)vEquip.nextElement();
-          if (c._range) {
+          if (c.hasRange()) {
             r = true;
             break;
           }
@@ -146,7 +149,7 @@ public final class Actor extends Costume {
         final Enumeration sMasks = states.keys();
         while (sMasks.hasMoreElements()) {
           StateMask s = (StateMask)sMasks.nextElement();
-          if (s._range) {
+          if (s.hasRange()) {
             r = true;
             break;
           }
@@ -179,30 +182,54 @@ public final class Actor extends Costume {
   }
   
   public boolean isActive() {
-      return this.active;
+      return (this.flags & FLAG_ACTIVE) == FLAG_ACTIVE;
   }
   
-  public Actor setActive(final boolean active) {
-      this.active = active;
-      return this;
+  public Actor setActive(final boolean value) {
+    if (value) {
+        this.flags |= FLAG_ACTIVE;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_ACTIVE) == FLAG_ACTIVE) {
+            flags -= FLAG_ACTIVE;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
   
   public boolean isRefelcting() {
-      return this.reflects;
+      return (this.flags & FLAG_REFLECTS) == FLAG_REFLECTS;
   }
   
-  public Actor setReflecting(final boolean reflects) {
-      this.reflects = reflects;
-      return this;
+  public Actor setReflecting(final boolean value) {
+    if (value) {
+        this.flags |= FLAG_REFLECTS;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_REFLECTS) == FLAG_REFLECTS) {
+            flags -= FLAG_REFLECTS;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
   
   public boolean isGuarding() {
-      return this.guards;
+      return (this.flags & FLAG_GUARDS) == FLAG_GUARDS;
   }
   
-  public Actor setGuarding(final boolean guards) {
-     this.guards = guards;
-     return this;
+  public Actor setGuarding(final boolean value) {
+    if (value) {
+        this.flags |= FLAG_GUARDS;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_GUARDS) == FLAG_GUARDS) {
+            flags -= FLAG_GUARDS;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
   
   public int getAutoMode() {
@@ -287,11 +314,11 @@ public final class Actor extends Costume {
     int i;
     if (remove) {
       i = -1;
-      if (role._range) {
+      if (role.hasRange()) {
         this._ranged = null;
       }
     } else {
-      if (role._range) {
+      if (role.hasRange()) {
         this._ranged = new Boolean(true);
       }
       i = 1;
@@ -395,8 +422,8 @@ public final class Actor extends Costume {
     String s = "";
     if (this._hp < 1) {
       s += ", " + this.name + " falls unconscious";
-      this.active = false;
-      this.guards = false;
+      this.setActive(false);
+      this.setGuarding(false);
       this._sp = 0;
       final Hashtable sDur = this.stateDur;
       if (sDur != null) {
@@ -419,9 +446,9 @@ public final class Actor extends Costume {
         this.automatic = 2;
       }
       if (this._hp > 0) {
-        this.guards = true;
+        this.setGuarding(true);
       }
-      this.reflects = false;
+      this.setReflecting(false);
     }
     boolean c = false;
     final Hashtable sDur = this.stateDur;
@@ -450,7 +477,7 @@ public final class Actor extends Costume {
     this._hp = this.mHp;
     this._mp = this.mMp;
     this._sp = 0;
-    this.active = true;
+    this.setActive(true);
     final Hashtable sDur = this.stateDur;
     if (sDur != null) {
       final Enumeration sMasks = sDur.keys();
@@ -545,10 +572,8 @@ public final class Actor extends Costume {
     super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes);
     this._xp = 0;
     this._maxp = 15;
-    this.active = true;
-    this._range = range;
-    this.guards = true;
-    this.reflects = false;
+    this.flags |= FLAG_ACTIVE | FLAG_GUARDS;
+    //this.setRange(range);
     this.automatic = 0;
     this.mInit = mInit;
     this.mHp = mHp;

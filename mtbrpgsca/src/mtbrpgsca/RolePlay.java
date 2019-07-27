@@ -17,11 +17,12 @@ limitations under the License.
 package mtbrpgsca;
 
 public abstract class RolePlay {
+  
+  protected final static int FLAG_RANGE = 1;
 
   protected String name, sprite;
-  protected int id, mHp, mMp, mSp, mInit;
+  protected int id, mHp, mMp, mSp, mInit, flags;
   protected StateMask[] aStates;
-  protected boolean _range;
   
   public int getId() {
       return this.id;
@@ -82,11 +83,19 @@ public abstract class RolePlay {
   }
 
   public boolean hasRange() {
-    return this._range;
+    return (this.flags & FLAG_RANGE) == FLAG_RANGE;
   }
 
-  public RolePlay setRange(final boolean range) {
-    this._range = range;
+  public RolePlay setRange(final boolean value) {
+    if (value) {
+        this.flags |= FLAG_RANGE;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_RANGE) == FLAG_RANGE) {
+            flags -= FLAG_RANGE;
+            this.flags = flags;
+        }
+    }
     return this;
   }
   
@@ -112,7 +121,9 @@ public abstract class RolePlay {
     this.mMp = mp;
     this.mSp = sp;
     this.mInit = mInit;
-    this._range = range;
+    if (range) {
+        this.flags |= FLAG_RANGE;
+    }
     this.aStates = states;
   }
 

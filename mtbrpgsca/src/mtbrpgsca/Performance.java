@@ -21,6 +21,10 @@ import java.util.Hashtable;
 import java.util.Random;
 
 public final class Performance extends RolePlay {
+  
+  protected final static int FLAG_STEAL = 2;
+  protected final static int FLAG_ABSORB = 4;
+  protected final static int FLAG_RESTORE = 8;
     
   public static final int DmgTypeAtk = 1;
   public static final int DmgTypeDef = 2;
@@ -29,7 +33,6 @@ public final class Performance extends RolePlay {
   public static final int DmgTypeAgi = 16;
 
   protected String sound;
-  protected boolean steal, absorb, restore;
   protected int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg;
   protected StateMask[] rStates;
   protected Integer elm;
@@ -134,37 +137,61 @@ public final class Performance extends RolePlay {
   }
   
   public boolean isStealing() {
-      return this.steal;
+      return (this.flags & FLAG_STEAL) == FLAG_STEAL;
   }
   
   public Performance setStealing(final boolean value) {
-      this.steal = value;
+    if (value) {
+        this.flags |= FLAG_STEAL;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_STEAL) == FLAG_STEAL) {
+            flags -= FLAG_STEAL;
+            this.flags = flags;
+        }
+    }
       return this;
   }
   
   public boolean isAbsorbing() {
-      return this.absorb;
+      return (this.flags & FLAG_ABSORB) == FLAG_ABSORB;
   }
   
   public Performance setAbsorbing(final boolean value) {
-      this.absorb = value;
-      return this;
+    if (value) {
+        this.flags |= FLAG_ABSORB;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_ABSORB) == FLAG_ABSORB) {
+            flags -= FLAG_ABSORB;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
   
   public boolean isRestoring() {
-      return this.restore;
+      return (this.flags & FLAG_RESTORE) == FLAG_RESTORE;
   }
   
   public Performance setRestoring(final boolean value) {
-      this.restore = value;
-      return this;
+    if (value) {
+        this.flags |= FLAG_RESTORE;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_RESTORE) == FLAG_RESTORE) {
+            flags -= FLAG_RESTORE;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
 
   public String execute(final Actor user, Actor target, final boolean applyCosts) {
     String s = "";
     final Random rnd = new Random();
     int dmg = rnd.nextInt(4);
-    if (target.reflects && ((this.dmgType & DmgTypeWis) == DmgTypeWis)) {
+    if (target.isRefelcting() && ((this.dmgType & DmgTypeWis) == DmgTypeWis)) {
       s += ", reflected by " + target.name;
       target = user;
     }
@@ -218,7 +245,7 @@ public final class Performance extends RolePlay {
       target.setCurrentHp(target._hp - hpDmg);
       target.setCurrentMp(target._mp - mpDmg);
       target.setCurrentSp(target._sp - spDmg);
-      if (this.absorb) {
+      if (this.isAbsorbing()) {
         user.setCurrentHp(user._hp + hpDmg / 2);
         user.setCurrentMp(user._mp + mpDmg / 2);
         user.setCurrentSp(user._sp + spDmg / 2);
@@ -252,7 +279,7 @@ public final class Performance extends RolePlay {
         }
       }
       final Hashtable trgItemMap = target._items;
-      if (this.steal && trgItemMap != null && trgItemMap != user._items && trgItemMap.size() > 0
+      if (this.isStealing() && trgItemMap != null && trgItemMap != user._items && trgItemMap.size() > 0
           && (rnd.nextInt(12) + user.agi / 4) > 4 + target.agi / 3) {
         final int rndItem = rnd.nextInt(trgItemMap.size() - 1);
         final Enumeration itemsEnum = trgItemMap.keys();
@@ -333,7 +360,9 @@ public final class Performance extends RolePlay {
               final StateMask[] rStates) {
     super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates);
     this.sound = sound;
-    this.steal = steal;
+    if (steal) {
+        this.flags |= FLAG_STEAL;
+    }
     this.lvRq = lvRq;
     this.hpC = hpC;
     this.mpC = mpC;
@@ -343,8 +372,12 @@ public final class Performance extends RolePlay {
     this.elm = new Integer(elm);
     this.mQty = mQty;
     this.rQty = rQty;
-    this.absorb = absorb;
-    this.restore = restoreKO;
+    if (absorb) {
+        this.flags |= FLAG_ABSORB;
+    }
+    if (restoreKO) {
+        this.flags |= FLAG_RESTORE;
+    }
     this.rStates = rStates;
   }
     

@@ -431,7 +431,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             if (gameAction == FIRE || keyCode == KEY_NUM5 || keyCode == KEY_NUM0) {
                 final Performance crPrf;
                 final int target = this.target;
-                if ((crPrf = this.crPrf).restore || sceneAct._players[target]._hp > 0) {
+                if ((crPrf = this.crPrf).isRestoring() || sceneAct._players[target]._hp > 0) {
                     this.ret = this.crAbility < 0
                             ? sceneAct.useAbility(crPrf, target, "")
                             : sceneAct.executeAbility(crPrf, target, "");

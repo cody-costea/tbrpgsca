@@ -20,9 +20,13 @@ import java.util.Hashtable;
 import java.util.Random;
 
 public final class StateMask extends Costume {
+  
+  protected final static int FLAG_AUTOMATE = 2;
+  protected final static int FLAG_CONFUSE = 4;
+  protected final static int FLAG_INACTIVATE = 8;
+  protected final static int FLAG_REFLECT = 16;
     
   protected Performance[] rSkills;
-  protected boolean automate, confuse, inactivate, reflect;
   protected int dur, sRes, dmgHp, dmgMp, dmgSp;
   
   public int getDuration() {
@@ -80,39 +84,71 @@ public final class StateMask extends Costume {
   }
   
   public boolean isAutomating() {
-      return this.automate;
+      return (this.flags & FLAG_AUTOMATE) == FLAG_AUTOMATE;
   }
   
   public StateMask setAutomating(final boolean value) {
-      this.automate = value;
+    if (value) {
+        this.flags |= FLAG_AUTOMATE;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_AUTOMATE) == FLAG_AUTOMATE) {
+            flags -= FLAG_AUTOMATE;
+            this.flags = flags;
+        }
+    }
       return this;
   }
   
   public boolean isConfusing() {
-      return this.confuse;
+      return (this.flags & FLAG_CONFUSE) == FLAG_CONFUSE;
   }
   
   public StateMask setConfusing(final boolean value) {
-      this.confuse = value;
-      return this;
+    if (value) {
+        this.flags |= FLAG_CONFUSE;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_CONFUSE) == FLAG_CONFUSE) {
+            flags -= FLAG_CONFUSE;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
   
   public boolean isInactivating() {
-      return this.inactivate;
+      return (this.flags & FLAG_INACTIVATE) == FLAG_INACTIVATE;
   }
   
   public StateMask setInactivating(final boolean value) {
-      this.inactivate = value;
-      return this;
+    if (value) {
+        this.flags |= FLAG_INACTIVATE;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_INACTIVATE) == FLAG_INACTIVATE) {
+            flags -= FLAG_INACTIVATE;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
   
   public boolean isRefelcting() {
-      return this.reflect;
+      return (this.flags & FLAG_REFLECT) == FLAG_REFLECT;
   }
   
   public StateMask setReflecting(final boolean value) {
-      this.reflect = value;
-      return this;
+    if (value) {
+        this.flags |= FLAG_REFLECT;
+    } else {
+        int flags = this.flags;
+        if ((flags & FLAG_REFLECT) == FLAG_REFLECT) {
+            flags -= FLAG_REFLECT;
+            this.flags = flags;
+        }
+    }
+    return this;
   }
 
   String inflict(final Actor actor, final boolean always, final boolean indefinite) {
@@ -197,20 +233,20 @@ public final class StateMask extends Costume {
             }
           }
           else {
-            if (this.inactivate) {
-              if (d > 0 && actor.active) {
+            if (this.isInactivating()) {
+              if (d > 0 && actor.isActive()) {
                 sDur.put(this, new Integer(d - 1));
               }
-              actor.active = false;
-              actor.guards = false;
+              actor.setActive(false);
+              actor.setGuarding(false);
             }
-            if (this.reflect) {
-              actor.reflects = true;
+            if (this.isRefelcting()) {
+              actor.setReflecting(true);
             }
-            if (this.automate && actor.automatic < 2) {
+            if (this.isAutomating() && actor.automatic < 2) {
               actor.automatic = 1;
             }
-            if (this.confuse) {
+            if (this.isConfusing()) {
               actor.automatic = actor.automatic < 2 ? -1 : -2;
             }
           }
@@ -226,7 +262,7 @@ public final class StateMask extends Costume {
     actor.updateStates(true, this.aStates);
     actor.updateSkills(true, this.aSkills);
     this.disableSkills(actor, true);
-    if (this.reflect) {
+    if (this.isRefelcting()) {
       actor.applyStates(false);
     }
   }
@@ -255,10 +291,18 @@ public final class StateMask extends Costume {
             final int agi, final int mInit, final boolean range, final Hashtable res, final Performance[] aSkills,
             final Performance[] rSkills, final StateMask[] states, final Hashtable stRes) {
     super(id, name, null, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
-    this.inactivate = inactivate;
-    this.automate = automate;
-    this.confuse = confuse;
-    this.reflect = reflect;
+    if (inactivate) {
+        this.flags |= FLAG_INACTIVATE;
+    }
+    if (automate) {
+        this.flags |= FLAG_AUTOMATE;
+    }
+    if (confuse) {
+        this.flags |= FLAG_CONFUSE;
+    }
+    if (reflect) {
+        this.flags |= FLAG_REFLECT;
+    }
     this.dur = dur;
     this.sRes = sRes;
     this.dmgHp = dmgHp;
