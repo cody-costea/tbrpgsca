@@ -424,7 +424,7 @@ public final class Actor extends Costume {
     }
   }
 
-  String checkStatus() {
+  public String checkStatus() {
     String s = "";
     if (this._hp < 1) {
       s += ", " + this.name + " falls unconscious";
@@ -442,7 +442,7 @@ public final class Actor extends Costume {
     return s;
   }
 
-  String applyStates(final boolean consume) {
+  public String applyStates(final boolean consume) {
     String s = "";
     if (!consume) {
       if (this.automatic < AUTO_ALLY && this.automatic > AUTO_ENEMY) {
@@ -479,7 +479,7 @@ public final class Actor extends Costume {
     return s;
   }
 
-  void recover() {
+  public void recover() {
     this._hp = this.mHp;
     this._mp = this.mMp;
     this._sp = 0;
@@ -532,7 +532,7 @@ public final class Actor extends Costume {
     }
   }
 
-  Costume unequipPos(final Object pos) {
+  public Costume unequipPos(final Object pos) {
     final Hashtable equipment = this.equipment;
     if (equipment == null) {
       return null;
@@ -544,7 +544,7 @@ public final class Actor extends Costume {
     }
   }
 
-  Object unequipItem(final Costume item) {
+  public Object unequipItem(final Costume item) {
     final Hashtable e = this.equipment;
     if (e != null) {
         final Enumeration vEquip = equipment.keys();
@@ -559,7 +559,7 @@ public final class Actor extends Costume {
     return null;
   }
 
-  Costume equipItem(final Object pos, final Costume item) {
+  public Costume equipItem(final Object pos, final Costume item) {
     final Costume r = this.unequipPos(pos);
     Hashtable e = this.equipment;
     if (e == null) {
@@ -571,7 +571,7 @@ public final class Actor extends Costume {
     return r;
   }
 
-  Actor(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
+  public Actor(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
         final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
         final int wis, final int agi, final boolean range, final Hashtable res, final Performance[] skills,
         final StateMask[] states, final Hashtable stRes, final Hashtable items) {

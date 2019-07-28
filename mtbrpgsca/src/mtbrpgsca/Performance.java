@@ -341,7 +341,7 @@ public final class Performance extends RolePlay {
     return s + user.checkStatus();
   }
 
-  void replenish(final Actor user) {
+  public void replenish(final Actor user) {
     if (this.mQty > 0) {
       Hashtable usrSkills = user.skillsQty;
       if (usrSkills == null) {
@@ -352,16 +352,16 @@ public final class Performance extends RolePlay {
     }
   }
 
-  boolean canPerform(final Actor actor) {
+  public boolean canPerform(final Actor actor) {
     final Object itemQty;
     final Hashtable skillsQty = actor.skillsQty;
     return this.mpC <= actor._mp && this.hpC < actor._hp && this.spC <= actor._sp && actor._lv >= this.lvRq
         && (skillsQty == null || ((itemQty = skillsQty.get(this)) == null ? 1 : ((Integer)itemQty).intValue()) > 0);
   }
 
-  Performance(final int id, final String name, final String sprite, final String sound, final boolean steal,
+  public Performance(final int id, final String name, final String sprite, final String sound, final boolean steal,
               final boolean range, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
-              final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final int elm, //TODO: int elm to integer
+              final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final Integer elm,
               final int mQty, final int rQty, final boolean absorb, final boolean restoreKO, final StateMask[] aStates,
               final StateMask[] rStates) {
     super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates);
@@ -375,7 +375,7 @@ public final class Performance extends RolePlay {
     this.spC = spC;
     this.dmgType = dmgType;
     this.trg = trg;
-    this.elm = new Integer(elm);
+    this.elm = elm;
     this.mQty = mQty;
     this.rQty = rQty;
     if (absorb) {

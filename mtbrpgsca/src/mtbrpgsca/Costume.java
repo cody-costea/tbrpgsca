@@ -96,7 +96,7 @@ public class Costume extends RolePlay {
       return this;
   }
 
-  Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp,
+  public Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp,
           final int atk, final int def, final int spi, final int wis, final int agi, final int mInit,
           final boolean range, final Hashtable res, final Performance[] skills, final StateMask[] states,
           final Hashtable stRes) {

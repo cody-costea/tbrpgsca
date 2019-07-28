@@ -219,7 +219,7 @@ public final class SceneAct {
     return ret;
   }
 
-  int getGuardian(final int target, final Performance skill) {
+  public int getGuardian(final int target, final Performance skill) {
     if (skill.hasRange() || (/*skill._range == null &&*/ this._players[this._current].hasRange())) {
       return target;
     }
@@ -265,7 +265,7 @@ public final class SceneAct {
     }
   }
 
-  String executeAbility(final Performance skill, int target, String ret) {
+  public String executeAbility(final Performance skill, int target, String ret) {
     switch (skill.trg) {
       case Performance.TRG_ENEMY:
         if (target < this._enIdx) {
@@ -313,7 +313,7 @@ public final class SceneAct {
     return ret;
   }
 
-  String executeAI(String ret) {
+  public String executeAI(String ret) {
     int skillIndex = 0;
     boolean nHeal = false;
     boolean nRestore = false;
@@ -369,7 +369,7 @@ public final class SceneAct {
     return this.executeAbility(ability, target, ret);
   }
 
-  int getAIskill(final int defSkill, final boolean nRestore) {
+  public int getAIskill(final int defSkill, final boolean nRestore) {
     int ret = defSkill;
     final Actor crActor = this._players[this._current];
     final Vector crSkills = crActor.getAvailableSkills();
@@ -391,11 +391,11 @@ public final class SceneAct {
     return ret;
   }
 
-  String performSkill(final int index, final int target, final String ret) {
+  public String performSkill(final int index, final int target, final String ret) {
     return this.executeAbility((Performance)this._players[this._current].getAvailableSkills().elementAt(index), target, ret);
   }
 
-  String useAbility(final Performance item, final int target, final String ret) {
+  public String useAbility(final Performance item, final int target, final String ret) {
     final Hashtable crItemsMap = this._players[this._current]._items;
     if (crItemsMap != null) {
       final Object itemQtyObj;
@@ -410,7 +410,7 @@ public final class SceneAct {
     return this.executeAbility(item, target, ret);
   }
 
-  String useItem(final int index, final int target, final String ret) {
+  public String useItem(final int index, final int target, final String ret) {
     final Performance[] crItems = this._crItems;
     if (crItems != null && index < crItems.length) {
       return this.useAbility((Performance)crItems[index], target, ret);
@@ -419,7 +419,7 @@ public final class SceneAct {
     }
   }
 
-  String escape() {
+  public String escape() {
     this._lastAbility = null;
     final int surprise = this._surprise;
     if (surprise < 0) {
@@ -453,7 +453,7 @@ public final class SceneAct {
     }
   }
 
-  SceneAct(final Actor[] party, final Actor[] enemy, final int surprise) {
+  public SceneAct(final Actor[] party, final Actor[] enemy, final int surprise) {
     boolean useInit = false;
     final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
     final Actor[] players = this._players = new Actor[party.length + enemy.length];//this._players = party + enemy;

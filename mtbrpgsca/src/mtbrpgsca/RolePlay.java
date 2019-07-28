@@ -112,7 +112,7 @@ public abstract class RolePlay {
       return object != null && object instanceof RolePlay && ((RolePlay)object).id == this.id;
   }
 
-  RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
+  public RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
            final int sp, final int mInit, final boolean range, final StateMask[] states) {
     this.id = id;
     this.name = name;

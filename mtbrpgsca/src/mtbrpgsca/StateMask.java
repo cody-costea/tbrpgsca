@@ -151,7 +151,7 @@ public final class StateMask extends Costume {
     return this;
   }
 
-  String inflict(final Actor actor, final boolean always, final boolean indefinite) {
+  public String inflict(final Actor actor, final boolean always, final boolean indefinite) {
     final Hashtable trgStRes = actor.stRes;
     Object o = null;
     if (always || new Random().nextInt(10) > (trgStRes == null ? 0 : ((o = trgStRes.get(this)) == null
@@ -267,7 +267,7 @@ public final class StateMask extends Costume {
     }
   }
 
-  boolean remove(final Actor actor, final boolean delete, final boolean always) {
+  public boolean remove(final Actor actor, final boolean delete, final boolean always) {
     Hashtable sDur = actor.stateDur;
     Object d;
     if (sDur != null && (always || ((d = sDur.get(this)) == null ? -2 : ((Integer)d).intValue()) != -2)) {
