@@ -49,6 +49,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     
     private final Thread thr;
     private final SpriteImage[] sprites;
+    private final SpriteImage[] updSprOrd;
     private Hashtable prfSprMap; //<Performance, Image>
     
     private volatile int target;
@@ -64,6 +65,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     private volatile String ret = "";
 
     private final static class SpriteImage {
+    
+        private static int RefPixel = 128;
+    
         protected final Actor actor;
         
         private final Sprite spr;
@@ -181,13 +185,35 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             }
             return spr;
         }
+    
+        static Image ResizeImg(final Image original, final int nWidth, final int nHeight) {
+            if (original == null) {
+                return null;
+            }
+            final int oHeight = original.getHeight();
+            final int oWidth = original.getWidth();
+            final int[] oPixels = new int[oHeight * oWidth];
+            original.getRGB(oPixels, 0, oWidth, 0, 0, oWidth, oHeight);
+            final int[] nPixels = new int[nHeight * nWidth];
+            for (int i = 0; i < nHeight; i++) {
+                int y = i * oHeight / nHeight;
+                for (int j = 0; j < nWidth; j++) {
+                    int x = j * oWidth / nWidth;
+                    nPixels[i * nWidth + j] = oPixels[y * oWidth + x];
+                }
+            }
+            return Image.createRGBImage(nPixels, nWidth, nHeight, true);
+        }
 
         public SpriteImage(final Actor actor, final int x, final int y, final boolean mirror) throws IOException {
             this.actor = actor;
             this.seq = new int[3][];
             final Image[] img = this.img = new Image[3];
             for (int i = 0; i < 3; i++) {
-                img[i] = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + "_l.png");
+                final Image sprImage = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + "_l.png");
+                final int imgHeight = sprImage.getHeight();
+                final int refPixel = SpriteImage.RefPixel;
+                img[i] = imgHeight > refPixel ? SpriteImage.ResizeImg(sprImage, (sprImage.getWidth() / imgHeight) * refPixel, refPixel) : sprImage;
             }
             final boolean ko = actor._hp < 1;
             final Sprite spr = this.spr = this.prepareSpr(ko ? SPR_FALL : SPR_HIT, false);
@@ -195,6 +221,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             spr.setRefPixelPosition(x, y);
             this.crt = ko ? SPR_KO : SPR_IDLE;
         }
+        
     }
     
     public int setAutoSkill() {
@@ -206,38 +233,20 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         this.prfCanPerform = true;
         return crAbility;
     }
-    
-    private Image resizeImg(final Image original, final int nWidth, final int nHeight) {
-        if (original == null) {
-            return null;
-        }
-        final int oHeight = original.getHeight();
-        final int oWidth = original.getWidth();
-        final int[] oPixels = new int[oHeight * oWidth];
-        original.getRGB(oPixels, 0, oWidth, 0, 0, oWidth, oHeight);
-        final int[] nPixels = new int[nHeight * nWidth];
-        for (int i = 0; i < nHeight; i++) {
-            int y = i * oHeight / nHeight;
-            for (int j = 0; j < nWidth; j++) {
-                int x = j * oWidth / nWidth;
-                nPixels[i * nWidth + j] = oPixels[y * oWidth + x];
-            }
-        }
-        return Image.createRGBImage(nPixels, nWidth, nHeight, true);
-    }
 
     public void run() {
         final Graphics g = this.getGraphics();
         final Font f = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         g.setFont(f);
         final SpriteImage[] sprites = this.sprites;
+        final SpriteImage[] sprImgOrd = this.updSprOrd;
         final SceneAct sceneAct = this.sceneAct;
         final int yPos = this.sceneYbegin;
         final int width = this.totalWidth;
         final int yEnd = this.sceneYend;
         final int height = this.totalHeight;
         final int scnHeight = yEnd - yPos;
-        final Image arenaImg = this.arenaImg = this.resizeImg(this.arenaImg, width, scnHeight);
+        final Image arenaImg = this.arenaImg = SpriteImage.ResizeImg(this.arenaImg, width, scnHeight);
         boolean updSprites = true;
         boolean updActorInfo = true;
         boolean newTurn = false;
@@ -372,8 +381,11 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                     } else {
                         g.drawImage(arenaImg, 0, yPos, Graphics.TOP | Graphics.LEFT);
                     }
-                    for (int i = 0; i < sprites.length; i++) {
-                        final SpriteImage sprImage = sprites[i];
+                    for (int i = 0; i < 8; i++) {
+                        final SpriteImage sprImage = sprImgOrd[i];
+                        if (sprImage == null) {
+                            continue;
+                        }
                         final int crtSprite = sprImage.crt;
                         if (crtSprite != SPR_DONE && (crtSprite == SPR_ACT || sprWait == 0)) {
                             if (sprImage.old != crtSprite) {
@@ -534,13 +546,14 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
         final int height = this.totalHeight = this.getHeight();
         final int width = this.totalWidth = this.getWidth();
-        final int xFactor = ((width / 4) + (width / (width / 10))) + (width % 30) / 3;
-        final int xFraction = xFactor / ((width / 30) / 2);
+        final int refPixel = SpriteImage.RefPixel = 128 - (((width - 240) * -1) / 4);
+        final int xFactor = (((refPixel / 2) + (refPixel / (refPixel / 10))) + (refPixel % 16) / 2);
+        final int xFraction = xFactor / ((refPixel / 16) / 2);
         final int xCentre = width / 2;
         final int sceneYbegin = this.sceneYbegin = 35;
         final int sceneYend = this.sceneYend = height - 21; //+ (yFactor * 3);        
-        final int yCentre = ((sceneYend) / 2) - sceneYbegin;
-        final int yFactor = (yCentre / 2);
+        final int yCentre = ((sceneYend) / 2) - sceneYbegin - (refPixel / 8);
+        final int yFactor = (yCentre / 2) + (((refPixel - 128) * -1) / 3);
         final int enIdx = sceneAct._enIdx;
         final Actor[] players = sceneAct._players;
         final int len = sceneAct._players.length;
@@ -548,25 +561,31 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             players[i].automatic = Actor.AUTO_ALLY;
         }
         final SpriteImage[] sprImages = this.sprites = new SpriteImage[len];
+        final SpriteImage[] sprImgOrd = this.updSprOrd = new SpriteImage[8];
         try {
             if (arenaImg != null && arenaImg.length() > 0) {
                 this.arenaImg = Image.createImage("/bg_" + arenaImg + ".png");
             }
-            Actor[] team = surprise < 0 ? enemy : party;
             int i;
+            SpriteImage sprImage;
+            Actor[] team = surprise < 0 ? enemy : party;
             for (i = 0; i < team.length; i++) {
                 switch (i) {
                     case 0:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, yCentre - yFactor / 5, false);
+                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor + xFraction), yCentre - yFactor / 5, false);
+                        sprImgOrd[2] = sprImage;
                         break;
                     case 1:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2 - xFraction), yCentre - yFactor, false);
+                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2), yCentre - yFactor, false);
+                        sprImgOrd[0] = sprImage;
                         break;
                     case 2:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2 - xFraction), yCentre + (yFactor - yFactor / 3), false);
+                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor * 2), yCentre + (yFactor - yFactor / 3), false);
+                        sprImgOrd[4] = sprImage;
                         break;
                     case 3:
-                        sprImages[i] = new SpriteImage(team[i], xCentre - xFactor, yCentre + yFactor + yFactor / 2, false);
+                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - (xFactor + xFraction), yCentre + yFactor + yFactor / 2, false);
+                        sprImgOrd[6] = sprImage;
                         break;
                 }               
             }
@@ -574,16 +593,20 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             for (int j = 0; j < team.length; j++) {
                 switch (j) {
                     case 0:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + xFactor, yCentre - yFactor, true);
+                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor + xFraction), yCentre - yFactor, true);
+                        sprImgOrd[1] = sprImage;
                         break;
                     case 1:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2 - xFraction), yCentre - yFactor / 5, true);
+                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2), yCentre - yFactor / 5, true);
+                        sprImgOrd[3] = sprImage;
                         break;
                     case 2:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2 - xFraction), yCentre + yFactor + yFactor / 2, true);
+                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor * 2), yCentre + yFactor + yFactor / 2, true);
+                        sprImgOrd[5] = sprImage;
                         break;
                     case 3:
-                        sprImages[i++] = new SpriteImage(team[j], xCentre + xFactor, yCentre + (yFactor - yFactor / 3), true);
+                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + (xFactor + xFraction), yCentre + (yFactor - yFactor / 3), true);
+                        sprImgOrd[7] = sprImage;
                         break;
                 }
             }
