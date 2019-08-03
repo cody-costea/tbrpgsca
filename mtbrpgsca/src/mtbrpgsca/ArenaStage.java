@@ -533,7 +533,10 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         }
         Object img = prfSprMap.get(ability);
         if (img == null) {
-            img = Image.createImage("/bt_" + ability.sprite + ".png");
+            final Image sprImage = Image.createImage("/bt_" + ability.sprite + ".png");
+            final int imgHeight = sprImage.getHeight();
+            final int refPixel = SpriteImage.RefPixel;
+            img = imgHeight > refPixel ? SpriteImage.ResizeImg(sprImage, (sprImage.getWidth() / imgHeight) * refPixel, refPixel) : sprImage;
             prfSprMap.put(ability, img);
         }
         return (Image)img;
@@ -547,14 +550,14 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final int height = this.totalHeight = this.getHeight();
         final int width = this.totalWidth = this.getWidth();
         final int refPixel = SpriteImage.RefPixel = 128 - (((width - 240) * -1) / 2);
-        final int xFactor = refPixel / 2;//(((refPixel / 2) + (refPixel / (refPixel / 10))) + (refPixel % 16) / 2);
+        final int xFactor = refPixel / 2;
         final int xCloser = xFactor + (xFactor / 2);
         final int xFurther = refPixel + (xFactor / 4);
         final int xCentre = width / 2;
         final int sceneYbegin = this.sceneYbegin = 35;
-        final int sceneYend = this.sceneYend = height - 21; //+ (yFactor * 3);        
+        final int sceneYend = this.sceneYend = height - 21;
         final int yCentre = (sceneYend / 2) - (sceneYbegin + (sceneYbegin / 3)) + ((128 - refPixel) / 2);
-        final int yCloser = (yCentre / 3); //+ ((128 - refPixel) / 5);
+        final int yCloser = (yCentre / 3);
         final int yFurther = (yCloser * 2) - (yCloser / 5);
         final int enIdx = sceneAct._enIdx;
         final Actor[] players = sceneAct._players;
