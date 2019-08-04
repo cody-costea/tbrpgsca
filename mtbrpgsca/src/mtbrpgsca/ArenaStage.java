@@ -212,7 +212,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
                 final Image sprImage = Image.createImage("/bt_" + actor._job.sprite + "_" + (i + 1) + "_l.png");
                 final int imgHeight = sprImage.getHeight();
                 final int refPixel = SpriteImage.RefPixel;
-                img[i] = imgHeight > refPixel ? SpriteImage.ResizeImg(sprImage, (sprImage.getWidth() / imgHeight) * refPixel, refPixel) : sprImage;
+                img[i] = imgHeight != refPixel ? SpriteImage.ResizeImg(sprImage, (sprImage.getWidth() / imgHeight) * refPixel, refPixel) : sprImage;
             }
             final boolean ko = actor._hp < 1;
             final Sprite spr = this.spr = this.prepareSpr(ko ? SPR_FALL : SPR_HIT, false);
@@ -535,7 +535,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             final Image sprImage = Image.createImage("/bt_" + ability.sprite + ".png");
             final int imgHeight = sprImage.getHeight();
             final int refPixel = SpriteImage.RefPixel;
-            img = imgHeight > refPixel ? SpriteImage.ResizeImg(sprImage, (sprImage.getWidth() / imgHeight) * refPixel, refPixel) : sprImage;
+            img = imgHeight != refPixel ? SpriteImage.ResizeImg(sprImage, (sprImage.getWidth() / imgHeight) * refPixel, refPixel) : sprImage;
             prfSprMap.put(ability, img);
         }
         return (Image)img;
