@@ -68,8 +68,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     
         private static int RefPixel = 128;
     
-        protected final Actor actor;
-        
+        protected final Actor actor;        
         private final Sprite spr;
         private final Image[] img;
         private final int[][] seq;
@@ -571,46 +570,46 @@ public final class ArenaStage extends GameCanvas implements Runnable {
             if (arenaImg != null && arenaImg.length() > 0) {
                 this.arenaImg = Image.createImage("/bg_" + arenaImg + ".png");
             }
-            int i;
             SpriteImage sprImage;
-            Actor[] team = surprise < 0 ? enemy : party;
-            for (i = 0; i < team.length; i++) {
+            final boolean surprised = surprise < 0;
+            int i, x = surprised ? 1 : -1;
+            for (i = 0; i < party.length; i++) {
                 switch (i) {
                     case 0:
-                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - xCloser, yCentre - yCloser, false);
+                        sprImage = sprImages[i] = new SpriteImage(party[i], xCentre + (xCloser * x), yCentre - yCloser, surprised);
                         sprImgOrd[2] = sprImage;
                         break;
                     case 1:
-                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - xFurther, yCentre - yFurther, false);
+                        sprImage = sprImages[i] = new SpriteImage(party[i], xCentre + (xFurther * x), yCentre - yFurther, surprised);
                         sprImgOrd[0] = sprImage;
                         break;
                     case 2:
-                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - xFurther, yCentre + yCloser, false);
+                        sprImage = sprImages[i] = new SpriteImage(party[i], xCentre + (xFurther * x), yCentre + yCloser, surprised);
                         sprImgOrd[4] = sprImage;
                         break;
                     case 3:
-                        sprImage = sprImages[i] = new SpriteImage(team[i], xCentre - xCloser, yCentre + yFurther, false);
+                        sprImage = sprImages[i] = new SpriteImage(party[i], xCentre + (xCloser * x), yCentre + yFurther, surprised);
                         sprImgOrd[6] = sprImage;
                         break;
                 }               
             }
-            team = surprise < 0 ? party : enemy;
-            for (int j = 0; j < team.length; j++) {
+            x = surprised ? -1 : 1;
+            for (int j = 0; j < enemy.length; j++) {
                 switch (j) {
                     case 0:
-                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + xCloser, yCentre - yFurther, true);
+                        sprImage = sprImages[i++] = new SpriteImage(enemy[j], xCentre + (xCloser * x), yCentre - yFurther, !surprised);
                         sprImgOrd[1] = sprImage;
                         break;
                     case 1:
-                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + xFurther, yCentre - yCloser, true);
+                        sprImage = sprImages[i++] = new SpriteImage(enemy[j], xCentre + (xFurther * x), yCentre - yCloser, !surprised);
                         sprImgOrd[3] = sprImage;
                         break;
                     case 2:
-                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + xFurther, yCentre + yFurther, true);
+                        sprImage = sprImages[i++] = new SpriteImage(enemy[j], xCentre + (xFurther * x), yCentre + yFurther, !surprised);
                         sprImgOrd[5] = sprImage;
                         break;
                     case 3:
-                        sprImage = sprImages[i++] = new SpriteImage(team[j], xCentre + xCloser, yCentre + yCloser, true);
+                        sprImage = sprImages[i++] = new SpriteImage(enemy[j], xCentre + (xCloser * x), yCentre + yCloser, !surprised);
                         sprImgOrd[7] = sprImage;
                         break;
                 }
