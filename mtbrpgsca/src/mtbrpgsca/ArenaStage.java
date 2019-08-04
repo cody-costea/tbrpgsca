@@ -436,6 +436,9 @@ public final class ArenaStage extends GameCanvas implements Runnable {
     }
     
     protected void keyReleased(final int keyCode) {
+        if (this.updActions) {
+            return;
+        }
         final SceneAct sceneAct = this.sceneAct;
         if (sceneAct._status == 0) {
             final int gameAction = getGameAction(keyCode);
