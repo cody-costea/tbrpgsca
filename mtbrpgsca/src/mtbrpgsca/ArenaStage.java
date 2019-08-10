@@ -66,7 +66,7 @@ public final class ArenaStage extends GameCanvas implements Runnable {
 
     private final static class SpriteImage {
     
-        private static int RefPixel = 128;
+        private static int RefPixel = 80;
     
         protected final Actor actor;        
         private final Sprite spr;
@@ -551,16 +551,16 @@ public final class ArenaStage extends GameCanvas implements Runnable {
         final SceneAct sceneAct = this.sceneAct = new SceneAct(party, enemy, surprise);
         final int height = this.totalHeight = this.getHeight();
         final int width = this.totalWidth = this.getWidth();
-        final int refPixel = SpriteImage.RefPixel = 128 - (((width - 240) * -1) / 2);
-        final int xFactor = refPixel / 2;
-        final int xCloser = xFactor + (xFactor / 2);
-        final int xFurther = refPixel + (xFactor / 4);
+        final int refPixel = 80 - (((width - 240) * -1) / 8);
+        int xFactor = refPixel / 2;
+        final int xCloser = xFactor + (xFactor = (xFactor / 2) + (xFactor / 3));
+        final int xFurther = refPixel + xFactor;
         final int xCentre = width / 2;
         final int sceneYbegin = this.sceneYbegin = 35;
         final int sceneYend = this.sceneYend = height - 21;
-        final int yCentre = (sceneYend / 2) - (sceneYbegin + (sceneYbegin / 3)) + ((128 - refPixel) / 2);
-        final int yCloser = (yCentre / 3);
-        final int yFurther = (yCloser * 2) - (yCloser / 5);
+        final int yCentre = ((sceneYend / 2) - (sceneYbegin - (sceneYbegin / 3))) + ((80 - refPixel) / 3);
+        final int yCloser = (yCentre / 5);
+        final int yFurther = (yCloser * 2) + yCloser;
         final int enIdx = sceneAct._enIdx;
         final Actor[] players = sceneAct._players;
         final int len = sceneAct._players.length;
