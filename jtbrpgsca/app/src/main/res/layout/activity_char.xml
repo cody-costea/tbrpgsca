@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Button
+        android:id="@+id/QuitBt"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/InfoBt"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/StartBt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Button" />
+
+    <Spinner
+        android:id="@+id/RaceBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/ClassBox"
+        android:layout_toRightOf="@+id/ClassTxt" />
+
+    <Spinner
+        android:id="@+id/ClassBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/RaceBox1"
+        android:layout_toLeftOf="@+id/ImgPlayer"
+        android:layout_toRightOf="@+id/ClassTxt" />
+
+    <TextView
+        android:id="@+id/RaceTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:layout_toLeftOf="@+id/RaceBox1"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/NameTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/NameField1"
+        android:layout_alignBottom="@+id/NameField1"
+        android:layout_alignLeft="@+id/ClassTxt"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/NameField1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/StartBt"
+        android:layout_alignRight="@+id/ClassBox"
+        android:layout_below="@+id/ClassBox"
+        android:layout_toRightOf="@+id/NameTxt"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <ImageView
+        android:id="@+id/ImgPlayer"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/RaceTxt"
+        android:layout_marginRight="38dp" />
+
+    <TextView
+        android:id="@+id/ClassTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ClassBox"
+        android:layout_marginTop="28dp"
+        android:layout_toRightOf="@+id/InfoBt"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>
