@@ -10,7 +10,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.tbrpgsca.library"
+        applicationId "com.codycostea.jtbrpgsca"
         targetSdkVersion 28
         minSdkVersion 1
     }

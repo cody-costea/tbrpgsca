@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. 
 */
-package com.tbrpgsca.demo;
+package com.codycostea.tbrpgsca;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +33,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.tbrpgsca.library.Ability;
-import com.tbrpgsca.library.Actor;
-import com.tbrpgsca.library.BattleAct;
-import com.tbrpgsca.library.Job;
-import com.tbrpgsca.library.R;
-import com.tbrpgsca.library.Race;
+import com.codycostea.tbrpgsca.R;
 
 public class DemoAct extends Activity {
 
