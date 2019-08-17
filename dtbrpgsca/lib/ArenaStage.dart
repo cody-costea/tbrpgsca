@@ -422,12 +422,12 @@ class ArenaState extends State<ArenaStage> {
                                 )
                               ),
                               Align(
-                                  alignment: Alignment(-0.3, -0.7),
-                                  child: ActorSprite(spriteState: actorSprites[surprised ? 7 : 0])
-                              ),
-                              Align(
                                   alignment: Alignment(-0.7, -1),
                                   child: ActorSprite(spriteState: actorSprites[surprised ? 6 : 1])
+                              ),
+                              Align(
+                                  alignment: Alignment(-0.3, -0.7),
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 7 : 0])
                               ),
                               Align(
                                   alignment: Alignment(-0.9, -0.5),
@@ -438,12 +438,12 @@ class ArenaState extends State<ArenaStage> {
                                   child: ActorSprite(spriteState: actorSprites[surprised ? 4 : 3])
                               ),
                               Align(
-                                  alignment: Alignment(0.9, -0.7),
-                                  child: ActorSprite(spriteState: actorSprites[surprised ? 1 : 6])
-                              ),
-                              Align(
                                   alignment: Alignment(0.5, -1),
                                   child: ActorSprite(spriteState: actorSprites[surprised ? 0 : 7])
+                              ),
+                              Align(
+                                  alignment: Alignment(0.9, -0.7),
+                                  child: ActorSprite(spriteState: actorSprites[surprised ? 1 : 6])
                               ),
                               Align(
                                   alignment: Alignment(0.3, -0.5),
