@@ -1,8 +1,0 @@
-# ftbrpgsca
-
-Turn-Based RPG Simple Combat Arena
-
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
