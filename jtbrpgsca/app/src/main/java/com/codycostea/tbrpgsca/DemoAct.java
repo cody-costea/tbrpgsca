@@ -37,10 +37,10 @@ import com.codycostea.tbrpgsca.R;
 
 public class DemoAct extends Activity {
 
-	private Ability[] Skill;
-	private ArrayList<Ability> Item;
-	private Race[] pcRace;
-	private Job[] pcJob;
+	private Performance[] Skill;
+	private ArrayList<Performance> Item;
+	private RolePlay[] pcRace;
+	private Costume[] pcJob;
 	private Actor[] Player;
 	private Actor[] Party;
 	private Actor[][] Enemy;
@@ -56,7 +56,7 @@ public class DemoAct extends Activity {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_demo);
 
-		final Actor.State[] state = this.AddStates();
+		final StateMask[] state = this.AddStates();
 		this.Skill = AddSkills(state);
 		this.Item = AddItems(state);
 		this.pcRace = AddRaces();
@@ -141,8 +141,8 @@ public class DemoAct extends Activity {
 			surprise = 1;
 		for (int i = 1; i < this.Player.length; i++)
 			this.Player[i].recover();
-		//BattleAct.PlayDemo(this);
-		BattleAct.InitiateBattle(this, 0, 0, this.Party, this.Enemy[this.level], new Ability[] { this.Skill[0], this.Skill[1] },
+		//ArenaAct.PlayDemo(this);
+		ArenaAct.InitiateBattle(this, 0, 0, this.Party, this.Enemy[this.level], new Performance[] { this.Skill[0], this.Skill[1] },
 				this.Item, null, surprise, this.level % 2 == 0, true);
 	}
 
@@ -199,75 +199,75 @@ public class DemoAct extends Activity {
 		}
 	}
 
-	private Actor.State[] AddStates()
+	private StateMask[] AddStates()
 	{
-		Actor.State state[] = new Actor.State[11];
-		state[0] = new Actor.State(1, "Regen", false, false, false, -1, 0, 10, 0, 0, 0,
+		StateMask state[] = new StateMask[11];
+		state[0] = new StateMask(1, "Regen", false, false, false, -1, 0, 10, 0, 0, 0,
 				2, 0, 0, 0, false);
-		state[1] = new Actor.State(2, "Poison", false, false, false, 10, 0, -7, 0, -2,
+		state[1] = new StateMask(2, "Poison", false, false, false, 10, 0, -7, 0, -2,
 				0, -2, 0, 0, 0, false);
-		state[2] = new Actor.State(3, "Clarity", false, false, false, -1, 0, 0, 7, 0, 0,
+		state[2] = new StateMask(3, "Clarity", false, false, false, -1, 0, 0, 7, 0, 0,
 				0, 1, 1, 0, false);
-		state[3] = new Actor.State(4, "Dizziness", false, false, false, 3, 0, 0, -7, 0,
+		state[3] = new StateMask(4, "Dizziness", false, false, false, 3, 0, 0, -7, 0,
 				0, 0, -1, -1, 0, false);
-		state[4] = new Actor.State(5, "Vigour", false, false, false, -1, 0, 0, 0, 7, 1,
+		state[4] = new StateMask(5, "Vigour", false, false, false, -1, 0, 0, 0, 7, 1,
 				0, 0, 0, 1, false);
-		state[5] = new Actor.State(6, "Weakness", false, false, false, 5, 0, 0, 0, -7,
+		state[5] = new StateMask(6, "Weakness", false, false, false, 5, 0, 0, 0, -7,
 				-1, 0, 0, 0, -1, false);
-		state[6] = new Actor.State(7, "Berserk", false, true, false, 7, 0, 0, 0, 0, 5,
+		state[6] = new StateMask(7, "Berserk", false, true, false, 7, 0, 0, 0, 0, 5,
 				-3, 0, 0, 3, false);
-		state[7] = new Actor.State(8, "Confusion", false, false, true, 3, 2, 0, 0, 0, 0,
+		state[7] = new StateMask(8, "Confusion", false, false, true, 3, 2, 0, 0, 0, 0,
 				0, 0, 0, 0, false);
-		state[8] = new Actor.State(9, "Sleep", true, false, false, 5, 1, 0, 0, 0, 0, -3,
+		state[8] = new StateMask(9, "Sleep", true, false, false, 5, 1, 0, 0, 0, 0, -3,
 				0, 0, -3, false);
-		state[9] = new Actor.State(10, "Stun", true, false, false, 1, 0, 0, 0, 0, 0, -1,
+		state[9] = new StateMask(10, "Stun", true, false, false, 1, 0, 0, 0, 0, 0, -1,
 				0, 0, -1, false);
-		state[10] = new Actor.State(11, "Reflect", false, false, false, 7, 0,0, 0, 0,
+		state[10] = new StateMask(11, "Reflect", false, false, false, 7, 0,0, 0, 0,
 				0, 0, 0, 0, 0, true);
 		return state;
 	}
 
-    private Race[] AddRaces()
+    private Costume[] AddRaces()
     {
-    	
-    	Race[] pcRace = new Race[4];
+
+		Costume[] pcRace = new Costume[4];
     			
-    	pcRace[0]=new Race(1, "Elf", 40,25,10, 7,5,15,12,11, new int[]{0,-1,1,1,1,1});
-    	pcRace[2]=new Race(2, "Human", 47,15,13, 9,11,9,11,10, new int[]{0,0,0,0,0,0,-1,1});
-    	pcRace[1]=new Race(3, "Half-Orc", 55,7,13, 17,12,5,7,9, new int[]{0,1,-1,-1,-1,-1});
-    	pcRace[3]=new Race(4, "Gnome", 40,15,20, 12,8,10,5,15, new int[]{0,0,0,0,0,0,1,-1});
+    	pcRace[0]=new Costume(1, "Elf", 40,25,10, 7,5,15,12,11, new int[]{0,-1,1,1,1,1});
+    	pcRace[2]=new Costume(2, "Human", 47,15,13, 9,11,9,11,10, new int[]{0,0,0,0,0,0,-1,1});
+    	pcRace[1]=new Costume(3, "Half-Orc", 55,7,13, 17,12,5,7,9, new int[]{0,1,-1,-1,-1,-1});
+    	pcRace[3]=new Costume(4, "Gnome", 40,15,20, 12,8,10,5,15, new int[]{0,0,0,0,0,0,1,-1});
     	return pcRace;
     	
     }
 	
-	private Job[] AddJobs()
+	private Costume[] AddJobs()
 	{
 		
-		Job pcJob[]=new Job[15];
+		Costume pcJob[]=new Costume[15];
 		
-		pcJob[1]=new Job(1, "Berserker",1,0,0, 1,0,0,0,1, new int[]{0,1,-1,-1,-1,-1}, new Ability[]{this.Skill[8],this.Skill[9],this.Skill[10],this.Skill[11],this.Skill[12],this.Skill[14]});
-		pcJob[2]=new Job(2, "Sorcerer",0,1,0, 0,0,1,0,1, new int[]{0,-1,1,1,1,1,1,-1}, new Ability[]{this.Skill[23],this.Skill[24],this.Skill[25],this.Skill[26],this.Skill[27],this.Skill[28],this.Skill[29],this.Skill[30],this.Skill[31],this.Skill[32],this.Skill[33],this.Skill[34],this.Skill[35],this.Skill[38]});
+		pcJob[1]=new Costume(1, "Berserker",1,0,0, 1,0,0,0,1, new int[]{0,1,-1,-1,-1,-1}, new Performance[]{this.Skill[8],this.Skill[9],this.Skill[10],this.Skill[11],this.Skill[12],this.Skill[14]});
+		pcJob[2]=new Costume(2, "Sorcerer",0,1,0, 0,0,1,0,1, new int[]{0,-1,1,1,1,1,1,-1}, new Performance[]{this.Skill[23],this.Skill[24],this.Skill[25],this.Skill[26],this.Skill[27],this.Skill[28],this.Skill[29],this.Skill[30],this.Skill[31],this.Skill[32],this.Skill[33],this.Skill[34],this.Skill[35],this.Skill[38]});
         pcJob[2].setSprName("Wizard");
-        pcJob[3]=new Job(3, "Monk",0,1,0, 0,1,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new Ability[]{this.Skill[2],this.Skill[3],this.Skill[4],this.Skill[5],this.Skill[6],this.Skill[7]});
-        pcJob[4]=new Job(4, "Rogue",0,0,1, 1,0,0,0,1, new int[]{}, new Ability[]{this.Skill[15],this.Skill[16],this.Skill[17],this.Skill[18],this.Skill[19],this.Skill[38]});
-        pcJob[5]=new Job(5, "Alchemist",0,1,0, 0,0,1,0,1, new int[]{}, this.Skill, new int[]{23,24,25,26,27,28,30,31,32,33,15,16,17,18,20});
-        pcJob[6]=new Job(6, "Dragoon",1,0,0, 1,0,1,0,0, new int[]{0,0,1,1,1,1,0,-1}, this.Skill, new int[]{8,9,10,11,23,24,25,26,27,28,30,31,32,33,41,42,43,44,50});
-        pcJob[7]=new Job(7, "Knight",1,0,0, 0,1,0,1,0, new int[]{0,1,-1,-1,-1,-1,-7,7}, this.Skill, new int[]{2,3,4,5,8,9,10,11,13});
-        pcJob[8]=new Job(8, "Warden",0,0,1, 0,0,0,1,1, new int[]{0,0,0,0,0,0,-2,2}, this.Skill, new int[]{2,3,4,5,15,16,17,18,21});
+        pcJob[3]=new Costume(3, "Monk",0,1,0, 0,1,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, new Performance[]{this.Skill[2],this.Skill[3],this.Skill[4],this.Skill[5],this.Skill[6],this.Skill[7]});
+        pcJob[4]=new Costume(4, "Rogue",0,0,1, 1,0,0,0,1, new int[]{}, new Performance[]{this.Skill[15],this.Skill[16],this.Skill[17],this.Skill[18],this.Skill[19],this.Skill[38]});
+        pcJob[5]=new Costume(5, "Alchemist",0,1,0, 0,0,1,0,1, new int[]{}, this.Skill, new int[]{23,24,25,26,27,28,30,31,32,33,15,16,17,18,20});
+        pcJob[6]=new Costume(6, "Dragoon",1,0,0, 1,0,1,0,0, new int[]{0,0,1,1,1,1,0,-1}, this.Skill, new int[]{8,9,10,11,23,24,25,26,27,28,30,31,32,33,41,42,43,44,50});
+        pcJob[7]=new Costume(7, "Knight",1,0,0, 0,1,0,1,0, new int[]{0,1,-1,-1,-1,-1,-7,7}, this.Skill, new int[]{2,3,4,5,8,9,10,11,13});
+        pcJob[8]=new Costume(8, "Warden",0,0,1, 0,0,0,1,1, new int[]{0,0,0,0,0,0,-2,2}, this.Skill, new int[]{2,3,4,5,15,16,17,18,21});
         pcJob[8].setSprName("Bard");
-        pcJob[9]=new Job(9, "Shaman",0,1,0, 0,0,1,1,0, new int[]{0,0,0,0,0,0,7,-7}, this.Skill, new int[]{52,53,54,55,23,24,29,34,49});
-        pcJob[10]=new Job(10, "Swashbuckler",0,0,1, 1,0,0,0,1, new int[]{}, this.Skill, new int[]{8,9,10,11,15,16,17,18,22});
-        pcJob[11]=new Job(11, "Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, this.Skill, new int[]{8,9,11,23,24,29,15,16,18,45,46});
-        pcJob[12]=new Job(12, "Ninja",0,0,1, 0,0,0,0,1, new int[]{}, this.Skill, new int[]{8,9,11,15,16,17,2,3,5,40});
-        pcJob[13]=new Job(13, "Crusader",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, this.Skill, new int[]{8,9,10,2,3,4,56,36,51,37,47});
+        pcJob[9]=new Costume(9, "Shaman",0,1,0, 0,0,1,1,0, new int[]{0,0,0,0,0,0,7,-7}, this.Skill, new int[]{52,53,54,55,23,24,29,34,49});
+        pcJob[10]=new Costume(10, "Swashbuckler",0,0,1, 1,0,0,0,1, new int[]{}, this.Skill, new int[]{8,9,10,11,15,16,17,18,22});
+        pcJob[11]=new Costume(11, "Reaver",1,0,0, 1,0,0,0,0, new int[]{0,0,0,0,0,0,7,-7}, this.Skill, new int[]{8,9,11,23,24,29,15,16,18,45,46});
+        pcJob[12]=new Costume(12, "Ninja",0,0,1, 0,0,0,0,1, new int[]{}, this.Skill, new int[]{8,9,11,15,16,17,2,3,5,40});
+        pcJob[13]=new Costume(13, "Crusader",1,0,0, 0,0,0,1,0, new int[]{0,0,0,0,0,0,-7,7}, this.Skill, new int[]{8,9,10,2,3,4,56,36,51,37,47});
         pcJob[13].setSprName("Templar");
-        pcJob[14]=new Job(14, "Druid",0,1,0, 0,0,1,0,0, new int[]{0,0,1,1,1,1,-1,-1}, this.Skill, new int[]{23,25,26,27,28,30,31,32,33,52,53,54,15,16,18,48});
-        pcJob[0]=new Job(15, "Hero",1,1,1, 0,0,0,0,0, new int[]{}, this.Skill, new int[]{8,9,10,11,23,24,25,26,27,28,29,41,42,43,44,45,30,31,32,33,34,36,51,37,2,3,4,5,15,16,17,18});
+        pcJob[14]=new Costume(14, "Druid",0,1,0, 0,0,1,0,0, new int[]{0,0,1,1,1,1,-1,-1}, this.Skill, new int[]{23,25,26,27,28,30,31,32,33,52,53,54,15,16,18,48});
+        pcJob[0]=new Costume(15, "Hero",1,1,1, 0,0,0,0,0, new int[]{}, this.Skill, new int[]{8,9,10,11,23,24,25,26,27,28,29,41,42,43,44,45,30,31,32,33,34,36,51,37,2,3,4,5,15,16,17,18});
         	
         return pcJob;
     }
     
-    private Actor[] AddCharacters(Actor.State[] state)
+    private Actor[] AddCharacters(StateMask[] state)
     {
         
     	int maxlv = 5;
@@ -281,118 +281,118 @@ public class DemoAct extends Activity {
     	npc[3]=new Actor(3, "Stephen",maxlv);
 
         npc[4]=new Actor(4, "Ogre","Ogre","Ogre", 9,9, 55,7,13, 17,12,5,7,3, 1,1,1, 1,1,0,0,0, new int[]{0,1}, null, this.Skill, new int[]{9,11}, false)
-        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(0)).setQty(2), new Ability(this.Item.get(1)).setQty(1))));
-        npc[4].setStateRes(state[5], 9).addState(new Actor.State(state[10]).setMaxDur(-2));
+        	.setItems(new ArrayList<Performance>(Arrays.asList(new Performance(this.Item.get(0)).setQty(2), new Performance(this.Item.get(1)).setQty(1))));
+        npc[4].setStateRes(state[5], 9).addState(new StateMask(state[10]).setMaxDur(-2));
         npc[5]=new Actor(5, "Lizard", "Lizard", "Lizard", 9, 9, 50,15,10, 13,12,9,7,5, 1,1,1, 1,0,1,0,0, new int[]{0,0,7,1}, null, this.Skill, new int[]{23,30}, false)
-        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(4)).setQty(1), new Ability(this.Item.get(8)).setQty(1))));
+        	.setItems(new ArrayList<Performance>(Arrays.asList(new Performance(this.Item.get(4)).setQty(1), new Performance(this.Item.get(8)).setQty(1))));
         npc[6]=new Actor(6, "Goblin", "Goblin", "Goblin", 9, 9, 45,5,20, 13,12,5,5,1, 1,1,1, 1,0,0,0,1, new int[]{}, null, this.Skill, new int[]{15}, false)
-        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(3)).setQty(2), new Ability(this.Item.get(6)).setQty(1))));
+        	.setItems(new ArrayList<Performance>(Arrays.asList(new Performance(this.Item.get(3)).setQty(2), new Performance(this.Item.get(6)).setQty(1))));
         npc[7]=new Actor(7, "Troll", "Troll", "Troll", 9, 9, 47,15,15, 13,12,5,10,7, 1,1,1, 0,1,0,1,0, new int[]{}, null, this.Skill, new int[]{2}, false)
-        	.setItems(new ArrayList<Ability>(Arrays.asList(new Ability(this.Item.get(7)).setQty(1))));
-        npc[7].addState(new Actor.State(state[0]).setMaxDur(-2));
+        	.setItems(new ArrayList<Performance>(Arrays.asList(new Performance(this.Item.get(7)).setQty(1))));
+        npc[7].addState(new StateMask(state[0]).setMaxDur(-2));
 
         return npc;
     }
     
-    private Ability[] AddSkills(Actor.State[] state)
+    private Performance[] AddSkills(StateMask[] state)
     {
 
-		final Actor.State[] confsleep = new Actor.State[] { state[7], state[8] };
-		final Actor.State[] cure = new Actor.State[] { state[1], state[3], state[5], state[6], state[7], state[8], state[9] };
-		final Actor.State[] dizziness = new Actor.State[] { state[3] };
-		final Actor.State[] poison = new Actor.State[] { state[1] };
-		final Actor.State[] regen = new Actor.State[] { state[0] };
-		final Actor.State[] madness = new Actor.State[] { state[3], state[6], state[7], state[8], state[9] };
-		final Actor.State[] clarity = new Actor.State[] { state[2] };
-		final Actor.State[] weakness = new Actor.State[] { state[5] };
-		final Actor.State[] vigour = new Actor.State[] { state[4] };
-		final Actor.State[] tregen = new Actor.State[] { state[0], state[2], state[4] };
-		final Actor.State[] berserk = new Actor.State[] { state[6] };
-		final Actor.State[] stun = new Actor.State[] { state[9] };
-		final Actor.State[] reflect = new Actor.State[] { state[10] };
-		final Actor.State[] confusion = new Actor.State[] { state[7] };
-		final Actor.State[] confclarity = new Actor.State[] { state[2], state[7], state[8] };
-		final Actor.State[] conftregen = new Actor.State[] { state[0], state[2], state[4], state[7], state[8] };
-		final Actor.State[] sleep = new Actor.State[] { state[8] };
-		final Actor.State[] tpoison = new Actor.State[] { state[1], state[3], state[5] };
-		final Actor.State[] dizzystun = new Actor.State[] { state[3], state[9] };
+		final StateMask[] confsleep = new StateMask[] { state[7], state[8] };
+		final StateMask[] cure = new StateMask[] { state[1], state[3], state[5], state[6], state[7], state[8], state[9] };
+		final StateMask[] dizziness = new StateMask[] { state[3] };
+		final StateMask[] poison = new StateMask[] { state[1] };
+		final StateMask[] regen = new StateMask[] { state[0] };
+		final StateMask[] madness = new StateMask[] { state[3], state[6], state[7], state[8], state[9] };
+		final StateMask[] clarity = new StateMask[] { state[2] };
+		final StateMask[] weakness = new StateMask[] { state[5] };
+		final StateMask[] vigour = new StateMask[] { state[4] };
+		final StateMask[] tregen = new StateMask[] { state[0], state[2], state[4] };
+		final StateMask[] berserk = new StateMask[] { state[6] };
+		final StateMask[] stun = new StateMask[] { state[9] };
+		final StateMask[] reflect = new StateMask[] { state[10] };
+		final StateMask[] confusion = new StateMask[] { state[7] };
+		final StateMask[] confclarity = new StateMask[] { state[2], state[7], state[8] };
+		final StateMask[] conftregen = new StateMask[] { state[0], state[2], state[4], state[7], state[8] };
+		final StateMask[] sleep = new StateMask[] { state[8] };
+		final StateMask[] tpoison = new StateMask[] { state[1], state[3], state[5] };
+		final StateMask[] dizzystun = new StateMask[] { state[3], state[9] };
 
-        Ability ability[] = new Ability[57];
+        Performance ability[] = new Performance[57];
     	
-    	ability[0]=new Ability(1, "Attack", 0, 0, false,false, 0, 0,0,0, 0,1, 10,0,-3, 0,1, false, null, confsleep);
-        ability[1]=new Ability(2, "Defend", 0, 0, false,true, 0, 0,0,0, 3,1, 0,-1,-2, -1,0, false, null, null);
-        ability[2]=new Ability(3, "Heal", 0, 0, false,true, 1, 0,3,0, 3,1, -25,0,0, 0,6, -1,-1, false, true, null, null);
-        ability[3]=new Ability(4, "Meditate", 0, 0, false,true, 1, 0,0,0, 3,1, -1,-7,10, -1,6, false, null, dizziness);
-        ability[4]=new Ability(5, "Cure", 0, 0, false,true, 3, 0,7,0, 3,1, -17,0,0, 0,7, -1, -1, false, true, null, cure);
-        ability[5]=new Ability(6, "Clarity", 0, 0, false,true, 3, 0,0,7, 3,1, 0,-3,0, 0,6, false, clarity, madness);
-        ability[6]=new Ability(7, "Regen", 0, 0, false,true, 4, 0,10,0, 3,1, -37,0,0, 0,6, -1, -1, false, true, regen, poison);
-        ability[7]=new Ability(8, "Prayer", 0, 0, false,true, 5, 0,7,0, 3,1, -23,0,0, 1,0, -1, -1, false, true, null, null);
-        ability[8]=new Ability(9, "Smite", 0, 0, false,false, 1, 1,0,2, 1,1, 4,3,-4, 0,1, false, null, confclarity);
-        ability[9]=new Ability(10, "Hit", 0, 0, false,false, 1, 3,0,1, 0,1, 12,0,-4, 0,1, false, null, confsleep);
-        ability[10]=new Ability(11, "Bash", 0, 0, false,false, 3, 3,0,5, 1,1, 7,5,-5, 0,1, false, dizziness, confclarity);
-        ability[11]=new Ability(12, "Smash", 0, 0, false,false, 3, 5,0,3, 0,1, 18,0,-7, 0,1, false, null, confsleep);
-        ability[12]=new Ability(13, "Berserk", 0, 0, false,false, 4, 7,0,4, 3,1, 0,0,0, -1,0, false, berserk, weakness);
-        ability[13]=new Ability(14, "Shock", 0, 0, false,false, 4, 4,0,7, 1,1, 10,5,-9, 0,7, false, dizzystun, confclarity);
-        ability[14]=new Ability(15, "Crush", 0, 0, false,false, 5, 7,4,0, 0,1, 25,0,-11, 0,1, false, stun, confsleep);
-        ability[15]=new Ability(16, "Strike", 0, 0, false,true, 1, 0,0,0, 4,1, 13,0,-3, 0,1, 5,3, false, false, null, confsleep);
-        ability[16]=new Ability(17, "Steal", 0, 0, true,true, 1, 0,0,0, 3,1, 0,0,0, 0,1, 5,3, false, false, null, null);
-        ability[17]=new Ability(18, "Dash", 0, 0, false,true, 3, 0,0,0, 4,1, 15,0,-5, 0,1, 3,7, false, false, null, confsleep);
-        ability[18]=new Ability(19, "Poison", 0, 0, false,true, 3, 0,0,0, 4,2, 5,0,2, 0,1, 3,7, false, false, poison, regen);
-        ability[19]=new Ability(20, "Mug", 0, 0, true,true, 4, 0,0,0, 4,2, 15,0,-7, 0,1, 1,5, false, false, null, confsleep);
-        ability[20]=new Ability(21, "Toxic Gas", 0, 0, false,true, 4, 0,10,0, 6,3, 1,1,1, 1,1, 3,7, false, false, tpoison, tregen);
-        ability[21]=new Ability(22, "Cheer", 0, 0, false,true, 4, 0,10,0, 3,-1, 0,0,-5, -2,0, 3,7, false, false, vigour, cure);
-        ability[22]=new Ability(23, "Venom Blade", 0, 0, false,false, 5, 0,0,10, 4,1, 17,0,-9, 0,1, 3,7, false, false, poison, conftregen);
-        ability[23]=new Ability(24, "Absorb", 0, 0, false,true, 1, 0,0,3, 2,1, 0,7,-3, 0,6, true, null, null);
-        ability[24]=new Ability(25, "Drain", 0, 0, false,true, 3, 0,10,0, 2,1, 15,0,-3, 0,6, true, null, null);
-        ability[25]=new Ability(26, "Fireball", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,2, false, null, sleep);
-        ability[26]=new Ability(27, "Iceshard", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,3, false, null, sleep);
-        ability[27]=new Ability(28, "Lighting", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,4, false, null, sleep);
-        ability[28]=new Ability(29, "Rock", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,5, false, null, sleep);
-        ability[29]=new Ability(30, "Darkness", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,6, false, null, sleep);
-        ability[30]=new Ability(31, "Flame", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,2, false, null, sleep);
-        ability[31]=new Ability(32, "Blizzard", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,3, false, null, sleep);
-        ability[32]=new Ability(33, "Storm", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,4, false, null, sleep);
-        ability[33]=new Ability(34, "Earthquake", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,5, false, null, sleep);
-        ability[34]=new Ability(35, "Eclipse", 0, 0, false,true, 3, 0,5,0, 2,1, 13,0,-7, 1,6, false, null, sleep);
-        ability[35]=new Ability(36, "Flare", 0, 0, false,true, 5, 0,12,0, 2,2, 25,0,-9, 0,1, false, null, sleep);
-        ability[36]=new Ability(37, "Light Ray", 0, 0, false,true, 1, 0,3,0, 3,1, 11,0,-5, 0,7, false, null, sleep);
-        ability[37]=new Ability(38, "Light Burst", 0, 0, false,true, 3, 0,5,0, 3,1, 15,0,-7, 1,7, false, null, sleep);
-        ability[38]=new Ability(39, "Confusion", 0, 0, false,true, 5, 0,15,0, 2,1, 0,0,0, 0,6, false, confusion, clarity);
-        ability[39]=new Ability(40, "Sleep", 0, 0, false,true, 4, 0,0,17, 4,1, 3,0,17, 0,1, false, sleep, clarity);
-        ability[40]=new Ability(41, "Slash", 0, 0, false,true, 5, 0,10,0, 4,1, 15,0,0, 1,1, 3,7, false, false, null, confsleep);
-        ability[41]=new Ability(42, "Fire Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,2, false, null, confsleep);
-        ability[42]=new Ability(43, "Ice Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,3, false, null, confsleep);
-        ability[43]=new Ability(44, "Electric Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,4, false, null, confsleep);
-        ability[44]=new Ability(45, "Stone Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,5, false, null, confsleep);
-        ability[45]=new Ability(46, "Dark Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,6, false, null, confsleep);
-        ability[46]=new Ability(47, "Vampiric Wpn", 0, 0, false,false, 5, 0,10,0, 5,1, 21,0,-9, 0,6, 3,7, true, false, null, confsleep);
-        ability[47]=new Ability(48, "Reflect", 0, 0, false,true, 5, 0,10,0, 3,1, 0,0,0, 0,0, false, reflect, null);
-        ability[48]=new Ability(49, "Meteor", 0, 0, false,true, 5, 0,17,0, 2,1, 19,0,-11, 1,1, false, null, sleep);
-        ability[49]=new Ability(50, "Syphon", 0, 0, false,true, 4, 0,15,0, 2,1, 13,0,-3, 1,6, true, null, null);
-        ability[50]=new Ability(51, "Dragon Breath", 0, 0, false,false, 4, 0,13,7, 5,1, 15,0,-11, 1,1, false, null, confsleep);
-        ability[51]=new Ability(52, "Light Wpn", 0, 0, false,false, 2, 0,3,2, 7,1, 17,0,-5, 0,7, false, null, confsleep);
-        ability[52]=new Ability(53, "Heal", 0, 0, false,true, 1, 0,3,0, 2,1, -25,0,0, 0,7, -1,-1, false, true, null, null);
-        ability[53]=new Ability(54, "Meditate", 0, 0, false,true, 1, 0,0,2, 2,1, -3,-7,0, -1,7, false, null, dizziness);
-        ability[54]=new Ability(55, "Cure", 0, 0, false,true, 3, 0,7,0, 2,1, -17,0,0, 0,7, -1,-1, false, true, null, cure);
-        ability[55]=new Ability(56, "Clarity", 0, 0, false,true, 3, 0,0,7, 2,1, 0,-3,0, 0,7, false, clarity, madness);
-        ability[56]=new Ability(57, "Absorb", 0, 0, false,true, 1, 0,0,3, 3,1, 0,7,-3, 0,7, true, null, null);
+    	ability[0]=new Performance(1, "Attack", 0, 0, false,false, 0, 0,0,0, 0,1, 10,0,-3, 0,1, false, null, confsleep);
+        ability[1]=new Performance(2, "Defend", 0, 0, false,true, 0, 0,0,0, 3,1, 0,-1,-2, -1,0, false, null, null);
+        ability[2]=new Performance(3, "Heal", 0, 0, false,true, 1, 0,3,0, 3,1, -25,0,0, 0,6, -1,-1, false, true, null, null);
+        ability[3]=new Performance(4, "Meditate", 0, 0, false,true, 1, 0,0,0, 3,1, -1,-7,10, -1,6, false, null, dizziness);
+        ability[4]=new Performance(5, "Cure", 0, 0, false,true, 3, 0,7,0, 3,1, -17,0,0, 0,7, -1, -1, false, true, null, cure);
+        ability[5]=new Performance(6, "Clarity", 0, 0, false,true, 3, 0,0,7, 3,1, 0,-3,0, 0,6, false, clarity, madness);
+        ability[6]=new Performance(7, "Regen", 0, 0, false,true, 4, 0,10,0, 3,1, -37,0,0, 0,6, -1, -1, false, true, regen, poison);
+        ability[7]=new Performance(8, "Prayer", 0, 0, false,true, 5, 0,7,0, 3,1, -23,0,0, 1,0, -1, -1, false, true, null, null);
+        ability[8]=new Performance(9, "Smite", 0, 0, false,false, 1, 1,0,2, 1,1, 4,3,-4, 0,1, false, null, confclarity);
+        ability[9]=new Performance(10, "Hit", 0, 0, false,false, 1, 3,0,1, 0,1, 12,0,-4, 0,1, false, null, confsleep);
+        ability[10]=new Performance(11, "Bash", 0, 0, false,false, 3, 3,0,5, 1,1, 7,5,-5, 0,1, false, dizziness, confclarity);
+        ability[11]=new Performance(12, "Smash", 0, 0, false,false, 3, 5,0,3, 0,1, 18,0,-7, 0,1, false, null, confsleep);
+        ability[12]=new Performance(13, "Berserk", 0, 0, false,false, 4, 7,0,4, 3,1, 0,0,0, -1,0, false, berserk, weakness);
+        ability[13]=new Performance(14, "Shock", 0, 0, false,false, 4, 4,0,7, 1,1, 10,5,-9, 0,7, false, dizzystun, confclarity);
+        ability[14]=new Performance(15, "Crush", 0, 0, false,false, 5, 7,4,0, 0,1, 25,0,-11, 0,1, false, stun, confsleep);
+        ability[15]=new Performance(16, "Strike", 0, 0, false,true, 1, 0,0,0, 4,1, 13,0,-3, 0,1, 5,3, false, false, null, confsleep);
+        ability[16]=new Performance(17, "Steal", 0, 0, true,true, 1, 0,0,0, 3,1, 0,0,0, 0,1, 5,3, false, false, null, null);
+        ability[17]=new Performance(18, "Dash", 0, 0, false,true, 3, 0,0,0, 4,1, 15,0,-5, 0,1, 3,7, false, false, null, confsleep);
+        ability[18]=new Performance(19, "Poison", 0, 0, false,true, 3, 0,0,0, 4,2, 5,0,2, 0,1, 3,7, false, false, poison, regen);
+        ability[19]=new Performance(20, "Mug", 0, 0, true,true, 4, 0,0,0, 4,2, 15,0,-7, 0,1, 1,5, false, false, null, confsleep);
+        ability[20]=new Performance(21, "Toxic Gas", 0, 0, false,true, 4, 0,10,0, 6,3, 1,1,1, 1,1, 3,7, false, false, tpoison, tregen);
+        ability[21]=new Performance(22, "Cheer", 0, 0, false,true, 4, 0,10,0, 3,-1, 0,0,-5, -2,0, 3,7, false, false, vigour, cure);
+        ability[22]=new Performance(23, "Venom Blade", 0, 0, false,false, 5, 0,0,10, 4,1, 17,0,-9, 0,1, 3,7, false, false, poison, conftregen);
+        ability[23]=new Performance(24, "Absorb", 0, 0, false,true, 1, 0,0,3, 2,1, 0,7,-3, 0,6, true, null, null);
+        ability[24]=new Performance(25, "Drain", 0, 0, false,true, 3, 0,10,0, 2,1, 15,0,-3, 0,6, true, null, null);
+        ability[25]=new Performance(26, "Fireball", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,2, false, null, sleep);
+        ability[26]=new Performance(27, "Iceshard", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,3, false, null, sleep);
+        ability[27]=new Performance(28, "Lighting", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,4, false, null, sleep);
+        ability[28]=new Performance(29, "Rock", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,5, false, null, sleep);
+        ability[29]=new Performance(30, "Darkness", 0, 0, false,true, 1, 0,3,0, 2,1, 11,0,-5, 0,6, false, null, sleep);
+        ability[30]=new Performance(31, "Flame", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,2, false, null, sleep);
+        ability[31]=new Performance(32, "Blizzard", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,3, false, null, sleep);
+        ability[32]=new Performance(33, "Storm", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,4, false, null, sleep);
+        ability[33]=new Performance(34, "Earthquake", 0, 0, false,true, 3, 0,5,0, 2,1, 15,0,-7, 1,5, false, null, sleep);
+        ability[34]=new Performance(35, "Eclipse", 0, 0, false,true, 3, 0,5,0, 2,1, 13,0,-7, 1,6, false, null, sleep);
+        ability[35]=new Performance(36, "Flare", 0, 0, false,true, 5, 0,12,0, 2,2, 25,0,-9, 0,1, false, null, sleep);
+        ability[36]=new Performance(37, "Light Ray", 0, 0, false,true, 1, 0,3,0, 3,1, 11,0,-5, 0,7, false, null, sleep);
+        ability[37]=new Performance(38, "Light Burst", 0, 0, false,true, 3, 0,5,0, 3,1, 15,0,-7, 1,7, false, null, sleep);
+        ability[38]=new Performance(39, "Confusion", 0, 0, false,true, 5, 0,15,0, 2,1, 0,0,0, 0,6, false, confusion, clarity);
+        ability[39]=new Performance(40, "Sleep", 0, 0, false,true, 4, 0,0,17, 4,1, 3,0,17, 0,1, false, sleep, clarity);
+        ability[40]=new Performance(41, "Slash", 0, 0, false,true, 5, 0,10,0, 4,1, 15,0,0, 1,1, 3,7, false, false, null, confsleep);
+        ability[41]=new Performance(42, "Fire Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,2, false, null, confsleep);
+        ability[42]=new Performance(43, "Ice Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,3, false, null, confsleep);
+        ability[43]=new Performance(44, "Electric Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,4, false, null, confsleep);
+        ability[44]=new Performance(45, "Stone Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,5, false, null, confsleep);
+        ability[45]=new Performance(46, "Dark Wpn", 0, 0, false,false, 2, 0,3,2, 5,1, 17,0,-7, 0,6, false, null, confsleep);
+        ability[46]=new Performance(47, "Vampiric Wpn", 0, 0, false,false, 5, 0,10,0, 5,1, 21,0,-9, 0,6, 3,7, true, false, null, confsleep);
+        ability[47]=new Performance(48, "Reflect", 0, 0, false,true, 5, 0,10,0, 3,1, 0,0,0, 0,0, false, reflect, null);
+        ability[48]=new Performance(49, "Meteor", 0, 0, false,true, 5, 0,17,0, 2,1, 19,0,-11, 1,1, false, null, sleep);
+        ability[49]=new Performance(50, "Syphon", 0, 0, false,true, 4, 0,15,0, 2,1, 13,0,-3, 1,6, true, null, null);
+        ability[50]=new Performance(51, "Dragon Breath", 0, 0, false,false, 4, 0,13,7, 5,1, 15,0,-11, 1,1, false, null, confsleep);
+        ability[51]=new Performance(52, "Light Wpn", 0, 0, false,false, 2, 0,3,2, 7,1, 17,0,-5, 0,7, false, null, confsleep);
+        ability[52]=new Performance(53, "Heal", 0, 0, false,true, 1, 0,3,0, 2,1, -25,0,0, 0,7, -1,-1, false, true, null, null);
+        ability[53]=new Performance(54, "Meditate", 0, 0, false,true, 1, 0,0,2, 2,1, -3,-7,0, -1,7, false, null, dizziness);
+        ability[54]=new Performance(55, "Cure", 0, 0, false,true, 3, 0,7,0, 2,1, -17,0,0, 0,7, -1,-1, false, true, null, cure);
+        ability[55]=new Performance(56, "Clarity", 0, 0, false,true, 3, 0,0,7, 2,1, 0,-3,0, 0,7, false, clarity, madness);
+        ability[56]=new Performance(57, "Absorb", 0, 0, false,true, 1, 0,0,3, 3,1, 0,7,-3, 0,7, true, null, null);
         
         return ability;
     }
     
-    private ArrayList<Ability> AddItems(Actor.State state[])
+    private ArrayList<Performance> AddItems(StateMask state[])
     {        
         
-        ArrayList<Ability> item = new ArrayList<Ability>(9);
-    	item.add(new Ability(1, "Potion", 0, 0, true, -25,0,0, 0,0, false, null, null));
-        item.add(new Ability(2, "Ether", 0, 0, true, 0,-10,0, 0,0, false, null, null));
-        item.add(new Ability(3, "Tonic", 0, 0, true, 0,0,-10, 0,0, false, null, null));
-        item.add(new Ability(4, "Antidote", 0, 0, true, 0,0,0, 0,0, false, null, new Actor.State[] { state[1] }));
-        item.add(new Ability(5, "Hi-Ether", 0, 0, true, 0,-25,0, 0,0, false, null, new Actor.State[] { state[3] }));
-        item.add(new Ability(6, "Hi-Tonic", 0, 0, true, 0,-20,0, 0,0, false, new Actor.State[] { state[4] }, new Actor.State[] { state[5] }));
-        item.add(new Ability(7, "Panacea", 0, 0, true, 0,0,0, 0,0, false, null, new Actor.State[] { state[1], state[3], state[5], state[6], state[7], state[8], state[9] }));
-        item.add(new Ability(8, "Elixir", 0, 0, true, -100,-100,-100, 0,0, true, null, null));
-        item.add(new Ability(9, "Hi-Potion", 0, 0, true, -50,0,0, 0,0, true, null, null));
+        ArrayList<Performance> item = new ArrayList<Performance>(9);
+    	item.add(new Performance(1, "Potion", 0, 0, true, -25,0,0, 0,0, false, null, null));
+        item.add(new Performance(2, "Ether", 0, 0, true, 0,-10,0, 0,0, false, null, null));
+        item.add(new Performance(3, "Tonic", 0, 0, true, 0,0,-10, 0,0, false, null, null));
+        item.add(new Performance(4, "Antidote", 0, 0, true, 0,0,0, 0,0, false, null, new StateMask[] { state[1] }));
+        item.add(new Performance(5, "Hi-Ether", 0, 0, true, 0,-25,0, 0,0, false, null, new StateMask[] { state[3] }));
+        item.add(new Performance(6, "Hi-Tonic", 0, 0, true, 0,-20,0, 0,0, false, new StateMask[] { state[4] }, new StateMask[] { state[5] }));
+        item.add(new Performance(7, "Panacea", 0, 0, true, 0,0,0, 0,0, false, null, new StateMask[] { state[1], state[3], state[5], state[6], state[7], state[8], state[9] }));
+        item.add(new Performance(8, "Elixir", 0, 0, true, -100,-100,-100, 0,0, true, null, null));
+        item.add(new Performance(9, "Hi-Potion", 0, 0, true, -50,0,0, 0,0, true, null, null));
         return item;        
     }
     

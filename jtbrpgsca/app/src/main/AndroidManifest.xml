@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codycostea.tbrpgsca"
-    android:versionCode="77" android:versionName="0.77">
+    android:versionCode="78" android:versionName="0.78">
 
     <application
         android:icon="@drawable/launcher"
@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.codycostea.tbrpgsca.BattleAct"
+            android:name="com.codycostea.tbrpgsca.ArenaAct"
             android:label="@string/app_name"
             android:screenOrientation="nosensor"
         	android:parentActivityName=".DemoAct">
