@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,41 +46,41 @@ public final class Performance extends RolePlay {
 
 	protected Performance(final Parcel in) {
 		super(in);
-		sound = in.readString();
-		lvRq = in.readInt();
-		hpC = in.readInt();
-		mpC = in.readInt();
-		spC = in.readInt();
-		mQty = in.readInt();
-		rQty = in.readInt();
-		dmgType = in.readInt();
-		trg = in.readInt();
-		rStates = in.createTypedArray(StateMask.CREATOR);
+		this.sound = in.readString();
+		this.lvRq = in.readInt();
+		this.hpC = in.readInt();
+		this.mpC = in.readInt();
+		this.spC = in.readInt();
+		this.mQty = in.readInt();
+		this.rQty = in.readInt();
+		this.dmgType = in.readInt();
+		this.trg = in.readInt();
+		this.rStates = in.createTypedArray(StateMask.CREATOR);
 		if (in.readByte() == 0) {
-			elm = null;
+			this.elm = null;
 		} else {
-			elm = in.readInt();
+			this.elm = in.readInt();
 		}
 	}
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeString(sound);
-		dest.writeInt(lvRq);
-		dest.writeInt(hpC);
-		dest.writeInt(mpC);
-		dest.writeInt(spC);
-		dest.writeInt(mQty);
-		dest.writeInt(rQty);
-		dest.writeInt(dmgType);
-		dest.writeInt(trg);
-		dest.writeTypedArray(rStates, flags);
-		if (elm == null) {
+		dest.writeString(this.sound);
+		dest.writeInt(this.lvRq);
+		dest.writeInt(this.hpC);
+		dest.writeInt(this.mpC);
+		dest.writeInt(this.spC);
+		dest.writeInt(this.mQty);
+		dest.writeInt(this.rQty);
+		dest.writeInt(this.dmgType);
+		dest.writeInt(this.trg);
+		dest.writeTypedArray(this.rStates, flags);
+		if (this.elm == null) {
 			dest.writeByte((byte) 0);
 		} else {
 			dest.writeByte((byte) 1);
-			dest.writeInt(elm);
+			dest.writeInt(this.elm);
 		}
 	}
 
@@ -255,7 +255,7 @@ public final class Performance extends RolePlay {
 		String s = "";
 		final Random rnd = new Random();
 		int dmg = rnd.nextInt(4);
-		if (target.isRefelcting() && ((this.dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)) {
+		if (target.isReflecting() && ((this.dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)) {
 			s += ", reflected by " + target.name;
 			target = user;
 		}

@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,23 +32,23 @@ public final class StateMask extends Costume {
 
     protected StateMask(final Parcel in) {
         super(in);
-        rSkills = in.createTypedArray(Performance.CREATOR);
-        dur = in.readInt();
-        sRes = in.readInt();
-        dmgHp = in.readInt();
-        dmgMp = in.readInt();
-        dmgSp = in.readInt();
+        this.rSkills = in.createTypedArray(Performance.CREATOR);
+        this.dur = in.readInt();
+        this.sRes = in.readInt();
+        this.dmgHp = in.readInt();
+        this.dmgMp = in.readInt();
+        this.dmgSp = in.readInt();
     }
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeTypedArray(rSkills, flags);
-        dest.writeInt(dur);
-        dest.writeInt(sRes);
-        dest.writeInt(dmgHp);
-        dest.writeInt(dmgMp);
-        dest.writeInt(dmgSp);
+        dest.writeTypedArray(this.rSkills, flags);
+        dest.writeInt(this.dur);
+        dest.writeInt(this.sRes);
+        dest.writeInt(this.dmgHp);
+        dest.writeInt(this.dmgMp);
+        dest.writeInt(this.dmgSp);
     }
 
     @Override

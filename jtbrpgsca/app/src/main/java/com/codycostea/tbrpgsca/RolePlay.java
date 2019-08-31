@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,6 +15,11 @@ limitations under the License.
  */
 package com.codycostea.tbrpgsca;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -26,29 +31,76 @@ public abstract class RolePlay implements Parcelable {
 	protected int id, mHp, mMp, mSp, mInit, flags = 0;
 	protected StateMask[] aStates;
 
+	public static int GetSpriteDuration(final AnimationDrawable sprAnim) {
+		int s = 0;
+		for (int i = 0; i < sprAnim.getNumberOfFrames(); i++) {
+			s += sprAnim.getDuration(i);
+		}
+		return s;
+	}
+
+	public static AnimationDrawable GetInvertedSprite(final AnimationDrawable sprAnim, final boolean firstFrameWait) {
+		final AnimationDrawable animSpr = new AnimationDrawable();
+		final int sprNr = sprAnim.getNumberOfFrames() - 1;
+		animSpr.setOneShot(true);
+		for (int i = sprNr; i > -1; i--) {
+			animSpr.addFrame(sprAnim.getFrame(i), (firstFrameWait && i == sprNr) ? 261 : 87);
+		}
+		return animSpr;
+	}
+
+	public static AnimationDrawable GetBitmapSprite(final BitmapDrawable spriteBmp, final Context context, final Drawable firstFrame,
+											  final boolean firstFrameWait, final Drawable lastFrame, final boolean addPlayback) {
+		final Bitmap bmp = spriteBmp.getBitmap();
+		final AnimationDrawable animSpr = new AnimationDrawable();
+		animSpr.setOneShot(true);
+		if (firstFrameWait && firstFrame != null) {
+			animSpr.addFrame(firstFrame, 261);
+		}
+		int sprWidth = bmp.getWidth();
+		final int sprHeight = bmp.getHeight();
+		final int sprCount = bmp.getWidth() / sprHeight;
+		sprWidth /= sprCount;
+		final int lastSprDur = (addPlayback && sprCount < 7) ? 261 : 87;
+		for (int i = 0; i < sprCount; i++) {
+			animSpr.addFrame(new BitmapDrawable(Bitmap.createBitmap(bmp, i * sprWidth, 0, sprWidth, sprHeight)),
+			(i < sprCount - 1) ? 87 : lastSprDur);
+		}
+		if (lastSprDur == 261) {
+			for (int i = sprCount - 2; i > 0; i--) {
+				animSpr.addFrame(animSpr.getFrame(i), 87);
+			}
+		}
+		if (lastFrame != null) {
+			animSpr.addFrame(lastFrame, 1);
+		}
+		//bmp.recycle();
+		return animSpr;
+	}
+
 	protected RolePlay(final Parcel in) {
-		name = in.readString();
-		sprite = in.readString();
-		id = in.readInt();
-		mHp = in.readInt();
-		mMp = in.readInt();
-		mSp = in.readInt();
-		mInit = in.readInt();
-		flags = in.readInt();
-		aStates = in.createTypedArray(StateMask.CREATOR);
+		this.name = in.readString();
+		this.sprite = in.readString();
+		this.id = in.readInt();
+		this.mHp = in.readInt();
+		this.mMp = in.readInt();
+		this.mSp = in.readInt();
+		this.mInit = in.readInt();
+		this.flags = in.readInt();
+		this.aStates = in.createTypedArray(StateMask.CREATOR);
 	}
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
-		dest.writeString(name);
-		dest.writeString(sprite);
-		dest.writeInt(id);
-		dest.writeInt(mHp);
-		dest.writeInt(mMp);
-		dest.writeInt(mSp);
-		dest.writeInt(mInit);
-		dest.writeInt(flags);
-		dest.writeTypedArray(aStates, flags);
+		dest.writeString(this.name);
+		dest.writeString(this.sprite);
+		dest.writeInt(this.id);
+		dest.writeInt(this.mHp);
+		dest.writeInt(this.mMp);
+		dest.writeInt(this.mSp);
+		dest.writeInt(this.mInit);
+		dest.writeInt(this.flags);
+		dest.writeTypedArray(this.aStates, flags);
 	}
 
 	@Override

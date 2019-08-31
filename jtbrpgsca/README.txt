@@ -1,6 +1,6 @@
 Turn-Based RPG Simple Combat Arena
 
-Copyright (C) AD 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use anything from this project, except in compliance

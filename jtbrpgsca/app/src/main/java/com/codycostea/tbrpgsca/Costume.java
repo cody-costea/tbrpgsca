@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,23 +27,23 @@ public class Costume extends RolePlay {
 
 	protected Costume(final Parcel in) {
 		super(in);
-		atk = in.readInt();
-		def = in.readInt();
-		spi = in.readInt();
-		wis = in.readInt();
-		agi = in.readInt();
-		aSkills = in.createTypedArray(Performance.CREATOR);
+		this.atk = in.readInt();
+		this.def = in.readInt();
+		this.spi = in.readInt();
+		this.wis = in.readInt();
+		this.agi = in.readInt();
+		this.aSkills = in.createTypedArray(Performance.CREATOR);
 	}
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeInt(atk);
-		dest.writeInt(def);
-		dest.writeInt(spi);
-		dest.writeInt(wis);
-		dest.writeInt(agi);
-		dest.writeTypedArray(aSkills, flags);
+		dest.writeInt(this.atk);
+		dest.writeInt(this.def);
+		dest.writeInt(this.spi);
+		dest.writeInt(this.wis);
+		dest.writeInt(this.agi);
+		dest.writeTypedArray(this.aSkills, flags);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2017 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.codycostea.tbrpgsca;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,8 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Parcelable;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -159,7 +156,90 @@ public class ArenaAct extends Activity {
     }
 
     private void playSpr() {
-
+        final Scene scenePlay = this.scenePlay;
+        final ImageView[] imgActor = this.imgActor;
+        final int current = scenePlay._current;
+        final Performance lastAbility = scenePlay._lastAbility;
+        final int sprType = (lastAbility == null || lastAbility.trg < 0
+                || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) ? 6 : 5;
+        final int usrSide = (current < scenePlay._enIdx) ? this.partySide : this.otherSide;
+        final Actor crActor = scenePlay._players[current];
+        final AnimationDrawable actAnim = crActor.getBtSprite(usrSide, sprType);//crActor.sprites[usrSide][sprType]
+        final int iDur = crActor.spritesDur[usrSide][sprType] - 174;
+        if (actAnim != null) {
+            actAnim.stop();
+            imgActor[current].setBackgroundDrawable(actAnim);
+            actAnim.start();
+        }
+        imgActor[current].postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int dur = iDur;
+                Actor htActor;
+                for (int trg = scenePlay._fTarget; trg <= scenePlay._lTarget; trg++) {
+                    if (trg != current && (lastAbility == null || !(lastAbility.dmgType == 2
+                            && scenePlay._players[trg].isReflecting()))) {
+                        htActor = (scenePlay._players[trg]);
+                        final int trgAnim;
+                        final int koActors = ArenaAct.this.koActors;
+                        final int koBit = 1 << trg;
+                        if (htActor._hp > 0) {
+                            if ((koActors & koBit) == koBit) {
+                                trgAnim = 4;
+                                ArenaAct.this.koActors = koActors - koBit;
+                            } else {
+                                trgAnim = 2;
+                            }
+                        } else {
+                            if ((koActors & koBit) == koBit) continue;
+                            trgAnim = 3;
+                            ArenaAct.this.koActors = koActors + koBit;
+                        }
+                        if (lastAbility != null) {
+                            final AnimationDrawable abilitySpr = lastAbility.getSprite(ArenaAct.this);
+                            if (abilitySpr != null) {
+                                if (lastAbility.spriteDur > dur) {
+                                    dur = lastAbility.spriteDur;
+                                }
+                                abilitySpr.stop();
+                                imgActor[trg].setImageDrawable(abilitySpr);
+                                abilitySpr.start();
+                            }
+                            final int soundDur = lastAbility.playSound(ArenaAct.this);
+                            if (soundDur > dur) {
+                                dur = soundDur;
+                            }
+                        }
+                        final int trgSide = (trg < scenePlay._enIdx) ? ArenaAct.this.partySide : ArenaAct.this.otherSide;
+                        final AnimationDrawable hitAnim = htActor.getBtSprite(trgSide, trgAnim);//htActor.sprites[trgSide][trgAnim]
+                        if (hitAnim != null) {
+                            hitAnim.stop();
+                            if (htActor.spritesDur[trgSide][trgAnim] > dur) {
+                                dur = htActor.spritesDur[trgSide][trgAnim];
+                            }
+                            imgActor[trg].setBackgroundDrawable(hitAnim);
+                            hitAnim.start();
+                        }
+                    }
+                }
+                imgActor[current].postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (crActor._hp < 1) {
+                            ArenaAct.this.koActors += (1 << current);
+                            final AnimationDrawable fallAnim = crActor.getBtSprite(usrSide, 3);//crActor.sprites[usrSide][3]
+                            if (fallAnim != null) {
+                                fallAnim.stop();
+                                imgActor[current].setBackgroundDrawable(fallAnim);
+                                fallAnim.start();
+                            }
+                        }
+                        ArenaAct.this.actionsTxt.append(scenePlay.setNext("", true));
+                        ArenaAct.this.afterAct();
+                    }
+                }, dur.toLong());
+            }
+        }, 174);
     }
 
     private void afterAct() {
@@ -239,6 +319,27 @@ public class ArenaAct extends Activity {
     public void onCreate(final Bundle savedInstance) {
         super.onCreate(savedInstance);
         this.setContentView(R.layout.activity_battle);
+    }
+
+    @Override
+    protected void onDestroy() {
+        final Scene scenePlay = this.scenePlay;
+        for (Actor player : scenePlay._players) {
+            if (player != null) {
+                for (Performance ability : player.getAvailableSkills()) {
+                    ability.cleanSound();
+                }
+            }
+        }
+        ArenaAct.cachedParty = null;
+        ArenaAct.cachedEnemy = null;
+        ArenaAct.cachedSkill = null;
+        ArenaAct.cachedItem = null;
+        ArenaAct.cachedScript = null;
+        if (this.songPlayer != null) {
+            songPlayer.release();
+        }
+        super.onDestroy();
     }
 
 }

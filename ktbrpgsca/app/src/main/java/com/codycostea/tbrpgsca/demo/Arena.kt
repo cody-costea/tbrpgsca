@@ -310,12 +310,14 @@ fun BitmapDrawable.getSprite(context : Context, firstFrame : Drawable? = null, f
     if (firstFrameWait && firstFrame !== null) {
         animSpr.addFrame(firstFrame, 261)
     }
-    val sprCount = bmp.width / bmp.height
-    val sprWidth = bmp.width / sprCount
+    var sprWidth = bmp.width
+    val sprHeight = bmp.height
+    val sprCount = sprWidth / sprHeight
+    sprWidth /= sprCount
     val lastSprDur = if (addPlayback && sprCount < 7) 261 else 87
     for (i in 0 until sprCount) {
         animSpr.addFrame(BitmapDrawable(context.resources,
-                Bitmap.createBitmap(bmp, i * sprWidth, 0, sprWidth, bmp.height)),
+                Bitmap.createBitmap(bmp, i * sprWidth, 0, sprWidth, sprHeight)),
                 if (i < sprCount - 1) 87 else lastSprDur)
     }
     if (lastSprDur == 261) {
@@ -614,7 +616,8 @@ class Arena : Fragment() {
 
     private val crActor : AdActor
         get() {
-            return this.scenePlay.players[this.scenePlay.current] as AdActor
+            val scenePlay = this.scenePlay
+            return scenePlay.players[scenePlay.current] as AdActor
         }
 
     private fun canTarget(target : Int, ability : Ability) : Boolean {
@@ -704,7 +707,7 @@ class Arena : Fragment() {
         val sprType = if (lastAbility === null || lastAbility.trg < 0
                 || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) 6 else 5
         val usrSide = if (current < scenePlay.enIdx) this.partySide else this.otherSide
-        val crActor = this.crActor
+        val crActor = scenePlay.players[current] as AdActor
         val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
         var dur = crActor.spritesDur[usrSide][sprType] - 174
         if (actAnim !== null) {

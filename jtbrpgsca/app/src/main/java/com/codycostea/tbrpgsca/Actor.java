@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@ limitations under the License.
  */
 package com.codycostea.tbrpgsca;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 
 import java.util.Enumeration;
@@ -38,40 +42,46 @@ public final class Actor extends Costume {
 	protected Hashtable _items, skillsQty, skillsQtyRgTurn, stateDur, equipment;
 	protected Boolean _ranged;
 
-	protected final Vector _skills = new Vector();
+	protected final Vector<Performance> _skills = new Vector();
+
+	int[][] spritesDur = {
+			{0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0}
+	};
+	private AnimationDrawable[][] sprites;
 
 	protected Actor(final Parcel in) {
 		super(in);
-		_race = in.readParcelable(Costume.class.getClassLoader());
-		_job = in.readParcelable(Costume.class.getClassLoader());
-		_lv = in.readInt();
-		maxLv = in.readInt();
-		_hp = in.readInt();
-		_mp = in.readInt();
-		_sp = in.readInt();
-		_xp = in.readInt();
-		_maxp = in.readInt();
-		automatic = in.readInt();
-		init = in.readInt();
+		this._race = in.readParcelable(Costume.class.getClassLoader());
+		this._job = in.readParcelable(Costume.class.getClassLoader());
+		this._lv = in.readInt();
+		this.maxLv = in.readInt();
+		this._hp = in.readInt();
+		this._mp = in.readInt();
+		this._sp = in.readInt();
+		this._xp = in.readInt();
+		this._maxp = in.readInt();
+		this.automatic = in.readInt();
+		this.init = in.readInt();
 		byte tmp_ranged = in.readByte();
-		_ranged = tmp_ranged == 0 ? null : tmp_ranged == 1;
+		this._ranged = tmp_ranged == 0 ? null : tmp_ranged == 1;
 	}
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeParcelable(_race, flags);
-		dest.writeParcelable(_job, flags);
-		dest.writeInt(_lv);
-		dest.writeInt(maxLv);
-		dest.writeInt(_hp);
-		dest.writeInt(_mp);
-		dest.writeInt(_sp);
-		dest.writeInt(_xp);
-		dest.writeInt(_maxp);
-		dest.writeInt(automatic);
-		dest.writeInt(init);
-		dest.writeByte((byte) (_ranged == null ? 0 : _ranged ? 1 : 2));
+		dest.writeParcelable(this._race, flags);
+		dest.writeParcelable(this._job, flags);
+		dest.writeInt(this._lv);
+		dest.writeInt(this.maxLv);
+		dest.writeInt(this._hp);
+		dest.writeInt(this._mp);
+		dest.writeInt(this._sp);
+		dest.writeInt(this._xp);
+		dest.writeInt(this._maxp);
+		dest.writeInt(this.automatic);
+		dest.writeInt(this.init);
+		dest.writeByte((byte) (this._ranged == null ? 0 : this._ranged ? 1 : 2));
 	}
 
 	@Override
@@ -257,7 +267,7 @@ public final class Actor extends Costume {
 		return this;
 	}
 
-	public boolean isRefelcting() {
+	public boolean isReflecting() {
 		return (this.flags & FLAG_REFLECTS) == FLAG_REFLECTS;
 	}
 
