@@ -15,6 +15,11 @@ limitations under the License.
  */
 package com.codycostea.tbrpgsca;
 
+import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Parcel;
 
 import java.util.Enumeration;
@@ -39,14 +44,18 @@ public final class Performance extends RolePlay {
 	public static final int DMG_TYPE_WIS = 8;
 	public static final int DMG_TYPE_AGI = 16;
 
-	protected String sound;
-	protected int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg;
+	private MediaPlayer _sndPlayer;
+	private AnimationDrawable _sprAnim;
+	private Context _context;
+
+	protected int sprId, sndId, lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg, spriteDur;
 	protected StateMask[] rStates;
 	protected Integer elm;
 
 	protected Performance(final Parcel in) {
 		super(in);
-		this.sound = in.readString();
+		this.sprId = in.readInt();
+		this.sndId = in.readInt();
 		this.lvRq = in.readInt();
 		this.hpC = in.readInt();
 		this.mpC = in.readInt();
@@ -66,7 +75,8 @@ public final class Performance extends RolePlay {
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeString(this.sound);
+		dest.writeInt(this.sprId);
+		dest.writeInt(this.sndId);
 		dest.writeInt(this.lvRq);
 		dest.writeInt(this.hpC);
 		dest.writeInt(this.mpC);
@@ -101,12 +111,80 @@ public final class Performance extends RolePlay {
 		}
 	};
 
-	public String getSound() {
-		return this.sound;
+	public AnimationDrawable getSpriteAnimation(final Context context) {
+		final int sprId = this.sprId;
+		if (sprId < 1) return null;
+		AnimationDrawable sprAnim = this._sprAnim;
+		if (this._context != context) {
+			sprAnim = null;
+			MediaPlayer sndPlayer = this._sndPlayer;
+			if (sndPlayer != null) {
+				sndPlayer.release();
+				this._sndPlayer = null;
+			}
+		}
+		if (sprAnim == null) {
+			Drawable drawable = context.getResources().getDrawable(sprId);
+			if (drawable instanceof AnimationDrawable) {
+				sprAnim = (AnimationDrawable) drawable;
+			} else if (drawable instanceof BitmapDrawable) {
+				sprAnim = RolePlay.GetBitmapSprite((BitmapDrawable)drawable, context, null,
+						false, null, false);
+			}
+			if (sprAnim == null) {
+				this.spriteDur = 0;
+			} else {
+				this.spriteDur = RolePlay.GetSpriteDuration(sprAnim);
+			}
+			this._sprAnim = sprAnim;
+		}
+		return sprAnim;
 	}
 
-	public Performance setSound(final String value) {
-		this.sound = value;
+	public int playSound(final Context context) {
+		final int sndId = this.sndId;
+		if (sndId < 1) return 0;
+		MediaPlayer sndPlayer = this._sndPlayer;
+		if (this._context != context) {
+			this._sprAnim = null;
+			this.spriteDur = 0;
+			if (sndPlayer != null) {
+				sndPlayer.release();
+				sndPlayer = null;
+			}
+		}
+		if (sndPlayer == null) {
+			sndPlayer = MediaPlayer.create(context, sndId);
+			if (sndPlayer == null) return 0;
+			this._context = context;
+			sndPlayer.setLooping(false);
+			this._sndPlayer = sndPlayer;
+		}
+		sndPlayer.start();
+		return sndPlayer.getDuration();
+	}
+
+	public int getSoundId() {
+		return this.sndId;
+	}
+
+	public Performance setSoundId(final int value) {
+		this.sndId = value;
+		final MediaPlayer sndPlayer = this._sndPlayer;
+		if (sndPlayer != null) {
+			sndPlayer.release();
+			this._sndPlayer = null;
+		}
+		return this;
+	}
+
+	public int getSpriteId() {
+		return this.sprId;
+	}
+
+	public Performance setSpriteId(final int value) {
+		this.sprId = value;
+		this._sprAnim = null;
 		return this;
 	}
 
@@ -417,13 +495,14 @@ public final class Performance extends RolePlay {
 				&& (skillsQty == null || ((itemQty = skillsQty.get(this)) == null ? 1 : ((Integer)itemQty).intValue()) > 0);
 	}
 
-	public Performance(final int id, final String name, final String sprite, final String sound, final boolean steal,
+	public Performance(final int id, final String name, final int sprId, final int sndId, final boolean steal,
 					   final boolean range, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
 					   final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final Integer elm,
 					   final int mQty, final int rQty, final boolean absorb, final boolean restoreKO, final StateMask[] aStates,
 					   final StateMask[] rStates) {
-		super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates);
-		this.sound = sound;
+		super(id, name, hpDmg, mpDmg, spDmg, atkI, range, aStates);
+		this.sprId = sprId;
+		this.sndId = sndId;
 		if (steal) {
 			this.flags |= FLAG_STEAL;
 		}

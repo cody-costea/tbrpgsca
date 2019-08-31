@@ -353,7 +353,8 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     fun applyStates(consume: Boolean): String {
         var s = ""
         if (!consume) {
-            if (this.automatic < 2 && this.automatic > -2) {
+            val automatic = this.automatic
+            if (automatic < 2 && automatic > -2) {
                 this.automatic = 0
             }
             else {

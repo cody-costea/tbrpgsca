@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 
@@ -44,11 +45,8 @@ public final class Actor extends Costume {
 
 	protected final Vector<Performance> _skills = new Vector();
 
-	int[][] spritesDur = {
-			{0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0}
-	};
-	private AnimationDrawable[][] sprites;
+	int[][] spritesDur = new int[7][7];
+	private AnimationDrawable[][] sprites = new AnimationDrawable[7][7];
 
 	protected Actor(final Parcel in) {
 		super(in);
@@ -101,6 +99,75 @@ public final class Actor extends Costume {
 		}
 	};
 
+	public Actor resetSprites() {
+		this.sprites = new AnimationDrawable[7][7];
+		this.spritesDur = new int[7][7];
+		return this;
+	}
+
+	public AnimationDrawable getBtSprite(final Context context, final int side, final int spr) {
+		AnimationDrawable sprAnim = this.sprites[side][spr];
+		if (sprAnim == null) {
+			final Costume job = this._job;
+			String sprName = "spr_bt_" + job.sprite.toLowerCase() + ((side == 0) ? "_l_" : "_r_");
+			switch (spr) {
+				case 0:
+					sprName += "idle";
+					break;
+				case 1:
+					sprName += "ko";
+					break;
+				case 2:
+					sprName += "hit";
+					break;
+				case 3:
+					sprName += "fallen";
+					break;
+				case 4:
+					sprName += "restored";
+					break;
+				case 5:
+					sprName += "act";
+					break;
+				case 6:
+					sprName += "cast";
+					break;
+                default:
+                	return null;
+			}
+			try {
+				final Drawable drawable = context.getResources().getDrawable(
+						context.getResources().getIdentifier(sprName, "drawable", context.getPackageName()));
+				if (drawable instanceof AnimationDrawable) {
+					sprAnim = (AnimationDrawable)drawable;
+				} else if (drawable instanceof BitmapDrawable) {
+					sprAnim = (RolePlay.GetBitmapSprite((BitmapDrawable)drawable, context,
+							(spr > -1 && spr < 2) ? null : this.getBtSprite(context, side, 0).getFrame(0),
+							spr > 1 && spr < 4, (spr < 2) ? null : ((spr == 3)
+									? this.getBtSprite(context, side, 1).getFrame(0)
+									: this.getBtSprite(context, side, 0).getFrame(0)),true));
+				}
+			}
+			catch (final Resources.NotFoundException e) {
+				switch (spr) {
+					case 4:
+						sprAnim = RolePlay.GetInvertedSprite(this.getBtSprite(context, side, 3), true);
+						break;
+					case 6:
+						this.getBtSprite(context, side, 5);
+						break;
+                    default:
+                    	sprAnim = null;
+				}
+			}
+            finally {
+				this.sprites[side][spr] = sprAnim;
+				this.spritesDur[side][spr] = sprAnim == null ? 0 : RolePlay.GetSpriteDuration(sprAnim);
+			}
+		}
+		return sprAnim;
+	}
+
 	public Vector<Performance> getAvailableSkills() {
 		return this._skills;
 	}
@@ -121,7 +188,17 @@ public final class Actor extends Costume {
 
 	public Actor setJob(final Costume job) {
 		this.switchCostume(this._job, job);
+		this.setSpriteName(job.sprite);
 		this._job = job;
+		return this;
+	}
+
+	@Override
+	public Actor setSpriteName(final String sprite) {
+		if (sprite != null && !sprite.equals(this.sprite)) {
+			super.setSpriteName(sprite);
+			this.resetSprites();
+		}
 		return this;
 	}
 
@@ -507,8 +584,12 @@ public final class Actor extends Costume {
 
 	public String applyStates(final boolean consume) {
 		String s = "";
+		String oldSprite = null;
 		if (!consume) {
-			if (this.automatic < AUTO_ALLY && this.automatic > AUTO_ENEMY) {
+			oldSprite = this.sprite;
+			this.sprite = this._job.sprite;
+			final int automatic = this.automatic;
+			if (automatic < AUTO_ALLY && automatic > AUTO_ENEMY) {
 				this.automatic = AUTO_NONE;
 			}
 			else {
@@ -536,6 +617,9 @@ public final class Actor extends Costume {
 					}
 				}
 			}
+		}
+		if (oldSprite != null && oldSprite.equals(this.sprite)) {
+			this.resetSprites();
 		}
 		s += this.checkStatus();
 		if (c && consume) s += ".";

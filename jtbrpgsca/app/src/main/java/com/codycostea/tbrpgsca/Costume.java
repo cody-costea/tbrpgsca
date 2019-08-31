@@ -21,12 +21,14 @@ import java.util.Hashtable;
 
 public class Costume extends RolePlay {
 
+	protected String sprite;
 	protected int atk, def, spi, wis, agi;
 	protected Performance[] aSkills;
 	protected Hashtable stRes, res;
 
 	protected Costume(final Parcel in) {
 		super(in);
+		this.sprite = in.readString();
 		this.atk = in.readInt();
 		this.def = in.readInt();
 		this.spi = in.readInt();
@@ -38,6 +40,7 @@ public class Costume extends RolePlay {
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		super.writeToParcel(dest, flags);
+		dest.writeString(this.sprite);
 		dest.writeInt(this.atk);
 		dest.writeInt(this.def);
 		dest.writeInt(this.spi);
@@ -62,6 +65,15 @@ public class Costume extends RolePlay {
 			return new Costume[size];
 		}
 	};
+
+	public String getSpriteName() {
+		return this.sprite;
+	}
+
+	public RolePlay setSpriteName(final String value) {
+		this.sprite = value;
+		return this;
+	}
 
 	public int getAttack() {
 		return this.atk;
@@ -139,7 +151,8 @@ public class Costume extends RolePlay {
 				   final int atk, final int def, final int spi, final int wis, final int agi, final int mInit,
 				   final boolean range, final Hashtable res, final Performance[] skills, final StateMask[] states,
 				   final Hashtable stRes) {
-		super(id, name, sprite, hp, mp, sp, mInit, range, states);
+		super(id, name, hp, mp, sp, mInit, range, states);
+		this.sprite = sprite;
 		this.atk = atk;
 		this.def = def;
 		this.spi = spi;

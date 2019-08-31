@@ -272,6 +272,10 @@ public final class StateMask extends Costume {
                         }
                     }
                     else {
+                        final String spr = this.sprite;
+                        if (spr != null && spr.length() > 0) {
+                            actor.sprite = spr;
+                        }
                         if (this.isInactivating()) {
                             if (d > 0 && actor.isActive()) {
                                 sDur.put(this, new Integer(d - 1));
@@ -324,12 +328,12 @@ public final class StateMask extends Costume {
         }
     }
 
-    StateMask(final int id, final String name, final boolean inactivate, final boolean automate, final boolean confuse,
-              final boolean reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp,
-              final int hp, final int mp, final int sp, final int atk, final int def, final int spi, final int wis,
-              final int agi, final int mInit, final boolean range, final Hashtable res, final Performance[] aSkills,
-              final Performance[] rSkills, final StateMask[] states, final Hashtable stRes) {
-        super(id, name, null, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
+    StateMask(final int id, final String name, final String sprite, final boolean inactivate, final boolean automate,
+              final boolean confuse, final boolean reflect, final int dur, final int sRes, final int dmgHp,
+              final int dmgMp, final int dmgSp, final int hp, final int mp, final int sp, final int atk, final int def,
+              final int spi, final int wis,  final int agi, final int mInit, final boolean range, final Hashtable res,
+              final Performance[] aSkills, final Performance[] rSkills, final StateMask[] states, final Hashtable stRes) {
+        super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
         if (inactivate) {
             this.flags |= FLAG_INACTIVATE;
         }

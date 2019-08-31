@@ -27,7 +27,7 @@ public abstract class RolePlay implements Parcelable {
 
 	protected final static int FLAG_RANGE = 1;
 
-	protected String name, sprite;
+	protected String name;
 	protected int id, mHp, mMp, mSp, mInit, flags = 0;
 	protected StateMask[] aStates;
 
@@ -80,7 +80,6 @@ public abstract class RolePlay implements Parcelable {
 
 	protected RolePlay(final Parcel in) {
 		this.name = in.readString();
-		this.sprite = in.readString();
 		this.id = in.readInt();
 		this.mHp = in.readInt();
 		this.mMp = in.readInt();
@@ -93,7 +92,6 @@ public abstract class RolePlay implements Parcelable {
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		dest.writeString(this.name);
-		dest.writeString(this.sprite);
 		dest.writeInt(this.id);
 		dest.writeInt(this.mHp);
 		dest.writeInt(this.mMp);
@@ -130,15 +128,6 @@ public abstract class RolePlay implements Parcelable {
 
 	public RolePlay setName(final String value) {
 		this.name = value;
-		return this;
-	}
-
-	public String getSprite() {
-		return this.sprite;
-	}
-
-	public RolePlay setSprite(final String value) {
-		this.sprite = value;
 		return this;
 	}
 
@@ -208,11 +197,10 @@ public abstract class RolePlay implements Parcelable {
 		return object != null && object instanceof RolePlay && ((RolePlay)object).id == this.id;
 	}
 
-	public RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
-					final int sp, final int mInit, final boolean range, final StateMask[] states) {
+	public RolePlay(final int id, final String name, final int hp, final int mp, final int sp,
+					final int mInit, final boolean range, final StateMask[] states) {
 		this.id = id;
 		this.name = name;
-		this.sprite = sprite;
 		this.mHp = hp;
 		this.mMp = mp;
 		this.mSp = sp;

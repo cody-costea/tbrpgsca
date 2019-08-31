@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,6 +50,8 @@ public class ArenaAct extends Activity {
     private Button autoBtn, runBtn, skillActBtn, itemUseBtn;
     private Spinner targetSpn, skillsSpn, itemsSpn;
     private TextView actionsTxt, infoTxt;
+
+    private MediaPlayer songPlayer;
 
     private class ViewHolder {
         private TextView nameText;
@@ -164,7 +167,7 @@ public class ArenaAct extends Activity {
                 || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) ? 6 : 5;
         final int usrSide = (current < scenePlay._enIdx) ? this.partySide : this.otherSide;
         final Actor crActor = scenePlay._players[current];
-        final AnimationDrawable actAnim = crActor.getBtSprite(usrSide, sprType);//crActor.sprites[usrSide][sprType]
+        final AnimationDrawable actAnim = crActor.getBtSprite(this, usrSide, sprType);
         final int iDur = crActor.spritesDur[usrSide][sprType] - 174;
         if (actAnim != null) {
             actAnim.stop();
@@ -196,7 +199,7 @@ public class ArenaAct extends Activity {
                             ArenaAct.this.koActors = koActors + koBit;
                         }
                         if (lastAbility != null) {
-                            final AnimationDrawable abilitySpr = lastAbility.getSprite(ArenaAct.this);
+                            final AnimationDrawable abilitySpr = lastAbility.getSpriteAnimation(ArenaAct.this);
                             if (abilitySpr != null) {
                                 if (lastAbility.spriteDur > dur) {
                                     dur = lastAbility.spriteDur;
@@ -211,7 +214,7 @@ public class ArenaAct extends Activity {
                             }
                         }
                         final int trgSide = (trg < scenePlay._enIdx) ? ArenaAct.this.partySide : ArenaAct.this.otherSide;
-                        final AnimationDrawable hitAnim = htActor.getBtSprite(trgSide, trgAnim);//htActor.sprites[trgSide][trgAnim]
+                        final AnimationDrawable hitAnim = htActor.getBtSprite(ArenaAct.this, trgSide, trgAnim);
                         if (hitAnim != null) {
                             hitAnim.stop();
                             if (htActor.spritesDur[trgSide][trgAnim] > dur) {
@@ -227,7 +230,7 @@ public class ArenaAct extends Activity {
                     public void run() {
                         if (crActor._hp < 1) {
                             ArenaAct.this.koActors += (1 << current);
-                            final AnimationDrawable fallAnim = crActor.getBtSprite(usrSide, 3);//crActor.sprites[usrSide][3]
+                            final AnimationDrawable fallAnim = crActor.getBtSprite(ArenaAct.this, usrSide, 3);
                             if (fallAnim != null) {
                                 fallAnim.stop();
                                 imgActor[current].setBackgroundDrawable(fallAnim);
@@ -237,7 +240,7 @@ public class ArenaAct extends Activity {
                         ArenaAct.this.actionsTxt.append(scenePlay.setNext("", true));
                         ArenaAct.this.afterAct();
                     }
-                }, dur.toLong());
+                }, dur);
             }
         }, 174);
     }
@@ -323,20 +326,13 @@ public class ArenaAct extends Activity {
 
     @Override
     protected void onDestroy() {
-        final Scene scenePlay = this.scenePlay;
-        for (Actor player : scenePlay._players) {
-            if (player != null) {
-                for (Performance ability : player.getAvailableSkills()) {
-                    ability.cleanSound();
-                }
-            }
-        }
         ArenaAct.cachedParty = null;
         ArenaAct.cachedEnemy = null;
         ArenaAct.cachedSkill = null;
         ArenaAct.cachedItem = null;
         ArenaAct.cachedScript = null;
-        if (this.songPlayer != null) {
+        final MediaPlayer songPlayer = this.songPlayer;
+        if (songPlayer != null) {
             songPlayer.release();
         }
         super.onDestroy();
