@@ -450,8 +450,9 @@ class Arena : Fragment() {
                 this.playSpr()
             }
             R.id.AutoBt -> {
-                this.automatic = !this.automatic
-                if (this.automatic) {
+                val automatic = !this.automatic
+                this.automatic = automatic
+                if (automatic) {
                     this.enableControls(false)
                     if (this.crActor.automatic == 0) {
                         this.afterAct()
@@ -472,10 +473,12 @@ class Arena : Fragment() {
                 }
             }
             R.id.RunBt -> {
-                val escText = this.scenePlay.escape()
-                this.actionsTxt.append(this.scenePlay.endTurn(""))
-                this.actionsTxt.append("\n$escText")
-                if (this.scenePlay.status == -1) {
+                val scenePlay = this.scenePlay
+                val actionsTxt = this.actionsTxt
+                val escText = scenePlay.escape()
+                actionsTxt.append(scenePlay.endTurn(""))
+                actionsTxt.append("\n$escText")
+                if (scenePlay.status == -1) {
                     this.endingMsg(this.getString(R.string.escape), Scene.escapeTxt)
                 }
                 else {
@@ -615,8 +618,9 @@ class Arena : Fragment() {
         }
 
     private fun canTarget(target : Int, ability : Ability) : Boolean {
-        return this.scenePlay.getGuardian(target, ability) == target
-                && (this.scenePlay.players[target].hp > 0 || ability.restoreKO)
+        val scenePlay = this.scenePlay
+        return scenePlay.getGuardian(target, ability) == target
+                && (scenePlay.players[target].hp > 0 || ability.restoreKO)
     }
 
     private fun enableControls(enable : Boolean) {
@@ -632,27 +636,32 @@ class Arena : Fragment() {
     }
 
     private fun setCrAutoSkill() {
-        val onPartySide = this.targetSpn.selectedItemPosition < this.scenePlay.enIdx
-        val autoSkill = this.scenePlay.getAIskill(if (onPartySide) 1 else 0,
-                onPartySide && this.scenePlay.players[this.targetSpn.selectedItemPosition].hp < 1)
-        if (this.skillsSpn.selectedItemPosition == autoSkill) {
-            this.skillActBtn.isEnabled = (this.crActor.availableSkills[autoSkill]).canPerform(this.crActor)
-                    && this.canTarget(this.targetSpn.selectedItemPosition, this.crActor.availableSkills[autoSkill])
+        val scenePlay = this.scenePlay
+        val targetPos = targetSpn.selectedItemPosition
+        val skillsSpn = this.skillsSpn
+        val crActor = this.crActor
+        val onPartySide = targetPos < scenePlay.enIdx
+        val autoSkill = scenePlay.getAIskill(if (onPartySide) 1 else 0,
+                onPartySide && scenePlay.players[targetPos].hp < 1)
+        if (skillsSpn.selectedItemPosition == autoSkill) {
+            this.skillActBtn.isEnabled = (crActor.availableSkills[autoSkill]).canPerform(crActor)
+                    && this.canTarget(targetPos, crActor.availableSkills[autoSkill])
         }
         else {
-            this.skillsSpn.setSelection(autoSkill)
+            skillsSpn.setSelection(autoSkill)
         }
     }
 
     private fun afterAct() {
+        val scenePlay = this.scenePlay
         val jScripts = this.jScripts
         if (jScripts !== null) {
             val jsContext = this.jsContext
             val jsScope = this.jsScope
             if (jsContext !== null && jsScope !== null) {
-                jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.fTarget, jsScope))
-                jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.lTarget, jsScope))
-                jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.scenePlay.status, jsScope))
+                jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(scenePlay.fTarget, jsScope))
+                jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(scenePlay.lTarget, jsScope))
+                jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(scenePlay.status, jsScope))
                 if ( jScripts.size > 3 && jScripts[3] !== null) {
                     try {
                         jsContext.evaluateString(jsScope, jScripts[3], "AfterAct", 1, null)
@@ -662,20 +671,21 @@ class Arena : Fragment() {
                 }
             }
         }
-        when (this.scenePlay.status) {
+        when (scenePlay.status) {
             0 -> {
-                if (this.automatic || this.crActor.automatic != 0) {
-                    if (this.infoTxt.text.isNotEmpty()) {
-                        this.infoTxt.text = ""
+                val actor = this.crActor
+                val infoTxt = this.infoTxt
+                if (this.automatic || actor.automatic != 0) {
+                    if (infoTxt.text.isNotEmpty()) {
+                        infoTxt.text = ""
                     }
-                    this.actionsTxt.append(this.scenePlay.executeAI(""))
+                    this.actionsTxt.append(scenePlay.executeAI(""))
                     this.playSpr()
                 }
                 else {
                     this.setCrSkills()
                     this.setCrItems()
-                    val actor = this.crActor
-                    this.infoTxt.text = String.format(this.getString(R.string.cr_actor_info), actor.name, actor.level, actor.exp, actor.mExp)
+                    infoTxt.text = String.format(this.getString(R.string.cr_actor_info), actor.name, actor.level, actor.exp, actor.mExp)
                     this.enableControls(true)
                     this.autoBtn.isEnabled = true
                     this.setCrAutoSkill()

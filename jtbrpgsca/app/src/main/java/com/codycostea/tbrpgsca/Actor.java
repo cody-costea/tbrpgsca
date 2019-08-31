@@ -91,7 +91,7 @@ public final class Actor extends Costume {
 		}
 	};
 
-	public Vector getAvailableSkills() {
+	public Vector<Performance> getAvailableSkills() {
 		return this._skills;
 	}
 
