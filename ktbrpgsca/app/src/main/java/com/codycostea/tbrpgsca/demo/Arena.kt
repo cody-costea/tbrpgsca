@@ -294,10 +294,11 @@ get() {
 }
 
 fun AnimationDrawable.getInvertedSprite(firstFrameWait: Boolean) : AnimationDrawable {
+    val framesNr = this.numberOfFrames - 1
     val animSpr = AnimationDrawable()
     animSpr.isOneShot = true
-    for (i in this.numberOfFrames - 1 downTo 0) {
-        animSpr.addFrame(this.getFrame(i), if (firstFrameWait && i == this.numberOfFrames - 1) 261 else 87)
+    for (i in framesNr downTo 0) {
+        animSpr.addFrame(this.getFrame(i), if (firstFrameWait && i == framesNr) 261 else 87)
     }
     return animSpr
 }
@@ -406,7 +407,6 @@ class Arena : Fragment() {
             actBundle.putStringArray("scripts", scripts)
             actBundle.putInt("arenaImg", arenaImgId)
             actBundle.putInt("song", songId)
-            //activity.startActivityForResult(Intent(activity, Arena::class.java).putExtras(actBundle), 1)
             arena.arguments = actBundle
             return arena
         }
@@ -913,14 +913,14 @@ class Arena : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_arena, container, false)
-
         val extra = this.arguments
         val party : Array<Actor>
         val enemy : Array<Actor>
+        val escapable : Boolean
         val surprised : Int
         if (extra !== null) {
             surprised = extra.getInt("surprise", 0)
-            this.escapable = extra.getBoolean("escapable", true)
+            escapable = extra.getBoolean("escapable", true)
             val songResId = extra.getInt("song", 0)
             if (songResId > 0) {
                 val songPlayer = MediaPlayer.create(this.context, songResId)
@@ -941,7 +941,7 @@ class Arena : Fragment() {
         }
         else {
             surprised = 0
-
+            escapable = true
             val humanRace = Costume(1, "Human")
             val heroJob = AdCostume(1, "Hero", "hero")
             val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
@@ -1022,7 +1022,7 @@ class Arena : Fragment() {
         }
         this.partySide = partySide
         this.otherSide = otherSide
-
+        this.escapable = escapable
         val scenePlay = AdScene(party, enemy, surprised)
         val players = scenePlay.players
         val enIdx = scenePlay.enIdx
@@ -1030,16 +1030,16 @@ class Arena : Fragment() {
 
         val runBtn : Button = view.findViewById(R.id.RunBt)
         val autoBtn : Button = view.findViewById(R.id.AutoBt)
-        val skillActBtn : Button = view.findViewById(R.id.ActBt)
         val itemUseBtn : Button = view.findViewById(R.id.UseBt)
-        val skillsSpn : Spinner = view.findViewById(R.id.SkillBox)
         val itemsSpn : Spinner = view.findViewById(R.id.ItemBox)
+        val skillActBtn : Button = view.findViewById(R.id.ActBt)
+        val skillsSpn : Spinner = view.findViewById(R.id.SkillBox)
         val targetSpn : Spinner = view.findViewById(R.id.TargetBox)
         val actionsTxt : TextView = view.findViewById(R.id.ItemCost)
         actionsTxt.movementMethod = ScrollingMovementMethod()
         this.infoTxt = view.findViewById(R.id.SkillCost)
-        runBtn.isEnabled = this.escapable
         this.skillActBtn = skillActBtn
+        runBtn.isEnabled = escapable
         this.itemUseBtn = itemUseBtn
         this.actionsTxt = actionsTxt
         this.targetSpn = targetSpn
@@ -1056,12 +1056,11 @@ class Arena : Fragment() {
         }
         this.koActors = koActors
 
-        val imgViews = ArrayList<ImageView>(party.size + enemy.size)
-
-        var pos = 0
-        var imgView : ImageView?
         val partySize = party.size
         val enemySize = enemy.size
+        val imgViews = ArrayList<ImageView>(partySize + enemySize)
+        var pos = 0
+        var imgView : ImageView?
         if (surprised < 0) {
             if (partySize > 0) {
                 imgView = view.findViewById(R.id.ImgEnemy1)
@@ -1183,6 +1182,7 @@ class Arena : Fragment() {
                     }
                 }
             }
+
         }
 
         val cAction = this.cAction
