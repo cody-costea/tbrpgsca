@@ -33,16 +33,12 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         var stolenTxt = ", obtaining %s from %s"
         @JvmStatic
         var missesTxt = ", but misses"
-        @JvmStatic
-        val DmgTypeAtk : Int = 1
-        @JvmStatic
-        val DmgTypeDef : Int = 2
-        @JvmStatic
-        val DmgTypeSpi : Int = 4
-        @JvmStatic
-        val DmgTypeWis : Int = 8
-        @JvmStatic
-        val DmgTypeAgi : Int = 16
+
+        const val DmgTypeAtk : Int = 1
+        const val DmgTypeDef : Int = 2
+        const val DmgTypeSpi : Int = 4
+        const val DmgTypeWis : Int = 8
+        const val DmgTypeAgi : Int = 16
     }
 
     open fun execute(user: Actor, target: Actor, applyCosts: Boolean): String {

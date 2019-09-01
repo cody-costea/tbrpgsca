@@ -539,10 +539,11 @@ class Arena : Fragment() {
             val view = this.prepareView(position, convertView, parent)
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
+            val crActor = this.arenaAct.crActor
             vHolder.nameText.text = skill.name +
-                    (if (this.asItems) " x ${this.arenaAct.crActor._items?.get(skill)} " else " ") +
+                    (if (this.asItems) " x ${crActor._items?.get(skill)} " else " ") +
                     String.format(this.context.getString(R.string.skill_info), skill.lvRq, skill.hpC,
-                            skill.mpC, skill.spC, (this.arenaAct.crActor.skillsQty?.get(skill) ?: "∞"),
+                            skill.mpC, skill.spC, (crActor.skillsQty?.get(skill) ?: "∞"),
                             (when {
                                 skill.trg == 0 -> this.context.getString(R.string.one)
                                 skill.trg == -1 -> this.context.getString(R.string.self)
@@ -647,8 +648,9 @@ class Arena : Fragment() {
         val autoSkill = scenePlay.getAIskill(if (onPartySide) 1 else 0,
                 onPartySide && scenePlay.players[targetPos].hp < 1)
         if (skillsSpn.selectedItemPosition == autoSkill) {
-            this.skillActBtn.isEnabled = (crActor.availableSkills[autoSkill]).canPerform(crActor)
-                    && this.canTarget(targetPos, crActor.availableSkills[autoSkill])
+            val autoAbility = crActor.availableSkills[autoSkill]
+            this.skillActBtn.isEnabled = autoAbility.canPerform(crActor)
+                    && this.canTarget(targetPos, autoAbility)
         }
         else {
             skillsSpn.setSelection(autoSkill)
@@ -703,11 +705,11 @@ class Arena : Fragment() {
         val scenePlay = this.scenePlay
         val imgActor = this.imgActor
         val current = scenePlay.current
+        val players = scenePlay.players
         val lastAbility = scenePlay.lastAbility as AdAbility?
-        val sprType = if (lastAbility === null || lastAbility.trg < 0
-                || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) 6 else 5
+        val sprType = if (lastAbility === null || (lastAbility.dmgType and Ability.DmgTypeAtk) == Ability.DmgTypeAtk) 5 else 6
         val usrSide = if (current < scenePlay.enIdx) this.partySide else this.otherSide
-        val crActor = scenePlay.players[current] as AdActor
+        val crActor = players[current] as AdActor
         val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
         var dur = crActor.spritesDur[usrSide][sprType] - 174
         if (actAnim !== null) {
@@ -718,9 +720,8 @@ class Arena : Fragment() {
         imgActor[current].postDelayed({
             var htActor: AdActor
             for (trg in scenePlay.fTarget..scenePlay.lTarget) {
-                if (trg != current && (lastAbility === null
-                                || !(lastAbility.dmgType == 2 && scenePlay.players[trg].reflect))) {
-                    htActor = (scenePlay.players[trg] as AdActor)
+                if (trg != current && (lastAbility === null || !(lastAbility.dmgType == Ability.DmgTypeWis && players[trg].reflect))) {
+                    htActor = (players[trg] as AdActor)
                     val trgAnim: Int
                     val koActors = this.koActors
                     val koBit = 1 shl trg
@@ -780,11 +781,15 @@ class Arena : Fragment() {
     }
 
     private fun setCrItems() {
-        val crItems = this.scenePlay.crItems!![this.scenePlay.current]
+        val itemsSpn = this.itemsSpn
+        val targetSpn = this.targetSpn
+        val itemUseBtn = this.itemUseBtn
+        val scenePlay = this.scenePlay
+        val crItems = scenePlay.crItems!![scenePlay.current]
         if (crItems === null || crItems.isEmpty()) {
-            if (this.itemsSpn.isEnabled) {
-                this.itemsSpn.setSelection(Spinner.INVALID_POSITION)
-                this.itemsSpn.isEnabled = false
+            if (itemsSpn.isEnabled) {
+                itemsSpn.setSelection(Spinner.INVALID_POSITION)
+                itemsSpn.isEnabled = false
             }
         }
         else {
@@ -792,59 +797,63 @@ class Arena : Fragment() {
             if (itemsAdapter === null) {
                 itemsAdapter = AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, crItems, true)
                 this.itemsAdapter = itemsAdapter
-                this.itemsSpn.adapter = itemsAdapter
+                itemsSpn.adapter = itemsAdapter
 
-                this.itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                itemsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
-                        this@Arena.itemUseBtn.isEnabled = false
+                        itemUseBtn.isEnabled = false
                     }
 
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        this@Arena.itemUseBtn.isEnabled = (view?.tag as ViewHolder).usable
-                                && this@Arena.canTarget(this@Arena.targetSpn.selectedItemPosition, this@Arena.itemsSpn.selectedItem as Ability)
+                        itemUseBtn.isEnabled = (view?.tag as ViewHolder).usable
+                                && this@Arena.canTarget(targetSpn.selectedItemPosition, itemsSpn.selectedItem as Ability)
                     }
 
                 }
 
-                this.itemUseBtn.setOnClickListener(this.cAction)
+                itemUseBtn.setOnClickListener(this.cAction)
             }
             else if (itemsAdapter.skills !== crItems) {
                 itemsAdapter.skills = crItems
-
             }
-            if (!this.itemsSpn.isEnabled) {
-                this.itemsSpn.setSelection(0)
-                this.itemsSpn.isEnabled = true
+            if (!itemsSpn.isEnabled) {
+                itemsSpn.setSelection(0)
+                itemsSpn.isEnabled = true
             }
-            this.targetSpn.selectedItemPosition
-            if (this.targetSpn.selectedItemPosition > -1) {
-                val item = this.itemsSpn.selectedItem as Ability
-                this.itemUseBtn.isEnabled = item.canPerform(this.crActor) && this.canTarget(this.targetSpn.selectedItemPosition, item)
+            val targetPos = this.targetSpn.selectedItemPosition
+            if (targetPos > -1) {
+                val item = itemsSpn.selectedItem as Ability
+                this.itemUseBtn.isEnabled = item.canPerform(this.crActor) && this.canTarget(targetPos, item)
             }
         }
     }
 
     private fun setCrSkills() {
+        val skillsSpn = this.skillsSpn
+        val targetSpn = this.targetSpn
+        val skillActBtn = this.skillActBtn
         var skillsAdapter = this.skillsAdapter
         if (skillsAdapter === null) {
             skillsAdapter = AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
                     this.crActor.availableSkills, false)
-            this.skillsSpn.adapter = skillsAdapter
+            skillsSpn.adapter = skillsAdapter
             this.skillsAdapter = skillsAdapter
 
-            this.skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            skillsSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-                    this@Arena.skillActBtn.isEnabled = false
+                    skillActBtn.isEnabled = false
                 }
 
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    this@Arena.skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
-                            || (view === null && this@Arena.crActor.availableSkills[position].canPerform(this@Arena.crActor)))
-                            && this@Arena.canTarget(this@Arena.targetSpn.selectedItemPosition, this@Arena.crActor.availableSkills[position])
+                    val crActor = this@Arena.crActor
+                    val availableSkills = crActor.availableSkills
+                    skillActBtn.isEnabled = ((view !== null && (view.tag as ViewHolder).usable)
+                            || (view === null && availableSkills[position].canPerform(crActor)))
+                            && this@Arena.canTarget(targetSpn.selectedItemPosition, availableSkills[position])
                 }
 
             }
-            this.skillActBtn.setOnClickListener(this.cAction)
+            skillActBtn.setOnClickListener(this.cAction)
         }
         else {
             skillsAdapter.skills = this.crActor.availableSkills
@@ -854,8 +863,9 @@ class Arena : Fragment() {
     private fun ImageView.setTargetClickListener(targetPos : Int) {
         this.setOnClickListener {
             if (targetPos == this@Arena.targetSpn.selectedItemPosition) {
-                if (this@Arena.crActor.automatic == 0 && this@Arena.skillActBtn.isEnabled) {
-                    this@Arena.skillActBtn.callOnClick()
+                val skillActBtn = this@Arena.skillActBtn
+                if (this@Arena.crActor.automatic == 0 && skillActBtn.isEnabled) {
+                    skillActBtn.callOnClick()
                 }
             }
             else {
@@ -902,8 +912,6 @@ class Arena : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //super.onCreateView(inflater, container, savedInstanceState)
-        //this.setContentView(R.layout.activity_arena)
         val view = inflater.inflate(R.layout.activity_arena, container, false)
 
         val extra = this.arguments
@@ -915,9 +923,10 @@ class Arena : Fragment() {
             this.escapable = extra.getBoolean("escapable", true)
             val songResId = extra.getInt("song", 0)
             if (songResId > 0) {
-                this.songPlayer = MediaPlayer.create(this.context, songResId)
-                this.songPlayer.isLooping = true
-                this.songPlayer.start()
+                val songPlayer = MediaPlayer.create(this.context, songResId)
+                this.songPlayer = songPlayer
+                songPlayer.isLooping = true
+                songPlayer.start()
             }
             val arenaResId = extra.getInt("arenaImg", 0)
             if (arenaResId > 0) {
@@ -983,11 +992,12 @@ class Arena : Fragment() {
                     AdActor(4, this.requireContext(), "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
-            party[0]._items = LinkedHashMap()
+            val items : LinkedHashMap<Ability, Int> = LinkedHashMap()
+            party[0]._items = items
             val potion = AdAbility(10, "Potion", 0, 0, false, false, 1, 0, 3, 0, -15, 0, 0,
                     3, 0, 0, 0, 0, 0, false, false, null, null)
-            party[0]._items!![potion] = 3
-            party[1]._items = party[0]._items
+            items[potion] = 3
+            party[1]._items = items
 
             enemy = arrayOf(
                     AdActor(8, this.requireContext(), "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
@@ -1000,32 +1010,46 @@ class Arena : Fragment() {
                             7, 7, 7, false, null, skills, null, null)
             )
         }
-
+        var partySide : Int
+        var otherSide : Int
         if (surprised < 0) {
-            this.partySide = 1
-            this.otherSide = 0
+            partySide = 1
+            otherSide = 0
         }
         else {
-            this.partySide = 0
-            this.otherSide = 1
+            partySide = 0
+            otherSide = 1
         }
+        this.partySide = partySide
+        this.otherSide = otherSide
 
-        this.scenePlay = AdScene(party, enemy, surprised)
+        val scenePlay = AdScene(party, enemy, surprised)
+        val players = scenePlay.players
+        val enIdx = scenePlay.enIdx
+        this.scenePlay = scenePlay
 
-        this.runBtn = view.findViewById(R.id.RunBt)
-        this.runBtn.isEnabled = this.escapable
-        this.autoBtn = view.findViewById(R.id.AutoBt)
-        this.skillActBtn = view.findViewById(R.id.ActBt)
-        this.itemUseBtn = view.findViewById(R.id.UseBt)
-        this.skillsSpn = view.findViewById(R.id.SkillBox)
-        this.itemsSpn = view.findViewById(R.id.ItemBox)
-        this.targetSpn = view.findViewById(R.id.TargetBox)
-        this.actionsTxt = view.findViewById(R.id.ItemCost)
-        this.actionsTxt.movementMethod = ScrollingMovementMethod()
+        val runBtn : Button = view.findViewById(R.id.RunBt)
+        val autoBtn : Button = view.findViewById(R.id.AutoBt)
+        val skillActBtn : Button = view.findViewById(R.id.ActBt)
+        val itemUseBtn : Button = view.findViewById(R.id.UseBt)
+        val skillsSpn : Spinner = view.findViewById(R.id.SkillBox)
+        val itemsSpn : Spinner = view.findViewById(R.id.ItemBox)
+        val targetSpn : Spinner = view.findViewById(R.id.TargetBox)
+        val actionsTxt : TextView = view.findViewById(R.id.ItemCost)
+        actionsTxt.movementMethod = ScrollingMovementMethod()
         this.infoTxt = view.findViewById(R.id.SkillCost)
+        runBtn.isEnabled = this.escapable
+        this.skillActBtn = skillActBtn
+        this.itemUseBtn = itemUseBtn
+        this.actionsTxt = actionsTxt
+        this.targetSpn = targetSpn
+        this.skillsSpn = skillsSpn
+        this.itemsSpn = itemsSpn
+        this.autoBtn = autoBtn
+        this.runBtn = runBtn
 
         var koActors = this.koActors
-        this.scenePlay.players.forEachIndexed { i, actor ->
+        players.forEachIndexed { i, actor ->
             if (actor.hp < 1) {
                 koActors += 1 shl i
             }
@@ -1036,149 +1060,142 @@ class Arena : Fragment() {
 
         var pos = 0
         var imgView : ImageView?
+        val partySize = party.size
+        val enemySize = enemy.size
         if (surprised < 0) {
-            if (party.isNotEmpty()) {
+            if (partySize > 0) {
                 imgView = view.findViewById(R.id.ImgEnemy1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (party.size > 1) {
+            if (partySize > 1) {
                 imgView = view.findViewById(R.id.ImgEnemy2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (party.size > 2) {
+            if (partySize > 2) {
                 imgView = view.findViewById(R.id.ImgEnemy3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (party.size > 3) {
+            if (partySize > 3) {
                 imgView = view.findViewById(R.id.ImgEnemy4)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.isNotEmpty()) {
+            if (enemySize > 0) {
                 imgView = view.findViewById(R.id.ImgPlayer1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.size > 1) {
+            if (enemySize > 1) {
                 imgView = view.findViewById(R.id.ImgPlayer2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.size > 2) {
+            if (enemySize > 2) {
                 imgView = view.findViewById(R.id.ImgPlayer3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.size > 3) {
+            if (enemySize > 3) {
                 imgView = view.findViewById(R.id.ImgPlayer4)
                 imgView.setTargetClickListener(pos)
                 imgViews.add(imgView)
             }
         }
         else {
-            if (party.isNotEmpty()) {
+            if (partySize > 0) {
                 imgView = view.findViewById(R.id.ImgPlayer1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (party.size > 1) {
+            if (partySize > 1) {
                 imgView = view.findViewById(R.id.ImgPlayer2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (party.size > 2) {
+            if (partySize > 2) {
                 imgView = view.findViewById(R.id.ImgPlayer3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (party.size > 3) {
+            if (partySize > 3) {
                 imgView = view.findViewById(R.id.ImgPlayer4)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.isNotEmpty()) {
+            if (enemySize > 0) {
                 imgView = view.findViewById(R.id.ImgEnemy1)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.size > 1) {
+            if (enemySize > 1) {
                 imgView = view.findViewById(R.id.ImgEnemy2)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.size > 2) {
+            if (enemySize > 2) {
                 imgView = view.findViewById(R.id.ImgEnemy3)
                 imgView.setTargetClickListener(pos++)
                 imgViews.add(imgView)
             }
-            if (enemy.size > 3) {
+            if (enemySize > 3) {
                 imgView = view.findViewById(R.id.ImgEnemy4)
                 imgView.setTargetClickListener(pos)
                 imgViews.add(imgView)
             }
-            //this.setCrSkills()
-            //this.setCrItems()
         }
 
-        this.imgActor = imgViews.toTypedArray()
+        val imgActor = imgViews.toTypedArray()
+        this.imgActor = imgActor
 
-        for (i in 0 until this.scenePlay.enIdx) {
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.partySide,
+        for (i in 0 until enIdx) {
+            imgActor[i].setBackgroundDrawable((players[i] as AdActor).getBtSprite(partySide,
                     if (koActors and (1 shl i) == 1 shl i) 1 else 0))
         }
 
-        for (i in this.scenePlay.enIdx until this.scenePlay.players.size) {
-            this.scenePlay.players[i].automatic = 2
-            this.imgActor[i].setBackgroundDrawable((this.scenePlay.players[i] as AdActor).getBtSprite(this.otherSide,
+        for (i in enIdx until players.size) {
+            players[i].automatic = 2
+            imgActor[i].setBackgroundDrawable((players[i] as AdActor).getBtSprite(otherSide,
                     if (koActors and (1 shl i) == 1 shl i) 1 else 0))
         }
 
-        this.playersAdapter = ActorArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
-                this.scenePlay.players)
-
-        this.targetSpn.adapter = this.playersAdapter
-
-        this.targetSpn.setSelection(this.scenePlay.enIdx)
-
-        this.targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        val playersAdapter = ActorArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, players)
+        this.playersAdapter = playersAdapter
+        targetSpn.adapter = playersAdapter
+        targetSpn.setSelection(enIdx)
+        targetSpn.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                this@Arena.skillActBtn.isEnabled = false
-                this@Arena.itemUseBtn.isEnabled = false
+                skillActBtn.isEnabled = false
+                itemUseBtn.isEnabled = false
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (this@Arena.crActor.automatic == 0) {
-                    if (this@Arena.itemsSpn.isEnabled) {
-                        this@Arena.itemUseBtn.isEnabled = (this@Arena.itemsSpn.selectedView.tag as ViewHolder).usable
-                                && this@Arena.canTarget(position, this@Arena.itemsSpn.selectedItem as Ability)
+                    if (itemsSpn.isEnabled) {
+                        itemUseBtn.isEnabled = (itemsSpn.selectedView.tag as ViewHolder).usable
+                                && this@Arena.canTarget(position, itemsSpn.selectedItem as Ability)
                     }
-                    if (this@Arena.skillsSpn.isEnabled) {
+                    if (skillsSpn.isEnabled) {
                         this@Arena.setCrAutoSkill()
                     }
                 }
             }
         }
 
-        this.runBtn.setOnClickListener(this.cAction)
-        this.autoBtn.setOnClickListener(this.cAction)
+        val cAction = this.cAction
+        runBtn.setOnClickListener(cAction)
+        autoBtn.setOnClickListener(cAction)
 
-        /*if (this.crActor.automatic != 0) {
-            this.afterAct()
-        }
-        else {
-            this.enableControls(true)
-            this.setCrAutoSkill()
-        }*/
         return view
     }
 
     override fun onStart() {
         super.onStart()
-        if (this.scenePlay.players[this.scenePlay.current].automatic != 0) {
+        val scenePlay = this.scenePlay
+        if (scenePlay.players[scenePlay.current].automatic != 0) {
             this.enableControls(false)
         }
         this.afterAct()
