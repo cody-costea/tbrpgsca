@@ -49,8 +49,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         get() = this._lv
         set(value) {
             var v = value
-            if (value > this.maxLv) {
-                v = this.maxLv
+            val maxLv = this.maxLv
+            if (value > maxLv) {
+                v = maxLv
             }
             while (this._lv < v) {
                 this.exp = this.mExp
@@ -73,8 +74,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open var hp : Int = this.mHp
         set(value) {
+            val mHp = this.mHp
             field = when {
-                value > this.mHp -> this.mHp
+                value > mHp -> mHp
                 value < 0 -> 0
                 else -> value
             }
@@ -146,11 +148,12 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
 
     open val equippedItems : Map<Char, Costume>?
         get() {
-            return if (this.equipment === null) {
+            val e = this.equipment
+            return if (e === null) {
                 null
             }
             else {
-                HashMap<Char, Costume>(this.equipment)
+                HashMap<Char, Costume>(e)
             }
         }
 
@@ -237,9 +240,10 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }
         else {
-            this.availableSkills.ensureCapacity(this.availableSkills.size + abilities.size)
+            val availableSkills = this.availableSkills
+            availableSkills.ensureCapacity(availableSkills.size + abilities.size)
             for (k in abilities) {
-                this.availableSkills.add(k)
+                availableSkills.add(k)
                 if (k.mQty > 0) {
                     var skillsQty = this.skillsQty;
                     if (skillsQty == null) {
@@ -336,8 +340,9 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     fun levelUp() {
-        while (this.mExp <= this.exp && this._lv < this.maxLv) {
-            this.mExp *= 2
+        val mExp = this.mExp
+        while (mExp <= this.exp && this._lv < this.maxLv) {
+            this.mExp = mExp * 2
             this._lv++
             this.mHp += 3
             this.mMp += 2

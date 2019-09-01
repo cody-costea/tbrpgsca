@@ -43,8 +43,8 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
 
     open fun execute(user: Actor, target: Actor, applyCosts: Boolean): String {
         var s = ""
-        var dmg = (Math.random() * 4).toInt()
         val trg : Actor
+        var dmg = (Math.random() * 4).toInt()
         val dmgType = this.dmgType
         if (target.reflect && dmgType == DmgTypeWis) {
             s += String.format(reflectedTxt, target.name)
@@ -92,24 +92,27 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         dmg = if (i == 0) 0 else (this.atkI + (dmg / i)) / (def / i * res + 1)
         if (canMiss == 0 || trg == user
                 || (Math.random() * 13 + user.agi / canMiss).toInt() > 2 + trg.agi / 4) {
-            var dmghp = if (this.hpDmg != 0) (if (this.hpDmg < 0) -1 else 1) * dmg + this.hpDmg else 0
-            var dmgmp = if (this.mpDmg != 0) (if (this.mpDmg < 0) -1 else 1) * dmg + this.mpDmg else 0
-            var dmgsp = if (this.spDmg != 0) (if (this.spDmg < 0) -1 else 1) * dmg + this.spDmg else 0
+            var dmgHp = this.hpDmg
+            dmgHp = if (dmgHp != 0) (if (dmgHp < 0) -1 else 1) * dmg + dmgHp else 0
+            var dmgMp = this.mpDmg
+            dmgMp = if (dmgMp != 0) (if (dmgMp < 0) -1 else 1) * dmg + dmgMp else 0
+            var dmgSp = this.spDmg
+            dmgSp = if (dmgSp != 0) (if (dmgSp < 0) -1 else 1) * dmg + dmgSp else 0
             if (res < 0) {
-                dmghp = -dmghp
-                dmgmp = -dmgmp
-                dmgsp = -dmgsp
+                dmgHp = -dmgHp
+                dmgMp = -dmgMp
+                dmgSp = -dmgSp
             }
-            trg.hp -= dmghp
-            trg.mp -= dmgmp
-            trg.sp -= dmgsp
+            trg.hp -= dmgHp
+            trg.mp -= dmgMp
+            trg.sp -= dmgSp
             if (this.absorb) {
-                user.hp += dmghp / 2
-                user.mp += dmgmp / 2
-                user.sp += dmgsp / 2
+                user.hp += dmgHp / 2
+                user.mp += dmgMp / 2
+                user.sp += dmgSp / 2
             }
-            if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                s += String.format(suffersTxt, trg.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
+            if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
+                s += String.format(suffersTxt, trg.name) + Costume.getDmgText(dmgHp, dmgMp, dmgSp)
             }
             val aStates = this.aStates
             var r : String
@@ -141,8 +144,9 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                     && trgItems !== user._items
                     && trgItems.isNotEmpty()
                     && (Math.random() * 12 + user.agi / 4).toInt() > 4 + trg.agi / 3) {
-                val itemId = (Math.random() * trgItems.size).toInt()
-                if (itemId < trgItems.size) {
+                val itemsSize = trgItems.size
+                val itemId = (Math.random() * itemsSize).toInt()
+                if (itemId < itemsSize) {
                     /*val iterator = trgItems.keys.iterator()
                     if (itemId > 1) {
                         itemId--
@@ -174,13 +178,14 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
             user.hp -= this.hpC
             user.mp -= this.mpC
             user.sp -= this.spC
-            if (this.mQty > 0) {
+            val mQty = this.mQty
+            if (mQty > 0) {
                 var usrSkillsQty = user.skillsQty
                 if (usrSkillsQty === null) {
                     usrSkillsQty = HashMap()
                     user.skillsQty = usrSkillsQty
                 }
-                usrSkillsQty[this] = (usrSkillsQty[this] ?: this.mQty) - 1
+                usrSkillsQty[this] = (usrSkillsQty[this] ?: mQty) - 1
             }
         }
         if (ko && trg.hp > 0) {
@@ -190,13 +195,14 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
     }
 
     open fun replenish(user: Actor) {
-        if (this.mQty > 0) {
+        val mQty = this.mQty
+        if (mQty > 0) {
             var usrSkills: MutableMap<Ability, Int>? = user.skillsQty
             if (usrSkills === null) {
                 usrSkills = HashMap()
                 user.skillsQty = usrSkills
             }
-            usrSkills[this] = this.mQty
+            usrSkills[this] = mQty
         }
     }
 

@@ -155,7 +155,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                 AdAbility(8, this.getString(R.string.skill_prayer), 0, 0, false, true, 5, 0, 7, 0, Ability.DmgTypeSpi, 1, -23, 0, 0, 1, 0, -1, -1, false, true, null, null),
                 AdAbility(9, this.getString(R.string.skill_smite), 0, 0, false, false, 1, 1, 0, 2, Ability.DmgTypeAtk or Ability.DmgTypeDef, 1, 4, 3, -4, 0, 1, -1, -1, false, false, null, confclarity),
                 AdAbility(10, this.getString(R.string.skill_hit), 0, 0, false, false, 1, 3, 0, 1, Ability.DmgTypeAtk, 1, 12, 0, -4, 0, 1, -1, -1, false, false, null, confsleep),
-                AdAbility(11, this.getString(R.string.skill_bash), 0, 0, false, false, 3, 3, 0, 5, (Ability.DmgTypeAtk or Ability.DmgTypeDef), 1, 7, 5, -5, 0, 1, -1, -1, false, false, dizziness, confclarity),
+                AdAbility(11, this.getString(R.string.skill_bash), 0, 0, false, false, 3, 3, 0, 5, Ability.DmgTypeAtk or Ability.DmgTypeDef, 1, 7, 5, -5, 0, 1, -1, -1, false, false, dizziness, confclarity),
                 AdAbility(12, this.getString(R.string.skill_smash), 0, 0, false, false, 3, 5, 0, 3, Ability.DmgTypeAtk, 1, 18, 0, -7, 0, 1, -1, -1, false, false, null, confsleep),
                 AdAbility(13, this.getString(R.string.skill_berserk), 0, 0, false, false, 4, 7, 0, 4, Ability.DmgTypeDef, 1, 0, 0, 0, -1, 0, -1, -1, false, false, berserk, weakness),
                 AdAbility(14, this.getString(R.string.skill_shock), 0, 0, false, false, 4, 4, 0, 7, Ability.DmgTypeAtk or Ability.DmgTypeDef, 1, 10, 5, -9, 0, 7, -1, -1, false, false, dizzystun, confclarity),

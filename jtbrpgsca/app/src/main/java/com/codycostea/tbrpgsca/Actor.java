@@ -31,6 +31,7 @@ public final class Actor extends Costume {
 	protected final static int FLAG_ACTIVE = 2;
 	protected final static int FLAG_REFLECTS = 4;
 	protected final static int FLAG_GUARDS = 8;
+	protected final static int FLAG_SHAPE_SHIFT = 16;
 
 	public final static int AUTO_NONE = 0;
 	public final static int AUTO_CONFUSED = -1;
@@ -378,6 +379,23 @@ public final class Actor extends Costume {
 		return this;
 	}
 
+	public boolean isShapeShifted() {
+		return (this.flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT;
+	}
+
+	public Actor setShapeShifted(final boolean value) {
+		if (value) {
+			this.flags |= FLAG_SHAPE_SHIFT;
+		} else {
+			int flags = this.flags;
+			if ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT) {
+				flags -= FLAG_SHAPE_SHIFT;
+				this.flags = flags;
+			}
+		}
+		return this;
+	}
+
 	public int getAutoMode() {
 		return this.automatic;
 	}
@@ -586,8 +604,10 @@ public final class Actor extends Costume {
 		String s = "";
 		String oldSprite = null;
 		if (!consume) {
-			oldSprite = this.sprite;
-			this.sprite = this._job.sprite;
+			if (this.isShapeShifted()) {
+				oldSprite = this.sprite;
+				this.sprite = this._job.sprite;
+			}
 			final int automatic = this.automatic;
 			if (automatic < AUTO_ALLY && automatic > AUTO_ENEMY) {
 				this.automatic = AUTO_NONE;
@@ -618,11 +638,11 @@ public final class Actor extends Costume {
 				}
 			}
 		}
-		if (oldSprite != null && oldSprite.equals(this.sprite)) {
+		if (oldSprite != null && !oldSprite.equals(this.sprite)) {
 			this.resetSprites();
 		}
 		s += this.checkStatus();
-		if (c && consume) s += ".";
+		if (c) s += ".";
 		return s;
 	}
 
@@ -643,6 +663,7 @@ public final class Actor extends Costume {
 			}
 		}
 		this.applyStates(false);
+		this.setShapeShifted(false);
 		final Hashtable res = this.res;
 		if (res != null) {
 			final Enumeration rsIdx = res.keys();
@@ -694,7 +715,7 @@ public final class Actor extends Costume {
 	public Object unequipItem(final Costume item) {
 		final Hashtable e = this.equipment;
 		if (e != null) {
-			final Enumeration vEquip = equipment.keys();
+			final Enumeration vEquip = e.keys();
 			while (vEquip.hasMoreElements()) {
 				Object k = vEquip.nextElement();
 				if (e.get(k).equals(item)) {

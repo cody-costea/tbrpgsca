@@ -209,6 +209,11 @@ public final class StateMask extends Costume {
             actor.updateStates(false, this.aStates);
             actor.updateSkills(false, this.aSkills);
             this.disableSkills(actor, false);
+            final String sprite = this.sprite;
+            if (sprite != null && sprite.length() > 0) {
+                actor.setShapeShifted(true);
+                actor.resetSprites();
+            }
             return this.apply(actor, false);
         } else {
             return "";
