@@ -28,6 +28,11 @@ import java.util.Random;
 
 public final class Performance extends RolePlay {
 
+	public static String reflectedTxt = ", reflected by %s";
+	public static String suffersTxt = ", %s suffers";
+	public static String stolenTxt = ", obtaining %s from %s";
+	public static String missesTxt = ", but misses";
+
 	protected final static int FLAG_STEAL = 2;
 	protected final static int FLAG_ABSORB = 4;
 	protected final static int FLAG_RESTORE = 8;

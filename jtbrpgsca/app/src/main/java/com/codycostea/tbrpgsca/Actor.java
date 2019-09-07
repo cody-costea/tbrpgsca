@@ -28,6 +28,8 @@ import java.util.Vector;
 
 public final class Actor extends Costume {
 
+	public static String koTxt = ", %s falls unconscious";
+
 	protected final static int FLAG_ACTIVE = 2;
 	protected final static int FLAG_REFLECTS = 4;
 	protected final static int FLAG_GUARDS = 8;

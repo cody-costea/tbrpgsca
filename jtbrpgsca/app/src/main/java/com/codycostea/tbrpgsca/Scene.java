@@ -22,6 +22,12 @@ import java.util.Vector;
 
 public final class Scene {
 
+    public static String performsTxt = "%s performs %s";
+    public static String victoryTxt = "The party has won!";
+    public static String fallenTxt = "The party has fallen!";
+    public static String escapeTxt = "The party has escaped!";
+    public static String failTxt = "The party attempted to escape, but failed.";
+
     protected int _surprise;
     public int getSurprise() {
         return this._surprise;

@@ -71,7 +71,6 @@ public class ArenaAct extends Activity {
         private final int layoutRes;
         private final ArenaAct arenaAct;
         private final boolean asItems;
-        private Performance[] skills;
 
         private Performance[] skills;
         public AbilityArrayAdapter setSkills(final Performance[] skills) {
@@ -94,10 +93,10 @@ public class ArenaAct extends Activity {
             final ViewHolder vHolder;
             final ArenaAct arenaAct = this.arenaAct;
             if (view == null || view.getTag() == null) {
-                view = ((LayoutInflater)arenaAct.getSystemService(Context.LAYOUT_INFLATER_SERVICE) )
+                view = ((LayoutInflater)arenaAct.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                         .inflate(this.layoutRes, parent, false);
                 final TextView txt = view.findViewById(android.R.id.text1);
-                        vHolder = new ViewHolder(txt);
+                vHolder = new ViewHolder(txt);
                 view.setTag(vHolder);
             } else {
                 vHolder = (ViewHolder)view.getTag();
@@ -108,8 +107,9 @@ public class ArenaAct extends Activity {
             return view;
         }
 
+
         @Override
-        public View getView(final int position, View view, final ViewGroup parent) {
+        public View getDropDownView(final int position, View view, final ViewGroup parent) {
             view = this.prepareView(position, view, parent);
             final ViewHolder vHolder = (ViewHolder)view.getTag();
             final Performance skill = this.skills[position];
@@ -139,6 +139,20 @@ public class ArenaAct extends Activity {
             return view;
         }
 
+        @Override
+        public View getView(final int position, View view, final ViewGroup parent) {
+            view = this.prepareView(position, view, parent);
+            final ViewHolder vHolder = (ViewHolder)view.getTag();
+            final Performance skill = this.skills[position];
+            final Scene scenePlay = this.arenaAct.scenePlay;
+            final Actor crActor = scenePlay._players[scenePlay._current];
+            final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
+            final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
+            vHolder.nameText.setText(itemsQtyInt == null ? skill.name : skill.name + " x "
+                    + String.valueOf(itemsQtyInt.intValue()) + " ");
+            return view;
+        }
+
         public AbilityArrayAdapter(final ArenaAct context, final int layoutRes,
                                    final Performance[] skills, final boolean asItems) {
             super(context, layoutRes);
@@ -150,8 +164,57 @@ public class ArenaAct extends Activity {
     }
 
     private class ActorArrayAdapter extends ArrayAdapter<Actor> {
-        public ActorArrayAdapter(Context context, int resource) {
-            super(context, resource);
+
+        private final int layoutRes;
+        private final ArenaAct arenaAct;
+        private Actor[] actors;
+
+        @Override
+        public Actor getItem(final int position) {
+            return this.actors[position];
+        }
+
+        @Override
+        public int getCount() {
+            return this.actors.length;
+        }
+
+        private View prepareView(View view, final ViewGroup parent) {
+            if (view == null || view.getTag() == null) {
+                view = ((LayoutInflater)this.arenaAct.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                        .inflate(this.layoutRes, parent, false);
+                final TextView txt = view.findViewById(android.R.id.text1);
+                view.setTag(new ViewHolder(txt));
+            }
+            return view;
+        }
+
+        @Override
+        public View getDropDownView(final int position, View view, final ViewGroup parent) {
+            view = this.prepareView(view, parent);
+            final ViewHolder vHolder = (ViewHolder)view.getTag();
+            final Actor actor = this.actors[position];
+            vHolder.nameText.setText(actor.name + " " + Costume.hpText + ": "
+                    + (((position < this.arenaAct.scenePlay._enIdx) ? actor._hp + "/"
+                    + actor.mHp + ", " + Costume.mpText + ": " + actor._mp +"/" + actor.mMp
+                    + ", " + Costume.spText + ": " + actor._sp + "/" + actor.mSp
+                    : "%.2f".format((((float)actor._hp) / ((float)actor.mHp) * 100.0f) + "%") + ")")));
+            return view;
+        }
+
+        @Override
+        public View getView(final int position, View view, final ViewGroup parent) {
+            view = this.prepareView(view, parent);
+            final ViewHolder vHolder = (ViewHolder)view.getTag();
+            vHolder.nameText.setText(this.actors[position].name);
+            return view;
+        }
+
+        public ActorArrayAdapter(final ArenaAct context, final int layoutRes, final Actor[] actors) {
+            super(context, layoutRes);
+            this.layoutRes = layoutRes;
+            this.arenaAct = context;
+            this.actors = actors;
         }
     }
 

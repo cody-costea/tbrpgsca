@@ -22,6 +22,8 @@ import java.util.Random;
 
 public final class StateMask extends Costume {
 
+    public static String causesTxt = " %s causes %s";
+
     protected final static int FLAG_AUTOMATE = 2;
     protected final static int FLAG_CONFUSE = 4;
     protected final static int FLAG_INACTIVATE = 8;
