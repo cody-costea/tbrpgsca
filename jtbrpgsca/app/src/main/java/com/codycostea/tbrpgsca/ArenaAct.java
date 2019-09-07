@@ -16,8 +16,10 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
@@ -26,8 +28,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Parcelable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -63,8 +67,85 @@ public class ArenaAct extends Activity {
     }
 
     private class AbilityArrayAdapter extends ArrayAdapter<Performance> {
-        public AbilityArrayAdapter(Context context, int resource) {
-            super(context, resource);
+
+        private final int layoutRes;
+        private final ArenaAct arenaAct;
+        private final boolean asItems;
+        private Performance[] skills;
+
+        private Performance[] skills;
+        public AbilityArrayAdapter setSkills(final Performance[] skills) {
+            this.skills = skills;
+            this.notifyDataSetChanged();
+            return this;
+        }
+
+        @Override
+        public Performance getItem(final int position) {
+            return this.skills[position];
+        }
+
+        @Override
+        public int getCount() {
+            return this.skills.length;
+        }
+
+        private View prepareView(final int position, View view, final ViewGroup parent) {
+            final ViewHolder vHolder;
+            final ArenaAct arenaAct = this.arenaAct;
+            if (view == null || view.getTag() == null) {
+                view = ((LayoutInflater)arenaAct.getSystemService(Context.LAYOUT_INFLATER_SERVICE) )
+                        .inflate(this.layoutRes, parent, false);
+                final TextView txt = view.findViewById(android.R.id.text1);
+                        vHolder = new ViewHolder(txt);
+                view.setTag(vHolder);
+            } else {
+                vHolder = (ViewHolder)view.getTag();
+            }
+            final Scene scenePlay = arenaAct.scenePlay;
+            final boolean usable = vHolder.usable = this.skills[position].canPerform(scenePlay._players[scenePlay._current]);
+            vHolder.nameText.setTextColor(usable ? Color.WHITE : Color.GRAY);
+            return view;
+        }
+
+        @Override
+        public View getView(final int position, View view, final ViewGroup parent) {
+            view = this.prepareView(position, view, parent);
+            final ViewHolder vHolder = (ViewHolder)view.getTag();
+            final Performance skill = this.skills[position];
+            final ArenaAct context = this.arenaAct;
+            final Scene scenePlay = context.scenePlay;
+            final Actor crActor = scenePlay._players[scenePlay._current];
+            final Hashtable skillsQtyMap = crActor.skillsQty;
+            final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
+            final Integer skillsQtyInt = skillsQtyMap == null ? null : (Integer)skillsQtyMap.get(skill);
+            final String skillQtyText = skillsQtyInt == null ? "∞" : String.valueOf(skillsQtyInt.intValue());
+            final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
+            final String itemQtyText = itemsQtyInt == null ? " " : " x " + String.valueOf(itemsQtyInt.intValue()) + " ";
+            final String trgText;
+            switch (skill.trg) {
+                case -1:
+                    trgText = context.getString(R.string.self);
+                    break;
+                case 0:
+                    trgText = context.getString(R.string.one);
+                    break;
+                default:
+                    trgText = context.getString(R.string.all);
+            }
+            vHolder.nameText.setText(skill.name + itemQtyText + String.format(context.getString(R.string.skill_info),
+                    skill.lvRq, skill.hpC, skill.mpC, skill.spC, skillQtyText, trgText, (skill.hasRange()
+                            ? context.getString(R.string.yes) : context.getString(R.string.no))));
+            return view;
+        }
+
+        public AbilityArrayAdapter(final ArenaAct context, final int layoutRes,
+                                   final Performance[] skills, final boolean asItems) {
+            super(context, layoutRes);
+            this.layoutRes = layoutRes;
+            this.arenaAct = context;
+            this.asItems = asItems;
+            this.skills = skills;
         }
     }
 
@@ -160,13 +241,14 @@ public class ArenaAct extends Activity {
 
     private void playSpr() {
         final Scene scenePlay = this.scenePlay;
+        final Actor[] players = scenePlay._players;
         final ImageView[] imgActor = this.imgActor;
         final int current = scenePlay._current;
+        final Actor crActor = players[current];
         final Performance lastAbility = scenePlay._lastAbility;
         final int sprType = (lastAbility == null || lastAbility.trg < 0
                 || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) ? 6 : 5;
         final int usrSide = (current < scenePlay._enIdx) ? this.partySide : this.otherSide;
-        final Actor crActor = scenePlay._players[current];
         final AnimationDrawable actAnim = crActor.getBtSprite(this, usrSide, sprType);
         final int iDur = crActor.spritesDur[usrSide][sprType] - 174;
         if (actAnim != null) {
@@ -181,8 +263,8 @@ public class ArenaAct extends Activity {
                 Actor htActor;
                 for (int trg = scenePlay._fTarget; trg <= scenePlay._lTarget; trg++) {
                     if (trg != current && (lastAbility == null || !(lastAbility.dmgType == 2
-                            && scenePlay._players[trg].isReflecting()))) {
-                        htActor = (scenePlay._players[trg]);
+                            && players[trg].isReflecting()))) {
+                        htActor = (players[trg]);
                         final int trgAnim;
                         final int koActors = ArenaAct.this.koActors;
                         final int koBit = 1 << trg;

@@ -528,9 +528,9 @@ class Arena : Fragment() {
                 view = convertView
                 vHolder = convertView.tag as ViewHolder
             }
-
-            vHolder.usable = this.skills[position].canPerform(this.arenaAct.crActor)
-            vHolder.nameText.setTextColor(if (vHolder.usable) Color.WHITE else Color.GRAY)
+            val usable = this.skills[position].canPerform(this.arenaAct.crActor)
+            vHolder.nameText.setTextColor(if (usable) Color.WHITE else Color.GRAY)
+            vHolder.usable = usable
             return view
         }
 
@@ -539,18 +539,19 @@ class Arena : Fragment() {
             val view = this.prepareView(position, convertView, parent)
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
-            val crActor = this.arenaAct.crActor
+            val context = this.arenaAct
+            val crActor = context.crActor
             vHolder.nameText.text = skill.name +
                     (if (this.asItems) " x ${crActor._items?.get(skill)} " else " ") +
-                    String.format(this.context.getString(R.string.skill_info), skill.lvRq, skill.hpC,
+                    String.format(context.getString(R.string.skill_info), skill.lvRq, skill.hpC,
                             skill.mpC, skill.spC, (crActor.skillsQty?.get(skill) ?: "∞"),
-                            (when {
-                                skill.trg == 0 -> this.context.getString(R.string.one)
-                                skill.trg == -1 -> this.context.getString(R.string.self)
-                                else -> this.context.getString(R.string.all)
+                            (when (skill.trg) {
+                                0 -> context.getString(R.string.one)
+                                -1 -> context.getString(R.string.self)
+                                else -> context.getString(R.string.all)
                             }),
-                            if (skill.range == true) this.context.getString(R.string.yes)
-                            else this.context.getString(R.string.no))
+                            if (skill.range == true) context.getString(R.string.yes)
+                            else context.getString(R.string.no))
             return view
         }
 
