@@ -17,6 +17,7 @@ package com.codycostea.tbrpgsca;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -32,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -72,8 +74,8 @@ public class ArenaAct extends Activity {
         private final ArenaAct arenaAct;
         private final boolean asItems;
 
-        private Performance[] skills;
-        public AbilityArrayAdapter setSkills(final Performance[] skills) {
+        private Vector<Performance> skills;
+        public AbilityArrayAdapter setSkills(final Vector<Performance> skills) {
             this.skills = skills;
             this.notifyDataSetChanged();
             return this;
@@ -102,7 +104,7 @@ public class ArenaAct extends Activity {
                 vHolder = (ViewHolder)view.getTag();
             }
             final Scene scenePlay = arenaAct.scenePlay;
-            final boolean usable = vHolder.usable = this.skills[position].canPerform(scenePlay._players[scenePlay._current]);
+            final boolean usable = vHolder.usable = this.skills.get(position).canPerform(scenePlay._players[scenePlay._current]);
             vHolder.nameText.setTextColor(usable ? Color.WHITE : Color.GRAY);
             return view;
         }
@@ -112,7 +114,7 @@ public class ArenaAct extends Activity {
         public View getDropDownView(final int position, View view, final ViewGroup parent) {
             view = this.prepareView(position, view, parent);
             final ViewHolder vHolder = (ViewHolder)view.getTag();
-            final Performance skill = this.skills[position];
+            final Performance skill = this.skills.get(position);
             final ArenaAct context = this.arenaAct;
             final Scene scenePlay = context.scenePlay;
             final Actor crActor = scenePlay._players[scenePlay._current];
@@ -143,7 +145,7 @@ public class ArenaAct extends Activity {
         public View getView(final int position, View view, final ViewGroup parent) {
             view = this.prepareView(position, view, parent);
             final ViewHolder vHolder = (ViewHolder)view.getTag();
-            final Performance skill = this.skills[position];
+            final Performance skill = this.skills.get(position);
             final Scene scenePlay = this.arenaAct.scenePlay;
             final Actor crActor = scenePlay._players[scenePlay._current];
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
@@ -154,7 +156,7 @@ public class ArenaAct extends Activity {
         }
 
         public AbilityArrayAdapter(final ArenaAct context, final int layoutRes,
-                                   final Performance[] skills, final boolean asItems) {
+                                   final Vector<Performance> skills, final boolean asItems) {
             super(context, layoutRes);
             this.layoutRes = layoutRes;
             this.arenaAct = context;
@@ -295,7 +297,43 @@ public class ArenaAct extends Activity {
     }
 
     private void setCrSkills() {
+        final Spinner skillsSpn = this.skillsSpn;
+        final Spinner targetSpn = this.targetSpn;
+        final Button skillActBtn = this.skillActBtn;
+        final Actor crActor;
+        {
+            final Scene scenePlay = this.scenePlay;
+            crActor = scenePlay._players[scenePlay._current];
+        }
+        AbilityArrayAdapter skillsAdapter = this.skillsAdapter;
+        if (skillsAdapter == null) {
+            skillsAdapter = new AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
+                    crActor.getAvailableSkills(), false);
+            skillsSpn.setAdapter(skillsAdapter);
+            this.skillsAdapter = skillsAdapter;
+            skillsSpn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                //@Override
+                public void onNothingSelected(final AdapterView<?> parent) {
+                    skillActBtn.setEnabled(false);
+                }
 
+                @Override
+                public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                    final Actor crActor;
+                    {
+                        final Scene scenePlay = ArenaAct.this.scenePlay;
+                        crActor = scenePlay._players[scenePlay._current];
+                    }
+                    final Vector<Performance> availableSkills = crActor.getAvailableSkills();
+                    skillActBtn.setEnabled(((view != null && ((ViewHolder) view.getTag()).usable)
+                            || (view == null && availableSkills.get(position).canPerform(crActor)))
+                            && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), availableSkills.get(position)));
+                }
+            });
+            skillActBtn.setOnClickListener(this.cAction);
+        } else {
+            skillsAdapter.setSkills(crActor.getAvailableSkills());
+        }
     }
 
     private void setCrItems() {
@@ -451,8 +489,9 @@ public class ArenaAct extends Activity {
         final int autoSkill = scenePlay.getAIskill(onPartySide ? 1 : 0,
                 onPartySide && scenePlay._players[targetPos]._hp < 1);
         if (skillsSpn.getSelectedItemPosition() == autoSkill) {
-            this.skillActBtn.setEnabled(crActor.getAvailableSkills().get(autoSkill).canPerform(crActor)
-                    && this.canTarget(targetPos, crActor.getAvailableSkills().get(autoSkill)));
+            final Performance autoAbility = crActor.getAvailableSkills().get(autoSkill);
+            this.skillActBtn.setEnabled(autoAbility.canPerform(crActor)
+                    && this.canTarget(targetPos, autoAbility));
         } else {
             skillsSpn.setSelection(autoSkill);
         }

@@ -1,0 +1,12 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="true">
+    <item android:drawable="@drawable/frm_bt_reaver_l_idle" android:duration="261" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit1" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit2" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit3" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit4" android:duration="261" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit3" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit2" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_hit1" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_reaver_l_idle" android:duration="1" />
+</animation-list>

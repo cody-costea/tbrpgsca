@@ -1,0 +1,15 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="true">
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act1" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act2" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act3" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act4" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act5" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act6" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act5" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act4" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act3" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act2" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_act1" android:duration="87" />
+    <item android:drawable="@drawable/frm_bt_alchemist_l_idle" android:duration="1" />
+</animation-list>
