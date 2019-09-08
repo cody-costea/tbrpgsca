@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca;
 
+import android.os.Parcelable;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
@@ -458,7 +460,7 @@ public final class Scene {
         }
     }
 
-    public Scene(final Actor[] party, final Actor[] enemy, final int surprise) {
+    public Scene(final Parcelable[] party, final Parcelable[] enemy, final int surprise) {
         boolean useInit = false;
         final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
         final Actor[] players = this._players = new Actor[party.length + enemy.length];//this._players = party + enemy;
@@ -466,7 +468,7 @@ public final class Scene {
         for (int i = 0; i < players.length; i++) {
             Actor iPlayer = players[i];
             if (iPlayer == null) {
-                iPlayer = players[i] = i < enIdx ? party[i] : enemy[i + enIdx];
+                iPlayer = players[i] = i < enIdx ? (Actor)party[i] : (Actor)enemy[i + enIdx];
             }
             if (!useInit && iPlayer.mInit != 0) {
                 useInit = true;
@@ -485,7 +487,7 @@ public final class Scene {
                 } else {
                     Actor jPlayer = players[j];
                     if (jPlayer == null) {
-                        jPlayer = players[j] = j < enIdx ? party[j] : enemy[j - enIdx];
+                        jPlayer = players[j] = j < enIdx ? (Actor)party[j] : (Actor)enemy[j - enIdx];
                     }
                     final int jInit = jPlayer.mInit > 0 ? jPlayer.mInit : players.length;
                     if (iInit < jInit) {

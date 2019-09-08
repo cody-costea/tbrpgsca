@@ -863,14 +863,15 @@ class Arena : Fragment() {
 
     private fun ImageView.setTargetClickListener(targetPos : Int) {
         this.setOnClickListener {
-            if (targetPos == this@Arena.targetSpn.selectedItemPosition) {
+            val targetSpn = this@Arena.targetSpn
+            if (targetPos == targetSpn.selectedItemPosition) {
                 val skillActBtn = this@Arena.skillActBtn
                 if (this@Arena.crActor.automatic == 0 && skillActBtn.isEnabled) {
                     skillActBtn.callOnClick()
                 }
             }
             else {
-                this@Arena.targetSpn.setSelection(targetPos)
+                targetSpn.setSelection(targetPos)
             }
         }
     }
@@ -1049,7 +1050,7 @@ class Arena : Fragment() {
         this.autoBtn = autoBtn
         this.runBtn = runBtn
 
-        var koActors = this.koActors
+        var koActors = 0
         players.forEachIndexed { i, actor ->
             if (actor.hp < 1) {
                 koActors += 1 shl i
@@ -1057,10 +1058,10 @@ class Arena : Fragment() {
         }
         this.koActors = koActors
 
+        var pos = 0
         val partySize = party.size
         val enemySize = enemy.size
         val imgViews = ArrayList<ImageView>(partySize + enemySize)
-        var pos = 0
         var imgView : ImageView?
         if (surprised < 0) {
             if (partySize > 0) {
@@ -1149,12 +1150,10 @@ class Arena : Fragment() {
 
         val imgActor = imgViews.toTypedArray()
         this.imgActor = imgActor
-
         for (i in 0 until enIdx) {
             imgActor[i].setBackgroundDrawable((players[i] as AdActor).getBtSprite(partySide,
                     if (koActors and (1 shl i) == 1 shl i) 1 else 0))
         }
-
         for (i in enIdx until players.size) {
             players[i].automatic = 2
             imgActor[i].setBackgroundDrawable((players[i] as AdActor).getBtSprite(otherSide,

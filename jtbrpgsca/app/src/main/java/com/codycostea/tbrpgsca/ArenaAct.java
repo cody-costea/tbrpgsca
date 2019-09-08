@@ -15,6 +15,7 @@ limitations under the License.
  */
 package com.codycostea.tbrpgsca;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -29,6 +30,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Parcelable;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -57,6 +59,8 @@ public class ArenaAct extends Activity {
     private Spinner targetSpn, skillsSpn, itemsSpn;
     private TextView actionsTxt, infoTxt;
 
+    private String[] jScripts;
+
     private MediaPlayer songPlayer;
 
     private class ViewHolder {
@@ -83,12 +87,12 @@ public class ArenaAct extends Activity {
 
         @Override
         public Performance getItem(final int position) {
-            return this.skills[position];
+            return this.skills.get(position);
         }
 
         @Override
         public int getCount() {
-            return this.skills.length;
+            return this.skills.size();
         }
 
         private View prepareView(final int position, View view, final ViewGroup parent) {
@@ -220,7 +224,7 @@ public class ArenaAct extends Activity {
         }
     }
 
-    private ActorArrayAdapter actorsAdapter;
+    private ActorArrayAdapter playersAdapter;
     private AbilityArrayAdapter skillsAdapter, itemsAdapter;
 
     private final View.OnClickListener cAction = new OnClickListener() {
@@ -279,6 +283,26 @@ public class ArenaAct extends Activity {
             }
         }
     };
+
+    private void setImgTargetClickListener(final ImageView img, final int targetPos) {
+        img.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final Spinner targetSpn = ArenaAct.this.targetSpn;
+                if (targetPos == targetSpn.getSelectedItemPosition()) {
+                    final Button skillActBtn = ArenaAct.this.skillActBtn;
+                    final Scene scenePlay = ArenaAct.this.scenePlay;
+                    final Actor crActor = scenePlay._players[scenePlay._current];
+                    if (crActor.automatic == 0 && skillActBtn.isEnabled()) {
+                        ArenaAct.this.cAction.onClick(skillActBtn);
+                    }
+                }
+                else {
+                    targetSpn.setSelection(targetPos);
+                }
+            }
+        });
+    }
 
     private void endingMsg(final String t, final String s) {
         new AlertDialog.Builder(this)
@@ -506,6 +530,210 @@ public class ArenaAct extends Activity {
     public void onCreate(final Bundle savedInstance) {
         super.onCreate(savedInstance);
         this.setContentView(R.layout.activity_battle);
+        final Bundle extra = this.getIntent().getExtras();
+        final Parcelable[] party;
+        final Parcelable[] enemy;
+        final boolean escapable;
+        final int surprised;
+        if (extra != null) {
+            surprised = extra.getInt("surprise", 0);
+            escapable = extra.getBoolean("escapable", true);
+            final int songResId = extra.getInt("song", 0);
+            if (songResId > 0) {
+                final MediaPlayer songPlayer = MediaPlayer.create(this, songResId);
+                this.songPlayer = songPlayer;
+                songPlayer.start();
+            }
+            final int arenaResId = extra.getInt("arenaImg", 0);
+            party = extra.getParcelableArray("party");
+            enemy = extra.getParcelableArray("enemy");
+            final String[] jScripts = extra.getStringArray("scripts");
+            if (jScripts != null) {
+                this.jScripts = jScripts;
+            }
+        } else {
+            surprised = 0;
+            escapable = true;
+            party = null;
+            enemy = null;
+        }
+        int partySide, otherSide;
+        if (surprised < 0) {
+            partySide = 1;
+            otherSide = 0;
+        } else {
+            partySide = 0;
+            otherSide = 1;
+        }
+        this.partySide = partySide;
+        this.otherSide = otherSide;
+        this.escapable = escapable;
+        final Scene scenePlay = new Scene(party, enemy, surprised);
+        final Actor[] players = scenePlay._players;
+        final int enIdx = scenePlay._enIdx;
+        this.scenePlay = scenePlay;
+        final Button runBtn = this.findViewById(R.id.RunBt);
+        final Button autoBtn = this.findViewById(R.id.AutoBt);
+        final Button itemUseBtn = this.findViewById(R.id.UseBt);
+        final Spinner itemsSpn = this.findViewById(R.id.ItemBox);
+        final Button skillActBtn = this.findViewById(R.id.ActBt);
+        final Spinner skillsSpn = this.findViewById(R.id.SkillBox);
+        final Spinner targetSpn = this.findViewById(R.id.TargetBox);
+        final TextView actionsTxt = this.findViewById(R.id.ItemCost);
+        actionsTxt.setMovementMethod(new ScrollingMovementMethod());
+        this.infoTxt = this.findViewById(R.id.SkillCost);
+        this.skillActBtn = skillActBtn;
+        runBtn.setEnabled(escapable);
+        this.itemUseBtn = itemUseBtn;
+        this.actionsTxt = actionsTxt;
+        this.targetSpn = targetSpn;
+        this.skillsSpn = skillsSpn;
+        this.itemsSpn = itemsSpn;
+        this.autoBtn = autoBtn;
+        this.runBtn = runBtn;
+        int koActors = 0;
+        for (int i = 0; i < players.length; i++) {
+            if (players[i]._hp < 1) {
+                koActors += 1 << i;
+            }
+        }
+        this.koActors = koActors;
+
+        int pos = 0;
+        final int partySize = party.length;
+        final int enemySize = enemy.length;
+        final ArrayList<ImageView> imgViews = new ArrayList<ImageView>(partySize + enemySize);
+        ImageView imgView;
+        if (surprised < 0) {
+            if (partySize > 0) {
+                imgView = this.findViewById(R.id.ImgEnemy1);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (partySize > 1) {
+                imgView = this.findViewById(R.id.ImgEnemy2);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (partySize > 2) {
+                imgView = this.findViewById(R.id.ImgEnemy3);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (partySize > 3) {
+                imgView = this.findViewById(R.id.ImgEnemy4);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 0) {
+                imgView = this.findViewById(R.id.ImgPlayer1);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 1) {
+                imgView = this.findViewById(R.id.ImgPlayer2);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 2) {
+                imgView = this.findViewById(R.id.ImgPlayer3);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 3) {
+                imgView = this.findViewById(R.id.ImgPlayer4);
+                this.setImgTargetClickListener(imgView, pos);
+                imgViews.add(imgView);
+            }
+        } else {
+            if (partySize > 0) {
+                imgView = this.findViewById(R.id.ImgPlayer1);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (partySize > 1) {
+                imgView = this.findViewById(R.id.ImgPlayer2);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (partySize > 2) {
+                imgView = this.findViewById(R.id.ImgPlayer3);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (partySize > 3) {
+                imgView = this.findViewById(R.id.ImgPlayer4);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 0) {
+                imgView = this.findViewById(R.id.ImgEnemy1);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 1) {
+                imgView = this.findViewById(R.id.ImgEnemy2);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 2) {
+                imgView = this.findViewById(R.id.ImgEnemy3);
+                this.setImgTargetClickListener(imgView, pos++);
+                imgViews.add(imgView);
+            }
+            if (enemySize > 3) {
+                imgView = this.findViewById(R.id.ImgEnemy4);
+                this.setImgTargetClickListener(imgView, pos);
+                imgViews.add(imgView);
+            }
+        }
+
+        final ImageView[] imgActor = imgViews.toArray(new ImageView[0]);
+        this.imgActor = imgActor;
+        for (int i = 0; i < enIdx; i++) {
+            imgActor[i].setBackgroundDrawable(players[i].getBtSprite(this, partySide,
+            ((koActors & (1 << i)) == (1 << i)) ? 1 : 0));
+        }
+        for (int i = enIdx; i < players.length; i++) {
+            players[i].automatic = 2;
+            imgActor[i].setBackgroundDrawable(players[i].getBtSprite(this, otherSide,
+            ((koActors & (1 << i)) == (1 << i)) ? 1 : 0));
+        }
+
+        final ActorArrayAdapter playersAdapter = new ActorArrayAdapter(this,
+                android.R.layout.simple_spinner_dropdown_item, players);
+        this.playersAdapter = playersAdapter;
+        targetSpn.setAdapter(playersAdapter);
+        targetSpn.setSelection(enIdx);
+        targetSpn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            //@Override
+            public void onNothingSelected(final AdapterView<?> parent) {
+                skillActBtn.setEnabled(false);
+                itemUseBtn.setEnabled(false);
+            }
+
+            @Override
+            public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                final Actor crActor;
+                {
+                    final Scene scene = ArenaAct.this.scenePlay;
+                    crActor = scene._players[scene._current];
+                }
+                if (crActor.automatic == 0) {
+                    if (itemsSpn.isEnabled()) {
+                        itemUseBtn.setEnabled(((ViewHolder)itemsSpn.getSelectedView().getTag()).usable
+                                && ArenaAct.this.canTarget(position, (Performance)itemsSpn.getSelectedItem()));
+                    }
+                    if (skillsSpn.isEnabled()) {
+                        ArenaAct.this.setCrAutoSkill();
+                    }
+                }
+            }
+        });
+
+        final View.OnClickListener cAction = this.cAction;
+        runBtn.setOnClickListener(cAction);
+        autoBtn.setOnClickListener(cAction);
     }
 
     @Override
@@ -520,6 +748,16 @@ public class ArenaAct extends Activity {
             songPlayer.release();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        final Scene scenePlay = this.scenePlay;
+        if (scenePlay._players[scenePlay._current].automatic != 0) {
+            this.enableControls(false);
+        }
+        this.afterAct();
     }
 
 }
