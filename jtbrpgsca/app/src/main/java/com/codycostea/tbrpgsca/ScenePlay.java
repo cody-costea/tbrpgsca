@@ -84,8 +84,9 @@ public final class ScenePlay {
         if (this._status == 0) {
             int initInc;
             int minInit = 1;
+            final Actor[] _players = this._players;
             final boolean useInit = this._useInit;
-            final Actor oldActor = this._players[this._current];
+            final Actor oldActor = _players[this._current];
             Actor crActor = oldActor;
             if (endTurn) {
                 crActor.setActive(false);
@@ -99,8 +100,8 @@ public final class ScenePlay {
                 boolean noParty = true;
                 boolean noEnemy = true;
                 initInc = minInit;
-                for (int i = 0; i < this._players.length; i++) {
-                    nxActor = this._players[i];
+                for (int i = 0; i < _players.length; i++) {
+                    nxActor = _players[i];
                     if (nxActor._hp > 0) {
                         if (i < this._enIdx) {
                             if (noParty) {
@@ -115,7 +116,7 @@ public final class ScenePlay {
                             nxActor.init += initInc;
                             int nInit = nxActor.init;
                             final int mInit = nxActor.mInit < 1
-                                    ? this._players.length
+                                    ? _players.length
                                     : nxActor.mInit;
                             if (nInit < mInit) {
                                 nInit -= mInit;
@@ -123,7 +124,7 @@ public final class ScenePlay {
                                     minInit = -1;
                                 }
                                 if (nxActor != crActor) {
-                                    final int cInit = crActor.init - (crActor.mInit < 1 ? this._players.length : crActor.mInit);
+                                    final int cInit = crActor.init - (crActor.mInit < 1 ? _players.length : crActor.mInit);
                                     if (cInit < nInit || (cInit == nInit && nxActor.agi > crActor.agi)) {
                                         nxActor.setActive(true);
                                         nxActor.applyStates(false);
@@ -227,30 +228,32 @@ public final class ScenePlay {
     }
 
     public int getGuardian(final int target, final Performance skill) {
-        if (skill.hasRange() || (/*skill._range == null &&*/ this._players[this._current].hasRange())) {
+        final Actor[] players = this._players;
+        final int current = this._current;
+        if (skill.hasRange() || (/*skill._range == null &&*/ players[current].hasRange())) {
             return target;
         }
-        int f;
-        int l;
-        if (this._current < this._enIdx) {
-            if (target <= this._enIdx || target == this._players.length - 1) {
+        int f, l;
+        final int enIdx = this._enIdx;
+        if (current < enIdx) {
+            if (target <= enIdx || target == players.length - 1) {
                 return target;
             }
-            f = this._enIdx;
-            l = this._players.length - 1;
+            f = enIdx;
+            l = players.length - 1;
         } else {
-            if (target >= this._enIdx - 1 || target == 0) {
+            if (target >= enIdx - 1 || target == 0) {
                 return target;
             }
             f = 0;
-            l = this._enIdx - 1;
+            l = enIdx - 1;
         }
         int difF = 0;
         int difL = 0;
         int guardF = target;
         int guardL = target;
         for (int i = f; i < target; i++) {
-            if (this._players[i]._hp > 0 && this._players[i].isGuarding()) {
+            if (players[i]._hp > 0 && players[i].isGuarding()) {
                 if (guardF == target) {
                     guardF = i;
                 }
@@ -261,7 +264,7 @@ public final class ScenePlay {
             return target;
         } else {
             for (int i = l; i > target; i--) {
-                if (this._players[i]._hp > 0 && this._players[i].isGuarding()) {
+                if (players[i]._hp > 0 && players[i].isGuarding()) {
                     if (guardL == target) {
                         guardL = i;
                     }
@@ -273,43 +276,46 @@ public final class ScenePlay {
     }
 
     public String executeAbility(final Performance skill, int target, String ret) {
+        final int enIdx = this._enIdx, fTarget, lTarget;
+        final Actor[] players = this._players;
+        final int current = this._current;
         switch (skill.trg) {
             case Performance.TRG_ENEMY:
-                if (target < this._enIdx) {
-                    this._fTarget = 0;
-                    this._lTarget = this._enIdx - 1;
+                if (target < enIdx) {
+                    fTarget = this._fTarget = 0;
+                    lTarget = this._lTarget = enIdx - 1;
                 } else {
-                    this._fTarget = this._enIdx;
-                    this._lTarget = this._players.length - 1;
+                    fTarget = this._fTarget = enIdx;
+                    lTarget = this._lTarget = players.length - 1;
                 }
                 break;
             case Performance.TRG_ALL:
-                this._fTarget = 0;
-                this._lTarget = this._players.length - 1;
+                fTarget = this._fTarget = 0;
+                lTarget = this._lTarget = players.length - 1;
                 break;
             case Performance.TRG_PARTY:
-                if (this._current < this._enIdx) {
-                    this._fTarget = 0;
-                    this._lTarget = this._enIdx - 1;
+                if (this._current < enIdx) {
+                    fTarget = this._fTarget = 0;
+                    lTarget = this._lTarget = enIdx - 1;
                 } else {
-                    this._fTarget = this._enIdx;
-                    this._lTarget = this._players.length - 1;
+                    fTarget = this._fTarget = enIdx;
+                    lTarget = this._lTarget = players.length - 1;
                 }
                 break;
             case Performance.TRG_SELF:
-                this._fTarget = this._lTarget = this._current;
+                fTarget = lTarget = this._fTarget = this._lTarget = current;
                 break;
             default:
                 target = this.getGuardian(target, skill);
-                this._fTarget = target;
-                this._lTarget = target;
+                fTarget = this._fTarget = target;
+                lTarget = this._lTarget = target;
         }
         boolean applyCosts = true;
-        final Actor crActor = this._players[this._current];
+        final Actor crActor = players[current];
         ret += crActor.name + " performs " + skill.name;
-        for (int i = this._fTarget; i <= this._lTarget; i++) {
-            if ((skill.mHp < 0 && skill.isRestoring()) || this._players[i]._hp > 0) {
-                ret += skill.execute(crActor, this._players[i], applyCosts);
+        for (int i = fTarget; i <= lTarget; i++) {
+            if ((skill.mHp < 0 && skill.isRestoring()) || players[i]._hp > 0) {
+                ret += skill.execute(crActor, players[i], applyCosts);
                 applyCosts = false;
             }
         }
@@ -324,24 +330,26 @@ public final class ScenePlay {
         int skillIndex = 0;
         boolean nHeal = false;
         boolean nRestore = false;
-        boolean party = this._current < this._enIdx;
+        final int enIdx = this._enIdx;
+        boolean party = this._current < enIdx;
+        final Actor[] players = this._players;
         int f;
         int l;
         if (party) {
             f = 0;
-            l = this._enIdx;
+            l = enIdx;
         } else {
-            f = this._enIdx;
-            l = this._players.length;
+            f = enIdx;
+            l = players.length;
         }
         for (int i = f; i < l; i++) {
-            if (this._players[i]._hp < 1) {
+            if (players[i]._hp < 1) {
                 nRestore = true;
-            } else if (this._players[i]._hp < this._players[i].mHp / 3) {
+            } else if (players[i]._hp < players[i].mHp / 3) {
                 nHeal = true;
             }
         }
-        final Actor crActor = this._players[this._current];
+        final Actor crActor = players[this._current];
         final Vector crSkills = crActor.getAvailableSkills();
         if (nRestore || nHeal) {
             for (int i = 0; i < crSkills.size(); i++) {
@@ -356,20 +364,23 @@ public final class ScenePlay {
         final boolean atkSkill = ability.mHp > -1;
         if (atkSkill) {
             if (party) {
-                f = this._enIdx;
-                l = this._players.length;
+                f = enIdx;
+                l = players.length;
             } else {
                 f = 0;
-                l = this._enIdx;
+                l = enIdx;
             }
         }
         int target = f;
+        Actor trgActor = players[target];
         final boolean restore = ability.isRestoring();
-        while (this._players[target]._hp < 1 && (atkSkill || !restore) && target < l) {
-            target++;
+        while (trgActor._hp < 1 && (atkSkill || !restore) && target < l) {
+            trgActor = players[++target];
         }
-        for (int i = target; i < l; i++) {
-            if (this._players[i]._hp < this._players[target]._hp && (this._players[i]._hp > 0 || restore)) {
+        for (int i = target + 1; i < l; i++) {
+            final Actor iPlayer = players[i];
+            if (iPlayer._hp < trgActor._hp && (iPlayer._hp > 0 || restore)) {
+                trgActor = iPlayer;
                 target = i;
             }
         }

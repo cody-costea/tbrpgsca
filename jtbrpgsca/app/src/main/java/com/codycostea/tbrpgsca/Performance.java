@@ -91,11 +91,12 @@ public final class Performance extends RoleData {
 		dest.writeInt(this.dmgType);
 		dest.writeInt(this.trg);
 		dest.writeTypedArray(this.rStates, flags);
-		if (this.elm == null) {
+		final Integer elm = this.elm;
+		if (elm == null) {
 			dest.writeByte((byte) 0);
 		} else {
 			dest.writeByte((byte) 1);
-			dest.writeInt(this.elm);
+			dest.writeInt(elm);
 		}
 	}
 

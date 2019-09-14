@@ -41,7 +41,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class ArenaAct extends Activity {
+public final class ArenaAct extends Activity {
 
 	private static Parcelable[] cachedParty = null, cachedEnemy = null;
 	private static Performance[] cachedSkill = null;

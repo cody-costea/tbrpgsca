@@ -82,7 +82,8 @@ public final class Actor extends Costume {
 		dest.writeInt(this._maxp);
 		dest.writeInt(this.automatic);
 		dest.writeInt(this.init);
-		dest.writeByte((byte) (this._ranged == null ? 0 : this._ranged ? 1 : 2));
+		final Boolean _ranged = this._ranged;
+		dest.writeByte((byte) (_ranged == null ? 0 : _ranged ? 1 : 2));
 	}
 
 	@Override
@@ -92,12 +93,12 @@ public final class Actor extends Costume {
 
 	public static final Creator<Actor> CREATOR = new Creator<Actor>() {
 		@Override
-		public Actor createFromParcel(Parcel in) {
+		public Actor createFromParcel(final Parcel in) {
 			return new Actor(in);
 		}
 
 		@Override
-		public Actor[] newArray(int size) {
+		public Actor[] newArray(final int size) {
 			return new Actor[size];
 		}
 	};
