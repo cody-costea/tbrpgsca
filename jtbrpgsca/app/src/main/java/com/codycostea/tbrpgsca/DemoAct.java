@@ -38,7 +38,7 @@ public class DemoAct extends Activity {
 	private Costume[] pcRace;
 	private Costume[] pcJob;
 	private Actor[] Player;
-	private Actor[] Party = new Actor[3];
+	//private Actor[] Party;
 	private Actor[][] Enemy;
 
 	private EditText name[] = new EditText[3];
@@ -261,80 +261,87 @@ public class DemoAct extends Activity {
 		enemies[5][2] = enemy[1];
 		enemies[5][3] = enemy[3];
 
-		this.raceList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-		this.jobList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-		this.raceBox[0] = (Spinner) findViewById(R.id.RaceBox1);
-		this.raceBox[1] = (Spinner) findViewById(R.id.RaceBox2);
-		this.raceBox[2] = (Spinner) findViewById(R.id.RaceBox3);
-		for (int i = 0; i < this.pcRace.length; i++)
-			this.raceList.add(this.pcRace[i].getName());
-		for (int i = 0; i < 3; i++)
-			this.raceBox[i].setAdapter(this.raceList);
-		this.raceBox[0].setSelection(1);
-		this.raceBox[1].setSelection(0);
-		this.raceBox[2].setSelection(2);
-		this.jobBox[0] = (Spinner) findViewById(R.id.JobBox1);
-		this.jobBox[1] = (Spinner) findViewById(R.id.JobBox2);
-		this.jobBox[2] = (Spinner) findViewById(R.id.JobBox3);
-		for (int i = 0; i < this.pcJob.length; i++)
-			this.jobList.add(this.pcJob[i].getName());
-		for (int i = 0; i < 3; i++)
-			this.jobBox[i].setAdapter(this.jobList);
-		this.jobBox[0].setSelection(0);
-		this.jobBox[1].setSelection(5);
-		this.jobBox[2].setSelection(3);
-		this.name[0] = (EditText) findViewById(R.id.NameField1);
-		this.name[1] = (EditText) findViewById(R.id.NameField2);
-		this.name[2] = (EditText) findViewById(R.id.NameField3);
-		this.Begin = (Button) findViewById(R.id.StartBt);
-		this.About = (Button) findViewById(R.id.InfoBt);
-		this.Exit = (Button) findViewById(R.id.QuitBt);
-		this.Begin.setOnClickListener(this.cAction);
-		this.About.setOnClickListener(this.cAction);
-		this.Exit.setOnClickListener(this.cAction);
-		this.Party[0] = this.Player[1];
-		this.Party[1] = this.Player[2];
-		this.Party[2] = this.Player[3];
-		this.Party[3] = null;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		this.getMenuInflater().inflate(R.menu.battle, menu);
-		return true;
+		final Spinner[] raceBox = this.raceBox, jobBox = this.jobBox;
+		final ArrayAdapter<String> raceList = this.raceList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item),
+            jobList = this.jobList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+		raceBox[0] = (Spinner) findViewById(R.id.RaceBox1);
+		raceBox[1] = (Spinner) findViewById(R.id.RaceBox2);
+		raceBox[2] = (Spinner) findViewById(R.id.RaceBox3);
+		for (int i = 0; i < race.length; i++) {
+            raceList.add(race[i].getName());
+        }
+		for (int i = 0; i < 3; i++) {
+            raceBox[i].setAdapter(raceList);
+        }
+		raceBox[0].setSelection(1);
+		raceBox[1].setSelection(0);
+		raceBox[2].setSelection(2);
+		jobBox[0] = (Spinner) findViewById(R.id.JobBox1);
+		jobBox[1] = (Spinner) findViewById(R.id.JobBox2);
+		jobBox[2] = (Spinner) findViewById(R.id.JobBox3);
+		for (int i = 0; i < job.length; i++) {
+            jobList.add(job[i].getName());
+        }
+		for (int i = 0; i < 3; i++) {
+            jobBox[i].setAdapter(jobList);
+        }
+		jobBox[0].setSelection(0);
+		jobBox[1].setSelection(5);
+		jobBox[2].setSelection(3);
+		final EditText[] name = this.name;
+		name[0] = (EditText) findViewById(R.id.NameField1);
+		name[1] = (EditText) findViewById(R.id.NameField2);
+		name[2] = (EditText) findViewById(R.id.NameField3);
+		final Button begin = this.Begin = (Button) findViewById(R.id.StartBt),
+		    about = this.About = (Button) findViewById(R.id.InfoBt),
+		    exit = this.Exit = (Button) findViewById(R.id.QuitBt);
+		final OnClickListener cAction = this.cAction;
+		begin.setOnClickListener(cAction);
+		about.setOnClickListener(cAction);
+		exit.setOnClickListener(cAction);
 	}
 
 	private void setPlayer(int p) {
-		String n = this.name[p - 1].getText().toString();
-		if (n.equals(""))
-			switch (p) {
-			case 1:
-				n = "Cody";
-				break;
-			case 2:
-				n = "George";
-				break;
-			case 3:
-				n = "Stephen";
-				break;
-			}
-		this.Player[p].setName(n);
-		if (this.raceBox[p - 1].isEnabled())
-			this.Player[p].setRace(this.pcRace[this.raceBox[p - 1].getSelectedItemPosition()]);
-		this.Player[p].setJob(this.pcJob[this.jobBox[p - 1].getSelectedItemPosition()]);
-		this.raceBox[p - 1].setEnabled(false);
+		String n = this.name[p].getText().toString();
+		if (n.equals("")) {
+            switch (p) {
+                case 0:
+                    n = "Cody";
+                    break;
+                case 1:
+                    n = "George";
+                    break;
+                case 2:
+                    n = "Stephen";
+                    break;
+            }
+        }
+		final Actor[] players = this.Player;
+        final Spinner[] raceBox = this.raceBox, jobBox = this.jobBox;
+		players[p].setName(n);
+		if (raceBox[p].isEnabled()) {
+            players[p].setRace(this.pcRace[raceBox[p].getSelectedItemPosition()]);
+        }
+		players[p].setJob(this.pcJob[jobBox[p].getSelectedItemPosition()]);
+		raceBox[p].setEnabled(false);
 	}
 
 	private void beginBt() {
-		for (int i = 1; i <= 3; i++)
-			this.setPlayer(i);
+		for (int i = 0; i < 3; i++) {
+            this.setPlayer(i);
+        }
+		final int level = this.level;
 		int surprise = 0;
-		if (this.level % 2 == 1)
-			surprise = -1;
-		if (this.level == 2)
-			surprise = 1;
-		for (int i = 1; i < this.Player.length; i++)
-			this.Player[i].recover();
+		if (level % 2 == 1) {
+            surprise = -1;
+        }
+		if (level == 2) {
+            surprise = 1;
+        }
+		final Actor[] players = this.Player;
+		for (int i = 0; i < players.length; i++) {
+            players[i].recover();
+        }
 		//ArenaAct.PlayDemo(this);
 //		ArenaAct.InitiateBattle(this, 0, 0, this.Party, this.Enemy[this.level], new Performance[] { this.Skill[0], this.Skill[1] },
 //				this.Item, null, surprise, this.level % 2 == 0, true);
@@ -380,13 +387,14 @@ public class DemoAct extends Activity {
 			if (resultCode == RESULT_OK) {
 				Bundle extra = data.getExtras();
 				if (extra.containsKey("Party")) {
-					System.arraycopy(extra.getParcelableArray("Party"), 0, this.Party, 0, 4);
-					this.Player[1] = this.Party[0];
+					System.arraycopy(extra.getParcelableArray("Party"), 0, this.Player, 0, 4);
+					/*this.Player[1] = this.Party[0];
 					this.Player[2] = this.Party[1];
-					this.Player[3] = this.Party[2];
+					this.Player[3] = this.Party[2];*/
 				}
-				if (extra.getInt("Outcome") > 0 && DemoAct.this.level < 5)
-					DemoAct.this.level++;
+				int level = DemoAct.this.level;
+				if (extra.getInt("Outcome") > 0 && level < 5)
+					DemoAct.this.level = level + 1;
 			}
 		}
 	}

@@ -15,7 +15,6 @@ limitations under the License.
  */
 package com.codycostea.tbrpgsca;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -529,7 +528,7 @@ public class ArenaAct extends Activity {
     @Override
     public void onCreate(final Bundle savedInstance) {
         super.onCreate(savedInstance);
-        this.setContentView(R.layout.activity_battle);
+        this.setContentView(R.layout.activity_arena);
         final Bundle extra = this.getIntent().getExtras();
         final Parcelable[] party;
         final Parcelable[] enemy;

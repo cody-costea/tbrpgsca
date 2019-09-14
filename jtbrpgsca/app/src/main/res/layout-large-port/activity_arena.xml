@@ -43,7 +43,7 @@
 		android:id="@+id/ItemCost"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@+id/LayoutArena"
+		android:layout_below="@id/LayoutArena"
 		android:layout_above="@+id/ButtonsLayer"
 		android:gravity="bottom"
 		android:maxLines="30"
@@ -69,12 +69,14 @@
 				android:layout_width="0dp"
 				android:layout_height="50dp"
 				android:layout_weight="1"
+				android:enabled="false"
 				android:text="@string/bt_act" />
 
 			<Spinner
 				android:id="@+id/SkillBox"
 				android:layout_width="0dp"
 				android:layout_height="50dp"
+				android:enabled="false"
 				android:layout_weight="1" />
 
 		</LinearLayout>
@@ -105,12 +107,14 @@
 				android:layout_width="0dp"
 				android:layout_height="50dp"
 				android:layout_weight="1"
+				android:enabled="false"
 				android:text="@string/bt_use" />
 
 			<Spinner
 				android:id="@+id/ItemBox"
 				android:layout_width="0dp"
 				android:layout_height="50dp"
+				android:enabled="false"
 				android:layout_weight="1" />
 
 		</LinearLayout>
@@ -121,7 +125,7 @@
 		android:id="@+id/LayoutArena"
 		android:layout_width="wrap_content"
 		android:layout_height="320dp"
-		android:layout_below="@+id/SkillCost"
+		android:layout_below="@id/SkillCost"
 		android:orientation="horizontal">
 
 		<ImageView
@@ -182,8 +186,8 @@
 			android:layout_width="128dp"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:layout_toLeftOf="@+id/LayoutArenaCentre"
-			android:layout_toStartOf="@+id/LayoutArenaCentre"
+			android:layout_toLeftOf="@id/LayoutArenaCentre"
+			android:layout_toStartOf="@id/LayoutArenaCentre"
 			android:layout_alignParentTop="true">
 
 			<ImageView
@@ -203,8 +207,8 @@
 			android:layout_width="128dp"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:layout_toRightOf="@+id/LayoutArenaCentre"
-			android:layout_toEndOf="@+id/LayoutArenaCentre"
+			android:layout_toRightOf="@id/LayoutArenaCentre"
+			android:layout_toEndOf="@id/LayoutArenaCentre"
 			android:layout_alignParentBottom="true">
 
 			<ImageView
