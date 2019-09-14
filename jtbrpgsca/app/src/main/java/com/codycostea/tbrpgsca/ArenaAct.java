@@ -44,9 +44,27 @@ import android.widget.TextView;
 public final class ArenaAct extends Activity {
 
 	private static Parcelable[] cachedParty = null, cachedEnemy = null;
-	private static Performance[] cachedSkill = null;
-	private static ArrayList<Performance> cachedItem = null;
 	private static String[] cachedScript = null;
+
+    public static void Stage(final Activity act, final int arenaDrawableId, final int songId,
+                             final Actor[] party, final Actor[] enemy, final String[] scripts,
+                             final int surprise, final boolean escapable, final boolean staticCache) {
+        if (staticCache) {
+            ArenaAct.cachedParty = party;
+            ArenaAct.cachedEnemy = enemy;
+            ArenaAct.cachedScript = scripts;
+        }
+        Intent btInt = new Intent(act, ArenaAct.class);
+        btInt.putExtra("static", staticCache);
+        btInt.putExtra("escapable", escapable);
+        btInt.putExtra("surprise", surprise);
+        btInt.putExtra("party", party);
+        btInt.putExtra("enemy", enemy);
+        btInt.putExtra("scripts", scripts);
+        btInt.putExtra("arenaImg", arenaDrawableId);
+        btInt.putExtra("song", songId);
+        act.startActivityForResult(btInt, 1);
+    }
 
 	private ScenePlay scenePlay;
 
@@ -334,14 +352,14 @@ public final class ArenaAct extends Activity {
                     crActor.getAvailableSkills(), false);
             skillsSpn.setAdapter(skillsAdapter);
             this.skillsAdapter = skillsAdapter;
-            skillsSpn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                //@Override
+            skillsSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
                 public void onNothingSelected(final AdapterView<?> parent) {
                     skillActBtn.setEnabled(false);
                 }
 
                 @Override
-                public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
                     final Actor crActor;
                     {
                         final ScenePlay scenePlay = ArenaAct.this.scenePlay;
@@ -360,7 +378,8 @@ public final class ArenaAct extends Activity {
     }
 
     private void setCrItems() {
-
+        //TODO:
+        this.itemsSpn.setSelection(Spinner.INVALID_POSITION);
     }
 
     private void playSpr() {
@@ -543,10 +562,18 @@ public final class ArenaAct extends Activity {
                 this.songPlayer = songPlayer;
                 songPlayer.start();
             }
+            final String[] jScripts;
             final int arenaResId = extra.getInt("arenaImg", 0);
-            party = extra.getParcelableArray("party");
-            enemy = extra.getParcelableArray("enemy");
-            final String[] jScripts = extra.getStringArray("scripts");
+            if (ArenaAct.cachedParty != null && ArenaAct.cachedEnemy != null
+                    && extra.getBoolean("static", false)) {
+                jScripts = ArenaAct.cachedScript;
+                party = ArenaAct.cachedParty;
+                enemy = ArenaAct.cachedEnemy;
+            } else {
+                party = extra.getParcelableArray("party");
+                enemy = extra.getParcelableArray("enemy");
+                jScripts = extra.getStringArray("scripts");
+            }
             if (jScripts != null) {
                 this.jScripts = jScripts;
             }
@@ -704,15 +731,15 @@ public final class ArenaAct extends Activity {
         this.playersAdapter = playersAdapter;
         targetSpn.setAdapter(playersAdapter);
         targetSpn.setSelection(enIdx);
-        targetSpn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            //@Override
+        targetSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
             public void onNothingSelected(final AdapterView<?> parent) {
                 skillActBtn.setEnabled(false);
                 itemUseBtn.setEnabled(false);
             }
 
             @Override
-            public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+            public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
                 final Actor crActor;
                 {
                     final ScenePlay scenePlay = ArenaAct.this.scenePlay;
@@ -739,8 +766,6 @@ public final class ArenaAct extends Activity {
     protected void onDestroy() {
         ArenaAct.cachedParty = null;
         ArenaAct.cachedEnemy = null;
-        ArenaAct.cachedSkill = null;
-        ArenaAct.cachedItem = null;
         ArenaAct.cachedScript = null;
         final MediaPlayer songPlayer = this.songPlayer;
         if (songPlayer != null) {

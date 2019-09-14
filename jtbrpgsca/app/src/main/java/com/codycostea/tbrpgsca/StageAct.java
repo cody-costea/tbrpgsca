@@ -228,33 +228,27 @@ public class StageAct extends Activity {
 				new Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 		};
 
-		final Actor enemies[][] = this.Enemy = new Actor[6][4];
-
+		final Actor enemies[][] = this.Enemy = new Actor[6][];
+		enemies[0] = new Actor[2];
 		enemies[0][0] = enemy[3];
 		enemies[0][1] = enemy[0];
-		enemies[0][2] = null;
-		enemies[0][3] = null;
-
+		enemies[1] = new Actor[2];
 		enemies[1][0] = enemy[1];
 		enemies[1][1] = enemy[2];
-		enemies[1][2] = null;
-		enemies[1][3] = null;
-
+		enemies[2] = new Actor[3];
 		enemies[2][0] = enemy[1];
 		enemies[2][1] = enemy[0];
 		enemies[2][2] = enemy[3];
-		enemies[2][3] = null;
-
+		enemies[3] = new Actor[3];
 		enemies[3][0] = enemy[1];
 		enemies[3][1] = enemy[2];
 		enemies[3][2] = enemy[3];
-		enemies[3][3] = null;
-
+		enemies[4] = new Actor[4];
 		enemies[4][0] = enemy[0];
 		enemies[4][1] = enemy[2];
 		enemies[4][2] = enemy[1];
 		enemies[4][3] = enemy[3];
-
+		enemies[5] = new Actor[4];
 		enemies[5][0] = enemy[0];
 		enemies[5][1] = enemy[2];
 		enemies[5][2] = enemy[1];
@@ -342,8 +336,8 @@ public class StageAct extends Activity {
             players[i].recover();
         }
 		//ArenaAct.PlayDemo(this);
-//		ArenaAct.InitiateBattle(this, 0, 0, this.Party, this.Enemy[this.level], new Performance[] { this.Skill[0], this.Skill[1] },
-//				this.Item, null, surprise, this.level % 2 == 0, true);
+		ArenaAct.Stage(this, 0, 0, players, this.Enemy[level],
+				null, surprise, level % 2 == 0, true);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {

@@ -96,6 +96,7 @@ public final class ScenePlay {
                 ret += crActor.applyStates(true);
             }
             Actor nxActor;
+            final int enIdx = this._enIdx;
             do {
                 boolean noParty = true;
                 boolean noEnemy = true;
@@ -103,7 +104,7 @@ public final class ScenePlay {
                 for (int i = 0; i < _players.length; i++) {
                     nxActor = _players[i];
                     if (nxActor._hp > 0) {
-                        if (i < this._enIdx) {
+                        if (i < enIdx) {
                             if (noParty) {
                                 noParty = false;
                             }
@@ -236,11 +237,12 @@ public final class ScenePlay {
         int f, l;
         final int enIdx = this._enIdx;
         if (current < enIdx) {
-            if (target <= enIdx || target == players.length - 1) {
+            final int pLength = players.length - 1;
+            if (target <= enIdx || target == pLength) {
                 return target;
             }
             f = enIdx;
-            l = players.length - 1;
+            l = pLength;
         } else {
             if (target >= enIdx - 1 || target == 0) {
                 return target;
@@ -253,7 +255,8 @@ public final class ScenePlay {
         int guardF = target;
         int guardL = target;
         for (int i = f; i < target; i++) {
-            if (players[i]._hp > 0 && players[i].isGuarding()) {
+            final Actor iPlayer = players[i];
+            if (iPlayer._hp > 0 && iPlayer.isGuarding()) {
                 if (guardF == target) {
                     guardF = i;
                 }
@@ -264,7 +267,8 @@ public final class ScenePlay {
             return target;
         } else {
             for (int i = l; i > target; i--) {
-                if (players[i]._hp > 0 && players[i].isGuarding()) {
+                final Actor iPlayer = players[i];
+                if (iPlayer._hp > 0 && iPlayer.isGuarding()) {
                     if (guardL == target) {
                         guardL = i;
                     }
@@ -314,8 +318,9 @@ public final class ScenePlay {
         final Actor crActor = players[current];
         ret += crActor.name + " performs " + skill.name;
         for (int i = fTarget; i <= lTarget; i++) {
-            if ((skill.mHp < 0 && skill.isRestoring()) || players[i]._hp > 0) {
-                ret += skill.execute(crActor, players[i], applyCosts);
+            final Actor iPlayer = players[i];
+            if ((skill.mHp < 0 && skill.isRestoring()) || iPlayer._hp > 0) {
+                ret += skill.execute(crActor, iPlayer, applyCosts);
                 applyCosts = false;
             }
         }
@@ -445,6 +450,7 @@ public final class ScenePlay {
         }
         final int enIdx = this._enIdx;
         final Actor[] players = this._players;
+        final int pLength = players.length;
         int pAgiSum = 0;
         int eAgiSum = 0;
         if (surprise < 1) {
@@ -455,13 +461,13 @@ public final class ScenePlay {
                 }
             }
             pAgiSum /= enIdx;
-            for (int i = enIdx; i < players.length; i++) {
+            for (int i = enIdx; i < pLength; i++) {
                 final Actor actor = players[i];
                 if (actor._hp > 0) {
                     eAgiSum += actor.agi;
                 }
             }
-            eAgiSum /= (players.length - enIdx);
+            eAgiSum /= (pLength - enIdx);
         }
         if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
             this._status = -1;
@@ -473,10 +479,11 @@ public final class ScenePlay {
 
     public ScenePlay(final Parcelable[] party, final Parcelable[] enemy, final int surprise) {
         boolean useInit = false;
+        final int pLength = party.length + enemy.length;
         final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
-        final Actor[] players = this._players = new Actor[party.length + enemy.length];//this._players = party + enemy;
+        final Actor[] players = this._players = new Actor[pLength];
         this._current = surprise < 0 ? enIdx : 0;
-        for (int i = 0; i < players.length; i++) {
+        for (int i = 0; i < pLength; i++) {
             Actor iPlayer = players[i];
             if (iPlayer == null) {
                 iPlayer = players[i] = i < enIdx ? (Actor)party[i] : (Actor)enemy[i + enIdx];
@@ -484,15 +491,18 @@ public final class ScenePlay {
             if (!useInit && iPlayer.mInit != 0) {
                 useInit = true;
             }
-            final int iInit = iPlayer.mInit > 0 ? iPlayer.mInit : players.length;
+            int iInit = iPlayer.mInit;
+            if (iInit < 1) {
+                iInit = pLength;
+            }
             if ((surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx)) {
                 iPlayer.init = 0;
                 iPlayer.setActive(false);
             } else {
                 iPlayer.init = iInit;
-                iPlayer.setActive(players[i]._hp > 0);
+                iPlayer.setActive(iPlayer._hp > 0);
             }
-            for (int j = 0; j < players.length; j++) {
+            for (int j = 0; j < pLength; j++) {
                 if (j == i) {
                     continue;
                 } else {
@@ -500,7 +510,10 @@ public final class ScenePlay {
                     if (jPlayer == null) {
                         jPlayer = players[j] = j < enIdx ? (Actor)party[j] : (Actor)enemy[j - enIdx];
                     }
-                    final int jInit = jPlayer.mInit > 0 ? jPlayer.mInit : players.length;
+                    int jInit = jPlayer.mInit;
+                    if (jInit < 1) {
+                        jInit = pLength;
+                    }
                     if (iInit < jInit) {
                         jPlayer.init -= (jInit - iInit);
                     }

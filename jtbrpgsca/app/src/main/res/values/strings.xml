@@ -4,7 +4,7 @@
     <string name="bt_run">Run</string>
     <string name="bt_act">Execute</string>
     <string name="bt_use">Use</string>
-    <string name="skill_info">(Lv: %s, HP: %s, MP: %s, RP: %s, Nr: %s, Trg: %s, Rng: %s)</string>
+    <string name="skill_info">(Lv: %d, HP: %d, MP: %d, RP: %d, Nr: %s, Trg: %s, Rng: %s)</string>
     <string name="one">One</string>
     <string name="self">Self</string>
     <string name="all">All</string>
@@ -111,7 +111,7 @@
     <string name="item_panacea">Panacea</string>
     <string name="item_elixir">Elixir</string>
     <string name="item_hipotion">Hi-Potion</string>
-    <string name="cr_actor_info">Current: %s (Level: %s, Exp: %s/%s)</string>
+    <string name="cr_actor_info">Current: %s (Level: %d, Exp: %d/%d)</string>
     <string name="victory">Victory</string>
     <string name="defeat">Defeat</string>
     <string name="escape">Escape</string>
