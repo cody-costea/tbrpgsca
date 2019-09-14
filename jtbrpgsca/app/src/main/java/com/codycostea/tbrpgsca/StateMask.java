@@ -275,7 +275,7 @@ public final class StateMask extends Costume {
                         actor.setCurrentMp(actor._mp - dmgmp);
                         actor.setCurrentSp(actor._sp - dmgsp);
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += " " + this.name + " causes " + actor.name + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
+                            s += " " + this.name + " causes " + actor.name + RoleData.getDmgText(dmghp, dmgmp, dmgsp);
                         }
                     }
                     else {

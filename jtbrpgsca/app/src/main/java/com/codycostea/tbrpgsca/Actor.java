@@ -144,7 +144,7 @@ public final class Actor extends Costume {
 				if (drawable instanceof AnimationDrawable) {
 					sprAnim = (AnimationDrawable)drawable;
 				} else if (drawable instanceof BitmapDrawable) {
-					sprAnim = (RolePlay.GetBitmapSprite((BitmapDrawable)drawable, context,
+					sprAnim = (RoleData.GetBitmapSprite((BitmapDrawable)drawable, context,
 							(spr > -1 && spr < 2) ? null : this.getBtSprite(context, side, 0).getFrame(0),
 							spr > 1 && spr < 4, (spr < 2) ? null : ((spr == 3)
 									? this.getBtSprite(context, side, 1).getFrame(0)
@@ -154,7 +154,7 @@ public final class Actor extends Costume {
 			catch (final Resources.NotFoundException e) {
 				switch (spr) {
 					case 4:
-						sprAnim = RolePlay.GetInvertedSprite(this.getBtSprite(context, side, 3), true);
+						sprAnim = RoleData.GetInvertedSprite(this.getBtSprite(context, side, 3), true);
 						break;
 					case 6:
 						this.getBtSprite(context, side, 5);
@@ -165,7 +165,7 @@ public final class Actor extends Costume {
 			}
             finally {
 				this.sprites[side][spr] = sprAnim;
-				this.spritesDur[side][spr] = sprAnim == null ? 0 : RolePlay.GetSpriteDuration(sprAnim);
+				this.spritesDur[side][spr] = sprAnim == null ? 0 : RoleData.GetSpriteDuration(sprAnim);
 			}
 		}
 		return sprAnim;
@@ -310,7 +310,7 @@ public final class Actor extends Costume {
 		return ranged != null && ranged.booleanValue();
 	}
 
-	public RolePlay setRange(final boolean range) {
+	public RoleData setRange(final boolean range) {
 		super.setRange(range);
 		this._ranged = range ? new Boolean(true) : null;
 		return this;

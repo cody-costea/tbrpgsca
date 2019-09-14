@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.util.Linkify;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -32,7 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-public class DemoAct extends Activity {
+public class StageAct extends Activity {
 
 	private Performance[] Skill;
 	private Costume[] pcRace;
@@ -301,7 +300,7 @@ public class DemoAct extends Activity {
 		exit.setOnClickListener(cAction);
 	}
 
-	private void setPlayer(int p) {
+	private void setPlayer(final int p) {
 		String n = this.name[p].getText().toString();
 		if (n.equals("")) {
             switch (p) {
@@ -352,13 +351,13 @@ public class DemoAct extends Activity {
 		public void onClick(final View v) {
 			switch (v.getId()) {
 			case R.id.StartBt:
-				DemoAct.this.beginBt();
+				StageAct.this.beginBt();
 				break;
 			case R.id.InfoBt:
-				DemoAct.this.displayMsg("About", getString(R.string.msg_about));
+				StageAct.this.displayMsg("About", getString(R.string.msg_about));
 				break;
 			case R.id.QuitBt:
-				DemoAct.this.finish();
+				StageAct.this.finish();
 				break;
 			}
 		}
@@ -392,9 +391,9 @@ public class DemoAct extends Activity {
 					this.Player[2] = this.Party[1];
 					this.Player[3] = this.Party[2];*/
 				}
-				int level = DemoAct.this.level;
+				int level = StageAct.this.level;
 				if (extra.getInt("Outcome") > 0 && level < 5)
-					DemoAct.this.level = level + 1;
+					StageAct.this.level = level + 1;
 			}
 		}
 	}

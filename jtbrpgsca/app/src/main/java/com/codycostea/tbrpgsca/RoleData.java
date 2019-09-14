@@ -23,7 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public abstract class RolePlay implements Parcelable {
+public abstract class RoleData implements Parcelable {
 
 	protected final static int FLAG_RANGE = 1;
 
@@ -78,7 +78,7 @@ public abstract class RolePlay implements Parcelable {
 		return animSpr;
 	}
 
-	protected RolePlay(final Parcel in) {
+	protected RoleData(final Parcel in) {
 		this.name = in.readString();
 		this.id = in.readInt();
 		this.mHp = in.readInt();
@@ -106,15 +106,15 @@ public abstract class RolePlay implements Parcelable {
 		return 0;
 	}
 
-	public static final Creator<RolePlay> CREATOR = new Creator<RolePlay>() {
+	public static final Creator<RoleData> CREATOR = new Creator<RoleData>() {
 		@Override
-		public RolePlay createFromParcel(Parcel in) {
+		public RoleData createFromParcel(Parcel in) {
 			return null;
 		}
 
 		@Override
-		public RolePlay[] newArray(int size) {
-			return new RolePlay[size];
+		public RoleData[] newArray(int size) {
+			return new RoleData[size];
 		}
 	};
 
@@ -126,7 +126,7 @@ public abstract class RolePlay implements Parcelable {
 		return this.name;
 	}
 
-	public RolePlay setName(final String value) {
+	public RoleData setName(final String value) {
 		this.name = value;
 		return this;
 	}
@@ -135,7 +135,7 @@ public abstract class RolePlay implements Parcelable {
 		return this.mHp;
 	}
 
-	public RolePlay setMaxHpMod(final int value) {
+	public RoleData setMaxHpMod(final int value) {
 		this.mHp = value;
 		return this;
 	}
@@ -144,7 +144,7 @@ public abstract class RolePlay implements Parcelable {
 		return this.mMp;
 	}
 
-	public RolePlay setMaxMpMod(final int value) {
+	public RoleData setMaxMpMod(final int value) {
 		this.mMp = value;
 		return this;
 	}
@@ -153,7 +153,7 @@ public abstract class RolePlay implements Parcelable {
 		return this.mSp;
 	}
 
-	public RolePlay setMaxSpMod(final int value) {
+	public RoleData setMaxSpMod(final int value) {
 		this.mSp = value;
 		return this;
 	}
@@ -162,7 +162,7 @@ public abstract class RolePlay implements Parcelable {
 		return this.mInit;
 	}
 
-	public RolePlay setMaxInitMod(final int value) {
+	public RoleData setMaxInitMod(final int value) {
 		this.mInit = value;
 		return this;
 	}
@@ -171,7 +171,7 @@ public abstract class RolePlay implements Parcelable {
 		return (this.flags & FLAG_RANGE) == FLAG_RANGE;
 	}
 
-	public RolePlay setRange(final boolean value) {
+	public RoleData setRange(final boolean value) {
 		if (value) {
 			this.flags |= FLAG_RANGE;
 		} else {
@@ -188,17 +188,17 @@ public abstract class RolePlay implements Parcelable {
 		return this.aStates;
 	}
 
-	public RolePlay setAddedStates(final StateMask[] value) {
+	public RoleData setAddedStates(final StateMask[] value) {
 		this.aStates = value;
 		return this;
 	}
 
 	public boolean equals(final Object object) {
-		return object != null && object instanceof RolePlay && ((RolePlay)object).id == this.id;
+		return object != null && object instanceof RoleData && ((RoleData)object).id == this.id;
 	}
 
-	public RolePlay(final int id, final String name, final int hp, final int mp, final int sp,
-					final int mInit, final boolean range, final StateMask[] states) {
+	public RoleData(final int id, final String name, final int hp, final int mp, final int sp,
+                    final int mInit, final boolean range, final StateMask[] states) {
 		this.id = id;
 		this.name = name;
 		this.mHp = hp;

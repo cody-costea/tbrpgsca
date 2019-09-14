@@ -48,7 +48,7 @@ public class ArenaAct extends Activity {
 	private static ArrayList<Performance> cachedItem = null;
 	private static String[] cachedScript = null;
 
-	private Scene scenePlay;
+	private ScenePlay scenePlay;
 
     private int koActors, partySide, otherSide;
     private boolean automatic, escapable;
@@ -106,7 +106,7 @@ public class ArenaAct extends Activity {
             } else {
                 vHolder = (ViewHolder)view.getTag();
             }
-            final Scene scenePlay = arenaAct.scenePlay;
+            final ScenePlay scenePlay = arenaAct.scenePlay;
             final boolean usable = vHolder.usable = this.skills.get(position).canPerform(scenePlay._players[scenePlay._current]);
             vHolder.nameText.setTextColor(usable ? Color.WHITE : Color.GRAY);
             return view;
@@ -119,7 +119,7 @@ public class ArenaAct extends Activity {
             final ViewHolder vHolder = (ViewHolder)view.getTag();
             final Performance skill = this.skills.get(position);
             final ArenaAct context = this.arenaAct;
-            final Scene scenePlay = context.scenePlay;
+            final ScenePlay scenePlay = context.scenePlay;
             final Actor crActor = scenePlay._players[scenePlay._current];
             final Hashtable skillsQtyMap = crActor.skillsQty;
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
@@ -149,7 +149,7 @@ public class ArenaAct extends Activity {
             view = this.prepareView(position, view, parent);
             final ViewHolder vHolder = (ViewHolder)view.getTag();
             final Performance skill = this.skills.get(position);
-            final Scene scenePlay = this.arenaAct.scenePlay;
+            final ScenePlay scenePlay = this.arenaAct.scenePlay;
             final Actor crActor = scenePlay._players[scenePlay._current];
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
@@ -239,7 +239,7 @@ public class ArenaAct extends Activity {
                     break;
                 }
                 case R.id.AutoBt: {
-                    final Scene scenePlay = ArenaAct.this.scenePlay;
+                    final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                     final boolean automatic = !ArenaAct.this.automatic;
                     ArenaAct.this.automatic = automatic;
                     if (automatic) {
@@ -265,13 +265,13 @@ public class ArenaAct extends Activity {
                     break;
                 }
                 case R.id.RunBt: {
-                    final Scene scenePlay = ArenaAct.this.scenePlay;
+                    final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                     final TextView actionsTxt = ArenaAct.this.actionsTxt;
                     final String escText = scenePlay.escape();
                     actionsTxt.append(scenePlay.setNext("", true));
                     actionsTxt.append("\n" + escText);
                     if (scenePlay._status == -1) {
-                        ArenaAct.this.endingMsg(ArenaAct.this.getString(R.string.escape), Scene.escapeTxt);
+                        ArenaAct.this.endingMsg(ArenaAct.this.getString(R.string.escape), ScenePlay.escapeTxt);
                     }
                     else {
                         ArenaAct.this.enableControls(false);
@@ -290,7 +290,7 @@ public class ArenaAct extends Activity {
                 final Spinner targetSpn = ArenaAct.this.targetSpn;
                 if (targetPos == targetSpn.getSelectedItemPosition()) {
                     final Button skillActBtn = ArenaAct.this.skillActBtn;
-                    final Scene scenePlay = ArenaAct.this.scenePlay;
+                    final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                     final Actor crActor = scenePlay._players[scenePlay._current];
                     if (crActor.automatic == 0 && skillActBtn.isEnabled()) {
                         ArenaAct.this.cAction.onClick(skillActBtn);
@@ -325,7 +325,7 @@ public class ArenaAct extends Activity {
         final Button skillActBtn = this.skillActBtn;
         final Actor crActor;
         {
-            final Scene scenePlay = this.scenePlay;
+            final ScenePlay scenePlay = this.scenePlay;
             crActor = scenePlay._players[scenePlay._current];
         }
         AbilityArrayAdapter skillsAdapter = this.skillsAdapter;
@@ -344,7 +344,7 @@ public class ArenaAct extends Activity {
                 public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
                     final Actor crActor;
                     {
-                        final Scene scenePlay = ArenaAct.this.scenePlay;
+                        final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                         crActor = scenePlay._players[scenePlay._current];
                     }
                     final Vector<Performance> availableSkills = crActor.getAvailableSkills();
@@ -364,7 +364,7 @@ public class ArenaAct extends Activity {
     }
 
     private void playSpr() {
-        final Scene scenePlay = this.scenePlay;
+        final ScenePlay scenePlay = this.scenePlay;
         final Actor[] players = scenePlay._players;
         final ImageView[] imgActor = this.imgActor;
         final int current = scenePlay._current;
@@ -452,7 +452,7 @@ public class ArenaAct extends Activity {
     }
 
     private void afterAct() {
-        final Scene scenePlay = this.scenePlay;
+        final ScenePlay scenePlay = this.scenePlay;
         switch (scenePlay._status) {
             case 0: {
                 final Actor actor = scenePlay._players[scenePlay._current];
@@ -475,18 +475,18 @@ public class ArenaAct extends Activity {
                 break;
             }
             case 1: {
-                this.endingMsg(this.getString(R.string.victory), Scene.victoryTxt);
+                this.endingMsg(this.getString(R.string.victory), ScenePlay.victoryTxt);
                 break;
             }
             case -2: {
-                this.endingMsg(this.getString(R.string.defeat), Scene.fallenTxt);
+                this.endingMsg(this.getString(R.string.defeat), ScenePlay.fallenTxt);
                 break;
             }
         }
     }
 
     private boolean canTarget(final int target, final Performance ability) {
-        final Scene scenePlay = this.scenePlay;
+        final ScenePlay scenePlay = this.scenePlay;
         return scenePlay.getGuardian(target, ability) == target
                 && (scenePlay._players[target]._hp > 0 || ability.isRestoring());
     }
@@ -504,7 +504,7 @@ public class ArenaAct extends Activity {
     }
 
     private void setCrAutoSkill() {
-        final Scene scenePlay = this.scenePlay;
+        final ScenePlay scenePlay = this.scenePlay;
         final Spinner skillsSpn = this.skillsSpn;
         final int targetPos = this.targetSpn.getSelectedItemPosition();
         final Actor crActor = scenePlay._players[scenePlay._current];
@@ -567,7 +567,7 @@ public class ArenaAct extends Activity {
         this.partySide = partySide;
         this.otherSide = otherSide;
         this.escapable = escapable;
-        final Scene scenePlay = new Scene(party, enemy, surprised);
+        final ScenePlay scenePlay = new ScenePlay(party, enemy, surprised);
         final Actor[] players = scenePlay._players;
         final int enIdx = scenePlay._enIdx;
         this.scenePlay = scenePlay;
@@ -715,8 +715,8 @@ public class ArenaAct extends Activity {
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
                 final Actor crActor;
                 {
-                    final Scene scene = ArenaAct.this.scenePlay;
-                    crActor = scene._players[scene._current];
+                    final ScenePlay scenePlay = ArenaAct.this.scenePlay;
+                    crActor = scenePlay._players[scenePlay._current];
                 }
                 if (crActor.automatic == 0) {
                     if (itemsSpn.isEnabled()) {
@@ -752,7 +752,7 @@ public class ArenaAct extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        final Scene scenePlay = this.scenePlay;
+        final ScenePlay scenePlay = this.scenePlay;
         if (scenePlay._players[scenePlay._current].automatic != 0) {
             this.enableControls(false);
         }

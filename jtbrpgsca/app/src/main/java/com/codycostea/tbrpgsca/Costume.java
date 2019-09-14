@@ -19,7 +19,7 @@ import android.os.Parcel;
 
 import java.util.Hashtable;
 
-public class Costume extends RolePlay {
+public class Costume extends RoleData {
 
 	public static String hpText = "HP";
 	public static String mpText = "MP";
@@ -74,7 +74,7 @@ public class Costume extends RolePlay {
 		return this.sprite;
 	}
 
-	public RolePlay setSpriteName(final String value) {
+	public RoleData setSpriteName(final String value) {
 		this.sprite = value;
 		return this;
 	}

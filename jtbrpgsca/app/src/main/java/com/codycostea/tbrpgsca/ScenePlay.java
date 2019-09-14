@@ -22,7 +22,7 @@ import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
 
-public final class Scene {
+public final class ScenePlay {
 
     public static String performsTxt = "%s performs %s";
     public static String victoryTxt = "The party has won!";
@@ -460,7 +460,7 @@ public final class Scene {
         }
     }
 
-    public Scene(final Parcelable[] party, final Parcelable[] enemy, final int surprise) {
+    public ScenePlay(final Parcelable[] party, final Parcelable[] enemy, final int surprise) {
         boolean useInit = false;
         final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
         final Actor[] players = this._players = new Actor[party.length + enemy.length];//this._players = party + enemy;

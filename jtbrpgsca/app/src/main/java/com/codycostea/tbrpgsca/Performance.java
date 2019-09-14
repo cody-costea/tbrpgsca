@@ -26,7 +26,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
 
-public final class Performance extends RolePlay {
+public final class Performance extends RoleData {
 
 	public static String reflectedTxt = ", reflected by %s";
 	public static String suffersTxt = ", %s suffers";
@@ -133,13 +133,13 @@ public final class Performance extends RolePlay {
 			if (drawable instanceof AnimationDrawable) {
 				sprAnim = (AnimationDrawable) drawable;
 			} else if (drawable instanceof BitmapDrawable) {
-				sprAnim = RolePlay.GetBitmapSprite((BitmapDrawable)drawable, context, null,
+				sprAnim = RoleData.GetBitmapSprite((BitmapDrawable)drawable, context, null,
 						false, null, false);
 			}
 			if (sprAnim == null) {
 				this.spriteDur = 0;
 			} else {
-				this.spriteDur = RolePlay.GetSpriteDuration(sprAnim);
+				this.spriteDur = RoleData.GetSpriteDuration(sprAnim);
 			}
 			this._sprAnim = sprAnim;
 		}
@@ -401,7 +401,7 @@ public final class Performance extends RolePlay {
 				user.setCurrentSp(user._sp + spDmg / 2);
 			}
 			if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
-				s += ", " + target.name + " suffers" + RolePlay.getDmgText(hpDmg, mpDmg, spDmg);
+				s += ", " + target.name + " suffers" + RoleData.getDmgText(hpDmg, mpDmg, spDmg);
 			}
 			String r;
 			final StateMask[] aStates = this.aStates;
