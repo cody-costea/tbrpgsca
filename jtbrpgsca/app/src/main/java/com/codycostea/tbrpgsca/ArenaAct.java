@@ -16,6 +16,7 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -348,10 +349,9 @@ public final class ArenaAct extends Activity {
         }
         AbilityArrayAdapter skillsAdapter = this.skillsAdapter;
         if (skillsAdapter == null) {
-            skillsAdapter = new AbilityArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
-                    crActor.getAvailableSkills(), false);
+            this.skillsAdapter = skillsAdapter = new AbilityArrayAdapter(this,
+                    android.R.layout.simple_spinner_dropdown_item, crActor.getAvailableSkills(), false);
             skillsSpn.setAdapter(skillsAdapter);
-            this.skillsAdapter = skillsAdapter;
             skillsSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onNothingSelected(final AdapterView<?> parent) {
@@ -378,8 +378,55 @@ public final class ArenaAct extends Activity {
     }
 
     private void setCrItems() {
-        //TODO:
-        this.itemsSpn.setSelection(Spinner.INVALID_POSITION);
+        final Spinner itemsSpn = this.itemsSpn;
+        final Spinner targetSpn = this.targetSpn;
+        final Button itemUseBtn = this.itemUseBtn;
+        final ScenePlay scenePlay = this.scenePlay;
+        final Vector<Performance> crItems = new Vector<Performance>(Arrays.asList(scenePlay._crItems));
+        if (crItems == null || crItems.size() == 0) {
+            if (itemsSpn.isEnabled()) {
+                itemsSpn.setSelection(Spinner.INVALID_POSITION);
+                itemsSpn.setEnabled(false);
+            }
+        } else {
+            AbilityArrayAdapter itemsAdapter = this.itemsAdapter;
+            if (itemsAdapter == null) {
+                this.itemsAdapter = itemsAdapter = new AbilityArrayAdapter(this,
+                        android.R.layout.simple_spinner_dropdown_item, crItems, true);
+                itemsSpn.setAdapter(itemsAdapter);
+                itemsSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onNothingSelected(final AdapterView<?> parent) {
+                        itemUseBtn.setEnabled(false);
+                    }
+
+                    @Override
+                    public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
+                        final Actor crActor;
+                        {
+                            final ScenePlay scenePlay = ArenaAct.this.scenePlay;
+                            crActor = scenePlay._players[scenePlay._current];
+                        }
+                        final Vector<Performance> availableSkills = crActor.getAvailableSkills();
+                        itemUseBtn.setEnabled(((view != null && ((ViewHolder) view.getTag()).usable)
+                                || (view == null && availableSkills.get(position).canPerform(crActor)))
+                                && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), availableSkills.get(position)));
+                    }
+                });
+                itemUseBtn.setOnClickListener(this.cAction);
+            } else if (itemsAdapter.skills != crItems) {
+                itemsAdapter.setSkills(crItems);
+            }
+            if (!itemsSpn.isEnabled()) {
+                itemsSpn.setSelection(0);
+                itemsSpn.setEnabled(true);
+            }
+            final int targetPos = targetSpn.getSelectedItemPosition();
+            if (targetPos > -1) {
+                final Performance item = (Performance)itemsSpn.getSelectedItem();
+                itemUseBtn.setEnabled(item.canPerform(scenePlay._players[scenePlay._current]) && this.canTarget(targetPos, item));
+            }
+        }
     }
 
     private void playSpr() {
@@ -747,7 +794,8 @@ public final class ArenaAct extends Activity {
                 }
                 if (crActor.automatic == 0) {
                     if (itemsSpn.isEnabled()) {
-                        itemUseBtn.setEnabled(((ViewHolder)itemsSpn.getSelectedView().getTag()).usable
+                        final View tagView = itemsSpn.getSelectedView();
+                        itemUseBtn.setEnabled(tagView != null && ((ViewHolder)tagView.getTag()).usable
                                 && ArenaAct.this.canTarget(position, (Performance)itemsSpn.getSelectedItem()));
                     }
                     if (skillsSpn.isEnabled()) {

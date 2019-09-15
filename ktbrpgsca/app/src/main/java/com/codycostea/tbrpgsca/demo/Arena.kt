@@ -821,10 +821,10 @@ class Arena : Fragment() {
                 itemsSpn.setSelection(0)
                 itemsSpn.isEnabled = true
             }
-            val targetPos = this.targetSpn.selectedItemPosition
+            val targetPos = targetSpn.selectedItemPosition
             if (targetPos > -1) {
                 val item = itemsSpn.selectedItem as Ability
-                this.itemUseBtn.isEnabled = item.canPerform(this.crActor) && this.canTarget(targetPos, item)
+                itemUseBtn.isEnabled = item.canPerform(this.crActor) && this.canTarget(targetPos, item)
             }
         }
     }
