@@ -155,7 +155,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                         iterator.next()
                     }*/
                     val stolen = trgItems.keys.elementAt(itemId)//if (iterator.hasNext()) iterator.next() else trgItems.keys.first()
-                    val trgItemQty = trgItems[stolen]
+                    var trgItemQty = trgItems[stolen]
                     if (trgItemQty !== null && trgItemQty > 0) {
                         var usrItems = user._items
                         if (usrItems === null) {
@@ -163,9 +163,13 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                             user._items = usrItems
                         }
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
-                        trgItems[stolen] = trgItemQty - 1
+                        if (--trgItemQty == 0) {
+                            trgItems.remove(stolen)
+                        }
+                        else {
+                            trgItems[stolen] = trgItemQty
+                        }
                         s += String.format(stolenTxt, stolen.name, trg.name)
-                        if (trgItems[stolen] == 0) trgItems.remove(stolen)
                     }
                 }
             }

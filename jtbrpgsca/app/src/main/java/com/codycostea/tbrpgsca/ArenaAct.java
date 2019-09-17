@@ -127,7 +127,7 @@ public final class ArenaAct extends Activity {
             }
             final ScenePlay scenePlay = arenaAct.scenePlay;
             final boolean usable = vHolder.usable = this.skills.get(position).canPerform(scenePlay._players[scenePlay._current]);
-            vHolder.nameText.setTextColor(usable ? Color.WHITE : Color.GRAY);
+            vHolder.nameText.setTextColor(usable ? Color.BLACK : Color.GRAY);
             return view;
         }
 
@@ -527,7 +527,7 @@ public final class ArenaAct extends Activity {
                     if (infoTxt.getText().length() > 0) {
                         infoTxt.setText("");
                     }
-                    this.actionsTxt.append(scenePlay.executeAI(""));
+                    this.actionsTxt.append(scenePlay.executeAI("\n"));
                     this.playSpr();
                 }
                 else {

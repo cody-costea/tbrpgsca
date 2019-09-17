@@ -52,27 +52,27 @@ public class StageAct extends Activity {
 		this.setContentView(R.layout.activity_demo);
 
 		final StateMask[] state = new StateMask[] {
-				new StateMask(1, "Regen", null, false, false, false, false, -1, 0, -10, 0, 0,
+				new StateMask(1, this.getString(R.string.skill_regen), null, false, false, false, false, -1, 0, -10, 0, 0,
 						0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null, null, null),
-				new StateMask(2, "Poison", null, false, false, false, false, 10, 0, 7, 0, 2,
+				new StateMask(2, this.getString(R.string.skill_poison), null, false, false, false, false, 10, 0, 7, 0, 2,
 						0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null, null, null),
-				new StateMask(3, "Clarity", null, false, false, false, false, -1, 0, 0, -7, 0,
+				new StateMask(3, this.getString(R.string.skill_clarity), null, false, false, false, false, -1, 0, 0, -7, 0,
 						0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null, null, null),
-				new StateMask(4, "Dizziness", null, false, false, false, false, 3, 0, 0, 7, 0,
+				new StateMask(4, this.getString(R.string.state_dizziness), null, false, false, false, false, 3, 0, 0, 7, 0,
 						0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null, null, null),
-				new StateMask(5, "Vigour", null, false, false, false, false, -1, 0, 0, 0, -7,
+				new StateMask(5, this.getString(R.string.state_vigour), null, false, false, false, false, -1, 0, 0, 0, -7,
 						0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null, null, null),
-				new StateMask(6, "Weakness", null, false, false, false, false, 5, 0, 0, 0, 7,
+				new StateMask(6, this.getString(R.string.state_weakness), null, false, false, false, false, 5, 0, 0, 0, 7,
 						0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null, null, null),
-				new StateMask(7, "Berserk", null, false, true, false, false, 7, 0, 0, 0, 0,
+				new StateMask(7, this.getString(R.string.skill_berserk), null, false, true, false, false, 7, 0, 0, 0, 0,
 						0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null, null, null),
-				new StateMask(8, "Confusion", null, false, false, true, false, 3, 2, 0, 0, 0,
+				new StateMask(8, this.getString(R.string.skill_confusion), null, false, false, true, false, 3, 2, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new StateMask(9, "Sleep", null, true, false, false, false, 5, 1, 0, 0, 0,
+				new StateMask(9, this.getString(R.string.skill_sleep), null, true, false, false, false, 5, 1, 0, 0, 0,
 						0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null, null, null),
-				new StateMask(10, "Stun", null, true, false, false, false, 1, 0, 0, 0, 0,
+				new StateMask(10, this.getString(R.string.state_stun), null, true, false, false, false, 1, 0, 0, 0, 0,
 						0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null, null, null),
-				new StateMask(11, "Reflect", null, false, false, false, true, 7, 0, 0, 0, 0,
+				new StateMask(11, this.getString(R.string.skill_reflect), null, false, false, false, true, 7, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 		};
 
@@ -106,14 +106,14 @@ public class StageAct extends Activity {
 		final Integer ELEMENT_LIGHT = new Integer(7);
 
 		final Performance[] skill = this.Skill = new Performance[] {
-				new Performance(1, "Attack", 0, 0, false, false, 0, 0, 0, 0, Performance.DMG_TYPE_ATK, 1, 10, 0, -3, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
-				new Performance(2, "Defend", 0, 0, false, true, 0, 0, 0, 0, Performance.DMG_TYPE_SPI, 1, 0, -1, -2, Performance.TRG_SELF, ELEMENT_NONE, -1, -1, false, false, null, null),
-				new Performance(3, "Heal", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_SPI, 1, -25, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, null, null),
-				new Performance(4, "Meditate", 0, 0, false, true, 1, 0, 0, 0, Performance.DMG_TYPE_SPI, 1, -1, -7, 10, Performance.TRG_SELF, ELEMENT_PSYCHIC, -1, -1, false, false, null, dizziness),
-				new Performance(5, "Cure", 0, 0, false, true, 3, 0, 7, 0, Performance.DMG_TYPE_SPI, 1, -17, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, null, cure),
-				new Performance(6, "Clariy", 0, 0, false, true, 3, 0, 0, 7, Performance.DMG_TYPE_SPI, 1, 0, -3, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, clarity, madness),
-				new Performance(7, "Regen", 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_SPI, 1, -37, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, regen, poison),
-				new Performance(8, "Prayer", 0, 0, false, true, 5, 0, 7, 0, Performance.DMG_TYPE_SPI, 1, -23, 0, 0, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, false, true, null, null),
+				new Performance(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Performance.DMG_TYPE_ATK, 1, 10, 0, -3, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
+				new Performance(2, this.getString(R.string.skill_defend), 0, 0, false, true, 0, 0, 0, 0, Performance.DMG_TYPE_SPI, 1, 0, -1, -2, Performance.TRG_SELF, ELEMENT_NONE, -1, -1, false, false, null, null),
+				new Performance(3, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_SPI, 1, -25, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, null, null),
+				new Performance(4, this.getString(R.string.skill_mediatate), 0, 0, false, true, 1, 0, 0, 0, Performance.DMG_TYPE_SPI, 1, -1, -7, 10, Performance.TRG_SELF, ELEMENT_PSYCHIC, -1, -1, false, false, null, dizziness),
+				new Performance(5, this.getString(R.string.skill_cure), 0, 0, false, true, 3, 0, 7, 0, Performance.DMG_TYPE_SPI, 1, -17, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, null, cure),
+				new Performance(6, this.getString(R.string.skill_clarity), 0, 0, false, true, 3, 0, 0, 7, Performance.DMG_TYPE_SPI, 1, 0, -3, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, clarity, madness),
+				new Performance(7, this.getString(R.string.skill_regen), 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_SPI, 1, -37, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, regen, poison),
+				new Performance(8, this.getString(R.string.skill_prayer), 0, 0, false, true, 5, 0, 7, 0, Performance.DMG_TYPE_SPI, 1, -23, 0, 0, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, false, true, null, null),
 				new Performance(9, "Smite", 0, 0, false, false, 1, 1, 0, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 4, 3, -4, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confclarity),
 				new Performance(10, "Hit", 0, 0, false, false, 1, 3, 0, 1, Performance.DMG_TYPE_ATK, 1, 12, 0, -4, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
 				new Performance(11, "Bash", 0, 0, false, false, 3, 3, 0, 5, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 7, 5, -5, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, dizziness, confclarity),
@@ -168,15 +168,15 @@ public class StageAct extends Activity {
 		};
 
 		final Performance[] items = new Performance[] {
-				new Performance(1, "Potion", 0, 0, false, true, 1, 0, 0, 0, 0, 0, -25, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
-				new Performance(2, "Ether", 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -10, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
-				new Performance(3, "Tonic", 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, -10, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
-				new Performance(4, "Antidote", 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, poison),
-				new Performance(9, "Hi-Potion", 0, 0, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
-				new Performance(5, "Hi-Ether", 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -25, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, dizziness),
-				new Performance(6, "Hi-Tonic", 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -20, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, vigour, weakness),
-				new Performance(7, "Panacea", 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, cure),
-				new Performance(8, "Elixir", 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, true, null, null)
+				new Performance(1, this.getString(R.string.item_potion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -25, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
+				new Performance(2, this.getString(R.string.item_ether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -10, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
+				new Performance(3, this.getString(R.string.item_tonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, -10, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
+				new Performance(4, this.getString(R.string.item_antidote), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, poison),
+				new Performance(9, this.getString(R.string.item_hipotion), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -50, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, null),
+				new Performance(5, this.getString(R.string.item_hiether), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -25, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, dizziness),
+				new Performance(6, this.getString(R.string.item_hitonic), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, -20, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, vigour, weakness),
+				new Performance(7, this.getString(R.string.item_panacea), 0, 0, false, true, 1, 0, 0, 0, 0, 0, 0, 0, 0, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, cure),
+				new Performance(8, this.getString(R.string.item_elixir), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, true, null, null)
 		};
 
 		final Integer itemsNr = new Integer(15);
@@ -188,28 +188,28 @@ public class StageAct extends Activity {
 		final Performance[] skills = new Performance[] {skill[0], skill[1]};
 
 		final Costume[] race = this.pcRace = new Costume[] {
-				new Costume(1, "Elf", null, 40, 25, 10, 7, 5, 15, 12, 11, 0, false, null, skills, null, null),
-				new Costume(2, "Human", null, 47, 15, 13, 9, 11, 9, 11, 10, 0, false, null, skills, null, null),
-				new Costume(3, "Half-Orc", null, 55, 7, 13, 17, 12, 5, 7, 9, 0, false, null, skills, null, null),
-				new Costume(4, "Gnome", null, 40, 15, 20, 12, 8, 10, 5, 15, 0, false, null, skills, null, null)
+				new Costume(1, this.getString(R.string.race_elf), null, 40, 25, 10, 7, 5, 15, 12, 11, 0, false, null, skills, null, null),
+				new Costume(2, this.getString(R.string.race_human), null, 47, 15, 13, 9, 11, 9, 11, 10, 0, false, null, skills, null, null),
+				new Costume(3, this.getString(R.string.race_halforc), null, 55, 7, 13, 17, 12, 5, 7, 9, 0, false, null, skills, null, null),
+				new Costume(4, this.getString(R.string.race_gnome), null, 40, 15, 20, 12, 8, 10, 5, 15, 0, false, null, skills, null, null)
 		};
 
 		final Costume[] job = this.pcJob = new Costume[] {
-				new Costume(15, "Hero", "hero", 1, 1, 1, 0, 0, 0, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[41], skill[42], skill[43], skill[44], skill[45], skill[30], skill[31], skill[32], skill[33], skill[34], skill[36], skill[51], skill[37], skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18]}, null, null),
-				new Costume(1, "Berserker", "berserker", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]}, null, null),
-				new Costume(2, "Wizard", "wizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]}, null, null),
-				new Costume(3, "Hesychast", "hesychast", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]}, null, null),
-				new Costume(4, "Spy", "spy", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]}, null, null),
-				new Costume(5, "Alchemist", "alchemist", 0, 1, 0, 0, 0, 1, 0, 1, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[15], skill[16], skill[17], skill[18], skill[20]}, null, null),
-				new Costume(6, "Dragoon", "dragoon", 1, 0, 0, 1, 0, 1, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[41], skill[42], skill[43], skill[44], skill[50]}, null, null),
-				new Costume(7, "Knight", "knight", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[8], skill[9], skill[10], skill[11], skill[13]}, null, null),
-				new Costume(8, "Ranger", "ranger", 0, 0, 1, 0, 0, 0, 1, 1, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18], skill[21]}, null, null),
-				new Costume(9, "Shaman", "shaman", 0, 1, 0, 0, 0, 1, 1, 0, 0, false, null, new Performance[] {skill[52], skill[53], skill[54], skill[55], skill[23], skill[24], skill[29], skill[34], skill[49]}, null, null),
-				new Costume(10, "Corsair", "swashbuckler", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[15], skill[16], skill[17], skill[18], skill[22]}, null, null),
-				new Costume(11, "Reaver", "reaver", 1, 0, 0, 1, 0, 0, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[11], skill[23], skill[24], skill[29], skill[15], skill[16], skill[18], skill[45], skill[46]}, null, null),
-				new Costume(12, "Ninja", "ninja", 0, 0, 1, 0, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[11], skill[15], skill[16], skill[17], skill[2], skill[3], skill[5], skill[40]}, null, null),
-				new Costume(13, "Crusader", "templar", 1, 0, 0, 0, 0, 0, 1, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]}, null, null),
-				new Costume(14, "Druid", "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, false, null, new Performance[] {skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]}, null, null),
+				new Costume(15, this.getString(R.string.job_hero), "hero", 1, 1, 1, 0, 0, 0, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[41], skill[42], skill[43], skill[44], skill[45], skill[30], skill[31], skill[32], skill[33], skill[34], skill[36], skill[51], skill[37], skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18]}, null, null),
+				new Costume(1, this.getString(R.string.job_berserker), "berserker", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]}, null, null),
+				new Costume(2, this.getString(R.string.job_wizard), "wizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]}, null, null),
+				new Costume(3, this.getString(R.string.job_hesychast), "hesychast", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]}, null, null),
+				new Costume(4, this.getString(R.string.job_spy), "spy", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]}, null, null),
+				new Costume(5, this.getString(R.string.job_alchemist), "alchemist", 0, 1, 0, 0, 0, 1, 0, 1, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[15], skill[16], skill[17], skill[18], skill[20]}, null, null),
+				new Costume(6, this.getString(R.string.job_dragoon), "dragoon", 1, 0, 0, 1, 0, 1, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[41], skill[42], skill[43], skill[44], skill[50]}, null, null),
+				new Costume(7, this.getString(R.string.job_knight), "knight", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[8], skill[9], skill[10], skill[11], skill[13]}, null, null),
+				new Costume(8, this.getString(R.string.job_ranger), "ranger", 0, 0, 1, 0, 0, 0, 1, 1, 0, false, null, new Performance[] {skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18], skill[21]}, null, null),
+				new Costume(9, this.getString(R.string.job_shaman), "shaman", 0, 1, 0, 0, 0, 1, 1, 0, 0, false, null, new Performance[] {skill[52], skill[53], skill[54], skill[55], skill[23], skill[24], skill[29], skill[34], skill[49]}, null, null),
+				new Costume(10, this.getString(R.string.job_corsair), "swashbuckler", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[15], skill[16], skill[17], skill[18], skill[22]}, null, null),
+				new Costume(11, this.getString(R.string.job_reaver), "reaver", 1, 0, 0, 1, 0, 0, 0, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[11], skill[23], skill[24], skill[29], skill[15], skill[16], skill[18], skill[45], skill[46]}, null, null),
+				new Costume(12, this.getString(R.string.job_ninja), "ninja", 0, 0, 1, 0, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[11], skill[15], skill[16], skill[17], skill[2], skill[3], skill[5], skill[40]}, null, null),
+				new Costume(13, this.getString(R.string.job_crusader), "templar", 1, 0, 0, 0, 0, 0, 1, 0, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]}, null, null),
+				new Costume(14, this.getString(R.string.job_druid), "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, false, null, new Performance[] {skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]}, null, null),
 				new Costume(16, "Sorceress", "sorceress", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]}, null, null),
 				new Costume(17, "Valkyrie", "valkyrie", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, null, new Performance[] {skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]}, null, null)
 		};
@@ -218,14 +218,14 @@ public class StageAct extends Activity {
 				new Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
 				new Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
 				new Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
-				new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap)
+				//new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap)
 		};
 
 		final Actor[] enemy = new Actor[] {
-				new Actor(2, "Goblin", race[2], job[12], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Actor(4, "Lizard", race[0], job[6], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Actor(6, "Troll", race[3], job[9], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Actor(8, "Ogre", race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+				new Actor(2, this.getString(R.string.race_goblin), race[2], job[12], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Actor(4, this.getString(R.string.race_lizard), race[0], job[6], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Actor(6, this.getString(R.string.race_troll), race[3], job[9], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Actor(8, this.getString(R.string.race_ogre), race[1], job[1], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 		};
 
 		final Actor enemies[][] = this.Enemy = new Actor[6][];
@@ -334,6 +334,10 @@ public class StageAct extends Activity {
 		final Actor[] players = this.Player;
 		for (int i = 0; i < players.length; i++) {
             players[i].recover();
+        }
+		final Actor[] enemies = this.Enemy[level];
+        for (int i = 0; i < enemies.length; i++) {
+            enemies[i].recover();
         }
 		//ArenaAct.PlayDemo(this);
 		ArenaAct.Stage(this, 0, 0, players, this.Enemy[level],
