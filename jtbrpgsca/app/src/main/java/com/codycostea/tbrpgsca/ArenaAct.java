@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Vector;
 
 import android.content.Context;
@@ -172,8 +173,8 @@ public final class ArenaAct extends Activity {
             final Actor crActor = scenePlay._players[scenePlay._current];
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
-            vHolder.nameText.setText(itemsQtyInt == null ? skill.name : skill.name + " x "
-                    + String.valueOf(itemsQtyInt.intValue()) + " ");
+            vHolder.nameText.setText(itemsQtyInt == null ? skill.name : String.format(Locale.US,
+                    "%s x %s ", skill.name, String.valueOf(itemsQtyInt.intValue())));
             return view;
         }
 
@@ -218,11 +219,11 @@ public final class ArenaAct extends Activity {
             view = this.prepareView(view, parent);
             final ViewHolder vHolder = (ViewHolder)view.getTag();
             final Actor actor = this.actors[position];
-            vHolder.nameText.setText(actor.name + " " + Costume.hpText + ": "
-                    + (((position < this.arenaAct.scenePlay._enIdx) ? actor._hp + "/"
-                    + actor.mHp + ", " + Costume.mpText + ": " + actor._mp +"/" + actor.mMp
-                    + ", " + Costume.spText + ": " + actor._sp + "/" + actor.mSp
-                    : "%.2f".format((((float)actor._hp) / ((float)actor.mHp) * 100.0f) + "%") + ")")));
+            vHolder.nameText.setText(String.format(Locale.US, "%s (%s: %s)",actor.name,
+                    Costume.hpText, (position < this.arenaAct.scenePlay._enIdx) ? String.format(Locale.US,
+                            "%d/%d, %s: %d/%d, %s: %d/%d", actor._hp, actor.mHp, Costume.mpText,
+                            actor._mp, actor.mMp, Costume.spText, actor._sp, actor.mSp)
+                    : String.format(Locale.US, "%.0f%%", (((float)actor._hp) / ((float)actor.mHp) * 100.0f))));
             return view;
         }
 
@@ -350,7 +351,7 @@ public final class ArenaAct extends Activity {
         AbilityArrayAdapter skillsAdapter = this.skillsAdapter;
         if (skillsAdapter == null) {
             this.skillsAdapter = skillsAdapter = new AbilityArrayAdapter(this,
-                    android.R.layout.simple_spinner_dropdown_item, crActor.getAvailableSkills(), false);
+                    android.R.layout.simple_spinner_item, crActor.getAvailableSkills(), false);
             skillsSpn.setAdapter(skillsAdapter);
             skillsSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -392,7 +393,7 @@ public final class ArenaAct extends Activity {
             AbilityArrayAdapter itemsAdapter = this.itemsAdapter;
             if (itemsAdapter == null) {
                 this.itemsAdapter = itemsAdapter = new AbilityArrayAdapter(this,
-                        android.R.layout.simple_spinner_dropdown_item, crItems, true);
+                        android.R.layout.simple_spinner_item, crItems, true);
                 itemsSpn.setAdapter(itemsAdapter);
                 itemsSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -774,7 +775,7 @@ public final class ArenaAct extends Activity {
         }
 
         final ActorArrayAdapter playersAdapter = new ActorArrayAdapter(this,
-                android.R.layout.simple_spinner_dropdown_item, players);
+                android.R.layout.simple_spinner_item, players);
         this.playersAdapter = playersAdapter;
         targetSpn.setAdapter(playersAdapter);
         targetSpn.setSelection(enIdx);

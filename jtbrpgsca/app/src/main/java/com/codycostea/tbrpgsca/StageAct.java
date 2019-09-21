@@ -114,57 +114,57 @@ public class StageAct extends Activity {
 				new Performance(6, this.getString(R.string.skill_clarity), 0, 0, false, true, 3, 0, 0, 7, Performance.DMG_TYPE_SPI, 1, 0, -3, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, clarity, madness),
 				new Performance(7, this.getString(R.string.skill_regen), 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_SPI, 1, -37, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, true, regen, poison),
 				new Performance(8, this.getString(R.string.skill_prayer), 0, 0, false, true, 5, 0, 7, 0, Performance.DMG_TYPE_SPI, 1, -23, 0, 0, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, false, true, null, null),
-				new Performance(9, "Smite", 0, 0, false, false, 1, 1, 0, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 4, 3, -4, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confclarity),
-				new Performance(10, "Hit", 0, 0, false, false, 1, 3, 0, 1, Performance.DMG_TYPE_ATK, 1, 12, 0, -4, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
-				new Performance(11, "Bash", 0, 0, false, false, 3, 3, 0, 5, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 7, 5, -5, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, dizziness, confclarity),
-				new Performance(12, "Smash", 0, 0, false, false, 3, 5, 0, 3, Performance.DMG_TYPE_ATK, 1, 18, 0, -7, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
-				new Performance(13, "Berserk", 0, 0, false, false, 4, 7, 0, 4, Performance.DMG_TYPE_SPI, 1, 0, 0, 0, Performance.TRG_SELF, ELEMENT_PSYCHIC, -1, -1, false, false, berserk, weakness),
-				new Performance(14, "Shock", 0, 0, false, false, 4, 4, 0, 7, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 10, 5, -9, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, dizzystun, confclarity),
-				new Performance(15, "Crush", 0, 0, false, false, 5, 7, 4, 0, Performance.DMG_TYPE_ATK, 1, 25, 0, -11, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, stun, confsleep),
-				new Performance(16, "Strike", 0, 0, false, true, 1, 0, 0, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 13, 0, -3, Performance.TRG_ONE, ELEMENT_PHYSICAL, 5, 3, false, false, null, confsleep),
-				new Performance(17, "Steal", 0, 0, true, true, 1, 0, 0, 0, Performance.DMG_TYPE_WIS, 1, 0, 0, 0, Performance.TRG_ONE, ELEMENT_PHYSICAL, 5, 3, false, false, null, null),
-				new Performance(18, "Dash", 0, 0, false, true, 3, 0, 0, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 15, 0, -5, Performance.TRG_ONE, ELEMENT_PHYSICAL, 3, 7, false, false, null, confsleep),
-				new Performance(19, "Poison", 0, 0, false, true, 3, 0, 0, 0, Performance.DMG_TYPE_WIS, 2, 5, 0, 2, Performance.TRG_ONE, ELEMENT_PHYSICAL, 3, 7, false, false, poison, regen),
-				new Performance(20, "Mug", 0, 0, true, true, 4, 0, 0, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 2, 15, 0, -7, Performance.TRG_ONE, ELEMENT_PHYSICAL, 1, 5, false, false, null, confsleep),
-				new Performance(21, "Toxic Gas", 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_WIS, 3, 1, 1, 1, Performance.TRG_ENEMY, ELEMENT_PHYSICAL, 3, 7, false, false, tpoison, tregen),
-				new Performance(22, "Cheer", 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_SPI, -1, 0, 0, -5, Performance.TRG_PARTY, ELEMENT_PSYCHIC, 3, 7, false, false, vigour, cure),
-				new Performance(23, "Venom Blade", 0, 0, false, false, 5, 0, 0, 10, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 17, 0, -9, Performance.TRG_ONE, ELEMENT_PHYSICAL, 3, 7, false, false, poison, conftregen),
-				new Performance(24, "Absorb", 0, 0, false, true, 1, 0, 0, 3, Performance.DMG_TYPE_WIS, 1, 0, 7, -3, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, true, false, null, null),
-				new Performance(25, "Drain", 0, 0, false, true, 3, 0, 10, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -3, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, true, false, null, null),
-				new Performance(26, "Fireball", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_FIRE, -1, -1, false, false, null, sleep),
-				new Performance(27, "Iceshard", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_WATER, -1, -1, false, false, null, sleep),
-				new Performance(28, "Lighting", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_WIND, -1, -1, false, false, null, sleep),
-				new Performance(29, "Rock", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_EARTH, -1, -1, false, false, null, sleep),
-				new Performance(30, "Darkness", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, null, sleep),
-				new Performance(31, "Flame", 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_FIRE, -1, -1, false, false, null, sleep),
-				new Performance(32, "Blizzard", 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_WATER, -1, -1, false, false, null, sleep),
-				new Performance(33, "Storm", 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_WIND, -1, -1, false, false, null, sleep),
-				new Performance(34, "Earthquake", 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_EARTH, -1, -1, false, false, null, sleep),
-				new Performance(35, "Eclipse", 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 13, 0, -7, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, false, false, null, sleep),
-				new Performance(36, "Flare", 0, 0, false, true, 5, 0, 12, 0, Performance.DMG_TYPE_WIS, 2, 25, 0, -9, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, sleep),
-				new Performance(37, "Light Ray", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_SPI, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, null, sleep),
-				new Performance(38, "Light Burst", 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_SPI, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_LIGHT, -1, -1, false, false, null, sleep),
-				new Performance(39, "Confusion", 0, 0, false, true, 5, 0, 15, 0, Performance.DMG_TYPE_WIS, 1, 0, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, confusion, clarity),
-				new Performance(40, "Sleep", 0, 0, false, true, 4, 0, 0, 17, Performance.DMG_TYPE_WIS, 1, 3, 0, 17, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, sleep, clarity),
-				new Performance(41, "Slash", 0, 0, false, true, 5, 0, 10, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 15, 0, 0, Performance.TRG_ENEMY, ELEMENT_PHYSICAL, 3, 7, false, false, null, confsleep),
-				new Performance(42, "Fire Wpn", 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_FIRE, -1, -1, false, false, null, confsleep),
-				new Performance(43, "Ice Wpn", 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_WATER, -1, -1, false, false, null, confsleep),
-				new Performance(44, "Electric Wpn", 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_WIND, -1, -1, false, false, null, confsleep),
-				new Performance(45, "Stone Wpn", 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_EARTH, -1, -1, false, false, null, confsleep),
-				new Performance(46, "Dark Wpn", 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, null, confsleep),
-				new Performance(47, "Vampiric Wpn", 0, 0, false, false, 5, 0, 10, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI | Performance.DMG_TYPE_WIS,
+				new Performance(9, this.getString(R.string.skill_smite), 0, 0, false, false, 1, 1, 0, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 4, 3, -4, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confclarity),
+				new Performance(10, this.getString(R.string.skill_hit), 0, 0, false, false, 1, 3, 0, 1, Performance.DMG_TYPE_ATK, 1, 12, 0, -4, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
+				new Performance(11, this.getString(R.string.skill_bash), 0, 0, false, false, 3, 3, 0, 5, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 7, 5, -5, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, dizziness, confclarity),
+				new Performance(12, this.getString(R.string.skill_smash), 0, 0, false, false, 3, 5, 0, 3, Performance.DMG_TYPE_ATK, 1, 18, 0, -7, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
+				new Performance(13, this.getString(R.string.skill_berserk), 0, 0, false, false, 4, 7, 0, 4, Performance.DMG_TYPE_SPI, 1, 0, 0, 0, Performance.TRG_SELF, ELEMENT_PSYCHIC, -1, -1, false, false, berserk, weakness),
+				new Performance(14, this.getString(R.string.skill_shock), 0, 0, false, false, 4, 4, 0, 7, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF, 1, 10, 5, -9, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, dizzystun, confclarity),
+				new Performance(15, this.getString(R.string.skill_crush), 0, 0, false, false, 5, 7, 4, 0, Performance.DMG_TYPE_ATK, 1, 25, 0, -11, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, stun, confsleep),
+				new Performance(16, this.getString(R.string.skill_strike), 0, 0, false, true, 1, 0, 0, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 13, 0, -3, Performance.TRG_ONE, ELEMENT_PHYSICAL, 5, 3, false, false, null, confsleep),
+				new Performance(17, this.getString(R.string.skill_steal), 0, 0, true, true, 1, 0, 0, 0, Performance.DMG_TYPE_WIS, 1, 0, 0, 0, Performance.TRG_ONE, ELEMENT_PHYSICAL, 5, 3, false, false, null, null),
+				new Performance(18, this.getString(R.string.skill_dash), 0, 0, false, true, 3, 0, 0, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 15, 0, -5, Performance.TRG_ONE, ELEMENT_PHYSICAL, 3, 7, false, false, null, confsleep),
+				new Performance(19, this.getString(R.string.skill_poison), 0, 0, false, true, 3, 0, 0, 0, Performance.DMG_TYPE_WIS, 2, 5, 0, 2, Performance.TRG_ONE, ELEMENT_PHYSICAL, 3, 7, false, false, poison, regen),
+				new Performance(20, this.getString(R.string.skill_mug), 0, 0, true, true, 4, 0, 0, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 2, 15, 0, -7, Performance.TRG_ONE, ELEMENT_PHYSICAL, 1, 5, false, false, null, confsleep),
+				new Performance(21, this.getString(R.string.skill_toxic_gas), 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_WIS, 3, 1, 1, 1, Performance.TRG_ENEMY, ELEMENT_PHYSICAL, 3, 7, false, false, tpoison, tregen),
+				new Performance(22, this.getString(R.string.skill_cheer), 0, 0, false, true, 4, 0, 10, 0, Performance.DMG_TYPE_SPI, -1, 0, 0, -5, Performance.TRG_PARTY, ELEMENT_PSYCHIC, 3, 7, false, false, vigour, cure),
+				new Performance(23, this.getString(R.string.skill_venom_blade), 0, 0, false, false, 5, 0, 0, 10, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 17, 0, -9, Performance.TRG_ONE, ELEMENT_PHYSICAL, 3, 7, false, false, poison, conftregen),
+				new Performance(24, this.getString(R.string.skill_absorb), 0, 0, false, true, 1, 0, 0, 3, Performance.DMG_TYPE_WIS, 1, 0, 7, -3, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, true, false, null, null),
+				new Performance(25, this.getString(R.string.skill_drain), 0, 0, false, true, 3, 0, 10, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -3, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, true, false, null, null),
+				new Performance(26, this.getString(R.string.skill_fireball), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_FIRE, -1, -1, false, false, null, sleep),
+				new Performance(27, this.getString(R.string.skill_iceshard), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_WATER, -1, -1, false, false, null, sleep),
+				new Performance(28, this.getString(R.string.skill_lighting), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_WIND, -1, -1, false, false, null, sleep),
+				new Performance(29, this.getString(R.string.skill_rock), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_EARTH, -1, -1, false, false, null, sleep),
+				new Performance(30, this.getString(R.string.skill_darkness), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, null, sleep),
+				new Performance(31, this.getString(R.string.skill_flame), 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_FIRE, -1, -1, false, false, null, sleep),
+				new Performance(32, this.getString(R.string.skill_blizzard), 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_WATER, -1, -1, false, false, null, sleep),
+				new Performance(33, this.getString(R.string.skill_storm), 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_WIND, -1, -1, false, false, null, sleep),
+				new Performance(34, this.getString(R.string.skill_earthquake), 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_EARTH, -1, -1, false, false, null, sleep),
+				new Performance(35, this.getString(R.string.skill_eclipse), 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_WIS, 1, 13, 0, -7, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, false, false, null, sleep),
+				new Performance(36, this.getString(R.string.skill_flare), 0, 0, false, true, 5, 0, 12, 0, Performance.DMG_TYPE_WIS, 2, 25, 0, -9, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, false, null, sleep),
+				new Performance(37, this.getString(R.string.skill_light_ray), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_SPI, 1, 11, 0, -5, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, null, sleep),
+				new Performance(38, this.getString(R.string.skill_light_burst), 0, 0, false, true, 3, 0, 5, 0, Performance.DMG_TYPE_SPI, 1, 15, 0, -7, Performance.TRG_ENEMY, ELEMENT_LIGHT, -1, -1, false, false, null, sleep),
+				new Performance(39, this.getString(R.string.skill_confusion), 0, 0, false, true, 5, 0, 15, 0, Performance.DMG_TYPE_WIS, 1, 0, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, confusion, clarity),
+				new Performance(40, this.getString(R.string.skill_sleep), 0, 0, false, true, 4, 0, 0, 17, Performance.DMG_TYPE_WIS, 1, 3, 0, 17, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, sleep, clarity),
+				new Performance(41, this.getString(R.string.skill_slash), 0, 0, false, true, 5, 0, 10, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI, 1, 15, 0, 0, Performance.TRG_ENEMY, ELEMENT_PHYSICAL, 3, 7, false, false, null, confsleep),
+				new Performance(42, this.getString(R.string.skill_fire_wpn), 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_FIRE, -1, -1, false, false, null, confsleep),
+				new Performance(43, this.getString(R.string.skill_ice_wpn), 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_WATER, -1, -1, false, false, null, confsleep),
+				new Performance(44, this.getString(R.string.skill_electric_wpn), 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_WIND, -1, -1, false, false, null, confsleep),
+				new Performance(45, this.getString(R.string.skill_stone_wpn), 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_EARTH, -1, -1, false, false, null, confsleep),
+				new Performance(46, this.getString(R.string.skill_dark_wpn), 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 17, 0, -7, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, null, confsleep),
+				new Performance(47, this.getString(R.string.skill_vampiric_wpn), 0, 0, false, false, 5, 0, 10, 0, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_AGI | Performance.DMG_TYPE_WIS,
 						1, 21, 0, -9, Performance.TRG_ONE, ELEMENT_PSYCHIC, 3, 7, true, false, null, confsleep),
-				new Performance(48, "Reflect", 0, 0, false, true, 5, 0, 10, 0, Performance.DMG_TYPE_SPI, 1, 0, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, reflect, null),
-				new Performance(49, "Meteor", 0, 0, false, true, 5, 0, 17, 0, Performance.DMG_TYPE_WIS, 1, 19, 0, -11, Performance.TRG_ENEMY, ELEMENT_PHYSICAL, -1, -1, false, false, null, sleep),
-				new Performance(50, "Syphon", 0, 0, false, true, 4, 0, 15, 0, Performance.DMG_TYPE_WIS, 1, 13, 0, -3, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, true, false, null, null),
-				new Performance(51, "Dragon Breath", 0, 0, false, false, 4, 0, 13, 7, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 15, 0, -11, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
-				new Performance(52, "Light Wpn", 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF | Performance.DMG_TYPE_SPI,
+				new Performance(48, this.getString(R.string.skill_reflect), 0, 0, false, true, 5, 0, 10, 0, Performance.DMG_TYPE_SPI, 1, 0, 0, 0, Performance.TRG_ONE, ELEMENT_PSYCHIC, -1, -1, false, false, reflect, null),
+				new Performance(49, this.getString(R.string.skill_meteor), 0, 0, false, true, 5, 0, 17, 0, Performance.DMG_TYPE_WIS, 1, 19, 0, -11, Performance.TRG_ENEMY, ELEMENT_PHYSICAL, -1, -1, false, false, null, sleep),
+				new Performance(50, this.getString(R.string.skill_syphon), 0, 0, false, true, 4, 0, 15, 0, Performance.DMG_TYPE_WIS, 1, 13, 0, -3, Performance.TRG_ENEMY, ELEMENT_PSYCHIC, -1, -1, true, false, null, null),
+				new Performance(51, this.getString(R.string.skill_dragon_breath), 0, 0, false, false, 4, 0, 13, 7, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_WIS, 1, 15, 0, -11, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
+				new Performance(52, this.getString(R.string.skill_light_wpn), 0, 0, false, false, 2, 0, 3, 2, Performance.DMG_TYPE_ATK | Performance.DMG_TYPE_DEF | Performance.DMG_TYPE_SPI,
 						1, 17, 0, -5, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, null, confsleep),
-				new Performance(53, "Heal", 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, -25, 0, 0, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, null, null),
-				new Performance(54, "Meditate", 0, 0, false, true, 1, 0, 0, Performance.DMG_TYPE_WIS, 2, 1, -3, -7, 0, Performance.TRG_SELF, ELEMENT_LIGHT, -1, -1, false, false, null, dizziness),
-				new Performance(55, "Cure", 0, 0, false, true, 3, 0, 7, 0, Performance.DMG_TYPE_WIS, 1, -17, 0, 0, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, true, null, cure),
-				new Performance(56, "Clarity", 0, 0, false, true, 3, 0, 0, 7, Performance.DMG_TYPE_WIS, 1, 0, -3, 0, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, clarity, madness),
-				new Performance(57, "Absorb", 0, 0, false, true, 1, 0, 0, 3, Performance.DMG_TYPE_SPI, 1, 0, 7, -3, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, true, false, null, null)
+				new Performance(53, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, Performance.DMG_TYPE_WIS, 1, -25, 0, 0, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, null, null),
+				new Performance(54, this.getString(R.string.skill_mediatate), 0, 0, false, true, 1, 0, 0, Performance.DMG_TYPE_WIS, 2, 1, -3, -7, 0, Performance.TRG_SELF, ELEMENT_LIGHT, -1, -1, false, false, null, dizziness),
+				new Performance(55, this.getString(R.string.skill_cure), 0, 0, false, true, 3, 0, 7, 0, Performance.DMG_TYPE_WIS, 1, -17, 0, 0, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, true, null, cure),
+				new Performance(56, this.getString(R.string.skill_clarity), 0, 0, false, true, 3, 0, 0, 7, Performance.DMG_TYPE_WIS, 1, 0, -3, 0, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, false, false, clarity, madness),
+				new Performance(57, this.getString(R.string.skill_absorb), 0, 0, false, true, 1, 0, 0, 3, Performance.DMG_TYPE_SPI, 1, 0, 7, -3, Performance.TRG_ONE, ELEMENT_LIGHT, -1, -1, true, false, null, null)
 		};
 
 		final Performance[] items = new Performance[] {
@@ -299,13 +299,13 @@ public class StageAct extends Activity {
 		if (n.equals("")) {
             switch (p) {
                 case 0:
-                    n = "Cody";
+                    n = this.getString(R.string.name_cody);
                     break;
                 case 1:
-                    n = "George";
+                    n = this.getString(R.string.name_george);
                     break;
                 case 2:
-                    n = "Stephen";
+                    n = this.getString(R.string.name_stephen);
                     break;
             }
         }
@@ -352,7 +352,7 @@ public class StageAct extends Activity {
 				StageAct.this.beginBt();
 				break;
 			case R.id.InfoBt:
-				StageAct.this.displayMsg("About", getString(R.string.msg_about));
+				StageAct.this.displayMsg(StageAct.this.getString(R.string.about), getString(R.string.msg_about));
 				break;
 			case R.id.QuitBt:
 				StageAct.this.finish();
