@@ -24,6 +24,7 @@ import android.os.Parcel;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Vector;
 
 public final class Actor extends Costume {
@@ -53,10 +54,10 @@ public final class Actor extends Costume {
 
 	protected Actor(final Parcel in) {
 		super(in);
-		this._race = in.readParcelable(Costume.class.getClassLoader());
-		this._job = in.readParcelable(Costume.class.getClassLoader());
 		this._lv = in.readInt();
 		this.maxLv = in.readInt();
+        this.setRace(in.readParcelable(Costume.class.getClassLoader()));
+        this.setJob(in.readParcelable(Costume.class.getClassLoader()));
 		this._hp = in.readInt();
 		this._mp = in.readInt();
 		this._sp = in.readInt();
@@ -71,10 +72,10 @@ public final class Actor extends Costume {
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeParcelable(this._race, flags);
-		dest.writeParcelable(this._job, flags);
 		dest.writeInt(this._lv);
 		dest.writeInt(this.maxLv);
+        dest.writeParcelable(this._race, flags);
+        dest.writeParcelable(this._job, flags);
 		dest.writeInt(this._hp);
 		dest.writeInt(this._mp);
 		dest.writeInt(this._sp);
@@ -586,9 +587,9 @@ public final class Actor extends Costume {
 	}
 
 	public String checkStatus() {
-		String s = "";
+		String s;
 		if (this._hp < 1) {
-			s += ", " + this.name + " falls unconscious";
+			s = String.format(Locale.US, Actor.koTxt, this.name);
 			this.setActive(false);
 			this.setGuarding(false);
 			this._sp = 0;
@@ -599,13 +600,15 @@ public final class Actor extends Costume {
 					((StateMask)sMasks.nextElement()).remove(this, false, false);
 				}
 			}
-		}
+		} else {
+		    s = "";
+        }
 		return s;
 	}
 
 	public String applyStates(final boolean consume) {
-		String s = "";
 		String oldSprite = null;
+        final StringBuilder s = new StringBuilder();
 		if (!consume) {
 			if (this.isShapeShifted()) {
 				oldSprite = this.sprite;
@@ -632,11 +635,11 @@ public final class Actor extends Costume {
 				if (((Integer)sDur.get(state)).intValue() > -3 && this._hp > 0) {
 					final String r = state.apply(this, consume);
 					if (r.length() > 0) {
-						if (c) s += ", ";
+						if (c) s.append(", ");
 						if (consume && !c) {
 							c = true;
 						}
-						s += r;
+						s.append(r);
 					}
 				}
 			}
@@ -644,9 +647,9 @@ public final class Actor extends Costume {
 		if (oldSprite != null && !oldSprite.equals(this.sprite)) {
 			this.resetSprites();
 		}
-		s += this.checkStatus();
-		if (c) s += ".";
-		return s;
+		s.append(this.checkStatus());
+		if (c) s.append(".");
+		return s.toString();
 	}
 
 	public void recover() {

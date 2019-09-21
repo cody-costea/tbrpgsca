@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca;
 import android.os.Parcel;
 
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Random;
 
 public final class StateMask extends Costume {
@@ -255,7 +256,7 @@ public final class StateMask extends Costume {
     }
 
     String apply(final Actor actor, final boolean consume) {
-        String s = "";
+        final StringBuilder s = new StringBuilder();
         final Hashtable sDur = actor.stateDur;
         if (sDur != null) {
             final Object dur = sDur.get(this);
@@ -275,7 +276,8 @@ public final class StateMask extends Costume {
                         actor.setCurrentMp(actor._mp - dmgmp);
                         actor.setCurrentSp(actor._sp - dmgsp);
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += " " + this.name + " causes " + actor.name + RoleData.getDmgText(dmghp, dmgmp, dmgsp);
+                            s.append(String.format(Locale.US, this.name, actor.name));
+                            s.append(RoleData.getDmgText(dmghp, dmgmp, dmgsp));
                         }
                     }
                     else {
@@ -303,7 +305,7 @@ public final class StateMask extends Costume {
                 }
             }
         }
-        return s;
+        return s.toString();
     }
 
     void disable(final Actor actor) {

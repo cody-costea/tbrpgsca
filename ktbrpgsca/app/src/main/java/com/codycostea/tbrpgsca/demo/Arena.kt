@@ -80,7 +80,8 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
         var sprAnim = this.sprites[side][spr]
         if (sprAnim === null) {
             val job = this.job
-            var sprName = "spr_bt_" + ((job as? AdCostume)?.sprName?.toLowerCase() ?: job.name.toLowerCase()) + if (side == 0) "_l_" else "_r_"
+            var sprName = ("spr_bt_" + ((job as? AdCostume)?.sprName?.toLowerCase(Locale.US)
+                    ?: job.name.toLowerCase(Locale.US)) + if (side == 0) "_l_" else "_r_")
             sprName += when (spr) {
                 0 -> "idle"
                 1 -> "ko"
@@ -92,13 +93,12 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
                 else -> return null
             }
             try {
-                val drawable = this.context.resources.getDrawable(
-                        this.context.resources.getIdentifier(sprName, "drawable", this.context.packageName))
-                when (drawable) {
+                val context = this.context
+                val resources = context.resources
+                when (val drawable = resources.getDrawable(resources.getIdentifier(sprName, "drawable", context.packageName))) {
                     is AnimationDrawable -> sprAnim = drawable
                     is BitmapDrawable -> {
-                        sprAnim = (drawable.getSprite(this.context,
-                                if (spr in 0..1) null
+                        sprAnim = (drawable.getSprite(context, if (spr in 0..1) null
                                 else this.getBtSprite(side, 0)?.getFrame(0), spr in 2..3,
                                 if (spr < 2) null else (if (spr == 3) this.getBtSprite(side, 1)?.getFrame(0)
                                 else this.getBtSprite(side, 0)?.getFrame(0)), true))
@@ -124,53 +124,56 @@ class AdActor(id : Int, private val context : Context, name: String, sprites : A
         val sprName : String
         sprName = if (spriteName === null) {
             val job = this.job
-            (job as? AdCostume)?.sprName?.toLowerCase() ?: job.name.toLowerCase()
+            (job as? AdCostume)?.sprName?.toLowerCase(Locale.US) ?: job.name.toLowerCase(Locale.US)
         }
         else {
-            spriteName.toLowerCase()
+            spriteName.toLowerCase(Locale.US)
         }
+        val context = this.context
+        val packageName = context.packageName
+        val resources = context.resources
         val sprites = arrayOf(
-                arrayOf(this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_idle", "drawable", this.context.packageName))
+                arrayOf(resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_idle", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_ko", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_ko", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_hit", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_hit", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_fallen", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_fallen", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_restored", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_restored", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_act", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_act", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_l_cast", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_l_cast", "drawable", packageName))
                                 as AnimationDrawable?),
-                arrayOf(this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_idle", "drawable", this.context.packageName))
+                arrayOf(resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_idle", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_ko", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_ko", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_hit", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_hit", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_fallen", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_fallen", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_restored", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_restored", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_act", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_act", "drawable", packageName))
                                 as AnimationDrawable?,
-                        this.context.resources.getDrawable(
-                                this.context.resources.getIdentifier("spr_bt_" + sprName + "_r_cast", "drawable", this.context.packageName))
+                        resources.getDrawable(
+                                resources.getIdentifier("spr_bt_" + sprName + "_r_cast", "drawable", packageName))
                                 as AnimationDrawable?)
         )
         this.sprites = sprites
@@ -541,8 +544,8 @@ class Arena : Fragment() {
             val skill = this.skills[position]
             val context = this.arenaAct
             val crActor = context.crActor
-            vHolder.nameText.text = skill.name +
-                    (if (this.asItems) " x ${crActor._items?.get(skill)} " else " ") +
+            vHolder.nameText.text = String.format(Locale.US, "%s%s%s", skill.name,
+                    (if (this.asItems) " X ${crActor._items?.get(skill)} " else " "),
                     String.format(context.getString(R.string.skill_info), skill.lvRq, skill.hpC,
                             skill.mpC, skill.spC, (crActor.skillsQty?.get(skill) ?: "∞"),
                             (when (skill.trg) {
@@ -551,7 +554,7 @@ class Arena : Fragment() {
                                 else -> context.getString(R.string.all)
                             }),
                             if (skill.range == true) context.getString(R.string.yes)
-                            else context.getString(R.string.no))
+                            else context.getString(R.string.no)))
             return view
         }
 
@@ -559,7 +562,7 @@ class Arena : Fragment() {
             val view = this.prepareView(position, convertView, parent)
             val vHolder = view.tag as ViewHolder
             val skill = this.skills[position]
-            vHolder.nameText.text = if (this.asItems) "${skill.name} x ${this.arenaAct.crActor._items?.get(skill)} " else skill.name
+            vHolder.nameText.text = if (this.asItems) "${skill.name} X ${this.arenaAct.crActor._items?.get(skill)} " else skill.name
             return view
         }
     }
@@ -601,10 +604,10 @@ class Arena : Fragment() {
             val view = this.prepareView(convertView, parent)
             val vHolder = view.tag as ViewHolder
             val actor = this.actors[position]
-            vHolder.nameText.text = "${actor.name} (${Costume.hpText}: " +
-                    ((if (position < this.arenaAct.scenePlay.enIdx)
+            vHolder.nameText.text = String.format(Locale.US, "%s%s)", "${actor.name} (${Costume.hpText}: ",
+                    (if (position < this.arenaAct.scenePlay.enIdx)
                         "${actor.hp}/${actor.mHp}, ${Costume.mpText}: ${actor.mp}/${actor.mMp}, ${Costume.spText}: ${actor.sp}/${actor.mSp}"
-                    else "%.2f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%") + ")")
+                    else "%.0f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%"))
             return view
         }
 

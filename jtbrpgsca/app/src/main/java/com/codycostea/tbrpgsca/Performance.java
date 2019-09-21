@@ -24,6 +24,7 @@ import android.os.Parcel;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Random;
 
 public final class Performance extends RoleData {
@@ -336,11 +337,12 @@ public final class Performance extends RoleData {
 	}
 
 	public String execute(final Actor user, Actor target, final boolean applyCosts) {
-		String s = "";
+		final StringBuilder s = new StringBuilder();
 		final Random rnd = new Random();
+		final int dmgType = this.dmgType;
 		int dmg = rnd.nextInt(4);
-		if (target.isReflecting() && ((this.dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)) {
-			s += ", reflected by " + target.name;
+		if (target.isReflecting() && ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)) {
+			s.append(String.format(Locale.US, Performance.reflectedTxt, target.name));
 			target = user;
 		}
 		Object o;
@@ -353,28 +355,28 @@ public final class Performance extends RoleData {
 		int i = 0;
 		int def = 0;
 		int canMiss = 0;
-		if ((this.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) {
+		if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) {
 			canMiss = 2;
 			dmg += user.atk;
 			def += target.def;
 			i++;
 		}
-		if ((this.dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF) {
+		if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF) {
 			dmg += user.def;
 			def += target.def;
 			i++;
 		}
-		if ((this.dmgType & DMG_TYPE_SPI) == DMG_TYPE_SPI) {
+		if ((dmgType & DMG_TYPE_SPI) == DMG_TYPE_SPI) {
 			dmg += user.spi;
 			def += target.wis;
 			i++;
 		}
-		if ((this.dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS) {
+		if ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS) {
 			dmg += user.wis;
 			def += target.spi;
 			i++;
 		}
-		if ((this.dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI) {
+		if ((dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI) {
 			canMiss = -canMiss + 4;
 			dmg += user.agi;
 			def += target.agi;
@@ -402,7 +404,8 @@ public final class Performance extends RoleData {
 				user.setCurrentSp(user._sp + spDmg / 2);
 			}
 			if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
-				s += ", " + target.name + " suffers" + RoleData.getDmgText(hpDmg, mpDmg, spDmg);
+				s.append(String.format(Locale.US, Performance.suffersTxt, target.name));
+				s.append(RoleData.getDmgText(hpDmg, mpDmg, spDmg));
 			}
 			String r;
 			final StateMask[] aStates = this.aStates;
@@ -410,7 +413,7 @@ public final class Performance extends RoleData {
 				for (int j = 0; j < aStates.length; j++) {
 					r = aStates[j].inflict(target, false, false);
 					if (r.length() > 0) {
-						s += r;
+						s.append(r);
 					}
 				}
 			}
@@ -458,13 +461,13 @@ public final class Performance extends RoleData {
 					} else {
 						trgItemMap.put(stolen, new Integer(trgItemQty));
 					}
-					s += ", obtaining " + stolen.name + " from " + target.name;
+					s.append(String.format(Locale.US, Performance.stolenTxt, stolen.name, target.name));
 				}
 			}
-			s += target.checkStatus();
+			s.append(target.checkStatus());
 		}
 		else {
-			s += ", but misses";
+			s.append(Performance.missesTxt);
 		}
 		if (applyCosts) {
 			user._hp -= this.hpC;
@@ -483,7 +486,7 @@ public final class Performance extends RoleData {
 		if (ko && target._hp > 0) {
 			target.applyStates(false);
 		}
-		return s + user.checkStatus();
+		return s.append(user.checkStatus()).toString();
 	}
 
 	public void replenish(final Actor user) {

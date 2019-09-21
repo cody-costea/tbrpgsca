@@ -221,9 +221,9 @@ public final class ArenaAct extends Activity {
             final ViewHolder vHolder = (ViewHolder)view.getTag();
             final Actor actor = this.actors[position];
             vHolder.nameText.setText(String.format(Locale.US, "%s (%s: %s)",actor.name,
-                    Costume.hpText, (position < this.arenaAct.scenePlay._enIdx) ? String.format(Locale.US,
-                            "%d/%d, %s: %d/%d, %s: %d/%d", actor._hp, actor.mHp, Costume.mpText,
-                            actor._mp, actor.mMp, Costume.spText, actor._sp, actor.mSp)
+                    RoleData.hpText, (position < this.arenaAct.scenePlay._enIdx) ? String.format(Locale.US,
+                            "%d/%d, %s: %d/%d, %s: %d/%d", actor._hp, actor.mHp, RoleData.mpText,
+                            actor._mp, actor.mMp, RoleData.spText, actor._sp, actor.mSp)
                     : String.format(Locale.US, "%.0f%%", (((float)actor._hp) / ((float)actor.mHp) * 100.0f))));
             return view;
         }
@@ -255,7 +255,7 @@ public final class ArenaAct extends Activity {
                     ArenaAct.this.enableControls(false);
                     ArenaAct.this.actionsTxt.append(ArenaAct.this.scenePlay.performSkill(
                             ArenaAct.this.skillsSpn.getSelectedItemPosition(),
-                            ArenaAct.this.targetSpn.getSelectedItemPosition(), ""));
+                            ArenaAct.this.targetSpn.getSelectedItemPosition(), "\n"));
                     ArenaAct.this.playSpr();
                     break;
                 }
@@ -279,7 +279,7 @@ public final class ArenaAct extends Activity {
                         ArenaAct.this.enableControls(false);
                         ArenaAct.this.actionsTxt.append(ArenaAct.this.scenePlay.useItem(
                                 ArenaAct.this.itemsSpn.getSelectedItemPosition(),
-                                ArenaAct.this.targetSpn.getSelectedItemPosition(), ""));
+                                ArenaAct.this.targetSpn.getSelectedItemPosition(), "\n"));
                         itemsAdapter.notifyDataSetChanged();
                         ArenaAct.this.playSpr();
                     }
@@ -289,8 +289,8 @@ public final class ArenaAct extends Activity {
                     final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                     final TextView actionsTxt = ArenaAct.this.actionsTxt;
                     final String escText = scenePlay.escape();
-                    actionsTxt.append(scenePlay.setNext("", true));
-                    actionsTxt.append("\n" + escText);
+                    actionsTxt.append(scenePlay.setNext("\n", true));
+                    actionsTxt.append(escText);
                     if (scenePlay._status == -1) {
                         ArenaAct.this.endingMsg(ArenaAct.this.getString(R.string.escape), ScenePlay.escapeTxt);
                     }
@@ -381,16 +381,17 @@ public final class ArenaAct extends Activity {
 
     private void setCrItems() {
         final Spinner itemsSpn = this.itemsSpn;
-        final Spinner targetSpn = this.targetSpn;
-        final Button itemUseBtn = this.itemUseBtn;
         final ScenePlay scenePlay = this.scenePlay;
-        final Vector<Performance> crItems = new Vector<Performance>(Arrays.asList(scenePlay._crItems));
-        if (crItems.size() == 0) {
+        final Performance[] items = scenePlay._crItems;
+        if (items == null || items.length == 0) {
             if (itemsSpn.isEnabled()) {
                 itemsSpn.setSelection(Spinner.INVALID_POSITION);
                 itemsSpn.setEnabled(false);
             }
         } else {
+            final Spinner targetSpn = this.targetSpn;
+            final Button itemUseBtn = this.itemUseBtn;
+            final Vector<Performance> crItems = new Vector<Performance>(Arrays.asList(items));
             AbilityArrayAdapter itemsAdapter = this.itemsAdapter;
             if (itemsAdapter == null) {
                 this.itemsAdapter = itemsAdapter = new AbilityArrayAdapter(this,
@@ -438,8 +439,8 @@ public final class ArenaAct extends Activity {
         final int current = scenePlay._current;
         final Actor crActor = players[current];
         final Performance lastAbility = scenePlay._lastAbility;
-        final int sprType = (lastAbility == null || lastAbility.trg < 0
-                || lastAbility.dmgType == 2 || lastAbility.dmgType == 3) ? 6 : 5;
+        final int sprType = lastAbility == null || (lastAbility.trg > -1
+                && (lastAbility.dmgType & Performance.DMG_TYPE_ATK) == Performance.DMG_TYPE_ATK) ? 5 : 6;
         final int usrSide = (current < scenePlay._enIdx) ? this.partySide : this.otherSide;
         final AnimationDrawable actAnim = crActor.getBtSprite(this, usrSide, sprType);
         final int iDur = crActor.spritesDur[usrSide][sprType] - 174;

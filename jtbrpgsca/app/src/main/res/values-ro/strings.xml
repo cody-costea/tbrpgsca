@@ -116,8 +116,8 @@
     <string name="victory">Victorie</string>
     <string name="defeat">Înfrângere</string>
     <string name="escape">Retragere</string>
-    <string name="scene_victory">Echipa a învins!</string>
-    <string name="scene_defeat">Echipa a fost înfrântă!</string>
+    <string name="scene_victory">Echipa a învins!%s</string>
+    <string name="scene_defeat">Echipa a fost înfrântă!%s</string>
     <string name="scene_escape">Echipa s-a retras!</string>
     <string name="scene_fail">Echipa a încercat să se retragă, dar a eșuat.</string>
     <string name="scene_performs">%s efetcuează %s</string>

@@ -23,7 +23,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Locale;
+
 public abstract class RoleData implements Parcelable {
+
+    public static String hpText = "HP";
+    public static String mpText = "MP";
+    public static String spText = "RP";
 
 	protected final static int FLAG_RANGE = 1;
 
@@ -219,7 +225,7 @@ public abstract class RoleData implements Parcelable {
 			if (dmghp < 0) {
 				s.append("+");
 			}
-			s.append(String.valueOf(-dmghp)).append(" HP");
+			s.append(String.format(Locale.US, "%d %s", -dmghp, RoleData.hpText));
 			c = true;
 		}
 		if (dmgmp != 0) {
@@ -230,7 +236,7 @@ public abstract class RoleData implements Parcelable {
 			if (dmgmp < 0) {
 				s.append("+");
 			}
-			s.append(String.valueOf(-dmgmp)).append(" MP");
+			s.append(String.format(Locale.US, "%d %s", -dmgmp, RoleData.mpText));
 			c = true;
 		}
 		if (dmgsp != 0) {
@@ -241,7 +247,7 @@ public abstract class RoleData implements Parcelable {
 			if (dmgsp < 0) {
 				s.append("+");
 			}
-			s.append(String.valueOf(-dmgsp)).append(" RP");
+			s.append(String.format(Locale.US, "%d %s", -dmgsp, RoleData.spText));
 		}
 		return s.toString();
 	}

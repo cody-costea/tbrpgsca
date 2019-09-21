@@ -16,17 +16,19 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import android.os.Parcelable;
+import android.transition.Scene;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Vector;
 
 public final class ScenePlay {
 
     public static String performsTxt = "%s performs %s";
-    public static String victoryTxt = "The party has won!";
-    public static String fallenTxt = "The party has fallen!";
+    public static String victoryTxt = "The party has won!%s";
+    public static String fallenTxt = "The party has fallen!%s";
     public static String escapeTxt = "The party has escaped!";
     public static String failTxt = "The party attempted to escape, but failed.";
 
@@ -84,6 +86,7 @@ public final class ScenePlay {
         if (this._status == 0) {
             int initInc;
             int minInit = 1;
+            StringBuilder retBuilder = new StringBuilder(ret);
             final Actor[] _players = this._players;
             final boolean useInit = this._useInit;
             final Actor oldActor = _players[this._current];
@@ -93,7 +96,7 @@ public final class ScenePlay {
                 if (useInit) {
                     crActor.init = 0;
                 }
-                ret += crActor.applyStates(true);
+                retBuilder.append(crActor.applyStates(true));
             }
             Actor nxActor;
             final int enIdx = this._enIdx;
@@ -134,10 +137,10 @@ public final class ScenePlay {
                                             crActor = nxActor;
                                         } else {
                                             nxActor.init = 0;
-                                            if (ret.length() > 0) {
-                                                ret = "\n" + ret;
+                                            if (retBuilder.length() > 0) {
+                                                retBuilder.append("\n");
                                             }
-                                            ret = nxActor.applyStates(true) + ret;
+                                            retBuilder.append(nxActor.applyStates(true));
                                         }
                                     }
                                 }
@@ -158,10 +161,10 @@ public final class ScenePlay {
                                     crActor = nxActor;
                                     this._current = i;
                                 } else {
-                                    if (ret.length() > 0) {
-                                        ret = "\n" + ret;
+                                    if (retBuilder.length() > 0) {
+                                        retBuilder.append("\n");
                                     }
-                                    ret = nxActor.applyStates(true) + ret;
+                                    retBuilder.append(nxActor.applyStates(true));
                                 }
                             }
                         }
@@ -169,16 +172,15 @@ public final class ScenePlay {
                 }
                 if (noParty) {
                     this._status = -2;
-                    ret = "The party has fallen!" + ret;
-                    return ret;
+                    return String.format(Locale.US, ScenePlay.failTxt, retBuilder.toString());
                 } else if (noEnemy) {
                     this._status = 1;
-                    ret = "The party has won!" + ret;
-                    return ret;
+                    return String.format(Locale.US, ScenePlay.victoryTxt, retBuilder.toString());
                 } else if (minInit != 0 && !useInit) {
                     minInit = 0;
                 }
             } while (initInc == 1 && minInit > -1);
+            ret = retBuilder.toString();
             if (oldActor == crActor) {
                 if (useInit) {
                     oldActor.setActive(true);
@@ -279,7 +281,8 @@ public final class ScenePlay {
         }
     }
 
-    public String executeAbility(final Performance skill, int target, String ret) {
+    public String executeAbility(final Performance skill, int target, final String ret) {
+        final StringBuilder retBuilder = new StringBuilder(ret);
         final int enIdx = this._enIdx, fTarget, lTarget;
         final Actor[] players = this._players;
         final int current = this._current;
@@ -316,19 +319,19 @@ public final class ScenePlay {
         }
         boolean applyCosts = true;
         final Actor crActor = players[current];
-        ret += crActor.name + " performs " + skill.name;
+        retBuilder.append(String.format(Locale.US, ScenePlay.performsTxt, crActor.name, skill.name));
         for (int i = fTarget; i <= lTarget; i++) {
             final Actor iPlayer = players[i];
             if ((skill.mHp < 0 && skill.isRestoring()) || iPlayer._hp > 0) {
-                ret += skill.execute(crActor, iPlayer, applyCosts);
+                retBuilder.append(skill.execute(crActor, iPlayer, applyCosts));
                 applyCosts = false;
             }
         }
-        ret += ".";
+        retBuilder.append(".");
         crActor._xp++;
         crActor.levelUp();
         this._lastAbility = skill;
-        return ret;
+        return retBuilder.toString();
     }
 
     public String executeAI(String ret) {
@@ -446,7 +449,7 @@ public final class ScenePlay {
         this._lastAbility = null;
         final int surprise = this._surprise;
         if (surprise < 0) {
-            return "The party attempted to escape, but failed.";
+            return ScenePlay.failTxt;
         }
         final int enIdx = this._enIdx;
         final Actor[] players = this._players;
@@ -471,9 +474,9 @@ public final class ScenePlay {
         }
         if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
             this._status = -1;
-            return "The party has escaped!";
+            return ScenePlay.escapeTxt;
         } else {
-            return "The party attempted to escape, but failed.";
+            return ScenePlay.failTxt;
         }
     }
 

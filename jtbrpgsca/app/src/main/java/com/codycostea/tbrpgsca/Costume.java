@@ -21,10 +21,6 @@ import java.util.Hashtable;
 
 public class Costume extends RoleData {
 
-	public static String hpText = "HP";
-	public static String mpText = "MP";
-	public static String spText = "RP";
-
 	protected String sprite;
 	protected int atk, def, spi, wis, agi;
 	protected Performance[] aSkills;
