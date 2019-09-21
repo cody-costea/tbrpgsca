@@ -146,7 +146,8 @@ public final class ArenaAct extends Activity {
             final Integer skillsQtyInt = skillsQtyMap == null ? null : (Integer)skillsQtyMap.get(skill);
             final String skillQtyText = skillsQtyInt == null ? "∞" : String.valueOf(skillsQtyInt.intValue());
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
-            final String itemQtyText = itemsQtyInt == null ? " " : " x " + String.valueOf(itemsQtyInt.intValue()) + " ";
+            final String itemQtyText = itemsQtyInt == null ? " " : String.format(Locale.US,
+                    " X %s ", String.valueOf(itemsQtyInt.intValue()));
             final String trgText;
             switch (skill.trg) {
                 case -1:
@@ -158,9 +159,9 @@ public final class ArenaAct extends Activity {
                 default:
                     trgText = context.getString(R.string.all);
             }
-            vHolder.nameText.setText(skill.name + itemQtyText + String.format(context.getString(R.string.skill_info),
-                    skill.lvRq, skill.hpC, skill.mpC, skill.spC, skillQtyText, trgText, (skill.hasRange()
-                            ? context.getString(R.string.yes) : context.getString(R.string.no))));
+            vHolder.nameText.setText(String.format(Locale.US, "%s%s%s", skill.name, itemQtyText,
+                    String.format(context.getString(R.string.skill_info), skill.lvRq, skill.hpC, skill.mpC,
+                            skill.spC, skillQtyText, trgText, (skill.hasRange() ? context.getString(R.string.yes) : context.getString(R.string.no)))));
             return view;
         }
 
@@ -174,7 +175,7 @@ public final class ArenaAct extends Activity {
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
             vHolder.nameText.setText(itemsQtyInt == null ? skill.name : String.format(Locale.US,
-                    "%s x %s ", skill.name, String.valueOf(itemsQtyInt.intValue())));
+                    "%s X %s ", skill.name, String.valueOf(itemsQtyInt.intValue())));
             return view;
         }
 
@@ -384,7 +385,7 @@ public final class ArenaAct extends Activity {
         final Button itemUseBtn = this.itemUseBtn;
         final ScenePlay scenePlay = this.scenePlay;
         final Vector<Performance> crItems = new Vector<Performance>(Arrays.asList(scenePlay._crItems));
-        if (crItems == null || crItems.size() == 0) {
+        if (crItems.size() == 0) {
             if (itemsSpn.isEnabled()) {
                 itemsSpn.setSelection(Spinner.INVALID_POSITION);
                 itemsSpn.setEnabled(false);
@@ -628,8 +629,8 @@ public final class ArenaAct extends Activity {
         } else {
             surprised = 0;
             escapable = true;
-            party = null;
-            enemy = null;
+            party = null; //TODO: add demo party
+            enemy = null; //TODO: add demo enemy
         }
         int partySide, otherSide;
         if (surprised < 0) {
