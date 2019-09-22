@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Parcelable;
 import android.text.method.ScrollingMovementMethod;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -337,7 +338,7 @@ public final class ArenaAct extends Activity {
                         ArenaAct.this.setResult(Activity.RESULT_OK, outcome);
                         ArenaAct.this.finish();
                     }
-                });
+                }).show();
     }
 
     private void setCrSkills() {
@@ -544,11 +545,11 @@ public final class ArenaAct extends Activity {
                 break;
             }
             case 1: {
-                this.endingMsg(this.getString(R.string.victory), ScenePlay.victoryTxt);
+                this.endingMsg(this.getString(R.string.victory), String.format(Locale.US, ScenePlay.victoryTxt, ""));
                 break;
             }
             case -2: {
-                this.endingMsg(this.getString(R.string.defeat), ScenePlay.fallenTxt);
+                this.endingMsg(this.getString(R.string.defeat), String.format(Locale.US, ScenePlay.fallenTxt, ""));
                 break;
             }
         }
@@ -587,11 +588,6 @@ public final class ArenaAct extends Activity {
         } else {
             skillsSpn.setSelection(autoSkill);
         }
-    }
-
-    private void renounce() {
-        this.scenePlay._status = -2;
-        this.afterAct();
     }
 
     @Override
@@ -811,6 +807,17 @@ public final class ArenaAct extends Activity {
         final View.OnClickListener cAction = this.cAction;
         runBtn.setOnClickListener(cAction);
         autoBtn.setOnClickListener(cAction);
+    }
+
+    @Override
+    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            this.scenePlay._status = -2;
+            this.afterAct();
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
     }
 
     @Override

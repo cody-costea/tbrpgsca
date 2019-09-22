@@ -364,8 +364,8 @@ public final class ScenePlay {
                 final Performance s = (Performance)crSkills.elementAt(i);
                 if ((s.isRestoring() || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
                     skillIndex = i;
+                    break;
                 }
-                break;
             }
         }
         final Performance ability = (Performance)crSkills.elementAt(this.getAIskill(skillIndex, nRestore));

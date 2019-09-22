@@ -47,7 +47,7 @@ public final class Actor extends Costume {
 	protected Hashtable _items, skillsQty, skillsQtyRgTurn, stateDur, equipment;
 	protected Boolean _ranged;
 
-	protected final Vector<Performance> _skills = new Vector();
+	protected final Vector<Performance> _skills = new Vector<>();
 
 	int[][] spritesDur = new int[7][7];
 	private AnimationDrawable[][] sprites = new AnimationDrawable[7][7];
@@ -159,7 +159,7 @@ public final class Actor extends Costume {
 						sprAnim = RoleData.GetInvertedSprite(this.getBtSprite(context, side, 3), true);
 						break;
 					case 6:
-						this.getBtSprite(context, side, 5);
+						sprAnim = this.getBtSprite(context, side, 5);
 						break;
                     default:
                     	sprAnim = null;

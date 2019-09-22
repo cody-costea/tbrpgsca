@@ -289,7 +289,7 @@ public class StageAct extends Activity {
 		jobBox[0] = (Spinner)this.findViewById(R.id.JobBox1);
 		jobBox[1] = (Spinner)this.findViewById(R.id.JobBox2);
 		jobBox[2] = (Spinner)this.findViewById(R.id.JobBox3);
-		for (int i = 0; i < job.length && i < 16; i++) {
+		for (int i = 0; i < job.length && i < 15; i++) {
             jobList.add(job[i].getName());
         }
 		for (int i = 0; i < 3; i++) {
