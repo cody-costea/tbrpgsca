@@ -27,7 +27,7 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Random;
 
-public final class Performance extends RoleData {
+public final class Performance extends RoleSheet {
 
 	public static String reflectedTxt = ", reflected by %s";
 	public static String suffersTxt = ", %s suffers";
@@ -135,13 +135,13 @@ public final class Performance extends RoleData {
 			if (drawable instanceof AnimationDrawable) {
 				sprAnim = (AnimationDrawable) drawable;
 			} else if (drawable instanceof BitmapDrawable) {
-				sprAnim = RoleData.GetBitmapSprite((BitmapDrawable)drawable, context, null,
+				sprAnim = RoleSheet.GetBitmapSprite((BitmapDrawable)drawable, context, null,
 						false, null, false);
 			}
 			if (sprAnim == null) {
 				this.spriteDur = 0;
 			} else {
-				this.spriteDur = RoleData.GetSpriteDuration(sprAnim);
+				this.spriteDur = RoleSheet.GetSpriteDuration(sprAnim);
 			}
 			this._sprAnim = sprAnim;
 		}
@@ -336,7 +336,7 @@ public final class Performance extends RoleData {
 		return this;
 	}
 
-	public String execute(final Actor user, Actor target, final boolean applyCosts) {
+	public String execute(final Interpreter user, Interpreter target, final boolean applyCosts) {
 		final StringBuilder s = new StringBuilder();
 		final Random rnd = new Random();
 		final int dmgType = this.dmgType;
@@ -405,7 +405,7 @@ public final class Performance extends RoleData {
 			}
 			if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
 				s.append(String.format(Locale.US, Performance.suffersTxt, target.name));
-				s.append(RoleData.getDmgText(hpDmg, mpDmg, spDmg));
+				s.append(RoleSheet.getDmgText(hpDmg, mpDmg, spDmg));
 			}
 			String r;
 			final StateMask[] aStates = this.aStates;
@@ -489,7 +489,7 @@ public final class Performance extends RoleData {
 		return s.append(user.checkStatus()).toString();
 	}
 
-	public void replenish(final Actor user) {
+	public void replenish(final Interpreter user) {
 		if (this.mQty > 0) {
 			Hashtable usrSkills = user.skillsQty;
 			if (usrSkills == null) {
@@ -500,7 +500,7 @@ public final class Performance extends RoleData {
 		}
 	}
 
-	public boolean canPerform(final Actor actor) {
+	public boolean canPerform(final Interpreter actor) {
 		final Object itemQty;
 		final Hashtable skillsQty = actor.skillsQty;
 		return this.mpC <= actor._mp && this.hpC < actor._hp && this.spC <= actor._sp && actor._lv >= this.lvRq

@@ -16,7 +16,6 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import android.os.Parcelable;
-import android.transition.Scene;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -67,8 +66,8 @@ public final class ScenePlay {
         return this._lastAbility;
     }
 
-    protected Actor[] _players;
-    public Actor[] getPlayers() {
+    protected Interpreter[] _players;
+    public Interpreter[] getPlayers() {
         return this._players;
     }
 
@@ -87,10 +86,10 @@ public final class ScenePlay {
             int initInc;
             int minInit = 1;
             StringBuilder retBuilder = new StringBuilder(ret);
-            final Actor[] _players = this._players;
+            final Interpreter[] _players = this._players;
             final boolean useInit = this._useInit;
-            final Actor oldActor = _players[this._current];
-            Actor crActor = oldActor;
+            final Interpreter oldActor = _players[this._current];
+            Interpreter crActor = oldActor;
             if (endTurn) {
                 crActor.setActive(false);
                 if (useInit) {
@@ -98,7 +97,7 @@ public final class ScenePlay {
                 }
                 retBuilder.append(crActor.applyStates(true));
             }
-            Actor nxActor;
+            Interpreter nxActor;
             final int enIdx = this._enIdx;
             do {
                 boolean noParty = true;
@@ -190,7 +189,7 @@ public final class ScenePlay {
                     return this.setNext(ret, true);
                 }
             } else {
-                if (crActor.automatic == Actor.AUTO_NONE) {
+                if (crActor.automatic == Interpreter.AUTO_NONE) {
                     final Hashtable crItems = crActor._items;
                     if (crItems == null) {
                         this._crItems = null;
@@ -231,7 +230,7 @@ public final class ScenePlay {
     }
 
     public int getGuardian(final int target, final Performance skill) {
-        final Actor[] players = this._players;
+        final Interpreter[] players = this._players;
         final int current = this._current;
         if (skill.hasRange() || (/*skill._range == null &&*/ players[current].hasRange())) {
             return target;
@@ -257,7 +256,7 @@ public final class ScenePlay {
         int guardF = target;
         int guardL = target;
         for (int i = f; i < target; i++) {
-            final Actor iPlayer = players[i];
+            final Interpreter iPlayer = players[i];
             if (iPlayer._hp > 0 && iPlayer.isGuarding()) {
                 if (guardF == target) {
                     guardF = i;
@@ -269,7 +268,7 @@ public final class ScenePlay {
             return target;
         } else {
             for (int i = l; i > target; i--) {
-                final Actor iPlayer = players[i];
+                final Interpreter iPlayer = players[i];
                 if (iPlayer._hp > 0 && iPlayer.isGuarding()) {
                     if (guardL == target) {
                         guardL = i;
@@ -284,7 +283,7 @@ public final class ScenePlay {
     public String executeAbility(final Performance skill, int target, final String ret) {
         final StringBuilder retBuilder = new StringBuilder(ret);
         final int enIdx = this._enIdx, fTarget, lTarget;
-        final Actor[] players = this._players;
+        final Interpreter[] players = this._players;
         final int current = this._current;
         switch (skill.trg) {
             case Performance.TRG_ENEMY:
@@ -318,10 +317,10 @@ public final class ScenePlay {
                 lTarget = this._lTarget = target;
         }
         boolean applyCosts = true;
-        final Actor crActor = players[current];
+        final Interpreter crActor = players[current];
         retBuilder.append(String.format(Locale.US, ScenePlay.performsTxt, crActor.name, skill.name));
         for (int i = fTarget; i <= lTarget; i++) {
-            final Actor iPlayer = players[i];
+            final Interpreter iPlayer = players[i];
             if ((skill.mHp < 0 && skill.isRestoring()) || iPlayer._hp > 0) {
                 retBuilder.append(skill.execute(crActor, iPlayer, applyCosts));
                 applyCosts = false;
@@ -340,7 +339,7 @@ public final class ScenePlay {
         boolean nRestore = false;
         final int enIdx = this._enIdx;
         boolean party = this._current < enIdx;
-        final Actor[] players = this._players;
+        final Interpreter[] players = this._players;
         int f;
         int l;
         if (party) {
@@ -357,7 +356,7 @@ public final class ScenePlay {
                 nHeal = true;
             }
         }
-        final Actor crActor = players[this._current];
+        final Interpreter crActor = players[this._current];
         final Vector crSkills = crActor.getAvailableSkills();
         if (nRestore || nHeal) {
             for (int i = 0; i < crSkills.size(); i++) {
@@ -380,13 +379,13 @@ public final class ScenePlay {
             }
         }
         int target = f;
-        Actor trgActor = players[target];
+        Interpreter trgActor = players[target];
         final boolean restore = ability.isRestoring();
         while (trgActor._hp < 1 && (atkSkill || !restore) && target < l) {
             trgActor = players[++target];
         }
         for (int i = target + 1; i < l; i++) {
-            final Actor iPlayer = players[i];
+            final Interpreter iPlayer = players[i];
             if (iPlayer._hp < trgActor._hp && (iPlayer._hp > 0 || restore)) {
                 trgActor = iPlayer;
                 target = i;
@@ -397,7 +396,7 @@ public final class ScenePlay {
 
     public int getAIskill(final int defSkill, final boolean nRestore) {
         int ret = defSkill;
-        final Actor crActor = this._players[this._current];
+        final Interpreter crActor = this._players[this._current];
         final Vector crSkills = crActor.getAvailableSkills();
         Performance s = (Performance)crSkills.elementAt(defSkill);
         for (int i = defSkill + 1; i < crSkills.size(); i++) {
@@ -452,20 +451,20 @@ public final class ScenePlay {
             return ScenePlay.failTxt;
         }
         final int enIdx = this._enIdx;
-        final Actor[] players = this._players;
+        final Interpreter[] players = this._players;
         final int pLength = players.length;
         int pAgiSum = 0;
         int eAgiSum = 0;
         if (surprise < 1) {
             for (int i = 0; i < enIdx; i++) {
-                final Actor actor = players[i];
+                final Interpreter actor = players[i];
                 if (actor._hp > 0) {
                     pAgiSum += actor.agi;
                 }
             }
             pAgiSum /= enIdx;
             for (int i = enIdx; i < pLength; i++) {
-                final Actor actor = players[i];
+                final Interpreter actor = players[i];
                 if (actor._hp > 0) {
                     eAgiSum += actor.agi;
                 }
@@ -484,12 +483,12 @@ public final class ScenePlay {
         boolean useInit = false;
         final int pLength = party.length + enemy.length;
         final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
-        final Actor[] players = this._players = new Actor[pLength];
+        final Interpreter[] players = this._players = new Interpreter[pLength];
         this._current = surprise < 0 ? enIdx : 0;
         for (int i = 0; i < pLength; i++) {
-            Actor iPlayer = players[i];
+            Interpreter iPlayer = players[i];
             if (iPlayer == null) {
-                iPlayer = players[i] = i < enIdx ? (Actor)party[i] : (Actor)enemy[i + enIdx];
+                iPlayer = players[i] = i < enIdx ? (Interpreter)party[i] : (Interpreter)enemy[i + enIdx];
             }
             if (!useInit && iPlayer.mInit != 0) {
                 useInit = true;
@@ -509,9 +508,9 @@ public final class ScenePlay {
                 if (j == i) {
                     continue;
                 } else {
-                    Actor jPlayer = players[j];
+                    Interpreter jPlayer = players[j];
                     if (jPlayer == null) {
-                        jPlayer = players[j] = j < enIdx ? (Actor)party[j] : (Actor)enemy[j - enIdx];
+                        jPlayer = players[j] = j < enIdx ? (Interpreter)party[j] : (Interpreter)enemy[j - enIdx];
                     }
                     int jInit = jPlayer.mInit;
                     if (jInit < 1) {

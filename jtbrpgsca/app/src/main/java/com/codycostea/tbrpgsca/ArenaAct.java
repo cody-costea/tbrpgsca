@@ -48,9 +48,10 @@ public final class ArenaAct extends Activity {
 
 	private static Parcelable[] cachedParty = null, cachedEnemy = null;
 	private static String[] cachedScript = null;
+	private boolean staticCache;
 
     public static void Stage(final Activity act, final int arenaDrawableId, final int songId,
-                             final Actor[] party, final Actor[] enemy, final String[] scripts,
+                             final Interpreter[] party, final Interpreter[] enemy, final String[] scripts,
                              final int surprise, final boolean escapable, final boolean staticCache) {
         if (staticCache) {
             ArenaAct.cachedParty = party;
@@ -73,7 +74,6 @@ public final class ArenaAct extends Activity {
 
     private int koActors, partySide, otherSide;
     private boolean automatic, escapable;
-
     private ImageView[] imgActor;
     private Button autoBtn, runBtn, skillActBtn, itemUseBtn;
     private Spinner targetSpn, skillsSpn, itemsSpn;
@@ -141,7 +141,7 @@ public final class ArenaAct extends Activity {
             final Performance skill = this.skills.get(position);
             final ArenaAct context = this.arenaAct;
             final ScenePlay scenePlay = context.scenePlay;
-            final Actor crActor = scenePlay._players[scenePlay._current];
+            final Interpreter crActor = scenePlay._players[scenePlay._current];
             final Hashtable skillsQtyMap = crActor.skillsQty;
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer skillsQtyInt = skillsQtyMap == null ? null : (Integer)skillsQtyMap.get(skill);
@@ -172,7 +172,7 @@ public final class ArenaAct extends Activity {
             final ViewHolder vHolder = (ViewHolder)view.getTag();
             final Performance skill = this.skills.get(position);
             final ScenePlay scenePlay = this.arenaAct.scenePlay;
-            final Actor crActor = scenePlay._players[scenePlay._current];
+            final Interpreter crActor = scenePlay._players[scenePlay._current];
             final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
             vHolder.nameText.setText(itemsQtyInt == null ? skill.name : String.format(Locale.US,
@@ -188,16 +188,17 @@ public final class ArenaAct extends Activity {
             this.asItems = asItems;
             this.skills = skills;
         }
+
     }
 
-    private class ActorArrayAdapter extends ArrayAdapter<Actor> {
+    private class ActorArrayAdapter extends ArrayAdapter<Interpreter> {
 
         private final int layoutRes;
         private final ArenaAct arenaAct;
-        private Actor[] actors;
+        private Interpreter[] actors;
 
         @Override
-        public Actor getItem(final int position) {
+        public Interpreter getItem(final int position) {
             return this.actors[position];
         }
 
@@ -220,11 +221,11 @@ public final class ArenaAct extends Activity {
         public View getDropDownView(final int position, View view, final ViewGroup parent) {
             view = this.prepareView(view, parent);
             final ViewHolder vHolder = (ViewHolder)view.getTag();
-            final Actor actor = this.actors[position];
+            final Interpreter actor = this.actors[position];
             vHolder.nameText.setText(String.format(Locale.US, "%s (%s: %s)",actor.name,
-                    RoleData.hpText, (position < this.arenaAct.scenePlay._enIdx) ? String.format(Locale.US,
-                            "%d/%d, %s: %d/%d, %s: %d/%d", actor._hp, actor.mHp, RoleData.mpText,
-                            actor._mp, actor.mMp, RoleData.spText, actor._sp, actor.mSp)
+                    RoleSheet.hpText, (position < this.arenaAct.scenePlay._enIdx) ? String.format(Locale.US,
+                            "%d/%d, %s: %d/%d, %s: %d/%d", actor._hp, actor.mHp, RoleSheet.mpText,
+                            actor._mp, actor.mMp, RoleSheet.spText, actor._sp, actor.mSp)
                     : String.format(Locale.US, "%.0f%%", (((float)actor._hp) / ((float)actor.mHp) * 100.0f))));
             return view;
         }
@@ -237,12 +238,13 @@ public final class ArenaAct extends Activity {
             return view;
         }
 
-        public ActorArrayAdapter(final ArenaAct context, final int layoutRes, final Actor[] actors) {
+        public ActorArrayAdapter(final ArenaAct context, final int layoutRes, final Interpreter[] actors) {
             super(context, layoutRes);
             this.layoutRes = layoutRes;
             this.arenaAct = context;
             this.actors = actors;
         }
+
     }
 
     private ActorArrayAdapter playersAdapter;
@@ -294,8 +296,7 @@ public final class ArenaAct extends Activity {
                     actionsTxt.append(escText);
                     if (scenePlay._status == -1) {
                         ArenaAct.this.endingMsg(ArenaAct.this.getString(R.string.escape), ScenePlay.escapeTxt);
-                    }
-                    else {
+                    } else {
                         ArenaAct.this.enableControls(false);
                         ArenaAct.this.afterAct();
                     }
@@ -313,12 +314,11 @@ public final class ArenaAct extends Activity {
                 if (targetPos == targetSpn.getSelectedItemPosition()) {
                     final Button skillActBtn = ArenaAct.this.skillActBtn;
                     final ScenePlay scenePlay = ArenaAct.this.scenePlay;
-                    final Actor crActor = scenePlay._players[scenePlay._current];
+                    final Interpreter crActor = scenePlay._players[scenePlay._current];
                     if (crActor.automatic == 0 && skillActBtn.isEnabled()) {
                         ArenaAct.this.cAction.onClick(skillActBtn);
                     }
-                }
-                else {
+                } else {
                     targetSpn.setSelection(targetPos);
                 }
             }
@@ -334,7 +334,17 @@ public final class ArenaAct extends Activity {
                     @Override
                     public void onClick(final DialogInterface dialog, final int which) {
                         final Intent outcome = new Intent();
-                        outcome.putExtra("Outcome", ArenaAct.this.scenePlay._status);
+                        final ScenePlay scenePlay = ArenaAct.this.scenePlay;
+                        final int enemyIndex = scenePlay._enIdx;
+                        outcome.putExtra("outcome", scenePlay._status);
+                        if (ArenaAct.this.staticCache) {
+                            final Parcelable[] party = new Parcelable[enemyIndex];
+                            final Interpreter[] players = scenePlay._players;
+                            for (int i = 0; i < enemyIndex; i++) {
+                                party[i] = players[i];
+                            }
+                            outcome.putExtra("party", party);
+                        }
                         ArenaAct.this.setResult(Activity.RESULT_OK, outcome);
                         ArenaAct.this.finish();
                     }
@@ -345,7 +355,7 @@ public final class ArenaAct extends Activity {
         final Spinner skillsSpn = this.skillsSpn;
         final Spinner targetSpn = this.targetSpn;
         final Button skillActBtn = this.skillActBtn;
-        final Actor crActor;
+        final Interpreter crActor;
         {
             final ScenePlay scenePlay = this.scenePlay;
             crActor = scenePlay._players[scenePlay._current];
@@ -363,7 +373,7 @@ public final class ArenaAct extends Activity {
 
                 @Override
                 public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
-                    final Actor crActor;
+                    final Interpreter crActor;
                     {
                         final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                         crActor = scenePlay._players[scenePlay._current];
@@ -406,7 +416,7 @@ public final class ArenaAct extends Activity {
 
                     @Override
                     public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
-                        final Actor crActor;
+                        final Interpreter crActor;
                         {
                             final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                             crActor = scenePlay._players[scenePlay._current];
@@ -435,10 +445,10 @@ public final class ArenaAct extends Activity {
 
     private void playSpr() {
         final ScenePlay scenePlay = this.scenePlay;
-        final Actor[] players = scenePlay._players;
+        final Interpreter[] players = scenePlay._players;
         final ImageView[] imgActor = this.imgActor;
         final int current = scenePlay._current;
-        final Actor crActor = players[current];
+        final Interpreter crActor = players[current];
         final Performance lastAbility = scenePlay._lastAbility;
         final int sprType = lastAbility == null || (lastAbility.trg > -1
                 && (lastAbility.dmgType & Performance.DMG_TYPE_ATK) == Performance.DMG_TYPE_ATK) ? 5 : 6;
@@ -454,7 +464,7 @@ public final class ArenaAct extends Activity {
             @Override
             public void run() {
                 int dur = iDur;
-                Actor htActor;
+                Interpreter htActor;
                 for (int trg = scenePlay._fTarget; trg <= scenePlay._lTarget; trg++) {
                     if (trg != current && (lastAbility == null || !(lastAbility.dmgType == 2
                             && players[trg].isReflecting()))) {
@@ -525,7 +535,7 @@ public final class ArenaAct extends Activity {
         final ScenePlay scenePlay = this.scenePlay;
         switch (scenePlay._status) {
             case 0: {
-                final Actor actor = scenePlay._players[scenePlay._current];
+                final Interpreter actor = scenePlay._players[scenePlay._current];
                 final TextView infoTxt = this.infoTxt;
                 if (this.automatic || actor.automatic != 0) {
                     if (infoTxt.getText().length() > 0) {
@@ -533,8 +543,7 @@ public final class ArenaAct extends Activity {
                     }
                     this.actionsTxt.append(scenePlay.executeAI("\n"));
                     this.playSpr();
-                }
-                else {
+                } else {
                     this.setCrSkills();
                     this.setCrItems();
                     infoTxt.setText(String.format(this.getString(R.string.cr_actor_info), actor.name, actor._lv, actor._xp, actor._maxp));
@@ -577,7 +586,7 @@ public final class ArenaAct extends Activity {
         final ScenePlay scenePlay = this.scenePlay;
         final Spinner skillsSpn = this.skillsSpn;
         final int targetPos = this.targetSpn.getSelectedItemPosition();
-        final Actor crActor = scenePlay._players[scenePlay._current];
+        final Interpreter crActor = scenePlay._players[scenePlay._current];
         final boolean onPartySide = targetPos < scenePlay._enIdx;
         final int autoSkill = scenePlay.getAIskill(onPartySide ? 1 : 0,
                 onPartySide && scenePlay._players[targetPos]._hp < 1);
@@ -610,8 +619,11 @@ public final class ArenaAct extends Activity {
             }
             final String[] jScripts;
             final int arenaResId = extra.getInt("arenaImg", 0);
+            if (arenaResId > 0) {
+                this.findViewById(R.id.ImgArena).setBackgroundResource(arenaResId);
+            }
             if (ArenaAct.cachedParty != null && ArenaAct.cachedEnemy != null
-                    && extra.getBoolean("static", false)) {
+                    && (this.staticCache = extra.getBoolean("static", false))) {
                 jScripts = ArenaAct.cachedScript;
                 party = ArenaAct.cachedParty;
                 enemy = ArenaAct.cachedEnemy;
@@ -641,7 +653,7 @@ public final class ArenaAct extends Activity {
         this.otherSide = otherSide;
         this.escapable = escapable;
         final ScenePlay scenePlay = new ScenePlay(party, enemy, surprised);
-        final Actor[] players = scenePlay._players;
+        final Interpreter[] players = scenePlay._players;
         final int enIdx = scenePlay._enIdx;
         this.scenePlay = scenePlay;
         final Button runBtn = this.findViewById(R.id.RunBt);
@@ -786,7 +798,7 @@ public final class ArenaAct extends Activity {
 
             @Override
             public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
-                final Actor crActor;
+                final Interpreter crActor;
                 {
                     final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                     crActor = scenePlay._players[scenePlay._current];

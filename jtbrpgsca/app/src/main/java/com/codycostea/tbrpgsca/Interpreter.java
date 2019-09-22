@@ -27,7 +27,7 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
 
-public final class Actor extends Costume {
+public final class Interpreter extends Costume {
 
 	public static String koTxt = ", %s falls unconscious";
 
@@ -52,7 +52,7 @@ public final class Actor extends Costume {
 	int[][] spritesDur = new int[7][7];
 	private AnimationDrawable[][] sprites = new AnimationDrawable[7][7];
 
-	protected Actor(final Parcel in) {
+	protected Interpreter(final Parcel in) {
 		super(in);
 		this._lv = in.readInt();
 		this.maxLv = in.readInt();
@@ -92,19 +92,19 @@ public final class Actor extends Costume {
 		return 0;
 	}
 
-	public static final Creator<Actor> CREATOR = new Creator<Actor>() {
+	public static final Creator<Interpreter> CREATOR = new Creator<Interpreter>() {
 		@Override
-		public Actor createFromParcel(final Parcel in) {
-			return new Actor(in);
+		public Interpreter createFromParcel(final Parcel in) {
+			return new Interpreter(in);
 		}
 
 		@Override
-		public Actor[] newArray(final int size) {
-			return new Actor[size];
+		public Interpreter[] newArray(final int size) {
+			return new Interpreter[size];
 		}
 	};
 
-	public Actor resetSprites() {
+	public Interpreter resetSprites() {
 		this.sprites = new AnimationDrawable[7][7];
 		this.spritesDur = new int[7][7];
 		return this;
@@ -146,7 +146,7 @@ public final class Actor extends Costume {
 				if (drawable instanceof AnimationDrawable) {
 					sprAnim = (AnimationDrawable)drawable;
 				} else if (drawable instanceof BitmapDrawable) {
-					sprAnim = (RoleData.GetBitmapSprite((BitmapDrawable)drawable, context,
+					sprAnim = (RoleSheet.GetBitmapSprite((BitmapDrawable)drawable, context,
 							(spr > -1 && spr < 2) ? null : this.getBtSprite(context, side, 0).getFrame(0),
 							spr > 1 && spr < 4, (spr < 2) ? null : ((spr == 3)
 									? this.getBtSprite(context, side, 1).getFrame(0)
@@ -156,7 +156,7 @@ public final class Actor extends Costume {
 			catch (final Resources.NotFoundException e) {
 				switch (spr) {
 					case 4:
-						sprAnim = RoleData.GetInvertedSprite(this.getBtSprite(context, side, 3), true);
+						sprAnim = RoleSheet.GetInvertedSprite(this.getBtSprite(context, side, 3), true);
 						break;
 					case 6:
 						sprAnim = this.getBtSprite(context, side, 5);
@@ -167,7 +167,7 @@ public final class Actor extends Costume {
 			}
             finally {
 				this.sprites[side][spr] = sprAnim;
-				this.spritesDur[side][spr] = sprAnim == null ? 0 : RoleData.GetSpriteDuration(sprAnim);
+				this.spritesDur[side][spr] = sprAnim == null ? 0 : RoleSheet.GetSpriteDuration(sprAnim);
 			}
 		}
 		return sprAnim;
@@ -181,7 +181,7 @@ public final class Actor extends Costume {
 		return this._race;
 	}
 
-	public Actor setRace(final Costume race) {
+	public Interpreter setRace(final Costume race) {
 		this.switchCostume(this._race, race);
 		this._race = race;
 		return this;
@@ -191,7 +191,7 @@ public final class Actor extends Costume {
 		return this._job;
 	}
 
-	public Actor setJob(final Costume job) {
+	public Interpreter setJob(final Costume job) {
 		this.switchCostume(this._job, job);
 		this.setSpriteName(job.sprite);
 		this._job = job;
@@ -199,7 +199,7 @@ public final class Actor extends Costume {
 	}
 
 	@Override
-	public Actor setSpriteName(final String sprite) {
+	public Interpreter setSpriteName(final String sprite) {
 		if (sprite != null && !sprite.equals(this.sprite)) {
 			super.setSpriteName(sprite);
 			this.resetSprites();
@@ -211,7 +211,7 @@ public final class Actor extends Costume {
 		return this._lv;
 	}
 
-	public Actor setCurrentLevel(final int lv) {
+	public Interpreter setCurrentLevel(final int lv) {
 		final int nLv = lv > this.maxLv ? this.maxLv : (lv < 1 ? 1 : lv);
 		while (this._lv < nLv) {
 			this._xp = this._maxp;
@@ -224,7 +224,7 @@ public final class Actor extends Costume {
 		return this.maxLv;
 	}
 
-	public Actor setMaxLevel(final int lv) {
+	public Interpreter setMaxLevel(final int lv) {
 		this.maxLv = lv;
 		return this;
 	}
@@ -233,7 +233,7 @@ public final class Actor extends Costume {
 		return this._xp;
 	}
 
-	public Actor setExperience(final int xp) {
+	public Interpreter setExperience(final int xp) {
 		this._xp = xp;
 		this.levelUp();
 		return this;
@@ -243,7 +243,7 @@ public final class Actor extends Costume {
 		return this._maxp;
 	}
 
-	public Actor setExpLimit(final int xp) {
+	public Interpreter setExpLimit(final int xp) {
 		//TODO: levels might be changed;
 		this._maxp = xp;
 		return this;
@@ -261,17 +261,17 @@ public final class Actor extends Costume {
 		return this._sp;
 	}
 
-	public Actor setCurrentHp(final int hp) {
+	public Interpreter setCurrentHp(final int hp) {
 		this._hp = hp > this.mHp ? this.mHp : (hp < 0 ? 0 : hp);
 		return this;
 	}
 
-	public Actor setCurrentMp(final int mp) {
+	public Interpreter setCurrentMp(final int mp) {
 		this._mp = mp > this.mMp ? this.mMp : (mp < 0 ? 0 : mp);
 		return this;
 	}
 
-	public Actor setCurrentSp(final int sp) {
+	public Interpreter setCurrentSp(final int sp) {
 		this._sp = sp > this.mSp ? this.mSp : (sp < 0 ? 0 : sp);
 		return this;
 	}
@@ -312,7 +312,7 @@ public final class Actor extends Costume {
 		return ranged != null && ranged.booleanValue();
 	}
 
-	public RoleData setRange(final boolean range) {
+	public RoleSheet setRange(final boolean range) {
 		super.setRange(range);
 		this._ranged = range ? new Boolean(true) : null;
 		return this;
@@ -327,7 +327,7 @@ public final class Actor extends Costume {
 		return items;
 	}
 
-	public Actor setItems(final Hashtable items) {
+	public Interpreter setItems(final Hashtable items) {
 		this._items = items;
 		return this;
 	}
@@ -336,7 +336,7 @@ public final class Actor extends Costume {
 		return (this.flags & FLAG_ACTIVE) == FLAG_ACTIVE;
 	}
 
-	public Actor setActive(final boolean value) {
+	public Interpreter setActive(final boolean value) {
 		if (value) {
 			this.flags |= FLAG_ACTIVE;
 		} else {
@@ -353,7 +353,7 @@ public final class Actor extends Costume {
 		return (this.flags & FLAG_REFLECTS) == FLAG_REFLECTS;
 	}
 
-	public Actor setReflecting(final boolean value) {
+	public Interpreter setReflecting(final boolean value) {
 		if (value) {
 			this.flags |= FLAG_REFLECTS;
 		} else {
@@ -370,7 +370,7 @@ public final class Actor extends Costume {
 		return (this.flags & FLAG_GUARDS) == FLAG_GUARDS;
 	}
 
-	public Actor setGuarding(final boolean value) {
+	public Interpreter setGuarding(final boolean value) {
 		if (value) {
 			this.flags |= FLAG_GUARDS;
 		} else {
@@ -387,7 +387,7 @@ public final class Actor extends Costume {
 		return (this.flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT;
 	}
 
-	public Actor setShapeShifted(final boolean value) {
+	public Interpreter setShapeShifted(final boolean value) {
 		if (value) {
 			this.flags |= FLAG_SHAPE_SHIFT;
 		} else {
@@ -404,7 +404,7 @@ public final class Actor extends Costume {
 		return this.automatic;
 	}
 
-	public Actor setAudoMode(final int auto) {
+	public Interpreter setAudoMode(final int auto) {
 		this.automatic = auto;
 		return this;
 	}
@@ -413,7 +413,7 @@ public final class Actor extends Costume {
 		return this.init;
 	}
 
-	public Actor setInitiative(final int init) {
+	public Interpreter setInitiative(final int init) {
 		this.init = init;
 		return this;
 	}
@@ -589,7 +589,7 @@ public final class Actor extends Costume {
 	public String checkStatus() {
 		String s;
 		if (this._hp < 1) {
-			s = String.format(Locale.US, Actor.koTxt, this.name);
+			s = String.format(Locale.US, Interpreter.koTxt, this.name);
 			this.setActive(false);
 			this.setGuarding(false);
 			this._sp = 0;
@@ -745,10 +745,10 @@ public final class Actor extends Costume {
 		return r;
 	}
 
-	public Actor(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
-				 final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
-				 final int wis, final int agi, final boolean range, final Hashtable res, final Performance[] skills,
-				 final StateMask[] states, final Hashtable stRes, final Hashtable items) {
+	public Interpreter(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
+                       final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
+                       final int wis, final int agi, final boolean range, final Hashtable res, final Performance[] skills,
+                       final StateMask[] states, final Hashtable stRes, final Hashtable items) {
 		super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes);
 		this._xp = 0;
 		this._maxp = 15;

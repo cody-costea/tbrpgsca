@@ -25,7 +25,7 @@ import android.os.Parcelable;
 
 import java.util.Locale;
 
-public abstract class RoleData implements Parcelable {
+public abstract class RoleSheet implements Parcelable {
 
     public static String hpText = "HP";
     public static String mpText = "MP";
@@ -84,7 +84,7 @@ public abstract class RoleData implements Parcelable {
 		return animSpr;
 	}
 
-	protected RoleData(final Parcel in) {
+	protected RoleSheet(final Parcel in) {
 		this.name = in.readString();
 		this.id = in.readInt();
 		this.mHp = in.readInt();
@@ -112,15 +112,15 @@ public abstract class RoleData implements Parcelable {
 		return 0;
 	}
 
-	public static final Creator<RoleData> CREATOR = new Creator<RoleData>() {
+	public static final Creator<RoleSheet> CREATOR = new Creator<RoleSheet>() {
 		@Override
-		public RoleData createFromParcel(Parcel in) {
+		public RoleSheet createFromParcel(Parcel in) {
 			return null;
 		}
 
 		@Override
-		public RoleData[] newArray(int size) {
-			return new RoleData[size];
+		public RoleSheet[] newArray(int size) {
+			return new RoleSheet[size];
 		}
 	};
 
@@ -132,7 +132,7 @@ public abstract class RoleData implements Parcelable {
 		return this.name;
 	}
 
-	public RoleData setName(final String value) {
+	public RoleSheet setName(final String value) {
 		this.name = value;
 		return this;
 	}
@@ -141,7 +141,7 @@ public abstract class RoleData implements Parcelable {
 		return this.mHp;
 	}
 
-	public RoleData setMaxHpMod(final int value) {
+	public RoleSheet setMaxHpMod(final int value) {
 		this.mHp = value;
 		return this;
 	}
@@ -150,7 +150,7 @@ public abstract class RoleData implements Parcelable {
 		return this.mMp;
 	}
 
-	public RoleData setMaxMpMod(final int value) {
+	public RoleSheet setMaxMpMod(final int value) {
 		this.mMp = value;
 		return this;
 	}
@@ -159,7 +159,7 @@ public abstract class RoleData implements Parcelable {
 		return this.mSp;
 	}
 
-	public RoleData setMaxSpMod(final int value) {
+	public RoleSheet setMaxSpMod(final int value) {
 		this.mSp = value;
 		return this;
 	}
@@ -168,7 +168,7 @@ public abstract class RoleData implements Parcelable {
 		return this.mInit;
 	}
 
-	public RoleData setMaxInitMod(final int value) {
+	public RoleSheet setMaxInitMod(final int value) {
 		this.mInit = value;
 		return this;
 	}
@@ -177,7 +177,7 @@ public abstract class RoleData implements Parcelable {
 		return (this.flags & FLAG_RANGE) == FLAG_RANGE;
 	}
 
-	public RoleData setRange(final boolean value) {
+	public RoleSheet setRange(final boolean value) {
 		if (value) {
 			this.flags |= FLAG_RANGE;
 		} else {
@@ -194,17 +194,17 @@ public abstract class RoleData implements Parcelable {
 		return this.aStates;
 	}
 
-	public RoleData setAddedStates(final StateMask[] value) {
+	public RoleSheet setAddedStates(final StateMask[] value) {
 		this.aStates = value;
 		return this;
 	}
 
 	public boolean equals(final Object object) {
-		return object != null && object instanceof RoleData && ((RoleData)object).id == this.id;
+		return object != null && object instanceof RoleSheet && ((RoleSheet)object).id == this.id;
 	}
 
-	public RoleData(final int id, final String name, final int hp, final int mp, final int sp,
-                    final int mInit, final boolean range, final StateMask[] states) {
+	public RoleSheet(final int id, final String name, final int hp, final int mp, final int sp,
+                     final int mInit, final boolean range, final StateMask[] states) {
 		this.id = id;
 		this.name = name;
 		this.mHp = hp;
@@ -225,7 +225,7 @@ public abstract class RoleData implements Parcelable {
 			if (dmghp < 0) {
 				s.append("+");
 			}
-			s.append(String.format(Locale.US, "%d %s", -dmghp, RoleData.hpText));
+			s.append(String.format(Locale.US, "%d %s", -dmghp, RoleSheet.hpText));
 			c = true;
 		}
 		if (dmgmp != 0) {
@@ -236,7 +236,7 @@ public abstract class RoleData implements Parcelable {
 			if (dmgmp < 0) {
 				s.append("+");
 			}
-			s.append(String.format(Locale.US, "%d %s", -dmgmp, RoleData.mpText));
+			s.append(String.format(Locale.US, "%d %s", -dmgmp, RoleSheet.mpText));
 			c = true;
 		}
 		if (dmgsp != 0) {
@@ -247,7 +247,7 @@ public abstract class RoleData implements Parcelable {
 			if (dmgsp < 0) {
 				s.append("+");
 			}
-			s.append(String.format(Locale.US, "%d %s", -dmgsp, RoleData.spText));
+			s.append(String.format(Locale.US, "%d %s", -dmgsp, RoleSheet.spText));
 		}
 		return s.toString();
 	}

@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.SpannableString;
 import android.text.util.Linkify;
 import android.view.View;
@@ -35,8 +36,8 @@ public class StageAct extends Activity {
 
 	private Costume[] pcRace;
 	private Costume[] pcJob;
-	private Actor[] Party;
-	private Actor[][] Enemy;
+	private Interpreter[] Party;
+	private Interpreter[][] Enemy;
 
 	private EditText[] name = new EditText[3];
 	private Spinner[] jobBox = new Spinner[3], raceBox = new Spinner[3];
@@ -53,15 +54,15 @@ public class StageAct extends Activity {
 			ScenePlay.escapeTxt = this.getString(R.string.scene_escape);
 			ScenePlay.performsTxt = this.getString(R.string.scene_performs);
 			ScenePlay.failTxt = this.getString(R.string.scene_fail);
-			Actor.koTxt = this.getString(R.string.actor_ko);
+			Interpreter.koTxt = this.getString(R.string.actor_ko);
 			Performance.reflectedTxt = this.getString(R.string.ability_reflected);
 			Performance.suffersTxt = this.getString(R.string.ability_suffers);
 			Performance.stolenTxt = this.getString(R.string.ability_stolen);
 			Performance.missesTxt = this.getString(R.string.ability_misses);
 			StateMask.causesTxt = this.getString(R.string.state_causes);
-			RoleData.hpText = this.getString(R.string.costume_hp);
-			RoleData.mpText = this.getString(R.string.costume_mp);
-			RoleData.spText = this.getString(R.string.costume_sp);
+			RoleSheet.hpText = this.getString(R.string.costume_hp);
+			RoleSheet.mpText = this.getString(R.string.costume_mp);
+			RoleSheet.spText = this.getString(R.string.costume_sp);
 		}
 
 		final StateMask[] state = new StateMask[] {
@@ -231,41 +232,41 @@ public class StageAct extends Activity {
 				new Costume(21, this.getString(R.string.race_lizard), "lizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]}, null, null)
 		};
 
-		final Actor[] party = this.Party = new Actor[] {
-				new Actor(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
-				new Actor(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
-				new Actor(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+		final Interpreter[] party = this.Party = new Interpreter[] {
+				new Interpreter(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+				new Interpreter(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+				new Interpreter(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
 				//new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap)
 		};
 
-		final Actor[] enemy = new Actor[] {
-				new Actor(2, this.getString(R.string.race_goblin), race[2], job[18], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Actor(4, this.getString(R.string.race_lizard), race[0], job[20], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Actor(6, this.getString(R.string.race_troll), race[3], job[19], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Actor(8, this.getString(R.string.race_ogre), race[1], job[17], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+		final Interpreter[] enemy = new Interpreter[] {
+				new Interpreter(2, this.getString(R.string.race_goblin), race[2], job[18], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Interpreter(4, this.getString(R.string.race_lizard), race[0], job[20], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Interpreter(6, this.getString(R.string.race_troll), race[3], job[19], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Interpreter(8, this.getString(R.string.race_ogre), race[1], job[17], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 		};
 
-		final Actor[][] enemies = this.Enemy = new Actor[6][];
-		enemies[0] = new Actor[2];
+		final Interpreter[][] enemies = this.Enemy = new Interpreter[6][];
+		enemies[0] = new Interpreter[2];
 		enemies[0][0] = enemy[3];
 		enemies[0][1] = enemy[0];
-		enemies[1] = new Actor[2];
+		enemies[1] = new Interpreter[2];
 		enemies[1][0] = enemy[1];
 		enemies[1][1] = enemy[2];
-		enemies[2] = new Actor[3];
+		enemies[2] = new Interpreter[3];
 		enemies[2][0] = enemy[1];
 		enemies[2][1] = enemy[0];
 		enemies[2][2] = enemy[3];
-		enemies[3] = new Actor[3];
+		enemies[3] = new Interpreter[3];
 		enemies[3][0] = enemy[1];
 		enemies[3][1] = enemy[2];
 		enemies[3][2] = enemy[3];
-		enemies[4] = new Actor[4];
+		enemies[4] = new Interpreter[4];
 		enemies[4][0] = enemy[0];
 		enemies[4][1] = enemy[2];
 		enemies[4][2] = enemy[1];
 		enemies[4][3] = enemy[3];
-		enemies[5] = new Actor[4];
+		enemies[5] = new Interpreter[4];
 		enemies[5][0] = enemy[0];
 		enemies[5][1] = enemy[2];
 		enemies[5][2] = enemy[1];
@@ -326,7 +327,7 @@ public class StageAct extends Activity {
                     break;
             }
         }
-		final Actor[] players = this.Party;
+		final Interpreter[] players = this.Party;
         final Spinner[] raceBox = this.raceBox, jobBox = this.jobBox;
 		players[p].setName(n);
 		if (raceBox[p].isEnabled()) {
@@ -348,11 +349,11 @@ public class StageAct extends Activity {
 		if (level == 2) {
             surprise = 1;
         }
-		final Actor[] players = this.Party;
+		final Interpreter[] players = this.Party;
 		for (int i = 0; i < players.length; i++) {
             players[i].recover();
         }
-		final Actor[] enemies = this.Enemy[level];
+		final Interpreter[] enemies = this.Enemy[level];
         for (int i = 0; i < enemies.length; i++) {
             enemies[i].recover();
         }
@@ -395,15 +396,15 @@ public class StageAct extends Activity {
 		if (requestCode >= 0) {
 			if (resultCode == RESULT_OK) {
 				Bundle extra = data.getExtras();
-				if (extra != null && extra.containsKey("Party")) {
-					System.arraycopy(extra.getParcelableArray("Party"), 0, this.Party, 0, 4);
-					/*this.Party[1] = this.Party[0];
-					this.Party[2] = this.Party[1];
-					this.Party[3] = this.Party[2];*/
+				if (extra != null && extra.containsKey("party")) {
+				    final Interpreter[] players = this.Party;
+				    final Parcelable[] party = extra.getParcelableArray("party");
+					System.arraycopy(party, 0, players, 0, Math.min(party.length, players.length));
 				}
 				int level = StageAct.this.level;
-				if (extra.getInt("Outcome") > 0 && level < 5)
-					StageAct.this.level = level + 1;
+				if (extra.getInt("outcome", 0) > 0 && level < 5) {
+                    StageAct.this.level = level + 1;
+                }
 			}
 		}
 	}

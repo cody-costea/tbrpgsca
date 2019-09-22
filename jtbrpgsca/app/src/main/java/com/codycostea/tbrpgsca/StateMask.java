@@ -193,7 +193,7 @@ public final class StateMask extends Costume {
         return this;
     }
 
-    public String inflict(final Actor actor, final boolean always, final boolean indefinite) {
+    public String inflict(final Interpreter actor, final boolean always, final boolean indefinite) {
         final Hashtable trgStRes = actor.stRes;
         Object o = null;
         if (always || new Random().nextInt(10) > (trgStRes == null ? 0 : ((o = trgStRes.get(this)) == null
@@ -223,7 +223,7 @@ public final class StateMask extends Costume {
         }
     }
 
-    void disableSkills(final Actor actor, final boolean remove) {
+    void disableSkills(final Interpreter actor, final boolean remove) {
         final Performance[] rSkills = this.rSkills;
         if (rSkills == null) {
             return;
@@ -255,7 +255,7 @@ public final class StateMask extends Costume {
         }
     }
 
-    String apply(final Actor actor, final boolean consume) {
+    String apply(final Interpreter actor, final boolean consume) {
         final StringBuilder s = new StringBuilder();
         final Hashtable sDur = actor.stateDur;
         if (sDur != null) {
@@ -277,7 +277,7 @@ public final class StateMask extends Costume {
                         actor.setCurrentSp(actor._sp - dmgsp);
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
                             s.append(String.format(Locale.US, this.name, actor.name));
-                            s.append(RoleData.getDmgText(dmghp, dmgmp, dmgsp));
+                            s.append(RoleSheet.getDmgText(dmghp, dmgmp, dmgsp));
                         }
                     }
                     else {
@@ -295,11 +295,11 @@ public final class StateMask extends Costume {
                         if (this.isRefelcting()) {
                             actor.setReflecting(true);
                         }
-                        if (this.isAutomating() && actor.automatic < Actor.AUTO_ALLY) {
-                            actor.automatic = Actor.AUTO_ENRAGED;
+                        if (this.isAutomating() && actor.automatic < Interpreter.AUTO_ALLY) {
+                            actor.automatic = Interpreter.AUTO_ENRAGED;
                         }
                         if (this.isConfusing()) {
-                            actor.automatic = actor.automatic < Actor.AUTO_ALLY ? Actor.AUTO_CONFUSED : Actor.AUTO_ENEMY;
+                            actor.automatic = actor.automatic < Interpreter.AUTO_ALLY ? Interpreter.AUTO_CONFUSED : Interpreter.AUTO_ENEMY;
                         }
                     }
                 }
@@ -308,7 +308,7 @@ public final class StateMask extends Costume {
         return s.toString();
     }
 
-    void disable(final Actor actor) {
+    void disable(final Interpreter actor) {
         actor.updateAttributes(true, this);
         actor.updateResistance(true, this.res, this.stRes);
         actor.updateStates(true, this.aStates);
@@ -319,7 +319,7 @@ public final class StateMask extends Costume {
         }
     }
 
-    public boolean remove(final Actor actor, final boolean delete, final boolean always) {
+    public boolean remove(final Interpreter actor, final boolean delete, final boolean always) {
         Hashtable sDur = actor.stateDur;
         Object d;
         if (sDur != null && (always || ((d = sDur.get(this)) == null ? -2 : ((Integer)d).intValue()) != -2)) {
