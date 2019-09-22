@@ -19,7 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:ftbrpgsca/Actor.dart';
 import 'package:ftbrpgsca/SceneAct.dart';
 import 'package:ftbrpgsca/Performance.dart';
-import 'package:audioplayers/audio_cache.dart';
+//import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:sprintf/sprintf.dart';
 
@@ -353,7 +353,7 @@ class ArenaState extends State<ArenaStage> {
     });
   }
 
-  AudioCache _flutterSound;
+  /*AudioCache _flutterSound;
   AudioCache get flutterSound {
     AudioCache flutterSound = this._flutterSound;
     if (flutterSound == null) {
@@ -361,7 +361,7 @@ class ArenaState extends State<ArenaStage> {
       this._flutterSound = flutterSound;
     }
     return flutterSound;
-  }
+  }*/
 
   List<DropdownMenuItem<Performance>> _emptyAbilities;
   List<DropdownMenuItem<Performance>> get emptyAbilities {
@@ -666,9 +666,9 @@ class ArenaState extends State<ArenaStage> {
         });
       }
       final String skillSnd = lastAbility.sound;
-      if (skillSnd != null && skillSnd.length > 0) {
+      /*if (skillSnd != null && skillSnd.length > 0) {
         this.flutterSound.play(skillSnd);
-      }
+      }*/
       this._actorSprites[crt].sprite = crActor.hp > 0
           ? ((lastAbility.dmgType & Performance.DmgTypeSpi ==
           Performance.DmgTypeSpi
@@ -813,9 +813,9 @@ class ArenaState extends State<ArenaStage> {
       }
     }
     this._actorSprites = actorSprites;
-    if (arenaSnd != null && arenaSnd.length > 0) {
+    /*if (arenaSnd != null && arenaSnd.length > 0) {
       this.flutterSound.loop(arenaSnd);
-    }
+    }*/
     if (crActor.automatic == 0) {
       this._setCrAutoSkill();
     } else {
