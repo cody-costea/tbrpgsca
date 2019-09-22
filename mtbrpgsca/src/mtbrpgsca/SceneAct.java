@@ -219,51 +219,56 @@ public final class SceneAct {
     return ret;
   }
 
-  public int getGuardian(final int target, final Performance skill) {
-    if (skill.hasRange() || (/*skill._range == null &&*/ this._players[this._current].hasRange())) {
-      return target;
-    }
-    int f;
-    int l;
-    if (this._current < this._enIdx) {
-      if (target <= this._enIdx || target == this._players.length - 1) {
-        return target;
-      }
-      f = this._enIdx;
-      l = this._players.length - 1;
-    } else {
-      if (target >= this._enIdx - 1 || target == 0) {
-        return target;
-      }
-      f = 0;
-      l = this._enIdx - 1;
-    }
-    int difF = 0;
-    int difL = 0;
-    int guardF = target;
-    int guardL = target;
-    for (int i = f; i < target; i++) {
-      if (this._players[i]._hp > 0 && this._players[i].isGuarding()) {
-        if (guardF == target) {
-          guardF = i;
+    public int getGuardian(final int target, final Performance skill) {
+        final Actor[] players = this._players;
+        final int current = this._current;
+        if (skill.hasRange() || (/*skill._range == null &&*/ players[current].hasRange())) {
+            return target;
         }
-        difF++;
-      }
-    }
-    if (difF == 0) {
-      return target;
-    } else {
-      for (int i = l; i > target; i--) {
-        if (this._players[i]._hp > 0 && this._players[i].isGuarding()) {
-          if (guardL == target) {
-            guardL = i;
-          }
-          difL++;
+        int f, l;
+        final int enIdx = this._enIdx;
+        if (current < enIdx) {
+            final int pLength = players.length - 1;
+            if (target <= enIdx || target == pLength) {
+                return target;
+            }
+            f = enIdx;
+            l = pLength;
+        } else {
+            if (target >= enIdx - 1 || target == 0) {
+                return target;
+            }
+            f = 0;
+            l = enIdx - 1;
         }
-      }
-      return difL == 0 ? target : (difF < difL ? guardF : guardL);
+        int difF = 0;
+        int difL = 0;
+        int guardF = target;
+        int guardL = target;
+        for (int i = f; i < target; i++) {
+            final Actor iPlayer = players[i];
+            if (iPlayer._hp > 0 && iPlayer.isGuarding()) {
+                if (guardF == target) {
+                    guardF = i;
+                }
+                difF++;
+            }
+        }
+        if (difF == 0) {
+            return target;
+        } else {
+            for (int i = l; i > target; i--) {
+                final Actor iPlayer = players[i];
+                if (iPlayer._hp > 0 && iPlayer.isGuarding()) {
+                    if (guardL == target) {
+                        guardL = i;
+                    }
+                    difL++;
+                }
+            }
+            return difL == 0 ? target : (difF < difL ? guardF : guardL);
+        }
     }
-  }
 
   public String executeAbility(final Performance skill, int target, String ret) {
     switch (skill.trg) {
@@ -313,83 +318,88 @@ public final class SceneAct {
     return ret;
   }
 
-  public String executeAI(String ret) {
-    int skillIndex = 0;
-    boolean nHeal = false;
-    boolean nRestore = false;
-    boolean party = this._current < this._enIdx;
-    int f;
-    int l;
-    if (party) {
-      f = 0;
-      l = this._enIdx;
-    } else {
-      f = this._enIdx;
-      l = this._players.length;
-    }
-    for (int i = f; i < l; i++) {
-      if (this._players[i]._hp < 1) {
-        nRestore = true;
-      } else if (this._players[i]._hp < this._players[i].mHp / 3) {
-        nHeal = true;
-      }
-    }
-    final Actor crActor = this._players[this._current];
-    final Vector crSkills = crActor.getAvailableSkills();
-    if (nRestore || nHeal) {
-      for (int i = 0; i < crSkills.size(); i++) {
-        final Performance s = (Performance)crSkills.elementAt(i);
-        if ((s.isRestoring() || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
-          skillIndex = i;
+    public String executeAI(String ret) {
+        int skillIndex = 0;
+        boolean nHeal = false;
+        boolean nRestore = false;
+        final int enIdx = this._enIdx;
+        boolean party = this._current < enIdx;
+        final Actor[] players = this._players;
+        int f;
+        int l;
+        if (party) {
+            f = 0;
+            l = enIdx;
+        } else {
+            f = enIdx;
+            l = players.length;
         }
-        break;
-      }
+        for (int i = f; i < l; i++) {
+            if (players[i]._hp < 1) {
+                nRestore = true;
+            } else if (players[i]._hp < players[i].mHp / 3) {
+                nHeal = true;
+            }
+        }
+        final Actor crActor = players[this._current];
+        final Vector crSkills = crActor.getAvailableSkills();
+        if (nRestore || nHeal) {
+            for (int i = 0; i < crSkills.size(); i++) {
+                final Performance s = (Performance)crSkills.elementAt(i);
+                if ((s.isRestoring() || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
+                    skillIndex = i;
+                    break;
+                }
+            }
+        }
+        final Performance ability = (Performance)crSkills.elementAt(this.getAIskill(skillIndex, nRestore));
+        final boolean atkSkill = ability.mHp > -1;
+        if (atkSkill) {
+            if (party) {
+                f = enIdx;
+                l = players.length;
+            } else {
+                f = 0;
+                l = enIdx;
+            }
+        }
+        int target = f;
+        Actor trgActor = players[target];
+        final boolean restore = ability.isRestoring();
+        while (trgActor._hp < 1 && (atkSkill || !restore) && target < l) {
+            trgActor = players[++target];
+        }
+        for (int i = target + 1; i < l; i++) {
+            final Actor iPlayer = players[i];
+            if (iPlayer._hp < trgActor._hp && (iPlayer._hp > 0 || restore)) {
+                trgActor = iPlayer;
+                target = i;
+            }
+        }
+        return this.executeAbility(ability, target, ret);
     }
-    final Performance ability = (Performance)crSkills.elementAt(this.getAIskill(skillIndex, nRestore));
-    final boolean atkSkill = ability.mHp > -1;
-    if (atkSkill) {
-      if (party) {
-        f = this._enIdx;
-        l = this._players.length;
-      } else {
-        f = 0;
-        l = this._enIdx;
-      }
-    }
-    int target = f;
-    final boolean restore = ability.isRestoring();
-    while (this._players[target]._hp < 1 && (atkSkill || !restore) && target < l) {
-      target++;
-    }
-    for (int i = target; i < l; i++) {
-      if (this._players[i]._hp < this._players[target]._hp && (this._players[i]._hp > 0 || restore)) {
-        target = i;
-      }
-    }
-    return this.executeAbility(ability, target, ret);
-  }
 
-  public int getAIskill(final int defSkill, final boolean nRestore) {
-    int ret = defSkill;
-    final Actor crActor = this._players[this._current];
-    final Vector crSkills = crActor.getAvailableSkills();
-    Performance s = (Performance)crSkills.elementAt(defSkill);
-    for (int i = defSkill + 1; i < crSkills.size(); i++) {
-      final Performance a = (Performance)crSkills.elementAt(i);
-      if (a.canPerform(crActor)) {
-        if (defSkill > 0) {
-          if (a.mHp < s.mHp && (a.isRestoring() || !nRestore)) {
-            s = a;
-            ret = i;
-          }
-        } else if (a.mHp > s.mHp) {
-          s = a;
-          ret = i;
+    public int getAIskill(final int defSkill, final boolean nRestore) {
+        int ret = defSkill;
+        final Actor crActor = this._players[this._current];
+        final Vector crSkills = crActor.getAvailableSkills();
+        Performance s = (Performance)crSkills.elementAt(defSkill);
+        for (int i = defSkill + 1; i < crSkills.size(); i++) {
+            final Performance a = (Performance)crSkills.elementAt(i);
+            if (a.canPerform(crActor)) {
+                if (defSkill > 0) {
+                    if (a.mHp < s.mHp && (a.isRestoring() || !nRestore)) {
+                        s = a;
+                        ret = i;
+                    }
+                } else if (a.mHp > s.mHp) {
+                    s = a;
+                    ret = i;
+                }
+            }
         }
-      }
+        return ret;
     }
-    return ret;
-  }
 
   public String performSkill(final int index, final int target, final String ret) {
     return this.executeAbility((Performance)this._players[this._current].getAvailableSkills().elementAt(index), target, ret);
