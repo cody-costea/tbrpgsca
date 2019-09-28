@@ -288,33 +288,31 @@ public final class ScenePlay {
         switch (skill.trg) {
             case Performance.TRG_ENEMY:
                 if (target < enIdx) {
-                    fTarget = this._fTarget = 0;
-                    lTarget = this._lTarget = enIdx - 1;
+                    this._fTarget = fTarget = 0;
+                    this._lTarget = lTarget = enIdx - 1;
                 } else {
-                    fTarget = this._fTarget = enIdx;
-                    lTarget = this._lTarget = players.length - 1;
+                    this._fTarget = fTarget = enIdx;
+                    this._lTarget = lTarget = players.length - 1;
                 }
                 break;
             case Performance.TRG_ALL:
-                fTarget = this._fTarget = 0;
-                lTarget = this._lTarget = players.length - 1;
+                this._fTarget = fTarget = 0;
+                this._lTarget = lTarget = players.length - 1;
                 break;
             case Performance.TRG_PARTY:
                 if (this._current < enIdx) {
-                    fTarget = this._fTarget = 0;
-                    lTarget = this._lTarget = enIdx - 1;
+                    this._fTarget = fTarget = 0;
+                    this._lTarget = lTarget = enIdx - 1;
                 } else {
-                    fTarget = this._fTarget = enIdx;
-                    lTarget = this._lTarget = players.length - 1;
+                    this._fTarget = fTarget = enIdx;
+                    this._lTarget = lTarget = players.length - 1;
                 }
                 break;
             case Performance.TRG_SELF:
-                fTarget = lTarget = this._fTarget = this._lTarget = current;
+                this._fTarget = this._lTarget = fTarget = lTarget = current;
                 break;
             default:
-                target = this.getGuardian(target, skill);
-                fTarget = this._fTarget = target;
-                lTarget = this._lTarget = target;
+                this._fTarget = this._lTarget = fTarget = lTarget = this.getGuardian(target, skill);
         }
         boolean applyCosts = true;
         final Interpreter crActor = players[current];
