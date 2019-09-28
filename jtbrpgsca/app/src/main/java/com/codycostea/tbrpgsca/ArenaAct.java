@@ -337,7 +337,7 @@ public final class ArenaAct extends Activity {
                         final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                         final int enemyIndex = scenePlay._enIdx;
                         outcome.putExtra("outcome", scenePlay._status);
-                        if (ArenaAct.this.staticCache) {
+                        if (!ArenaAct.this.staticCache) {
                             final Parcelable[] party = new Parcelable[enemyIndex];
                             final Interpreter[] players = scenePlay._players;
                             for (int i = 0; i < enemyIndex; i++) {
