@@ -414,7 +414,7 @@ public final class Actor extends Costume {
         Enumeration rIdx = rs.keys();
         while (rIdx.hasMoreElements()) {
           Integer k = ((Integer)rIdx.nextElement());
-          if (!remove || i == k) {
+          if (!remove || i.equals(k)) {
             rs.put(k, new Integer(((x = rs.get(k)) == null ? 3 : ((Integer)x).intValue())
                     + (((remove) ? -1 : 1) * ((y = resMap.get(i)) == null
                             ? 0 : ((Integer)y).intValue()))));
