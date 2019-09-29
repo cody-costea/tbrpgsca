@@ -110,14 +110,14 @@ public class StageAct extends Activity {
 		final StateMask[] tpoison = new StateMask[] {state[1], state[3], state[5]};
 		final StateMask[] dizzystun = new StateMask[] {state[3], state[9]};
 
-		final Integer ELEMENT_NONE = new Integer(0);
-		final Integer ELEMENT_PHYSICAL = new Integer(1);
-		final Integer ELEMENT_FIRE = new Integer(2);
-		final Integer ELEMENT_WATER = new Integer(3);
-		final Integer ELEMENT_WIND = new Integer(4);
-		final Integer ELEMENT_EARTH = new Integer(5);
-		final Integer ELEMENT_PSYCHIC = new Integer(6);
-		final Integer ELEMENT_LIGHT = new Integer(7);
+		final Integer ELEMENT_NONE = Integer.valueOf(0);
+		final Integer ELEMENT_PHYSICAL = Integer.valueOf(1);
+		final Integer ELEMENT_FIRE = Integer.valueOf(2);
+		final Integer ELEMENT_WATER = Integer.valueOf(3);
+		final Integer ELEMENT_WIND = Integer.valueOf(4);
+		final Integer ELEMENT_EARTH = Integer.valueOf(5);
+		final Integer ELEMENT_PSYCHIC = Integer.valueOf(6);
+		final Integer ELEMENT_LIGHT = Integer.valueOf(7);
 
 		final Performance[] skill = new Performance[] {
 				new Performance(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Performance.DMG_TYPE_ATK, 1, 10, 0, -3, Performance.TRG_ONE, ELEMENT_PHYSICAL, -1, -1, false, false, null, confsleep),
