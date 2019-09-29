@@ -350,7 +350,8 @@ public final class Performance extends RoleSheet {
 		int o;
 		final boolean ko = target._hp < 1;
 		final SparseIntArray trgResMap = target.res;
-		int res = trgResMap == null ? 3 : (o = trgResMap.get(this.elm)) == 0 ? 3 : o;
+		int res = trgResMap == null ? 3 : (o = trgResMap.get(this.elm, Integer.MIN_VALUE))
+				== Integer.MIN_VALUE ? 3 : (o < 1 ? 1 : o);
 		if (res > 6) {
 			res = -1;
 		}

@@ -554,7 +554,8 @@ public final class Interpreter extends Costume {
 				for (int b = 0; b < r.size(); b++) {
 					final int k = r.keyAt(b);
 					if (!remove || i == k) {
-						r.put(k, ((x = r.get(k)) == 0 ? 3 : x) + ((remove) ? -1 : 1) * ((y = resMap.get(i)) == 0 ? 3 : y));
+						r.put(k, ((x = r.get(k, Integer.MIN_VALUE)) == Integer.MIN_VALUE ? 3 : x) + ((remove) ? -1 : 1)
+								* ((y = resMap.get(i, Integer.MIN_VALUE)) == Integer.MIN_VALUE ? 3 : y));
 					}
 				}
 			}
