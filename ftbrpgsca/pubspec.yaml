@@ -13,8 +13,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  sprintf: "^4.0.0"
-  audioplayers: "^0.10.1"
+  sprintf: "^4.0.2"
   flutter:
     sdk: flutter
 
