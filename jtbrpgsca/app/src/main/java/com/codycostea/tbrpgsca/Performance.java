@@ -23,8 +23,8 @@ import android.media.MediaPlayer;
 import android.os.Parcel;
 import android.util.SparseIntArray;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Random;
 
@@ -420,14 +420,12 @@ public final class Performance extends RoleSheet {
 					}
 				}
 			}
-			final Hashtable trgStateMap = target.stateDur;
+			final HashMap<StateMask, Integer> trgStateMap = target.stateDur;
 			if (trgStateMap != null) {
 				final StateMask[] rStates = this.rStates;
 				if (rStates != null) {
 					for (int j = 0; j < rStates.length; j++) {
-						final Enumeration trgStates = trgStateMap.keys();
-						while (trgStates.hasMoreElements()) {
-							final StateMask state = (StateMask)trgStates.nextElement();
+						for (StateMask state : trgStateMap.keySet()) {
 							if (rStates[j].equals(state)) {
 								state.remove(target, false, false);
 							}
@@ -435,36 +433,42 @@ public final class Performance extends RoleSheet {
 					}
 				}
 			}
-			final Hashtable trgItemMap = target._items;
+			final HashMap<Performance, Integer> trgItemMap = target._items;
 			if (this.isStealing() && trgItemMap != null && trgItemMap != user._items && trgItemMap.size() > 0
 					&& (rnd.nextInt(12) + user.agi / 4) > 4 + target.agi / 3) {
 				final int rndItem = rnd.nextInt(trgItemMap.size() - 1);
-				final Enumeration itemsEnum = trgItemMap.keys();
 				Performance stolen = null;
-				for (int j = 0; j <= rndItem && itemsEnum.hasMoreElements(); j++) {
-					if (j == rndItem) {
-						stolen = (Performance)itemsEnum.nextElement();
-					} else {
-						itemsEnum.nextElement();
+				{
+					int j = 0;
+					for (Performance x : trgItemMap.keySet()) {
+						if (j++ == rndItem) {
+							stolen = x;
+						}
 					}
 				}
-				int trgItemQty;
-				final Object itemQtyObj = trgItemMap.get(stolen);
-				if (itemQtyObj != null && ((trgItemQty = ((Integer)itemQtyObj).intValue()) > 0)) {
-					Hashtable usrItems = user._items;
-					if (usrItems == null) {
-						usrItems = new Hashtable();
-						user._items = usrItems;
+				if (stolen == null) {
+					s.append(Performance.missesTxt);
+				}
+				else {
+					int trgItemQty;
+					final Object itemQtyObj = trgItemMap.get(stolen);
+					if (itemQtyObj != null && ((trgItemQty = ((Integer) itemQtyObj).intValue()) > 0)) {
+						LinkedHashMap<Performance, Integer> usrItems = user._items;
+						if (usrItems == null) {
+							usrItems = new LinkedHashMap<>();
+							user._items = usrItems;
+						}
+						final Object usrItem;
+						usrItems.put(stolen, Integer.valueOf((usrItem = usrItems.get(stolen)) == null
+								? 0 : ((Integer) usrItem).intValue() + 1));
+						trgItemQty--;
+						if (trgItemQty == 0) {
+							trgItemMap.remove(stolen);
+						} else {
+							trgItemMap.put(stolen, new Integer(trgItemQty));
+						}
+						s.append(String.format(Locale.US, Performance.stolenTxt, stolen.name, target.name));
 					}
-					final Object usrItem;
-					usrItems.put(stolen, new Integer((usrItem = usrItems.get(stolen)) == null ? 0 : ((Integer)usrItem).intValue() + 1));
-					trgItemQty--;
-					if (trgItemQty == 0) {
-						trgItemMap.remove(stolen);
-					} else {
-						trgItemMap.put(stolen, new Integer(trgItemQty));
-					}
-					s.append(String.format(Locale.US, Performance.stolenTxt, stolen.name, target.name));
 				}
 			}
 			s.append(target.checkStatus());
@@ -477,13 +481,14 @@ public final class Performance extends RoleSheet {
 			user._mp -= this.mpC;
 			user._sp -= this.spC;
 			if (this.mQty > 0) {
-				Hashtable usrSkillsQty = user.skillsQty;
+				HashMap<Performance, Integer> usrSkillsQty = user.skillsQty;
 				if (usrSkillsQty == null) {
-					usrSkillsQty = new Hashtable();
+					usrSkillsQty = new HashMap<>();
 					user.skillsQty = usrSkillsQty;
 				}
 				final Object usrItemQty;
-				usrSkillsQty.put(this, new Integer(((usrItemQty = usrSkillsQty.get(this)) == null ? this.mQty : ((Integer)usrItemQty).intValue()) - 1));
+				usrSkillsQty.put(this, Integer.valueOf(((usrItemQty = usrSkillsQty.get(this)) == null
+						? this.mQty : ((Integer)usrItemQty).intValue()) - 1));
 			}
 		}
 		if (ko && target._hp > 0) {
@@ -494,18 +499,18 @@ public final class Performance extends RoleSheet {
 
 	public void replenish(final Interpreter user) {
 		if (this.mQty > 0) {
-			Hashtable usrSkills = user.skillsQty;
+			HashMap<Performance, Integer> usrSkills = user.skillsQty;
 			if (usrSkills == null) {
-				usrSkills = new Hashtable();
+				usrSkills = new HashMap<>();
 				user.skillsQty = usrSkills;
 			}
-			usrSkills.put(this, new Integer(this.mQty));
+			usrSkills.put(this, Integer.valueOf(this.mQty));
 		}
 	}
 
 	public boolean canPerform(final Interpreter actor) {
 		final Object itemQty;
-		final Hashtable skillsQty = actor.skillsQty;
+		final HashMap<Performance, Integer> skillsQty = actor.skillsQty;
 		return this.mpC <= actor._mp && this.hpC < actor._hp && this.spC <= actor._sp && actor._lv >= this.lvRq
 				&& (skillsQty == null || ((itemQty = skillsQty.get(this)) == null ? 1 : ((Integer)itemQty).intValue()) > 0);
 	}

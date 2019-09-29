@@ -21,14 +21,14 @@ import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
+import android.util.SparseArray;
 import android.util.SparseIntArray;
 
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Set;
-import java.util.Vector;
 
 public final class Interpreter extends Costume {
 
@@ -47,10 +47,13 @@ public final class Interpreter extends Costume {
 
 	protected Costume _race, _job;
 	protected int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
-	protected Hashtable _items, skillsQty, skillsQtyRgTurn, stateDur, equipment;
+	protected HashMap<Performance, Integer> skillsQty, skillsQtyRgTurn;
+	protected LinkedHashMap<Performance, Integer> _items;
+	protected HashMap<StateMask, Integer> stateDur;
+	protected SparseArray<Costume> equipment;
 	protected Boolean _ranged;
 
-	protected final Vector<Performance> _skills = new Vector<>();
+	protected final ArrayList<Performance> _skills = new ArrayList<>();
 
 	int[][] spritesDur = new int[7][7];
 	private AnimationDrawable[][] sprites = new AnimationDrawable[7][7];
@@ -176,7 +179,7 @@ public final class Interpreter extends Costume {
 		return sprAnim;
 	}
 
-	public Vector<Performance> getAvailableSkills() {
+	public ArrayList<Performance> getAvailableSkills() {
 		return this._skills;
 	}
 
@@ -286,13 +289,12 @@ public final class Interpreter extends Costume {
 	public boolean hasRange() {
 		Boolean ranged = this._ranged;
 		if (ranged == null) {
-			final Hashtable equipment = this.equipment;
-			final Hashtable states = this.stateDur;
+			final SparseArray<Costume> equipment = this.equipment;
+			final HashMap<StateMask, Integer> states = this.stateDur;
 			boolean r = super.hasRange() || this._job.hasRange() || this._race.hasRange();
 			if (!r && equipment != null) {
-				final Enumeration vEquip = equipment.elements();
-				while (vEquip.hasMoreElements()) {
-					Costume c = (Costume)vEquip.nextElement();
+				for (int i = 0; i < equipment.size(); i++) {
+					final Costume c = equipment.get(i);
 					if (c.hasRange()) {
 						r = true;
 						break;
@@ -300,16 +302,14 @@ public final class Interpreter extends Costume {
 				}
 			}
 			if (!r && states != null) {
-				final Enumeration sMasks = states.keys();
-				while (sMasks.hasMoreElements()) {
-					StateMask s = (StateMask)sMasks.nextElement();
+				for (StateMask s : states.keySet()) {
 					if (s.hasRange()) {
 						r = true;
 						break;
 					}
 				}
 			}
-			ranged = new Boolean(r);
+			ranged = Boolean.valueOf(r);
 			this._ranged = ranged;
 		}
 		return ranged != null && ranged.booleanValue();
@@ -321,16 +321,16 @@ public final class Interpreter extends Costume {
 		return this;
 	}
 
-	public Hashtable getItems() {
-		Hashtable items = this._items;
+	public LinkedHashMap<Performance, Integer> getItems() {
+		LinkedHashMap<Performance, Integer> items = this._items;
 		if (items == null) {
-			items = new Hashtable();
+			items = new LinkedHashMap<>();
 			this._items = items;
 		}
 		return items;
 	}
 
-	public Interpreter setItems(final Hashtable items) {
+	public Interpreter setItems(final LinkedHashMap<Performance, Integer> items) {
 		this._items = items;
 		return this;
 	}
@@ -438,12 +438,12 @@ public final class Interpreter extends Costume {
 
 	void checkRegSkill(final Performance skill) {
 		if (skill.rQty > 0) {
-			Hashtable regSkills = this.skillsQtyRgTurn;
+			HashMap<Performance, Integer> regSkills = this.skillsQtyRgTurn;
 			if (regSkills == null) {
-				regSkills = new Hashtable();
+				regSkills = new HashMap<>();
 				this.skillsQtyRgTurn = regSkills;
 			}
-			regSkills.put(skill, new Integer(0));
+			regSkills.put(skill, Integer.valueOf(0));
 		}
 	}
 
@@ -466,7 +466,7 @@ public final class Interpreter extends Costume {
 		if (states == null) {
 			return;
 		}
-		final Hashtable aStates = this.stateDur;
+		final HashMap<StateMask, Integer> aStates = this.stateDur;
 		if (remove) {
 			if (aStates == null) {
 				return;
@@ -490,7 +490,7 @@ public final class Interpreter extends Costume {
 			}
 		} else {
 			if (role.hasRange()) {
-				this._ranged = new Boolean(true);
+				this._ranged = Boolean.valueOf(true);
 			}
 			i = 1;
 		}
@@ -508,13 +508,13 @@ public final class Interpreter extends Costume {
 		if (abilities == null) {
 			return;
 		}
-		final Vector skills = this._skills;
+		final ArrayList<Performance> skills = this._skills;
 		if (remove) {
 			for (int i = 0; i < abilities.length; i++) {
 				Performance k = abilities[i];
-				skills.removeElement(k);
+				skills.remove(k);
 				if (k.rQty > 0) {
-					Hashtable regSkills = this.skillsQtyRgTurn;
+					HashMap<Performance, Integer> regSkills = this.skillsQtyRgTurn;
 					if (regSkills != null) {
 						regSkills.remove(k);
 					}
@@ -522,15 +522,15 @@ public final class Interpreter extends Costume {
 			}
 		} else {
 			for (int i = 0; i < abilities.length; i++) {
-				Performance k = abilities[i];
-				skills.addElement(k);
+				final Performance k = abilities[i];
+				skills.add(k);
 				if (k.mQty > 0) {
-					Hashtable skillsQty = this.skillsQty;
+					HashMap<Performance, Integer> skillsQty = this.skillsQty;
 					if (skillsQty == null) {
-						skillsQty = new Hashtable();
+						skillsQty = new HashMap<>();
 						this.skillsQty = skillsQty;
 					}
-					skillsQty.put(k, new Integer(k.mQty));
+					skillsQty.put(k, Integer.valueOf(k.mQty));
 					this.checkRegSkill(k);
 				}
 			}
@@ -592,11 +592,11 @@ public final class Interpreter extends Costume {
 			this.setActive(false);
 			this.setGuarding(false);
 			this._sp = 0;
-			final Hashtable sDur = this.stateDur;
+			final HashMap<StateMask, Integer> sDur = this.stateDur;
 			if (sDur != null) {
-				final Enumeration sMasks = sDur.keys();
-				while (sMasks.hasMoreElements()) {
-					((StateMask)sMasks.nextElement()).remove(this, false, false);
+				//final Enumeration sMasks = sDur.keys();
+				for (StateMask state : sDur.keySet()) {
+					state.remove(this, false, false);
 				}
 			}
 		} else {
@@ -626,11 +626,11 @@ public final class Interpreter extends Costume {
 			this.setReflecting(false);
 		}
 		boolean c = false;
-		final Hashtable sDur = this.stateDur;
+		final HashMap<StateMask, Integer> sDur = this.stateDur;
 		if (sDur != null) {
-			final Enumeration sMasks = sDur.keys();
-			while (sMasks.hasMoreElements()) {
-				final StateMask state = (StateMask)sMasks.nextElement();
+			//final Enumeration sMasks = sDur.keys();
+			for (StateMask state : sDur.keySet()) {
+				//final StateMask state = (StateMask)sMasks.nextElement();
 				if (((Integer)sDur.get(state)).intValue() > -3 && this._hp > 0) {
 					final String r = state.apply(this, consume);
 					if (r.length() > 0) {
@@ -656,11 +656,9 @@ public final class Interpreter extends Costume {
 		this._mp = this.mMp;
 		this._sp = 0;
 		this.setActive(true);
-		final Hashtable sDur = this.stateDur;
+		final HashMap<StateMask, Integer> sDur = this.stateDur;
 		if (sDur != null) {
-			final Enumeration sMasks = sDur.keys();
-			while (sMasks.hasMoreElements()) {
-				final StateMask state = (StateMask)sMasks.nextElement();
+			for (StateMask state : sDur.keySet()) {
 				state.remove(this, true, false);
 			}
 			if (sDur.size() == 0) {
@@ -671,23 +669,12 @@ public final class Interpreter extends Costume {
 		this.setShapeShifted(false);
 		final SparseIntArray res = this.res;
 		if (res != null && res.size() == 0) {
-			/*final Enumeration rsIdx = res.keys();
-			for (int i = 0; i < res.size(); i++) {
-				final int r = res.keyAt(i);
-				/if (res.get(r) == 3) {
-					res.removeAt(i);
-				}
-			}
-			if (res.size() == 0) {*/
 				this.res = null;
-			//}
 		}
 		Object x;
 		final HashMap<StateMask, Integer> stRes = this.stRes;
 		if (stRes != null) {
-			//final Enumeration rsIdx = stRes.keys();
 			for (StateMask r : stRes.keySet()) {
-				//StateMask r = ((StateMask)rsIdx.nextElement());
 				if ((x = stRes.get(r)) != null && x.equals(0)) {
 					stRes.remove(r);
 				}
@@ -696,36 +683,32 @@ public final class Interpreter extends Costume {
 				this.stRes = null;
 			}
 		}
-		final Hashtable skillQty = this.skillsQty;
+		final HashMap<Performance, Integer> skillQty = this.skillsQty;
 		if (skillQty != null) {
-			final Enumeration skIdx = skillQty.keys();
-			while (skIdx.hasMoreElements()) {
-				Performance ability = ((Performance)skIdx.nextElement());
-				skillQty.put(ability, new Integer(ability.mQty));
+			for (Performance ability : skillQty.keySet()) {
+				skillQty.put(ability, Integer.valueOf(ability.mQty));
 			}
 		}
 	}
 
-	public Costume unequipPos(final Object pos) {
-		final Hashtable equipment = this.equipment;
+	public Costume unequipPos(final int pos) {
+		final SparseArray<Costume> equipment = this.equipment;
 		if (equipment == null) {
 			return null;
 		} else {
-			final Object r = equipment.get(pos);
-			final Costume c = r == null ? null : ((Costume)r);
+			final Costume c = equipment.get(pos);
 			this.switchCostume(c, null);
 			return c;
 		}
 	}
 
 	public Object unequipItem(final Costume item) {
-		final Hashtable e = this.equipment;
+		final SparseArray<Costume> e = this.equipment;
 		if (e != null) {
-			final Enumeration vEquip = e.keys();
-			while (vEquip.hasMoreElements()) {
-				Object k = vEquip.nextElement();
-				if (e.get(k).equals(item)) {
-					this.unequipPos(k);
+			for (int i = 0; i < e.size(); i++) {
+				final Costume k = e.get(i);
+				if (k != null && k.equals(item)) {
+					this.unequipPos(i);
 					return k;
 				}
 			}
@@ -733,11 +716,11 @@ public final class Interpreter extends Costume {
 		return null;
 	}
 
-	public Costume equipItem(final Object pos, final Costume item) {
+	public Costume equipItem(final int pos, final Costume item) {
 		final Costume r = this.unequipPos(pos);
-		Hashtable e = this.equipment;
+		SparseArray<Costume> e = this.equipment;
 		if (e == null) {
-			e = new Hashtable();
+			e = new SparseArray<>();
 			this.equipment = e;
 		}
 		e.put(pos, item);
@@ -745,10 +728,11 @@ public final class Interpreter extends Costume {
 		return r;
 	}
 
-	public Interpreter(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
-                       final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
-                       final int wis, final int agi, final boolean range, final SparseIntArray res, final Performance[] skills,
-                       final StateMask[] states, final HashMap<StateMask, Integer> stRes, final Hashtable items) {
+	public Interpreter(final int id, final String name, final Costume race, final Costume job, final int level,
+					   final int maxLv, final int mInit, final int mHp, final int mMp, final int mSp, final int atk,
+					   final int def, final int spi, final int wis, final int agi, final boolean range, final SparseIntArray res,
+					   final Performance[] skills, final StateMask[] states, final HashMap<StateMask, Integer> stRes,
+					   final LinkedHashMap<Performance, Integer> items) {
 		super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes);
 		this._xp = 0;
 		this._maxp = 15;

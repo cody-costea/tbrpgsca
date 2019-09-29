@@ -16,10 +16,9 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Vector;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -98,8 +97,8 @@ public final class ArenaAct extends Activity {
         private final ArenaAct arenaAct;
         private final boolean asItems;
 
-        private Vector<Performance> skills;
-        public AbilityArrayAdapter setSkills(final Vector<Performance> skills) {
+        private ArrayList<Performance> skills;
+        public AbilityArrayAdapter setSkills(final ArrayList<Performance> skills) {
             this.skills = skills;
             this.notifyDataSetChanged();
             return this;
@@ -142,8 +141,8 @@ public final class ArenaAct extends Activity {
             final ArenaAct context = this.arenaAct;
             final ScenePlay scenePlay = context.scenePlay;
             final Interpreter crActor = scenePlay._players[scenePlay._current];
-            final Hashtable skillsQtyMap = crActor.skillsQty;
-            final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
+            final HashMap<Performance, Integer> skillsQtyMap = crActor.skillsQty;
+            final LinkedHashMap<Performance, Integer> itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer skillsQtyInt = skillsQtyMap == null ? null : (Integer)skillsQtyMap.get(skill);
             final String skillQtyText = skillsQtyInt == null ? "∞" : String.valueOf(skillsQtyInt.intValue());
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
@@ -173,7 +172,7 @@ public final class ArenaAct extends Activity {
             final Performance skill = this.skills.get(position);
             final ScenePlay scenePlay = this.arenaAct.scenePlay;
             final Interpreter crActor = scenePlay._players[scenePlay._current];
-            final Hashtable itemsQtyMap = this.asItems ? crActor._items : null;
+            final LinkedHashMap<Performance, Integer> itemsQtyMap = this.asItems ? crActor._items : null;
             final Integer itemsQtyInt = itemsQtyMap == null ? null : (Integer)itemsQtyMap.get(skill);
             vHolder.nameText.setText(itemsQtyInt == null ? skill.name : String.format(Locale.US,
                     "%s X %s ", skill.name, String.valueOf(itemsQtyInt.intValue())));
@@ -181,7 +180,7 @@ public final class ArenaAct extends Activity {
         }
 
         public AbilityArrayAdapter(final ArenaAct context, final int layoutRes,
-                                   final Vector<Performance> skills, final boolean asItems) {
+                                   final ArrayList<Performance> skills, final boolean asItems) {
             super(context, layoutRes);
             this.layoutRes = layoutRes;
             this.arenaAct = context;
@@ -378,7 +377,7 @@ public final class ArenaAct extends Activity {
                         final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                         crActor = scenePlay._players[scenePlay._current];
                     }
-                    final Vector<Performance> availableSkills = crActor.getAvailableSkills();
+                    final ArrayList<Performance> availableSkills = crActor.getAvailableSkills();
                     skillActBtn.setEnabled(((view != null && ((ViewHolder) view.getTag()).usable)
                             || (view == null && availableSkills.get(position).canPerform(crActor)))
                             && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), availableSkills.get(position)));
@@ -393,8 +392,8 @@ public final class ArenaAct extends Activity {
     private void setCrItems() {
         final Spinner itemsSpn = this.itemsSpn;
         final ScenePlay scenePlay = this.scenePlay;
-        final Performance[] items = scenePlay._crItems;
-        if (items == null || items.length == 0) {
+        final ArrayList<Performance> items = scenePlay._crItems;
+        if (items == null || items.size() == 0) {
             if (itemsSpn.isEnabled()) {
                 itemsSpn.setSelection(Spinner.INVALID_POSITION);
                 itemsSpn.setEnabled(false);
@@ -402,11 +401,10 @@ public final class ArenaAct extends Activity {
         } else {
             final Spinner targetSpn = this.targetSpn;
             final Button itemUseBtn = this.itemUseBtn;
-            final Vector<Performance> crItems = new Vector<Performance>(Arrays.asList(items));
             AbilityArrayAdapter itemsAdapter = this.itemsAdapter;
             if (itemsAdapter == null) {
                 this.itemsAdapter = itemsAdapter = new AbilityArrayAdapter(this,
-                        android.R.layout.simple_spinner_item, crItems, true);
+                        android.R.layout.simple_spinner_item, items, true);
                 itemsSpn.setAdapter(itemsAdapter);
                 itemsSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -421,15 +419,15 @@ public final class ArenaAct extends Activity {
                             final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                             crActor = scenePlay._players[scenePlay._current];
                         }
-                        final Vector<Performance> availableSkills = crActor.getAvailableSkills();
+                        final ArrayList<Performance> availableSkills = crActor.getAvailableSkills();
                         itemUseBtn.setEnabled(((view != null && ((ViewHolder) view.getTag()).usable)
                                 || (view == null && availableSkills.get(position).canPerform(crActor)))
                                 && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), availableSkills.get(position)));
                     }
                 });
                 itemUseBtn.setOnClickListener(this.cAction);
-            } else if (itemsAdapter.skills != crItems) {
-                itemsAdapter.setSkills(crItems);
+            } else if (itemsAdapter.skills != items) {
+                itemsAdapter.setSkills(items);
             }
             if (!itemsSpn.isEnabled()) {
                 itemsSpn.setSelection(0);

@@ -16,6 +16,7 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -193,8 +194,8 @@ public class StageAct extends Activity {
 				new Performance(8, this.getString(R.string.item_elixir), 0, 0, false, true, 1, 0, 0, 0, 0, 0, -100, -100, -100, Performance.TRG_ONE, ELEMENT_NONE, -1, -1, false, true, null, null)
 		};
 
-		final Integer itemsNr = new Integer(15);
-		final Hashtable itemsMap = new Hashtable(items.length);
+		final Integer itemsNr = Integer.valueOf(15);
+		final LinkedHashMap<Performance, Integer> itemsMap = new LinkedHashMap<Performance, Integer>(items.length);
 		for (int i = 0; i < items.length; i++) {
 			itemsMap.put(items[i], itemsNr);
 		}

@@ -16,11 +16,9 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import android.os.Parcel;
-import android.util.ArrayMap;
 import android.util.SparseIntArray;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Random;
 
@@ -201,14 +199,14 @@ public final class StateMask extends Costume {
         Object o = null;
         if (always || new Random().nextInt(10) > ((trgStRes == null ? 0 : ((o = trgStRes.get(this)) == null
                 ? 0 : ((Integer)o).intValue())) + this.sRes)) {
-            Hashtable trgStates = actor.stateDur;
+            HashMap<StateMask, Integer> trgStates = actor.stateDur;
             if (trgStates == null) {
-                trgStates = new Hashtable();
+                trgStates = new HashMap<>();
                 actor.stateDur = trgStates;
             }
             final int crDur = ((o == null || (o = trgStates.get(this)) == null) ? 0 : ((Integer)o).intValue());
             if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
-                trgStates.put(this, new Integer(indefinite ? -2 : this.dur));
+                trgStates.put(this, Integer.valueOf(indefinite ? -2 : this.dur));
             }
             actor.updateAttributes(false, this);
             actor.updateResistance(false, this.res, this.stRes);
@@ -232,7 +230,7 @@ public final class StateMask extends Costume {
             return;
         }
         Object q;
-        Hashtable iSkills = actor.skillsQty;
+        HashMap<Performance, Integer> iSkills = actor.skillsQty;
         if (remove) {
             if (iSkills == null) {
                 return;
@@ -248,7 +246,7 @@ public final class StateMask extends Costume {
             }
         } else {
             if (iSkills == null) {
-                iSkills = new Hashtable();
+                iSkills = new HashMap<>();
                 actor.skillsQty = iSkills;
             }
             for (int i = 0; i < rSkills.length; i++) {
@@ -260,7 +258,7 @@ public final class StateMask extends Costume {
 
     String apply(final Interpreter actor, final boolean consume) {
         final StringBuilder s = new StringBuilder();
-        final Hashtable sDur = actor.stateDur;
+        final HashMap<StateMask, Integer> sDur = actor.stateDur;
         if (sDur != null) {
             final Object dur = sDur.get(this);
             if (dur != null && actor._hp > 0) {
@@ -323,7 +321,7 @@ public final class StateMask extends Costume {
     }
 
     public boolean remove(final Interpreter actor, final boolean delete, final boolean always) {
-        Hashtable sDur = actor.stateDur;
+        HashMap<StateMask, Integer> sDur = actor.stateDur;
         Object d;
         if (sDur != null && (always || ((d = sDur.get(this)) == null ? -2 : ((Integer)d).intValue()) != -2)) {
             if (((d = sDur.get(this)) == null ? -3 : ((Integer)d).intValue()) > -3) {

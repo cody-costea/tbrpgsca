@@ -17,11 +17,11 @@ package com.codycostea.tbrpgsca;
 
 import android.os.Parcelable;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Random;
-import java.util.Vector;
 
 public final class ScenePlay {
 
@@ -76,8 +76,8 @@ public final class ScenePlay {
         return this._useInit;
     }
 
-    protected Performance[] _crItems;
-    public Performance[] getCrItems() {
+    protected ArrayList<Performance> _crItems;
+    public ArrayList<Performance> getCrItems() {
         return this._crItems;
     }
 
@@ -190,36 +190,33 @@ public final class ScenePlay {
                 }
             } else {
                 if (crActor.automatic == Interpreter.AUTO_NONE) {
-                    final Hashtable crItems = crActor._items;
+                    final LinkedHashMap<Performance, Integer> crItems = crActor._items;
                     if (crItems == null) {
                         this._crItems = null;
                     } else {
-                        int i = 0;
                         final int len = crItems.size();
-                        final Performance[] items = new Performance[len];
-                        final Enumeration itemsEnum = crItems.keys();
-                        while (itemsEnum.hasMoreElements()) {
-                            items[i++] = (Performance)itemsEnum.nextElement();
+                        final ArrayList<Performance> items = new ArrayList<Performance>(len);
+                        for (Performance ability : crItems.keySet()) {
+                            items.add(ability);
                         }
                         this._crItems = items;
                     }
                 }
             }
-            final Hashtable regSkills = crActor.skillsQtyRgTurn;
+            final HashMap<Performance, Integer> regSkills = crActor.skillsQtyRgTurn;
             if (regSkills != null) {
-                final Enumeration regSkillsEnum = regSkills.keys();
-                final Hashtable skillsQty = crActor.skillsQty;
-                while (regSkillsEnum.hasMoreElements()) {
-                    final Performance skill = (Performance)regSkillsEnum.nextElement();
+                //final Enumeration regSkillsEnum = regSkills.keys();
+                final HashMap<Performance, Integer> skillsQty = crActor.skillsQty;
+                for (Performance skill : regSkills.keySet()) {
                     int skillQtyInt = 0;
                     Object skillQtyObj;
                     if (skillsQty != null && ((skillQtyObj = skillsQty.get(skill)) == null
                             ? skill.mQty : (skillQtyInt = ((Integer)skillQtyObj).intValue())) < skill.mQty) {
-                        if (((Integer)regSkills.get(skill)).intValue() == skill.rQty) {
-                            skillsQty.put(skill, new Integer(skillQtyInt + 1));
-                            regSkills.put(skill, new Integer(0));
+                        if (regSkills.get(skill).intValue() == skill.rQty) {
+                            skillsQty.put(skill, Integer.valueOf(skillQtyInt + 1));
+                            regSkills.put(skill, Integer.valueOf(0));
                         } else {
-                            regSkills.put(skill, new Integer(((skillQtyObj = regSkills.get(skill)) == null
+                            regSkills.put(skill, Integer.valueOf(((skillQtyObj = regSkills.get(skill)) == null
                                     ? 0 : ((Integer)skillQtyObj).intValue()) + 1));
                         }
                     }
@@ -355,17 +352,17 @@ public final class ScenePlay {
             }
         }
         final Interpreter crActor = players[this._current];
-        final Vector crSkills = crActor.getAvailableSkills();
+        final ArrayList<Performance> crSkills = crActor.getAvailableSkills();
         if (nRestore || nHeal) {
             for (int i = 0; i < crSkills.size(); i++) {
-                final Performance s = (Performance)crSkills.elementAt(i);
+                final Performance s = crSkills.get(i);
                 if ((s.isRestoring() || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
                     skillIndex = i;
                     break;
                 }
             }
         }
-        final Performance ability = (Performance)crSkills.elementAt(this.getAIskill(skillIndex, nRestore));
+        final Performance ability = crSkills.get(this.getAIskill(skillIndex, nRestore));
         final boolean atkSkill = ability.mHp > -1;
         if (atkSkill) {
             if (party) {
@@ -395,10 +392,10 @@ public final class ScenePlay {
     public int getAIskill(final int defSkill, final boolean nRestore) {
         int ret = defSkill;
         final Interpreter crActor = this._players[this._current];
-        final Vector crSkills = crActor.getAvailableSkills();
-        Performance s = (Performance)crSkills.elementAt(defSkill);
+        final ArrayList<Performance> crSkills = crActor.getAvailableSkills();
+        Performance s = crSkills.get(defSkill);
         for (int i = defSkill + 1; i < crSkills.size(); i++) {
-            final Performance a = (Performance)crSkills.elementAt(i);
+            final Performance a = crSkills.get(i);
             if (a.canPerform(crActor)) {
                 if (defSkill > 0) {
                     if (a.mHp < s.mHp && (a.isRestoring() || !nRestore)) {
@@ -415,17 +412,17 @@ public final class ScenePlay {
     }
 
     public String performSkill(final int index, final int target, final String ret) {
-        return this.executeAbility((Performance)this._players[this._current].getAvailableSkills().elementAt(index), target, ret);
+        return this.executeAbility((Performance)this._players[this._current].getAvailableSkills().get(index), target, ret);
     }
 
     public String useAbility(final Performance item, final int target, final String ret) {
-        final Hashtable crItemsMap = this._players[this._current]._items;
+        final LinkedHashMap<Performance, Integer> crItemsMap = this._players[this._current]._items;
         if (crItemsMap != null) {
             final Object itemQtyObj;
             final int itemQty = ((itemQtyObj = crItemsMap.get(item)) == null
                     ? 1 : ((Integer)itemQtyObj).intValue()) - 1;
             if (itemQty > 0) {
-                crItemsMap.put(item, new Integer(itemQty));
+                crItemsMap.put(item, Integer.valueOf(itemQty));
             } else {
                 crItemsMap.remove(item);
             }
@@ -434,9 +431,9 @@ public final class ScenePlay {
     }
 
     public String useItem(final int index, final int target, final String ret) {
-        final Performance[] crItems = this._crItems;
-        if (crItems != null && index < crItems.length) {
-            return this.useAbility((Performance)crItems[index], target, ret);
+        final ArrayList<Performance> crItems = this._crItems;
+        if (crItems != null && index < crItems.size()) {
+            return this.useAbility(crItems.get(index), target, ret);
         } else {
             return ret;
         }
