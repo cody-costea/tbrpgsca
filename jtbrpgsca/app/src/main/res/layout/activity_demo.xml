@@ -1,125 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal" >  
-    
+    android:layout_height="fill_parent">
 
-    <LinearLayout 
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1.00"
-        android:orientation="vertical"
-        >
-    <Spinner
-        android:id="@+id/RaceBox2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    
-    
-    <Spinner
-        android:id="@+id/JobBox2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <EditText
-        android:id="@+id/NameField2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="George" />
-    
-    <Button
-        android:id="@+id/InfoBt"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="97dp"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_gravity="end"
-        android:text="@string/bt_about" />
-
-    </LinearLayout>
-    
-    <LinearLayout 
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        
-    	<Spinner
-        android:id="@+id/RaceBox1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    
-    <Spinner
-        android:id="@+id/JobBox1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    
-    <EditText
-        android:id="@+id/NameField1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" 
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Cody" />
-    
-    <Button
-        android:id="@+id/StartBt"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="@string/bt_begin" />
-    
-    </LinearLayout>
-    
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        >
-    <Spinner
-        android:id="@+id/RaceBox3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:id="@+id/PartyLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
-    <Spinner
-        android:id="@+id/JobBox3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 
-    <EditText
-        android:id="@+id/NameField3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Stephen" >
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.00"
+            android:orientation="vertical"
+            >
+        <Spinner
+            android:id="@+id/RaceBox2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-        
-    </EditText>
-    
 
-    <Button
-        android:id="@+id/QuitBt"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="97dp"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_gravity="start"
-        android:text="@string/bt_exit" />
+        <Spinner
+            android:id="@+id/JobBox2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <EditText
+            android:id="@+id/NameField2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@string/name_george" />
+
+        <Button
+            android:id="@+id/InfoBt"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="97dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            android:text="@string/about" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Spinner
+            android:id="@+id/RaceBox1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/JobBox1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <EditText
+            android:id="@+id/NameField1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@string/name_cody" />
+
+        <Button
+            android:id="@+id/StartBt"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/begin" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+        <Spinner
+            android:id="@+id/RaceBox3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/JobBox3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <EditText
+            android:id="@+id/NameField3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="@string/name_stephen" >
+
+
+        </EditText>
+
+
+        <Button
+            android:id="@+id/QuitBt"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="97dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="start"
+            android:text="@string/exit" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/Fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+</RelativeLayout>
