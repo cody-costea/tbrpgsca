@@ -21,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Parcel;
+import android.util.SparseIntArray;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -345,10 +346,11 @@ public final class Performance extends RoleSheet {
 			s.append(String.format(Locale.US, Performance.reflectedTxt, target.name));
 			target = user;
 		}
-		Object o;
+		//Object o;
+		int o;
 		final boolean ko = target._hp < 1;
-		final Hashtable trgResMap = target.res;
-		int res = trgResMap == null ? 3 : ((o = trgResMap.get(this.elm)) == null ? 3 : ((Integer)o).intValue());
+		final SparseIntArray trgResMap = target.res;
+		int res = trgResMap == null ? 3 : (o = trgResMap.get(this.elm)) == 0 ? 3 : o;
 		if (res > 6) {
 			res = -1;
 		}

@@ -21,10 +21,13 @@ import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
+import android.util.SparseIntArray;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Vector;
 
 public final class Interpreter extends Costume {
@@ -534,52 +537,47 @@ public final class Interpreter extends Costume {
 		}
 	}
 
-	void updateResistance(final boolean remove, final Hashtable resMap, final Hashtable stResMap) {
-		Object x, y = null;
+	void updateResistance(final boolean remove, final SparseIntArray resMap, final HashMap<StateMask, Integer> stResMap) {
 		if (resMap != null) {
-			Hashtable r = this.res;
+			SparseIntArray r = this.res;
 			if (r == null) {
 				if (remove) {
 					return;
 				} else {
-					r = new Hashtable();
+					r = new SparseIntArray();
 					this.res = r;
 				}
 			}
-			final Enumeration rsIdx = resMap.keys();
-			while (rsIdx.hasMoreElements()) {
-				Integer i = ((Integer)rsIdx.nextElement());
-				Enumeration rIdx = r.keys();
-				while (rIdx.hasMoreElements()) {
-					Integer k = ((Integer)rIdx.nextElement());
-					if (!remove || i.intValue() == k.intValue()) {
-						r.put(k, new Integer(((x = r.get(k)) == null ? 3 : ((Integer)x).intValue())
-								+ (((remove) ? -1 : 1) * ((y = resMap.get(i)) == null
-								? 0 : ((Integer)y).intValue()))));
+			int x, y;
+			for (int a = 0; a < resMap.size(); a++) {
+				final int i = resMap.keyAt(a);
+				for (int b = 0; b < r.size(); b++) {
+					final int k = r.keyAt(b);
+					if (!remove || i == k) {
+						r.put(k, ((x = r.get(k)) == 0 ? 3 : x) + ((remove) ? -1 : 1) * ((y = resMap.get(i)) == 0 ? 3 : y));
 					}
 				}
 			}
 		}
 		if (stResMap != null) {
-			Hashtable rs = this.stRes;
+			HashMap<StateMask, Integer> rs = this.stRes;
 			if (rs == null) {
 				if (remove) {
 					return;
 				} else {
-					rs = new Hashtable();
+					rs = new HashMap<StateMask, Integer>();
 					this.stRes = rs;
 				}
 			}
-			final Enumeration rsIdx = stResMap.keys();
-			while (rsIdx.hasMoreElements()) {
-				Integer i = ((Integer)rsIdx.nextElement());
-				Enumeration rIdx = rs.keys();
-				while (rIdx.hasMoreElements()) {
-					Integer k = ((Integer)rIdx.nextElement());
+			Object x, y;
+			final Set<StateMask> rsIdx = stResMap.keySet();
+			for (StateMask i : rsIdx) {
+				Set<StateMask> rIdx = rs.keySet();
+				for (StateMask k : rIdx) {
 					if (!remove || i.equals(k)) {
-						rs.put(k, new Integer(((x = rs.get(k)) == null ? 3 : ((Integer)x).intValue())
-								+ (((remove) ? -1 : 1) * ((y = resMap.get(i)) == null
-								? 0 : ((Integer)y).intValue()))));
+						rs.put(k, Integer.valueOf(((x = rs.get(k)) == null ? 0 : ((Integer) x).intValue())
+								+ (((remove) ? -1 : 1) * ((y = stResMap.get(i)) == null
+								? 0 : ((Integer) y).intValue()))));
 					}
 				}
 			}
@@ -670,30 +668,31 @@ public final class Interpreter extends Costume {
 		}
 		this.applyStates(false);
 		this.setShapeShifted(false);
-		final Hashtable res = this.res;
-		if (res != null) {
-			final Enumeration rsIdx = res.keys();
-			while (rsIdx.hasMoreElements()) {
-				Integer r = ((Integer)rsIdx.nextElement());
-				if (((Integer)res.get(r)).intValue() == 3) {
-					res.remove(r);
+		final SparseIntArray res = this.res;
+		if (res != null && res.size() == 0) {
+			/*final Enumeration rsIdx = res.keys();
+			for (int i = 0; i < res.size(); i++) {
+				final int r = res.keyAt(i);
+				/if (res.get(r) == 3) {
+					res.removeAt(i);
 				}
 			}
-			if (res.size() == 0) {
+			if (res.size() == 0) {*/
 				this.res = null;
-			}
+			//}
 		}
-		final Hashtable stRes = this.stRes;
+		Object x;
+		final HashMap<StateMask, Integer> stRes = this.stRes;
 		if (stRes != null) {
-			final Enumeration rsIdx = stRes.keys();
-			while (rsIdx.hasMoreElements()) {
-				StateMask r = ((StateMask)rsIdx.nextElement());
-				if (((Integer)res.get(r)).intValue() == 0) {
-					res.remove(r);
+			//final Enumeration rsIdx = stRes.keys();
+			for (StateMask r : stRes.keySet()) {
+				//StateMask r = ((StateMask)rsIdx.nextElement());
+				if ((x = stRes.get(r)) != null && x.equals(0)) {
+					stRes.remove(r);
 				}
 			}
-			if (res.size() == 0) {
-				this.res = null;
+			if (stRes.size() == 0) {
+				this.stRes = null;
 			}
 		}
 		final Hashtable skillQty = this.skillsQty;
@@ -747,8 +746,8 @@ public final class Interpreter extends Costume {
 
 	public Interpreter(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
                        final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
-                       final int wis, final int agi, final boolean range, final Hashtable res, final Performance[] skills,
-                       final StateMask[] states, final Hashtable stRes, final Hashtable items) {
+                       final int wis, final int agi, final boolean range, final SparseIntArray res, final Performance[] skills,
+                       final StateMask[] states, final HashMap<StateMask, Integer> stRes, final Hashtable items) {
 		super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes);
 		this._xp = 0;
 		this._maxp = 15;

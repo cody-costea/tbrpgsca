@@ -16,7 +16,10 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import android.os.Parcel;
+import android.util.ArrayMap;
+import android.util.SparseIntArray;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Random;
@@ -194,10 +197,10 @@ public final class StateMask extends Costume {
     }
 
     public String inflict(final Interpreter actor, final boolean always, final boolean indefinite) {
-        final Hashtable trgStRes = actor.stRes;
+        final HashMap<StateMask, Integer> trgStRes = actor.stRes;
         Object o = null;
-        if (always || new Random().nextInt(10) > (trgStRes == null ? 0 : ((o = trgStRes.get(this)) == null
-                ? 0 : ((Integer)o).intValue() + this.sRes))) {
+        if (always || new Random().nextInt(10) > (trgStRes == null ? 0 : (((o = trgStRes.get(this)) == null
+                ? 0 : ((Integer)o).intValue()) + this.sRes))) {
             Hashtable trgStates = actor.stateDur;
             if (trgStates == null) {
                 trgStates = new Hashtable();
@@ -237,7 +240,7 @@ public final class StateMask extends Costume {
                 for (int i = 0; i < rSkills.length; i++) {
                     Performance k = rSkills[i];
                     if (k.mQty > 0) {
-                        iSkills.put(k, new Integer((q = iSkills.get(k)) == null ? 0 : -1 * ((Integer)q).intValue()));
+                        iSkills.put(k, Integer.valueOf((q = iSkills.get(k)) == null ? 0 : -1 * ((Integer)q).intValue()));
                     } else {
                         iSkills.remove(k);
                     }
@@ -250,7 +253,7 @@ public final class StateMask extends Costume {
             }
             for (int i = 0; i < rSkills.length; i++) {
                 Performance k = rSkills[i];
-                iSkills.put(k, new Integer(k.mQty > 0 ? -1 * ((q = iSkills.get(k)) == null ? 0 : ((Integer)q).intValue()) : 0));
+                iSkills.put(k, Integer.valueOf(k.mQty > 0 ? -1 * ((q = iSkills.get(k)) == null ? 0 : ((Integer)q).intValue()) : 0));
             }
         }
     }
@@ -264,7 +267,7 @@ public final class StateMask extends Costume {
                 final int d = ((Integer)dur).intValue();
                 if (d == 0) {
                     this.disable(actor);
-                    sDur.put(this, new Integer(-3));
+                    sDur.put(this, Integer.valueOf(-3));
                 }
                 else if (d > -3) {
                     if (consume) {
@@ -287,7 +290,7 @@ public final class StateMask extends Costume {
                         }
                         if (this.isInactivating()) {
                             if (d > 0 && actor.isActive()) {
-                                sDur.put(this, new Integer(d - 1));
+                                sDur.put(this, Integer.valueOf(d - 1));
                             }
                             actor.setActive(false);
                             actor.setGuarding(false);
@@ -329,7 +332,7 @@ public final class StateMask extends Costume {
             if (delete) {
                 sDur.remove(this);
             } else {
-                sDur.put(this, new Integer(-3));
+                sDur.put(this, Integer.valueOf(-3));
             }
             return true;
         } else {
@@ -338,10 +341,10 @@ public final class StateMask extends Costume {
     }
 
     StateMask(final int id, final String name, final String sprite, final boolean inactivate, final boolean automate,
-              final boolean confuse, final boolean reflect, final int dur, final int sRes, final int dmgHp,
-              final int dmgMp, final int dmgSp, final int hp, final int mp, final int sp, final int atk, final int def,
-              final int spi, final int wis,  final int agi, final int mInit, final boolean range, final Hashtable res,
-              final Performance[] aSkills, final Performance[] rSkills, final StateMask[] states, final Hashtable stRes) {
+              final boolean confuse, final boolean reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp,
+              final int dmgSp, final int hp, final int mp, final int sp, final int atk, final int def, final int spi, final int wis,
+              final int agi, final int mInit, final boolean range, final SparseIntArray res, final Performance[] aSkills,
+              final Performance[] rSkills, final StateMask[] states, final HashMap<StateMask, Integer> stRes) {
         super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
         if (inactivate) {
             this.flags |= FLAG_INACTIVATE;

@@ -16,15 +16,17 @@ limitations under the License.
 package com.codycostea.tbrpgsca;
 
 import android.os.Parcel;
+import android.util.SparseIntArray;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 public class Costume extends RoleSheet {
 
 	protected String sprite;
 	protected int atk, def, spi, wis, agi;
+	protected HashMap<StateMask, Integer> stRes;
 	protected Performance[] aSkills;
-	protected Hashtable stRes, res;
+	protected SparseIntArray res;
 
 	protected Costume(final Parcel in) {
 		super(in);
@@ -129,28 +131,28 @@ public class Costume extends RoleSheet {
 		return this;
 	}
 
-	public Hashtable getStateResistance() {
+	public HashMap<StateMask, Integer> getStateResistance() {
 		return this.stRes;
 	}
 
-	public Costume setStateResistance(final Hashtable value) {
+	public Costume setStateResistance(final HashMap<StateMask, Integer> value) {
 		this.stRes = value;
 		return this;
 	}
 
-	public Hashtable getElementalResistance() {
+	public SparseIntArray getElementalResistance() {
 		return this.res;
 	}
 
-	public Costume setElementalResistance(final Hashtable value) {
+	public Costume setElementalResistance(final SparseIntArray value) {
 		this.res = value;
 		return this;
 	}
 
 	public Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp,
 				   final int atk, final int def, final int spi, final int wis, final int agi, final int mInit,
-				   final boolean range, final Hashtable res, final Performance[] skills, final StateMask[] states,
-				   final Hashtable stRes) {
+				   final boolean range, final SparseIntArray res, final Performance[] skills, final StateMask[] states,
+				   final HashMap<StateMask, Integer> stRes) {
 		super(id, name, hp, mp, sp, mInit, range, states);
 		this.sprite = sprite;
 		this.atk = atk;
