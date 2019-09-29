@@ -26,14 +26,14 @@ import javax.microedition.lcdui.game.Sprite;
 
 public final class ArenaStage extends GameCanvas implements Runnable {
     
-    static final int FRM_TIME = 71;
-    static final int SPR_DONE = -3;
-    static final int SPR_KO = -2;
-    static final int SPR_IDLE = -1;
-    static final int SPR_HIT = 0;
-    static final int SPR_FALL = 1;
-    static final int SPR_ACT = 2;
-    static final int SPR_RISE = 3;
+    private static final int FRM_TIME = 71;
+    private static final int SPR_DONE = -3;
+    private static final int SPR_KO = -2;
+    private static final int SPR_IDLE = -1;
+    private static final int SPR_HIT = 0;
+    private static final int SPR_FALL = 1;
+    private static final int SPR_ACT = 2;
+    private static final int SPR_RISE = 3;
     
     private final Midlet app;
 

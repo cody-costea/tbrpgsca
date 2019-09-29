@@ -386,10 +386,10 @@ public final class Actor extends Costume {
       }
       final Enumeration rsIdx = resMap.keys();
       while (rsIdx.hasMoreElements()) {
-        Integer i = ((Integer)rsIdx.nextElement());
-        Enumeration rIdx = r.keys();
+        final Integer i = ((Integer)rsIdx.nextElement());
+        final Enumeration rIdx = r.keys();
         while (rIdx.hasMoreElements()) {
-          Integer k = ((Integer)rIdx.nextElement());
+          final Integer k = ((Integer)rIdx.nextElement());
           if (!remove || i.intValue() == k.intValue()) {
             r.put(k, new Integer(((x = r.get(k)) == null ? 3 : ((Integer)x).intValue())
                     + (((remove) ? -1 : 1) * ((y = resMap.get(i)) == null
@@ -410,13 +410,13 @@ public final class Actor extends Costume {
       }
       final Enumeration rsIdx = stResMap.keys();
       while (rsIdx.hasMoreElements()) {
-        Integer i = ((Integer)rsIdx.nextElement());
-        Enumeration rIdx = rs.keys();
+        final StateMask i = ((StateMask)rsIdx.nextElement());
+        final Enumeration rIdx = rs.keys();
         while (rIdx.hasMoreElements()) {
-          Integer k = ((Integer)rIdx.nextElement());
-          if (!remove || i == k) {
-            rs.put(k, new Integer(((x = rs.get(k)) == null ? 3 : ((Integer)x).intValue())
-                    + (((remove) ? -1 : 1) * ((y = resMap.get(i)) == null
+          final StateMask k = ((StateMask)rIdx.nextElement());
+          if (!remove || i.equals(k)) {
+            rs.put(k, new Integer(((x = rs.get(k)) == null ? 0 : ((Integer)x).intValue())
+                    + (((remove) ? -1 : 1) * ((y = stResMap.get(i)) == null
                             ? 0 : ((Integer)y).intValue()))));
           }
         }
