@@ -108,12 +108,12 @@ public final class Performance extends RoleSheet {
 
 	public static final Creator<Performance> CREATOR = new Creator<Performance>() {
 		@Override
-		public Performance createFromParcel(Parcel in) {
+		public Performance createFromParcel(final Parcel in) {
 			return new Performance(in);
 		}
 
 		@Override
-		public Performance[] newArray(int size) {
+		public Performance[] newArray(final int size) {
 			return new Performance[size];
 		}
 	};

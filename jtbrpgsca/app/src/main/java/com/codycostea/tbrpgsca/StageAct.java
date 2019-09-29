@@ -232,7 +232,7 @@ public class StageAct extends Activity {
 				new Costume(21, this.getString(R.string.race_lizard), "lizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, new Performance[] {skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]}, null, null)
 		};
 
-		final Interpreter[] party = this.Party = new Interpreter[] {
+		this.Party = new Interpreter[] {
 				new Interpreter(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
 				new Interpreter(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
 				new Interpreter(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
@@ -379,7 +379,7 @@ public class StageAct extends Activity {
 		}
 	};
 
-	private void displayMsg(String t, String s) {
+	private void displayMsg(final String t, final String s) {
 		SpannableString text = new SpannableString(s);
 		Linkify.addLinks(text, Linkify.WEB_URLS);
 		AlertDialog.Builder msg = new AlertDialog.Builder(this);
@@ -392,7 +392,7 @@ public class StageAct extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if (requestCode >= 0) {
 			if (resultCode == RESULT_OK) {
 				Bundle extra = data.getExtras();
