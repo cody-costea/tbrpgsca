@@ -81,10 +81,6 @@ public final class ArenaAct extends Activity {
     private Spinner targetSpn, skillsSpn, itemsSpn;
     private TextView actionsTxt, infoTxt;
 
-    private String[] jScripts;
-    private org.mozilla.javascript.Context jsContext;
-    private Scriptable jsScope;
-
     private MediaPlayer songPlayer;
 
     private class ViewHolder {
@@ -250,7 +246,6 @@ public final class ArenaAct extends Activity {
 
     }
 
-    //private ActorArrayAdapter playersAdapter;
     private AbilityArrayAdapter skillsAdapter, itemsAdapter;
 
     private final View.OnClickListener cAction = new OnClickListener() {
@@ -275,9 +270,7 @@ public final class ArenaAct extends Activity {
                         if (scenePlay._players[scenePlay._current].automatic == 0) {
                             ArenaAct.this.afterAct();
                         }
-                    } /*else {
-                        ArenaAct.this.autoBtn.setEnabled(false);
-                    }*/
+                    }
                     break;
                 }
                 case R.id.UseBt: {
@@ -635,9 +628,6 @@ public final class ArenaAct extends Activity {
                 enemy = extra.getParcelableArray("enemy");
                 jScripts = extra.getStringArray("scripts");
             }
-            if (jScripts != null) {
-                this.jScripts = jScripts;
-            }
         } else {
             surprised = 0;
             escapable = true;
@@ -697,7 +687,7 @@ public final class ArenaAct extends Activity {
                         Log.e("Rhino", e.getMessage());
                     }
                 }
-                return true;
+                return false;
             }
         });
         if (jScripts != null) {
@@ -775,6 +765,7 @@ public final class ArenaAct extends Activity {
         this.itemsSpn = itemsSpn;
         this.autoBtn = autoBtn;
         this.runBtn = runBtn;
+
         int koActors = 0;
         for (int i = 0; i < players.length; i++) {
             if (players[i]._hp < 1) {
@@ -886,7 +877,6 @@ public final class ArenaAct extends Activity {
 
         final ActorArrayAdapter playersAdapter = new ActorArrayAdapter(this,
                 android.R.layout.simple_spinner_item, players);
-        //this.playersAdapter = playersAdapter;
         targetSpn.setAdapter(playersAdapter);
         targetSpn.setSelection(enIdx);
         targetSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
