@@ -360,7 +360,7 @@ public class StageAct extends Activity {
         }
 		//ArenaAct.PlayDemo(this);
 		ArenaAct.Stage(this, 0, 0, players, this.Enemy[level],
-				null, surprise, level % 2 == 0, true);
+				new String[0], surprise, level % 2 == 0, true);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {
