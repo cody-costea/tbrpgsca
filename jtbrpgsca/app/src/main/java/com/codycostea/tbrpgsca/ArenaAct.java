@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Parcelable;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.mozilla.javascript.Scriptable;
 
 public final class ArenaAct extends Activity {
 
@@ -79,6 +82,8 @@ public final class ArenaAct extends Activity {
     private TextView actionsTxt, infoTxt;
 
     private String[] jScripts;
+    private org.mozilla.javascript.Context jsContext;
+    private Scriptable jsScope;
 
     private MediaPlayer songPlayer;
 
@@ -604,6 +609,7 @@ public final class ArenaAct extends Activity {
         final Bundle extra = this.getIntent().getExtras();
         final Parcelable[] party;
         final Parcelable[] enemy;
+        final String[] jScripts;
         final boolean escapable;
         final int surprised;
         if (extra != null) {
@@ -615,7 +621,6 @@ public final class ArenaAct extends Activity {
                 this.songPlayer = songPlayer;
                 songPlayer.start();
             }
-            final String[] jScripts;
             final int arenaResId = extra.getInt("arenaImg", 0);
             if (arenaResId > 0) {
                 this.findViewById(R.id.ImgArena).setBackgroundResource(arenaResId);
@@ -636,6 +641,7 @@ public final class ArenaAct extends Activity {
         } else {
             surprised = 0;
             escapable = true;
+            jScripts = null;
             party = null; //TODO: add demo party
             enemy = null; //TODO: add demo enemy
         }
@@ -650,7 +656,103 @@ public final class ArenaAct extends Activity {
         this.partySide = partySide;
         this.otherSide = otherSide;
         this.escapable = escapable;
-        final ScenePlay scenePlay = new ScenePlay(party, enemy, surprised);
+        final org.mozilla.javascript.Context jsContext;
+        final Scriptable jsScope;
+        if (jScripts == null) {
+            jsContext = null;
+            jsScope = null;
+        } else {
+            jsContext = org.mozilla.javascript.Context.enter();
+            jsContext.setOptimizationLevel(-1);
+            jsScope = jsContext.initSafeStandardObjects();
+        }
+        final ScenePlay scenePlay = new ScenePlay(party, enemy, surprised,
+                jScripts == null ? null : new ScenePlay.SceneRunnable() {
+                @Override
+                public boolean run(final ScenePlay scene, final String ret) {
+                    final String jScript;
+                    if (jScripts.length > 0 && (jScript = jScripts[0]) != null) {
+                        try {
+                            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(scene, jsScope));
+                            jsScope.put("Message", jsScope, org.mozilla.javascript.Context.javaToJS(ret, jsScope));
+                            jsScope.put("Activity", jsScope, org.mozilla.javascript.Context.javaToJS(ArenaAct.this, jsScope));
+                            jsContext.evaluateString(jsScope, jScript, "OnStart", 1, null);
+                        } catch (final Exception e) {
+                            Log.e("Rhino", e.getMessage());
+                        }
+                    }
+                    return true;
+                }
+            }, jScripts == null ? null : new ScenePlay.SceneRunnable() {
+            @Override
+            public boolean run(final ScenePlay scene, final String ret) {
+                final String jScript;
+                if (jScripts.length > 1 && (jScript = jScripts[1]) != null) {
+                    try {
+                        jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(scene, jsScope));
+                        jsScope.put("Message", jsScope, org.mozilla.javascript.Context.javaToJS(ret, jsScope));
+                        jsScope.put("Activity", jsScope, org.mozilla.javascript.Context.javaToJS(ArenaAct.this, jsScope));
+                        jsContext.evaluateString(jsScope, jScript, "OnBeginTurn", 1, null);
+                    } catch (final Exception e) {
+                        Log.e("Rhino", e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+        if (jScripts != null) {
+            scenePlay.setBeforeActRunnable(new ScenePlay.SceneRunnable() {
+                @Override
+                public boolean run(final ScenePlay scene, final String ret) {
+                    final String jScript;
+                    if (jScripts.length > 2 && (jScript = jScripts[2]) != null) {
+                        try {
+                            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(scene, jsScope));
+                            jsScope.put("Message", jsScope, org.mozilla.javascript.Context.javaToJS(ret, jsScope));
+                            jsScope.put("Activity", jsScope, org.mozilla.javascript.Context.javaToJS(ArenaAct.this, jsScope));
+                            jsContext.evaluateString(jsScope, jScript, "BeforeAct", 1, null);
+                        } catch (final Exception e) {
+                            Log.e("Rhino", e.getMessage());
+                        }
+                    }
+                    return true;
+                }
+            });
+            scenePlay.setAfterActRunnable(new ScenePlay.SceneRunnable() {
+                @Override
+                public boolean run(final ScenePlay scene, final String ret) {
+                    final String jScript;
+                    if (jScripts.length > 3 && (jScript = jScripts[3]) != null) {
+                        try {
+                            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(scene, jsScope));
+                            jsScope.put("Message", jsScope, org.mozilla.javascript.Context.javaToJS(ret, jsScope));
+                            jsScope.put("Activity", jsScope, org.mozilla.javascript.Context.javaToJS(ArenaAct.this, jsScope));
+                            jsContext.evaluateString(jsScope, jScript, "AfterAct", 1, null);
+                        } catch (final Exception e) {
+                            Log.e("Rhino", e.getMessage());
+                        }
+                    }
+                    return true;
+                }
+            });
+            scenePlay.setOnEndSceneRunnable(new ScenePlay.SceneRunnable() {
+                @Override
+                public boolean run(final ScenePlay scene, final String ret) {
+                    final String jScript;
+                    if (jScripts.length > 4 && (jScript = jScripts[4]) != null) {
+                        try {
+                            jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(scene, jsScope));
+                            jsScope.put("Message", jsScope, org.mozilla.javascript.Context.javaToJS(ret, jsScope));
+                            jsScope.put("Activity", jsScope, org.mozilla.javascript.Context.javaToJS(ArenaAct.this, jsScope));
+                            jsContext.evaluateString(jsScope, jScript, "OnStop", 1, null);
+                        } catch (final Exception e) {
+                            Log.e("Rhino", e.getMessage());
+                        }
+                    }
+                    return true;
+                }
+            });
+        }
         final Interpreter[] players = scenePlay._players;
         final int enIdx = scenePlay._enIdx;
         this.scenePlay = scenePlay;

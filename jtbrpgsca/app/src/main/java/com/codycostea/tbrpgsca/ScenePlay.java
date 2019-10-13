@@ -32,7 +32,7 @@ public final class ScenePlay {
     public static String failTxt = "The party attempted to escape, but failed.";
 
     public interface SceneRunnable {
-        boolean run(final ScenePlay scene);
+        boolean run(final ScenePlay scene, final String ret);
     }
 
     protected SceneRunnable onStart, onStop, onNewTurn, beforeAct, afterAct;
@@ -213,16 +213,18 @@ public final class ScenePlay {
                 }
                 if (noParty) {
                     this._status = -2;
+                    ret = retBuilder.toString();
                     final SceneRunnable onStop = this.onStop;
-                    return onStop == null || onStop.run(this)
-                            ? String.format(Locale.US, ScenePlay.failTxt, retBuilder.toString())
-                            : this.setNext(retBuilder.toString() + "\n", endTurn);
+                    return onStop == null || onStop.run(this, ret)
+                            ? String.format(Locale.US, ScenePlay.failTxt, ret)
+                            : this.setNext(ret + "\n", endTurn);
                 } else if (noEnemy) {
                     this._status = 1;
+                    ret = retBuilder.toString();
                     final SceneRunnable onStop = this.onStop;
-                    return onStop == null || onStop.run(this)
-                            ? String.format(Locale.US, ScenePlay.victoryTxt, retBuilder.toString())
-                            : this.setNext(retBuilder.toString() + "\n", endTurn);
+                    return onStop == null || onStop.run(this, ret)
+                            ? String.format(Locale.US, ScenePlay.victoryTxt, ret)
+                            : this.setNext(ret + "\n", endTurn);
                 } else if (minInit != 0 && !useInit) {
                     minInit = 0;
                 }
@@ -271,9 +273,9 @@ public final class ScenePlay {
                 }
             }
             final SceneRunnable onNewTurn = this.onNewTurn;
-            if (endTurn && onNewTurn != null && onNewTurn.run(this)
+            if (endTurn && onNewTurn != null && onNewTurn.run(this, ret)
                     && crActor.automatic != 0) {
-                return this.executeAI(ret);
+                return this.executeAI("");
             }
         }
         return ret;
@@ -330,10 +332,10 @@ public final class ScenePlay {
         }
     }
 
-    public String executeAbility(final Performance skill, int target, final String ret) {
-        final StringBuilder retBuilder = new StringBuilder(ret);
+    public String executeAbility(final Performance skill, int target, String ret) {
         final SceneRunnable beforeAct = this.beforeAct;
-        if (beforeAct == null || beforeAct.run(this)) {
+        if (beforeAct == null || beforeAct.run(this, ret)) {
+            final StringBuilder retBuilder = new StringBuilder(ret);
             final int enIdx = this._enIdx, fTarget, lTarget;
             final Interpreter[] players = this._players;
             final int current = this._current;
@@ -378,13 +380,14 @@ public final class ScenePlay {
             }
             retBuilder.append(".");
             this._lastAbility = skill;
+            ret = retBuilder.toString();
             final SceneRunnable afterAct = this.afterAct;
-            if (afterAct == null || afterAct.run(this)) {
+            if (afterAct == null || afterAct.run(this, ret)) {
                 crActor._xp++;
                 crActor.levelUp();
             }
         }
-        return retBuilder.toString();
+        return ret;
     }
 
     public String executeAI(String ret) {
@@ -528,14 +531,18 @@ public final class ScenePlay {
         if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
             this._status = -1;
             final SceneRunnable onStop = this.onStop;
-            if (onStop == null || onStop.run(this)) {
-                return ScenePlay.escapeTxt;
+            final String ret = ScenePlay.escapeTxt;
+            if (onStop == null || onStop.run(this, ret)) {
+                return ret;
+            } else {
+                this._status = 0;
             }
         }
         return ScenePlay.failTxt;
     }
 
-    public ScenePlay(final Parcelable[] party, final Parcelable[] enemy, final int surprise) {
+    public ScenePlay(final Parcelable[] party, final Parcelable[] enemy, final int surprise,
+                     final SceneRunnable onBeginScene, final SceneRunnable onNewTurn) {
         boolean useInit = false;
         final int pLength = party.length + enemy.length;
         final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
@@ -578,13 +585,13 @@ public final class ScenePlay {
                 }
             }
         }
+        this.onNewTurn = onNewTurn;
+        this.onStart = onBeginScene;
         this._surprise = surprise;
         this._useInit = useInit;
-        this.setNext("", false);
-        final SceneRunnable onStart = this.onStart;
-        if (onStart == null || onStart.run(this)) {
-            final SceneRunnable onNewTurn = this.onNewTurn;
-            if (onNewTurn != null && onNewTurn.run(this)
+        final String ret = this.setNext("", false);
+        if (onBeginScene == null || onBeginScene.run(this, ret)) {
+            if (onNewTurn != null && onNewTurn.run(this, ret)
                     && players[this._current].automatic != 0) {
                 this.executeAI("");
             }

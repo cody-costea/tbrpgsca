@@ -277,8 +277,8 @@ public class StageAct extends Activity {
 		final ArrayAdapter<String> raceList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item),
             jobList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
 		raceBox[0] = (Spinner) findViewById(R.id.RaceBox1);
-		raceBox[1] = (Spinner) findViewById(R.id.RaceBox2);
-		raceBox[2] = (Spinner) findViewById(R.id.RaceBox3);
+		raceBox[2] = (Spinner) findViewById(R.id.RaceBox2);
+		raceBox[1] = (Spinner) findViewById(R.id.RaceBox3);
 		for (int i = 0; i < race.length; i++) {
             raceList.add(race[i].getName());
         }
@@ -286,11 +286,11 @@ public class StageAct extends Activity {
             raceBox[i].setAdapter(raceList);
         }
 		raceBox[0].setSelection(1);
-		raceBox[1].setSelection(0);
-		raceBox[2].setSelection(2);
+		raceBox[2].setSelection(0);
+		raceBox[1].setSelection(2);
 		jobBox[0] = (Spinner)this.findViewById(R.id.JobBox1);
-		jobBox[1] = (Spinner)this.findViewById(R.id.JobBox2);
-		jobBox[2] = (Spinner)this.findViewById(R.id.JobBox3);
+		jobBox[2] = (Spinner)this.findViewById(R.id.JobBox2);
+		jobBox[1] = (Spinner)this.findViewById(R.id.JobBox3);
 		for (int i = 0; i < job.length && i < 15; i++) {
             jobList.add(job[i].getName());
         }
@@ -298,12 +298,12 @@ public class StageAct extends Activity {
             jobBox[i].setAdapter(jobList);
         }
 		jobBox[0].setSelection(0);
-		jobBox[1].setSelection(5);
-		jobBox[2].setSelection(3);
+		jobBox[2].setSelection(5);
+		jobBox[1].setSelection(3);
 		final EditText[] name = this.name;
 		name[0] = (EditText)this.findViewById(R.id.NameField1);
-		name[1] = (EditText)this.findViewById(R.id.NameField2);
-		name[2] = (EditText)this.findViewById(R.id.NameField3);
+		name[2] = (EditText)this.findViewById(R.id.NameField2);
+		name[1] = (EditText)this.findViewById(R.id.NameField3);
 		final Button begin = (Button)this.findViewById(R.id.StartBt),
 		    about = (Button)this.findViewById(R.id.InfoBt),
 		    exit = (Button)this.findViewById(R.id.QuitBt);
