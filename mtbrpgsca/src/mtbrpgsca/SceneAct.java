@@ -22,6 +22,47 @@ import java.util.Random;
 import java.util.Vector;
 
 public final class SceneAct {
+
+    public interface SceneRunnable {
+        boolean run(final SceneAct scene, final String ret);
+    }
+
+    protected SceneRunnable onStart, onStop, onNewTurn, beforeAct, afterAct;
+    public SceneRunnable getOnBeginSceneRunnable() {
+        return this.onStart;
+    }
+    public SceneRunnable getOnEndSceneRunnable() {
+        return this.onStop;
+    }
+    public SceneRunnable getOnNewTurnRunnable() {
+        return this.onNewTurn;
+    }
+    public SceneRunnable getBeforeActRunnable() {
+        return this.beforeAct;
+    }
+    public SceneRunnable getAfterActRunnable() {
+        return this.afterAct;
+    }
+    public SceneAct setOnBeginSceneRunnable(final SceneRunnable run) {
+        this.onStart = run;
+        return this;
+    }
+    public SceneAct setOnEndSceneRunnable(final SceneRunnable run) {
+        this.onStop = run;
+        return this;
+    }
+    public SceneAct setOnNewTurnRunnable(final SceneRunnable run) {
+        this.onNewTurn = run;
+        return this;
+    }
+    public SceneAct setBeforeActRunnable(final SceneRunnable run) {
+        this.beforeAct = run;
+        return this;
+    }
+    public SceneAct setAfterActRunnable(final SceneRunnable run) {
+        this.afterAct = run;
+        return this;
+    }
     
   protected int _surprise;
   public int getSurprise() {
@@ -105,12 +146,13 @@ public final class SceneAct {
               }
             }
             if (useInit) {
-              nxActor.init += initInc;
-              int nInit = nxActor.init;
-              final int mInit = nxActor.mInit < 1
-                  ? this._players.length
-                  : nxActor.mInit;
-              if (nInit < mInit) {
+              int nInit = nxActor.init + initInc;
+              nxActor.init = nInit;
+              int mInit = nxActor.mInit;
+              if (mInit < 1) {
+                mInit = this._players.length;
+              }
+              if (nInit > mInit) {
                 nInit -= mInit;
                 if (initInc == 1) {
                   minInit = -1;
@@ -161,11 +203,15 @@ public final class SceneAct {
         if (noParty) {
           this._status = -2;
           ret = "The party has fallen!" + ret;
-          return ret;
+          final SceneRunnable onStop = this.onStop;
+          return onStop == null || onStop.run(this, ret)
+                  ? ret : this.setNext(ret, endTurn);
         } else if (noEnemy) {
           this._status = 1;
           ret = "The party has won!" + ret;
-          return ret;
+          final SceneRunnable onStop = this.onStop;
+          return onStop == null || onStop.run(this, ret)
+                  ? ret : this.setNext(ret, endTurn);
         } else if (minInit != 0 && !useInit) {
           minInit = 0;
         }
@@ -214,6 +260,11 @@ public final class SceneAct {
             }
           }
         }
+      }
+      final SceneRunnable onNewTurn = this.onNewTurn;
+      if (endTurn && onNewTurn != null && onNewTurn.run(this, ret)
+              && crActor.automatic != 0) {
+          return this.executeAI("");
       }
     }
     return ret;
@@ -271,50 +322,56 @@ public final class SceneAct {
     }
 
   public String executeAbility(final Performance skill, int target, String ret) {
-    switch (skill.trg) {
-      case Performance.TRG_ENEMY:
-        if (target < this._enIdx) {
-          this._fTarget = 0;
-          this._lTarget = this._enIdx - 1;
-        } else {
-          this._fTarget = this._enIdx;
-          this._lTarget = this._players.length - 1;
+    final SceneRunnable beforeAct = this.beforeAct;
+    if (beforeAct == null || beforeAct.run(this, ret)) {
+        switch (skill.trg) {
+          case Performance.TRG_ENEMY:
+            if (target < this._enIdx) {
+              this._fTarget = 0;
+              this._lTarget = this._enIdx - 1;
+            } else {
+              this._fTarget = this._enIdx;
+              this._lTarget = this._players.length - 1;
+            }
+            break;
+          case Performance.TRG_ALL:
+            this._fTarget = 0;
+            this._lTarget = this._players.length - 1;
+            break;
+          case Performance.TRG_PARTY:
+            if (this._current < this._enIdx) {
+              this._fTarget = 0;
+              this._lTarget = this._enIdx - 1;
+            } else {
+              this._fTarget = this._enIdx;
+              this._lTarget = this._players.length - 1;
+            }
+            break;
+          case Performance.TRG_SELF:
+            this._fTarget = this._lTarget = this._current;
+            break;
+          default:
+            target = this.getGuardian(target, skill);
+            this._fTarget = target;
+            this._lTarget = target;
         }
-        break;
-      case Performance.TRG_ALL:
-        this._fTarget = 0;
-        this._lTarget = this._players.length - 1;
-        break;
-      case Performance.TRG_PARTY:
-        if (this._current < this._enIdx) {
-          this._fTarget = 0;
-          this._lTarget = this._enIdx - 1;
-        } else {
-          this._fTarget = this._enIdx;
-          this._lTarget = this._players.length - 1;
+        boolean applyCosts = true;
+        final Actor crActor = this._players[this._current];
+        ret += crActor.name + " performs " + skill.name;
+        for (int i = this._fTarget; i <= this._lTarget; i++) {
+          if ((skill.mHp < 0 && skill.isRestoring()) || this._players[i]._hp > 0) {
+            ret += skill.execute(crActor, this._players[i], applyCosts);
+            applyCosts = false;
+          }
         }
-        break;
-      case Performance.TRG_SELF:
-        this._fTarget = this._lTarget = this._current;
-        break;
-      default:
-        target = this.getGuardian(target, skill);
-        this._fTarget = target;
-        this._lTarget = target;
+        ret += ".";
+        this._lastAbility = skill;
+        final SceneRunnable afterAct = this.afterAct;
+        if (afterAct == null || afterAct.run(this, ret)) {
+            crActor._xp++;
+            crActor.levelUp();
+        }
     }
-    boolean applyCosts = true;
-    final Actor crActor = this._players[this._current];
-    ret += crActor.name + " performs " + skill.name;
-    for (int i = this._fTarget; i <= this._lTarget; i++) {
-      if ((skill.mHp < 0 && skill.isRestoring()) || this._players[i]._hp > 0) {
-        ret += skill.execute(crActor, this._players[i], applyCosts);
-        applyCosts = false;
-      }
-    }
-    ret += ".";
-    crActor._xp++;
-    crActor.levelUp();
-    this._lastAbility = skill;
     return ret;
   }
 
@@ -457,10 +514,15 @@ public final class SceneAct {
     }
     if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
       this._status = -1;
-      return "The party has escaped!";
-    } else {
-      return "The party attempted to escape, but failed.";
+      final SceneRunnable onStop = this.onStop;
+      final String ret = "The party has escaped!";
+      if (onStop == null || onStop.run(this, ret)) {
+        return ret;
+      } else {
+        this._status = 0;
+      }
     }
+    return "The party attempted to escape, but failed.";
   }
 
   public SceneAct(final Actor[] party, final Actor[] enemy, final int surprise) {
@@ -501,7 +563,15 @@ public final class SceneAct {
     }
     this._surprise = surprise;
     this._useInit = useInit;
-    this.setNext("", false);
+    final String ret = this.setNext("", false);
+    final SceneRunnable onStart = this.onStart;
+    if (onStart == null || onStart.run(this, ret)) {
+        final SceneRunnable onNewTurn = this.onNewTurn;
+        if (onNewTurn != null && onNewTurn.run(this, ret)
+                && players[this._current].automatic != 0) {
+            this.executeAI("");
+        }
+    }
   }
     
 }
