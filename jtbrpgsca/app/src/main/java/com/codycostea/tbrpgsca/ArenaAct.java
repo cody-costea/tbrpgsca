@@ -377,10 +377,10 @@ public final class ArenaAct extends Activity {
                         final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                         crActor = scenePlay._players[scenePlay._current];
                     }
-                    final ArrayList<Performance> availableSkills = crActor.getAvailableSkills();
+                    final Performance performance = crActor.getAvailableSkills().get(position);
                     skillActBtn.setEnabled(((view != null && ((ViewHolder) view.getTag()).usable)
-                            || (view == null && availableSkills.get(position).canPerform(crActor)))
-                            && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), availableSkills.get(position)));
+                            || (view == null && performance.canPerform(crActor)))
+                            && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), performance));
                 }
             });
             skillActBtn.setOnClickListener(this.cAction);
@@ -419,10 +419,10 @@ public final class ArenaAct extends Activity {
                             final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                             crActor = scenePlay._players[scenePlay._current];
                         }
-                        final ArrayList<Performance> availableSkills = crActor.getAvailableSkills();
-                        itemUseBtn.setEnabled(((view != null && ((ViewHolder) view.getTag()).usable)
-                                || (view == null && availableSkills.get(position).canPerform(crActor)))
-                                && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), availableSkills.get(position)));
+                        final Performance performance = (Performance)itemsSpn.getSelectedItem();
+                        itemUseBtn.setEnabled(performance != null && ((view != null
+                                && ((ViewHolder) view.getTag()).usable) || (view == null && performance.canPerform(crActor)))
+                                && ArenaAct.this.canTarget(targetSpn.getSelectedItemPosition(), performance));
                     }
                 });
                 itemUseBtn.setOnClickListener(this.cAction);

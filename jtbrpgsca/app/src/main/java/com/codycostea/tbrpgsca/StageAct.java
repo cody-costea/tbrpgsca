@@ -234,17 +234,17 @@ public class StageAct extends Activity {
 		};
 
 		this.Party = new Interpreter[] {
-				new Interpreter(1, "Cody", race[2], job[0], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
-				new Interpreter(3, "Victoria", race[0], job[16], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
-				new Interpreter(5, "Stephanie", race[3], job[15], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+				new Interpreter(1, "Cody", race[2], job[0], 1, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+				new Interpreter(3, "Victoria", race[0], job[16], 1, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
+				new Interpreter(5, "Stephanie", race[3], job[15], 1, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap),
 				//new Actor(7, "George", race[1], job[13], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, itemsMap)
 		};
 
 		final Interpreter[] enemy = new Interpreter[] {
-				new Interpreter(2, this.getString(R.string.race_goblin), race[2], job[18], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Interpreter(4, this.getString(R.string.race_lizard), race[0], job[20], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Interpreter(6, this.getString(R.string.race_troll), race[3], job[19], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new Interpreter(8, this.getString(R.string.race_ogre), race[1], job[17], 1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+				new Interpreter(2, this.getString(R.string.race_goblin), race[2], job[18], 1, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Interpreter(4, this.getString(R.string.race_lizard), race[0], job[20], 1, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Interpreter(6, this.getString(R.string.race_troll), race[3], job[19], 1, 9, 5, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new Interpreter(8, this.getString(R.string.race_ogre), race[1], job[17], 1, 9, 7, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 		};
 
 		final Interpreter[][] enemies = this.Enemy = new Interpreter[6][];
@@ -396,16 +396,20 @@ public class StageAct extends Activity {
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if (requestCode >= 0) {
 			if (resultCode == RESULT_OK) {
-				Bundle extra = data.getExtras();
-				if (extra != null && extra.containsKey("party")) {
-				    final Interpreter[] players = this.Party;
-				    final Parcelable[] party = extra.getParcelableArray("party");
-					System.arraycopy(party, 0, players, 0, Math.min(party.length, players.length));
+				final Bundle extra = data.getExtras();
+				if (extra != null) {
+					if (extra.containsKey("party")) {
+						final Interpreter[] players = this.Party;
+						final Parcelable[] party = extra.getParcelableArray("party");
+						if (party != null) {
+							System.arraycopy(party, 0, players, 0, Math.min(party.length, players.length));
+						}
+					}
+					int level = StageAct.this.level;
+					if (extra.getInt("outcome", 0) > 0 && level < 5) {
+						StageAct.this.level = level + 1;
+					}
 				}
-				int level = StageAct.this.level;
-				if (extra.getInt("outcome", 0) > 0 && level < 5) {
-                    StageAct.this.level = level + 1;
-                }
 			}
 		}
 	}

@@ -31,6 +31,47 @@ public final class ScenePlay {
     public static String escapeTxt = "The party has escaped!";
     public static String failTxt = "The party attempted to escape, but failed.";
 
+    public interface SceneRunnable {
+        boolean run(final ScenePlay scene);
+    }
+
+    protected SceneRunnable onStart, onStop, onNewTurn, beforeAct, afterAct;
+    public SceneRunnable getOnBeginSceneRunnable() {
+        return this.onStart;
+    }
+    public SceneRunnable getOnEndSceneRunnable() {
+        return this.onStop;
+    }
+    public SceneRunnable getOnNewTurnRunnable() {
+        return this.onNewTurn;
+    }
+    public SceneRunnable getBeforeActRunnable() {
+        return this.beforeAct;
+    }
+    public SceneRunnable getAfterActRunnable() {
+        return this.afterAct;
+    }
+    public ScenePlay setOnBeginSceneRunnable(final SceneRunnable run) {
+        this.onStart = run;
+        return this;
+    }
+    public ScenePlay setOnEndSceneRunnable(final SceneRunnable run) {
+        this.onStop = run;
+        return this;
+    }
+    public ScenePlay setOnNewTurnRunnable(final SceneRunnable run) {
+        this.onNewTurn = run;
+        return this;
+    }
+    public ScenePlay setBeforeActRunnable(final SceneRunnable run) {
+        this.beforeAct = run;
+        return this;
+    }
+    public ScenePlay setAfterActRunnable(final SceneRunnable run) {
+        this.afterAct = run;
+        return this;
+    }
+
     protected int _surprise;
     public int getSurprise() {
         return this._surprise;
@@ -116,12 +157,13 @@ public final class ScenePlay {
                             }
                         }
                         if (useInit) {
-                            nxActor.init += initInc;
-                            int nInit = nxActor.init;
-                            final int mInit = nxActor.mInit < 1
-                                    ? _players.length
-                                    : nxActor.mInit;
-                            if (nInit < mInit) {
+                            int nInit = nxActor.init + initInc;
+                            nxActor.init = nInit;
+                            int mInit = nxActor.mInit;
+                            if (mInit < 1) {
+                                mInit = _players.length;
+                            }
+                            if (nInit > mInit) {
                                 nInit -= mInit;
                                 if (initInc == 1) {
                                     minInit = -1;
@@ -144,9 +186,9 @@ public final class ScenePlay {
                                     }
                                 }
                             }
-                            if (minInit > 0 && minInit > mInit) {
+                            /*if (minInit > 0 && minInit > mInit) {
                                 minInit = mInit;
-                            }
+                            }*/
                         } else {
                             if (minInit != 1) {
                                 nxActor.setActive(true);
@@ -171,10 +213,16 @@ public final class ScenePlay {
                 }
                 if (noParty) {
                     this._status = -2;
-                    return String.format(Locale.US, ScenePlay.failTxt, retBuilder.toString());
+                    final SceneRunnable onStop = this.onStop;
+                    return onStop == null || onStop.run(this)
+                            ? String.format(Locale.US, ScenePlay.failTxt, retBuilder.toString())
+                            : this.setNext(retBuilder.toString() + "\n", endTurn);
                 } else if (noEnemy) {
                     this._status = 1;
-                    return String.format(Locale.US, ScenePlay.victoryTxt, retBuilder.toString());
+                    final SceneRunnable onStop = this.onStop;
+                    return onStop == null || onStop.run(this)
+                            ? String.format(Locale.US, ScenePlay.victoryTxt, retBuilder.toString())
+                            : this.setNext(retBuilder.toString() + "\n", endTurn);
                 } else if (minInit != 0 && !useInit) {
                     minInit = 0;
                 }
@@ -221,6 +269,11 @@ public final class ScenePlay {
                         }
                     }
                 }
+            }
+            final SceneRunnable onNewTurn = this.onNewTurn;
+            if (endTurn && onNewTurn != null && onNewTurn.run(this)
+                    && crActor.automatic != 0) {
+                return this.executeAI(ret);
             }
         }
         return ret;
@@ -279,52 +332,58 @@ public final class ScenePlay {
 
     public String executeAbility(final Performance skill, int target, final String ret) {
         final StringBuilder retBuilder = new StringBuilder(ret);
-        final int enIdx = this._enIdx, fTarget, lTarget;
-        final Interpreter[] players = this._players;
-        final int current = this._current;
-        switch (skill.trg) {
-            case Performance.TRG_ENEMY:
-                if (target < enIdx) {
+        final SceneRunnable beforeAct = this.beforeAct;
+        if (beforeAct == null || beforeAct.run(this)) {
+            final int enIdx = this._enIdx, fTarget, lTarget;
+            final Interpreter[] players = this._players;
+            final int current = this._current;
+            switch (skill.trg) {
+                case Performance.TRG_ENEMY:
+                    if (target < enIdx) {
+                        this._fTarget = fTarget = 0;
+                        this._lTarget = lTarget = enIdx - 1;
+                    } else {
+                        this._fTarget = fTarget = enIdx;
+                        this._lTarget = lTarget = players.length - 1;
+                    }
+                    break;
+                case Performance.TRG_ALL:
                     this._fTarget = fTarget = 0;
-                    this._lTarget = lTarget = enIdx - 1;
-                } else {
-                    this._fTarget = fTarget = enIdx;
                     this._lTarget = lTarget = players.length - 1;
+                    break;
+                case Performance.TRG_PARTY:
+                    if (this._current < enIdx) {
+                        this._fTarget = fTarget = 0;
+                        this._lTarget = lTarget = enIdx - 1;
+                    } else {
+                        this._fTarget = fTarget = enIdx;
+                        this._lTarget = lTarget = players.length - 1;
+                    }
+                    break;
+                case Performance.TRG_SELF:
+                    this._fTarget = this._lTarget = fTarget = lTarget = current;
+                    break;
+                default:
+                    this._fTarget = this._lTarget = fTarget = lTarget = this.getGuardian(target, skill);
+            }
+            boolean applyCosts = true;
+            final Interpreter crActor = players[current];
+            retBuilder.append(String.format(Locale.US, ScenePlay.performsTxt, crActor.name, skill.name));
+            for (int i = fTarget; i <= lTarget; i++) {
+                final Interpreter iPlayer = players[i];
+                if ((skill.mHp < 0 && skill.isRestoring()) || iPlayer._hp > 0) {
+                    retBuilder.append(skill.execute(crActor, iPlayer, applyCosts));
+                    applyCosts = false;
                 }
-                break;
-            case Performance.TRG_ALL:
-                this._fTarget = fTarget = 0;
-                this._lTarget = lTarget = players.length - 1;
-                break;
-            case Performance.TRG_PARTY:
-                if (this._current < enIdx) {
-                    this._fTarget = fTarget = 0;
-                    this._lTarget = lTarget = enIdx - 1;
-                } else {
-                    this._fTarget = fTarget = enIdx;
-                    this._lTarget = lTarget = players.length - 1;
-                }
-                break;
-            case Performance.TRG_SELF:
-                this._fTarget = this._lTarget = fTarget = lTarget = current;
-                break;
-            default:
-                this._fTarget = this._lTarget = fTarget = lTarget = this.getGuardian(target, skill);
-        }
-        boolean applyCosts = true;
-        final Interpreter crActor = players[current];
-        retBuilder.append(String.format(Locale.US, ScenePlay.performsTxt, crActor.name, skill.name));
-        for (int i = fTarget; i <= lTarget; i++) {
-            final Interpreter iPlayer = players[i];
-            if ((skill.mHp < 0 && skill.isRestoring()) || iPlayer._hp > 0) {
-                retBuilder.append(skill.execute(crActor, iPlayer, applyCosts));
-                applyCosts = false;
+            }
+            retBuilder.append(".");
+            this._lastAbility = skill;
+            final SceneRunnable afterAct = this.afterAct;
+            if (afterAct == null || afterAct.run(this)) {
+                crActor._xp++;
+                crActor.levelUp();
             }
         }
-        retBuilder.append(".");
-        crActor._xp++;
-        crActor.levelUp();
-        this._lastAbility = skill;
         return retBuilder.toString();
     }
 
@@ -468,10 +527,12 @@ public final class ScenePlay {
         }
         if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
             this._status = -1;
-            return ScenePlay.escapeTxt;
-        } else {
-            return ScenePlay.failTxt;
+            final SceneRunnable onStop = this.onStop;
+            if (onStop == null || onStop.run(this)) {
+                return ScenePlay.escapeTxt;
+            }
         }
+        return ScenePlay.failTxt;
     }
 
     public ScenePlay(final Parcelable[] party, final Parcelable[] enemy, final int surprise) {
@@ -520,6 +581,14 @@ public final class ScenePlay {
         this._surprise = surprise;
         this._useInit = useInit;
         this.setNext("", false);
+        final SceneRunnable onStart = this.onStart;
+        if (onStart == null || onStart.run(this)) {
+            final SceneRunnable onNewTurn = this.onNewTurn;
+            if (onNewTurn != null && onNewTurn.run(this)
+                    && players[this._current].automatic != 0) {
+                this.executeAI("");
+            }
+        }
     }
 
 }
