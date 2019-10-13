@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca;
 
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
@@ -358,9 +357,8 @@ public class StageAct extends Activity {
         for (int i = 0; i < enemies.length; i++) {
             enemies[i].recover();
         }
-		//ArenaAct.PlayDemo(this);
 		ArenaAct.Stage(this, 0, 0, players, this.Enemy[level],
-				new String[0], surprise, level % 2 == 0, true);
+				null, surprise, level % 2 == 0, true);
 	}
 
 	private OnClickListener cAction = new OnClickListener() {
