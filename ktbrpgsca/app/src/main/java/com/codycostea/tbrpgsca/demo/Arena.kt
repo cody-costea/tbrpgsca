@@ -457,15 +457,16 @@ class Arena : Fragment() {
             R.id.AutoBt -> {
                 val automatic = !this.automatic
                 this.automatic = automatic
-                if (automatic) {
+                this.autoBtn.text = this.getString(if (automatic) R.string.bt_manual else R.string.bt_auto)
+                if (automatic && this.skillActBtn.isEnabled) {
                     this.enableControls(false)
                     if (this.crActor.automatic == 0) {
                         this.afterAct()
                     }
                 }
-                else {
+                /*else {
                     this.autoBtn.isEnabled = false
-                }
+                }*/
             }
             R.id.UseBt -> {
                 val itemsAdapter = this.itemsAdapter
@@ -696,7 +697,7 @@ class Arena : Fragment() {
                     this.setCrItems()
                     infoTxt.text = String.format(this.getString(R.string.cr_actor_info), actor.name, actor.level, actor.exp, actor.mExp)
                     this.enableControls(true)
-                    this.autoBtn.isEnabled = true
+                    //this.autoBtn.isEnabled = true
                     this.setCrAutoSkill()
                 }
             }
