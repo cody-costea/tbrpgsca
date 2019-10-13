@@ -186,9 +186,6 @@ public final class ScenePlay {
                                     }
                                 }
                             }
-                            /*if (minInit > 0 && minInit > mInit) {
-                                minInit = mInit;
-                            }*/
                         } else {
                             if (minInit != 1) {
                                 nxActor.setActive(true);
@@ -255,7 +252,6 @@ public final class ScenePlay {
             }
             final HashMap<Performance, Integer> regSkills = crActor.skillsQtyRgTurn;
             if (regSkills != null) {
-                //final Enumeration regSkillsEnum = regSkills.keys();
                 final HashMap<Performance, Integer> skillsQty = crActor.skillsQty;
                 for (Performance skill : regSkills.keySet()) {
                     int skillQtyInt = 0;
