@@ -380,9 +380,11 @@ class ArenaState extends State<ArenaStage> {
   Widget build(final BuildContext context) {
     final List<SpriteState> actorSprites = this._actorSprites;
     final bool surprised = this._surprise < 0;
-    final bool activeBtn = this._activeBtn;
     final Performance crSkill = this._crSkill;
+    final SceneAct sceneAct = this._sceneAct;
     final Performance crItem = this._crItem;
+    final bool activeBtn = this._activeBtn;
+    final String arenaImg = this._arenaImg;
     final Actor crActor = this._crActor;
     return new MaterialApp(
         navigatorKey: this.navigatorKey,
@@ -397,7 +399,7 @@ class ArenaState extends State<ArenaStage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Text(this._crActor.automatic == 0 ? "   ${this._crActor.name} - "
+                    Text(crActor.automatic == 0 ? "   ${crActor.name} - "
                       "Lv: ${crActor.level}/${crActor.maxLv}, "
                       "HP: ${crActor.hp}/${crActor.mHp}, "
                       "MP: ${crActor.mp}/${crActor.mMp}, "
@@ -413,8 +415,8 @@ class ArenaState extends State<ArenaStage> {
                                 child: FractionallySizedBox(
                                   widthFactor: 1,
                                   heightFactor: 0.69,
-                                  child: this._arenaImg == null || this._arenaImg.length == 0 ? SizedBox() : Image(
-                                    image: AssetImage('assets/sprites/arena/$_arenaImg'),
+                                  child: arenaImg == null || arenaImg.length == 0 ? SizedBox() : Image(
+                                    image: AssetImage('assets/sprites/arena/$arenaImg'),
                                     fit: BoxFit.fill,
                                     height: null,
                                     width: null
@@ -489,13 +491,14 @@ class ArenaState extends State<ArenaStage> {
                           ),
                           Expanded(
                               child: DropdownButton(
+                                  isExpanded: true,
                                   items: this._crSkills,
                                   onChanged: ((final Performance value) {
                                     this.setState(() {
                                       this._crSkill = value;
                                     });
                                   }),
-                                  value: this._crSkill
+                                  value: crSkill
                               )
                           )
                         ]
@@ -504,10 +507,11 @@ class ArenaState extends State<ArenaStage> {
                       children: <Widget>[
                         Expanded(
                             child: DropdownButton(
+                                isExpanded: true,
                                 items: this._players,
                                 onChanged: ((final int value) {
                                   final int trg = this._target;
-                                  final int enIdx = this._sceneAct.enemyIndex;
+                                  final int enIdx = sceneAct.enemyIndex;
                                   final bool autoSkill = (trg < enIdx && value >= enIdx)
                                       || (trg >= enIdx && value < enIdx);
                                   this.setState(() {
@@ -537,7 +541,7 @@ class ArenaState extends State<ArenaStage> {
                                 Expanded(
                                     child: MaterialButton(
                                         onPressed: this._surprise < 0 ? null : () {
-                                          this._afterAct("\n${this._sceneAct.escape()}");
+                                          this._afterAct("\n${sceneAct.escape()}");
                                         },
                                         child: Text('Run', overflow: TextOverflow.fade)
                                     )
@@ -553,20 +557,21 @@ class ArenaState extends State<ArenaStage> {
                               child: MaterialButton(
                                 onPressed: activeBtn && crItem != null
                                     && this._canPerform(crItem) ? () {
-                                  this._afterAct(this._sceneAct.useAbility(crItem, this._target, ""));
+                                  this._afterAct(sceneAct.useAbility(crItem, this._target, ""));
                                 } : null,
                                 child: Text('Use', overflow: TextOverflow.fade),
                               )
                           ),
                           Expanded(
                               child: DropdownButton(
+                                isExpanded: true,
                                 items: this._crItems,
                                 onChanged: ((final Performance value) {
                                   this.setState(() {
                                     this._crItem = value;
                                   });
                                 }),
-                                value: this._crItem
+                                value: crItem
                               )
                           )
                         ]
