@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Turn-Based RPG Simple Combat Arena</string>
     <string name="bt_auto">Auto</string>
+    <string name="bt_manual">Manual</string>
     <string name="bt_run">Fugi</string>
     <string name="bt_act">Execută</string>
     <string name="bt_use">Utilizează</string>

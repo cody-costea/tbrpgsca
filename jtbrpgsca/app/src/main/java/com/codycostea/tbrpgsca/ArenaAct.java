@@ -132,7 +132,6 @@ public final class ArenaAct extends Activity {
             return view;
         }
 
-
         @Override
         public View getDropDownView(final int position, View view, final ViewGroup parent) {
             view = this.prepareView(position, view, parent);
@@ -246,7 +245,7 @@ public final class ArenaAct extends Activity {
 
     }
 
-    private ActorArrayAdapter playersAdapter;
+    //private ActorArrayAdapter playersAdapter;
     private AbilityArrayAdapter skillsAdapter, itemsAdapter;
 
     private final View.OnClickListener cAction = new OnClickListener() {
@@ -264,15 +263,16 @@ public final class ArenaAct extends Activity {
                 case R.id.AutoBt: {
                     final ScenePlay scenePlay = ArenaAct.this.scenePlay;
                     final boolean automatic = !ArenaAct.this.automatic;
+                    ArenaAct.this.autoBtn.setText(ArenaAct.this.getString(automatic ? R.string.bt_manual : R.string.bt_auto));
                     ArenaAct.this.automatic = automatic;
-                    if (automatic) {
+                    if (automatic && ArenaAct.this.skillActBtn.isEnabled()) {
                         ArenaAct.this.enableControls(false);
                         if (scenePlay._players[scenePlay._current].automatic == 0) {
                             ArenaAct.this.afterAct();
                         }
-                    } else {
+                    } /*else {
                         ArenaAct.this.autoBtn.setEnabled(false);
-                    }
+                    }*/
                     break;
                 }
                 case R.id.UseBt: {
@@ -533,6 +533,7 @@ public final class ArenaAct extends Activity {
         final ScenePlay scenePlay = this.scenePlay;
         switch (scenePlay._status) {
             case 0: {
+                //this.autoBtn.setEnabled(true);
                 final Interpreter actor = scenePlay._players[scenePlay._current];
                 final TextView infoTxt = this.infoTxt;
                 if (this.automatic || actor.automatic != 0) {
@@ -546,7 +547,6 @@ public final class ArenaAct extends Activity {
                     this.setCrItems();
                     infoTxt.setText(String.format(this.getString(R.string.cr_actor_info), actor.name, actor._lv, actor._xp, actor._maxp));
                     this.enableControls(true);
-                    this.autoBtn.setEnabled(true);
                     this.setCrAutoSkill();
                 }
                 break;
@@ -784,7 +784,7 @@ public final class ArenaAct extends Activity {
 
         final ActorArrayAdapter playersAdapter = new ActorArrayAdapter(this,
                 android.R.layout.simple_spinner_item, players);
-        this.playersAdapter = playersAdapter;
+        //this.playersAdapter = playersAdapter;
         targetSpn.setAdapter(playersAdapter);
         targetSpn.setSelection(enIdx);
         targetSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
