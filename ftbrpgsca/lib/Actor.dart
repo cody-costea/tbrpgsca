@@ -20,14 +20,67 @@ import 'package:sprintf/sprintf.dart';
 
 class Actor extends Costume {
 
+  static const int FLAG_ACTIVE = 2;
+  static const int FLAG_REFLECTS = 4;
+  static const int FLAG_GUARDS = 8;
+  static const int FLAG_SHAPE_SHIFT = 16;
+
   static String koTxt = ", %s falls unconscious";
 
+  bool _ranged;
   Costume _race, _job;
   int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
-  bool active, reflects, guards, _ranged;
   Map<Performance, int> _items, skillsQty, skillsQtyRgTurn;
   Map<StateMask, int> stateDur;
   Map<int, Costume> equipment;
+
+  bool get active {
+    return (this.flags & FLAG_ACTIVE) == FLAG_ACTIVE;
+  }
+
+  set active(final bool active) {
+    int flags = this.flags;
+    if (active != ((flags & FLAG_ACTIVE) == FLAG_ACTIVE)) {
+      flags ^= FLAG_ACTIVE;
+      this.flags = flags;
+    }
+  }
+
+  bool get reflects {
+    return (this.flags & FLAG_REFLECTS) == FLAG_REFLECTS;
+  }
+
+  set reflects(final bool reflects) {
+    int flags = this.flags;
+    if (reflects != ((flags & FLAG_REFLECTS) == FLAG_REFLECTS)) {
+      flags ^= FLAG_REFLECTS;
+      this.flags = flags;
+    }
+  }
+
+  bool get guards {
+    return (this.flags & FLAG_GUARDS) == FLAG_GUARDS;
+  }
+
+  set guards(final bool guards) {
+    int flags = this.flags;
+    if (guards != ((flags & FLAG_GUARDS) == FLAG_GUARDS)) {
+      flags ^= FLAG_GUARDS;
+      this.flags = flags;
+    }
+  }
+
+  bool get shapeShift {
+    return (this.flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT;
+  }
+
+  set shapeShift(final bool shapeShift) {
+    int flags = this.flags;
+    if (shapeShift != ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT)) {
+      flags ^= FLAG_SHAPE_SHIFT;
+      this.flags = flags;
+    }
+  }
 
   final List<Performance> _skills = new List();
   List<Performance> get availableSkills {

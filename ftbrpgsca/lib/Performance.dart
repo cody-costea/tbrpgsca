@@ -21,6 +21,10 @@ import 'package:sprintf/sprintf.dart';
 
 class Performance extends RolePlay {
 
+  static const int FLAG_STEAL = 2;
+  static const int FLAG_ABSORB = 4;
+  static const int FLAG_RESTORE = 8;
+
   static const int DmgTypeAtk = 1;
   static const int DmgTypeDef = 2;
   static const int DmgTypeSpi = 4;
@@ -33,9 +37,44 @@ class Performance extends RolePlay {
   static String missesTxt = ", but misses";
 
   String sound;
-  bool steal, absorb, restore;
   int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg, elm; //dmgType could be used as a bitwise int, including element types;
   List<StateMask> rStates;
+
+  bool get steal {
+    return (this.flags & FLAG_STEAL) == FLAG_STEAL;
+  }
+
+  set steal(final bool steal) {
+    int flags = this.flags;
+    if (steal != ((flags & FLAG_STEAL) == FLAG_STEAL)) {
+      flags ^= FLAG_STEAL;
+      this.flags = flags;
+    }
+  }
+
+  bool get absorb {
+    return (this.flags & FLAG_ABSORB) == FLAG_ABSORB;
+  }
+
+  set absorb(final bool absorb) {
+    int flags = this.flags;
+    if (absorb != ((flags & FLAG_ABSORB) == FLAG_ABSORB)) {
+      flags ^= FLAG_ABSORB;
+      this.flags = flags;
+    }
+  }
+
+  bool get restore {
+    return (this.flags & FLAG_RESTORE) == FLAG_RESTORE;
+  }
+
+  set restore(final bool restore) {
+    int flags = this.flags;
+    if (restore != ((flags & FLAG_RESTORE) == FLAG_RESTORE)) {
+      flags ^= FLAG_RESTORE;
+      this.flags = flags;
+    }
+  }
 
   String execute(final Actor user, Actor target, final bool applyCosts) {
     String s = "";

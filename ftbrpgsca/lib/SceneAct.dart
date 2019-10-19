@@ -18,7 +18,7 @@ import 'package:ftbrpgsca/Actor.dart';
 import 'package:ftbrpgsca/Performance.dart';
 import 'package:sprintf/sprintf.dart';
 
-typedef bool SceneRunnable(final SceneAct sceneAct, final String ret);
+typedef bool SceneRun(final SceneAct sceneAct, final String ret);
 
 class SceneAct {
 
@@ -28,7 +28,7 @@ class SceneAct {
   static String escapeTxt = "The party has escaped!";
   static String failTxt = "The party attempted to escape, but failed.";
 
-  SceneRunnable onStart, onStop, onNewTurn, onBeforeAct, onAfterAct;
+  SceneRun onStart, onStop, onBeforeAct, onAfterAct, onNewTurn;
 
   int _surprise;
   int get surprise {
@@ -169,13 +169,13 @@ class SceneAct {
         if (noParty) {
           this._status = -2;
           ret = SceneAct.fallenTxt + ret;
-          final SceneRunnable onStop = this.onStop;
+          final SceneRun onStop = this.onStop;
           return onStop == null || onStop(this, ret)
               ? ret : this.setNext(ret, endTurn);
         } else if (noEnemy) {
           this._status = 1;
           ret = SceneAct.victoryTxt + ret;
-          final SceneRunnable onStop = this.onStop;
+          final SceneRun onStop = this.onStop;
           return onStop == null || onStop(this, ret)
               ? ret : this.setNext(ret, endTurn);
         } else if (minInit != 0 && !useInit) {
@@ -218,7 +218,7 @@ class SceneAct {
           }
         }
       }
-      final SceneRunnable onNewTurn = this.onNewTurn;
+      final SceneRun onNewTurn = this.onNewTurn;
       if (endTurn && onNewTurn != null && onNewTurn(this, ret)
           && crActor.automatic != 0) {
         return this.executeAI("");
@@ -279,7 +279,7 @@ class SceneAct {
   }
 
   String executeAbility(final Performance skill, int target, String ret) {
-    final SceneRunnable beforeAct = this.onBeforeAct;
+    final SceneRun beforeAct = this.onBeforeAct;
     if (beforeAct == null || beforeAct(this, ret)) {
       final List<Actor> players = this._players;
       final int current = this._current;
@@ -327,7 +327,7 @@ class SceneAct {
       }
       ret += ".";
       this._lastAbility = skill;
-      final SceneRunnable afterAct = this.onAfterAct;
+      final SceneRun afterAct = this.onAfterAct;
       if (afterAct == null || afterAct(this, ret)) {
         crActor.exp++;
         crActor.levelUp();
@@ -475,7 +475,7 @@ class SceneAct {
     }
     if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
       this._status = -1;
-      final SceneRunnable onStop = this.onStop;
+      final SceneRun onStop = this.onStop;
       final String ret = SceneAct.escapeTxt;
       if (onStop == null || onStop(this, ret)) {
         return ret;
@@ -520,9 +520,9 @@ class SceneAct {
     this._surprise = surprise;
     this._useInit = useInit;
     final String ret = this.setNext("", false);
-    final SceneRunnable onStart = this.onStart;
+    final SceneRun onStart = this.onStart;
     if (onStart == null || onStart(this, ret)) {
-      final SceneRunnable onNewTurn = this.onNewTurn;
+      final SceneRun onNewTurn = this.onNewTurn;
       if (onNewTurn != null && onNewTurn(this, ret)
           && players[this._current].automatic != 0) {
         this.executeAI("");

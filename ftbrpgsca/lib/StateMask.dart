@@ -23,11 +23,63 @@ import 'package:sprintf/sprintf.dart';
 
 class StateMask extends Costume {
 
+  static const int FLAG_AUTOMATE = 2;
+  static const int FLAG_CONFUSE = 4;
+  static const int FLAG_INACTIVATE = 8;
+  static const int FLAG_REFLECT = 16;
+
   static String causesTxt = " %s causes %s";
 
   List<Performance> rSkills;
-  bool automate, confuse, inactivate, reflect;
   int dur, sRes, dmgHp, dmgMp, dmgSp;
+
+  bool get automate {
+    return (this.flags & FLAG_AUTOMATE) == FLAG_AUTOMATE;
+  }
+
+  set automate(final bool automate) {
+    int flags = this.flags;
+    if (automate != ((flags & FLAG_AUTOMATE) == FLAG_AUTOMATE)) {
+      flags ^= FLAG_AUTOMATE;
+      this.flags = flags;
+    }
+  }
+
+  bool get confuse {
+    return (this.flags & FLAG_CONFUSE) == FLAG_CONFUSE;
+  }
+
+  set confuse(final bool confuse) {
+    int flags = this.flags;
+    if (confuse != ((flags & FLAG_CONFUSE) == FLAG_CONFUSE)) {
+      flags ^= FLAG_CONFUSE;
+      this.flags = flags;
+    }
+  }
+
+  bool get inactivate {
+    return (this.flags & FLAG_INACTIVATE) == FLAG_INACTIVATE;
+  }
+
+  set inactivate(final bool inactivate) {
+    int flags = this.flags;
+    if (inactivate != ((flags & FLAG_INACTIVATE) == FLAG_INACTIVATE)) {
+      flags ^= FLAG_INACTIVATE;
+      this.flags = flags;
+    }
+  }
+
+  bool get reflect {
+    return (this.flags & FLAG_REFLECT) == FLAG_REFLECT;
+  }
+
+  set reflect(final bool reflect) {
+    int flags = this.flags;
+    if (reflect != ((flags & FLAG_REFLECT) == FLAG_REFLECT)) {
+      flags ^= FLAG_REFLECT;
+      this.flags = flags;
+    }
+  }
 
   String inflict(final Actor actor, final bool always, final bool indefinite) {
     final Map<StateMask, int> trgStRes = actor.stRes;
