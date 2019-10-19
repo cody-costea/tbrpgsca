@@ -24,7 +24,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:sprintf/sprintf.dart';
 
 const int FRAME_TIME = 71;//87;
-
 const int SPR_HIT = 0;
 const int SPR_FALLEN = 1;
 const int SPR_RISEN = 2;
@@ -56,6 +55,7 @@ class SpriteState extends State<ActorSprite> {
   String _pos;
   int _koBit;
   int _sprite;
+  bool shapeShift = false;
   List<List<int>> _sprTime;
   List<List<String>> _sprFiles;
   List<int> _sprFullTime;
@@ -69,7 +69,7 @@ class SpriteState extends State<ActorSprite> {
 
   set actor(final Actor value) {
     this._player = value;
-    this.name = value.job.sprite;
+    this.name = value.sprite;//value.job.sprite;
   }
 
   Actor get actor {
@@ -149,6 +149,20 @@ class SpriteState extends State<ActorSprite> {
   }
 
   void _prepareSpr(final int crSprite, final bool play) {
+    {
+      final Actor crActor = this._player;
+      bool crShapeShift = crActor.shapeShift;
+      if (this.shapeShift != crShapeShift) {
+        String name = crActor.sprite;//crShapeShift ? crActor.sprite : crActor.job.sprite;
+        this.shapeShift = crShapeShift;
+        this._idleSpr = null;
+        this._koSpr = null;
+        this._sprFiles = new List(5);
+        this._sprFullTime = new List(5);
+        this._sprTime = new List(5);
+        this._name = name;
+      }
+    }
     if (crSprite != null && this._sprFiles[crSprite] == null) {
       this._readSprInfo(crSprite).then((sprInfo) {
         final List<String> sprites = sprInfo.split("\\");
@@ -290,7 +304,7 @@ class SpriteState extends State<ActorSprite> {
     }
     this._pos = pos;
     this._player = actor;
-    this._name = actor.job.sprite;
+    this._name = actor.sprite;//actor.job.sprite;
     this._sprFiles = new List(5);
     this._sprFullTime = new List(5);
     this._sprTime = new List(5);

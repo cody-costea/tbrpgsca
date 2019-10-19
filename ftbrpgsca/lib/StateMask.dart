@@ -142,8 +142,7 @@ class StateMask extends Costume {
         if (dur == 0) {
           this.disable(actor);
           sDur[this] = -3;
-        }
-        else if (dur > -3) {
+        } else if (dur > -3) {
           if (consume) {
             final int rnd = new Random().nextInt(3);
             final int dmghp = (actor.mHp + rnd) * this.dmgHp ~/ 100;
@@ -155,8 +154,12 @@ class StateMask extends Costume {
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
               s += sprintf(StateMask.causesTxt, [this.name, actor.name]) + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
             }
-          }
-          else {
+          } else {
+            final String sprite = this.sprite;
+            if (sprite != null && sprite.length > 0) {
+              actor.sprite = sprite;
+              actor.shapeShift = true;
+            }
             if (this.inactivate) {
               if (dur > 0 && actor.active) {
                 sDur[this] = dur - 1;

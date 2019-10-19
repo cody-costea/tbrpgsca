@@ -26,8 +26,8 @@ abstract class RolePlay {
 
   String name, sprite;
   int id, mHp, mMp, mSp, mInit;
-  List<StateMask> aStates;
   @protected int flags = 0;
+  List<StateMask> aStates;
 
   bool get range {
     return (this.flags & FLAG_RANGE) == FLAG_RANGE;
