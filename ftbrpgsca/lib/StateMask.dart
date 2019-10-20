@@ -154,6 +154,9 @@ class StateMask extends Costume {
             if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
               s += sprintf(StateMask.causesTxt, [this.name, actor.name]) + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
             }
+            if (dur > 0) {
+              sDur[this] = dur - 1;
+            }
           } else {
             final String sprite = this.sprite;
             if (sprite != null && sprite.length > 0) {
@@ -197,7 +200,7 @@ class StateMask extends Costume {
   bool remove(final Actor actor, final bool delete, final bool always) {
     final Map<StateMask, int> sDur = actor.stateDur;
     if (sDur != null && (always || (sDur[this] ?? -2) != -2)) {
-      if (sDur[this] ?? -3 > -3) {
+      if ((sDur[this] ?? -3) > -3) {
         this.disable(actor);
       }
       if (delete) {
@@ -211,11 +214,12 @@ class StateMask extends Costume {
     }
   }
 
-  StateMask(final int id, final String name, final bool inactivate, final bool automate, final bool confuse, final bool reflect,
-            final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp, final int hp, final int mp, final int sp,
-            final int atk, final int def, final int spi, final int wis, final int agi, final int mInit, final bool range, final Map<int, int> res,
-            final List<Performance> aSkills, final List<Performance> rSkills, final List<StateMask> states, final Map<StateMask, int> stRes)
-      : super(id, name, null, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes) {
+  StateMask(final int id, final String name, final String sprite, final bool inactivate, final bool automate, final bool confuse,
+            final bool reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp, final int hp, final int mp,
+            final int sp, final int atk, final int def, final int spi, final int wis, final int agi, final int mInit, final bool range,
+            final Map<int, int> res, final List<Performance> aSkills, final List<Performance> rSkills, final List<StateMask> states,
+            final Map<StateMask, int> stRes)
+      : super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes) {
     this.inactivate = inactivate;
     this.automate = automate;
     this.confuse = confuse;

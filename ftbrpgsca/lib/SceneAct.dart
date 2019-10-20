@@ -141,9 +141,9 @@ class SceneAct {
                   }
                 }
               }
-              if (minInit > 0 && minInit > mInit) {
+              /*if (minInit > 0 && minInit > mInit) {
                 minInit = mInit;
-              }
+              }*/
             } else {
               if (minInit != 1) {
                 nxActor.active = true;

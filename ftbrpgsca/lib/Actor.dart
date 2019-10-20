@@ -374,7 +374,10 @@ class Actor extends Costume {
       s += sprintf(Actor.koTxt, [this.name]);
       this.active = false;
       this.guards = false;
-      this.shapeShift = false;
+      if (this.shapeShift) {
+        this.shapeShift = false;
+        this.sprite = this._job.sprite;
+      }
       this._sp = 0;
       final Map<StateMask, int> sDur = this.stateDur;
       if (sDur != null) {
