@@ -23,43 +23,43 @@ import java.util.Vector;
 
 public final class SceneAct {
 
-    public interface SceneRunnable {
+    public interface SceneRun {
         boolean run(final SceneAct scene, final String ret);
     }
 
-    protected SceneRunnable onStart, onStop, onNewTurn, beforeAct, afterAct;
-    public SceneRunnable getOnBeginSceneRunnable() {
+    protected SceneRun onStart, onStop, onNewTurn, beforeAct, afterAct;
+    public SceneRun getOnBeginSceneRunnable() {
         return this.onStart;
     }
-    public SceneRunnable getOnEndSceneRunnable() {
+    public SceneRun getOnEndSceneRunnable() {
         return this.onStop;
     }
-    public SceneRunnable getOnNewTurnRunnable() {
+    public SceneRun getOnNewTurnRunnable() {
         return this.onNewTurn;
     }
-    public SceneRunnable getBeforeActRunnable() {
+    public SceneRun getBeforeActRunnable() {
         return this.beforeAct;
     }
-    public SceneRunnable getAfterActRunnable() {
+    public SceneRun getAfterActRunnable() {
         return this.afterAct;
     }
-    public SceneAct setOnBeginSceneRunnable(final SceneRunnable run) {
+    public SceneAct setOnBeginSceneRunnable(final SceneRun run) {
         this.onStart = run;
         return this;
     }
-    public SceneAct setOnEndSceneRunnable(final SceneRunnable run) {
+    public SceneAct setOnEndSceneRunnable(final SceneRun run) {
         this.onStop = run;
         return this;
     }
-    public SceneAct setOnNewTurnRunnable(final SceneRunnable run) {
+    public SceneAct setOnNewTurnRunnable(final SceneRun run) {
         this.onNewTurn = run;
         return this;
     }
-    public SceneAct setBeforeActRunnable(final SceneRunnable run) {
+    public SceneAct setBeforeActRunnable(final SceneRun run) {
         this.beforeAct = run;
         return this;
     }
-    public SceneAct setAfterActRunnable(final SceneRunnable run) {
+    public SceneAct setAfterActRunnable(final SceneRun run) {
         this.afterAct = run;
         return this;
     }
@@ -175,9 +175,9 @@ public final class SceneAct {
                   }
                 }
               }
-              if (minInit > 0 && minInit > mInit) {
+              /*if (minInit > 0 && minInit > mInit) {
                 minInit = mInit;
-              }
+              }*/
             } else {
               if (minInit != 1) {
                 nxActor.setActive(true);
@@ -203,13 +203,13 @@ public final class SceneAct {
         if (noParty) {
           this._status = -2;
           ret = "The party has fallen!" + ret;
-          final SceneRunnable onStop = this.onStop;
+          final SceneRun onStop = this.onStop;
           return onStop == null || onStop.run(this, ret)
                   ? ret : this.setNext(ret, endTurn);
         } else if (noEnemy) {
           this._status = 1;
           ret = "The party has won!" + ret;
-          final SceneRunnable onStop = this.onStop;
+          final SceneRun onStop = this.onStop;
           return onStop == null || onStop.run(this, ret)
                   ? ret : this.setNext(ret, endTurn);
         } else if (minInit != 0 && !useInit) {
@@ -261,7 +261,7 @@ public final class SceneAct {
           }
         }
       }
-      final SceneRunnable onNewTurn = this.onNewTurn;
+      final SceneRun onNewTurn = this.onNewTurn;
       if (endTurn && onNewTurn != null && onNewTurn.run(this, ret)
               && crActor.automatic != 0) {
           return this.executeAI("");
@@ -322,7 +322,7 @@ public final class SceneAct {
     }
 
   public String executeAbility(final Performance skill, int target, String ret) {
-    final SceneRunnable beforeAct = this.beforeAct;
+    final SceneRun beforeAct = this.beforeAct;
     if (beforeAct == null || beforeAct.run(this, ret)) {
         switch (skill.trg) {
           case Performance.TRG_ENEMY:
@@ -366,7 +366,7 @@ public final class SceneAct {
         }
         ret += ".";
         this._lastAbility = skill;
-        final SceneRunnable afterAct = this.afterAct;
+        final SceneRun afterAct = this.afterAct;
         if (afterAct == null || afterAct.run(this, ret)) {
             crActor._xp++;
             crActor.levelUp();
@@ -514,7 +514,7 @@ public final class SceneAct {
     }
     if (surprise > 0 || (new Random().nextInt(7) + pAgiSum > eAgiSum)) {
       this._status = -1;
-      final SceneRunnable onStop = this.onStop;
+      final SceneRun onStop = this.onStop;
       final String ret = "The party has escaped!";
       if (onStop == null || onStop.run(this, ret)) {
         return ret;
@@ -564,9 +564,9 @@ public final class SceneAct {
     this._surprise = surprise;
     this._useInit = useInit;
     final String ret = this.setNext("", false);
-    final SceneRunnable onStart = this.onStart;
+    final SceneRun onStart = this.onStart;
     if (onStart == null || onStart.run(this, ret)) {
-        final SceneRunnable onNewTurn = this.onNewTurn;
+        final SceneRun onNewTurn = this.onNewTurn;
         if (onNewTurn != null && onNewTurn.run(this, ret)
                 && players[this._current].automatic != 0) {
             this.executeAI("");
