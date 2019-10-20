@@ -266,8 +266,7 @@ public final class StateMask extends Costume {
                 if (d == 0) {
                     this.disable(actor);
                     sDur.put(this, Integer.valueOf(-3));
-                }
-                else if (d > -3) {
+                } else if (d > -3) {
                     if (consume) {
                         final int rnd = new Random().nextInt(3);
                         final int dmghp = (actor.mHp + rnd) * this.dmgHp / 100;
@@ -279,6 +278,9 @@ public final class StateMask extends Costume {
                         if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
                             s.append(String.format(Locale.US, this.name, actor.name));
                             s.append(RoleSheet.getDmgText(dmghp, dmgmp, dmgsp));
+                        }
+                        if (d > 0) {
+                            sDur.put(this, Integer.valueOf(d - 1));
                         }
                     }
                     else {
