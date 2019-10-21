@@ -19,33 +19,78 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
-open class Actor(id : Int, name: String, race: Costume, job: Costume, level : Int = 1, open var maxLv: Int = 9, mActions : Int = 1,
+open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int = 1, open var maxLv: Int = 9, mActions: Int = 1,
                  mInit: Int = 0, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, mAtk: Int = 7, mDef: Int = 7, mSpi: Int = 7, mWis: Int = 7,
-                 mAgi: Int = 7, range : Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+                 mAgi: Int = 7, range: Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
                  states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
-    : Costume(id, name, mHp + race.mHp + job.mHp, mMp + race.mMp + job.mMp, mSp + race.mSp + job.mSp,
-        mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi,
-        mWis + race.wis + job.wis, mAgi + race.agi + job.agi, mActions, mInit, range, mRes, skills, states, mStRes) {
+    : Costume(id, name, job.sprite, mHp + race.mHp + job.mHp, mMp + race.mMp + job.mMp, mSp + race.mSp + job.mSp,
+        mAtk + race.atk + job.atk, mDef + race.def + job.def, mSpi + race.spi + job.spi, mWis + race.wis + job.wis,
+        mAgi + race.agi + job.agi, mActions, mInit, range, mRes, skills, states, mStRes) {
 
     companion object {
         @JvmStatic
         var koTxt = ", %s falls unconscious"
+
+        const val FLAG_REFLECTS: Int = 2
+        const val FLAG_GUARDS: Int = 4
+        const val FLAG_SHAPE_SHIFT: Int = 8
     }
 
-    open var race : Costume = race
+    open val active: Boolean
+        get() {
+            return this.actions == 0
+        }
+
+    open var reflect: Boolean
+        get() {
+            return (this.flags and FLAG_REFLECTS) == FLAG_REFLECTS
+        }
+        set(value) {
+            var flags = this.flags
+            if (value != (flags and FLAG_REFLECTS == FLAG_REFLECTS)) {
+                flags = flags xor FLAG_REFLECTS
+                this.flags = flags
+            }
+        }
+
+    open var guards: Boolean
+        get() {
+            return (this.flags and FLAG_GUARDS) == FLAG_GUARDS
+        }
+        set(value) {
+            var flags = this.flags
+            if (value != (flags and FLAG_GUARDS == FLAG_GUARDS)) {
+                flags = flags xor FLAG_GUARDS
+                this.flags = flags
+            }
+        }
+
+    open var shapeShift: Boolean
+        get() {
+            return (this.flags and FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT
+        }
+        set(value) {
+            var flags = this.flags
+            if (value != (flags and FLAG_SHAPE_SHIFT == FLAG_SHAPE_SHIFT)) {
+                flags = flags xor FLAG_SHAPE_SHIFT
+                this.flags = flags
+            }
+        }
+
+    open var race: Costume = race
         set(value) {
             this.switchCostume(field, value)
             field = value
         }
 
-    open var job : Costume = job
+    open var job: Costume = job
         set(value) {
             this.switchCostume(field, value)
             field = value
         }
 
-    private var _lv : Int = 1
-    open var level : Int
+    private var _lv: Int = 1
+    open var level: Int
         get() = this._lv
         set(value) {
             var v = value
@@ -59,20 +104,18 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }
 
-    open var exp : Int = (level - 1) * 15
+    open var exp: Int = (level - 1) * 15
         set(value) {
             field = value
             this.levelUp()
         }
-    open var mExp : Int = level * 15
+    open var mExp: Int = level * 15
 
-    open var init : Int = 0
-    open var actions : Int = this.mActions
-    open var guards : Boolean = true
-    open var reflect : Boolean = false
-    open var automatic : Int = 0
+    open var init: Int = 0
+    open var actions: Int = this.mActions
+    open var automatic: Int = 0
 
-    open var hp : Int = this.mHp
+    open var hp: Int = this.mHp
         set(value) {
             val mHp = this.mHp
             field = when {
@@ -81,7 +124,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 else -> value
             }
         }
-    open var mp : Int = this.mMp
+    open var mp: Int = this.mMp
         set(value) {
             field = when {
                 value > this.mMp -> this.mMp
@@ -89,7 +132,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 else -> value
             }
         }
-    open var sp : Int = this.mSp
+    open var sp: Int = this.mSp
         set(value) {
             field = when {
                 value > this.mSp -> this.mSp
@@ -98,10 +141,10 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             }
         }
 
-    open var stateDur : MutableMap<State, Int>? = null
+    open var stateDur: MutableMap<State, Int>? = null
         internal set
 
-    open val availableSkills : ArrayList<Ability> = ArrayList()
+    open val availableSkills: ArrayList<Ability> = ArrayList()
 
     private var ranged: Boolean? = null
     override var range: Boolean
@@ -121,17 +164,16 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             super.range = value
             if (value) {
                 this.ranged = true
-            }
-            else {
+            } else {
                 this.ranged = null
             }
         }
 
-    internal var skillsQty : MutableMap<Ability, Int>? = null
-    internal var skillsQtyRgTurn : MutableMap<Ability, Int>? = null
+    internal var skillsQty: MutableMap<Ability, Int>? = null
+    internal var skillsQtyRgTurn: MutableMap<Ability, Int>? = null
 
-    internal open var _items : LinkedHashMap<Ability, Int>? = null
-    var items : LinkedHashMap<Ability, Int>
+    internal open var _items: LinkedHashMap<Ability, Int>? = null
+    var items: LinkedHashMap<Ability, Int>
         get() {
             var items = this._items
             if (items === null) {
@@ -144,21 +186,20 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             this._items = value
         }
 
-    private var equipment : MutableMap<Char, Costume>? = null
+    private var equipment: MutableMap<Char, Costume>? = null
 
-    open val equippedItems : Map<Char, Costume>?
+    open val equippedItems: Map<Char, Costume>?
         get() {
             val e = this.equipment
             return if (e === null) {
                 null
-            }
-            else {
+            } else {
                 HashMap<Char, Costume>(e)
             }
         }
 
-    open fun equipItem(pos: Char, item : Costume) : Costume? {
-        val r : Costume? = this.unequipPos(pos)
+    open fun equipItem(pos: Char, item: Costume): Costume? {
+        val r: Costume? = this.unequipPos(pos)
         var e = this.equipment
         if (e === null) {
             e = HashMap()
@@ -169,19 +210,18 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         return r
     }
 
-    open fun unequipPos(pos : Char) : Costume? {
+    open fun unequipPos(pos: Char): Costume? {
         val e = this.equipment
         return if (e === null) {
             null
-        }
-        else {
+        } else {
             val r: Costume? = e.get(pos)
             this.switchCostume(r, null)
             r
         }
     }
 
-    open fun unequipItem(item : Costume) : Char? {
+    open fun unequipItem(item: Costume): Char? {
         val e = this.equipment
         if (e !== null) {
             for (k in e.keys) {
@@ -193,7 +233,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         return null
     }
 
-    private fun checkRegSkill(skill : Ability) {
+    private fun checkRegSkill(skill: Ability) {
         if (skill.rQty > 0) {
             var regSkills = this.skillsQtyRgTurn
             if (regSkills === null) {
@@ -204,7 +244,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
     }
 
-    internal fun updateStates(remove : Boolean, states : Array<State>?) {
+    internal fun updateStates(remove: Boolean, states: Array<State>?) {
         if (states === null) {
             return
         }
@@ -216,15 +256,14 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             for (k in states) {
                 k.remove(this, true, true)
             }
-        }
-        else {
+        } else {
             for (k in states) {
                 k.inflict(this, true, true)
             }
         }
     }
 
-    internal fun updateSkills(remove : Boolean, abilities : Array<Ability>?) {
+    internal fun updateSkills(remove: Boolean, abilities: Array<Ability>?) {
         if (abilities === null) {
             return
         }
@@ -238,8 +277,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                     }
                 }
             }
-        }
-        else {
+        } else {
             val availableSkills = this.availableSkills
             availableSkills.ensureCapacity(availableSkills.size + abilities.size)
             for (k in abilities) {
@@ -257,30 +295,29 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         }
     }
 
-    protected open fun switchCostume(oldRole : Costume?, newRole : Costume?) {
+    protected open fun switchCostume(oldRole: Costume?, newRole: Costume?) {
         if (oldRole !== null) {
-            this.updateSkills(true, oldRole.skills)
+            this.updateSkills(true, oldRole.aSkills)
             this.updateAttributes(true, oldRole)
             this.updateResistance(true, oldRole.res, oldRole.stRes)
-            this.updateStates(true, oldRole.states)
+            this.updateStates(true, oldRole.aStates)
         }
         if (newRole !== null) {
-            this.updateStates(false, newRole.states)
+            this.updateStates(false, newRole.aStates)
             this.updateResistance(false, newRole.res, newRole.stRes)
             this.updateAttributes(false, newRole)
-            this.updateSkills(false, newRole.skills)
+            this.updateSkills(false, newRole.aSkills)
         }
     }
 
-    internal open fun updateAttributes(remove : Boolean, role : Costume) {
+    internal open fun updateAttributes(remove: Boolean, role: Costume) {
         val i: Int
         if (remove) {
             i = -1
             if (role.range) {
                 this.ranged = null
             }
-        }
-        else {
+        } else {
             if (role.range) {
                 this.ranged = true
             }
@@ -298,14 +335,13 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
         this.mInit += i * role.mInit
     }
 
-    internal fun updateResistance(remove : Boolean, resMap : Map<Int, Int>?, stResMap : Map<State, Int>?) {
+    internal fun updateResistance(remove: Boolean, resMap: Map<Int, Int>?, stResMap: Map<State, Int>?) {
         if (resMap !== null) {
             var r = this.res
             if (r === null) {
                 if (remove) {
                     return
-                }
-                else {
+                } else {
                     r = HashMap(resMap.size)
                     this.res = r
                 }
@@ -323,8 +359,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             if (rs === null) {
                 if (remove) {
                     return
-                }
-                else {
+                } else {
                     rs = HashMap()
                     this.stRes = rs
                 }
@@ -361,8 +396,7 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
             val automatic = this.automatic
             if (automatic < 2 && automatic > -2) {
                 this.automatic = 0
-            }
-            else {
+            } else {
                 this.automatic = 2
             }
             if (this.hp > 0) {
@@ -457,11 +491,12 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
     }
 
     init {
-        val raceSkills = race.skills
-        val jobSkills = job.skills
-        val s : Int = (raceSkills?.size ?: 0)
-        + (jobSkills?.size ?: 0)
-        + (skills?.size ?: 0)
+        this.guards = true
+        val raceSkills = race.aSkills
+        val jobSkills = job.aSkills
+        val s: Int = (raceSkills?.size ?: 0)
+        +(jobSkills?.size ?: 0)
+        +(skills?.size ?: 0)
         this.availableSkills.ensureCapacity(s)
         if (raceSkills !== null) {
             for (a in raceSkills) {
@@ -481,13 +516,13 @@ open class Actor(id : Int, name: String, race: Costume, job: Costume, level : In
                 this.availableSkills.add(a)
             }
         }
-        this.updateStates(false, race.states)
-        this.updateStates(false, job.states)
+        this.updateStates(false, race.aStates)
+        this.updateStates(false, job.aStates)
         this.updateStates(false, states)
         /*val e = this.equipment
         if (e != null) {
             for (k in e.keys) {
-                this.updateStates(false, e[k]?.states)
+                this.updateStates(false, e[k]?.aStates)
             }
         }*/
         if (level > 1) {

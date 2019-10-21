@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
-open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
+open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise: Int) {
 
     companion object {
         @JvmStatic
@@ -30,15 +30,15 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         var failTxt = "The party attempted to escape, but failed."
     }
 
-    open var status : Int = 0
+    open var status: Int = 0
         internal set
 
-    open val enIdx : Int = party.size
-    open val players : Array<Actor> = party + enemy
+    open val enIdx: Int = party.size
+    open val players: Array<Actor> = party + enemy
 
-    open var current : Int = if (this.surprise < 0) this.enIdx else 0
+    open var current: Int = if (this.surprise < 0) this.enIdx else 0
         protected set
-    open var crItems : MutableMap<Int, MutableList<Ability>?>? = null
+    open var crItems: MutableMap<Int, MutableList<Ability>?>? = null
         get() {
             if (field === null) {
                 field = HashMap()
@@ -47,19 +47,19 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
         protected set
 
-    open var fTarget : Int = this.enIdx
+    open var fTarget: Int = this.enIdx
         protected set
-    open var lTarget : Int = this.enIdx
+    open var lTarget: Int = this.enIdx
         protected set
 
-    open var lastAbility : Ability? = null
+    open var lastAbility: Ability? = null
 
-    open val aiTurn : Boolean
+    open val aiTurn: Boolean
         get() {
             return this.players[this.current].automatic != 0
         }
 
-    private val useInit : Boolean
+    private val useInit: Boolean
 
     init {
         var useInit = false
@@ -81,8 +81,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             for (j in 0 until pSize) {
                 if (j == i) {
                     continue
-                }
-                else {
+                } else {
                     val jPlayer = players[j]
                     var jInit = jPlayer.mInit
                     if (jInit < 1) {
@@ -104,7 +103,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         this.setNextCurrent()
     }
 
-    protected open fun setNextCurrent() : String {
+    protected open fun setNextCurrent(): String {
         var ret = ""
         var initInc: Int
         val useInit = this.useInit
@@ -136,8 +135,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                     if (iActions > 0) {
                                         crActor = iPlayer
                                         this.current = i
-                                    }
-                                    else {
+                                    } else {
                                         iPlayer.init = 0
                                         if (ret.isNotEmpty()) {
                                             ret += "\n"
@@ -150,14 +148,12 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                         if (minInit > 0 && minInit > mInit) {
                             minInit = mInit
                         }
-                    }
-                    else {
-                        val iActions : Int
+                    } else {
+                        val iActions: Int
                         if (minInit != 1) {
                             iActions = iPlayer.mActions
                             iPlayer.actions = iActions
-                        }
-                        else {
+                        } else {
                             iActions = iPlayer.actions
                         }
                         if (crActor !== iPlayer && iActions > 0
@@ -167,8 +163,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                                 if (initInc > 0) initInc = 0
                                 crActor = iPlayer
                                 this.current = i
-                            }
-                            else {
+                            } else {
                                 if (ret.isNotEmpty()) {
                                     ret += "\n"
                                 }
@@ -183,12 +178,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
         } while (initInc == 1 && minInit > -1)
         if (oldActor === crActor) {
-            val cActions : Int
+            val cActions: Int
             if (useInit) {
                 cActions = crActor.mActions
                 crActor.actions = cActions
-            }
-            else {
+            } else {
                 cActions = crActor.actions
             }
             crActor.applyStates(false)
@@ -196,8 +190,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 ret += crActor.applyStates(true)
                 return ret + this.setNextCurrent()
             }
-        }
-        else {
+        } else {
             if (crActor.automatic == 0) {
                 val crItems = crActor._items
                 if (crItems !== null && oldActor._items !== crItems) {//TODO: analyze if ok
@@ -214,8 +207,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     if (recoverableSkills[skill] == skill.rQty) {
                         skillsQty[skill] = (skillsQty[skill] ?: 0) + 1
                         recoverableSkills[skill] = 0
-                    }
-                    else {
+                    } else {
                         recoverableSkills[skill] = (recoverableSkills[skill] ?: 0) + 1
                     }
                 }
@@ -224,7 +216,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    open fun endTurn(txt : String) : String {
+    open fun endTurn(txt: String): String {
         var ret = txt
         var current = this.current
         val players = this.players
@@ -251,8 +243,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                         if (i < enIdx) {
                             noParty = false
                             i = enIdx - 1
-                        }
-                        else {
+                        } else {
                             noEnemy = false
                             break
                         }
@@ -262,8 +253,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 if (noParty) {
                     status = -2
                     ret += "\n$fallenTxt"
-                }
-                else {
+                } else {
                     if (noEnemy) {
                         status = 1
                         ret += "\n$victoryTxt"
@@ -278,14 +268,14 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    open fun getGuardian(target : Int, skill : Ability) : Int {
+    open fun getGuardian(target: Int, skill: Ability): Int {
         val players = this.players
         val current = this.current
-        if ((skill.range === null && players[current].range) || skill.range == true) {
+        if (skill.range || (/*skill.range === null &&*/ players[current].range)) {
             return target
         }
-        val f : Int
-        val l : Int
+        val f: Int
+        val l: Int
         val enIdx = this.enIdx
         if (current < enIdx) {
             val pSize = players.size - 1
@@ -294,8 +284,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
             f = enIdx
             l = pSize
-        }
-        else {
+        } else {
             if (target >= enIdx - 1 || target == 0) {
                 return target
             }
@@ -317,8 +306,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
         return if (difF == 0) {
             target
-        }
-        else {
+        } else {
             for (i in l downTo target + 1) {
                 val iPlayer = players[i]
                 if (iPlayer.hp > 0 && iPlayer.guards) {
@@ -332,25 +320,24 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
     }
 
-    protected open fun executeAbility(skill : Ability, defTarget : Int, txt : String) : String {
-        var ret : String = txt
-        var target : Int = defTarget
+    protected open fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
+        var ret: String = txt
+        var target: Int = defTarget
         val current = this.current
         val players = this.players
         val enIdx = this.enIdx
-        val fTarget : Int
-        val lTarget : Int
+        val fTarget: Int
+        val lTarget: Int
         when (skill.trg) {
-             1 -> {
-                 if (target < enIdx) {
-                     fTarget = 0
-                     lTarget = enIdx - 1
-                 }
-                 else {
-                     fTarget = enIdx
-                     lTarget = players.size - 1
-                 }
-             }
+            1 -> {
+                if (target < enIdx) {
+                    fTarget = 0
+                    lTarget = enIdx - 1
+                } else {
+                    fTarget = enIdx
+                    lTarget = players.size - 1
+                }
+            }
             2 -> {
                 fTarget = 0
                 lTarget = players.size - 1
@@ -359,8 +346,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 if (current < enIdx) {
                     fTarget = 0
                     lTarget = enIdx - 1
-                }
-                else  {
+                } else {
                     fTarget = enIdx
                     lTarget = players.size - 1
                 }
@@ -382,7 +368,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         ret += String.format("\n$performsTxt", crActor.name, skill.name)
         for (i in fTarget..lTarget) {
             val iPlayer = players[i]
-            if ((skill.hpDmg < 0 && skill.restoreKO) || iPlayer.hp > 0) {
+            if ((skill.mHp < 0 && skill.restore) || iPlayer.hp > 0) {
                 ret += skill.execute(crActor, iPlayer, applyCosts)
                 applyCosts = false
             }
@@ -394,20 +380,19 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    open fun executeAI(ret : String) : String {
+    open fun executeAI(ret: String): String {
         val players = this.players
         val current = this.current
         val enIdx = this.enIdx
         var skillIndex = 0
         var nHeal = false
         var nRestore = false
-        var f : Int
-        var l : Int
+        var f: Int
+        var l: Int
         if (current < enIdx) {
             f = 0
             l = enIdx
-        }
-        else {
+        } else {
             f = enIdx
             l = players.size
         }
@@ -415,8 +400,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             val iPlayer = players[i]
             if (iPlayer.hp < 1) {
                 nRestore = true
-            }
-            else if (iPlayer.hp < (iPlayer.mHp / 3)) {
+            } else if (iPlayer.hp < (iPlayer.mHp / 3)) {
                 nHeal = true
             }
         }
@@ -425,30 +409,29 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         if (nRestore || nHeal) {
             for (i in 0 until availableSkills.size) {
                 val s = availableSkills[i]
-                if ((s.restoreKO || (nHeal && s.hpDmg < 0)) && s.canPerform(crActor)) {
+                if ((s.restore || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
                     skillIndex = i
                     break
                 }
             }
         }
         val ability = availableSkills[this.getAIskill(skillIndex, nRestore)]
-        val atkSkill = ability.hpDmg > -1
+        val atkSkill = ability.mHp > -1
         if (atkSkill) {
             if (current < enIdx) {
                 f = enIdx
                 l = players.size
-            }
-            else {
+            } else {
                 f = 0
                 l = enIdx
             }
         }
         var target = f
         var trgPlayer = players[target]
-        while (trgPlayer.hp < 1 && (atkSkill || !ability.restoreKO) && target < l) trgPlayer = players[++target]
+        while (trgPlayer.hp < 1 && (atkSkill || !ability.restore) && target < l) trgPlayer = players[++target]
         for (i in target + 1 until l) {
             val iPlayer = players[i]
-            if (iPlayer.hp < trgPlayer.hp && (iPlayer.hp > 0 || ability.restoreKO)) {
+            if (iPlayer.hp < trgPlayer.hp && (iPlayer.hp > 0 || ability.restore)) {
                 trgPlayer = iPlayer
                 target = i
             }
@@ -456,7 +439,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return this.executeAbility(ability, target, ret)
     }
 
-    open fun getAIskill(defSkill : Int, nRestore : Boolean) : Int {
+    open fun getAIskill(defSkill: Int, nRestore: Boolean): Int {
         var ret = defSkill
         val current = this.current
         val players = this.players
@@ -467,12 +450,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             val a = availableSkills[i]
             if (a.canPerform(crActor)) {
                 if (defSkill > 0) {
-                    if (a.hpDmg < s.hpDmg && (a.restoreKO || !nRestore)) {
+                    if (a.mHp < s.mHp && (a.restore || !nRestore)) {
                         s = a
                         ret = i
                     }
-                }
-                else if (a.hpDmg > s.hpDmg) {
+                } else if (a.mHp > s.mHp) {
                     s = a
                     ret = i
                 }
@@ -481,11 +463,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    open fun performSkill(index : Int, target : Int, txt : String) : String {
+    open fun performSkill(index: Int, target: Int, txt: String): String {
         return this.executeAbility(this.players[this.current].availableSkills[index], target, txt)
     }
 
-    open fun useItem(index : Int, target : Int, ret : String) : String {
+    open fun useItem(index: Int, target: Int, ret: String): String {
         val current = this.current
         val crItems = this.crItems!![current]
         if (crItems !== null) {
@@ -495,29 +477,26 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 val itemQty = (crItemsMap[item] ?: 1) - 1
                 if (itemQty > 0) {
                     crItemsMap[item] = itemQty
-                }
-                else {
+                } else {
                     crItems.remove(item)
                     crItemsMap.remove(item)
                 }
             }
             return this.executeAbility(item, target, ret)
-        }
-        else {
+        } else {
             return ret
         }
     }
 
-    open fun escape() : String {
+    open fun escape(): String {
         val enIdx = this.enIdx
         val players = this.players
-        val pAgiSum = players.filterIndexed { i, _ ->  i < enIdx}.sumBy { it.agi } / enIdx
-        val eAgiSum = players.filterIndexed { i, _ ->  i >= enIdx}.sumBy { it.agi } / (players.size - this.enIdx)
+        val pAgiSum = players.filterIndexed { i, _ -> i < enIdx }.sumBy { it.agi } / enIdx
+        val eAgiSum = players.filterIndexed { i, _ -> i >= enIdx }.sumBy { it.agi } / (players.size - this.enIdx)
         return if (this.surprise > 0 || (Math.random() * 7) + pAgiSum > eAgiSum) {
             this.status = -1
             Scene.escapeTxt
-        }
-        else Scene.failTxt
+        } else Scene.failTxt
     }
 
 }

@@ -40,32 +40,32 @@ class DemoAct : AppCompatActivity(), ArenaStager {
     private var level = 0
 
     private val states: Array<State>
-    get() {
-        return arrayOf(
-                AdState(1, this.getString(R.string.skill_regen), false, false, false, false, -1, 0, -10, 0, 0,
-                        0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
-                AdState(2, this.getString(R.string.skill_poison), false, false, false, false, 10, 0, 7, 0, 2,
-                        0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
-                AdState(3, this.getString(R.string.skill_clarity), false, false, false, false, -1, 0, 0, -7, 0,
-                        0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
-                AdState(4, this.getString(R.string.state_dizziness), false, false, false, false, 3, 0, 0, 7, 0,
-                        0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                AdState(5, this.getString(R.string.state_vigour), false, false, false, false, -1, 0, 0, 0, -7,
-                        0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
-                AdState(6, this.getString(R.string.state_weakness), false, false, false, false, 5, 0, 0, 0, 7,
-                        0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
-                AdState(7, this.getString(R.string.skill_berserk), false, true, false, false, 7, 0, 0, 0, 0,
-                        0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
-                AdState(8, this.getString(R.string.skill_confusion), false, false, true, false, 3, 2, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
-                AdState(9, this.getString(R.string.skill_sleep), true, false, false, false, 5, 1, 0, 0, 0,
-                        0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null),
-                AdState(10, this.getString(R.string.state_stun), true, false, false, false, 1, 0, 0, 0, 0,
-                        0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null),
-                AdState(11, this.getString(R.string.skill_reflect), false, false, false, true, 7, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
-        )
-    }
+        get() {
+            return arrayOf(
+                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, -1, 0, -10, 0, 0,
+                            0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
+                    AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, 10, 0, 7, 0, 2,
+                            0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
+                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, -1, 0, 0, -7, 0,
+                            0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
+                    AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, 3, 0, 0, 7, 0,
+                            0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
+                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, -1, 0, 0, 0, -7,
+                            0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
+                    AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, 5, 0, 0, 0, 7,
+                            0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
+                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, 7, 0, 0, 0, 0,
+                            0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
+                    AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, 3, 2, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
+                    AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, 5, 1, 0, 0, 0,
+                            0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null),
+                    AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, 1, 0, 0, 0, 0,
+                            0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null),
+                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, 7, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
+            )
+        }
 
     private fun getRaces(skill: Array<Ability>): Array<Costume> {
         val skills: Array<Ability> = arrayOf(skill[0], skill[1])
@@ -78,7 +78,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         )
     }
 
-    private fun getJobs(skill : Array<Ability>): Array<Costume> {
+    private fun getJobs(skill: Array<Ability>): Array<Costume> {
         return arrayOf(
                 AdCostume(15, this.getString(R.string.job_hero), "hero", 1, 1, 1, 0, 0, 0, 0, 0, 0, false, null, arrayOf(skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[41], skill[42], skill[43], skill[44], skill[45], skill[30], skill[31], skill[32], skill[33], skill[34], skill[36], skill[51], skill[37], skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18]), null, null),
                 AdCostume(1, this.getString(R.string.job_berserker), "berserker", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]), null, null),
@@ -98,7 +98,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         )
     }
 
-    private fun getCharacters(state: Array<State>, skill : Array<Ability>, race : Array<Costume>, item: Array<Ability>): Array<Actor> {
+    private fun getCharacters(state: Array<State>, skill: Array<Ability>, race: Array<Costume>, item: Array<Ability>): Array<Actor> {
         val maxlv = 5
 
         val ogreJob = AdCostume(1, this.getString(R.string.race_ogre), "ogre", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[11]), null, null)
@@ -260,9 +260,9 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         val raceList = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item)
         val jobList = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item)
         val raceBox = arrayOf<Spinner>(
-            this.findViewById(R.id.RaceBox1),
-            this.findViewById(R.id.RaceBox2),
-            this.findViewById(R.id.RaceBox3)
+                this.findViewById(R.id.RaceBox1),
+                this.findViewById(R.id.RaceBox2),
+                this.findViewById(R.id.RaceBox3)
         )
         for (i in pcRace.indices) {
             raceList.add(pcRace[i].name)
@@ -274,9 +274,9 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         raceBox[1].setSelection(0)
         raceBox[2].setSelection(2)
         val jobBox = arrayOf<Spinner>(
-            this.findViewById(R.id.JobBox1),
-            this.findViewById(R.id.JobBox2),
-            this.findViewById(R.id.JobBox3)
+                this.findViewById(R.id.JobBox1),
+                this.findViewById(R.id.JobBox2),
+                this.findViewById(R.id.JobBox3)
         )
         for (i in pcJob.indices) {
             jobList.add(pcJob[i].name)
@@ -288,9 +288,9 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         jobBox[1].setSelection(5)
         jobBox[2].setSelection(3)
         val nameEdit = arrayOf<EditText>(
-            this.findViewById(R.id.NameField1),
-            this.findViewById(R.id.NameField2),
-            this.findViewById(R.id.NameField3)
+                this.findViewById(R.id.NameField1),
+                this.findViewById(R.id.NameField2),
+                this.findViewById(R.id.NameField3)
         )
 
         val cAction = OnClickListener { v ->
@@ -319,7 +319,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                     for (i in 0 until player.size) {
                         player[i].recover()
                     }
-                    this.arena = this.stage(this, R.id.Fragment,0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
+                    this.arena = this.stage(this, R.id.Fragment, 0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
                     this.partyLayout.visibility = View.GONE
                     this.fragment.visibility = View.VISIBLE
                 }
@@ -353,9 +353,9 @@ class DemoAct : AppCompatActivity(), ArenaStager {
             Ability.stolenTxt = this.getString(R.string.ability_stolen)
             Ability.missesTxt = this.getString(R.string.ability_misses)
             State.causesTxt = this.getString(R.string.state_causes)
-            Costume.hpText = this.getString(R.string.costume_hp)
-            Costume.mpText = this.getString(R.string.costume_mp)
-            Costume.spText = this.getString(R.string.costume_sp)
+            Role.hpText = this.getString(R.string.costume_hp)
+            Role.mpText = this.getString(R.string.costume_mp)
+            Role.spText = this.getString(R.string.costume_sp)
         }
     }
 
@@ -369,8 +369,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
     override fun onBackPressed() {
         if (this.fragment.visibility == View.GONE) {
             super.onBackPressed()
-        }
-        else {
+        } else {
             this.arena.renounce()
         }
     }
