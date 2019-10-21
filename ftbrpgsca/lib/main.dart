@@ -21,27 +21,27 @@ import 'package:flutter/material.dart';
 import 'package:ftbrpgsca/ArenaStage.dart';
 
 final List<StateMask> state = [
-  StateMask(1, "Regen", false, false, false, false, -1, 0, -10, 0, 0,
+  StateMask(1, "Regen", null, false, false, false, false, -1, 0, -10, 0, 0,
       0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null, null, null),
-  StateMask(2, "Poison", false, false, false, false, 10, 0, 7, 0, 2,
+  StateMask(2, "Poison", null, false, false, false, false, 10, 0, 7, 0, 2,
       0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null, null, null),
-  StateMask(3, "Clarity", false, false, false, false, -1, 0, 0, -7, 0,
+  StateMask(3, "Clarity", null, false, false, false, false, -1, 0, 0, -7, 0,
       0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null, null, null),
-  StateMask(4, "Dizziness", false, false, false, false, 3, 0, 0, 7, 0,
+  StateMask(4, "Dizziness", null, false, false, false, false, 3, 0, 0, 7, 0,
       0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null, null, null),
-  StateMask(5, "Vigour", false, false, false, false, -1, 0, 0, 0, -7,
+  StateMask(5, "Vigour", null, false, false, false, false, -1, 0, 0, 0, -7,
       0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null, null, null),
-  StateMask(6, "Weakness", false, false, false, false, 5, 0, 0, 0, 7,
+  StateMask(6, "Weakness", null, false, false, false, false, 5, 0, 0, 0, 7,
       0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null, null, null),
-  StateMask(7, "Berserk", false, true, false, false, 7, 0, 0, 0, 0,
+  StateMask(7, "Berserk", null, false, true, false, false, 7, 0, 0, 0, 0,
       0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null, null, null),
-  StateMask(8, "Confusion", false, false, true, false, 3, 2, 0, 0, 0,
+  StateMask(8, "Confusion", null, false, false, true, false, 3, 2, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-  StateMask(9, "Sleep", true, false, false, false, 5, 1, 0, 0, 0,
+  StateMask(9, "Sleep", null, true, false, false, false, 5, 1, 0, 0, 0,
       0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null, null, null),
-  StateMask(10, "Stun", true, false, false, false, 1, 0, 0, 0, 0,
+  StateMask(10, "Stun", null, true, false, false, false, 1, 0, 0, 0, 0,
       0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null, null, null),
-  StateMask(11, "Reflect", false, false, false, true, 7, 0, 0, 0, 0,
+  StateMask(11, "Reflect", null, false, false, false, true, 7, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 ];
 

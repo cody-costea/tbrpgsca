@@ -20,14 +20,67 @@ import 'package:sprintf/sprintf.dart';
 
 class Actor extends Costume {
 
+  static const int FLAG_ACTIVE = 2;
+  static const int FLAG_REFLECTS = 4;
+  static const int FLAG_GUARDS = 8;
+  static const int FLAG_SHAPE_SHIFT = 16;
+
   static String koTxt = ", %s falls unconscious";
 
+  bool _ranged;
   Costume _race, _job;
   int _lv = 1, maxLv, _hp, _mp, _sp, _xp, _maxp, automatic, init;
-  bool active, reflects, guards, _ranged;
   Map<Performance, int> _items, skillsQty, skillsQtyRgTurn;
   Map<StateMask, int> stateDur;
   Map<int, Costume> equipment;
+
+  bool get active {
+    return (this.flags & FLAG_ACTIVE) == FLAG_ACTIVE;
+  }
+
+  set active(final bool active) {
+    int flags = this.flags;
+    if (active != ((flags & FLAG_ACTIVE) == FLAG_ACTIVE)) {
+      flags ^= FLAG_ACTIVE;
+      this.flags = flags;
+    }
+  }
+
+  bool get reflects {
+    return (this.flags & FLAG_REFLECTS) == FLAG_REFLECTS;
+  }
+
+  set reflects(final bool reflects) {
+    int flags = this.flags;
+    if (reflects != ((flags & FLAG_REFLECTS) == FLAG_REFLECTS)) {
+      flags ^= FLAG_REFLECTS;
+      this.flags = flags;
+    }
+  }
+
+  bool get guards {
+    return (this.flags & FLAG_GUARDS) == FLAG_GUARDS;
+  }
+
+  set guards(final bool guards) {
+    int flags = this.flags;
+    if (guards != ((flags & FLAG_GUARDS) == FLAG_GUARDS)) {
+      flags ^= FLAG_GUARDS;
+      this.flags = flags;
+    }
+  }
+
+  bool get shapeShift {
+    return (this.flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT;
+  }
+
+  set shapeShift(final bool shapeShift) {
+    int flags = this.flags;
+    if (shapeShift != ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT)) {
+      flags ^= FLAG_SHAPE_SHIFT;
+      this.flags = flags;
+    }
+  }
 
   final List<Performance> _skills = new List();
   List<Performance> get availableSkills {
@@ -49,6 +102,9 @@ class Actor extends Costume {
 
   set job(final Costume job) {
     this.switchCostume(this._job, job);
+    if (!this.shapeShift) {
+      this.sprite = job.sprite;
+    }
     this._job = job;
   }
 
@@ -257,7 +313,6 @@ class Actor extends Costume {
       }
     }
     else {
-      //this.availableSkills.ensureCapacity(this.availableSkills.size + abilities.size)
       for (Performance k in abilities) {
         this.availableSkills.add(k);
         if (k.mQty > 0) {
@@ -319,6 +374,10 @@ class Actor extends Costume {
       s += sprintf(Actor.koTxt, [this.name]);
       this.active = false;
       this.guards = false;
+      if (this.shapeShift) {
+        this.shapeShift = false;
+        this.sprite = this._job.sprite;
+      }
       this._sp = 0;
       final Map<StateMask, int> sDur = this.stateDur;
       if (sDur != null) {
@@ -332,15 +391,20 @@ class Actor extends Costume {
 
   String applyStates(final bool consume) {
     String s = "";
+    String oldSprite;
     if (!consume) {
-      if (this.automatic < 2 && this.automatic > -2) {
+			if (this.shapeShift) {
+				oldSprite = this._job.sprite;
+				this.sprite = oldSprite;
+			}
+      final int automatic = this.automatic;
+      if (automatic < 2 && automatic > -2) {
         this.automatic = 0;
       }
       else {
         this.automatic = 2;
       }
       if (this._hp > 0) {
-        //if (consume) this.actions = this.mActions
         this.guards = true;
       }
       this.reflects = false;
@@ -354,7 +418,6 @@ class Actor extends Costume {
           if (r.length > 0) {
             if (c) s += ", ";
             if (consume && !c) {
-              //s += "\n"
               c = true;
             }
             s += r;
@@ -362,6 +425,9 @@ class Actor extends Costume {
         }
       }
     }
+    if (oldSprite != null && oldSprite == this.sprite) {
+			this.shapeShift = false;
+		}
     s += this.checkStatus();
     if (c && consume) s += ".";
     return s;
@@ -381,6 +447,7 @@ class Actor extends Costume {
         this.stateDur = null;
       }
     }
+    this.shapeShift = false;
     this.applyStates(false);
     final Map<int, int> res = this.res;
     if (res != null) {
@@ -452,7 +519,7 @@ class Actor extends Costume {
         final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
         final int wis, final int agi, final bool range, final Map<int, int> res, final List<Performance> skills,
         final List<StateMask> states, final Map<StateMask, int> stRes, final Map<Performance, int> items)
-      : super(id, name, null, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes) {
+      : super(id, name, job.sprite, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes) {
     this._xp = 0;
     this._maxp = 15;
     this.active = true;

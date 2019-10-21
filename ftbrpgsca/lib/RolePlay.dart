@@ -13,9 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import 'package:flutter/material.dart';
 import 'package:ftbrpgsca/StateMask.dart';
 
 abstract class RolePlay {
+
+  static const int FLAG_RANGE = 1;
 
   static String hpText = "HP";
   static String mpText = "MP";
@@ -23,15 +26,19 @@ abstract class RolePlay {
 
   String name, sprite;
   int id, mHp, mMp, mSp, mInit;
+  @protected int flags = 0;
   List<StateMask> aStates;
-  bool _range;
 
   bool get range {
-    return this._range;
+    return (this.flags & FLAG_RANGE) == FLAG_RANGE;
   }
 
   set range(final bool range) {
-    this._range = range;
+    int flags = this.flags;
+    if (range != ((flags & FLAG_RANGE) == FLAG_RANGE)) {
+      flags ^= FLAG_RANGE;
+      this.flags = flags;
+    }
   }
 
   RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
@@ -43,7 +50,7 @@ abstract class RolePlay {
     this.mMp = mp;
     this.mSp = sp;
     this.mInit = mInit;
-    this._range = range;
+    this.range = range;
     this.aStates = states;
   }
 
