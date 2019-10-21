@@ -300,66 +300,24 @@ fun BitmapDrawable.getSprite(context: Context, firstFrame: Drawable? = null, fir
     return animSpr
 }
 
-class Arena : Fragment() {
+class Arena : Fragment(), Scene {
 
-    private inner class AdScene(party: Array<Actor>, enemy: Array<Actor>, surprise: Int) : Scene(party, enemy, surprise) {
-
-        override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
-            val jScripts = this@Arena.jScripts
-            if (jScripts !== null) {
-                val jsContext = this@Arena.jsContext
-                val jsScope = this@Arena.jsScope
-                if (jsContext !== null && jsScope !== null) {
-                    jsScope.put("Target", jsScope, org.mozilla.javascript.Context.javaToJS(defTarget, jsScope))
-                    jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(skill, jsScope))
-                    if (jScripts.size > 2 && jScripts[2] !== null) {
-                        try {
-                            jsContext.evaluateString(jsScope, jScripts[2], "BeforeAct", 1, null)
-                        } catch (e: Exception) {
-                            Log.e("Rhino", e.message)
-                        }
-                    }
-                }
+    override var enIdx: Int = 0
+    override var status: Int = 0
+    override var fTarget: Int = 0
+    override var lTarget: Int = 0
+    override var current: Int = 0
+    override var surprise: Int = 0
+    override lateinit var players: Array<Actor>
+    override var crItems: MutableMap<Int, MutableList<Ability>?>? = null
+        get() {
+            if (field === null) {
+                field = HashMap()
             }
-            return super.executeAbility(skill, defTarget, txt)
+            return field
         }
-
-        override fun setNextCurrent(): String {
-            val jScripts = this@Arena.jScripts
-            if (jScripts !== null && jScripts.isNotEmpty()) {
-                var jsContext = this@Arena.jsContext
-                var jsScope = this@Arena.jsScope
-                if (jsContext === null || jsScope === null) {
-                    jsContext = org.mozilla.javascript.Context.enter()
-                    jsContext.optimizationLevel = -1
-                    jsScope = jsContext.initSafeStandardObjects()
-                    jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this@Arena, jsScope))
-                    jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
-                    jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.players, jsScope))
-                    jsScope.put("EnemyIndex", jsScope, org.mozilla.javascript.Context.javaToJS(this.enIdx, jsScope))
-                    if (jScripts[0] !== null) {
-                        try {
-                            jsContext.evaluateString(jsScope, jScripts[0], "OnStart", 1, null)
-                        } catch (e: Exception) {
-                            Log.e("Rhino", e.message)
-                        }
-                    }
-                    this@Arena.jsContext = jsContext
-                    this@Arena.jsScope = jsScope
-                }
-                jsScope!!.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.current, jsScope))
-                if (jScripts.size > 1 && jScripts[1] !== null) {
-                    try {
-                        jsContext!!.evaluateString(jsScope, jScripts[1], "OnBeginTurn", 1, null)
-                    } catch (e: Exception) {
-                        Log.e("Rhino", e.message)
-                    }
-                }
-            }
-            return super.setNextCurrent()
-        }
-
-    }
+    override var lastAbility: Ability? = null
+    override var useInit: Boolean = false
 
     private class ActorArrayBinder(val actorArray: Array<Actor>) : Binder()
 
@@ -378,8 +336,6 @@ class Arena : Fragment() {
             return arena
         }
     }
-
-    private lateinit var scenePlay: AdScene
 
     private lateinit var imgActor: Array<ImageView>
     private lateinit var autoBtn: Button
@@ -414,7 +370,7 @@ class Arena : Fragment() {
         when (it.id) {
             R.id.ActBt -> {
                 this.enableControls(false)
-                this.actionsTxt.append(this.scenePlay.performSkill(this.skillsSpn.selectedItemPosition,
+                this.actionsTxt.append(this.performSkill(this.skillsSpn.selectedItemPosition,
                         this.targetSpn.selectedItemPosition, ""))
                 this.playSpr()
             }
@@ -436,19 +392,18 @@ class Arena : Fragment() {
                 val itemsAdapter = this.itemsAdapter
                 if (itemsAdapter !== null) {
                     this.enableControls(false)
-                    this.actionsTxt.append(this.scenePlay.useItem(this.itemsSpn.selectedItemPosition,
+                    this.actionsTxt.append(this.useItem(this.itemsSpn.selectedItemPosition,
                             this.targetSpn.selectedItemPosition, ""))
                     itemsAdapter.notifyDataSetChanged()
                     this.playSpr()
                 }
             }
             R.id.RunBt -> {
-                val scenePlay = this.scenePlay
                 val actionsTxt = this.actionsTxt
-                val escText = scenePlay.escape()
-                actionsTxt.append(scenePlay.endTurn(""))
+                val escText = this.escape()
+                actionsTxt.append(this.endTurn(""))
                 actionsTxt.append("\n$escText")
-                if (scenePlay.status == -1) {
+                if (this.status == -1) {
                     this.endingMsg(this.getString(R.string.escape), Scene.escapeTxt)
                 } else {
                     this.enableControls(false)
@@ -567,7 +522,7 @@ class Arena : Fragment() {
             val vHolder = view.tag as ViewHolder
             val actor = this.actors[position]
             vHolder.nameText.text = String.format(Locale.US, "%s%s)", "${actor.name} (${Role.hpText}: ",
-                    (if (position < this.arenaAct.scenePlay.enIdx)
+                    (if (position < this.arenaAct.enIdx)
                         "${actor.hp}/${actor.mHp}, ${Role.mpText}: ${actor.mp}/${actor.mMp}, ${Role.spText}: ${actor.sp}/${actor.mSp}"
                     else "%.0f".format((actor.hp.toFloat() / actor.mHp.toFloat()) * 100.0f) + "%"))
             return view
@@ -583,14 +538,12 @@ class Arena : Fragment() {
 
     private val crActor: AdActor
         get() {
-            val scenePlay = this.scenePlay
-            return scenePlay.players[scenePlay.current] as AdActor
+            return this.players[this.current] as AdActor
         }
 
     private fun canTarget(target: Int, ability: Ability): Boolean {
-        val scenePlay = this.scenePlay
-        return scenePlay.getGuardian(target, ability) == target
-                && (scenePlay.players[target].hp > 0 || ability.restore)
+        return this.getGuardian(target, ability) == target
+                && (this.players[target].hp > 0 || ability.restore)
     }
 
     private fun enableControls(enable: Boolean) {
@@ -606,13 +559,12 @@ class Arena : Fragment() {
     }
 
     private fun setCrAutoSkill() {
-        val scenePlay = this.scenePlay
         val targetPos = targetSpn.selectedItemPosition
         val skillsSpn = this.skillsSpn
         val crActor = this.crActor
-        val onPartySide = targetPos < scenePlay.enIdx
-        val autoSkill = scenePlay.getAIskill(if (onPartySide) 1 else 0,
-                onPartySide && scenePlay.players[targetPos].hp < 1)
+        val onPartySide = targetPos < this.enIdx
+        val autoSkill = this.getAIskill(if (onPartySide) 1 else 0,
+                onPartySide && this.players[targetPos].hp < 1)
         if (skillsSpn.selectedItemPosition == autoSkill) {
             val autoAbility = crActor.availableSkills[autoSkill]
             this.skillActBtn.isEnabled = autoAbility.canPerform(crActor)
@@ -623,15 +575,14 @@ class Arena : Fragment() {
     }
 
     private fun afterAct() {
-        val scenePlay = this.scenePlay
         val jScripts = this.jScripts
         if (jScripts !== null) {
             val jsContext = this.jsContext
             val jsScope = this.jsScope
             if (jsContext !== null && jsScope !== null) {
-                jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(scenePlay.fTarget, jsScope))
-                jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(scenePlay.lTarget, jsScope))
-                jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(scenePlay.status, jsScope))
+                jsScope.put("FirstTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.fTarget, jsScope))
+                jsScope.put("LastTarget", jsScope, org.mozilla.javascript.Context.javaToJS(this.lTarget, jsScope))
+                jsScope.put("Outcome", jsScope, org.mozilla.javascript.Context.javaToJS(this.status, jsScope))
                 if (jScripts.size > 3 && jScripts[3] !== null) {
                     try {
                         jsContext.evaluateString(jsScope, jScripts[3], "AfterAct", 1, null)
@@ -641,7 +592,7 @@ class Arena : Fragment() {
                 }
             }
         }
-        when (scenePlay.status) {
+        when (this.status) {
             0 -> {
                 val actor = this.crActor
                 val infoTxt = this.infoTxt
@@ -649,7 +600,7 @@ class Arena : Fragment() {
                     if (infoTxt.text.isNotEmpty()) {
                         infoTxt.text = ""
                     }
-                    this.actionsTxt.append(scenePlay.executeAI(""))
+                    this.actionsTxt.append(this.executeAI(""))
                     this.playSpr()
                 } else {
                     this.setCrSkills()
@@ -666,13 +617,12 @@ class Arena : Fragment() {
     }
 
     private fun playSpr() {
-        val scenePlay = this.scenePlay
         val imgActor = this.imgActor
-        val current = scenePlay.current
-        val players = scenePlay.players
-        val lastAbility = scenePlay.lastAbility as AdAbility?
+        val current = this.current
+        val players = this.players
+        val lastAbility = this.lastAbility as AdAbility?
         val sprType = if (lastAbility === null || (lastAbility.dmgType and Ability.DmgTypeAtk) == Ability.DmgTypeAtk) 5 else 6
-        val usrSide = if (current < scenePlay.enIdx) this.partySide else this.otherSide
+        val usrSide = if (current < this.enIdx) this.partySide else this.otherSide
         val crActor = players[current] as AdActor
         val actAnim = crActor.getBtSprite(usrSide, sprType)//crActor.sprites[usrSide][sprType]
         var dur = crActor.spritesDur[usrSide][sprType] - 174
@@ -683,7 +633,7 @@ class Arena : Fragment() {
         }
         imgActor[current].postDelayed({
             var htActor: AdActor
-            for (trg in scenePlay.fTarget..scenePlay.lTarget) {
+            for (trg in this.fTarget..this.lTarget) {
                 if (trg != current && (lastAbility === null || !(lastAbility.dmgType == Ability.DmgTypeWis && players[trg].reflect))) {
                     htActor = (players[trg] as AdActor)
                     val trgAnim: Int
@@ -716,7 +666,7 @@ class Arena : Fragment() {
                             dur = soundDur
                         }
                     }
-                    val trgSide = if (trg < scenePlay.enIdx) this.partySide else this.otherSide
+                    val trgSide = if (trg < this.enIdx) this.partySide else this.otherSide
                     val hitAnim = htActor.getBtSprite(trgSide, trgAnim)//htActor.sprites[trgSide][trgAnim]
                     if (hitAnim !== null) {
                         hitAnim.stop()
@@ -738,7 +688,7 @@ class Arena : Fragment() {
                         fallAnim.start()
                     }
                 }
-                this.actionsTxt.append(scenePlay.endTurn(""))
+                this.actionsTxt.append(this.endTurn(""))
                 this.afterAct()
             }, dur.toLong())
         }, 174)
@@ -748,8 +698,7 @@ class Arena : Fragment() {
         val itemsSpn = this.itemsSpn
         val targetSpn = this.targetSpn
         val itemUseBtn = this.itemUseBtn
-        val scenePlay = this.scenePlay
-        val crItems = scenePlay.crItems!![scenePlay.current]
+        val crItems = this.crItems!![this.current]
         if (crItems === null || crItems.isEmpty()) {
             if (itemsSpn.isEnabled) {
                 itemsSpn.setSelection(Spinner.INVALID_POSITION)
@@ -857,19 +806,74 @@ class Arena : Fragment() {
                             }
                         }
                         //val outcome = Intent()
-                        //outcome.putExtra("Outcome", this.scenePlay.status)
+                        //outcome.putExtra("Outcome", this.status)
                         //this.requireActivity().setResult(Activity.RESULT_OK, outcome)
                         //this.requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
                         if (context is ArenaStager) {
-                            context.onArenaConclusion(this.scenePlay.status)
+                            context.onArenaConclusion(this.status)
                         }
                     }.create().show()
         }
     }
 
     fun renounce() {
-        this.scenePlay.status = -2
+        this.status = -2
         this.afterAct()
+    }
+
+    override fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
+        val jScripts = this@Arena.jScripts
+        if (jScripts !== null) {
+            val jsContext = this@Arena.jsContext
+            val jsScope = this@Arena.jsScope
+            if (jsContext !== null && jsScope !== null) {
+                jsScope.put("Target", jsScope, org.mozilla.javascript.Context.javaToJS(defTarget, jsScope))
+                jsScope.put("Ability", jsScope, org.mozilla.javascript.Context.javaToJS(skill, jsScope))
+                if (jScripts.size > 2 && jScripts[2] !== null) {
+                    try {
+                        jsContext.evaluateString(jsScope, jScripts[2], "BeforeAct", 1, null)
+                    } catch (e: Exception) {
+                        Log.e("Rhino", e.message)
+                    }
+                }
+            }
+        }
+        return super.executeAbility(skill, defTarget, txt)
+    }
+
+    override fun setNextCurrent(): String {
+        val jScripts = this@Arena.jScripts
+        if (jScripts !== null && jScripts.isNotEmpty()) {
+            var jsContext = this@Arena.jsContext
+            var jsScope = this@Arena.jsScope
+            if (jsContext === null || jsScope === null) {
+                jsContext = org.mozilla.javascript.Context.enter()
+                jsContext.optimizationLevel = -1
+                jsScope = jsContext.initSafeStandardObjects()
+                jsScope.put("Arena", jsScope, org.mozilla.javascript.Context.javaToJS(this@Arena, jsScope))
+                jsScope.put("Scene", jsScope, org.mozilla.javascript.Context.javaToJS(this, jsScope))
+                jsScope.put("Players", jsScope, org.mozilla.javascript.Context.javaToJS(this.players, jsScope))
+                jsScope.put("EnemyIndex", jsScope, org.mozilla.javascript.Context.javaToJS(this.enIdx, jsScope))
+                if (jScripts[0] !== null) {
+                    try {
+                        jsContext.evaluateString(jsScope, jScripts[0], "OnStart", 1, null)
+                    } catch (e: Exception) {
+                        Log.e("Rhino", e.message)
+                    }
+                }
+                this@Arena.jsContext = jsContext
+                this@Arena.jsScope = jsScope
+            }
+            jsScope!!.put("Current", jsScope, org.mozilla.javascript.Context.javaToJS(this.current, jsScope))
+            if (jScripts.size > 1 && jScripts[1] !== null) {
+                try {
+                    jsContext!!.evaluateString(jsScope, jScripts[1], "OnBeginTurn", 1, null)
+                } catch (e: Exception) {
+                    Log.e("Rhino", e.message)
+                }
+            }
+        }
+        return super.setNextCurrent()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -982,10 +986,9 @@ class Arena : Fragment() {
         this.partySide = partySide
         this.otherSide = otherSide
         this.escapable = escapable
-        val scenePlay = AdScene(party, enemy, surprised)
-        val players = scenePlay.players
-        val enIdx = scenePlay.enIdx
-        this.scenePlay = scenePlay
+        this.prepare(party, enemy, surprised)
+        val players = this.players
+        val enIdx = this.enIdx
 
         val runBtn: Button = view.findViewById(R.id.RunBt)
         val autoBtn: Button = view.findViewById(R.id.AutoBt)
@@ -1150,8 +1153,7 @@ class Arena : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        val scenePlay = this.scenePlay
-        if (scenePlay.players[scenePlay.current].automatic != 0) {
+        if (this.players[this.current].automatic != 0) {
             this.enableControls(false)
         }
         this.afterAct()

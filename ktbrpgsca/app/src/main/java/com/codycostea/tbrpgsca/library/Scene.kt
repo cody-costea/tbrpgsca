@@ -15,58 +15,51 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
-open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise: Int) {
+interface Scene {
 
     companion object {
-        @JvmStatic
         var performsTxt = "%s performs %s"
-        @JvmStatic
+
         var victoryTxt = "The party has won!"
-        @JvmStatic
+
         var fallenTxt = "The party has fallen!"
-        @JvmStatic
+
         var escapeTxt = "The party has escaped!"
-        @JvmStatic
+
         var failTxt = "The party attempted to escape, but failed."
     }
 
-    open var status: Int = 0
-        internal set
+    interface EventRun {
+        fun call(scene: Scene, ret: String): Boolean
+    }
 
-    open val enIdx: Int = party.size
-    open val players: Array<Actor> = party + enemy
+    var enIdx: Int
+    var status: Int
+    var current: Int
+    var players: Array<Actor>
+    var crItems: MutableMap<Int, MutableList<Ability>?>?
 
-    open var current: Int = if (this.surprise < 0) this.enIdx else 0
-        protected set
-    open var crItems: MutableMap<Int, MutableList<Ability>?>? = null
-        get() {
-            if (field === null) {
-                field = HashMap()
-            }
-            return field
-        }
-        protected set
+    var fTarget: Int
+    var lTarget: Int
 
-    open var fTarget: Int = this.enIdx
-        protected set
-    open var lTarget: Int = this.enIdx
-        protected set
-
-    open var lastAbility: Ability? = null
-
-    open val aiTurn: Boolean
+    val aiTurn: Boolean
         get() {
             return this.players[this.current].automatic != 0
         }
 
-    private val useInit: Boolean
+    var lastAbility: Ability?
 
-    init {
-        var useInit = false
-        val players = this.players
-        val surprise = this.surprise
+    var surprise: Int
+    var useInit: Boolean
+
+    fun prepare(party: Array<Actor>, enemy: Array<Actor>, surprise: Int): String {
+        val players = party + enemy
+        this.surprise = surprise
         val pSize = players.size
-        val enIdx = this.enIdx
+        val enIdx = party.size
+        this.players = players
+        var useInit = false
+        this.enIdx = enIdx
         for (i in 0 until pSize) {
             val iPlayer = players[i]
             var iInit = iPlayer.mInit
@@ -93,17 +86,22 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
                 }
             }
         }
-        val current = this.current
+        this.status = 0
+        this.fTarget = enIdx
+        this.lTarget = enIdx
+        this.lastAbility = null
+        val current = if (this.surprise < 0) this.enIdx else 0
         val crActor = players[current]
         val crItems = crActor._items
+        this.current = current
         if (crItems !== null) {
             this.crItems!![current] = crItems.keys.toMutableList()
         }
         this.useInit = useInit
-        this.setNextCurrent()
+        return this.setNextCurrent()
     }
 
-    protected open fun setNextCurrent(): String {
+    fun setNextCurrent(): String {
         var ret = ""
         var initInc: Int
         val useInit = this.useInit
@@ -216,7 +214,7 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         return ret
     }
 
-    open fun endTurn(txt: String): String {
+    fun endTurn(txt: String): String {
         var ret = txt
         var current = this.current
         val players = this.players
@@ -268,7 +266,7 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         return ret
     }
 
-    open fun getGuardian(target: Int, skill: Ability): Int {
+    fun getGuardian(target: Int, skill: Ability): Int {
         val players = this.players
         val current = this.current
         if (skill.range || (/*skill.range === null &&*/ players[current].range)) {
@@ -320,7 +318,7 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         }
     }
 
-    protected open fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
+    fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
         var ret: String = txt
         var target: Int = defTarget
         val current = this.current
@@ -380,7 +378,7 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         return ret
     }
 
-    open fun executeAI(ret: String): String {
+    fun executeAI(ret: String): String {
         val players = this.players
         val current = this.current
         val enIdx = this.enIdx
@@ -439,7 +437,7 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         return this.executeAbility(ability, target, ret)
     }
 
-    open fun getAIskill(defSkill: Int, nRestore: Boolean): Int {
+    fun getAIskill(defSkill: Int, nRestore: Boolean): Int {
         var ret = defSkill
         val current = this.current
         val players = this.players
@@ -463,11 +461,11 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         return ret
     }
 
-    open fun performSkill(index: Int, target: Int, txt: String): String {
+    fun performSkill(index: Int, target: Int, txt: String): String {
         return this.executeAbility(this.players[this.current].availableSkills[index], target, txt)
     }
 
-    open fun useItem(index: Int, target: Int, ret: String): String {
+    fun useItem(index: Int, target: Int, ret: String): String {
         val current = this.current
         val crItems = this.crItems!![current]
         if (crItems !== null) {
@@ -488,7 +486,7 @@ open class Scene(party: Array<Actor>, enemy: Array<Actor>, private val surprise:
         }
     }
 
-    open fun escape(): String {
+    fun escape(): String {
         val enIdx = this.enIdx
         val players = this.players
         val pAgiSum = players.filterIndexed { i, _ -> i < enIdx }.sumBy { it.agi } / enIdx
