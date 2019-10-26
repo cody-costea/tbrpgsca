@@ -15,22 +15,16 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
+typealias SceneRun = (Scene, String?) -> Boolean
+
 interface Scene {
 
     companion object {
         var performsTxt = "%s performs %s"
-
         var victoryTxt = "The party has won!"
-
         var fallenTxt = "The party has fallen!"
-
         var escapeTxt = "The party has escaped!"
-
         var failTxt = "The party attempted to escape, but failed."
-    }
-
-    interface EventRun {
-        fun call(scene: Scene, ret: String): Boolean
     }
 
     var enIdx: Int
@@ -38,7 +32,6 @@ interface Scene {
     var current: Int
     var players: Array<Actor>
     var crItems: MutableMap<Int, MutableList<Ability>?>?
-
     var fTarget: Int
     var lTarget: Int
 
@@ -47,8 +40,13 @@ interface Scene {
             return this.players[this.current].automatic != 0
         }
 
-    var lastAbility: Ability?
+    var onStop: SceneRun?
+    var onStart: SceneRun?
+    var onBeforeAct: SceneRun?
+    var onAfterAct: SceneRun?
+    var onNewTurn: SceneRun?
 
+    var lastAbility: Ability?
     var surprise: Int
     var useInit: Boolean
 
@@ -98,7 +96,15 @@ interface Scene {
             this.crItems!![current] = crItems.keys.toMutableList()
         }
         this.useInit = useInit
-        return this.setNextCurrent()
+        val ret = this.setNextCurrent()
+        val onStart = this.onStart
+        if (onStart === null || onStart(this, ret)) {
+            val onNewTurn = this.onNewTurn
+            if (onNewTurn !== null && onNewTurn(this, ret) && players[this.current].automatic != 0) {
+                return this.executeAI(ret)
+            }
+        }
+        return ret
     }
 
     fun setNextCurrent(): String {
@@ -211,7 +217,12 @@ interface Scene {
                 }
             }
         }
-        return ret
+        val onNewTurn = this.onNewTurn
+        return if (onNewTurn !== null && onNewTurn(this, ret) && crActor.automatic != 0) {
+            this.executeAI("")
+        } else {
+            ret
+        }
     }
 
     fun endTurn(txt: String): String {
@@ -260,10 +271,13 @@ interface Scene {
             } while (status == 0 && cActions < 1)
             crActor.actions = cActions
         }
-        if (status != 0) {
+        return if (status != 0) {
             this.status = status
+            val onStop = this.onStop
+            if (onStop === null || onStop(this, ret)) ret else this.setNextCurrent()
+        } else {
+            ret
         }
-        return ret
     }
 
     fun getGuardian(target: Int, skill: Ability): Int {
@@ -320,61 +334,67 @@ interface Scene {
 
     fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
         var ret: String = txt
-        var target: Int = defTarget
-        val current = this.current
-        val players = this.players
-        val enIdx = this.enIdx
-        val fTarget: Int
-        val lTarget: Int
-        when (skill.trg) {
-            1 -> {
-                if (target < enIdx) {
+        val beforeAct = this.onBeforeAct
+        if (beforeAct === null || beforeAct(this, ret)) {
+            var target: Int = defTarget
+            val current = this.current
+            val players = this.players
+            val enIdx = this.enIdx
+            val fTarget: Int
+            val lTarget: Int
+            when (skill.trg) {
+                1 -> {
+                    if (target < enIdx) {
+                        fTarget = 0
+                        lTarget = enIdx - 1
+                    } else {
+                        fTarget = enIdx
+                        lTarget = players.size - 1
+                    }
+                }
+                2 -> {
                     fTarget = 0
-                    lTarget = enIdx - 1
-                } else {
-                    fTarget = enIdx
                     lTarget = players.size - 1
                 }
-            }
-            2 -> {
-                fTarget = 0
-                lTarget = players.size - 1
-            }
-            -2 -> {
-                if (current < enIdx) {
-                    fTarget = 0
-                    lTarget = enIdx - 1
-                } else {
-                    fTarget = enIdx
-                    lTarget = players.size - 1
+                -2 -> {
+                    if (current < enIdx) {
+                        fTarget = 0
+                        lTarget = enIdx - 1
+                    } else {
+                        fTarget = enIdx
+                        lTarget = players.size - 1
+                    }
+                }
+                -1 -> {
+                    fTarget = current
+                    lTarget = current
+                }
+                else -> {
+                    target = this.getGuardian(target, skill)
+                    fTarget = target
+                    lTarget = target
                 }
             }
-            -1 -> {
-                fTarget = current
-                lTarget = current
+            var applyCosts = true
+            this.fTarget = fTarget
+            this.lTarget = lTarget
+            val crActor = players[current]
+            ret += String.format("\n$performsTxt", crActor.name, skill.name)
+            for (i in fTarget..lTarget) {
+                val iPlayer = players[i]
+                if ((skill.mHp < 0 && skill.restore) || iPlayer.hp > 0) {
+                    ret += skill.execute(crActor, iPlayer, applyCosts)
+                    applyCosts = false
+                }
             }
-            else -> {
-                target = this.getGuardian(target, skill)
-                fTarget = target
-                lTarget = target
-            }
-        }
-        var applyCosts = true
-        this.fTarget = fTarget
-        this.lTarget = lTarget
-        val crActor = players[current]
-        ret += String.format("\n$performsTxt", crActor.name, skill.name)
-        for (i in fTarget..lTarget) {
-            val iPlayer = players[i]
-            if ((skill.mHp < 0 && skill.restore) || iPlayer.hp > 0) {
-                ret += skill.execute(crActor, iPlayer, applyCosts)
-                applyCosts = false
+            ret += "."
+            this.lastAbility = skill
+            val afterAct = this.onAfterAct
+            if (afterAct === null || afterAct(this, ret)) {
+                crActor.exp++
+                crActor.levelUp()
             }
         }
-        ret += "."
-        crActor.exp++
-        crActor.levelUp()
-        this.lastAbility = skill
         return ret
     }
 
@@ -481,20 +501,37 @@ interface Scene {
                 }
             }
             return this.executeAbility(item, target, ret)
-        } else {
-            return ret
-        }
+        } else return ret
     }
 
     fun escape(): String {
-        val enIdx = this.enIdx
-        val players = this.players
-        val pAgiSum = players.filterIndexed { i, _ -> i < enIdx }.sumBy { it.agi } / enIdx
-        val eAgiSum = players.filterIndexed { i, _ -> i >= enIdx }.sumBy { it.agi } / (players.size - this.enIdx)
-        return if (this.surprise > 0 || (Math.random() * 7) + pAgiSum > eAgiSum) {
-            this.status = -1
-            Scene.escapeTxt
-        } else Scene.failTxt
+        val beforeAct = this.onBeforeAct
+        if (beforeAct === null || beforeAct(this, null)) {
+            val enIdx = this.enIdx
+            val players = this.players
+            val afterAct = this.onAfterAct
+            val pAgiSum = players.filterIndexed { i, _ -> i < enIdx }.sumBy { it.agi } / enIdx
+            val eAgiSum = players.filterIndexed { i, _ -> i >= enIdx }.sumBy { it.agi } / (players.size - this.enIdx)
+            if (this.surprise > 0 || (Math.random() * 7) + pAgiSum > eAgiSum) {
+                this.status = -1
+                if (afterAct === null || afterAct(this, null)) {
+                    val ret = Scene.escapeTxt
+                    val onStop = this.onStop
+                    if (onStop === null || onStop(this, ret)) {
+                        return ret
+                    }
+                }
+                this.status = 0
+            } else if (afterAct !== null && !afterAct(this, null)) {
+                this.status = -1
+                val ret = Scene.escapeTxt
+                val onStop = this.onStop
+                if (onStop === null || onStop(this, ret)) {
+                    return ret
+                }
+            }
+        }
+        return Scene.failTxt
     }
 
 }

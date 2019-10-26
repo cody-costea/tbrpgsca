@@ -64,7 +64,6 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
 
     internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
     private var sprites: Array<Array<AnimationDrawable?>> = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
-    //private var sprites : Array<Array<AnimationDrawable?>> = this.setAllBtSprites()
 
     fun getBtSprite(side: Int, spr: Int): AnimationDrawable? {
         var sprAnim = this.sprites[side][spr]
@@ -296,7 +295,6 @@ fun BitmapDrawable.getSprite(context: Context, firstFrame: Drawable? = null, fir
     if (lastFrame !== null) {
         animSpr.addFrame(lastFrame, 1)
     }
-    //bmp.recycle()
     return animSpr
 }
 
@@ -318,6 +316,12 @@ class Arena : Fragment(), Scene {
         }
     override var lastAbility: Ability? = null
     override var useInit: Boolean = false
+
+    override var onStop: SceneRun? = null
+    override var onStart: SceneRun? = null
+    override var onBeforeAct: SceneRun? = null
+    override var onAfterAct: SceneRun? = null
+    override var onNewTurn: SceneRun? = null
 
     private class ActorArrayBinder(val actorArray: Array<Actor>) : Binder()
 
@@ -974,8 +978,8 @@ class Arena : Fragment(), Scene {
                             7, 7, 7, false, null, skills, null, null)
             )
         }
-        var partySide: Int
-        var otherSide: Int
+        val partySide: Int
+        val otherSide: Int
         if (surprised < 0) {
             partySide = 1
             otherSide = 0

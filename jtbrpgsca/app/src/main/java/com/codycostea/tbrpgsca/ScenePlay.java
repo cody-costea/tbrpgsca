@@ -268,10 +268,11 @@ public final class ScenePlay {
                     }
                 }
             }
-            final SceneRunnable onNewTurn = this.onNewTurn;
-            if (endTurn && onNewTurn != null && onNewTurn.run(this, ret)
-                    && crActor.automatic != 0) {
-                return this.executeAI("");
+            if (endTurn) {
+                final SceneRunnable onNewTurn = this.onNewTurn;
+                if (onNewTurn != null && onNewTurn.run(this, ret) && crActor.automatic != 0) {
+                    return this.executeAI("");
+                }
             }
         }
         return ret;
