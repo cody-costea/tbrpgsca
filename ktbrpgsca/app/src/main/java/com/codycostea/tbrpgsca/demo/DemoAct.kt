@@ -319,7 +319,8 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                     for (i in 0 until player.size) {
                         player[i].recover()
                     }
-                    this.arena = this.stage(this, R.id.Fragment, 0, 0, this.party, enemy[this.level], surprise, this.level % 2 == 0, null)
+                    this.arena = this.stage(this, R.id.Fragment, 0, 0, this.party,
+                            enemy[this.level], surprise, this.level % 2 == 0, null)
                     this.partyLayout.visibility = View.GONE
                     this.fragment.visibility = View.VISIBLE
                 }

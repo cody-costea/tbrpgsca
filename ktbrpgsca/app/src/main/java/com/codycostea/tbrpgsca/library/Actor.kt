@@ -19,6 +19,8 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
+typealias ActorFun = (Actor) -> Unit
+
 open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int = 1, open var maxLv: Int = 9, mActions: Int = 1,
                  mInit: Int = 0, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, mAtk: Int = 7, mDef: Int = 7, mSpi: Int = 7, mWis: Int = 7,
                  mAgi: Int = 7, range: Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
@@ -31,8 +33,11 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
         @JvmStatic
         var koTxt = ", %s falls unconscious"
 
-        const val FLAG_REFLECTS: Int = 2
-        const val FLAG_GUARDS: Int = 4
+        @JvmStatic
+        var onTurnReorder: ActorFun? = null
+
+        const val FLAG_GUARDS: Int = 2
+        const val FLAG_REFLECTS: Int = 4
         const val FLAG_SHAPE_SHIFT: Int = 8
     }
 
@@ -46,10 +51,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             return (this.flags and FLAG_REFLECTS) == FLAG_REFLECTS
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_REFLECTS == FLAG_REFLECTS)) {
-                flags = flags xor FLAG_REFLECTS
-                this.flags = flags
+                this.flags = flags xor FLAG_REFLECTS
             }
         }
 
@@ -58,10 +62,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             return (this.flags and FLAG_GUARDS) == FLAG_GUARDS
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_GUARDS == FLAG_GUARDS)) {
-                flags = flags xor FLAG_GUARDS
-                this.flags = flags
+                this.flags = flags xor FLAG_GUARDS
             }
         }
 
@@ -70,11 +73,20 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             return (this.flags and FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_SHAPE_SHIFT == FLAG_SHAPE_SHIFT)) {
-                flags = flags xor FLAG_SHAPE_SHIFT
-                this.flags = flags
+                this.flags = flags xor FLAG_SHAPE_SHIFT
             }
+        }
+
+    override var agi: Int
+        get() = super.agi
+        set(value) {
+            val onReorder = onTurnReorder
+            if (onReorder !== null) {
+                onReorder(this)
+            }
+            super.agi = value
         }
 
     open var race: Costume = race

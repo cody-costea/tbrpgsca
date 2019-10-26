@@ -15,22 +15,28 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
-typealias SceneRun = (Scene, String?) -> Boolean
+typealias SceneFun = (Scene, String?) -> Boolean
 
 interface Scene {
 
     companion object {
         var performsTxt = "%s performs %s"
+
         var victoryTxt = "The party has won!"
+
         var fallenTxt = "The party has fallen!"
+
         var escapeTxt = "The party has escaped!"
+
         var failTxt = "The party attempted to escape, but failed."
     }
 
     var enIdx: Int
     var status: Int
     var current: Int
+    var ordIndex: Int
     var players: Array<Actor>
+    var ordered: Array<Actor>?
     var crItems: MutableMap<Int, MutableList<Ability>?>?
     var fTarget: Int
     var lTarget: Int
@@ -40,159 +46,148 @@ interface Scene {
             return this.players[this.current].automatic != 0
         }
 
-    var onStop: SceneRun?
-    var onStart: SceneRun?
-    var onBeforeAct: SceneRun?
-    var onAfterAct: SceneRun?
-    var onNewTurn: SceneRun?
+    var onStop: SceneFun?
+    var onStart: SceneFun?
+    var onBeforeAct: SceneFun?
+    var onAfterAct: SceneFun?
+    var onNewTurn: SceneFun?
 
     var lastAbility: Ability?
     var surprise: Int
     var useInit: Boolean
 
-    fun prepare(party: Array<Actor>, enemy: Array<Actor>, surprise: Int): String {
-        val players = party + enemy
-        this.surprise = surprise
-        val pSize = players.size
-        val enIdx = party.size
-        this.players = players
-        var useInit = false
-        this.enIdx = enIdx
-        for (i in 0 until pSize) {
-            val iPlayer = players[i]
-            var iInit = iPlayer.mInit
-            if (!useInit && iInit != 0) {
-                useInit = true
-            }
-            if (iInit < 1) {
-                iInit = pSize
-            }
-            iPlayer.init = (if ((surprise < 0 && i < enIdx)
-                    || (surprise > 0 && i >= enIdx)) 0 else iInit)
-            for (j in 0 until pSize) {
-                if (j == i) {
-                    continue
-                } else {
-                    val jPlayer = players[j]
-                    var jInit = jPlayer.mInit
-                    if (jInit < 1) {
-                        jInit = pSize
-                    }
-                    if (iInit < jInit /*|| (iInit == jInit && this.players[i].agi > this.players[j].agi)*/) {
-                        jPlayer.init -= (jInit - iInit) //+ 1
-                    }
-                }
-            }
-        }
-        this.status = 0
-        this.fTarget = enIdx
-        this.lTarget = enIdx
-        this.lastAbility = null
-        val current = if (this.surprise < 0) this.enIdx else 0
-        val crActor = players[current]
-        val crItems = crActor._items
-        this.current = current
-        if (crItems !== null) {
-            this.crItems!![current] = crItems.keys.toMutableList()
-        }
-        this.useInit = useInit
-        val ret = this.setNextCurrent()
-        val onStart = this.onStart
-        if (onStart === null || onStart(this, ret)) {
-            val onNewTurn = this.onNewTurn
-            if (onNewTurn !== null && onNewTurn(this, ret) && players[this.current].automatic != 0) {
-                return this.executeAI(ret)
-            }
-        }
-        return ret
+    private fun sortPlayers(players: Array<Actor>) {
+        val ordered = players.copyOf()
+        val crActor = players[this.current]
+        ordered.sortByDescending { it.agi }
+        this.ordIndex = ordered.indexOf(crActor)
+        this.ordered = ordered
     }
 
     fun setNextCurrent(): String {
         var ret = ""
         var initInc: Int
-        val useInit = this.useInit
+        val useInit: Boolean
         val players = this.players
-        var crActor = players[this.current]
+        val ordered = this.ordered
+        var crActor: Actor = players[this.current]
+        val noReorder = (ordered === null)
         val oldActor = crActor
-        var minInit = 1
-        do {
-            initInc = minInit
-            for (i in players.indices) {
-                val iPlayer = players[i]
-                if (iPlayer.hp > 0) {
-                    if (useInit) {
-                        var nInit = iPlayer.init + initInc
-                        iPlayer.init = nInit
-                        var mInit = iPlayer.mInit
-                        if (mInit < 1) {
-                            mInit = players.size
-                        }
-                        if (nInit > mInit) {
-                            nInit -= mInit
-                            if (initInc == 1) minInit = -1
-                            if (crActor !== iPlayer) {
-                                val cInit = (crActor.init - (if (crActor.mInit < 1) players.size else crActor.mInit))
-                                if (cInit < nInit || (cInit == nInit && iPlayer.agi > crActor.agi)) {
-                                    val iActions = iPlayer.mActions
-                                    iPlayer.actions = iActions
-                                    iPlayer.applyStates(false)
-                                    if (iActions > 0) {
-                                        crActor = iPlayer
-                                        this.current = i
-                                    } else {
-                                        iPlayer.init = 0
-                                        if (ret.isNotEmpty()) {
-                                            ret += "\n"
+        if (noReorder) {
+            useInit = this.useInit
+            var minInit = 1
+            do {
+                initInc = minInit
+                for (i in players.indices) {
+                    val iPlayer = players[i]
+                    if (iPlayer.hp > 0) {
+                        if (useInit) {
+                            var nInit = iPlayer.init + initInc
+                            iPlayer.init = nInit
+                            var mInit = iPlayer.mInit
+                            if (mInit < 1) {
+                                mInit = players.size
+                            }
+                            if (nInit > mInit) {
+                                nInit -= mInit
+                                if (initInc == 1) minInit = -1
+                                if (crActor !== iPlayer) {
+                                    val cInit = (crActor.init - (if (crActor.mInit < 1) players.size else crActor.mInit))
+                                    if (cInit < nInit || (cInit == nInit && iPlayer.agi > crActor.agi)) {
+                                        iPlayer.actions = iPlayer.mActions
+                                        iPlayer.applyStates(false)
+                                        if (iPlayer.actions > 0) {
+                                            crActor = iPlayer
+                                            this.current = i
+                                        } else {
+                                            iPlayer.init = 0
+                                            if (ret.isNotEmpty()) {
+                                                ret += "\n"
+                                            }
+                                            ret += iPlayer.applyStates(true)
                                         }
-                                        ret += iPlayer.applyStates(true)
                                     }
                                 }
                             }
-                        }
-                        if (minInit > 0 && minInit > mInit) {
-                            minInit = mInit
-                        }
-                    } else {
-                        val iActions: Int
-                        if (minInit != 1) {
-                            iActions = iPlayer.mActions
-                            iPlayer.actions = iActions
+                            if (minInit > 0 && minInit > mInit) {
+                                minInit = mInit
+                            }
                         } else {
-                            iActions = iPlayer.actions
-                        }
-                        if (crActor !== iPlayer && iActions > 0
-                                && (crActor.actions < 1 || iPlayer.agi > crActor.agi)) {
-                            iPlayer.applyStates(false)
-                            if (iActions > 0) {
-                                if (initInc > 0) initInc = 0
-                                crActor = iPlayer
-                                this.current = i
+                            val iActions: Int
+                            if (minInit != 1) {
+                                iActions = iPlayer.mActions
+                                iPlayer.actions = iActions
                             } else {
-                                if (ret.isNotEmpty()) {
-                                    ret += "\n"
+                                iActions = iPlayer.actions
+                            }
+                            if (crActor !== iPlayer && iActions > 0
+                                    && (crActor.actions < 1 || iPlayer.agi > crActor.agi)) {
+                                iPlayer.applyStates(false)
+                                if (iPlayer.actions > 0) {
+                                    if (initInc > 0) initInc = 0
+                                    crActor = iPlayer
+                                    this.current = i
+                                } else {
+                                    if (ret.isNotEmpty()) {
+                                        ret += "\n"
+                                    }
+                                    ret += iPlayer.applyStates(true)
                                 }
-                                ret += iPlayer.applyStates(true)
                             }
                         }
                     }
                 }
-            }
-            if (minInit != 0 && !useInit) {
-                minInit = 0
-            }
-        } while (initInc == 1 && minInit > -1)
+                if (minInit != 0 && !useInit) {
+                    minInit = 0
+                }
+            } while (initInc == 1 && minInit > -1)
+        } else {
+            useInit = false
+            val pSize = players.size
+            var current = this.ordIndex
+            var refresh = true
+            do {
+                if (++current == pSize) {
+                    current = 0
+                }
+                crActor = ordered!![current]
+                if (crActor === oldActor) {
+                    if (refresh) {
+                        for (actor in players) {
+                            if (actor.hp > 0) {
+                                actor.actions = actor.mActions
+                                actor.applyStates(false)
+                                if (actor.actions < 1) {
+                                    if (ret.isNotEmpty()) {
+                                        ret += "\n"
+                                    }
+                                    ret += actor.applyStates(true)
+                                }
+                            }
+                        }
+                        refresh = false
+                        continue
+                    } else {
+                        return ret //TODO: analyze if ok
+                    }
+                }
+                if (crActor.actions > 0 && crActor.hp > 0) {
+                    break
+                }
+            } while (true)
+            this.current = players.indexOf(crActor)
+            this.ordIndex = current
+        }
         if (oldActor === crActor) {
-            val cActions: Int
-            if (useInit) {
-                cActions = crActor.mActions
-                crActor.actions = cActions
-            } else {
-                cActions = crActor.actions
-            }
-            crActor.applyStates(false)
-            if (cActions < 1) {
-                ret += crActor.applyStates(true)
-                return ret + this.setNextCurrent()
+            if (noReorder) {
+                if (useInit) {
+                    crActor.actions = crActor.mActions
+                }
+                crActor.applyStates(false)
+                if (crActor.actions < 1) {
+                    ret += crActor.applyStates(true)
+                    return ret + this.setNextCurrent()
+                }
             }
         } else {
             if (crActor.automatic == 0) {
@@ -501,7 +496,9 @@ interface Scene {
                 }
             }
             return this.executeAbility(item, target, ret)
-        } else return ret
+        } else {
+            return ret
+        }
     }
 
     fun escape(): String {
@@ -532,6 +529,69 @@ interface Scene {
             }
         }
         return Scene.failTxt
+    }
+
+    fun prepare(party: Array<Actor>, enemy: Array<Actor>, surprise: Int, reorder: Boolean): String {
+        val players = party + enemy
+        this.surprise = surprise
+        val pSize = players.size
+        val enIdx = party.size
+        this.players = players
+        var useInit = false
+        this.enIdx = enIdx
+        for (i in 0 until pSize) {
+            val iPlayer = players[i]
+            var iInit = iPlayer.mInit
+            if (!useInit && iInit != 0) {
+                useInit = true
+            }
+            if (iInit < 1) {
+                iInit = pSize
+            }
+            iPlayer.init = (if ((surprise < 0 && i < enIdx)
+                    || (surprise > 0 && i >= enIdx)) 0 else iInit)
+            for (j in 0 until pSize) {
+                if (j == i) {
+                    continue
+                } else {
+                    val jPlayer = players[j]
+                    var jInit = jPlayer.mInit
+                    if (jInit < 1) {
+                        jInit = pSize
+                    }
+                    if (iInit < jInit /*|| (iInit == jInit && this.players[i].agi > this.players[j].agi)*/) {
+                        jPlayer.init -= (jInit - iInit) //+ 1
+                    }
+                }
+            }
+        }
+        this.status = 0
+        this.fTarget = enIdx
+        this.lTarget = enIdx
+        this.lastAbility = null
+        val current = if (this.surprise < 0) this.enIdx else 0
+        val crActor = players[current]
+        val crItems = crActor._items
+        this.current = current
+        if (crItems !== null) {
+            this.crItems!![current] = crItems.keys.toMutableList()
+        }
+        if (reorder && !useInit) {
+            this.sortPlayers(players)
+            this.ordIndex = pSize - 1
+            val onReorder: ActorFun = { this.sortPlayers(players) }
+            Actor.onTurnReorder = onReorder
+        }
+        this.useInit = useInit
+        val ret = this.setNextCurrent()
+        val onStart = this.onStart
+        if (onStart === null || onStart(this, ret)) {
+            val onNewTurn = this.onNewTurn
+            if (onNewTurn !== null && onNewTurn(this, ret) && players[this.current].automatic != 0) {
+                return this.executeAI(ret)
+            }
+        }
+        return ret
     }
 
 }

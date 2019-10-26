@@ -73,10 +73,9 @@ abstract class Role(val id: Int, open var name: String, open var mHp: Int = 30, 
             return (this.flags and FLAG_RANGE) == FLAG_RANGE
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_RANGE == FLAG_RANGE)) {
-                flags = flags xor FLAG_RANGE
-                this.flags = flags
+                this.flags = flags xor FLAG_RANGE
             }
         }
 

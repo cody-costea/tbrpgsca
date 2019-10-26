@@ -37,10 +37,9 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
             return (this.flags and FLAG_INACTIVATE) == FLAG_INACTIVATE
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_INACTIVATE == FLAG_INACTIVATE)) {
-                flags = flags xor FLAG_INACTIVATE
-                this.flags = flags
+                this.flags = flags xor FLAG_INACTIVATE
             }
         }
 
@@ -49,10 +48,9 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
             return (this.flags and FLAG_AUTOMATE) == FLAG_AUTOMATE
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_AUTOMATE == FLAG_AUTOMATE)) {
-                flags = flags xor FLAG_AUTOMATE
-                this.flags = flags
+                this.flags = flags xor FLAG_AUTOMATE
             }
         }
 
@@ -61,10 +59,9 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
             return (this.flags and FLAG_CONFUSE) == FLAG_CONFUSE
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_CONFUSE == FLAG_CONFUSE)) {
-                flags = flags xor FLAG_CONFUSE
-                this.flags = flags
+                this.flags = flags xor FLAG_CONFUSE
             }
         }
 
@@ -73,10 +70,9 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
             return (this.flags and FLAG_REFLECT) == FLAG_REFLECT
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_REFLECT == FLAG_REFLECT)) {
-                flags = flags xor FLAG_REFLECT
-                this.flags = flags
+                this.flags = flags xor FLAG_REFLECT
             }
         }
 

@@ -306,6 +306,8 @@ class Arena : Fragment(), Scene {
     override var lTarget: Int = 0
     override var current: Int = 0
     override var surprise: Int = 0
+    override var ordIndex: Int = 0
+    override var ordered: Array<Actor>? = null
     override lateinit var players: Array<Actor>
     override var crItems: MutableMap<Int, MutableList<Ability>?>? = null
         get() {
@@ -317,11 +319,11 @@ class Arena : Fragment(), Scene {
     override var lastAbility: Ability? = null
     override var useInit: Boolean = false
 
-    override var onStop: SceneRun? = null
-    override var onStart: SceneRun? = null
-    override var onBeforeAct: SceneRun? = null
-    override var onAfterAct: SceneRun? = null
-    override var onNewTurn: SceneRun? = null
+    override var onStop: SceneFun? = null
+    override var onStart: SceneFun? = null
+    override var onBeforeAct: SceneFun? = null
+    override var onAfterAct: SceneFun? = null
+    override var onNewTurn: SceneFun? = null
 
     private class ActorArrayBinder(val actorArray: Array<Actor>) : Binder()
 
@@ -990,7 +992,7 @@ class Arena : Fragment(), Scene {
         this.partySide = partySide
         this.otherSide = otherSide
         this.escapable = escapable
-        this.prepare(party, enemy, surprised)
+        this.prepare(party, enemy, surprised, true)
         val players = this.players
         val enIdx = this.enIdx
 

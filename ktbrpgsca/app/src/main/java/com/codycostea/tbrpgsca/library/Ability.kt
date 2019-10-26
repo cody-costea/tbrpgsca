@@ -53,10 +53,9 @@ open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean
             return (this.flags and FLAG_STEAL) == FLAG_STEAL
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_STEAL == FLAG_STEAL)) {
-                flags = flags xor FLAG_STEAL
-                this.flags = flags
+                this.flags = flags xor FLAG_STEAL
             }
         }
 
@@ -65,10 +64,9 @@ open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean
             return (this.flags and FLAG_ABSORB) == FLAG_ABSORB
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_ABSORB == FLAG_ABSORB)) {
-                flags = flags xor FLAG_ABSORB
-                this.flags = flags
+                this.flags = flags xor FLAG_ABSORB
             }
         }
 
@@ -77,10 +75,9 @@ open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean
             return (this.flags and FLAG_RESTORE) == FLAG_RESTORE
         }
         set(value) {
-            var flags = this.flags
+            val flags = this.flags
             if (value != (flags and FLAG_RESTORE == FLAG_RESTORE)) {
-                flags = flags xor FLAG_RESTORE
-                this.flags = flags
+                this.flags = flags xor FLAG_RESTORE
             }
         }
 
