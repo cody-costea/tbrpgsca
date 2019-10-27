@@ -18,6 +18,7 @@ package com.codycostea.tbrpgsca.library
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
+import kotlin.math.abs
 
 typealias ActorFun = (Actor) -> Unit
 
@@ -39,6 +40,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
         const val FLAG_GUARDS: Int = 2
         const val FLAG_REFLECTS: Int = 4
         const val FLAG_SHAPE_SHIFT: Int = 8
+        const val FLAG_AI_PLAYER: Int = 16
+        const val FLAG_AUTOMATED: Int = 32
+        const val FLAG_CONFUSED: Int = 64
     }
 
     open val active: Boolean
@@ -125,7 +129,42 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
 
     open var init: Int = 0
     open var actions: Int = this.mActions
-    open var automatic: Int = 0
+    open var automatic: Int
+        get() {
+            val flags = this.flags
+            return if ((flags and FLAG_AI_PLAYER) == FLAG_AI_PLAYER) {
+                if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) -2 else 2
+            } else if ((flags and FLAG_AUTOMATED) == FLAG_AUTOMATED) {
+                if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) -1 else 1
+            } else 0
+        }
+        set(value) {
+            var flags = this.flags
+            if (value < 0) {
+                flags = (flags or FLAG_CONFUSED)
+            } else if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) {
+                flags = flags xor FLAG_CONFUSED
+            }
+            val absValue = abs(value)
+            if (absValue > 0) {
+                flags = (flags or FLAG_AUTOMATED)
+                if (absValue > 1) {
+                    flags = (flags or FLAG_AI_PLAYER)
+                } else {
+                    if ((flags and FLAG_AI_PLAYER) == FLAG_AI_PLAYER) {
+                        flags = flags xor FLAG_AI_PLAYER
+                    }
+                }
+            } else {
+                if ((flags and FLAG_AUTOMATED) == FLAG_AUTOMATED) {
+                    flags = flags xor FLAG_AUTOMATED
+                }
+                if ((flags and FLAG_AI_PLAYER) == FLAG_AI_PLAYER) {
+                    flags = flags xor FLAG_AI_PLAYER
+                }
+            }
+            this.flags = flags
+        }
 
     open var hp: Int = this.mHp
         set(value) {
