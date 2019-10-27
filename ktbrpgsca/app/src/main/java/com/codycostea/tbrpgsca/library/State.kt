@@ -137,14 +137,15 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 } else if (dur > -3) {
                     if (consume) {
                         val rnd = (Math.random() * 3).toInt()
-                        val dmghp = (actor.mHp + rnd) * this.dmgHp / 100
-                        val dmgmp = (actor.mMp + rnd) * this.dmgMp / 100
-                        val dmgsp = (actor.mSp + rnd) * this.dmgSp / 100
-                        actor.hp -= dmghp
-                        actor.mp -= dmgmp
-                        actor.sp -= dmgsp
-                        if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += String.format(causesTxt, this.name, actor.name) + Role.getDmgText(dmghp, dmgmp, dmgsp)
+                        val dmgHp = (actor.mHp + rnd) * this.dmgHp / 100
+                        val dmgMp = (actor.mMp + rnd) * this.dmgMp / 100
+                        val dmgSp = (actor.mSp + rnd) * this.dmgSp / 100
+                        val actorHp = actor.hp
+                        actor.hp = if (actorHp > dmgHp) actorHp - dmgHp else 1
+                        actor.mp -= dmgMp
+                        actor.sp -= dmgSp
+                        if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
+                            s += String.format(causesTxt, this.name, actor.name) + Role.getDmgText(dmgHp, dmgMp, dmgSp)
                         }
                         if (dur > 0) {
                             sDur[this] = dur - 1

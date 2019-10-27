@@ -317,8 +317,6 @@ class Arena : Fragment(), Scene {
             return field
         }
     override var lastAbility: Ability? = null
-    override var useInit: Boolean = false
-
     override var onStop: SceneFun? = null
     override var onStart: SceneFun? = null
     override var onBeforeAct: SceneFun? = null
@@ -328,7 +326,8 @@ class Arena : Fragment(), Scene {
     private class ActorArrayBinder(val actorArray: Array<Actor>) : Binder()
 
     companion object {
-        fun prepare(arenaImgId: Int, songId: Int, party: Array<Actor>, enemy: Array<Actor>, surprise: Int, escapable: Boolean, scripts: Array<String?>?): Arena {
+        fun prepare(arenaImgId: Int, songId: Int, party: Array<Actor>, enemy: Array<Actor>,
+                    surprise: Int, escapable: Boolean, scripts: Array<String?>?): Arena {
             val arena = Arena()
             val actBundle = Bundle()
             actBundle.putBinder("party", ActorArrayBinder(party))
@@ -1124,7 +1123,6 @@ class Arena : Fragment(), Scene {
             imgActor[i].setBackgroundDrawable((players[i] as AdActor).getBtSprite(otherSide,
                     if (koActors and (1 shl i) == 1 shl i) 1 else 0))
         }
-
         val playersAdapter = ActorArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, players)
         this.playersAdapter = playersAdapter
         targetSpn.adapter = playersAdapter

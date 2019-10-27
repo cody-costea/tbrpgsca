@@ -412,7 +412,6 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 this.automatic = 2
             }
             if (this.hp > 0) {
-                //if (consume) this.actions = this.mActions
                 this.guards = true
             }
             this.reflect = false
@@ -426,7 +425,6 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                     if (r.isNotEmpty()) {
                         if (c) s += ", "
                         if (consume && !c) {
-                            //s += "\n"
                             c = true
                         }
                         s += r
@@ -464,8 +462,8 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
         this.actions = this.mActions
         val sDur = this.stateDur
         if (sDur !== null) {
-            for (state in sDur.keys) {
-                state.remove(this, true, false)
+            for (state in sDur.keys) { //TODO: prevent "ConcurrentModificationException"
+                state.remove(this, false, false)
             }
             if (sDur.isEmpty()) {
                 this.stateDur = null
@@ -531,12 +529,6 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
         this.updateStates(false, race.aStates)
         this.updateStates(false, job.aStates)
         this.updateStates(false, states)
-        /*val e = this.equipment
-        if (e != null) {
-            for (k in e.keys) {
-                this.updateStates(false, e[k]?.aStates)
-            }
-        }*/
         if (level > 1) {
             this.level = level
         }

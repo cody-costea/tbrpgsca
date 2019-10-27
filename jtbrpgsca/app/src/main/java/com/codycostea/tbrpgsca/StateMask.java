@@ -198,13 +198,13 @@ public final class StateMask extends Costume {
         final HashMap<StateMask, Integer> trgStRes = actor.stRes;
         Object o = null;
         if (always || new Random().nextInt(10) > ((trgStRes == null ? 0 : ((o = trgStRes.get(this)) == null
-                ? 0 : ((Integer)o).intValue())) + this.sRes)) {
+                ? 0 : ((Integer) o).intValue())) + this.sRes)) {
             HashMap<StateMask, Integer> trgStates = actor.stateDur;
             if (trgStates == null) {
                 trgStates = new HashMap<>();
                 actor.stateDur = trgStates;
             }
-            final int crDur = ((o == null || (o = trgStates.get(this)) == null) ? 0 : ((Integer)o).intValue());
+            final int crDur = ((o == null || (o = trgStates.get(this)) == null) ? 0 : ((Integer) o).intValue());
             if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
                 trgStates.put(this, Integer.valueOf(indefinite ? -2 : this.dur));
             }
@@ -238,7 +238,7 @@ public final class StateMask extends Costume {
                 for (int i = 0; i < rSkills.length; i++) {
                     Performance k = rSkills[i];
                     if (k.mQty > 0) {
-                        iSkills.put(k, Integer.valueOf((q = iSkills.get(k)) == null ? 0 : -1 * ((Integer)q).intValue()));
+                        iSkills.put(k, Integer.valueOf((q = iSkills.get(k)) == null ? 0 : -1 * ((Integer) q).intValue()));
                     } else {
                         iSkills.remove(k);
                     }
@@ -251,7 +251,7 @@ public final class StateMask extends Costume {
             }
             for (int i = 0; i < rSkills.length; i++) {
                 Performance k = rSkills[i];
-                iSkills.put(k, Integer.valueOf(k.mQty > 0 ? -1 * ((q = iSkills.get(k)) == null ? 0 : ((Integer)q).intValue()) : 0));
+                iSkills.put(k, Integer.valueOf(k.mQty > 0 ? -1 * ((q = iSkills.get(k)) == null ? 0 : ((Integer) q).intValue()) : 0));
             }
         }
     }
@@ -262,28 +262,28 @@ public final class StateMask extends Costume {
         if (sDur != null) {
             final Object dur = sDur.get(this);
             if (dur != null && actor._hp > 0) {
-                final int d = ((Integer)dur).intValue();
+                final int d = ((Integer) dur).intValue();
                 if (d == 0) {
                     this.disable(actor);
                     sDur.put(this, Integer.valueOf(-3));
                 } else if (d > -3) {
                     if (consume) {
                         final int rnd = new Random().nextInt(3);
-                        final int dmghp = (actor.mHp + rnd) * this.dmgHp / 100;
-                        final int dmgmp = (actor.mMp + rnd) * this.dmgMp / 100;
-                        final int dmgsp = (actor.mSp + rnd) * this.dmgSp / 100;
-                        actor.setCurrentHp(actor._hp - dmghp);
-                        actor.setCurrentMp(actor._mp - dmgmp);
-                        actor.setCurrentSp(actor._sp - dmgsp);
-                        if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
+                        final int dmgHp = (actor.mHp + rnd) * this.dmgHp / 100;
+                        final int dmgMp = (actor.mMp + rnd) * this.dmgMp / 100;
+                        final int dmgSp = (actor.mSp + rnd) * this.dmgSp / 100;
+                        final int actorHp = actor._hp;
+                        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
+                        actor.setCurrentMp(actor._mp - dmgMp);
+                        actor.setCurrentSp(actor._sp - dmgSp);
+                        if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
                             s.append(String.format(Locale.US, this.name, actor.name));
-                            s.append(RoleSheet.getDmgText(dmghp, dmgmp, dmgsp));
+                            s.append(RoleSheet.getDmgText(dmgHp, dmgMp, dmgSp));
                         }
                         if (d > 0) {
                             sDur.put(this, Integer.valueOf(d - 1));
                         }
-                    }
-                    else {
+                    } else {
                         final String spr = this.sprite;
                         if (spr != null && spr.length() > 0) {
                             actor.sprite = spr;
@@ -325,8 +325,8 @@ public final class StateMask extends Costume {
     public boolean remove(final Interpreter actor, final boolean delete, final boolean always) {
         HashMap<StateMask, Integer> sDur = actor.stateDur;
         Object d;
-        if (sDur != null && (always || ((d = sDur.get(this)) == null ? -2 : ((Integer)d).intValue()) != -2)) {
-            if (((d = sDur.get(this)) == null ? -3 : ((Integer)d).intValue()) > -3) {
+        if (sDur != null && (always || ((d = sDur.get(this)) == null ? -2 : ((Integer) d).intValue()) != -2)) {
+            if (((d = sDur.get(this)) == null ? -3 : ((Integer) d).intValue()) > -3) {
                 this.disable(actor);
             }
             if (delete) {

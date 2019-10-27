@@ -117,6 +117,7 @@
     <string name="victory">Victorie</string>
     <string name="defeat">Înfrângere</string>
     <string name="escape">Retragere</string>
+    <string name="scene_surprised">Surprins</string>
     <string name="scene_victory">Echipa a învins!</string>
     <string name="scene_defeat">Echipa a fost înfrântă!</string>
     <string name="scene_escape">Echipa s-a retras!</string>

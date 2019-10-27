@@ -20,6 +20,8 @@ typealias SceneFun = (Scene, String?) -> Boolean
 interface Scene {
 
     companion object {
+        var surprisedTxt = "Surprised"
+
         var performsTxt = "%s performs %s"
 
         var victoryTxt = "The party has won!"
@@ -40,28 +42,26 @@ interface Scene {
     var crItems: MutableMap<Int, MutableList<Ability>?>?
     var fTarget: Int
     var lTarget: Int
-
     val aiTurn: Boolean
         get() {
             return this.players[this.current].automatic != 0
         }
-
     var onStop: SceneFun?
     var onStart: SceneFun?
     var onBeforeAct: SceneFun?
     var onAfterAct: SceneFun?
     var onNewTurn: SceneFun?
-
     var lastAbility: Ability?
     var surprise: Int
-    var useInit: Boolean
 
     private fun sortPlayers(players: Array<Actor>) {
-        val ordered = players.copyOf()
-        val crActor = players[this.current]
-        ordered.sortByDescending { it.agi }
-        this.ordIndex = ordered.indexOf(crActor)
-        this.ordered = ordered
+        if (this.ordIndex > -1) {
+            val ordered = players.copyOf()
+            val crActor = players[this.current]
+            ordered.sortByDescending { it.agi }
+            this.ordIndex = ordered.indexOf(crActor)
+            this.ordered = ordered
+        }
     }
 
     fun setNextCurrent(): String {
@@ -74,7 +74,7 @@ interface Scene {
         val noReorder = (ordered === null)
         val oldActor = crActor
         if (noReorder) {
-            useInit = this.useInit
+            useInit = this.ordIndex < -1
             var minInit = 1
             do {
                 initInc = minInit
@@ -145,49 +145,41 @@ interface Scene {
             useInit = false
             val pSize = players.size
             var current = this.ordIndex
-            var refresh = true
+            this.ordIndex = -1
             do {
                 if (++current == pSize) {
                     current = 0
                 }
                 crActor = ordered!![current]
-                if (crActor === oldActor) {
-                    if (refresh) {
-                        for (actor in players) {
-                            if (actor.hp > 0) {
-                                actor.actions = actor.mActions
-                                actor.applyStates(false)
-                                if (actor.actions < 1) {
-                                    if (ret.isNotEmpty()) {
-                                        ret += "\n"
-                                    }
-                                    ret += actor.applyStates(true)
-                                }
-                            }
+                if (crActor.hp > 0) {
+                    crActor.actions = crActor.mActions
+                    if (crActor !== oldActor) {
+                        crActor.applyStates(false)
+                        if (crActor.actions < 1) {
+                            if (ret.isNotEmpty()) {
+                                ret += "\n"
+                            }//TODO: actor sprites should be played when some states are applied
+                            this.ordIndex = 0
+                            ret += crActor.applyStates(true)
+                            this.ordIndex = -1
+                            continue
+                        } else {
+                            this.current = players.indexOf(crActor)
                         }
-                        refresh = false
-                        continue
-                    } else {
-                        return ret //TODO: analyze if ok
                     }
-                }
-                if (crActor.actions > 0 && crActor.hp > 0) {
+                    this.ordIndex = current
                     break
                 }
             } while (true)
-            this.current = players.indexOf(crActor)
-            this.ordIndex = current
         }
         if (oldActor === crActor) {
-            if (noReorder) {
-                if (useInit) {
-                    crActor.actions = crActor.mActions
-                }
-                crActor.applyStates(false)
-                if (crActor.actions < 1) {
-                    ret += crActor.applyStates(true)
-                    return ret + this.setNextCurrent()
-                }
+            if (useInit) {
+                crActor.actions = crActor.mActions
+            }
+            crActor.applyStates(false)
+            if (crActor.actions < 1) {
+                ret += crActor.applyStates(true)
+                return ret + this.setNextCurrent() //TODO: analyze if ok
             }
         } else {
             if (crActor.automatic == 0) {
@@ -539,6 +531,9 @@ interface Scene {
         this.players = players
         var useInit = false
         this.enIdx = enIdx
+        val surprised = if (surprise == 0) null else State(0, surprisedTxt, null, true, false,
+                false, false, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,false, null, null, null)
         for (i in 0 until pSize) {
             val iPlayer = players[i]
             var iInit = iPlayer.mInit
@@ -547,9 +542,13 @@ interface Scene {
             }
             if (iInit < 1) {
                 iInit = pSize
-            }
-            iPlayer.init = (if ((surprise < 0 && i < enIdx)
-                    || (surprise > 0 && i >= enIdx)) 0 else iInit)
+            } //TODO: also set actions to 0 for surprised actors
+            if ((surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx)) {
+                //iPlayer.init = 0
+                surprised!!.inflict(iPlayer, true, false)
+            } //else {
+                iPlayer.init = iInit
+            //}
             for (j in 0 until pSize) {
                 if (j == i) {
                     continue
@@ -576,13 +575,14 @@ interface Scene {
         if (crItems !== null) {
             this.crItems!![current] = crItems.keys.toMutableList()
         }
-        if (reorder && !useInit) {
+        if (useInit) {
+            this.ordIndex = -2
+        } else if (reorder) {
             this.sortPlayers(players)
             this.ordIndex = pSize - 1
             val onReorder: ActorFun = { this.sortPlayers(players) }
             Actor.onTurnReorder = onReorder
         }
-        this.useInit = useInit
         val ret = this.setNextCurrent()
         val onStart = this.onStart
         if (onStart === null || onStart(this, ret)) {
