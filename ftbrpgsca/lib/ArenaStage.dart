@@ -804,7 +804,7 @@ class ArenaState extends State<ArenaStage> {
       enemy[i].automatic = 2;
     }
     this._surprise = surprise;
-    final SceneAct sceneAct = this._sceneAct = SceneAct(party, enemy, surprise);
+    final SceneAct sceneAct = this._sceneAct = SceneAct(party, enemy, surprise, null, null);
     final List<Actor> players = sceneAct.players;
     final int current = sceneAct.current;
     final Actor crActor = this._crActor = players[current];

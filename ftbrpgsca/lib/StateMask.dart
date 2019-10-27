@@ -145,14 +145,15 @@ class StateMask extends Costume {
         } else if (dur > -3) {
           if (consume) {
             final int rnd = new Random().nextInt(3);
-            final int dmghp = (actor.mHp + rnd) * this.dmgHp ~/ 100;
-            final int dmgmp = (actor.mMp + rnd) * this.dmgMp ~/ 100;
-            final int dmgsp = (actor.mSp + rnd) * this.dmgSp ~/ 100;
-            actor.hp -= dmghp;
-            actor.mp -= dmgmp;
-            actor.sp -= dmgsp;
-            if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-              s += sprintf(StateMask.causesTxt, [this.name, actor.name]) + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
+            final int dmgHp = (actor.mHp + rnd) * this.dmgHp ~/ 100;
+            final int dmgMp = (actor.mMp + rnd) * this.dmgMp ~/ 100;
+            final int dmgSp = (actor.mSp + rnd) * this.dmgSp ~/ 100;
+            final int actorHp = actor.hp;
+            actor.hp = (actorHp > dmgHp) ? actorHp - dmgHp : 1;
+            actor.mp -= dmgMp;
+            actor.sp -= dmgSp;
+            if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
+              s += sprintf(StateMask.causesTxt, [this.name, actor.name]) + RolePlay.getDmgText(dmgHp, dmgMp, dmgSp);
             }
             if (dur > 0) {
               sDur[this] = dur - 1;
@@ -173,11 +174,16 @@ class StateMask extends Costume {
             if (this.reflect) {
               actor.reflects = true;
             }
-            if (this.automate && actor.automatic < 2) {
-              actor.automatic = 1;
-            }
             if (this.confuse) {
-              actor.automatic = actor.automatic < 2 ? -1 : -2;
+              final int actorAuto = actor.automatic;
+              if (actorAuto > -1) {
+                actor.automatic = actorAuto < 2 ? -1 : -2;
+              }
+            } else if (this.automate) {
+              final int actorAuto = actor.automatic;
+              if (actorAuto < 2 && actorAuto > -2) {
+                actor.automatic = 1;
+              }
             }
           }
         }
