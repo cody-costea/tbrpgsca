@@ -162,7 +162,8 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                             actor.reflect = true
                         }
                         if (this.confuse) {
-                            actor.automatic = if (actor.automatic < 2) -1 else -2
+                            val actorAuto = actor.automatic
+                            actor.automatic = if (actorAuto < 2 && actorAuto > -2) -1 else -2
                         } else if (this.automate) {
                             val actorAuto = actor.automatic
                             if (actorAuto < 2 && actorAuto > -2) {
