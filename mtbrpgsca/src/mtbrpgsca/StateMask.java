@@ -221,14 +221,15 @@ public final class StateMask extends Costume {
         } else if (d > -3) {
           if (consume) {
             final int rnd = new Random().nextInt(3);
-            final int dmghp = (actor.mHp + rnd) * this.dmgHp / 100;
-            final int dmgmp = (actor.mMp + rnd) * this.dmgMp / 100;
-            final int dmgsp = (actor.mSp + rnd) * this.dmgSp / 100;
-            actor.setCurrentHp(actor._hp - dmghp);
-            actor.setCurrentMp(actor._mp - dmgmp);
-            actor.setCurrentSp(actor._sp - dmgsp);
-            if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-              s += " " + this.name + " causes " + actor.name + RolePlay.getDmgText(dmghp, dmgmp, dmgsp);
+            final int dmgHp = (actor.mHp + rnd) * this.dmgHp / 100;
+            final int dmgMp = (actor.mMp + rnd) * this.dmgMp / 100;
+            final int dmgSp = (actor.mSp + rnd) * this.dmgSp / 100;
+            final int actorHp = actor._hp;
+            actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
+            actor.setCurrentMp(actor._mp - dmgMp);
+            actor.setCurrentSp(actor._sp - dmgSp);
+            if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
+              s += " " + this.name + " causes " + actor.name + RolePlay.getDmgText(dmgHp, dmgMp, dmgSp);
             }
             if (d > 0) {
               sDur.put(this, new Integer(d - 1));
@@ -244,11 +245,15 @@ public final class StateMask extends Costume {
             if (this.isRefelcting()) {
               actor.setReflecting(true);
             }
-            if (this.isAutomating() && actor.automatic < Actor.AUTO_ALLY) {
-              actor.automatic = Actor.AUTO_ENRAGED;
-            }
             if (this.isConfusing()) {
-              actor.automatic = actor.automatic < Actor.AUTO_ALLY ? Actor.AUTO_CONFUSED : Actor.AUTO_ENEMY;
+                final int actorAuto = actor.automatic;
+                if (actorAuto > Actor.AUTO_CONFUSED) {
+                    actor.automatic = actorAuto < Actor.AUTO_ALLY ? Actor.AUTO_CONFUSED : Actor.AUTO_ENEMY;
+                }
+            } else if (this.isAutomating()) {
+                final int actorAuto = actor.automatic;
+                if (actorAuto > Actor.AUTO_ENEMY && actorAuto < Actor.AUTO_ALLY)
+                    actor.automatic = Actor.AUTO_ENRAGED;
             }
           }
         }
@@ -286,12 +291,12 @@ public final class StateMask extends Costume {
     }
   }
 
-  StateMask(final int id, final String name, final boolean inactivate, final boolean automate, final boolean confuse,
-            final boolean reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp,
-            final int hp, final int mp, final int sp, final int atk, final int def, final int spi, final int wis,
-            final int agi, final int mInit, final boolean range, final Hashtable res, final Performance[] aSkills,
+  StateMask(final int id, final String name, final String sprite, final boolean inactivate, final boolean automate,
+            final boolean confuse, final boolean reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp,
+            final int dmgSp, final int hp, final int mp, final int sp, final int atk, final int def, final int spi,
+            final int wis, final int agi, final int mInit, final boolean range, final Hashtable res, final Performance[] aSkills,
             final Performance[] rSkills, final StateMask[] states, final Hashtable stRes) {
-    super(id, name, null, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
+    super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
     if (inactivate) {
         this.flags |= FLAG_INACTIVATE;
     }

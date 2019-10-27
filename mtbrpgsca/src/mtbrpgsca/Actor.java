@@ -25,6 +25,7 @@ public final class Actor extends Costume {
   protected final static int FLAG_ACTIVE = 2;
   protected final static int FLAG_REFLECTS = 4;
   protected final static int FLAG_GUARDS = 8;
+  protected final static int FLAG_SHAPE_SHIFT = 16;
   
   public final static int AUTO_NONE = 0;
   public final static int AUTO_CONFUSED = -1;
@@ -234,6 +235,23 @@ public final class Actor extends Costume {
             flags -= FLAG_GUARDS;
             this.flags = flags;
         }
+    }
+    return this;
+  }
+
+  public boolean isShapeShifted() {
+    return (this.flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT;
+  }
+
+  public Actor setShapeShifted(final boolean value) {
+    if (value) {
+      this.flags |= FLAG_SHAPE_SHIFT;
+    } else {
+      int flags = this.flags;
+      if ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT) {
+        flags -= FLAG_SHAPE_SHIFT;
+        this.flags = flags;
+      }
     }
     return this;
   }
