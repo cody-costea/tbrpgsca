@@ -129,6 +129,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
 
     open var init: Int = 0
     open var actions: Int = this.mActions
+
     open var automatic: Int
         get() {
             val flags = this.flags
