@@ -18,39 +18,78 @@ package com.codycostea.tbrpgsca.library
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-open class Ability(val id: Int, open val name: String, open val range: Boolean? = null, open val steal: Boolean = false,
-                   open val lvRq: Int, open val hpC: Int, open val mpC: Int, open val spC: Int, open val hpDmg: Int,
-                   open val mpDmg: Int, open val spDmg: Int, open val dmgType: Int, open val atkI: Int, open val trg : Int,
-                   open val elm: Int, open val mQty: Int, open val rQty: Int, open val absorb: Boolean, open val restoreKO: Boolean,
-                   open val aStates: Array<State>? = null, open val rStates: Array<State>? = null) {
+open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean = false, open val lvRq: Int, open val hpC: Int,
+                   open val mpC: Int, open val spC: Int, hpDmg: Int, mpDmg: Int, spDmg: Int, open val dmgType: Int, atkI: Int,
+                   open val trg: Int, open val elm: Int, open val mQty: Int, open val rQty: Int, absorb: Boolean, restore: Boolean,
+                   aStates: Array<State>? = null, open val rStates: Array<State>? = null)
+    : Role(id, name, hpDmg, mpDmg, spDmg, atkI, range, aStates) {
 
     companion object {
         @JvmStatic
         var reflectedTxt = ", reflected by %s"
+
         @JvmStatic
         var suffersTxt = ", %s suffers"
+
         @JvmStatic
         var stolenTxt = ", obtaining %s from %s"
+
         @JvmStatic
         var missesTxt = ", but misses"
 
-        const val DmgTypeAtk : Int = 1
-        const val DmgTypeDef : Int = 2
-        const val DmgTypeSpi : Int = 4
-        const val DmgTypeWis : Int = 8
-        const val DmgTypeAgi : Int = 16
+        const val FLAG_STEAL: Int = 2
+        const val FLAG_ABSORB: Int = 4
+        const val FLAG_RESTORE: Int = 8
+
+        const val DmgTypeAtk: Int = 1
+        const val DmgTypeDef: Int = 2
+        const val DmgTypeSpi: Int = 4
+        const val DmgTypeWis: Int = 8
+        const val DmgTypeAgi: Int = 16
     }
+
+    open var steal: Boolean
+        get() {
+            return (this.flags and FLAG_STEAL) == FLAG_STEAL
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_STEAL == FLAG_STEAL)) {
+                this.flags = flags xor FLAG_STEAL
+            }
+        }
+
+    open var absorb: Boolean
+        get() {
+            return (this.flags and FLAG_ABSORB) == FLAG_ABSORB
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_ABSORB == FLAG_ABSORB)) {
+                this.flags = flags xor FLAG_ABSORB
+            }
+        }
+
+    open var restore: Boolean
+        get() {
+            return (this.flags and FLAG_RESTORE) == FLAG_RESTORE
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_RESTORE == FLAG_RESTORE)) {
+                this.flags = flags xor FLAG_RESTORE
+            }
+        }
 
     open fun execute(user: Actor, target: Actor, applyCosts: Boolean): String {
         var s = ""
-        val trg : Actor
+        val trg: Actor
         var dmg = (Math.random() * 4).toInt()
         val dmgType = this.dmgType
         if (target.reflect && dmgType == DmgTypeWis) {
             s += String.format(reflectedTxt, target.name)
             trg = user
-        }
-        else {
+        } else {
             trg = target
         }
         val ko = trg.hp < 1
@@ -89,14 +128,14 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 i++
             }
         }
-        dmg = if (i == 0) 0 else (this.atkI + (dmg / i)) / (def / i * res + 1)
+        dmg = if (i == 0) 0 else (this.mInit + (dmg / i)) / (def / i * res + 1)
         if (canMiss == 0 || trg == user
                 || (Math.random() * 13 + user.agi / canMiss).toInt() > 2 + trg.agi / 4) {
-            var dmgHp = this.hpDmg
+            var dmgHp = this.mHp
             dmgHp = if (dmgHp != 0) (if (dmgHp < 0) -1 else 1) * dmg + dmgHp else 0
-            var dmgMp = this.mpDmg
+            var dmgMp = this.mMp
             dmgMp = if (dmgMp != 0) (if (dmgMp < 0) -1 else 1) * dmg + dmgMp else 0
-            var dmgSp = this.spDmg
+            var dmgSp = this.mSp
             dmgSp = if (dmgSp != 0) (if (dmgSp < 0) -1 else 1) * dmg + dmgSp else 0
             if (res < 0) {
                 dmgHp = -dmgHp
@@ -112,10 +151,10 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 user.sp += dmgSp / 2
             }
             if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
-                s += String.format(suffersTxt, trg.name) + Costume.getDmgText(dmgHp, dmgMp, dmgSp)
+                s += String.format(suffersTxt, trg.name) + Role.getDmgText(dmgHp, dmgMp, dmgSp)
             }
             val aStates = this.aStates
-            var r : String
+            var r: String
             if (aStates !== null) {
                 for (state in aStates) {
                     r = state.inflict(trg, false, false)
@@ -165,8 +204,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                         usrItems[stolen] = (usrItems[stolen] ?: 0) + 1
                         if (--trgItemQty == 0) {
                             trgItems.remove(stolen)
-                        }
-                        else {
+                        } else {
                             trgItems[stolen] = trgItemQty
                         }
                         s += String.format(stolenTxt, stolen.name, trg.name)
@@ -174,8 +212,7 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
                 }
             }
             s += trg.checkStatus()
-        }
-        else {
+        } else {
             s += missesTxt
         }
         if (applyCosts) {
@@ -210,10 +247,17 @@ open class Ability(val id: Int, open val name: String, open val range: Boolean? 
         }
     }
 
-    open fun canPerform(actor : Actor) : Boolean {
+    open fun canPerform(actor: Actor): Boolean {
         val skillsQty = actor.skillsQty
         return this.mpC <= actor.mp && this.hpC < actor.hp && this.spC <= actor.sp && actor.level >= this.lvRq
-                && /*(this.mQty < 1 && skillsQty === null) || */(skillsQty === null || (skillsQty[this] ?: 1) > 0)
+                && /*(this.mQty < 1 && skillsQty === null) || */(skillsQty === null || (skillsQty[this]
+                ?: 1) > 0)
+    }
+
+    init {
+        this.steal = steal
+        this.absorb = absorb
+        this.restore = restore
     }
 
 }

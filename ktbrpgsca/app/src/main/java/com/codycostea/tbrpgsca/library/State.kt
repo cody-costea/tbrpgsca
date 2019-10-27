@@ -15,21 +15,71 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
-open class State(id : Int, name : String, open var inactivate : Boolean, open var automate : Boolean, open var confuse : Boolean,
-                 open var reflect : Boolean, open val dur : Int = 3, open val sRes : Int = 0, open val dmgHp : Int = 0, open val dmgMp : Int = 0,
-                 open val dmgSp : Int = 0, mHp : Int, mMp : Int, mSp : Int, mAtk : Int, mDef: Int, mSpi: Int, mWis : Int, mAgi : Int, mActions : Int,
-                 mInit: Int = 0, range: Boolean, mRes : MutableMap<Int, Int>? = null, skills : Array<Ability>? = null,
-                 open val rSkills : Array<Ability>? = null, rStates : Array<State>? = null, mStRes : MutableMap<State, Int>? = null)
-    : Costume(id, name, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rStates, mStRes) {
+open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
+                 open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0, open val dmgMp: Int = 0, open val dmgSp: Int = 0,
+                 mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, mInit: Int = 0,
+                 range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, open val rSkills: Array<Ability>? = null,
+                 rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
+    : Costume(id, name, sprite, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rStates, mStRes) {
 
     companion object {
         @JvmStatic
-        var causesTxt : String = " %s causes %s"
+        var causesTxt: String = " %s causes %s"
+
+        const val FLAG_AUTOMATE: Int = 2
+        const val FLAG_CONFUSE: Int = 4
+        const val FLAG_INACTIVATE: Int = 8
+        const val FLAG_REFLECT: Int = 16
     }
+
+    open var inactivate: Boolean
+        get() {
+            return (this.flags and FLAG_INACTIVATE) == FLAG_INACTIVATE
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_INACTIVATE == FLAG_INACTIVATE)) {
+                this.flags = flags xor FLAG_INACTIVATE
+            }
+        }
+
+    open var automate: Boolean
+        get() {
+            return (this.flags and FLAG_AUTOMATE) == FLAG_AUTOMATE
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_AUTOMATE == FLAG_AUTOMATE)) {
+                this.flags = flags xor FLAG_AUTOMATE
+            }
+        }
+
+    open var confuse: Boolean
+        get() {
+            return (this.flags and FLAG_CONFUSE) == FLAG_CONFUSE
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_CONFUSE == FLAG_CONFUSE)) {
+                this.flags = flags xor FLAG_CONFUSE
+            }
+        }
+
+    open var reflect: Boolean
+        get() {
+            return (this.flags and FLAG_REFLECT) == FLAG_REFLECT
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_REFLECT == FLAG_REFLECT)) {
+                this.flags = flags xor FLAG_REFLECT
+            }
+        }
 
     open fun inflict(actor: Actor, always: Boolean, indefinite: Boolean): String {
         val trgStRes = actor.stRes
-        if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + this.sRes) {
+        if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this]
+                        ?: 0) + this.sRes) {
             var trgStates = actor.stateDur
             if (trgStates === null) {
                 trgStates = HashMap(1)
@@ -41,34 +91,30 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
             }
             actor.updateAttributes(false, this)
             actor.updateResistance(false, this.res, this.stRes)
-            actor.updateStates(false, this.states)
-            actor.updateSkills(false, this.skills)
+            actor.updateStates(false, this.aStates)
+            actor.updateSkills(false, this.aSkills)
             this.disableSkills(actor, false)
             return this.apply(actor, false)
-        }
-        else return ""
+        } else return ""
     }
 
-    private fun disableSkills(actor : Actor, remove : Boolean) {
+    private fun disableSkills(actor: Actor, remove: Boolean) {
         val rSkills = this.rSkills ?: return
         var iSkills = actor.skillsQty
 
         if (remove) {
             if (iSkills === null) {
                 return
-            }
-            else {
+            } else {
                 for (k in rSkills) {
                     if (k.mQty > 0) {
                         iSkills[k] = -1 * (iSkills[k] ?: 0)
-                    }
-                    else {
+                    } else {
                         iSkills.remove(k)
                     }
                 }
             }
-        }
-        else {
+        } else {
             if (iSkills === null) {
                 iSkills = HashMap()
                 actor.skillsQty = iSkills
@@ -88,24 +134,23 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                 if (dur == 0) {
                     this.disable(actor)
                     sDur[this] = -3
-                }
-                else if (dur > -3) {
+                } else if (dur > -3) {
                     if (consume) {
                         val rnd = (Math.random() * 3).toInt()
-                        val dmghp = (actor.mHp + rnd) * this.dmgHp / 100
-                        val dmgmp = (actor.mMp + rnd) * this.dmgMp / 100
-                        val dmgsp = (actor.mSp + rnd) * this.dmgSp / 100
-                        actor.hp -= dmghp
-                        actor.mp -= dmgmp
-                        actor.sp -= dmgsp
-                        if (dmghp != 0 || dmgmp != 0 || dmgsp != 0) {
-                            s += String.format(causesTxt, this.name, actor.name) + Costume.getDmgText(dmghp, dmgmp, dmgsp)
+                        val dmgHp = (actor.mHp + rnd) * this.dmgHp / 100
+                        val dmgMp = (actor.mMp + rnd) * this.dmgMp / 100
+                        val dmgSp = (actor.mSp + rnd) * this.dmgSp / 100
+                        val actorHp = actor.hp
+                        actor.hp = if (actorHp > dmgHp) actorHp - dmgHp else 1
+                        actor.mp -= dmgMp
+                        actor.sp -= dmgSp
+                        if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
+                            s += String.format(causesTxt, this.name, actor.name) + Role.getDmgText(dmgHp, dmgMp, dmgSp)
                         }
                         if (dur > 0) {
                             sDur[this] = dur - 1
                         }
-                    }
-                    else {
+                    } else {
                         if (this.inactivate) {
                             if (dur > 0 && dur == this.dur && actor.actions > 0) {
                                 sDur[this] = dur - 1
@@ -116,11 +161,16 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
                         if (this.reflect) {
                             actor.reflect = true
                         }
-                        if (this.automate && actor.automatic < 2) {
-                            actor.automatic = 1
-                        }
                         if (this.confuse) {
-                            actor.automatic = if (actor.automatic < 2) -1 else -2
+                            val actorAuto = actor.automatic
+                            if (actorAuto > -1) {
+                                actor.automatic = if (actorAuto < 2) -1 else -2
+                            }
+                        } else if (this.automate) {
+                            val actorAuto = actor.automatic
+                            if (actorAuto < 2 && actorAuto > -2) {
+                                actor.automatic = 1
+                            }
                         }
                     }
                 }
@@ -132,8 +182,8 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
     internal fun disable(actor: Actor) {
         actor.updateAttributes(true, this)
         actor.updateResistance(true, this.res, this.stRes)
-        actor.updateStates(true, this.states)
-        actor.updateSkills(true, this.skills)
+        actor.updateStates(true, this.aStates)
+        actor.updateSkills(true, this.aSkills)
         this.disableSkills(actor, true)
         if (this.reflect) {
             actor.applyStates(false)
@@ -148,15 +198,20 @@ open class State(id : Int, name : String, open var inactivate : Boolean, open va
             }
             if (delete) {
                 sDur.remove(this)
-            }
-            else {
+            } else {
                 sDur[this] = -3
             }
             true
-        }
-        else {
+        } else {
             false
         }
+    }
+
+    init {
+        this.inactivate = inactivate
+        this.automate = automate
+        this.confuse = confuse
+        this.reflect = reflect
     }
 
 }

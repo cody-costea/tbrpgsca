@@ -15,189 +15,159 @@ limitations under the License.
 */
 package com.codycostea.tbrpgsca.library
 
-open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surprise : Int) {
+typealias SceneFun = (Scene, String?) -> Boolean
+
+interface Scene {
 
     companion object {
-        @JvmStatic
+        var surprisedTxt = "Surprised"
         var performsTxt = "%s performs %s"
-        @JvmStatic
         var victoryTxt = "The party has won!"
-        @JvmStatic
         var fallenTxt = "The party has fallen!"
-        @JvmStatic
         var escapeTxt = "The party has escaped!"
-        @JvmStatic
         var failTxt = "The party attempted to escape, but failed."
     }
 
-    open var status : Int = 0
-        internal set
+    var enIdx: Int
+    var status: Int
+    var current: Int
+    var ordIndex: Int
+    var lastAbility: Ability?
+    var players: Array<Actor>
+    var crItems: MutableMap<Int, MutableList<Ability>?>?
+    var ordered: Array<Actor>?
+    var fTarget: Int
+    var lTarget: Int
+    var surprise: Int
 
-    open val enIdx : Int = party.size
-    open val players : Array<Actor> = party + enemy
+    var onStop: SceneFun?
+    var onStart: SceneFun?
+    var onBeforeAct: SceneFun?
+    var onAfterAct: SceneFun?
+    var onNewTurn: SceneFun?
 
-    open var current : Int = if (this.surprise < 0) this.enIdx else 0
-        protected set
-    open var crItems : MutableMap<Int, MutableList<Ability>?>? = null
-        get() {
-            if (field === null) {
-                field = HashMap()
-            }
-            return field
-        }
-        protected set
-
-    open var fTarget : Int = this.enIdx
-        protected set
-    open var lTarget : Int = this.enIdx
-        protected set
-
-    open var lastAbility : Ability? = null
-
-    open val aiTurn : Boolean
+    val aiTurn: Boolean
         get() {
             return this.players[this.current].automatic != 0
         }
 
-    private val useInit : Boolean
-
-    init {
-        var useInit = false
-        val players = this.players
-        val surprise = this.surprise
-        val pSize = players.size
-        val enIdx = this.enIdx
-        for (i in 0 until pSize) {
-            val iPlayer = players[i]
-            var iInit = iPlayer.mInit
-            if (!useInit && iInit != 0) {
-                useInit = true
-            }
-            if (iInit < 1) {
-                iInit = pSize
-            }
-            iPlayer.init = (if ((surprise < 0 && i < enIdx)
-                    || (surprise > 0 && i >= enIdx)) 0 else iInit)
-            for (j in 0 until pSize) {
-                if (j == i) {
-                    continue
-                }
-                else {
-                    val jPlayer = players[j]
-                    var jInit = jPlayer.mInit
-                    if (jInit < 1) {
-                        jInit = pSize
-                    }
-                    if (iInit < jInit /*|| (iInit == jInit && this.players[i].agi > this.players[j].agi)*/) {
-                        jPlayer.init -= (jInit - iInit) //+ 1
-                    }
-                }
-            }
-        }
-        val current = this.current
-        val crActor = players[current]
-        val crItems = crActor._items
-        if (crItems !== null) {
-            this.crItems!![current] = crItems.keys.toMutableList()
-        }
-        this.useInit = useInit
-        this.setNextCurrent()
-    }
-
-    protected open fun setNextCurrent() : String {
+    fun setNextCurrent(): String {
         var ret = ""
         var initInc: Int
-        val useInit = this.useInit
+        val useInit: Boolean
         val players = this.players
-        var crActor = players[this.current]
+        val ordered = this.ordered
+        var ordIndex = this.ordIndex
+        var crActor: Actor = players[this.current]
         val oldActor = crActor
-        var minInit = 1
-        do {
-            initInc = minInit
-            for (i in players.indices) {
-                val iPlayer = players[i]
-                if (iPlayer.hp > 0) {
-                    if (useInit) {
-                        var nInit = iPlayer.init + initInc
-                        iPlayer.init = nInit
-                        var mInit = iPlayer.mInit
-                        if (mInit < 1) {
-                            mInit = players.size
-                        }
-                        if (nInit > mInit) {
-                            nInit -= mInit
-                            if (initInc == 1) minInit = -1
-                            if (crActor !== iPlayer) {
-                                val cInit = (crActor.init - (if (crActor.mInit < 1) players.size else crActor.mInit))
-                                if (cInit < nInit || (cInit == nInit && iPlayer.agi > crActor.agi)) {
-                                    val iActions = iPlayer.mActions
-                                    iPlayer.actions = iActions
-                                    iPlayer.applyStates(false)
-                                    if (iActions > 0) {
-                                        crActor = iPlayer
-                                        this.current = i
-                                    }
-                                    else {
-                                        iPlayer.init = 0
-                                        if (ret.isNotEmpty()) {
-                                            ret += "\n"
+        if (ordered === null) {
+            useInit = ordIndex < -1
+            var minInit = 1
+            do {
+                initInc = minInit
+                for (i in players.indices) {
+                    val iPlayer = players[i]
+                    if (iPlayer.hp > 0) {
+                        if (useInit) {
+                            var nInit = iPlayer.init + initInc
+                            iPlayer.init = nInit
+                            var mInit = iPlayer.mInit
+                            if (mInit < 1) {
+                                mInit = players.size
+                            }
+                            if (nInit > mInit) {
+                                nInit -= mInit
+                                if (initInc == 1) minInit = -1
+                                if (crActor !== iPlayer) {
+                                    val cInit = (crActor.init - (if (crActor.mInit < 1) players.size else crActor.mInit))
+                                    if (cInit < nInit || (cInit == nInit && iPlayer.agi > crActor.agi)) {
+                                        iPlayer.actions = iPlayer.mActions
+                                        iPlayer.applyStates(false)
+                                        if (iPlayer.actions > 0) {
+                                            crActor = iPlayer
+                                            this.current = i
+                                        } else {
+                                            iPlayer.init = 0
+                                            if (ret.isNotEmpty()) {
+                                                ret += "\n"
+                                            }
+                                            ret += iPlayer.applyStates(true)
                                         }
-                                        ret += iPlayer.applyStates(true)
                                     }
                                 }
                             }
-                        }
-                        if (minInit > 0 && minInit > mInit) {
-                            minInit = mInit
-                        }
-                    }
-                    else {
-                        val iActions : Int
-                        if (minInit != 1) {
-                            iActions = iPlayer.mActions
-                            iPlayer.actions = iActions
-                        }
-                        else {
-                            iActions = iPlayer.actions
-                        }
-                        if (crActor !== iPlayer && iActions > 0
-                                && (crActor.actions < 1 || iPlayer.agi > crActor.agi)) {
-                            iPlayer.applyStates(false)
-                            if (iActions > 0) {
-                                if (initInc > 0) initInc = 0
-                                crActor = iPlayer
-                                this.current = i
+                            if (minInit > 0 && minInit > mInit) {
+                                minInit = mInit
                             }
-                            else {
-                                if (ret.isNotEmpty()) {
-                                    ret += "\n"
+                        } else {
+                            val iActions: Int
+                            if (minInit != 1) {
+                                iActions = iPlayer.mActions
+                                iPlayer.actions = iActions
+                            } else {
+                                iActions = iPlayer.actions
+                            }
+                            if (crActor !== iPlayer && iActions > 0
+                                    && (crActor.actions < 1 || iPlayer.agi > crActor.agi)) {
+                                iPlayer.applyStates(false)
+                                if (iPlayer.actions > 0) {
+                                    if (initInc > 0) initInc = 0
+                                    crActor = iPlayer
+                                    this.current = i
+                                } else {
+                                    if (ret.isNotEmpty()) {
+                                        ret += "\n"
+                                    }
+                                    ret += iPlayer.applyStates(true)
                                 }
-                                ret += iPlayer.applyStates(true)
                             }
                         }
                     }
                 }
-            }
-            if (minInit != 0 && !useInit) {
-                minInit = 0
-            }
-        } while (initInc == 1 && minInit > -1)
+                if (minInit != 0 && !useInit) {
+                    minInit = 0
+                }
+            } while (initInc == 1 && minInit > -1)
+        } else {
+            useInit = false
+            val pSize = players.size
+            this.ordIndex = -1
+            do {
+                if (++ordIndex == pSize) {
+                    ordIndex = 0
+                }
+                crActor = ordered[ordIndex]
+                if (crActor.hp > 0) { //TODO: analyze if ok
+                    crActor.actions = crActor.mActions
+                    if (crActor !== oldActor) {
+                        crActor.applyStates(false)
+                        if (crActor.actions < 1) {
+                            if (ret.isNotEmpty()) {
+                                ret += "\n"
+                            }//TODO: actor sprites should be played when some states are applied
+                            this.ordIndex = 0
+                            ret += crActor.applyStates(true)
+                            this.ordIndex = -1
+                            continue
+                        } else {
+                            this.current = players.indexOf(crActor)
+                        }
+                    }
+                    this.ordIndex = ordIndex
+                    break
+                }
+            } while (true)
+        }
         if (oldActor === crActor) {
-            val cActions : Int
             if (useInit) {
-                cActions = crActor.mActions
-                crActor.actions = cActions
-            }
-            else {
-                cActions = crActor.actions
+                crActor.actions = crActor.mActions
             }
             crActor.applyStates(false)
-            if (cActions < 1) {
+            if (crActor.actions < 1) {
                 ret += crActor.applyStates(true)
-                return ret + this.setNextCurrent()
+                return ret + this.setNextCurrent() //TODO: analyze if ok
             }
-        }
-        else {
+        } else {
             if (crActor.automatic == 0) {
                 val crItems = crActor._items
                 if (crItems !== null && oldActor._items !== crItems) {//TODO: analyze if ok
@@ -214,17 +184,21 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                     if (recoverableSkills[skill] == skill.rQty) {
                         skillsQty[skill] = (skillsQty[skill] ?: 0) + 1
                         recoverableSkills[skill] = 0
-                    }
-                    else {
+                    } else {
                         recoverableSkills[skill] = (recoverableSkills[skill] ?: 0) + 1
                     }
                 }
             }
         }
-        return ret
+        val onNewTurn = this.onNewTurn
+        return if (onNewTurn !== null && onNewTurn(this, ret) && crActor.automatic != 0) {
+            this.executeAI("")
+        } else {
+            ret
+        }
     }
 
-    open fun endTurn(txt : String) : String {
+    fun endTurn(txt: String): String {
         var ret = txt
         var current = this.current
         val players = this.players
@@ -251,8 +225,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                         if (i < enIdx) {
                             noParty = false
                             i = enIdx - 1
-                        }
-                        else {
+                        } else {
                             noEnemy = false
                             break
                         }
@@ -262,8 +235,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 if (noParty) {
                     status = -2
                     ret += "\n$fallenTxt"
-                }
-                else {
+                } else {
                     if (noEnemy) {
                         status = 1
                         ret += "\n$victoryTxt"
@@ -272,20 +244,23 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             } while (status == 0 && cActions < 1)
             crActor.actions = cActions
         }
-        if (status != 0) {
+        return if (status != 0) {
             this.status = status
+            val onStop = this.onStop
+            if (onStop === null || onStop(this, ret)) ret else this.setNextCurrent()
+        } else {
+            ret
         }
-        return ret
     }
 
-    open fun getGuardian(target : Int, skill : Ability) : Int {
+    fun getGuardian(target: Int, skill: Ability): Int {
         val players = this.players
         val current = this.current
-        if ((skill.range === null && players[current].range) || skill.range == true) {
+        if (skill.range || (/*skill.range === null &&*/ players[current].range)) {
             return target
         }
-        val f : Int
-        val l : Int
+        val f: Int
+        val l: Int
         val enIdx = this.enIdx
         if (current < enIdx) {
             val pSize = players.size - 1
@@ -294,8 +269,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             }
             f = enIdx
             l = pSize
-        }
-        else {
+        } else {
             if (target >= enIdx - 1 || target == 0) {
                 return target
             }
@@ -317,8 +291,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
         return if (difF == 0) {
             target
-        }
-        else {
+        } else {
             for (i in l downTo target + 1) {
                 val iPlayer = players[i]
                 if (iPlayer.hp > 0 && iPlayer.guards) {
@@ -332,82 +305,85 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         }
     }
 
-    protected open fun executeAbility(skill : Ability, defTarget : Int, txt : String) : String {
-        var ret : String = txt
-        var target : Int = defTarget
-        val current = this.current
-        val players = this.players
-        val enIdx = this.enIdx
-        val fTarget : Int
-        val lTarget : Int
-        when (skill.trg) {
-             1 -> {
-                 if (target < enIdx) {
-                     fTarget = 0
-                     lTarget = enIdx - 1
-                 }
-                 else {
-                     fTarget = enIdx
-                     lTarget = players.size - 1
-                 }
-             }
-            2 -> {
-                fTarget = 0
-                lTarget = players.size - 1
-            }
-            -2 -> {
-                if (current < enIdx) {
-                    fTarget = 0
-                    lTarget = enIdx - 1
+    fun executeAbility(skill: Ability, defTarget: Int, txt: String): String {
+        var ret: String = txt
+        val beforeAct = this.onBeforeAct
+        if (beforeAct === null || beforeAct(this, ret)) {
+            var target: Int = defTarget
+            val current = this.current
+            val players = this.players
+            val enIdx = this.enIdx
+            val fTarget: Int
+            val lTarget: Int
+            when (skill.trg) {
+                1 -> {
+                    if (target < enIdx) {
+                        fTarget = 0
+                        lTarget = enIdx - 1
+                    } else {
+                        fTarget = enIdx
+                        lTarget = players.size - 1
+                    }
                 }
-                else  {
-                    fTarget = enIdx
+                2 -> {
+                    fTarget = 0
                     lTarget = players.size - 1
                 }
+                -2 -> {
+                    if (current < enIdx) {
+                        fTarget = 0
+                        lTarget = enIdx - 1
+                    } else {
+                        fTarget = enIdx
+                        lTarget = players.size - 1
+                    }
+                }
+                -1 -> {
+                    fTarget = current
+                    lTarget = current
+                }
+                else -> {
+                    target = this.getGuardian(target, skill)
+                    fTarget = target
+                    lTarget = target
+                }
             }
-            -1 -> {
-                fTarget = current
-                lTarget = current
+            var applyCosts = true
+            this.fTarget = fTarget
+            this.lTarget = lTarget
+            val crActor = players[current]
+            ret += String.format("\n$performsTxt", crActor.name, skill.name)
+            for (i in fTarget..lTarget) {
+                val iPlayer = players[i]
+                if ((skill.mHp < 0 && skill.restore) || iPlayer.hp > 0) {
+                    ret += skill.execute(crActor, iPlayer, applyCosts)
+                    applyCosts = false
+                }
             }
-            else -> {
-                target = this.getGuardian(target, skill)
-                fTarget = target
-                lTarget = target
+            ret += "."
+            this.lastAbility = skill
+            val afterAct = this.onAfterAct
+            if (afterAct === null || afterAct(this, ret)) {
+                crActor.exp++
+                crActor.levelUp()
             }
         }
-        var applyCosts = true
-        this.fTarget = fTarget
-        this.lTarget = lTarget
-        val crActor = players[current]
-        ret += String.format("\n$performsTxt", crActor.name, skill.name)
-        for (i in fTarget..lTarget) {
-            val iPlayer = players[i]
-            if ((skill.hpDmg < 0 && skill.restoreKO) || iPlayer.hp > 0) {
-                ret += skill.execute(crActor, iPlayer, applyCosts)
-                applyCosts = false
-            }
-        }
-        ret += "."
-        crActor.exp++
-        crActor.levelUp()
-        this.lastAbility = skill
         return ret
     }
 
-    open fun executeAI(ret : String) : String {
+    fun executeAI(ret: String): String {
         val players = this.players
         val current = this.current
         val enIdx = this.enIdx
         var skillIndex = 0
         var nHeal = false
         var nRestore = false
-        var f : Int
-        var l : Int
+        var f: Int
+        var l: Int
         if (current < enIdx) {
             f = 0
             l = enIdx
-        }
-        else {
+        } else {
             f = enIdx
             l = players.size
         }
@@ -415,8 +391,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             val iPlayer = players[i]
             if (iPlayer.hp < 1) {
                 nRestore = true
-            }
-            else if (iPlayer.hp < (iPlayer.mHp / 3)) {
+            } else if (iPlayer.hp < (iPlayer.mHp / 3)) {
                 nHeal = true
             }
         }
@@ -425,30 +400,29 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         if (nRestore || nHeal) {
             for (i in 0 until availableSkills.size) {
                 val s = availableSkills[i]
-                if ((s.restoreKO || (nHeal && s.hpDmg < 0)) && s.canPerform(crActor)) {
+                if ((s.restore || (nHeal && s.mHp < 0)) && s.canPerform(crActor)) {
                     skillIndex = i
                     break
                 }
             }
         }
         val ability = availableSkills[this.getAIskill(skillIndex, nRestore)]
-        val atkSkill = ability.hpDmg > -1
+        val atkSkill = ability.mHp > -1
         if (atkSkill) {
             if (current < enIdx) {
                 f = enIdx
                 l = players.size
-            }
-            else {
+            } else {
                 f = 0
                 l = enIdx
             }
         }
         var target = f
         var trgPlayer = players[target]
-        while (trgPlayer.hp < 1 && (atkSkill || !ability.restoreKO) && target < l) trgPlayer = players[++target]
+        while (trgPlayer.hp < 1 && (atkSkill || !ability.restore) && target < l) trgPlayer = players[++target]
         for (i in target + 1 until l) {
             val iPlayer = players[i]
-            if (iPlayer.hp < trgPlayer.hp && (iPlayer.hp > 0 || ability.restoreKO)) {
+            if (iPlayer.hp < trgPlayer.hp && (iPlayer.hp > 0 || ability.restore)) {
                 trgPlayer = iPlayer
                 target = i
             }
@@ -456,7 +430,7 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return this.executeAbility(ability, target, ret)
     }
 
-    open fun getAIskill(defSkill : Int, nRestore : Boolean) : Int {
+    fun getAIskill(defSkill: Int, nRestore: Boolean): Int {
         var ret = defSkill
         val current = this.current
         val players = this.players
@@ -467,12 +441,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
             val a = availableSkills[i]
             if (a.canPerform(crActor)) {
                 if (defSkill > 0) {
-                    if (a.hpDmg < s.hpDmg && (a.restoreKO || !nRestore)) {
+                    if (a.mHp < s.mHp && (a.restore || !nRestore)) {
                         s = a
                         ret = i
                     }
-                }
-                else if (a.hpDmg > s.hpDmg) {
+                } else if (a.mHp > s.mHp) {
                     s = a
                     ret = i
                 }
@@ -481,11 +454,11 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
         return ret
     }
 
-    open fun performSkill(index : Int, target : Int, txt : String) : String {
+    fun performSkill(index: Int, target: Int, txt: String): String {
         return this.executeAbility(this.players[this.current].availableSkills[index], target, txt)
     }
 
-    open fun useItem(index : Int, target : Int, ret : String) : String {
+    fun useItem(index: Int, target: Int, ret: String): String {
         val current = this.current
         val crItems = this.crItems!![current]
         if (crItems !== null) {
@@ -495,29 +468,120 @@ open class Scene(party : Array<Actor>, enemy : Array<Actor>, private val surpris
                 val itemQty = (crItemsMap[item] ?: 1) - 1
                 if (itemQty > 0) {
                     crItemsMap[item] = itemQty
-                }
-                else {
+                } else {
                     crItems.remove(item)
                     crItemsMap.remove(item)
                 }
             }
             return this.executeAbility(item, target, ret)
-        }
-        else {
+        } else {
             return ret
         }
     }
 
-    open fun escape() : String {
-        val enIdx = this.enIdx
-        val players = this.players
-        val pAgiSum = players.filterIndexed { i, _ ->  i < enIdx}.sumBy { it.agi } / enIdx
-        val eAgiSum = players.filterIndexed { i, _ ->  i >= enIdx}.sumBy { it.agi } / (players.size - this.enIdx)
-        return if (this.surprise > 0 || (Math.random() * 7) + pAgiSum > eAgiSum) {
-            this.status = -1
-            Scene.escapeTxt
+    fun escape(): String {
+        val beforeAct = this.onBeforeAct
+        if (beforeAct === null || beforeAct(this, null)) {
+            val enIdx = this.enIdx
+            val players = this.players
+            val afterAct = this.onAfterAct
+            val pAgiSum = players.filterIndexed { i, _ -> i < enIdx }.sumBy { it.agi } / enIdx
+            val eAgiSum = players.filterIndexed { i, _ -> i >= enIdx }.sumBy { it.agi } / (players.size - this.enIdx)
+            if (this.surprise > 0 || (Math.random() * 7) + pAgiSum > eAgiSum) {
+                this.status = -1
+                if (afterAct === null || afterAct(this, null)) {
+                    val ret = Scene.escapeTxt
+                    val onStop = this.onStop
+                    if (onStop === null || onStop(this, ret)) {
+                        return ret
+                    }
+                }
+                this.status = 0
+            } else if (afterAct !== null && !afterAct(this, null)) {
+                this.status = -1
+                val ret = Scene.escapeTxt
+                val onStop = this.onStop
+                if (onStop === null || onStop(this, ret)) {
+                    return ret
+                }
+            }
         }
-        else Scene.failTxt
+        return Scene.failTxt
+    }
+
+    fun prepare(party: Array<Actor>, enemy: Array<Actor>, surprise: Int, reorder: Boolean): String {
+        val players = party + enemy
+        this.surprise = surprise
+        val pSize = players.size
+        val enIdx = party.size
+        this.players = players
+        var useInit = false
+        this.enIdx = enIdx
+        val surprised = if (surprise == 0) null else State(0, surprisedTxt, null, true, false,
+                false, false, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,false, null, null, null)
+        for (i in 0 until pSize) {
+            val iPlayer = players[i]
+            var iInit = iPlayer.mInit
+            if (!useInit && iInit != 0) {
+                useInit = true
+            }
+            if (iInit < 1) {
+                iInit = pSize
+            } //TODO: also set actions to 0 for surprised actors
+            if ((surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx)) {
+                surprised!!.inflict(iPlayer, true, false)
+            }
+            iPlayer.init = iInit
+            for (j in 0 until pSize) {
+                if (j == i) {
+                    continue
+                } else {
+                    val jPlayer = players[j]
+                    var jInit = jPlayer.mInit
+                    if (jInit < 1) {
+                        jInit = pSize
+                    }
+                    if (iInit < jInit /*|| (iInit == jInit && this.players[i].agi > this.players[j].agi)*/) {
+                        jPlayer.init -= (jInit - iInit) //+ 1
+                    }
+                }
+            }
+        }
+        this.status = 0
+        this.fTarget = enIdx
+        this.lTarget = enIdx
+        this.lastAbility = null
+        val current = if (this.surprise < 0) this.enIdx else 0
+        val crActor = players[current]
+        val crItems = crActor._items
+        this.current = current
+        if (crItems !== null) {
+            this.crItems!![current] = crItems.keys.toMutableList()
+        }
+        if (useInit) {
+            this.ordIndex = -2
+        } else if (reorder) {
+            val ordered = players.copyOf()
+            ordered.sortByDescending { it.agi }
+            this.ordered = ordered
+            this.ordIndex = pSize - 1
+            Actor.onTurnReorder = {
+                if (this.ordIndex > -1) {
+                    ordered.sortByDescending { it.agi }
+                    this.ordIndex = ordered.indexOf(players[this.current])
+                }
+            }
+        }
+        val ret = this.setNextCurrent()
+        val onStart = this.onStart
+        if (onStart === null || onStart(this, ret)) {
+            val onNewTurn = this.onNewTurn
+            if (onNewTurn !== null && onNewTurn(this, ret) && players[this.current].automatic != 0) {
+                return this.executeAI(ret)
+            }
+        }
+        return ret
     }
 
 }

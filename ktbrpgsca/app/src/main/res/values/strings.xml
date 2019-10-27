@@ -116,6 +116,7 @@
     <string name="victory">Victory</string>
     <string name="defeat">Defeat</string>
     <string name="escape">Escape</string>
+    <string name="scene_surprised"/>
     <string name="scene_victory"/>
     <string name="scene_defeat"/>
     <string name="scene_escape"/>
