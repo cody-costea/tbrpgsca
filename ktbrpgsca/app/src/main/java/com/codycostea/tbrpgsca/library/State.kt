@@ -151,6 +151,11 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                             sDur[this] = dur - 1
                         }
                     } else {
+                        val sprite = this.sprite
+                        if (sprite !== null && sprite.isNotEmpty()) {
+                            actor.shapeShift = true
+                            actor.sprite = sprite
+                        }
                         if (this.inactivate) {
                             if (dur > 0 && dur == this.dur && actor.actions > 0) {
                                 sDur[this] = dur - 1

@@ -102,6 +102,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     open var job: Costume = job
         set(value) {
             this.switchCostume(field, value)
+            if (!this.shapeShift) {
+                this.sprite = value.sprite
+            }
             field = value
         }
 
@@ -444,7 +447,12 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
 
     fun applyStates(consume: Boolean): String {
         var s = ""
+        var oldSprite: String? = null
         if (!consume) {
+            if (this.shapeShift) {
+                oldSprite = this.job.sprite
+                this.sprite = oldSprite
+            }
             val automatic = this.automatic
             if (automatic < 2 && automatic > -2) {
                 this.automatic = 0
@@ -472,6 +480,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 }
             }
         }
+        if (oldSprite !== null && oldSprite == this.sprite) {
+            this.shapeShift = false
+        }
         s += checkStatus()
         if (c && consume) s += "."
         return s
@@ -483,6 +494,10 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             s += String.format(koTxt, this.name)
             this.actions = 0
             this.guards = false
+            if (this.shapeShift) {
+                this.shapeShift = false
+                this.sprite = this.job.sprite
+            }
             this.init = 0
             this.sp = 0
             val sDur = this.stateDur

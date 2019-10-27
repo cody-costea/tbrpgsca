@@ -62,6 +62,15 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
             field = value
         }
 
+    override var shapeShift: Boolean
+        get() = super.shapeShift
+        set(value) {
+            super.shapeShift = value
+            this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
+            this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
+
+        }
+
     internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
     private var sprites: Array<Array<AnimationDrawable?>> = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
 
