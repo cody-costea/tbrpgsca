@@ -106,7 +106,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2]), null, null)
         val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, arrayOf(skill[15]), null, null)
 
-        /*val characters = arrayOf<Actor>(
+        val characters = arrayOf<Actor>(
                 AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, mInit = 7, maxLv = maxlv),
                 AdActor(2, this, this.getString(R.string.name_george), null, race[0], lizardJob, mInit = 6, maxLv = maxlv),
                 AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, mInit = 7, maxLv = maxlv),
@@ -114,15 +114,6 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                 AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, level = 3, maxLv = 3, mInit = 7, mRes = mutableMapOf(2 to 7, 3 to 1)),
                 AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, mInit = 5, level = 3, maxLv = 3),
                 AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3, maxLv = 3, mInit = 8, states = arrayOf(state[0]))
-        )*/
-        val characters = arrayOf<Actor>(
-                AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, mInit = 0, maxLv = maxlv),
-                AdActor(2, this, this.getString(R.string.name_george), null, race[0], lizardJob, mInit = 0, maxLv = maxlv),
-                AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, mInit = 0, maxLv = maxlv),
-                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, level = 3, maxLv = 3, mInit = 0, states = arrayOf(state[10])),
-                AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, level = 3, maxLv = 3, mInit = 0, mRes = mutableMapOf(2 to 7, 3 to 1)),
-                AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, mInit = 0, level = 3, maxLv = 3),
-                AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3, maxLv = 3, mInit = 0, states = arrayOf(state[0]))
         )
         characters[3].items = (mutableMapOf(item[0] to 2, item[2] to 2)) as LinkedHashMap<Ability, Int>
         characters[4].items = (mutableMapOf(item[1] to 2, item[5] to 1)) as LinkedHashMap<Ability, Int>

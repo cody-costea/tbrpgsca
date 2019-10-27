@@ -21,15 +21,10 @@ interface Scene {
 
     companion object {
         var surprisedTxt = "Surprised"
-
         var performsTxt = "%s performs %s"
-
         var victoryTxt = "The party has won!"
-
         var fallenTxt = "The party has fallen!"
-
         var escapeTxt = "The party has escaped!"
-
         var failTxt = "The party attempted to escape, but failed."
     }
 
@@ -37,32 +32,24 @@ interface Scene {
     var status: Int
     var current: Int
     var ordIndex: Int
+    var lastAbility: Ability?
     var players: Array<Actor>
-    var ordered: Array<Actor>?
     var crItems: MutableMap<Int, MutableList<Ability>?>?
+    var ordered: Array<Actor>?
     var fTarget: Int
     var lTarget: Int
-    val aiTurn: Boolean
-        get() {
-            return this.players[this.current].automatic != 0
-        }
+    var surprise: Int
+
     var onStop: SceneFun?
     var onStart: SceneFun?
     var onBeforeAct: SceneFun?
     var onAfterAct: SceneFun?
     var onNewTurn: SceneFun?
-    var lastAbility: Ability?
-    var surprise: Int
 
-    private fun sortPlayers(players: Array<Actor>) {
-        if (this.ordIndex > -1) {
-            val ordered = players.copyOf()
-            val crActor = players[this.current]
-            ordered.sortByDescending { it.agi }
-            this.ordIndex = ordered.indexOf(crActor)
-            this.ordered = ordered
+    val aiTurn: Boolean
+        get() {
+            return this.players[this.current].automatic != 0
         }
-    }
 
     fun setNextCurrent(): String {
         var ret = ""
@@ -70,11 +57,11 @@ interface Scene {
         val useInit: Boolean
         val players = this.players
         val ordered = this.ordered
+        var ordIndex = this.ordIndex
         var crActor: Actor = players[this.current]
-        val noReorder = (ordered === null)
         val oldActor = crActor
-        if (noReorder) {
-            useInit = this.ordIndex < -1
+        if (ordered === null) {
+            useInit = ordIndex < -1
             var minInit = 1
             do {
                 initInc = minInit
@@ -144,14 +131,13 @@ interface Scene {
         } else {
             useInit = false
             val pSize = players.size
-            var current = this.ordIndex
             this.ordIndex = -1
             do {
-                if (++current == pSize) {
-                    current = 0
+                if (++ordIndex == pSize) {
+                    ordIndex = 0
                 }
-                crActor = ordered!![current]
-                if (crActor.hp > 0) {
+                crActor = ordered[ordIndex]
+                if (crActor.hp > 0) { //TODO: analyze if ok
                     crActor.actions = crActor.mActions
                     if (crActor !== oldActor) {
                         crActor.applyStates(false)
@@ -167,7 +153,7 @@ interface Scene {
                             this.current = players.indexOf(crActor)
                         }
                     }
-                    this.ordIndex = current
+                    this.ordIndex = ordIndex
                     break
                 }
             } while (true)
@@ -544,11 +530,9 @@ interface Scene {
                 iInit = pSize
             } //TODO: also set actions to 0 for surprised actors
             if ((surprise < 0 && i < enIdx) || (surprise > 0 && i >= enIdx)) {
-                //iPlayer.init = 0
                 surprised!!.inflict(iPlayer, true, false)
-            } //else {
-                iPlayer.init = iInit
-            //}
+            }
+            iPlayer.init = iInit
             for (j in 0 until pSize) {
                 if (j == i) {
                     continue
@@ -578,10 +562,16 @@ interface Scene {
         if (useInit) {
             this.ordIndex = -2
         } else if (reorder) {
-            this.sortPlayers(players)
+            val ordered = players.copyOf()
+            ordered.sortByDescending { it.agi }
+            this.ordered = ordered
             this.ordIndex = pSize - 1
-            val onReorder: ActorFun = { this.sortPlayers(players) }
-            Actor.onTurnReorder = onReorder
+            Actor.onTurnReorder = {
+                if (this.ordIndex > -1) {
+                    ordered.sortByDescending { it.agi }
+                    this.ordIndex = ordered.indexOf(players[this.current])
+                }
+            }
         }
         val ret = this.setNextCurrent()
         val onStart = this.onStart
