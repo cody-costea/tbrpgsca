@@ -54,18 +54,18 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
               skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
     : Actor(id, name, race, job, level, maxLv, mActions, mInit, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
 
-    override var job: Costume = job
+    /*override var job: Costume = job
         set(value) {
             super.job = value
             this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
             this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
             field = value
-        }
+        }*/
 
-    override var shapeShift: Boolean
-        get() = super.shapeShift
+    override var sprite: String?
+        get() = super.sprite
         set(value) {
-            super.shapeShift = value
+            super.sprite = value
             this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
             this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
 
@@ -78,8 +78,7 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
         var sprAnim = this.sprites[side][spr]
         if (sprAnim === null) {
             val job = this.job
-            var sprName = ("spr_bt_" + ((job as? AdCostume)?.sprite?.toLowerCase(Locale.US)
-                    ?: job.name.toLowerCase(Locale.US)) + if (side == 0) "_l_" else "_r_")
+            var sprName = ("spr_bt_" + this.sprite?.toLowerCase(Locale.US) + if (side == 0) "_l_" else "_r_")
             sprName += when (spr) {
                 0 -> "idle"
                 1 -> "ko"
