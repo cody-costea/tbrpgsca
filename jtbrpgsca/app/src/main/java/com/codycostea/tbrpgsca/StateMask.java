@@ -298,11 +298,15 @@ public final class StateMask extends Costume {
                         if (this.isRefelcting()) {
                             actor.setReflecting(true);
                         }
-                        if (this.isAutomating() && actor.automatic < Interpreter.AUTO_ALLY) {
-                            actor.automatic = Interpreter.AUTO_ENRAGED;
-                        }
                         if (this.isConfusing()) {
-                            actor.automatic = actor.automatic < Interpreter.AUTO_ALLY ? Interpreter.AUTO_CONFUSED : Interpreter.AUTO_ENEMY;
+                            final int actorAuto = actor.automatic;
+                            if (actorAuto > Interpreter.AUTO_CONFUSED) {
+                                actor.automatic = actorAuto < Interpreter.AUTO_ALLY ? Interpreter.AUTO_CONFUSED : Interpreter.AUTO_ENEMY;
+                            }
+                        } else if (this.isAutomating()) {
+                            final int actorAuto = actor.automatic;
+                            if (actorAuto > Interpreter.AUTO_ENEMY && actorAuto < Interpreter.AUTO_ALLY)
+                                actor.automatic = Interpreter.AUTO_ENRAGED;
                         }
                     }
                 }
