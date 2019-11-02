@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
         const val FLAG_AUTOMATED: Int = 32
         const val FLAG_CONFUSED: Int = 64
         const val FLAG_REVIVES: Int = 128
+
         const val AUTO_NONE: Int = 0
         const val AUTO_CONFUSED: Int = -1
         const val AUTO_ENRAGED: Int = 1
@@ -77,6 +78,11 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             if (value != (flags and FLAG_GUARDS == FLAG_GUARDS)) {
                 this.flags = flags xor FLAG_GUARDS
             }
+        }
+
+    open val counters: Boolean
+        get() {
+            return this.counter !== null
         }
 
     open var revives: Boolean
@@ -149,6 +155,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     open var mExp: Int = level * 15
 
     open var init: Int = 0
+
     open var actions: Int = this.mActions
 
     open var automatic: Int
@@ -241,6 +248,8 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 this.ranged = null
             }
         }
+
+    internal var counter: Ability? = null
 
     internal var skillsQty: MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn: MutableMap<Ability, Int>? = null
@@ -482,6 +491,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             }
             this.reflect = false
             this.revives = false
+            this.counter = null
         }
         var c = false
         val sDur = this.stateDur
@@ -516,9 +526,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 this.shapeShift = false
                 this.sprite = this.job.sprite
             }
+            this.sp = 0
             this.init = 0
             this.actions = 0
-            this.sp = 0
             val sDur = this.stateDur
             if (sDur !== null) {
                 for (state in sDur.keys) {

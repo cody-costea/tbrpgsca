@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ interface Scene {
     companion object {
         var surprisedTxt = "Surprised"
         var performsTxt = "%s performs %s"
+        var countersTxt = ", %s counters"
         var victoryTxt = "The party has won!"
         var fallenTxt = "The party has fallen!"
         var escapeTxt = "The party has escaped!"
@@ -32,6 +33,7 @@ interface Scene {
     var status: Int
     var current: Int
     var ordIndex: Int
+
     var lastAbility: Ability?
     var players: Array<Actor>
     var crItems: MutableMap<Int, MutableList<Ability>?>?
@@ -357,6 +359,14 @@ interface Scene {
                 val iPlayer = players[i]
                 if ((skill.mHp < 0 && skill.restore) || iPlayer.hp > 0) {
                     ret += skill.execute(crActor, iPlayer, applyCosts)
+                    val counter = iPlayer.counter
+                    if (counter !== null) {
+                        val dmgType = counter.dmgType
+                        if ((skill.dmgType and dmgType) == dmgType) {
+                            ret += (String.format(countersTxt, iPlayer.name)
+                                    + counter.execute(iPlayer, crActor, false))
+                        }
+                    }
                     applyCosts = false
                 }
             }
@@ -518,7 +528,7 @@ interface Scene {
         var useInit = false
         this.enIdx = enIdx
         val surprised = if (surprise == 0) null else State(0, surprisedTxt, null, true, false,
-                false, false, false,2, 0, 0, 0, 0, 0, 0, 0, 0,
+                false, false, false, null,2, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0,false, null, null, null)
         for (i in 0 until pSize) {
             val iPlayer = players[i]

@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@ limitations under the License.
 package com.codycostea.tbrpgsca.library
 
 open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
-                 revive: Boolean, open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0, open val dmgMp: Int = 0,
-                 open val dmgSp: Int = 0, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
-                 mActions: Int, mInit: Int = 0, range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+                 revive: Boolean, open var counterSkill: Ability? = null, open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0,
+                 open val dmgMp: Int = 0, open val dmgSp: Int = 0, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int,
+                 mAgi: Int, mActions: Int, mInit: Int = 0, range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
                  open val rSkills: Array<Ability>? = null, rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, sprite, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rStates, mStRes) {
 
@@ -43,7 +43,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_INACTIVATE
             }
         }
-
     open var automate: Boolean
         get() {
             return (this.flags and FLAG_AUTOMATE) == FLAG_AUTOMATE
@@ -54,7 +53,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_AUTOMATE
             }
         }
-
     open var confuse: Boolean
         get() {
             return (this.flags and FLAG_CONFUSE) == FLAG_CONFUSE
@@ -65,7 +63,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_CONFUSE
             }
         }
-
     open var reflect: Boolean
         get() {
             return (this.flags and FLAG_REFLECT) == FLAG_REFLECT
@@ -76,7 +73,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_REFLECT
             }
         }
-
     open var revive: Boolean
         get() {
             return (this.flags and FLAG_REVIVE) == FLAG_REVIVE
@@ -174,6 +170,10 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                             actor.actions = 0
                             actor.guards = false
                         }
+                        val counterSkill = this.counterSkill
+                        if (counterSkill !== null) {
+                            actor.counter = counterSkill
+                        }
                         if (this.revive) {
                             actor.revives = true
                         }
@@ -204,7 +204,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         actor.updateStates(true, this.aStates)
         actor.updateSkills(true, this.aSkills)
         this.disableSkills(actor, true)
-        if (this.reflect) {
+        if (this.reflect) { //TODO: analyze if ok
             actor.applyStates(false)
         }
     }

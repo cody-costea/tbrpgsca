@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -202,6 +202,7 @@ class AdAbility(id: Int, name: String, private val sprId: Int, private val sndId
     private var _context: Context? = null
     private var _sndPlayer: MediaPlayer? = null
     private var _sprAnim: AnimationDrawable? = null
+
     var spriteDur: Int = 0
 
     fun getSprite(context: Context): AnimationDrawable? {
@@ -256,12 +257,11 @@ class AdAbility(id: Int, name: String, private val sprId: Int, private val sndId
 
 }
 
-class AdState(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
-              revive: Boolean, dur: Int = 3, sRes: Int = 0, dmgHp: Int, dmgMp: Int, dmgSp: Int, mHp: Int, mMp: Int, mSp: Int, mAtk: Int,
-              mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, range: Boolean, mRes: MutableMap<Int, Int>? = null,
-              skills: Array<Ability>? = null, rSkills: Array<Ability>? = null, rStates: Array<State>? = null,
-              mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
-    : State(id, name, sprite, inactivate, automate, confuse, reflect, revive, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef,
+class AdState(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean, revive: Boolean,
+              counterSkill: Ability? = null, dur: Int = 3, sRes: Int = 0, dmgHp: Int, dmgMp: Int, dmgSp: Int, mHp: Int, mMp: Int, mSp: Int, mAtk: Int,
+              mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+              rSkills: Array<Ability>? = null, rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
+    : State(id, name, sprite, inactivate, automate, confuse, reflect, revive, counterSkill, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef,
         mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rSkills, rStates, mStRes)
 
 val AnimationDrawable.fullDur: Int
@@ -660,7 +660,17 @@ class Arena : Fragment(), Scene {
                             trgAnim = 4
                             this.koActors = koActors - koBit
                         } else {
-                            trgAnim = 2
+                            val counter = htActor.counter
+                            trgAnim = if (counter === null) {
+                                2
+                            } else {
+                                val cntDmgType = counter.dmgType
+                                if (lastAbility !== null && (lastAbility.dmgType and cntDmgType) == cntDmgType) {
+                                    if ((cntDmgType and Ability.DmgTypeAtk) == Ability.DmgTypeAtk) 5 else 6
+                                } else {
+                                    2
+                                }
+                            }
                         }
                     } else {
                         if (koActors and koBit == koBit) continue

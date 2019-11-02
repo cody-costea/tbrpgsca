@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,29 +41,35 @@ class DemoAct : AppCompatActivity(), ArenaStager {
 
     private val states: Array<State>
         get() {
+            val confusion = AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, null,
+                    3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
+            val counter = AdAbility(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Ability.DmgTypeAtk, 1,
+                    5, 0, -1, 0, 1, -1, -1, false, false, null, arrayOf(confusion))
             return arrayOf(
-                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, 7, 0, -10, 0, 0,
-                            0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, 10, 0, 7, 0, 2,
-                            0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, 7, 0, 0, -7, 0,
-                            0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
-                    AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, 3, 0, 0, 7, 0,
-                            0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, 7, 0, 0, 0, -7,
-                            0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
-                    AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, 5, 0, 0, 0, 7,
-                            0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
-                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, 7, 0, 0, 0, 0,
-                            0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
-                    AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, 3, 2, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
-                    AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, 5, 1, 0, 0, 0,
-                            0, 0, 0, 0, -3, 0, 0, -5, 0, false, null, null, null),
-                    AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, false, 2, 0, 0, 0, 0,
-                            0, 0, 0, 0, -3, 0, 0, -4, 0, false, null, null, null),
-                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, -1, 0, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
+                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, null, 7, 0, -10,
+                            0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
+                    AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, null, 10, 0, 7,
+                            0, 2, 0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
+                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, null, 7, 0, 0,
+                            -7, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
+                    AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, null, 3, 0, 0,
+                            7, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
+                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, null, 7, 0, 0,
+                            0, -7, 0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
+                    AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, null, 5, 0, 0,
+                            0, 7, 0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
+                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, null, 7, 0, 0,
+                            0, 0, 0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
+                    confusion,
+                    AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, null, 5, 1, 0,
+                            0, 0, 0, 0, 0, 0, -3, 0, 0, -5, 0, false, null, null, null),
+                    AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, false, null, 2, 0, 0,
+                            0, 0, 0, 0, 0, 0, -3, 0, 0, -4, 0, false, null, null, null),
+                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, null, -1, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
+                    AdState(12, this.getString(R.string.skill_defend), null, false, false, false, false, false, counter, 1,
+                            0, 0, 0, 0, 0, 0, 0, -1, 3, 1, 1, -1, 0, false, null,
+                            null, null)
             )
         }
 
@@ -134,18 +140,19 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         val vigour = arrayOf<State>(state[4])
         val tregen = arrayOf<State>(state[0], state[2], state[4])
         val berserk = arrayOf<State>(state[6])
-        val stun = arrayOf<State>(state[9])
         val reflect = arrayOf<State>(state[10])
         val confusion = arrayOf<State>(state[7])
         val confclarity = arrayOf<State>(state[2], state[7], state[8])
         val conftregen = arrayOf<State>(state[0], state[2], state[4], state[7], state[8])
-        val sleep = arrayOf<State>(state[8])
         val tpoison = arrayOf<State>(state[1], state[3], state[5])
         val dizzystun = arrayOf<State>(state[3], state[9])
+        val defend = arrayOf<State>(state[11])
+        val sleep = arrayOf<State>(state[8])
+        val stun = arrayOf<State>(state[9])
 
         return arrayOf(
                 AdAbility(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Ability.DmgTypeAtk, 1, 10, 0, -3, 0, 1, -1, -1, false, false, null, confsleep),
-                AdAbility(2, this.getString(R.string.skill_defend), 0, 0, false, true, 0, 0, 0, 0, Ability.DmgTypeDef, 1, 0, -1, -2, -1, 0, -1, -1, false, false, null, null),
+                AdAbility(2, this.getString(R.string.skill_defend), 0, 0, false, true, 0, 0, 0, 0, Ability.DmgTypeDef, 1, 0, -1, -2, -1, 0, -1, -1, false, false, defend, null),
                 AdAbility(3, this.getString(R.string.skill_heal), 0, 0, false, true, 1, 0, 3, 0, Ability.DmgTypeSpi, 1, -25, 0, 0, 0, 6, -1, -1, false, false, null, null),
                 AdAbility(4, this.getString(R.string.skill_mediatate), 0, 0, false, true, 1, 0, 0, 0, Ability.DmgTypeSpi, 1, -1, -7, 10, -1, 6, -1, -1, false, false, null, dizziness),
                 AdAbility(5, this.getString(R.string.skill_cure), 0, 0, false, true, 3, 0, 7, 0, Ability.DmgTypeSpi, 1, -17, 0, 0, 0, 7, -1, -1, false, true, null, cure),
@@ -159,9 +166,9 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                 AdAbility(13, this.getString(R.string.skill_berserk), 0, 0, false, false, 4, 7, 0, 4, Ability.DmgTypeDef, 1, 0, 0, 0, -1, 0, -1, -1, false, false, berserk, weakness),
                 AdAbility(14, this.getString(R.string.skill_shock), 0, 0, false, false, 4, 4, 0, 7, Ability.DmgTypeAtk or Ability.DmgTypeDef, 1, 10, 5, -9, 0, 7, -1, -1, false, false, dizzystun, confclarity),
                 AdAbility(15, this.getString(R.string.skill_crush), 0, 0, false, false, 5, 7, 4, 0, Ability.DmgTypeAtk, 1, 25, 0, -11, 0, 1, -1, -1, false, false, stun, confsleep),
-                AdAbility(16, this.getString(R.string.skill_strike), 0, 0, false, true, 1, 0, 0, 0, Ability.DmgTypeAgi, 1, 13, 0, -3, 0, 1, 5, 3, false, false, null, confsleep),
+                AdAbility(16, this.getString(R.string.skill_strike), 0, 0, false, true, 1, 0, 0, 0, Ability.DmgTypeAgi or Ability.DmgTypeAtk, 1, 13, 0, -3, 0, 1, 5, 3, false, false, null, confsleep),
                 AdAbility(17, this.getString(R.string.skill_steal), 0, 0, true, true, 1, 0, 0, 0, Ability.DmgTypeDef, 1, 0, 0, 0, 0, 1, 5, 3, false, false, null, null),
-                AdAbility(18, this.getString(R.string.skill_dash), 0, 0, false, true, 3, 0, 0, 0, Ability.DmgTypeAgi, 1, 15, 0, -5, 0, 1, 3, 7, false, false, null, confsleep),
+                AdAbility(18, this.getString(R.string.skill_dash), 0, 0, false, true, 3, 0, 0, 0, Ability.DmgTypeAgi or Ability.DmgTypeAtk, 1, 15, 0, -5, 0, 1, 3, 7, false, false, null, confsleep),
                 AdAbility(19, this.getString(R.string.skill_poison), 0, 0, false, true, 3, 0, 0, 0, Ability.DmgTypeAgi, 2, 5, 0, 2, 0, 1, 3, 7, false, false, poison, regen),
                 AdAbility(20, this.getString(R.string.skill_mug), 0, 0, true, true, 4, 0, 0, 0, Ability.DmgTypeAgi or Ability.DmgTypeAtk, 2, 15, 0, -7, 0, 1, 1, 5, false, false, null, confsleep),
                 AdAbility(21, this.getString(R.string.skill_toxic_gas), 0, 0, false, true, 4, 0, 10, 0, Ability.DmgTypeAgi or Ability.DmgTypeWis, 3, 1, 1, 1, 1, 1, 3, 7, false, false, tpoison, tregen),
@@ -346,6 +353,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
             Scene.fallenTxt = this.getString(R.string.scene_defeat)
             Scene.escapeTxt = this.getString(R.string.scene_escape)
             Scene.surprisedTxt = this.getString(R.string.scene_surprised)
+            Scene.countersTxt = this.getString(R.string.scene_counters)
             Scene.performsTxt = this.getString(R.string.scene_performs)
             Scene.failTxt = this.getString(R.string.scene_fail)
             Actor.koTxt = this.getString(R.string.actor_ko)
