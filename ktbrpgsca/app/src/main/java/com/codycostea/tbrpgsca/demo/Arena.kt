@@ -48,19 +48,24 @@ class AdCostume(id: Int, name: String, sprite: String?, mHp: Int = 30, mMp: Int 
                 skills: Array<Ability>? = null, states: Array<State>? = null, stRes: MutableMap<State, Int>? = null, mInit: Int = 0)
     : Costume(id, name, sprite, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, mInit, range, res, skills, states, stRes)
 
-class AdActor(id: Int, private val context: Context, name: String, sprites: Array<Array<AnimationDrawable>>? = null, race: Costume,
-              job: AdCostume, level: Int = 1, maxLv: Int = 9, mActions: Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5,
-              mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5, mAgi: Int = 5, range: Boolean = false, mRes: MutableMap<Int, Int>? = null,
-              skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
+class AdActor(id: Int, private val context: Context, name: String, race: Costume, job: AdCostume, level: Int = 1, maxLv: Int = 9,
+              mActions: Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5, mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5,
+              mAgi: Int = 5, range: Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+              states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
     : Actor(id, name, race, job, level, maxLv, mActions, mInit, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
 
-    /*override var job: Costume = job
-        set(value) {
-            super.job = value
-            this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
-            this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
-            field = value
-        }*/
+    companion object {
+        const val FLAG_NEW_SPRITE: Int = -2147483648
+    }
+
+    val shapeShifted: Boolean
+        get() {
+            val flags = this.flags
+            return if ((flags and FLAG_NEW_SPRITE) == FLAG_NEW_SPRITE) {
+                this.flags = flags xor FLAG_NEW_SPRITE
+                true
+            } else false
+        }
 
     override var sprite: String?
         get() = super.sprite
@@ -68,7 +73,9 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
             super.sprite = value
             this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
             this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
-
+            if (this.shapeShift) {
+                this.flags = this.flags or FLAG_NEW_SPRITE
+            }
         }
 
     internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
@@ -77,7 +84,6 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
     fun getBtSprite(side: Int, spr: Int): AnimationDrawable? {
         var sprAnim = this.sprites[side][spr]
         if (sprAnim === null) {
-            val job = this.job
             var sprName = ("spr_bt_" + this.sprite?.toLowerCase(Locale.US) + if (side == 0) "_l_" else "_r_")
             sprName += when (spr) {
                 0 -> "idle"
@@ -251,12 +257,12 @@ class AdAbility(id: Int, name: String, private val sprId: Int, private val sndId
 }
 
 class AdState(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
-              dur: Int = 3, sRes: Int = 0, dmgHp: Int, dmgMp: Int, dmgSp: Int, mHp: Int, mMp: Int, mSp: Int, mAtk: Int,
+              revive: Boolean, dur: Int = 3, sRes: Int = 0, dmgHp: Int, dmgMp: Int, dmgSp: Int, mHp: Int, mMp: Int, mSp: Int, mAtk: Int,
               mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, range: Boolean, mRes: MutableMap<Int, Int>? = null,
               skills: Array<Ability>? = null, rSkills: Array<Ability>? = null, rStates: Array<State>? = null,
               mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
-    : State(id, name, sprite, inactivate, automate, confuse, reflect, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef, mSpi,
-        mWis, mAgi, mActions, mInit, range, mRes, skills, rSkills, rStates, mStRes)
+    : State(id, name, sprite, inactivate, automate, confuse, reflect, revive, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef,
+        mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rSkills, rStates, mStRes)
 
 val AnimationDrawable.fullDur: Int
     get() {
@@ -360,14 +366,11 @@ class Arena : Fragment(), Scene {
     private lateinit var targetSpn: Spinner
     private lateinit var actionsTxt: TextView
     private lateinit var infoTxt: TextView
-
     private lateinit var songPlayer: MediaPlayer
 
     private var koActors: Int = 0
-
     private var partySide = 0
     private var otherSide = 1
-
     private var automatic = false
     private var escapable = true
 
@@ -484,7 +487,7 @@ class Arena : Fragment(), Scene {
                                 -1 -> context.getString(R.string.self)
                                 else -> context.getString(R.string.all)
                             }),
-                            if (skill.range == true) context.getString(R.string.yes)
+                            if (skill.range) context.getString(R.string.yes)
                             else context.getString(R.string.no)))
             return view
         }
@@ -886,7 +889,14 @@ class Arena : Fragment(), Scene {
                 }
             }
         }
-        return super.setNextCurrent()
+        val ret = super.setNextCurrent()
+        val current = this.current
+        val crActor = this.players[current] as AdActor
+        if (crActor.shapeShifted && !crActor.shapeShift) {
+            this.imgActor[current].setBackgroundDrawable(
+                    crActor.getBtSprite(if (current < this.enIdx) this.partySide else this.otherSide, 0))
+        }
+        return ret
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -960,13 +970,13 @@ class Arena : Fragment(), Scene {
                             0, 0, 0, 0, 0, 0, false, false, null, null))
 
             party = arrayOf(
-                    AdActor(1, this.requireContext(), "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(1, this.requireContext(), "Cody", humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills2, null, null),
-                    AdActor(2, this.requireContext(), "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(2, this.requireContext(), "Victoria", humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills2, null, null),
-                    AdActor(3, this.requireContext(), "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(3, this.requireContext(), "Stephanie", humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(4, this.requireContext(), "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(4, this.requireContext(), "George", humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
             val items: LinkedHashMap<Ability, Int> = LinkedHashMap()
@@ -977,13 +987,13 @@ class Arena : Fragment(), Scene {
             party[1]._items = items
 
             enemy = arrayOf(
-                    AdActor(8, this.requireContext(), "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(8, this.requireContext(), "Goblin", humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(7, this.requireContext(), "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(7, this.requireContext(), "Troll", humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(6, this.requireContext(), "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(6, this.requireContext(), "Lizard", humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(5, this.requireContext(), "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(5, this.requireContext(), "Ogre", humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
         }

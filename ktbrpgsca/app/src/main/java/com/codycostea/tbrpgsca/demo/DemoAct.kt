@@ -42,27 +42,27 @@ class DemoAct : AppCompatActivity(), ArenaStager {
     private val states: Array<State>
         get() {
             return arrayOf(
-                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, -1, 0, -10, 0, 0,
+                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, false, -1, 0, -10, 0, 0,
                             0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, 10, 0, 7, 0, 2,
+                    AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, 10, 0, 7, 0, 2,
                             0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, -1, 0, 0, -7, 0,
+                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, -1, 0, 0, -7, 0,
                             0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
-                    AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, 3, 0, 0, 7, 0,
+                    AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, 3, 0, 0, 7, 0,
                             0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, -1, 0, 0, 0, -7,
+                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, -1, 0, 0, 0, -7,
                             0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
-                    AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, 5, 0, 0, 0, 7,
+                    AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, 5, 0, 0, 0, 7,
                             0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
-                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, 7, 0, 0, 0, 0,
+                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, 7, 0, 0, 0, 0,
                             0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
-                    AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, 3, 2, 0, 0, 0,
+                    AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, 3, 2, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
-                    AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, 5, 1, 0, 0, 0,
+                    AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, 5, 1, 0, 0, 0,
                             0, 0, 0, 0, -3, 0, 0, -5, 0, false, null, null, null),
-                    AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, 2, 0, 0, 0, 0,
+                    AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, false, 2, 0, 0, 0, 0,
                             0, 0, 0, 0, -3, 0, 0, -4, 0, false, null, null, null),
-                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, 7, 0, 0, 0, 0,
+                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, 7, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
             )
         }
@@ -107,13 +107,13 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, arrayOf(skill[15]), null, null)
 
         val characters = arrayOf<Actor>(
-                AdActor(1, this, this.getString(R.string.name_cody), null, race[2], goblinJob, mInit = 7, maxLv = maxlv),
-                AdActor(2, this, this.getString(R.string.name_george), null, race[0], lizardJob, mInit = 6, maxLv = maxlv),
-                AdActor(3, this, this.getString(R.string.name_stephen), null, race[1], trollJob, mInit = 7, maxLv = maxlv),
-                AdActor(4, this, this.getString(R.string.race_ogre), null, race[2], ogreJob, level = 3, maxLv = 3, mInit = 10, states = arrayOf(state[10])),
-                AdActor(5, this, this.getString(R.string.race_lizard), null, race[0], lizardJob, level = 3, maxLv = 3, mInit = 7, mRes = mutableMapOf(2 to 7, 3 to 1)),
-                AdActor(6, this, this.getString(R.string.race_goblin), null, race[3], goblinJob, mInit = 5, level = 3, maxLv = 3),
-                AdActor(7, this, this.getString(R.string.race_troll), null, race[1], trollJob, level = 3, maxLv = 3, mInit = 8, states = arrayOf(state[0]))
+                AdActor(1, this, this.getString(R.string.name_cody), race[2], goblinJob, mInit = 7, maxLv = maxlv),
+                AdActor(2, this, this.getString(R.string.name_george), race[0], lizardJob, mInit = 6, maxLv = maxlv),
+                AdActor(3, this, this.getString(R.string.name_stephen), race[1], trollJob, mInit = 7, maxLv = maxlv),
+                AdActor(4, this, this.getString(R.string.race_ogre), race[2], ogreJob, level = 3, maxLv = 3, mInit = 10, states = arrayOf(state[10])),
+                AdActor(5, this, this.getString(R.string.race_lizard), race[0], lizardJob, level = 3, maxLv = 3, mInit = 7, mRes = mutableMapOf(2 to 7, 3 to 1)),
+                AdActor(6, this, this.getString(R.string.race_goblin), race[3], goblinJob, mInit = 5, level = 3, maxLv = 3),
+                AdActor(7, this, this.getString(R.string.race_troll), race[1], trollJob, level = 3, maxLv = 3, mInit = 8, states = arrayOf(state[0]))
         )
         characters[3].items = (mutableMapOf(item[0] to 2, item[2] to 2)) as LinkedHashMap<Ability, Int>
         characters[4].items = (mutableMapOf(item[1] to 2, item[5] to 1)) as LinkedHashMap<Ability, Int>

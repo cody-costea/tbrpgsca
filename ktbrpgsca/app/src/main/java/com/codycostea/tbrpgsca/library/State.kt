@@ -16,10 +16,10 @@ limitations under the License.
 package com.codycostea.tbrpgsca.library
 
 open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
-                 open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0, open val dmgMp: Int = 0, open val dmgSp: Int = 0,
-                 mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, mInit: Int = 0,
-                 range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, open val rSkills: Array<Ability>? = null,
-                 rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
+                 revive: Boolean, open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0, open val dmgMp: Int = 0,
+                 open val dmgSp: Int = 0, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int,
+                 mActions: Int, mInit: Int = 0, range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+                 open val rSkills: Array<Ability>? = null, rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, sprite, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rStates, mStRes) {
 
     companion object {
@@ -30,6 +30,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         const val FLAG_CONFUSE: Int = 4
         const val FLAG_INACTIVATE: Int = 8
         const val FLAG_REFLECT: Int = 16
+        const val FLAG_REVIVE: Int = 32
     }
 
     open var inactivate: Boolean
@@ -76,6 +77,17 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
             }
         }
 
+    open var revive: Boolean
+        get() {
+            return (this.flags and FLAG_REVIVE) == FLAG_REVIVE
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_REVIVE == FLAG_REVIVE)) {
+                this.flags = flags xor FLAG_REVIVE
+            }
+        }
+
     open fun inflict(actor: Actor, always: Boolean, indefinite: Boolean): String {
         val trgStRes = actor.stRes
         if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this]
@@ -101,7 +113,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
     private fun disableSkills(actor: Actor, remove: Boolean) {
         val rSkills = this.rSkills ?: return
         var iSkills = actor.skillsQty
-
         if (remove) {
             if (iSkills === null) {
                 return
@@ -163,6 +174,9 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                             actor.actions = 0
                             actor.guards = false
                         }
+                        if (this.revive) {
+                            actor.revives = true
+                        }
                         if (this.reflect) {
                             actor.reflect = true
                         }
@@ -217,6 +231,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         this.automate = automate
         this.confuse = confuse
         this.reflect = reflect
+        this.revive = revive
     }
 
 }
