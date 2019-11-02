@@ -518,7 +518,7 @@ interface Scene {
         var useInit = false
         this.enIdx = enIdx
         val surprised = if (surprise == 0) null else State(0, surprisedTxt, null, true, false,
-                false, false, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+                false, false, false,2, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0,false, null, null, null)
         for (i in 0 until pSize) {
             val iPlayer = players[i]

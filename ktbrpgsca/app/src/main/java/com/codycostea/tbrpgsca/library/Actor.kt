@@ -33,7 +33,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     companion object {
         @JvmStatic
         var koTxt = ", %s falls unconscious"
-        var riseTxt = ", but rises back"
+        var riseTxt = ", but rises again"
 
         @JvmStatic
         internal var onTurnReorder: ActorFun? = null

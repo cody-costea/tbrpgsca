@@ -42,15 +42,15 @@ class DemoAct : AppCompatActivity(), ArenaStager {
     private val states: Array<State>
         get() {
             return arrayOf(
-                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, false, -1, 0, -10, 0, 0,
+                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, 7, 0, -10, 0, 0,
                             0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
                     AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, 10, 0, 7, 0, 2,
                             0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, -1, 0, 0, -7, 0,
+                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, 7, 0, 0, -7, 0,
                             0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
                     AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, 3, 0, 0, 7, 0,
                             0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, -1, 0, 0, 0, -7,
+                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, 7, 0, 0, 0, -7,
                             0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
                     AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, 5, 0, 0, 0, 7,
                             0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
@@ -62,7 +62,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
                             0, 0, 0, 0, -3, 0, 0, -5, 0, false, null, null, null),
                     AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, false, 2, 0, 0, 0, 0,
                             0, 0, 0, 0, -3, 0, 0, -4, 0, false, null, null, null),
-                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, 7, 0, 0, 0, 0,
+                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, -1, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
             )
         }
@@ -119,7 +119,6 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         characters[4].items = (mutableMapOf(item[1] to 2, item[5] to 1)) as LinkedHashMap<Ability, Int>
         characters[5].items = (mutableMapOf(item[3] to 2, item[7] to 1)) as LinkedHashMap<Ability, Int>
         characters[6].items = (mutableMapOf(item[4] to 1, item[8] to 1)) as LinkedHashMap<Ability, Int>
-
         return characters
     }
 
@@ -350,6 +349,7 @@ class DemoAct : AppCompatActivity(), ArenaStager {
             Scene.performsTxt = this.getString(R.string.scene_performs)
             Scene.failTxt = this.getString(R.string.scene_fail)
             Actor.koTxt = this.getString(R.string.actor_ko)
+            Actor.riseTxt = this.getString(R.string.actor_rise)
             Ability.reflectedTxt = this.getString(R.string.ability_reflected)
             Ability.suffersTxt = this.getString(R.string.ability_suffers)
             Ability.stolenTxt = this.getString(R.string.ability_stolen)
