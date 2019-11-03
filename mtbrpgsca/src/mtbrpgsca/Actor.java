@@ -26,6 +26,7 @@ public final class Actor extends Costume {
   protected final static int FLAG_REFLECTS = 4;
   protected final static int FLAG_GUARDS = 8;
   protected final static int FLAG_SHAPE_SHIFT = 16;
+  protected final static int FLAG_REVIVES = 32;
   
   public final static int AUTO_NONE = 0;
   public final static int AUTO_CONFUSED = -1;
@@ -198,8 +199,7 @@ public final class Actor extends Costume {
     } else {
         int flags = this.flags;
         if ((flags & FLAG_ACTIVE) == FLAG_ACTIVE) {
-            flags -= FLAG_ACTIVE;
-            this.flags = flags;
+            this.flags = flags ^ FLAG_ACTIVE;
         }
     }
     return this;
@@ -215,8 +215,7 @@ public final class Actor extends Costume {
     } else {
         int flags = this.flags;
         if ((flags & FLAG_REFLECTS) == FLAG_REFLECTS) {
-            flags -= FLAG_REFLECTS;
-            this.flags = flags;
+            this.flags = flags ^ FLAG_REFLECTS;
         }
     }
     return this;
@@ -232,8 +231,7 @@ public final class Actor extends Costume {
     } else {
         int flags = this.flags;
         if ((flags & FLAG_GUARDS) == FLAG_GUARDS) {
-            flags -= FLAG_GUARDS;
-            this.flags = flags;
+            this.flags = flags ^ FLAG_GUARDS;
         }
     }
     return this;
@@ -249,11 +247,26 @@ public final class Actor extends Costume {
     } else {
       int flags = this.flags;
       if ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT) {
-        flags -= FLAG_SHAPE_SHIFT;
-        this.flags = flags;
+        this.flags = flags ^ FLAG_SHAPE_SHIFT;
       }
     }
     return this;
+  }
+
+  public boolean isReviving() {
+      return (this.flags & FLAG_REVIVES) == FLAG_REVIVES;
+  }
+
+  public Actor setReviving(final boolean value) {
+      if (value) {
+          this.flags |= FLAG_REVIVES;
+      } else {
+          int flags = this.flags;
+          if ((flags & FLAG_REVIVES) == FLAG_REVIVES) {
+              this.flags = flags ^ FLAG_REVIVES;
+          }
+      }
+      return this;
   }
   
   public int getAutoMode() {
@@ -445,9 +458,9 @@ public final class Actor extends Costume {
   public String checkStatus() {
     String s = "";
     if (this._hp < 1) {
+      final boolean revives = this.isReviving();
       s += ", " + this.name + " falls unconscious";
       this.setActive(false);
-      this.setGuarding(false);
       this._sp = 0;
       final Hashtable sDur = this.stateDur;
       if (sDur != null) {
@@ -455,6 +468,12 @@ public final class Actor extends Costume {
         while (sMasks.hasMoreElements()) {
           ((StateMask)sMasks.nextElement()).remove(this, false, false);
         }
+      }
+      if (revives) {
+        s += ", but rises again";
+        this._hp = this.mHp;
+      } else {
+        this.setGuarding(false);
       }
     }
     return s;
@@ -473,6 +492,7 @@ public final class Actor extends Costume {
         this.setGuarding(true);
       }
       this.setReflecting(false);
+      this.setReviving(false);
     }
     boolean c = false;
     final Hashtable sDur = this.stateDur;

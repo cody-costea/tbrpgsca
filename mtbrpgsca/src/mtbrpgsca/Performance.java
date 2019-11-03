@@ -152,8 +152,7 @@ public final class Performance extends RolePlay {
     } else {
         int flags = this.flags;
         if ((flags & FLAG_STEAL) == FLAG_STEAL) {
-            flags -= FLAG_STEAL;
-            this.flags = flags;
+            this.flags = flags ^ FLAG_STEAL;
         }
     }
       return this;
@@ -169,8 +168,7 @@ public final class Performance extends RolePlay {
     } else {
         int flags = this.flags;
         if ((flags & FLAG_ABSORB) == FLAG_ABSORB) {
-            flags -= FLAG_ABSORB;
-            this.flags = flags;
+            this.flags = flags ^ FLAG_ABSORB;
         }
     }
     return this;
@@ -186,8 +184,7 @@ public final class Performance extends RolePlay {
     } else {
         int flags = this.flags;
         if ((flags & FLAG_RESTORE) == FLAG_RESTORE) {
-            flags -= FLAG_RESTORE;
-            this.flags = flags;
+            this.flags = flags ^ FLAG_RESTORE;
         }
     }
     return this;
