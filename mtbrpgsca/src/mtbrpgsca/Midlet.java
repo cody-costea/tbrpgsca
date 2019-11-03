@@ -25,27 +25,27 @@ public final class Midlet extends MIDlet {
     public void startApp() {
         
         final StateMask[] state = new StateMask[] {
-            new StateMask(1, "Regen", null, false, false, false, false, -1, 0, -10, 0, 0,
+            new StateMask(1, "Regen", null, false, false, false, false, true, 7, 0, -10, 0, 0,
                 0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null, null, null),
-            new StateMask(2, "Poison", null, false, false, false, false, 10, 0, 7, 0, 2,
+            new StateMask(2, "Poison", null, false, false, false, false, false, 10, 0, 7, 0, 2,
                 0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null, null, null),
-            new StateMask(3, "Clarity", null, false, false, false, false, -1, 0, 0, -7, 0,
+            new StateMask(3, "Clarity", null, false, false, false, false, false, -1, 0, 0, -7, 0,
                 0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null, null, null),
-            new StateMask(4, "Dizziness", null, false, false, false, false, 3, 0, 0, 7, 0,
+            new StateMask(4, "Dizziness", null, false, false, false, false, false, 3, 0, 0, 7, 0,
                 0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null, null, null),
-            new StateMask(5, "Vigour", null, false, false, false, false, -1, 0, 0, 0, -7,
+            new StateMask(5, "Vigour", null, false, false, false, false, false, -1, 0, 0, 0, -7,
                 0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null, null, null),
-            new StateMask(6, "Weakness", null, false, false, false, false, 5, 0, 0, 0, 7,
+            new StateMask(6, "Weakness", null, false, false, false, false, false, 5, 0, 0, 0, 7,
                 0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null, null, null),
-            new StateMask(7, "Berserk", null, false, true, false, false, 7, 0, 0, 0, 0,
+            new StateMask(7, "Berserk", null, false, true, false, false, false, 7, 0, 0, 0, 0,
                 0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null, null, null),
-            new StateMask(8, "Confusion", null, false, false, true, false, 3, 2, 0, 0, 0,
+            new StateMask(8, "Confusion", null, false, false, true, false, false, 3, 2, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-            new StateMask(9, "Sleep", null, true, false, false, false, 5, 1, 0, 0, 0,
+            new StateMask(9, "Sleep", null, true, false, false, false, false, 5, 1, 0, 0, 0,
                 0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null, null, null),
-            new StateMask(10, "Stun", null, true, false, false, false, 1, 0, 0, 0, 0,
+            new StateMask(10, "Stun", null, true, false, false, false, false, 1, 0, 0, 0, 0,
                 0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null, null, null),
-            new StateMask(11, "Reflect", null, false, false, false, true, 7, 0, 0, 0, 0,
+            new StateMask(11, "Reflect", null, false, false, false, true, false, -1, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
         };
         
