@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:ftbrpgsca/StateMask.dart';
 
 abstract class RolePlay {
-
   static const int FLAG_RANGE = 1;
 
   static String hpText = "HP";
@@ -26,7 +25,8 @@ abstract class RolePlay {
 
   String name, sprite;
   int id, mHp, mMp, mSp, mInit;
-  @protected int flags = 0;
+  @protected
+  int flags = 0;
   List<StateMask> aStates;
 
   bool get range {
@@ -36,13 +36,20 @@ abstract class RolePlay {
   set range(final bool range) {
     int flags = this.flags;
     if (range != ((flags & FLAG_RANGE) == FLAG_RANGE)) {
-      flags ^= FLAG_RANGE;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_RANGE;
     }
   }
 
-  RolePlay(final int id, final String name, final String sprite, final int hp, final int mp,
-      final int sp, final int mInit, final bool range, final List<StateMask> states) {
+  RolePlay(
+      final int id,
+      final String name,
+      final String sprite,
+      final int hp,
+      final int mp,
+      final int sp,
+      final int mInit,
+      final bool range,
+      final List<StateMask> states) {
     this.id = id;
     this.name = name;
     this.sprite = sprite;
@@ -88,5 +95,4 @@ abstract class RolePlay {
     }
     return s.toString();
   }
-
 }

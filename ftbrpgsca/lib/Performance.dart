@@ -20,7 +20,6 @@ import 'package:ftbrpgsca/StateMask.dart';
 import 'package:sprintf/sprintf.dart';
 
 class Performance extends RolePlay {
-
   static const int FLAG_STEAL = 2;
   static const int FLAG_ABSORB = 4;
   static const int FLAG_RESTORE = 8;
@@ -37,7 +36,15 @@ class Performance extends RolePlay {
   static String missesTxt = ", but misses";
 
   String sound;
-  int lvRq, hpC, mpC, spC, mQty, rQty, dmgType, trg, elm; //dmgType could be used as a bitwise int, including element types;
+  int lvRq,
+      hpC,
+      mpC,
+      spC,
+      mQty,
+      rQty,
+      dmgType,
+      trg,
+      elm; //dmgType could be used as a bitwise int, including element types;
   List<StateMask> rStates;
 
   bool get steal {
@@ -47,8 +54,7 @@ class Performance extends RolePlay {
   set steal(final bool steal) {
     int flags = this.flags;
     if (steal != ((flags & FLAG_STEAL) == FLAG_STEAL)) {
-      flags ^= FLAG_STEAL;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_STEAL;
     }
   }
 
@@ -59,8 +65,7 @@ class Performance extends RolePlay {
   set absorb(final bool absorb) {
     int flags = this.flags;
     if (absorb != ((flags & FLAG_ABSORB) == FLAG_ABSORB)) {
-      flags ^= FLAG_ABSORB;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_ABSORB;
     }
   }
 
@@ -71,8 +76,7 @@ class Performance extends RolePlay {
   set restore(final bool restore) {
     int flags = this.flags;
     if (restore != ((flags & FLAG_RESTORE) == FLAG_RESTORE)) {
-      flags ^= FLAG_RESTORE;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_RESTORE;
     }
   }
 
@@ -121,10 +125,14 @@ class Performance extends RolePlay {
       i++;
     }
     dmg = i == 0 ? 0 : (this.mInit + (dmg / i)) ~/ (def ~/ i * res + 1);
-    if (canMiss == 0 || ((rnd.nextInt(13) + user.agi ~/ canMiss)) > 2 + target.agi ~/ 4) {
-      int hpDmg = this.mHp == 0 ? 0 : ((this.mHp < 0 ? -1 : 1) * dmg + this.mHp);
-      int mpDmg = this.mMp == 0 ? 0 : ((this.mMp < 0 ? -1 : 1) * dmg + this.mMp);
-      int spDmg = this.mSp == 0 ? 0 : ((this.mSp < 0 ? -1 : 1) * dmg + this.mSp);
+    if (canMiss == 0 ||
+        ((rnd.nextInt(13) + user.agi ~/ canMiss)) > 2 + target.agi ~/ 4) {
+      int hpDmg =
+          this.mHp == 0 ? 0 : ((this.mHp < 0 ? -1 : 1) * dmg + this.mHp);
+      int mpDmg =
+          this.mMp == 0 ? 0 : ((this.mMp < 0 ? -1 : 1) * dmg + this.mMp);
+      int spDmg =
+          this.mSp == 0 ? 0 : ((this.mSp < 0 ? -1 : 1) * dmg + this.mSp);
       if (res < 0) {
         hpDmg = -hpDmg;
         mpDmg = -mpDmg;
@@ -139,7 +147,8 @@ class Performance extends RolePlay {
         user.sp += spDmg ~/ 2;
       }
       if (hpDmg != 0 || mpDmg != 0 || spDmg != 0) {
-        s += sprintf(Performance.suffersTxt, [target.name]) + RolePlay.getDmgText(hpDmg, mpDmg, spDmg);
+        s += sprintf(Performance.suffersTxt, [target.name]) +
+            RolePlay.getDmgText(hpDmg, mpDmg, spDmg);
       }
       String r;
       final List<StateMask> aStates = this.aStates;
@@ -166,10 +175,14 @@ class Performance extends RolePlay {
         }
       }
       final Map<Performance, int> trgItemMap = target.items;
-      if (this.steal && trgItemMap != null && trgItemMap != user.items && trgItemMap.length > 0
-          && (rnd.nextInt(12) + user.agi ~/ 4) > 4 + target.agi ~/ 3) {
+      if (this.steal &&
+          trgItemMap != null &&
+          trgItemMap != user.items &&
+          trgItemMap.length > 0 &&
+          (rnd.nextInt(12) + user.agi ~/ 4) > 4 + target.agi ~/ 3) {
         //final List<Performance> trgItems = trgItemMap.keys.toList();
-        final Performance stolen = trgItemMap.keys.toList()[rnd.nextInt(trgItemMap.length - 1)];
+        final Performance stolen =
+            trgItemMap.keys.toList()[rnd.nextInt(trgItemMap.length - 1)];
         int trgItemQty = trgItemMap[stolen];
         if (trgItemQty != null && trgItemQty > 0) {
           Map<Performance, int> usrItems = user.items;
@@ -187,8 +200,7 @@ class Performance extends RolePlay {
         }
       }
       s += target.checkStatus();
-    }
-    else {
+    } else {
       s += Performance.missesTxt;
     }
     if (applyCosts) {
@@ -223,15 +235,37 @@ class Performance extends RolePlay {
 
   bool canPerform(final Actor actor) {
     final skillsQty = actor.skillsQty;
-    return this.mpC <= actor.mp && this.hpC < actor.hp && this.spC <= actor.sp && actor.level >= this.lvRq
-        && (skillsQty == null || (skillsQty[this] ?? 1) > 0);
+    return this.mpC <= actor.mp &&
+        this.hpC < actor.hp &&
+        this.spC <= actor.sp &&
+        actor.level >= this.lvRq &&
+        (skillsQty == null || (skillsQty[this] ?? 1) > 0);
   }
 
-  Performance(final int id, final String name, final String sprite, final String sound, final bool steal,
-              final bool range, final int lvRq, final int hpC, final int mpC, final int spC, final int dmgType,
-              final int atkI, final int hpDmg, final int mpDmg, final int spDmg, final int trg, final int elm,
-              final int mQty, final int rQty, final bool absorb, final bool restoreKO, final List<StateMask> aStates,
-              final List<StateMask> rStates)
+  Performance(
+      final int id,
+      final String name,
+      final String sprite,
+      final String sound,
+      final bool steal,
+      final bool range,
+      final int lvRq,
+      final int hpC,
+      final int mpC,
+      final int spC,
+      final int dmgType,
+      final int atkI,
+      final int hpDmg,
+      final int mpDmg,
+      final int spDmg,
+      final int trg,
+      final int elm,
+      final int mQty,
+      final int rQty,
+      final bool absorb,
+      final bool restoreKO,
+      final List<StateMask> aStates,
+      final List<StateMask> rStates)
       : super(id, name, sprite, hpDmg, mpDmg, spDmg, atkI, range, aStates) {
     this.sound = sound;
     this.steal = steal;
@@ -248,5 +282,4 @@ class Performance extends RolePlay {
     this.restore = restoreKO;
     this.rStates = rStates;
   }
-
 }

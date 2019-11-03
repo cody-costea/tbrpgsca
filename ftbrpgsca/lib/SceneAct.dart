@@ -21,7 +21,6 @@ import 'package:sprintf/sprintf.dart';
 typedef bool SceneFun(final SceneAct sceneAct, final String ret);
 
 class SceneAct {
-
   static String performsTxt = "%s performs %s";
   static String victoryTxt = "The party has won!";
   static String fallenTxt = "The party has fallen!";
@@ -31,54 +30,64 @@ class SceneAct {
   SceneFun onStart, onStop, onBeforeAct, onAfterAct, onNewTurn;
 
   int _surprise;
+
   int get surprise {
     return this._surprise;
   }
 
   int _status = 0;
+
   int get status {
     return this._status;
   }
 
   int _current;
+
   int get current {
     return this._current;
   }
 
   int _fTarget;
+
   int get firstTarget {
     return this._fTarget;
   }
 
   int _lTarget;
+
   int get lastTarget {
     return this._lTarget;
   }
 
   int _enIdx;
+
   int get enemyIndex {
     return this._enIdx;
   }
 
   Performance _lastAbility;
+
   Performance get lastAbility {
     return this._lastAbility;
   }
 
   List<Actor> _players;
+
   List<Actor> get players {
     return this._players;
   }
 
   bool _useInit;
+
   bool get useInit {
     return this._useInit;
   }
 
   Map<int, List<Performance>> _crItems;
+
   Map<int, List<Performance>> get crItems {
     return this._crItems;
-}
+  }
 
   String setNext(String ret, final bool endTurn) {
     if (this._status == 0) {
@@ -114,9 +123,8 @@ class SceneAct {
             if (useInit) {
               nxActor.init += initInc;
               int nInit = nxActor.init;
-              final int mInit = nxActor.mInit < 1
-                  ? this._players.length
-                  : nxActor.mInit;
+              final int mInit =
+                  nxActor.mInit < 1 ? this._players.length : nxActor.mInit;
               if (nInit > mInit) {
                 nInit -= mInit;
                 if (initInc == 1) {
@@ -124,8 +132,11 @@ class SceneAct {
                 }
                 if (nxActor != crActor) {
                   final int cInit = crActor.init -
-                      (crActor.mInit < 1 ? this._players.length : crActor.mInit);
-                  if (cInit < nInit || (cInit == nInit && nxActor.agi > crActor.agi)) {
+                      (crActor.mInit < 1
+                          ? this._players.length
+                          : crActor.mInit);
+                  if (cInit < nInit ||
+                      (cInit == nInit && nxActor.agi > crActor.agi)) {
                     nxActor.active = true;
                     nxActor.applyStates(false);
                     if (nxActor.active) {
@@ -148,7 +159,9 @@ class SceneAct {
               if (minInit != 1) {
                 nxActor.active = true;
               }
-              if (crActor != nxActor && nxActor.active && (!crActor.active || nxActor.agi > crActor.agi)) {
+              if (crActor != nxActor &&
+                  nxActor.active &&
+                  (!crActor.active || nxActor.agi > crActor.agi)) {
                 nxActor.applyStates(false);
                 if (nxActor.active) {
                   if (initInc > 0) {
@@ -171,13 +184,15 @@ class SceneAct {
           ret = SceneAct.fallenTxt + ret;
           final SceneFun onStop = this.onStop;
           return onStop == null || onStop(this, ret)
-              ? ret : this.setNext(ret, endTurn);
+              ? ret
+              : this.setNext(ret, endTurn);
         } else if (noEnemy) {
           this._status = 1;
           ret = SceneAct.victoryTxt + ret;
           final SceneFun onStop = this.onStop;
           return onStop == null || onStop(this, ret)
-              ? ret : this.setNext(ret, endTurn);
+              ? ret
+              : this.setNext(ret, endTurn);
         } else if (minInit != 0 && !useInit) {
           minInit = 0;
         }
@@ -219,8 +234,10 @@ class SceneAct {
         }
       }
       final SceneFun onNewTurn = this.onNewTurn;
-      if (endTurn && onNewTurn != null && onNewTurn(this, ret)
-          && crActor.automatic != 0) {
+      if (endTurn &&
+          onNewTurn != null &&
+          onNewTurn(this, ret) &&
+          crActor.automatic != 0) {
         return this.executeAI("");
       }
     }
@@ -312,8 +329,8 @@ class SceneAct {
           this._fTarget = this._lTarget = fTarget = lTarget = current;
           break;
         default:
-          this._fTarget = this._lTarget = fTarget = lTarget =
-              this.getGuardian(target, skill);
+          this._fTarget = this._lTarget =
+              fTarget = lTarget = this.getGuardian(target, skill);
       }
       bool applyCosts = true;
       final Actor crActor = players[current];
@@ -422,10 +439,12 @@ class SceneAct {
   }
 
   String performSkill(final int index, final int target, final String ret) {
-    return this.executeAbility(this._players[this._current].availableSkills[index], target, ret);
+    return this.executeAbility(
+        this._players[this._current].availableSkills[index], target, ret);
   }
 
-  String useAbility(final Performance item, final int target, final String ret) {
+  String useAbility(
+      final Performance item, final int target, final String ret) {
     final Map<Performance, int> crItemsMap = this._players[this._current].items;
     if (crItemsMap != null) {
       final int itemQty = (crItemsMap[item] ?? 1) - 1;
@@ -486,9 +505,11 @@ class SceneAct {
     return SceneAct.failTxt;
   }
 
-  SceneAct(final List<Actor> party, final List<Actor> enemy, final int surprise, final SceneFun onStart, final SceneFun onNewTurn) {
+  SceneAct(final List<Actor> party, final List<Actor> enemy, final int surprise,
+      final SceneFun onStart, final SceneFun onNewTurn) {
     bool useInit = false;
-    final int enIdx = this._fTarget = this._lTarget = this._enIdx = party.length;
+    final int enIdx =
+        this._fTarget = this._lTarget = this._enIdx = party.length;
     final List<Actor> players = this._players = party + enemy;
     this._current = surprise < 0 ? enIdx : 0;
     for (int i = 0; i < players.length; i++) {
@@ -522,11 +543,11 @@ class SceneAct {
     this.onStart = onStart;
     final String ret = this.setNext("", false);
     if (onStart == null || onStart(this, ret)) {
-      if (onNewTurn != null && onNewTurn(this, ret)
-          && players[this._current].automatic != 0) {
+      if (onNewTurn != null &&
+          onNewTurn(this, ret) &&
+          players[this._current].automatic != 0) {
         this.executeAI("");
       }
     }
   }
-
 }

@@ -19,13 +19,14 @@ import 'package:ftbrpgsca/StateMask.dart';
 import 'package:sprintf/sprintf.dart';
 
 class Actor extends Costume {
-
   static const int FLAG_ACTIVE = 2;
   static const int FLAG_REFLECTS = 4;
   static const int FLAG_GUARDS = 8;
   static const int FLAG_SHAPE_SHIFT = 16;
+  static const int FLAG_REVIVES = 32;
 
   static String koTxt = ", %s falls unconscious";
+  static String riseTxt = ", but rises again";
 
   bool _ranged;
   Costume _race, _job;
@@ -41,8 +42,7 @@ class Actor extends Costume {
   set active(final bool active) {
     int flags = this.flags;
     if (active != ((flags & FLAG_ACTIVE) == FLAG_ACTIVE)) {
-      flags ^= FLAG_ACTIVE;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_ACTIVE;
     }
   }
 
@@ -53,8 +53,7 @@ class Actor extends Costume {
   set reflects(final bool reflects) {
     int flags = this.flags;
     if (reflects != ((flags & FLAG_REFLECTS) == FLAG_REFLECTS)) {
-      flags ^= FLAG_REFLECTS;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_REFLECTS;
     }
   }
 
@@ -65,8 +64,7 @@ class Actor extends Costume {
   set guards(final bool guards) {
     int flags = this.flags;
     if (guards != ((flags & FLAG_GUARDS) == FLAG_GUARDS)) {
-      flags ^= FLAG_GUARDS;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_GUARDS;
     }
   }
 
@@ -77,12 +75,23 @@ class Actor extends Costume {
   set shapeShift(final bool shapeShift) {
     int flags = this.flags;
     if (shapeShift != ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT)) {
-      flags ^= FLAG_SHAPE_SHIFT;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_SHAPE_SHIFT;
+    }
+  }
+
+  bool get revives {
+    return (this.flags & FLAG_REVIVES) == FLAG_REVIVES;
+  }
+
+  set revives(final bool revives) {
+    int flags = this.flags;
+    if (revives != ((flags & FLAG_REVIVES) == FLAG_REVIVES)) {
+      this.flags = flags ^ FLAG_REVIVES;
     }
   }
 
   final List<Performance> _skills = new List();
+
   List<Performance> get availableSkills {
     return this._skills;
   }
@@ -266,8 +275,7 @@ class Actor extends Costume {
       for (StateMask k in states) {
         k.remove(this, true, true);
       }
-    }
-    else {
+    } else {
       for (StateMask k in states) {
         k.inflict(this, true, true);
       }
@@ -311,8 +319,7 @@ class Actor extends Costume {
           }
         }
       }
-    }
-    else {
+    } else {
       for (Performance k in abilities) {
         this.availableSkills.add(k);
         if (k.mQty > 0) {
@@ -328,14 +335,14 @@ class Actor extends Costume {
     }
   }
 
-  void updateResistance(final bool remove, final Map<int, int> resMap, Map<StateMask, int> stResMap) {
+  void updateResistance(final bool remove, final Map<int, int> resMap,
+      Map<StateMask, int> stResMap) {
     if (resMap != null) {
       Map<int, int> r = this.res;
       if (r == null) {
         if (remove) {
           return;
-        }
-        else {
+        } else {
           r = new Map();
           this.res = r;
         }
@@ -371,9 +378,9 @@ class Actor extends Costume {
   String checkStatus() {
     String s = "";
     if (this._hp < 1) {
+      final bool revives = this.revives;
       s += sprintf(Actor.koTxt, [this.name]);
       this.active = false;
-      this.guards = false;
       if (this.shapeShift) {
         this.shapeShift = false;
         this.sprite = this._job.sprite;
@@ -385,6 +392,12 @@ class Actor extends Costume {
           state.remove(this, false, false);
         }
       }
+      if (revives) {
+        s += Actor.riseTxt;
+        this._hp = this.mHp;
+      } else {
+        this.guards = false;
+      }
     }
     return s;
   }
@@ -393,21 +406,21 @@ class Actor extends Costume {
     String s = "";
     String oldSprite;
     if (!consume) {
-			if (this.shapeShift) {
-				oldSprite = this._job.sprite;
-				this.sprite = oldSprite;
-			}
+      if (this.shapeShift) {
+        oldSprite = this._job.sprite;
+        this.sprite = oldSprite;
+      }
       final int automatic = this.automatic;
       if (automatic < 2 && automatic > -2) {
         this.automatic = 0;
-      }
-      else {
+      } else {
         this.automatic = 2;
       }
       if (this._hp > 0) {
         this.guards = true;
       }
       this.reflects = false;
+      this.revives = false;
     }
     bool c = false;
     final Map<StateMask, int> sDur = this.stateDur;
@@ -426,8 +439,8 @@ class Actor extends Costume {
       }
     }
     if (oldSprite != null && oldSprite == this.sprite) {
-			this.shapeShift = false;
-		}
+      this.shapeShift = false;
+    }
     s += this.checkStatus();
     if (c && consume) s += ".";
     return s;
@@ -515,11 +528,30 @@ class Actor extends Costume {
     return r;
   }
 
-  Actor(final int id, final String name, final Costume race, final Costume job, final int level, final int maxLv,
-        final int mInit, final int mHp, final int mMp, final int mSp, final int atk, final int def, final int spi,
-        final int wis, final int agi, final bool range, final Map<int, int> res, final List<Performance> skills,
-        final List<StateMask> states, final Map<StateMask, int> stRes, final Map<Performance, int> items)
-      : super(id, name, job.sprite, mHp, mMp, mSp, atk, def, spi, wis, agi, mInit, range, res, skills, states, stRes) {
+  Actor(
+      final int id,
+      final String name,
+      final Costume race,
+      final Costume job,
+      final int level,
+      final int maxLv,
+      final int mInit,
+      final int mHp,
+      final int mMp,
+      final int mSp,
+      final int atk,
+      final int def,
+      final int spi,
+      final int wis,
+      final int agi,
+      final bool range,
+      final Map<int, int> res,
+      final List<Performance> skills,
+      final List<StateMask> states,
+      final Map<StateMask, int> stRes,
+      final Map<Performance, int> items)
+      : super(id, name, job.sprite, mHp, mMp, mSp, atk, def, spi, wis, agi,
+            mInit, range, res, skills, states, stRes) {
     this._xp = 0;
     this._maxp = 15;
     this.active = true;
@@ -540,5 +572,4 @@ class Actor extends Costume {
     this.sp = this.mSp;
     this._items = items;
   }
-
 }
