@@ -18,15 +18,29 @@ import 'package:ftbrpgsca/RolePlay.dart';
 import 'package:ftbrpgsca/StateMask.dart';
 
 class Costume extends RolePlay {
-
   int atk, def, spi, wis, agi;
   List<Performance> aSkills;
   Map<StateMask, int> stRes;
   Map<int, int> res;
 
-  Costume(final int id, final String name, final String sprite, final int hp, final int mp, final int sp, final int atk,
-          final int def, final int spi, final int wis, final int agi, final int mInit, final bool range, final Map<int, int> res,
-          final List<Performance> skills, final List<StateMask> states, final Map<StateMask, int> stRes)
+  Costume(
+      final int id,
+      final String name,
+      final String sprite,
+      final int hp,
+      final int mp,
+      final int sp,
+      final int atk,
+      final int def,
+      final int spi,
+      final int wis,
+      final int agi,
+      final int mInit,
+      final bool range,
+      final Map<int, int> res,
+      final List<Performance> skills,
+      final List<StateMask> states,
+      final Map<StateMask, int> stRes)
       : super(id, name, sprite, hp, mp, sp, mInit, range, states) {
     this.atk = atk;
     this.def = def;
@@ -37,5 +51,4 @@ class Costume extends RolePlay {
     this.res = res;
     this.stRes = stRes;
   }
-
 }

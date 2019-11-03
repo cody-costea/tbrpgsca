@@ -22,11 +22,11 @@ import 'package:ftbrpgsca/RolePlay.dart';
 import 'package:sprintf/sprintf.dart';
 
 class StateMask extends Costume {
-
   static const int FLAG_AUTOMATE = 2;
   static const int FLAG_CONFUSE = 4;
   static const int FLAG_INACTIVATE = 8;
   static const int FLAG_REFLECT = 16;
+  static const int FLAG_REVIVE = 32;
 
   static String causesTxt = " %s causes %s";
 
@@ -40,8 +40,7 @@ class StateMask extends Costume {
   set automate(final bool automate) {
     int flags = this.flags;
     if (automate != ((flags & FLAG_AUTOMATE) == FLAG_AUTOMATE)) {
-      flags ^= FLAG_AUTOMATE;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_AUTOMATE;
     }
   }
 
@@ -52,8 +51,7 @@ class StateMask extends Costume {
   set confuse(final bool confuse) {
     int flags = this.flags;
     if (confuse != ((flags & FLAG_CONFUSE) == FLAG_CONFUSE)) {
-      flags ^= FLAG_CONFUSE;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_CONFUSE;
     }
   }
 
@@ -64,8 +62,7 @@ class StateMask extends Costume {
   set inactivate(final bool inactivate) {
     int flags = this.flags;
     if (inactivate != ((flags & FLAG_INACTIVATE) == FLAG_INACTIVATE)) {
-      flags ^= FLAG_INACTIVATE;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_INACTIVATE;
     }
   }
 
@@ -76,22 +73,37 @@ class StateMask extends Costume {
   set reflect(final bool reflect) {
     int flags = this.flags;
     if (reflect != ((flags & FLAG_REFLECT) == FLAG_REFLECT)) {
-      flags ^= FLAG_REFLECT;
-      this.flags = flags;
+      this.flags = flags ^ FLAG_REFLECT;
+    }
+  }
+
+  bool get revive {
+    return (this.flags & FLAG_REVIVE) == FLAG_REVIVE;
+  }
+
+  set revive(final bool revive) {
+    int flags = this.flags;
+    if (revive != ((flags & FLAG_REVIVE) == FLAG_REVIVE)) {
+      this.flags = flags ^ FLAG_REVIVE;
     }
   }
 
   String inflict(final Actor actor, final bool always, final bool indefinite) {
+    final int stateRes = this.sRes;
     final Map<StateMask, int> trgStRes = actor.stRes;
-    if (always || (new Random().nextInt(10) > (trgStRes == null ? 0 : (trgStRes[this] ?? 0) + this.sRes))) {
+    if (always ||
+        stateRes < 0 ||
+        (new Random().nextInt(10) >
+            (trgStRes == null ? 0 : (trgStRes[this] ?? 0) + stateRes))) {
       Map<StateMask, int> trgStates = actor.stateDur;
       if (trgStates == null) {
         trgStates = new Map();
         actor.stateDur = trgStates;
       }
+      final int stateDur = this.dur;
       final int crDur = (trgStates[this] ?? 0);
-      if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
-        trgStates[this] = indefinite ? -2 : this.dur;
+      if (crDur < stateDur || (crDur > -1 && stateDur < 0)) {
+        trgStates[this] = indefinite ? -2 : stateDur;
       }
       actor.updateAttributes(false, this);
       actor.updateResistance(false, this.res, this.stRes);
@@ -153,7 +165,8 @@ class StateMask extends Costume {
             actor.mp -= dmgMp;
             actor.sp -= dmgSp;
             if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0) {
-              s += sprintf(StateMask.causesTxt, [this.name, actor.name]) + RolePlay.getDmgText(dmgHp, dmgMp, dmgSp);
+              s += sprintf(StateMask.causesTxt, [this.name, actor.name]) +
+                  RolePlay.getDmgText(dmgHp, dmgMp, dmgSp);
             }
             if (dur > 0) {
               sDur[this] = dur - 1;
@@ -173,6 +186,9 @@ class StateMask extends Costume {
             }
             if (this.reflect) {
               actor.reflects = true;
+            }
+            if (this.revive) {
+              actor.revives = true;
             }
             if (this.confuse) {
               final int actorAuto = actor.automatic;
@@ -220,16 +236,42 @@ class StateMask extends Costume {
     }
   }
 
-  StateMask(final int id, final String name, final String sprite, final bool inactivate, final bool automate, final bool confuse,
-            final bool reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp, final int dmgSp, final int hp, final int mp,
-            final int sp, final int atk, final int def, final int spi, final int wis, final int agi, final int mInit, final bool range,
-            final Map<int, int> res, final List<Performance> aSkills, final List<Performance> rSkills, final List<StateMask> states,
-            final Map<StateMask, int> stRes)
-      : super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes) {
+  StateMask(
+      final int id,
+      final String name,
+      final String sprite,
+      final bool inactivate,
+      final bool automate,
+      final bool confuse,
+      final bool reflect,
+      final bool revive,
+      final int dur,
+      final int sRes,
+      final int dmgHp,
+      final int dmgMp,
+      final int dmgSp,
+      final int hp,
+      final int mp,
+      final int sp,
+      final int atk,
+      final int def,
+      final int spi,
+      final int wis,
+      final int agi,
+      final int mInit,
+      final bool range,
+      final Map<int, int> res,
+      final List<Performance> aSkills,
+      final List<Performance> rSkills,
+      final List<StateMask> states,
+      final Map<StateMask, int> stRes)
+      : super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit,
+            range, res, aSkills, states, stRes) {
     this.inactivate = inactivate;
     this.automate = automate;
     this.confuse = confuse;
     this.reflect = reflect;
+    this.revive = revive;
     this.dur = dur;
     this.sRes = sRes;
     this.dmgHp = dmgHp;
@@ -237,5 +279,4 @@ class StateMask extends Costume {
     this.dmgSp = dmgSp;
     this.rSkills = rSkills;
   }
-
 }
