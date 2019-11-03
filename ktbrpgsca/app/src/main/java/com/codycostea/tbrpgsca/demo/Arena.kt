@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,23 +43,34 @@ import com.codycostea.tbrpgsca.R
 import com.codycostea.tbrpgsca.library.*
 import org.mozilla.javascript.Scriptable
 
-class AdCostume(id: Int, name: String, sprite: String?, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, atk: Int = 7, def: Int = 7,
-                spi: Int = 7, wis: Int = 7, agi: Int = 7, mActions: Int = 1, range: Boolean = false, res: MutableMap<Int, Int>? = null,
-                skills: Array<Ability>? = null, states: Array<State>? = null, stRes: MutableMap<State, Int>? = null, mInit: Int = 0)
-    : Costume(id, name, sprite, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, mInit, range, res, skills, states, stRes)
-
-class AdActor(id: Int, private val context: Context, name: String, sprites: Array<Array<AnimationDrawable>>? = null, race: Costume,
-              job: AdCostume, level: Int = 1, maxLv: Int = 9, mActions: Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5,
-              mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5, mAgi: Int = 5, range: Boolean = false, mRes: MutableMap<Int, Int>? = null,
-              skills: Array<Ability>? = null, states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
+class AdActor(id: Int, private val context: Context, name: String, race: Costume, job: Costume, level: Int = 1, maxLv: Int = 9,
+              mActions: Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5, mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5,
+              mAgi: Int = 5, range: Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+              states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
     : Actor(id, name, race, job, level, maxLv, mActions, mInit, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, range, mRes, skills, states, mStRes) {
 
-    override var job: Costume = job
+    companion object {
+        const val FLAG_NEW_SPRITE: Int = -2147483648
+    }
+
+    val shapeShifted: Boolean
+        get() {
+            val flags = this.flags
+            return if ((flags and FLAG_NEW_SPRITE) == FLAG_NEW_SPRITE) {
+                this.flags = flags xor FLAG_NEW_SPRITE
+                true
+            } else false
+        }
+
+    override var sprite: String?
+        get() = super.sprite
         set(value) {
-            super.job = value
+            super.sprite = value
             this.sprites = arrayOf(arrayOfNulls(7), arrayOfNulls(7))
             this.spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
-            field = value
+            if (this.shapeShift) {
+                this.flags = this.flags or FLAG_NEW_SPRITE
+            }
         }
 
     internal var spritesDur = arrayOf(intArrayOf(0, 0, 0, 0, 0, 0, 0), intArrayOf(0, 0, 0, 0, 0, 0, 0))
@@ -68,9 +79,7 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
     fun getBtSprite(side: Int, spr: Int): AnimationDrawable? {
         var sprAnim = this.sprites[side][spr]
         if (sprAnim === null) {
-            val job = this.job
-            var sprName = ("spr_bt_" + ((job as? AdCostume)?.sprite?.toLowerCase(Locale.US)
-                    ?: job.name.toLowerCase(Locale.US)) + if (side == 0) "_l_" else "_r_")
+            var sprName = ("spr_bt_" + this.sprite?.toLowerCase(Locale.US) + if (side == 0) "_l_" else "_r_")
             sprName += when (spr) {
                 0 -> "idle"
                 1 -> "ko"
@@ -111,7 +120,7 @@ class AdActor(id: Int, private val context: Context, name: String, sprites: Arra
         val sprName: String
         sprName = if (spriteName === null) {
             val job = this.job
-            (job as? AdCostume)?.sprite?.toLowerCase(Locale.US) ?: job.name.toLowerCase(Locale.US)
+            (job as? Costume)?.sprite?.toLowerCase(Locale.US) ?: job.name.toLowerCase(Locale.US)
         } else {
             spriteName.toLowerCase(Locale.US)
         }
@@ -188,6 +197,7 @@ class AdAbility(id: Int, name: String, private val sprId: Int, private val sndId
     private var _context: Context? = null
     private var _sndPlayer: MediaPlayer? = null
     private var _sprAnim: AnimationDrawable? = null
+
     var spriteDur: Int = 0
 
     fun getSprite(context: Context): AnimationDrawable? {
@@ -241,14 +251,6 @@ class AdAbility(id: Int, name: String, private val sprId: Int, private val sndId
     }
 
 }
-
-class AdState(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
-              dur: Int = 3, sRes: Int = 0, dmgHp: Int, dmgMp: Int, dmgSp: Int, mHp: Int, mMp: Int, mSp: Int, mAtk: Int,
-              mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, range: Boolean, mRes: MutableMap<Int, Int>? = null,
-              skills: Array<Ability>? = null, rSkills: Array<Ability>? = null, rStates: Array<State>? = null,
-              mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
-    : State(id, name, sprite, inactivate, automate, confuse, reflect, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef, mSpi,
-        mWis, mAgi, mActions, mInit, range, mRes, skills, rSkills, rStates, mStRes)
 
 val AnimationDrawable.fullDur: Int
     get() {
@@ -309,6 +311,7 @@ class Arena : Fragment(), Scene {
     override var ordIndex: Int = 0
     override var ordered: Array<Actor>? = null
     override lateinit var players: Array<Actor>
+
     override var crItems: MutableMap<Int, MutableList<Ability>?>? = null
         get() {
             if (field === null) {
@@ -316,6 +319,7 @@ class Arena : Fragment(), Scene {
             }
             return field
         }
+
     override var lastAbility: Ability? = null
     override var onStop: SceneFun? = null
     override var onStart: SceneFun? = null
@@ -352,14 +356,11 @@ class Arena : Fragment(), Scene {
     private lateinit var targetSpn: Spinner
     private lateinit var actionsTxt: TextView
     private lateinit var infoTxt: TextView
-
     private lateinit var songPlayer: MediaPlayer
 
     private var koActors: Int = 0
-
     private var partySide = 0
     private var otherSide = 1
-
     private var automatic = false
     private var escapable = true
 
@@ -476,7 +477,7 @@ class Arena : Fragment(), Scene {
                                 -1 -> context.getString(R.string.self)
                                 else -> context.getString(R.string.all)
                             }),
-                            if (skill.range == true) context.getString(R.string.yes)
+                            if (skill.range) context.getString(R.string.yes)
                             else context.getString(R.string.no)))
             return view
         }
@@ -649,7 +650,17 @@ class Arena : Fragment(), Scene {
                             trgAnim = 4
                             this.koActors = koActors - koBit
                         } else {
-                            trgAnim = 2
+                            val counter = htActor.counter
+                            trgAnim = if (counter === null) {
+                                2
+                            } else {
+                                val cntDmgType = counter.dmgType
+                                if (lastAbility !== null && (lastAbility.dmgType and cntDmgType) == cntDmgType) {
+                                    if ((cntDmgType and Ability.DmgTypeAtk) == Ability.DmgTypeAtk) 5 else 6
+                                } else {
+                                    2
+                                }
+                            }
                         }
                     } else {
                         if (koActors and koBit == koBit) continue
@@ -878,7 +889,14 @@ class Arena : Fragment(), Scene {
                 }
             }
         }
-        return super.setNextCurrent()
+        val ret = super.setNextCurrent()
+        val current = this.current
+        val crActor = this.players[current] as AdActor
+        if (crActor.shapeShifted && !crActor.shapeShift) {
+            this.imgActor[current].setBackgroundDrawable(
+                    crActor.getBtSprite(if (current < this.enIdx) this.partySide else this.otherSide, 0))
+        }
+        return ret
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -912,27 +930,27 @@ class Arena : Fragment(), Scene {
             surprised = 0
             escapable = true
             val humanRace = Costume(1, "Human", null)
-            val heroJob = AdCostume(1, "Hero", "hero")
-            val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
-            val crusaderJob = AdCostume(1, "Crusader", "crusader")
-            val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
-            val ninjaJob = AdCostume(1, "Ninja", "ninja")
-            val dragoonJob = AdCostume(1, "Dragoon", "dragoon")
-            val hesychastJob = AdCostume(1, "Hesychast", "hesychast")
-            val shamanJob = AdCostume(1, "Shaman", "shaman")
-            val alchemistJob = AdCostume(1, "Alchemist", "alchemist")
-            val reaverJob = AdCostume(1, "Reaver", "reaver")
-            val rangerJob = AdCostume(1, "Ranger", "ranger")
-            val corsairJob = AdCostume(1, "Corsair", "corsair")
-            val druidJob = AdCostume(1, "Druid", "druid")
-            val knightJob = AdCostume(1, "Knight", "knight")
-            val spyJob = AdCostume(1, "Spy", "spy")
-            val wizardJob = AdCostume(1, "Wizard", "wizard")
-            val berserkerJob = AdCostume(1, "Berserker", "berserker")
-            val ogreJob = AdCostume(1, "Ogre", "ogre")
-            val lizardJob = AdCostume(1, "Lizard", "lizard")
-            val trollJob = AdCostume(1, "Troll", "troll")
-            val goblinJob = AdCostume(1, "Goblin", "goblin")
+            val heroJob = Costume(1, "Hero", "hero")
+            val valkyrieJob = Costume(1, "Valkyrie", "valkyrie")
+            val crusaderJob = Costume(1, "Crusader", "crusader")
+            val sorceressJob = Costume(1, "Sorceress", "sorceress")
+            val ninjaJob = Costume(1, "Ninja", "ninja")
+            val dragoonJob = Costume(1, "Dragoon", "dragoon")
+            val hesychastJob = Costume(1, "Hesychast", "hesychast")
+            val shamanJob = Costume(1, "Shaman", "shaman")
+            val alchemistJob = Costume(1, "Alchemist", "alchemist")
+            val reaverJob = Costume(1, "Reaver", "reaver")
+            val rangerJob = Costume(1, "Ranger", "ranger")
+            val corsairJob = Costume(1, "Corsair", "corsair")
+            val druidJob = Costume(1, "Druid", "druid")
+            val knightJob = Costume(1, "Knight", "knight")
+            val spyJob = Costume(1, "Spy", "spy")
+            val wizardJob = Costume(1, "Wizard", "wizard")
+            val berserkerJob = Costume(1, "Berserker", "berserker")
+            val ogreJob = Costume(1, "Ogre", "ogre")
+            val lizardJob = Costume(1, "Lizard", "lizard")
+            val trollJob = Costume(1, "Troll", "troll")
+            val goblinJob = Costume(1, "Goblin", "goblin")
 
             val skills: Array<Ability> = arrayOf(
                     AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,
@@ -952,13 +970,13 @@ class Arena : Fragment(), Scene {
                             0, 0, 0, 0, 0, 0, false, false, null, null))
 
             party = arrayOf(
-                    AdActor(1, this.requireContext(), "Cody", null, humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(1, this.requireContext(), "Cody", humanRace, knightJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills2, null, null),
-                    AdActor(2, this.requireContext(), "Victoria", null, humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(2, this.requireContext(), "Victoria", humanRace, valkyrieJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills2, null, null),
-                    AdActor(3, this.requireContext(), "Stephanie", null, humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(3, this.requireContext(), "Stephanie", humanRace, sorceressJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(4, this.requireContext(), "George", null, humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(4, this.requireContext(), "George", humanRace, hesychastJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
             val items: LinkedHashMap<Ability, Int> = LinkedHashMap()
@@ -969,13 +987,13 @@ class Arena : Fragment(), Scene {
             party[1]._items = items
 
             enemy = arrayOf(
-                    AdActor(8, this.requireContext(), "Goblin", null, humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(8, this.requireContext(), "Goblin", humanRace, goblinJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(7, this.requireContext(), "Troll", null, humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(7, this.requireContext(), "Troll", humanRace, trollJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(6, this.requireContext(), "Lizard", null, humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(6, this.requireContext(), "Lizard", humanRace, lizardJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null),
-                    AdActor(5, this.requireContext(), "Ogre", null, humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
+                    AdActor(5, this.requireContext(), "Ogre", humanRace, ogreJob, 1, 9, 1, 50, 25, 25, 7, 7,
                             7, 7, 7, false, null, skills, null, null)
             )
         }

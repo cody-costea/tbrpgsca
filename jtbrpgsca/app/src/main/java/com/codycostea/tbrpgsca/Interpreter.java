@@ -33,11 +33,13 @@ import java.util.Set;
 public final class Interpreter extends Costume {
 
 	public static String koTxt = ", %s falls unconscious";
+	public static String riseTxt = ", but rises again";
 
 	protected final static int FLAG_ACTIVE = 2;
 	protected final static int FLAG_REFLECTS = 4;
 	protected final static int FLAG_GUARDS = 8;
 	protected final static int FLAG_SHAPE_SHIFT = 16;
+	protected final static int FLAG_REVIVES = 32;
 
 	public final static int AUTO_NONE = 0;
 	public final static int AUTO_CONFUSED = -1;
@@ -345,8 +347,7 @@ public final class Interpreter extends Costume {
 		} else {
 			int flags = this.flags;
 			if ((flags & FLAG_ACTIVE) == FLAG_ACTIVE) {
-				flags -= FLAG_ACTIVE;
-				this.flags = flags;
+				this.flags = flags ^ FLAG_ACTIVE;
 			}
 		}
 		return this;
@@ -362,8 +363,7 @@ public final class Interpreter extends Costume {
 		} else {
 			int flags = this.flags;
 			if ((flags & FLAG_REFLECTS) == FLAG_REFLECTS) {
-				flags -= FLAG_REFLECTS;
-				this.flags = flags;
+				this.flags = flags ^ FLAG_REFLECTS;
 			}
 		}
 		return this;
@@ -379,8 +379,7 @@ public final class Interpreter extends Costume {
 		} else {
 			int flags = this.flags;
 			if ((flags & FLAG_GUARDS) == FLAG_GUARDS) {
-				flags -= FLAG_GUARDS;
-				this.flags = flags;
+				this.flags = flags ^ FLAG_GUARDS;
 			}
 		}
 		return this;
@@ -396,8 +395,23 @@ public final class Interpreter extends Costume {
 		} else {
 			int flags = this.flags;
 			if ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT) {
-				flags -= FLAG_SHAPE_SHIFT;
-				this.flags = flags;
+				this.flags = flags ^ FLAG_SHAPE_SHIFT;
+			}
+		}
+		return this;
+	}
+
+	public boolean isReviving() {
+		return (this.flags & FLAG_REVIVES) == FLAG_REVIVES;
+	}
+
+	public Interpreter setReviving(final boolean value) {
+		if (value) {
+			this.flags |= FLAG_REVIVES;
+		} else {
+			int flags = this.flags;
+			if ((flags & FLAG_REVIVES) == FLAG_REVIVES) {
+				this.flags = flags ^ FLAG_REVIVES;
 			}
 		}
 		return this;
@@ -588,16 +602,21 @@ public final class Interpreter extends Costume {
 	public String checkStatus() {
 		String s;
 		if (this._hp < 1) {
+			final boolean revives = this.isReviving();
 			s = String.format(Locale.US, Interpreter.koTxt, this.name);
 			this.setActive(false);
-			this.setGuarding(false);
 			this._sp = 0;
 			final HashMap<StateMask, Integer> sDur = this.stateDur;
 			if (sDur != null) {
-				//final Enumeration sMasks = sDur.keys();
 				for (StateMask state : sDur.keySet()) {
 					state.remove(this, false, false);
 				}
+			}
+			if (revives) {
+				s += Interpreter.riseTxt;
+				this._hp = this.mHp;
+			} else {
+				this.setGuarding(false);
 			}
 		} else {
 		    s = "";
@@ -624,13 +643,12 @@ public final class Interpreter extends Costume {
 				this.setGuarding(true);
 			}
 			this.setReflecting(false);
+			this.setReviving(false);
 		}
 		boolean c = false;
 		final HashMap<StateMask, Integer> sDur = this.stateDur;
 		if (sDur != null) {
-			//final Enumeration sMasks = sDur.keys();
 			for (StateMask state : sDur.keySet()) {
-				//final StateMask state = (StateMask)sMasks.nextElement();
 				if (((Integer)sDur.get(state)).intValue() > -3 && this._hp > 0) {
 					final String r = state.apply(this, consume);
 					if (r.length() > 0) {

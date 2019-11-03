@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@ limitations under the License.
 package com.codycostea.tbrpgsca.library
 
 open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean,
-                 open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0, open val dmgMp: Int = 0, open val dmgSp: Int = 0,
-                 mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, mInit: Int = 0,
-                 range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null, open val rSkills: Array<Ability>? = null,
-                 rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
+                 revive: Boolean, open var counterSkill: Ability? = null, open val dur: Int = 3, open val sRes: Int = 0, open val dmgHp: Int = 0,
+                 open val dmgMp: Int = 0, open val dmgSp: Int = 0, mHp: Int, mMp: Int, mSp: Int, mAtk: Int, mDef: Int, mSpi: Int, mWis: Int,
+                 mAgi: Int, mActions: Int, mInit: Int = 0, range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
+                 open val rSkills: Array<Ability>? = null, rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null)
     : Costume(id, name, sprite, mHp, mMp, mSp, mAtk, mDef, mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rStates, mStRes) {
 
     companion object {
@@ -30,6 +30,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         const val FLAG_CONFUSE: Int = 4
         const val FLAG_INACTIVATE: Int = 8
         const val FLAG_REFLECT: Int = 16
+        const val FLAG_REVIVE: Int = 32
     }
 
     open var inactivate: Boolean
@@ -42,7 +43,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_INACTIVATE
             }
         }
-
     open var automate: Boolean
         get() {
             return (this.flags and FLAG_AUTOMATE) == FLAG_AUTOMATE
@@ -53,7 +53,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_AUTOMATE
             }
         }
-
     open var confuse: Boolean
         get() {
             return (this.flags and FLAG_CONFUSE) == FLAG_CONFUSE
@@ -64,7 +63,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_CONFUSE
             }
         }
-
     open var reflect: Boolean
         get() {
             return (this.flags and FLAG_REFLECT) == FLAG_REFLECT
@@ -75,19 +73,31 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 this.flags = flags xor FLAG_REFLECT
             }
         }
+    open var revive: Boolean
+        get() {
+            return (this.flags and FLAG_REVIVE) == FLAG_REVIVE
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_REVIVE == FLAG_REVIVE)) {
+                this.flags = flags xor FLAG_REVIVE
+            }
+        }
 
     open fun inflict(actor: Actor, always: Boolean, indefinite: Boolean): String {
+        val stateRes = this.sRes
         val trgStRes = actor.stRes
-        if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this]
-                        ?: 0) + this.sRes) {
+        if (always || stateRes < 0 || (Math.random() * 10).toInt()
+                > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + stateRes) {
             var trgStates = actor.stateDur
             if (trgStates === null) {
                 trgStates = HashMap(1)
                 actor.stateDur = trgStates
             }
+            val stateDur = this.dur
             val crDur = (trgStates[this] ?: 0)
-            if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
-                trgStates[this] = if (indefinite) -2 else this.dur
+            if (crDur < stateDur || (crDur > -1 && stateDur < 0)) {
+                trgStates[this] = if (indefinite) -2 else stateDur
             }
             actor.updateAttributes(false, this)
             actor.updateResistance(false, this.res, this.stRes)
@@ -101,7 +111,6 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
     private fun disableSkills(actor: Actor, remove: Boolean) {
         val rSkills = this.rSkills ?: return
         var iSkills = actor.skillsQty
-
         if (remove) {
             if (iSkills === null) {
                 return
@@ -151,12 +160,24 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                             sDur[this] = dur - 1
                         }
                     } else {
+                        val sprite = this.sprite
+                        if (sprite !== null && sprite.isNotEmpty()) {
+                            actor.shapeShift = true
+                            actor.sprite = sprite
+                        }
                         if (this.inactivate) {
                             if (dur > 0 && dur == this.dur && actor.actions > 0) {
                                 sDur[this] = dur - 1
                             }
                             actor.actions = 0
                             actor.guards = false
+                        }
+                        val counterSkill = this.counterSkill
+                        if (counterSkill !== null) {
+                            actor.counter = counterSkill
+                        }
+                        if (this.revive) {
+                            actor.revives = true
                         }
                         if (this.reflect) {
                             actor.reflect = true
@@ -185,7 +206,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         actor.updateStates(true, this.aStates)
         actor.updateSkills(true, this.aSkills)
         this.disableSkills(actor, true)
-        if (this.reflect) {
+        if (this.reflect) { //TODO: analyze if ok
             actor.applyStates(false)
         }
     }
@@ -202,9 +223,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 sDur[this] = -3
             }
             true
-        } else {
-            false
-        }
+        } else false
     }
 
     init {
@@ -212,6 +231,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         this.automate = automate
         this.confuse = confuse
         this.reflect = reflect
+        this.revive = revive
     }
 
 }

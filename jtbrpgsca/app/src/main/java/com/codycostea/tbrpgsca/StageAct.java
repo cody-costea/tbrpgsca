@@ -41,6 +41,7 @@ public class StageAct extends Activity {
 
 	private EditText[] name = new EditText[3];
 	private Spinner[] jobBox = new Spinner[3], raceBox = new Spinner[3];
+
 	private int level = 0;
 
 	@Override
@@ -55,6 +56,7 @@ public class StageAct extends Activity {
 			ScenePlay.performsTxt = this.getString(R.string.scene_performs);
 			ScenePlay.failTxt = this.getString(R.string.scene_fail);
 			Interpreter.koTxt = this.getString(R.string.actor_ko);
+			Interpreter.riseTxt = this.getString(R.string.actor_rise);
 			Performance.reflectedTxt = this.getString(R.string.ability_reflected);
 			Performance.suffersTxt = this.getString(R.string.ability_suffers);
 			Performance.stolenTxt = this.getString(R.string.ability_stolen);
@@ -66,28 +68,28 @@ public class StageAct extends Activity {
 		}
 
 		final StateMask[] state = new StateMask[] {
-				new StateMask(1, this.getString(R.string.skill_regen), null, false, false, false, false, -1, 0, -10, 0, 0,
-						0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null, null, null),
-				new StateMask(2, this.getString(R.string.skill_poison), null, false, false, false, false, 10, 0, 7, 0, 2,
-						0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null, null, null),
-				new StateMask(3, this.getString(R.string.skill_clarity), null, false, false, false, false, -1, 0, 0, -7, 0,
-						0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null, null, null),
-				new StateMask(4, this.getString(R.string.state_dizziness), null, false, false, false, false, 3, 0, 0, 7, 0,
-						0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null, null, null),
-				new StateMask(5, this.getString(R.string.state_vigour), null, false, false, false, false, -1, 0, 0, 0, -7,
-						0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null, null, null),
-				new StateMask(6, this.getString(R.string.state_weakness), null, false, false, false, false, 5, 0, 0, 0, 7,
-						0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null, null, null),
-				new StateMask(7, this.getString(R.string.skill_berserk), null, false, true, false, false, 7, 0, 0, 0, 0,
-						0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null, null, null),
-				new StateMask(8, this.getString(R.string.skill_confusion), null, false, false, true, false, 3, 2, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
-				new StateMask(9, this.getString(R.string.skill_sleep), null, true, false, false, false, 5, 1, 0, 0, 0,
-						0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null, null, null),
-				new StateMask(10, this.getString(R.string.state_stun), null, true, false, false, false, 1, 0, 0, 0, 0,
-						0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null, null, null),
-				new StateMask(11, this.getString(R.string.skill_reflect), null, false, false, false, true, 7, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
+				new StateMask(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, 7, -1, -10, 0,
+						0, 0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null, null, null),
+				new StateMask(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, 10, 0, 7, 0,
+						2, 0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null, null, null),
+				new StateMask(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, -1, -1, 0, -7,
+						0, 0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null, null, null),
+				new StateMask(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, 3, 0, 0, 7,
+						0, 0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null, null, null),
+				new StateMask(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, -1, -1, 0, 0,
+						-7, 0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null, null, null),
+				new StateMask(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, 5, 0, 0, 0,
+						7, 0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null, null, null),
+				new StateMask(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, 7, -1, 0, 0,
+						0, 0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null, null, null),
+				new StateMask(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, 3, 2, 0, 0,
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null),
+				new StateMask(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, 5, 1, 0, 0,
+						0, 0, 0, 0, 0, -3, 0, 0, -3, 0, false, null, null, null, null, null),
+				new StateMask(10, this.getString(R.string.state_stun), null, true, false, false, false, false, 1, 0, 0, 0,
+						0, 0, 0, 0, 0, -1, 0, 0, -1, 0, false, null, null, null, null, null),
+				new StateMask(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, -1, -1, 0, 0,
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null, null, null)
 		};
 
 		final StateMask[] confsleep = new StateMask[] {state[7], state[8]};

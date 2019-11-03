@@ -121,8 +121,10 @@
     <string name="scene_defeat"/>
     <string name="scene_escape"/>
     <string name="scene_fail"/>
+    <string name="scene_counters"/>
     <string name="scene_performs"/>
     <string name="actor_ko"/>
+    <string name="actor_rise"/>
     <string name="ability_reflected"/>
     <string name="ability_suffers"/>
     <string name="ability_stolen"/>

@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2018-2019 Claudiu-Stefan Costea
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,9 +33,10 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     companion object {
         @JvmStatic
         var koTxt = ", %s falls unconscious"
+        var riseTxt = ", but rises again"
 
         @JvmStatic
-        var onTurnReorder: ActorFun? = null
+        internal var onTurnReorder: ActorFun? = null
 
         const val FLAG_GUARDS: Int = 2
         const val FLAG_REFLECTS: Int = 4
@@ -43,11 +44,18 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
         const val FLAG_AI_PLAYER: Int = 16
         const val FLAG_AUTOMATED: Int = 32
         const val FLAG_CONFUSED: Int = 64
+        const val FLAG_REVIVES: Int = 128
+
+        const val AUTO_NONE: Int = 0
+        const val AUTO_CONFUSED: Int = -1
+        const val AUTO_ENRAGED: Int = 1
+        const val AUTO_ENEMY: Int = -2
+        const val AUTO_ALLY: Int = 2
     }
 
     open val active: Boolean
         get() {
-            return this.actions == 0
+            return this.actions > 0
         }
 
     open var reflect: Boolean
@@ -69,6 +77,22 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
             val flags = this.flags
             if (value != (flags and FLAG_GUARDS == FLAG_GUARDS)) {
                 this.flags = flags xor FLAG_GUARDS
+            }
+        }
+
+    open val counters: Boolean
+        get() {
+            return this.counter !== null
+        }
+
+    open var revives: Boolean
+        get() {
+            return (this.flags and FLAG_REVIVES) == FLAG_REVIVES
+        }
+        set(value) {
+            val flags = this.flags
+            if (value != (flags and FLAG_REVIVES == FLAG_REVIVES)) {
+                this.flags = flags xor FLAG_REVIVES
             }
         }
 
@@ -102,6 +126,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     open var job: Costume = job
         set(value) {
             this.switchCostume(field, value)
+            if (!this.shapeShift) {
+                this.sprite = value.sprite
+            }
             field = value
         }
 
@@ -128,16 +155,17 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     open var mExp: Int = level * 15
 
     open var init: Int = 0
+
     open var actions: Int = this.mActions
 
     open var automatic: Int
         get() {
             val flags = this.flags
             return if ((flags and FLAG_AI_PLAYER) == FLAG_AI_PLAYER) {
-                if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) -2 else 2
+                if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) AUTO_ENEMY else AUTO_ALLY
             } else if ((flags and FLAG_AUTOMATED) == FLAG_AUTOMATED) {
-                if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) -1 else 1
-            } else 0
+                if ((flags and FLAG_CONFUSED) == FLAG_CONFUSED) AUTO_CONFUSED else AUTO_ENRAGED
+            } else AUTO_NONE
         }
         set(value) {
             var flags = this.flags
@@ -220,6 +248,8 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 this.ranged = null
             }
         }
+
+    internal var counter: Ability? = null
 
     internal var skillsQty: MutableMap<Ability, Int>? = null
     internal var skillsQtyRgTurn: MutableMap<Ability, Int>? = null
@@ -444,7 +474,12 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
 
     fun applyStates(consume: Boolean): String {
         var s = ""
+        var oldSprite: String? = null
         if (!consume) {
+            if (this.shapeShift) {
+                oldSprite = this.job.sprite
+                this.sprite = oldSprite
+            }
             val automatic = this.automatic
             if (automatic < 2 && automatic > -2) {
                 this.automatic = 0
@@ -455,6 +490,8 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 this.guards = true
             }
             this.reflect = false
+            this.revives = false
+            this.counter = null
         }
         var c = false
         val sDur = this.stateDur
@@ -472,6 +509,9 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 }
             }
         }
+        if (oldSprite !== null && oldSprite == this.sprite) {
+            this.shapeShift = false
+        }
         s += checkStatus()
         if (c && consume) s += "."
         return s
@@ -480,16 +520,26 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
     fun checkStatus(): String {
         var s = ""
         if (this.hp < 1) {
+            val revives = this.revives
             s += String.format(koTxt, this.name)
-            this.actions = 0
-            this.guards = false
-            this.init = 0
+            if (this.shapeShift) {
+                this.shapeShift = false
+                this.sprite = this.job.sprite
+            }
             this.sp = 0
+            this.init = 0
+            this.actions = 0
             val sDur = this.stateDur
             if (sDur !== null) {
                 for (state in sDur.keys) {
                     state.remove(this, false, false)
                 }
+            }
+            if (revives) {
+                s += riseTxt
+                this.hp = this.mHp
+            } else {
+                this.guards = false
             }
         }
         return s

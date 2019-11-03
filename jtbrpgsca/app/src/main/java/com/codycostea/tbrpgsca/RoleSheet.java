@@ -183,8 +183,7 @@ public abstract class RoleSheet implements Parcelable {
 		} else {
 			int flags = this.flags;
 			if ((flags & FLAG_RANGE) == FLAG_RANGE) {
-				flags -= FLAG_RANGE;
-				this.flags = flags;
+                this.flags = flags ^ FLAG_RANGE;
 			}
 		}
 		return this;
