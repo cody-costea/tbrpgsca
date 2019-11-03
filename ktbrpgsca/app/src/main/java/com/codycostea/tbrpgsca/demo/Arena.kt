@@ -43,12 +43,7 @@ import com.codycostea.tbrpgsca.R
 import com.codycostea.tbrpgsca.library.*
 import org.mozilla.javascript.Scriptable
 
-class AdCostume(id: Int, name: String, sprite: String?, mHp: Int = 30, mMp: Int = 10, mSp: Int = 10, atk: Int = 7, def: Int = 7,
-                spi: Int = 7, wis: Int = 7, agi: Int = 7, mActions: Int = 1, range: Boolean = false, res: MutableMap<Int, Int>? = null,
-                skills: Array<Ability>? = null, states: Array<State>? = null, stRes: MutableMap<State, Int>? = null, mInit: Int = 0)
-    : Costume(id, name, sprite, mHp, mMp, mSp, atk, def, spi, wis, agi, mActions, mInit, range, res, skills, states, stRes)
-
-class AdActor(id: Int, private val context: Context, name: String, race: Costume, job: AdCostume, level: Int = 1, maxLv: Int = 9,
+class AdActor(id: Int, private val context: Context, name: String, race: Costume, job: Costume, level: Int = 1, maxLv: Int = 9,
               mActions: Int = 1, mHp: Int = 15, mMp: Int = 7, mSp: Int = 7, mAtk: Int = 5, mDef: Int = 5, mSpi: Int = 5, mWis: Int = 5,
               mAgi: Int = 5, range: Boolean = false, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
               states: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
@@ -125,7 +120,7 @@ class AdActor(id: Int, private val context: Context, name: String, race: Costume
         val sprName: String
         sprName = if (spriteName === null) {
             val job = this.job
-            (job as? AdCostume)?.sprite?.toLowerCase(Locale.US) ?: job.name.toLowerCase(Locale.US)
+            (job as? Costume)?.sprite?.toLowerCase(Locale.US) ?: job.name.toLowerCase(Locale.US)
         } else {
             spriteName.toLowerCase(Locale.US)
         }
@@ -257,13 +252,6 @@ class AdAbility(id: Int, name: String, private val sprId: Int, private val sndId
 
 }
 
-class AdState(id: Int, name: String, sprite: String?, inactivate: Boolean, automate: Boolean, confuse: Boolean, reflect: Boolean, revive: Boolean,
-              counterSkill: Ability? = null, dur: Int = 3, sRes: Int = 0, dmgHp: Int, dmgMp: Int, dmgSp: Int, mHp: Int, mMp: Int, mSp: Int, mAtk: Int,
-              mDef: Int, mSpi: Int, mWis: Int, mAgi: Int, mActions: Int, range: Boolean, mRes: MutableMap<Int, Int>? = null, skills: Array<Ability>? = null,
-              rSkills: Array<Ability>? = null, rStates: Array<State>? = null, mStRes: MutableMap<State, Int>? = null, mInit: Int = 0)
-    : State(id, name, sprite, inactivate, automate, confuse, reflect, revive, counterSkill, dur, sRes, dmgHp, dmgMp, dmgSp, mHp, mMp, mSp, mAtk, mDef,
-        mSpi, mWis, mAgi, mActions, mInit, range, mRes, skills, rSkills, rStates, mStRes)
-
 val AnimationDrawable.fullDur: Int
     get() {
         var s = 0
@@ -323,6 +311,7 @@ class Arena : Fragment(), Scene {
     override var ordIndex: Int = 0
     override var ordered: Array<Actor>? = null
     override lateinit var players: Array<Actor>
+
     override var crItems: MutableMap<Int, MutableList<Ability>?>? = null
         get() {
             if (field === null) {
@@ -330,6 +319,7 @@ class Arena : Fragment(), Scene {
             }
             return field
         }
+
     override var lastAbility: Ability? = null
     override var onStop: SceneFun? = null
     override var onStart: SceneFun? = null
@@ -940,27 +930,27 @@ class Arena : Fragment(), Scene {
             surprised = 0
             escapable = true
             val humanRace = Costume(1, "Human", null)
-            val heroJob = AdCostume(1, "Hero", "hero")
-            val valkyrieJob = AdCostume(1, "Valkyrie", "valkyrie")
-            val crusaderJob = AdCostume(1, "Crusader", "crusader")
-            val sorceressJob = AdCostume(1, "Sorceress", "sorceress")
-            val ninjaJob = AdCostume(1, "Ninja", "ninja")
-            val dragoonJob = AdCostume(1, "Dragoon", "dragoon")
-            val hesychastJob = AdCostume(1, "Hesychast", "hesychast")
-            val shamanJob = AdCostume(1, "Shaman", "shaman")
-            val alchemistJob = AdCostume(1, "Alchemist", "alchemist")
-            val reaverJob = AdCostume(1, "Reaver", "reaver")
-            val rangerJob = AdCostume(1, "Ranger", "ranger")
-            val corsairJob = AdCostume(1, "Corsair", "corsair")
-            val druidJob = AdCostume(1, "Druid", "druid")
-            val knightJob = AdCostume(1, "Knight", "knight")
-            val spyJob = AdCostume(1, "Spy", "spy")
-            val wizardJob = AdCostume(1, "Wizard", "wizard")
-            val berserkerJob = AdCostume(1, "Berserker", "berserker")
-            val ogreJob = AdCostume(1, "Ogre", "ogre")
-            val lizardJob = AdCostume(1, "Lizard", "lizard")
-            val trollJob = AdCostume(1, "Troll", "troll")
-            val goblinJob = AdCostume(1, "Goblin", "goblin")
+            val heroJob = Costume(1, "Hero", "hero")
+            val valkyrieJob = Costume(1, "Valkyrie", "valkyrie")
+            val crusaderJob = Costume(1, "Crusader", "crusader")
+            val sorceressJob = Costume(1, "Sorceress", "sorceress")
+            val ninjaJob = Costume(1, "Ninja", "ninja")
+            val dragoonJob = Costume(1, "Dragoon", "dragoon")
+            val hesychastJob = Costume(1, "Hesychast", "hesychast")
+            val shamanJob = Costume(1, "Shaman", "shaman")
+            val alchemistJob = Costume(1, "Alchemist", "alchemist")
+            val reaverJob = Costume(1, "Reaver", "reaver")
+            val rangerJob = Costume(1, "Ranger", "ranger")
+            val corsairJob = Costume(1, "Corsair", "corsair")
+            val druidJob = Costume(1, "Druid", "druid")
+            val knightJob = Costume(1, "Knight", "knight")
+            val spyJob = Costume(1, "Spy", "spy")
+            val wizardJob = Costume(1, "Wizard", "wizard")
+            val berserkerJob = Costume(1, "Berserker", "berserker")
+            val ogreJob = Costume(1, "Ogre", "ogre")
+            val lizardJob = Costume(1, "Lizard", "lizard")
+            val trollJob = Costume(1, "Troll", "troll")
+            val goblinJob = Costume(1, "Goblin", "goblin")
 
             val skills: Array<Ability> = arrayOf(
                     AdAbility(1, "Attack", 0, 0, false, false, 1, 0, 0, 1, 10, 0, 0,

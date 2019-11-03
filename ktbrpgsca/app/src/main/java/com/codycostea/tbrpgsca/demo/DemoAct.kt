@@ -37,38 +37,39 @@ class DemoAct : AppCompatActivity(), ArenaStager {
     private lateinit var partyLayout: View
     private lateinit var party: Array<Actor>
     private lateinit var arena: Arena
+
     private var level = 0
 
     private val states: Array<State>
         get() {
-            val confusion = AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, null, 3, 2,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
+            val confusion = State(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, null, 3, 2,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
             val counter = AdAbility(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Ability.DmgTypeAtk, 1, 5, 0,
                     -1, 0, 1, -1, -1, false, false, null, arrayOf(confusion))
             return arrayOf(
-                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, null, 7, -1, -10,
-                            0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, null, 10, 0, 7,
-                            0, 2, 0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, null, 7, -1, 0,
-                            -7, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
-                    AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, null, 3, 0, 0,
-                            7, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, null, 7, -1, 0,
-                            0, -7, 0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
-                    AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, null, 5, 0, 0,
-                            0, 7, 0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
-                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, null, 7, -1, 0,
-                            0, 0, 0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
+                    State(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, null, 7, -1, -10,
+                            0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, false, null, null, null),
+                    State(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, null, 10, 0, 7,
+                            0, 2, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, false, null, null, null),
+                    State(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, null, 7, -1, 0,
+                            -7, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, false, null, null, null),
+                    State(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, null, 3, 0, 0,
+                            7, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, false, null, null, null),
+                    State(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, null, 7, -1, 0,
+                            0, -7, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, false, null, null, null),
+                    State(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, null, 5, 0, 0,
+                            0, 7, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, false, null, null, null),
+                    State(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, null, 7, -1, 0,
+                            0, 0, 0, 0, 0, 5, -3, 0, 0, 3, 0, 0, false, null, null, null),
                     confusion,
-                    AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, null, 5, 1, 0,
-                            0, 0, 0, 0, 0, 0, -3, 0, 0, -5, 0, false, null, null, null),
-                    AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, false, null, 2, 0, 0,
-                            0, 0, 0, 0, 0, 0, -3, 0, 0, -4, 0, false, null, null, null),
-                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, null, -1, -1, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
-                    AdState(12, this.getString(R.string.skill_defend), null, false, false, false, false, false, counter, 1, -1, 0, 0,
-                            0, 0, 0, 0, -1, 3, 1, 1, -1, 0, false, null, null, null)
+                    State(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, null, 5, 1, 0,
+                            0, 0, 0, 0, 0, 0, -3, 0, 0, -5, 0, 0, false, null, null, null),
+                    State(10, this.getString(R.string.state_stun), null, true, false, false, false, false, null, 2, 0, 0,
+                            0, 0, 0, 0, 0, 0, -3, 0, 0, -4, 0, 0, false, null, null, null),
+                    State(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, null, -1, -1, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
+                    State(12, this.getString(R.string.skill_defend), null, false, false, false, false, false, counter, 1, -1, 0, 0,
+                            0, 0, 0, 0, -1, 3, 1, 1, -1, 0, 0, false, null, null, null)
             )
         }
 
@@ -76,40 +77,40 @@ class DemoAct : AppCompatActivity(), ArenaStager {
         val skills: Array<Ability> = arrayOf(skill[0], skill[1])
 
         return arrayOf(
-                AdCostume(1, this.getString(R.string.race_elf), "", 40, 25, 10, 7, 5, 15, 12, 11, 0, false, mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1), skills, null, null),
-                AdCostume(2, this.getString(R.string.race_human), "", 47, 15, 13, 9, 11, 9, 11, 10, 0, false, mutableMapOf(6 to -1, 7 to 1), skills, null, null),
-                AdCostume(3, this.getString(R.string.race_halforc), "", 55, 7, 13, 17, 12, 5, 7, 9, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), skills, null, null),
-                AdCostume(4, this.getString(R.string.race_gnome), "", 40, 15, 20, 12, 8, 10, 5, 15, 0, false, mutableMapOf(6 to 1, 7 to -1), skills, null, null)
+                Costume(1, this.getString(R.string.race_elf), "", 40, 25, 10, 7, 5, 15, 12, 11, 0, 0, false, mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1), skills, null, null),
+                Costume(2, this.getString(R.string.race_human), "", 47, 15, 13, 9, 11, 9, 11, 10, 0, 0, false, mutableMapOf(6 to -1, 7 to 1), skills, null, null),
+                Costume(3, this.getString(R.string.race_halforc), "", 55, 7, 13, 17, 12, 5, 7, 9, 0, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), skills, null, null),
+                Costume(4, this.getString(R.string.race_gnome), "", 40, 15, 20, 12, 8, 10, 5, 15, 0, 0, false, mutableMapOf(6 to 1, 7 to -1), skills, null, null)
         )
     }
 
     private fun getJobs(skill: Array<Ability>): Array<Costume> {
         return arrayOf(
-                AdCostume(15, this.getString(R.string.job_hero), "hero", 1, 1, 1, 0, 0, 0, 0, 0, 0, false, null, arrayOf(skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[41], skill[42], skill[43], skill[44], skill[45], skill[30], skill[31], skill[32], skill[33], skill[34], skill[36], skill[51], skill[37], skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18]), null, null),
-                AdCostume(1, this.getString(R.string.job_berserker), "berserker", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]), null, null),
-                AdCostume(2, this.getString(R.string.job_wizard), "wizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1), arrayOf(skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]), null, null),
-                AdCostume(3, this.getString(R.string.job_hesychast), "hesychast", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]), null, null),
-                AdCostume(4, this.getString(R.string.job_spy), "spy", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, arrayOf(skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]), null, null),
-                AdCostume(5, this.getString(R.string.job_alchemist), "alchemist", 0, 1, 0, 0, 0, 1, 0, 1, 0, false, null, arrayOf(skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[15], skill[16], skill[17], skill[18], skill[20]), null, null),
-                AdCostume(6, this.getString(R.string.job_dragoon), "dragoon", 1, 0, 0, 1, 0, 1, 0, 0, 0, false, mutableMapOf(2 to 1, 3 to 1, 4 to 1, 5 to 1, 7 to -1), arrayOf(skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[41], skill[42], skill[43], skill[44], skill[50]), null, null),
-                AdCostume(7, this.getString(R.string.job_knight), "knight", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1, 6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[8], skill[9], skill[10], skill[11], skill[13]), null, null),
-                AdCostume(8, this.getString(R.string.job_ranger), "ranger", 0, 0, 1, 0, 0, 0, 1, 1, 0, false, mutableMapOf(6 to -2, 7 to 2), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18], skill[21]), null, null),
-                AdCostume(9, this.getString(R.string.job_shaman), "shaman", 0, 1, 0, 0, 0, 1, 1, 0, 0, false, mutableMapOf(6 to 7, 7 to -7), arrayOf(skill[52], skill[53], skill[54], skill[55], skill[23], skill[24], skill[29], skill[34], skill[49]), null, null),
-                AdCostume(10, this.getString(R.string.job_corsair), "corsair", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, arrayOf(skill[8], skill[9], skill[10], skill[11], skill[15], skill[16], skill[17], skill[18], skill[22]), null, null),
-                AdCostume(11, this.getString(R.string.job_reaver), "reaver", 1, 0, 0, 1, 0, 0, 0, 0, 0, false, mutableMapOf(6 to 7, 7 to -7), arrayOf(skill[8], skill[9], skill[11], skill[23], skill[24], skill[29], skill[15], skill[16], skill[18], skill[45], skill[46]), null, null),
-                AdCostume(12, this.getString(R.string.job_ninja), "ninja", 0, 0, 1, 0, 0, 0, 0, 1, 0, false, null, arrayOf(skill[8], skill[9], skill[11], skill[15], skill[16], skill[17], skill[2], skill[3], skill[5], skill[40]), null, null),
-                AdCostume(13, this.getString(R.string.job_crusader), "crusader", 1, 0, 0, 0, 0, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]), null, null),
-                AdCostume(14, this.getString(R.string.job_druid), "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, false, mutableMapOf(2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1, 7 to -1), arrayOf(skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]), null, null)
+                Costume(15, this.getString(R.string.job_hero), "hero", 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, false, null, arrayOf(skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[41], skill[42], skill[43], skill[44], skill[45], skill[30], skill[31], skill[32], skill[33], skill[34], skill[36], skill[51], skill[37], skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18]), null, null),
+                Costume(1, this.getString(R.string.job_berserker), "berserker", 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[8], skill[9], skill[10], skill[11], skill[12], skill[14]), null, null),
+                Costume(2, this.getString(R.string.job_wizard), "wizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, false, mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1), arrayOf(skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[29], skill[30], skill[31], skill[32], skill[33], skill[34], skill[35], skill[38]), null, null),
+                Costume(3, this.getString(R.string.job_hesychast), "hesychast", 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[6], skill[7]), null, null),
+                Costume(4, this.getString(R.string.job_spy), "spy", 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, false, null, arrayOf(skill[15], skill[16], skill[17], skill[18], skill[19], skill[38]), null, null),
+                Costume(5, this.getString(R.string.job_alchemist), "alchemist", 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, false, null, arrayOf(skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[15], skill[16], skill[17], skill[18], skill[20]), null, null),
+                Costume(6, this.getString(R.string.job_dragoon), "dragoon", 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, false, mutableMapOf(2 to 1, 3 to 1, 4 to 1, 5 to 1, 7 to -1), arrayOf(skill[8], skill[9], skill[10], skill[11], skill[23], skill[24], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[41], skill[42], skill[43], skill[44], skill[50]), null, null),
+                Costume(7, this.getString(R.string.job_knight), "knight", 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1, 6 to -7, 7 to 7), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[8], skill[9], skill[10], skill[11], skill[13]), null, null),
+                Costume(8, this.getString(R.string.job_ranger), "ranger", 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, false, mutableMapOf(6 to -2, 7 to 2), arrayOf(skill[2], skill[3], skill[4], skill[5], skill[15], skill[16], skill[17], skill[18], skill[21]), null, null),
+                Costume(9, this.getString(R.string.job_shaman), "shaman", 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, false, mutableMapOf(6 to 7, 7 to -7), arrayOf(skill[52], skill[53], skill[54], skill[55], skill[23], skill[24], skill[29], skill[34], skill[49]), null, null),
+                Costume(10, this.getString(R.string.job_corsair), "corsair", 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, false, null, arrayOf(skill[8], skill[9], skill[10], skill[11], skill[15], skill[16], skill[17], skill[18], skill[22]), null, null),
+                Costume(11, this.getString(R.string.job_reaver), "reaver", 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, false, mutableMapOf(6 to 7, 7 to -7), arrayOf(skill[8], skill[9], skill[11], skill[23], skill[24], skill[29], skill[15], skill[16], skill[18], skill[45], skill[46]), null, null),
+                Costume(12, this.getString(R.string.job_ninja), "ninja", 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, false, null, arrayOf(skill[8], skill[9], skill[11], skill[15], skill[16], skill[17], skill[2], skill[3], skill[5], skill[40]), null, null),
+                Costume(13, this.getString(R.string.job_crusader), "crusader", 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[8], skill[9], skill[10], skill[2], skill[3], skill[4], skill[56], skill[36], skill[51], skill[37], skill[47]), null, null),
+                Costume(14, this.getString(R.string.job_druid), "druid", 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, false, mutableMapOf(2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1, 7 to -1), arrayOf(skill[23], skill[25], skill[26], skill[27], skill[28], skill[30], skill[31], skill[32], skill[33], skill[52], skill[53], skill[54], skill[15], skill[16], skill[18], skill[48]), null, null)
         )
     }
 
     private fun getCharacters(state: Array<State>, skill: Array<Ability>, race: Array<Costume>, item: Array<Ability>): Array<Actor> {
         val maxlv = 5
 
-        val ogreJob = AdCostume(1, this.getString(R.string.race_ogre), "ogre", 1, 0, 0, 1, 0, 0, 0, 1, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[11]), null, null)
-        val lizardJob = AdCostume(2, this.getString(R.string.race_lizard), "lizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1), arrayOf(skill[30]), null, null)
-        val trollJob = AdCostume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2]), null, null)
-        val goblinJob = AdCostume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, false, null, arrayOf(skill[15]), null, null)
+        val ogreJob = Costume(1, this.getString(R.string.race_ogre), "ogre", 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, false, mutableMapOf(1 to 1, 2 to -1, 3 to -1, 4 to -1, 5 to -1), arrayOf(skill[11]), null, null)
+        val lizardJob = Costume(2, this.getString(R.string.race_lizard), "lizard", 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, false, mutableMapOf(1 to -1, 2 to 1, 3 to 1, 4 to 1, 5 to 1, 6 to -1), arrayOf(skill[30]), null, null)
+        val trollJob = Costume(3, this.getString(R.string.race_troll), "troll", 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, false, mutableMapOf(6 to -7, 7 to 7), arrayOf(skill[2]), null, null)
+        val goblinJob = Costume(4, this.getString(R.string.race_goblin), "goblin", 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, false, null, arrayOf(skill[15]), null, null)
 
         val characters = arrayOf<Actor>(
                 AdActor(1, this, this.getString(R.string.name_cody), race[2], goblinJob, mInit = 7, maxLv = maxlv),

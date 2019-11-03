@@ -353,9 +353,9 @@ interface Scene {
             this.lTarget = lTarget
             val crActor = players[current]
             ret += String.format("\n$performsTxt", crActor.name, skill.name)
+            val healing = skill.mHp < 0
             for (i in fTarget..lTarget) {
                 val iPlayer = players[i]
-                val healing = skill.mHp < 0
                 if ((healing && skill.restore) || iPlayer.hp > 0) {
                     ret += skill.execute(crActor, iPlayer, applyCosts)
                     if (!healing) {

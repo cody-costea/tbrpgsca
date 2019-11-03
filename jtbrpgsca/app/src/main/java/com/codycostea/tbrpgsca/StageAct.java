@@ -41,6 +41,7 @@ public class StageAct extends Activity {
 
 	private EditText[] name = new EditText[3];
 	private Spinner[] jobBox = new Spinner[3], raceBox = new Spinner[3];
+
 	private int level = 0;
 
 	@Override
@@ -55,6 +56,7 @@ public class StageAct extends Activity {
 			ScenePlay.performsTxt = this.getString(R.string.scene_performs);
 			ScenePlay.failTxt = this.getString(R.string.scene_fail);
 			Interpreter.koTxt = this.getString(R.string.actor_ko);
+			Interpreter.riseTxt = this.getString(R.string.actor_rise);
 			Performance.reflectedTxt = this.getString(R.string.ability_reflected);
 			Performance.suffersTxt = this.getString(R.string.ability_suffers);
 			Performance.stolenTxt = this.getString(R.string.ability_stolen);
