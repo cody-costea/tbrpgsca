@@ -123,7 +123,7 @@
     <string name="scene_escape">Echipa s-a retras!</string>
     <string name="scene_fail">Echipa a încercat să se retragă, dar a eșuat.</string>
     <string name="scene_performs">%s efetcuează %s</string>
-    <string name="scene_counters"> și contra-atacă</string>
+    <string name="scene_counters">\u0020și contra-atacă</string>
     <string name="actor_ko">, %s cade inconștient</string>
     <string name="actor_rise">, dar se ridică iar</string>
     <string name="ability_reflected">, reflectă %s</string>

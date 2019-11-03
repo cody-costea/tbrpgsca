@@ -210,17 +210,19 @@ public final class StateMask extends Costume {
 
     public String inflict(final Interpreter actor, final boolean always, final boolean indefinite) {
         final HashMap<StateMask, Integer> trgStRes = actor.stRes;
+        final int stateRes = this.sRes;
         Object o = null;
-        if (always || new Random().nextInt(10) > ((trgStRes == null ? 0 : ((o = trgStRes.get(this)) == null
-                ? 0 : ((Integer) o).intValue())) + this.sRes)) {
+        if (always || stateRes < 0 || new Random().nextInt(10) > ((trgStRes == null
+                ? 0 : ((o = trgStRes.get(this)) == null ? 0 : ((Integer) o).intValue())) + stateRes)) {
             HashMap<StateMask, Integer> trgStates = actor.stateDur;
             if (trgStates == null) {
                 trgStates = new HashMap<>();
                 actor.stateDur = trgStates;
             }
+            final int stateDur = this.dur;
             final int crDur = ((o == null || (o = trgStates.get(this)) == null) ? 0 : ((Integer) o).intValue());
-            if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
-                trgStates.put(this, Integer.valueOf(indefinite ? -2 : this.dur));
+            if (crDur < stateDur || (crDur > -1 && stateDur < 0)) {
+                trgStates.put(this, Integer.valueOf(indefinite ? -2 : stateDur));
             }
             actor.updateAttributes(false, this);
             actor.updateResistance(false, this.res, this.stRes);

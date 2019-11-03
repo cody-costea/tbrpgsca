@@ -33,21 +33,18 @@ interface Scene {
     var status: Int
     var current: Int
     var ordIndex: Int
-
     var lastAbility: Ability?
     var players: Array<Actor>
     var crItems: MutableMap<Int, MutableList<Ability>?>?
     var ordered: Array<Actor>?
-
-    var fTarget: Int
-    var lTarget: Int
-    var surprise: Int
-
     var onStop: SceneFun?
     var onStart: SceneFun?
     var onBeforeAct: SceneFun?
     var onAfterAct: SceneFun?
     var onNewTurn: SceneFun?
+    var fTarget: Int
+    var lTarget: Int
+    var surprise: Int
 
     val aiTurn: Boolean
         get() {
@@ -358,13 +355,16 @@ interface Scene {
             ret += String.format("\n$performsTxt", crActor.name, skill.name)
             for (i in fTarget..lTarget) {
                 val iPlayer = players[i]
-                if ((skill.mHp < 0 && skill.restore) || iPlayer.hp > 0) {
+                val healing = skill.mHp < 0
+                if ((healing && skill.restore) || iPlayer.hp > 0) {
                     ret += skill.execute(crActor, iPlayer, applyCosts)
-                    val counter = iPlayer.counter
-                    if (counter !== null) {
-                        val dmgType = counter.dmgType
-                        if ((skill.dmgType and dmgType) == dmgType) {
-                            ret += countersTxt + counter.execute(iPlayer, crActor, false)
+                    if (!healing) {
+                        val counter = iPlayer.counter
+                        if (counter !== null) {
+                            val dmgType = counter.dmgType
+                            if ((skill.dmgType and dmgType) == dmgType) {
+                                ret += countersTxt + counter.execute(iPlayer, crActor, false)
+                            }
                         }
                     }
                     applyCosts = false

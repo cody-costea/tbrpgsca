@@ -85,17 +85,19 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
         }
 
     open fun inflict(actor: Actor, always: Boolean, indefinite: Boolean): String {
+        val stateRes = this.sRes
         val trgStRes = actor.stRes
-        if (always || (Math.random() * 10).toInt() > (if (trgStRes === null) 0 else trgStRes[this]
-                        ?: 0) + this.sRes) {
+        if (always || stateRes < 0 || (Math.random() * 10).toInt()
+                > (if (trgStRes === null) 0 else trgStRes[this] ?: 0) + stateRes) {
             var trgStates = actor.stateDur
             if (trgStates === null) {
                 trgStates = HashMap(1)
                 actor.stateDur = trgStates
             }
+            val stateDur = this.dur
             val crDur = (trgStates[this] ?: 0)
-            if (crDur < this.dur || (crDur > -1 && this.dur < 0)) {
-                trgStates[this] = if (indefinite) -2 else this.dur
+            if (crDur < stateDur || (crDur > -1 && stateDur < 0)) {
+                trgStates[this] = if (indefinite) -2 else stateDur
             }
             actor.updateAttributes(false, this)
             actor.updateResistance(false, this.res, this.stRes)
@@ -221,9 +223,7 @@ open class State(id: Int, name: String, sprite: String?, inactivate: Boolean, au
                 sDur[this] = -3
             }
             true
-        } else {
-            false
-        }
+        } else false
     }
 
     init {

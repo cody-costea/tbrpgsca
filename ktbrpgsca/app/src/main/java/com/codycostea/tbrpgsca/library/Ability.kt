@@ -186,14 +186,7 @@ open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean
                 val itemsSize = trgItems.size
                 val itemId = (Math.random() * itemsSize).toInt()
                 if (itemId < itemsSize) {
-                    /*val iterator = trgItems.keys.iterator()
-                    if (itemId > 1) {
-                        itemId--
-                    }
-                    for (i in 0..itemId) {
-                        iterator.next()
-                    }*/
-                    val stolen = trgItems.keys.elementAt(itemId)//if (iterator.hasNext()) iterator.next() else trgItems.keys.first()
+                    val stolen = trgItems.keys.elementAt(itemId)
                     var trgItemQty = trgItems[stolen]
                     if (trgItemQty !== null && trgItemQty > 0) {
                         var usrItems = user._items
@@ -250,8 +243,7 @@ open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean
     open fun canPerform(actor: Actor): Boolean {
         val skillsQty = actor.skillsQty
         return this.mpC <= actor.mp && this.hpC < actor.hp && this.spC <= actor.sp && actor.level >= this.lvRq
-                && /*(this.mQty < 1 && skillsQty === null) || */(skillsQty === null || (skillsQty[this]
-                ?: 1) > 0)
+                && (skillsQty === null || (skillsQty[this] ?: 1) > 0)
     }
 
     init {

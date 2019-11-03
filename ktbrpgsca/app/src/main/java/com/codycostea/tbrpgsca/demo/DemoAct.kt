@@ -41,35 +41,34 @@ class DemoAct : AppCompatActivity(), ArenaStager {
 
     private val states: Array<State>
         get() {
-            val confusion = AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, null,
-                    3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
-            val counter = AdAbility(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Ability.DmgTypeAtk, 1,
-                    5, 0, -1, 0, 1, -1, -1, false, false, null, arrayOf(confusion))
+            val confusion = AdState(8, this.getString(R.string.skill_confusion), null, false, false, true, false, false, null, 3, 2,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null)
+            val counter = AdAbility(1, this.getString(R.string.skill_attack), 0, 0, false, false, 0, 0, 0, 0, Ability.DmgTypeAtk, 1, 5, 0,
+                    -1, 0, 1, -1, -1, false, false, null, arrayOf(confusion))
             return arrayOf(
-                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, null, 7, 0, -10,
+                    AdState(1, this.getString(R.string.skill_regen), null, false, false, false, false, true, null, 7, -1, -10,
                             0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, false, null, null, null),
                     AdState(2, this.getString(R.string.skill_poison), null, false, false, false, false, false, null, 10, 0, 7,
                             0, 2, 0, 0, 0, 0, -2, 0, 0, 0, 0, false, null, null, null),
-                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, null, 7, 0, 0,
+                    AdState(3, this.getString(R.string.skill_clarity), null, false, false, false, false, false, null, 7, -1, 0,
                             -7, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, false, null, null, null),
                     AdState(4, this.getString(R.string.state_dizziness), null, false, false, false, false, false, null, 3, 0, 0,
                             7, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, false, null, null, null),
-                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, null, 7, 0, 0,
+                    AdState(5, this.getString(R.string.state_vigour), null, false, false, false, false, false, null, 7, -1, 0,
                             0, -7, 0, 0, 0, 1, 0, 0, 0, 1, 0, false, null, null, null),
                     AdState(6, this.getString(R.string.state_weakness), null, false, false, false, false, false, null, 5, 0, 0,
                             0, 7, 0, 0, 0, -1, 0, 0, 0, -1, 0, false, null, null, null),
-                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, null, 7, 0, 0,
+                    AdState(7, this.getString(R.string.skill_berserk), null, false, true, false, false, false, null, 7, -1, 0,
                             0, 0, 0, 0, 0, 5, -3, 0, 0, 3, 0, false, null, null, null),
                     confusion,
                     AdState(9, this.getString(R.string.skill_sleep), null, true, false, false, false, false, null, 5, 1, 0,
                             0, 0, 0, 0, 0, 0, -3, 0, 0, -5, 0, false, null, null, null),
                     AdState(10, this.getString(R.string.state_stun), null, true, false, false, false, false, null, 2, 0, 0,
                             0, 0, 0, 0, 0, 0, -3, 0, 0, -4, 0, false, null, null, null),
-                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, null, -1, 0, 0,
+                    AdState(11, this.getString(R.string.skill_reflect), null, false, false, false, true, false, null, -1, -1, 0,
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, null, null, null),
-                    AdState(12, this.getString(R.string.skill_defend), null, false, false, false, false, false, counter, 1,
-                            0, 0, 0, 0, 0, 0, 0, -1, 3, 1, 1, -1, 0, false, null,
-                            null, null)
+                    AdState(12, this.getString(R.string.skill_defend), null, false, false, false, false, false, counter, 1, -1, 0, 0,
+                            0, 0, 0, 0, -1, 3, 1, 1, -1, 0, false, null, null, null)
             )
         }
 
