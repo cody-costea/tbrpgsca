@@ -22,7 +22,7 @@ interface Scene {
     companion object {
         var surprisedTxt = "Surprised"
         var performsTxt = "%s performs %s"
-        var countersTxt = ", %s counters"
+        var countersTxt = " and counters"
         var victoryTxt = "The party has won!"
         var fallenTxt = "The party has fallen!"
         var escapeTxt = "The party has escaped!"
@@ -38,6 +38,7 @@ interface Scene {
     var players: Array<Actor>
     var crItems: MutableMap<Int, MutableList<Ability>?>?
     var ordered: Array<Actor>?
+
     var fTarget: Int
     var lTarget: Int
     var surprise: Int
@@ -363,8 +364,7 @@ interface Scene {
                     if (counter !== null) {
                         val dmgType = counter.dmgType
                         if ((skill.dmgType and dmgType) == dmgType) {
-                            ret += (String.format(countersTxt, iPlayer.name)
-                                    + counter.execute(iPlayer, crActor, false))
+                            ret += countersTxt + counter.execute(iPlayer, crActor, false)
                         }
                     }
                     applyCosts = false

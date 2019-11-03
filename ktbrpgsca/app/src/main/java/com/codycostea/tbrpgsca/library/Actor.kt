@@ -55,7 +55,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
 
     open val active: Boolean
         get() {
-            return this.actions == 0
+            return this.actions > 0
         }
 
     open var reflect: Boolean
