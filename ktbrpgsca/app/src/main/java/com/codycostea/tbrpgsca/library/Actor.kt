@@ -536,7 +536,7 @@ open class Actor(id: Int, name: String, race: Costume, job: Costume, level: Int 
                 }
             }
             if (revives) {
-                s += String.format(riseTxt, this.name)
+                s += riseTxt
                 this.hp = this.mHp
             } else {
                 this.guards = false

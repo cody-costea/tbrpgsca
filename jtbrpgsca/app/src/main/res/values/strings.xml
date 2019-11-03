@@ -122,6 +122,7 @@
     <string name="scene_fail"/>
     <string name="scene_performs"/>
     <string name="actor_ko"/>
+    <string name="actor_rise"/>
     <string name="ability_reflected"/>
     <string name="ability_suffers"/>
     <string name="ability_stolen"/>

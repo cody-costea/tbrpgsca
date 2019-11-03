@@ -30,6 +30,7 @@ public final class StateMask extends Costume {
     protected final static int FLAG_CONFUSE = 4;
     protected final static int FLAG_INACTIVATE = 8;
     protected final static int FLAG_REFLECT = 16;
+    protected final static int FLAG_REVIVE = 32;
 
     protected Performance[] rSkills;
     protected int dur, sRes, dmgHp, dmgMp, dmgSp;
@@ -136,8 +137,7 @@ public final class StateMask extends Costume {
         } else {
             int flags = this.flags;
             if ((flags & FLAG_AUTOMATE) == FLAG_AUTOMATE) {
-                flags -= FLAG_AUTOMATE;
-                this.flags = flags;
+                this.flags = flags ^ FLAG_AUTOMATE;
             }
         }
         return this;
@@ -153,8 +153,7 @@ public final class StateMask extends Costume {
         } else {
             int flags = this.flags;
             if ((flags & FLAG_CONFUSE) == FLAG_CONFUSE) {
-                flags -= FLAG_CONFUSE;
-                this.flags = flags;
+                this.flags = flags ^ FLAG_CONFUSE;
             }
         }
         return this;
@@ -187,8 +186,23 @@ public final class StateMask extends Costume {
         } else {
             int flags = this.flags;
             if ((flags & FLAG_REFLECT) == FLAG_REFLECT) {
-                flags -= FLAG_REFLECT;
-                this.flags = flags;
+                this.flags = flags ^ FLAG_REFLECT;
+            }
+        }
+        return this;
+    }
+
+    public boolean isReviving() {
+        return (this.flags & FLAG_REVIVE) == FLAG_REVIVE;
+    }
+
+    public StateMask setReviving(final boolean value) {
+        if (value) {
+            this.flags |= FLAG_REVIVE;
+        } else {
+            int flags = this.flags;
+            if ((flags & FLAG_REVIVE) == FLAG_REVIVE) {
+                this.flags = flags ^ FLAG_REVIVE;
             }
         }
         return this;
@@ -298,6 +312,9 @@ public final class StateMask extends Costume {
                         if (this.isRefelcting()) {
                             actor.setReflecting(true);
                         }
+                        if (this.isReviving()) {
+                            actor.setReviving(true);
+                        }
                         if (this.isConfusing()) {
                             final int actorAuto = actor.automatic;
                             if (actorAuto > Interpreter.AUTO_CONFUSED) {
@@ -345,9 +362,9 @@ public final class StateMask extends Costume {
     }
 
     StateMask(final int id, final String name, final String sprite, final boolean inactivate, final boolean automate,
-              final boolean confuse, final boolean reflect, final int dur, final int sRes, final int dmgHp, final int dmgMp,
-              final int dmgSp, final int hp, final int mp, final int sp, final int atk, final int def, final int spi, final int wis,
-              final int agi, final int mInit, final boolean range, final SparseIntArray res, final Performance[] aSkills,
+              final boolean confuse, final boolean reflect, final boolean revive, final int dur, final int sRes, final int dmgHp,
+              final int dmgMp, final int dmgSp, final int hp, final int mp, final int sp, final int atk, final int def, final int spi,
+              final int wis, final int agi, final int mInit, final boolean range, final SparseIntArray res, final Performance[] aSkills,
               final Performance[] rSkills, final StateMask[] states, final HashMap<StateMask, Integer> stRes) {
         super(id, name, sprite, hp, mp, sp, atk, def, spi, wis, agi, mInit, range, res, aSkills, states, stRes);
         if (inactivate) {
@@ -361,6 +378,9 @@ public final class StateMask extends Costume {
         }
         if (reflect) {
             this.flags |= FLAG_REFLECT;
+        }
+        if (revive) {
+            this.flags |= FLAG_REVIVE;
         }
         this.dur = dur;
         this.sRes = sRes;
