@@ -562,7 +562,7 @@ interface Scene {
         this.fTarget = enIdx
         this.lTarget = enIdx
         this.lastAbility = null
-        val current = if (this.surprise < 0) this.enIdx else 0
+        val current = if (this.surprise < 0) enIdx else 0
         val crActor = players[current]
         val crItems = crActor._items
         this.current = current
