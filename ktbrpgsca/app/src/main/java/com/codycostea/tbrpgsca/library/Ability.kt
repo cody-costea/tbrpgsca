@@ -167,9 +167,9 @@ open class Ability(id: Int, name: String, range: Boolean = false, steal: Boolean
             if (trgStates !== null) {
                 val rStates = this.rStates
                 if (rStates !== null) {
-                    for (i in 0 until rStates.size) {
+                    for (element in rStates) {
                         for (aState in trgStates.keys) {
-                            if (aState == rStates[i]) {
+                            if (aState == element) {
                                 aState.remove(trg, false, false)
                                 break
                             }
