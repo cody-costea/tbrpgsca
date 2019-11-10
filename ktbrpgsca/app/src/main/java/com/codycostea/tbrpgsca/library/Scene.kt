@@ -358,7 +358,7 @@ interface Scene {
                 val iPlayer = players[i]
                 if ((healing && skill.restore) || iPlayer.hp > 0) {
                     ret += skill.execute(crActor, iPlayer, applyCosts)
-                    if (!healing) {
+                    if ((!healing) && iPlayer.hp > 0) {
                         val counter = iPlayer.counter
                         if (counter !== null) {
                             val dmgType = counter.dmgType
@@ -562,7 +562,7 @@ interface Scene {
         this.fTarget = enIdx
         this.lTarget = enIdx
         this.lastAbility = null
-        val current = if (this.surprise < 0) this.enIdx else 0
+        val current = if (surprise < 0) enIdx else 0
         val crActor = players[current]
         val crItems = crActor._items
         this.current = current
