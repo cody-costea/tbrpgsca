@@ -118,7 +118,7 @@ Window {
                     arenaForm.abilitySnd.source = 'qrc:/audio/' + s;
                     arenaForm.abilitySnd.play();
                 }
-                if (i != arenaForm.crActor) {
+                if (i !== arenaForm.crActor) {
                     var koActors = arenaForm.koActors;
                     var crStatus = arena.checkIfKO(i);
                     var koBit = 1 << i;
