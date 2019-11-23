@@ -650,7 +650,7 @@ class Arena : Fragment(), Scene {
                             trgAnim = 4
                             this.koActors = koActors - koBit
                         } else {
-                            val counter = htActor.counter
+                            val counter = if (htActor.guards) htActor.counter else null
                             trgAnim = if (counter === null) {
                                 2
                             } else {
