@@ -40,19 +40,19 @@ namespace ctbrpgsca
         QMap<int, int>* getElementResistance();
         QMap<State*, int>* getStateResistance();
 
-        Ability** getAddedSkills();
+        int getAddedSkillsSize();
+        Ability* getAddedSkill(int n);
 
-        Costume(int const id, const QString& name, const QString* const sprite, int const hp, int const mp, int const sp,
-                int const atk, int const def, int const spi, int const wis, int const agi, int const mInit, bool const range,
-                bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive,
-                QMap<int, int>* const res, Ability** const skills, State** const states,  QMap<State*, int>* const stRes);
+        Costume(int const id, const QString& name, const QString* const sprite, int const hp, int const mp, int const sp, int const atk, int const def, int const spi,
+                int const wis, int const agi, int const mInit, bool const range, bool const automate, bool const confuse, bool const reflect, bool const counter,
+                bool const revive, QMap<int, int>* const res, QVector<Ability*>* const skills, QVector<State*>* const states, QMap<State*, int>* const stRes);
 
         ~Costume();
     private:
         int atk, def, spi, wis, agi;
+        QVector<Ability*>* aSkills;
         QMap<State*, int>* stRes;
         QMap<int, int>* res;
-        Ability** aSkills;
 
         friend class Actor;
         friend class Ability;

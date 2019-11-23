@@ -22,21 +22,9 @@ int Role::getHpMod() const
     return this->mHp;
 }
 
-Role* Role::setHpMod(const int hp)
-{
-    this->mHp = hp;
-    return this;
-}
-
 int Role::getMpMod() const
 {
     return this->mMp;
-}
-
-Role* Role::setMpMod(const int mp)
-{
-    this->mMp = mp;
-    return this;
 }
 
 int Role::getSpMod() const
@@ -44,32 +32,16 @@ int Role::getSpMod() const
     return this->mSp;
 }
 
-Role* Role::setSpMod(const int sp)
+State* Role::getAddedState(int n) const
 {
-    this->mSp = sp;
-    return this;
+    QVector<State*>* aStates = this->aStates;
+    return aStates == nullptr || n < 0 || n >= aStates->size() ? nullptr : aStates->at(n);
 }
 
-int Role::getInitMod() const
+int Role::getAddedStatesSize() const
 {
-    return this->mInit;
-}
-
-Role* Role::setInitMod(const int init)
-{
-    this->mInit = init;
-    return this;
-}
-
-State** Role::getAddedStates() const
-{
-    return this->aStates;
-}
-
-Role* Role::setAddedStates(State** const  value)
-{
-    this->aStates = value;
-    return this;
+    QVector<State*>* aStates = this->aStates;
+    return aStates == nullptr ? 0 : aStates->size();
 }
 
 QString Role::getName() const
@@ -77,21 +49,9 @@ QString Role::getName() const
     return this->name;
 }
 
-Role* Role::setName(const QString& value)
-{
-    this->name = value;
-    return this;
-}
-
 QString Role::getSprite() const
 {
     return this->sprite;
-}
-
-Role* Role::setSprite(const QString& value)
-{
-    this->sprite = value;
-    return this;
 }
 
 int Role::getId() const
@@ -99,25 +59,9 @@ int Role::getId() const
     return this->id;
 }
 
-Role* Role::setId(const int value)
-{
-    this->id = value;
-    return this;
-}
-
 bool Role::isRanged() const
 {
     return (this->flags & FLAG_RANGE) == FLAG_RANGE;
-}
-
-Role* Role::setRanged(const bool range)
-{
-    int flags = this->flags;
-    if (range != ((flags & FLAG_RANGE) == FLAG_RANGE))
-    {
-        this->flags = flags ^ FLAG_RANGE;
-    }
-    return this;
 }
 
 bool Role::isReviving() const
@@ -125,30 +69,25 @@ bool Role::isReviving() const
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
 }
 
-Role* Role::setReviving(const bool revive)
+Role::Role(const int id, const QString& name, const QString& sprite, const int hpDmg, const int mpDmg, const int spDmg,
+           const int mHp, const int mMp, const int mSp, const bool range, const bool revive, QVector<State*>* const aStates)
 {
-    int flags = this->flags;
-    if (revive != ((flags & FLAG_REVIVE) == FLAG_REVIVE))
-    {
-        this->flags = flags ^ FLAG_REVIVE;
-    }
-    return this;
-}
-
-Role::Role(const int id, const QString& name, const QString& sprite, const int mHp, const int mMp,
-           const int mSp, const int mInit, const bool range, const bool revive, State** const aStates)
-{
-    this->flags = 0;
     this->id = id;
     this->name = name;
+    this->aStates = aStates;
     this->sprite = sprite;
     this->mHp = mHp;
     this->mHp = mMp;
     this->mSp = mSp;
-    this->mInit = mInit;
-    this->aStates = aStates;
-    this->setReviving(revive);
-    this->setRanged(range);
+    this->hp = hpDmg;
+    this->mp = mpDmg;
+    this->sp = spDmg;
+    int flags = revive ? FLAG_REVIVE : 0;
+    if (range)
+    {
+        flags = flags | FLAG_RANGE;
+    }
+    this->flags = flags;
 }
 
 Role::~Role()

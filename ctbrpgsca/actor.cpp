@@ -17,6 +17,72 @@ limitations under the License.
 
 using namespace ctbrpgsca;
 
+Actor* Actor::setHpMod(const int hp)
+{
+    this->mHp = hp;
+    return this;
+}
+
+Actor* Actor::setMpMod(const int mp)
+{
+    this->mMp = mp;
+    return this;
+}
+
+Actor* Actor::setSpMod(const int sp)
+{
+    this->mSp = sp;
+    return this;
+}
+
+State** Role::getAddedStates() const
+{
+    return this->aStates;
+}
+
+Actor* Actor::setAddedStates(State** const  value)
+{
+    this->aStates = value;
+    return this;
+}
+
+Actor* Actor::setName(const QString& value)
+{
+    this->name = value;
+    return this;
+}
+
+Actor* Actor::setSprite(const QString& value)
+{
+    this->sprite = value;
+    return this;
+}
+
+int Role::getId() const
+{
+    return this->id;
+}
+
+Actor* Actor::setRanged(const bool range)
+{
+    int flags = this->flags;
+    if (range != ((flags & FLAG_RANGE) == FLAG_RANGE))
+    {
+        this->flags = flags ^ FLAG_RANGE;
+    }
+    return this;
+}
+
+Actor* Actor::setReviving(const bool revive)
+{
+    int flags = this->flags;
+    if (revive != ((flags & FLAG_REVIVE) == FLAG_REVIVE))
+    {
+        this->flags = flags ^ FLAG_REVIVE;
+    }
+    return this;
+}
+
 Actor::Actor()
 {
 

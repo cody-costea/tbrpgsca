@@ -17,6 +17,7 @@ limitations under the License.
 #define ROLE_H
 
 #include <QString>
+#include <QVector>
 
 namespace ctbrpgsca
 {
@@ -28,43 +29,28 @@ namespace ctbrpgsca
     #define FLAG_RANGE 2
     public:
         int getId() const;
-        Role* setId(const int value);
-
         QString getName() const;
-        Role* setName(const QString& value);
-
+        State* getAddedState(int n) const;
+        int getAddedStatesSize() const;
         QString getSprite() const;
-        Role* setSprite(const QString& value);
-
-        int getHpMod() const;
-        Role* setHpMod(const int hp);
-
-        int getMpMod() const;
-        Role* setMpMod(const int mp);
-
-        int getSpMod() const;
-        Role* setSpMod(const int sp);
-
-        int getInitMod() const;
-        Role* setInitMod(const int init);
-
-        bool isRanged() const;
-        Role* setRanged(const bool range);
-
         bool isReviving() const;
-        Role* setReviving(const bool revive);
+        bool isRanged() const;
+        //int getInitMod() const;
+        int getHpMod() const;
+        int getMpMod() const;
+        int getSpMod() const;
+        int getDmgHp() const;
+        int getDmgMp() const;
+        int getDmgSp() const;
 
-        State** getAddedStates() const;
-        Role* setAddedStates(State** const value);
-
-        Role(const int id, const QString& name, const QString& sprite, const int mHp, const int mMp,
-             const int mSp, const int mInit, const bool range, const bool revive, State** const aStates);
+        Role(const int id, const QString& name, const QString& sprite, const int hpDmg, const int mpDmg, const int spDmg,
+             const int mHp, const int mMp, const int mSp, const bool range, const bool revive, QVector<State*>* const aStates);
 
         ~Role();
     private:
         QString name, sprite;
-        int id, mHp, mMp, mSp, mInit, flags;
-        State** aStates;
+        int id, hp, mp, sp, mHp, mMp, mSp, flags;
+        QVector<State*>* aStates;
 
         friend class Ability;
         friend class Costume;

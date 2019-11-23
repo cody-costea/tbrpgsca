@@ -24,6 +24,16 @@ namespace ctbrpgsca
     class Actor : public Costume
     {
     public:
+        Actor* setName(const QString& value);
+        Actor* setSprite(const QString& value);
+        Actor* setHpMod(const int hp);
+        Actor* setMpMod(const int mp);
+        Actor* setSpMod(const int sp);
+        Actor* setInitMod(const int init);
+        Actor* setRanged(const bool range);
+        Actor* setReviving(const bool revive);
+        Actor* setAddedStates(State** const value);
+
         Actor();
     };
 
