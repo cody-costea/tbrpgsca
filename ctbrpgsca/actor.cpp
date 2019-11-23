@@ -15,6 +15,8 @@ limitations under the License.
 */
 #include "actor.h"
 
+using namespace ctbrpgsca;
+
 Actor::Actor()
 {
 

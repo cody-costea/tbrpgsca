@@ -18,16 +18,46 @@ limitations under the License.
 
 #include "role.h"
 
+#include <QMap>
+
 namespace ctbrpgsca
 {
     class Ability;
 
     class Costume : public Role
     {
+    #define FLAG_AUTOMATE 4
+    #define FLAG_CONFUSE 8
+    #define FLAG_COUNTER 16
+    #define FLAG_REFLECT 32
     public:
-        Costume(const int id, QString* const name, const QString* const sprite, const int hp, const int mp, const int sp,
-                const int atk, const int def, const int spi, const int wis, const int agi, const int mInit, const bool range,
-                QMap<int, int>* const res, Ability** const skills, State** const states, QMap<State*, int>* const stRes);
+        int getAttack();
+        int getDefense();
+        int getSpirit();
+        int getWisdom();
+        int getAgility();
+
+        QMap<int, int>* getElementResistance();
+        QMap<State*, int>* getStateResistance();
+
+        Ability** getAddedSkills();
+
+        Costume(int const id, const QString& name, const QString* const sprite, int const hp, int const mp, int const sp,
+                int const atk, int const def, int const spi, int const wis, int const agi, int const mInit, bool const range,
+                bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive,
+                QMap<int, int>* const res, Ability** const skills, State** const states,  QMap<State*, int>* const stRes);
+
+        ~Costume();
+    private:
+        int atk, def, spi, wis, agi;
+        QMap<State*, int>* stRes;
+        QMap<int, int>* res;
+        Ability** aSkills;
+
+        friend class Actor;
+        friend class Ability;
+        friend class State;
+        friend class Scene;
     };
 }
 

@@ -72,14 +72,25 @@ Role* Role::setAddedStates(State** const  value)
     return this;
 }
 
-QString* Role::getName() const
+QString Role::getName() const
 {
     return this->name;
 }
 
-Role* Role::setName(QString* const value)
+Role* Role::setName(const QString& value)
 {
     this->name = value;
+    return this;
+}
+
+QString Role::getSprite() const
+{
+    return this->sprite;
+}
+
+Role* Role::setSprite(const QString& value)
+{
+    this->sprite = value;
     return this;
 }
 
@@ -94,12 +105,12 @@ Role* Role::setId(const int value)
     return this;
 }
 
-bool Role::getRange() const
+bool Role::isRanged() const
 {
     return (this->flags & FLAG_RANGE) == FLAG_RANGE;
 }
 
-Role* Role::setRange(const bool range)
+Role* Role::setRanged(const bool range)
 {
     int flags = this->flags;
     if (range != ((flags & FLAG_RANGE) == FLAG_RANGE))
@@ -109,15 +120,38 @@ Role* Role::setRange(const bool range)
     return this;
 }
 
-Role::Role(int id, QString* name, int mHp, int mMp, int mSp, int mInit, bool range, State** aStates)
+bool Role::isReviving() const
+{
+    return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
+}
+
+Role* Role::setReviving(const bool revive)
+{
+    int flags = this->flags;
+    if (revive != ((flags & FLAG_REVIVE) == FLAG_REVIVE))
+    {
+        this->flags = flags ^ FLAG_REVIVE;
+    }
+    return this;
+}
+
+Role::Role(const int id, const QString& name, const QString& sprite, const int mHp, const int mMp,
+           const int mSp, const int mInit, const bool range, const bool revive, State** const aStates)
 {
     this->flags = 0;
     this->id = id;
     this->name = name;
+    this->sprite = sprite;
     this->mHp = mHp;
     this->mHp = mMp;
     this->mSp = mSp;
     this->mInit = mInit;
     this->aStates = aStates;
-    this->setRange(range);
+    this->setReviving(revive);
+    this->setRanged(range);
+}
+
+Role::~Role()
+{
+    //delete this->name;
 }

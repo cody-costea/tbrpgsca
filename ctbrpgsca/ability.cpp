@@ -15,6 +15,8 @@ limitations under the License.
 */
 #include "ability.h"
 
+using namespace ctbrpgsca;
+
 Ability::Ability()
 {
 
