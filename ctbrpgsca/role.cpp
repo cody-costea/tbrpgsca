@@ -69,12 +69,12 @@ bool Role::isReviving() const
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
 }
 
-Role::Role(const int id, const QString& name, const QString& sprite, const int hpDmg, const int mpDmg, const int spDmg,
-           const int mHp, const int mMp, const int mSp, const bool range, const bool revive, QVector<State*>* const aStates)
+Role::Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
+           int const mHp, int const mMp, int const mSp, bool const range, bool const revive, QVector<State*>* const states)
 {
     this->id = id;
     this->name = name;
-    this->aStates = aStates;
+    this->aStates = states;
     this->sprite = sprite;
     this->mHp = mHp;
     this->mHp = mMp;
@@ -85,7 +85,7 @@ Role::Role(const int id, const QString& name, const QString& sprite, const int h
     int flags = revive ? FLAG_REVIVE : 0;
     if (range)
     {
-        flags = flags | FLAG_RANGE;
+        flags |= FLAG_RANGE;
     }
     this->flags = flags;
 }

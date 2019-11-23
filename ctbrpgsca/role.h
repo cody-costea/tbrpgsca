@@ -43,8 +43,8 @@ namespace ctbrpgsca
         int getDmgMp() const;
         int getDmgSp() const;
 
-        Role(const int id, const QString& name, const QString& sprite, const int hpDmg, const int mpDmg, const int spDmg,
-             const int mHp, const int mMp, const int mSp, const bool range, const bool revive, QVector<State*>* const aStates);
+        Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
+             int const mHp, int const mMp, int const mSp, bool const range, bool const revive, QVector<State*>* const states);
 
         ~Role();
     private:

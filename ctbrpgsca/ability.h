@@ -23,8 +23,28 @@ namespace ctbrpgsca
 
     class Ability : public Role
     {
+        #define FLAG_MELEE 4
+        #define FLAG_STEAL 8
+        #define FLAG_ABSORB 16
+        #define FLAG_TRG_ALL 32
+        #define FLAG_TRG_SELF 64
+        #define FLAG_TRG_FULL 128
     public:
+        static int constexpr DmgTypeAtk = 256;
+        static int constexpr DmgTypeDef = 512;
+        static int constexpr DmgTypeSpi = 1024;
+        static int constexpr DmgTypeWis = 2048;
+        static int constexpr DmgTypeAgi = 4096;
+
         Ability();
+    private:
+        int lvRq, elm, mQty, rQty;
+        QVector<State*>* rStates;
+
+        friend class Costume;
+        friend class Actor;
+        friend class State;
+        friend class Scene;
     };
 
 }

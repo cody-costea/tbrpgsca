@@ -26,10 +26,10 @@ namespace ctbrpgsca
 
     class Costume : public Role
     {
-    #define FLAG_AUTOMATE 4
-    #define FLAG_CONFUSE 8
-    #define FLAG_COUNTER 16
-    #define FLAG_REFLECT 32
+        #define FLAG_AUTOMATE 4
+        #define FLAG_CONFUSE 8
+        #define FLAG_COUNTER 16
+        #define FLAG_REFLECT 32
     public:
         int getAttack();
         int getDefense();
@@ -43,9 +43,10 @@ namespace ctbrpgsca
         int getAddedSkillsSize();
         Ability* getAddedSkill(int n);
 
-        Costume(int const id, const QString& name, const QString* const sprite, int const hp, int const mp, int const sp, int const atk, int const def, int const spi,
-                int const wis, int const agi, int const mInit, bool const range, bool const automate, bool const confuse, bool const reflect, bool const counter,
-                bool const revive, QMap<int, int>* const res, QVector<Ability*>* const skills, QVector<State*>* const states, QMap<State*, int>* const stRes);
+        Costume(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+                int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
+                bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
+                QVector<Ability*>* const skills, QVector<State*>* const states, QMap<State*, int>* const stRes);
 
         ~Costume();
     private:
