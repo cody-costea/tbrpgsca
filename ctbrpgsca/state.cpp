@@ -15,7 +15,7 @@ limitations under the License.
 */
 #include "state.h"
 
-using namespace ctbrpgsca;
+using namespace tbrpgsca;
 
 State::State()
 {

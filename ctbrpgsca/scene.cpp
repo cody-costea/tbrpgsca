@@ -15,7 +15,7 @@ limitations under the License.
 */
 #include "scene.h"
 
-using namespace ctbrpgsca;
+using namespace tbrpgsca;
 
 Scene::Scene()
 {

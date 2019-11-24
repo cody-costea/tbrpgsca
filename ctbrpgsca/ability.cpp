@@ -15,7 +15,7 @@ limitations under the License.
 */
 #include "ability.h"
 
-using namespace ctbrpgsca;
+using namespace tbrpgsca;
 
 QString Ability::MissesTxt = ", but misses";
 QString Ability::SuffersTxt = ", %s suffers";

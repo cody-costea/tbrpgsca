@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef SCENE_H
 #define SCENE_H
 
-namespace ctbrpgsca
+namespace tbrpgsca
 {
 
     class Scene

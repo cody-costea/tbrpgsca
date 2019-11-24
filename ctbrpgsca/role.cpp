@@ -15,7 +15,7 @@ limitations under the License.
 */
 #include "role.h"
 
-using namespace ctbrpgsca;
+using namespace tbrpgsca;
 
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";

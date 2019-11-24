@@ -19,7 +19,7 @@ limitations under the License.
 #include <QString>
 #include <QVector>
 
-namespace ctbrpgsca
+namespace tbrpgsca
 {
     class State;
 
@@ -31,6 +31,7 @@ namespace ctbrpgsca
         static QString HpTxt;
         static QString MpTxt;
         static QString SpTxt;
+        static QString CausesTxt;
 
         inline int getId() const;
         inline QString getName() const;

@@ -21,7 +21,7 @@ limitations under the License.
 
 #include <QMap>
 
-namespace ctbrpgsca
+namespace tbrpgsca
 {
     class Costume : public Role
     {

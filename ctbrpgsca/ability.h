@@ -18,7 +18,7 @@ limitations under the License.
 
 #include "role.h"
 
-namespace ctbrpgsca
+namespace tbrpgsca
 {
 
     class Actor;

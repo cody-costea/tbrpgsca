@@ -1,6 +1,6 @@
 #include "costume.h"
 
-using namespace ctbrpgsca;
+using namespace tbrpgsca;
 
 Costume::Costume(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                  int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,

@@ -18,7 +18,7 @@ limitations under the License.
 
 #include "costume.h"
 
-namespace ctbrpgsca
+namespace tbrpgsca
 {
 
     class Actor : public Costume

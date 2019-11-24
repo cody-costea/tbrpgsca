@@ -19,16 +19,35 @@ limitations under the License.
 #include "costume.h"
 
 
-namespace ctbrpgsca
+namespace tbrpgsca
 {
 
     class State : public Costume
     {
         #define FLAG_STUN 64;
     public:
-        static QString CausesTxt;
+        inline int getDuration() const;
+        inline int getStateResistance() const;
 
-        State();
+        inline bool isStunning() const;
+
+        int getRemovedSkillsSize();
+        Ability* getRemovedSkill(int n);
+
+        QString inflict(const Actor& actor, bool const always, bool const indefinite);
+        void disableSkills(const Actor& actor, bool const remove);
+        QString apply(const Actor& actor, bool const consume);
+
+        State(int const id, const QString& name, const QString& sprite, int dur, int sRes, int const hpDmg, int const mpDmg, int const spDmg,
+              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
+              bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
+              QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills, QVector<State*>* const rStates);
+    private:
+        QVector<Ability*>* rSkills;
+        int dur, sRes;
+
+        friend class Actor;
+        friend class Ability;
     };
 
 }

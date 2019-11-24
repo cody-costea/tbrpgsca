@@ -15,7 +15,7 @@ limitations under the License.
 */
 #include "actor.h"
 
-using namespace ctbrpgsca;
+using namespace tbrpgsca;
 
 Actor* Actor::setHpMod(const int hp)
 {
@@ -32,17 +32,6 @@ Actor* Actor::setMpMod(const int mp)
 Actor* Actor::setSpMod(const int sp)
 {
     this->mSp = sp;
-    return this;
-}
-
-State** Role::getAddedStates() const
-{
-    return this->aStates;
-}
-
-Actor* Actor::setAddedStates(State** const  value)
-{
-    this->aStates = value;
     return this;
 }
 
