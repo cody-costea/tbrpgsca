@@ -28,23 +28,29 @@ namespace ctbrpgsca
     #define FLAG_REVIVE 1
     #define FLAG_RANGE 2
     public:
-        int getId() const;
-        QString getName() const;
+        static QString HpTxt;
+        static QString MpTxt;
+        static QString SpTxt;
+
+        inline int getId() const;
+        inline QString getName() const;
+        inline QString getSprite() const;
+        inline bool isReviving() const;
+        inline bool isRanged() const;
+        inline int getMaximumHp() const;
+        inline int getMaximumMp() const;
+        inline int getMaximumRp() const;
+        inline int getCurrentHp() const;
+        inline int getCurrentMp() const;
+        inline int getCurrentRp() const;
+
         State* getAddedState(int n) const;
         int getAddedStatesSize() const;
-        QString getSprite() const;
-        bool isReviving() const;
-        bool isRanged() const;
-        //int getInitMod() const;
-        int getHpMod() const;
-        int getMpMod() const;
-        int getSpMod() const;
-        int getDmgHp() const;
-        int getDmgMp() const;
-        int getDmgSp() const;
 
         Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, bool const range, bool const revive, QVector<State*>* const states);
+
+        Role(Role& role);
 
         ~Role();
     private:

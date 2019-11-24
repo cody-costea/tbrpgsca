@@ -16,14 +16,13 @@ limitations under the License.
 #ifndef COSTUME_H
 #define COSTUME_H
 
+#include "ability.h"
 #include "role.h"
 
 #include <QMap>
 
 namespace ctbrpgsca
 {
-    class Ability;
-
     class Costume : public Role
     {
         #define FLAG_AUTOMATE 4
@@ -31,11 +30,11 @@ namespace ctbrpgsca
         #define FLAG_COUNTER 16
         #define FLAG_REFLECT 32
     public:
-        int getAttack();
-        int getDefense();
-        int getSpirit();
-        int getWisdom();
-        int getAgility();
+        inline int getAttack();
+        inline int getDefense();
+        inline int getSpirit();
+        inline int getWisdom();
+        inline int getAgility();
 
         QMap<int, int>* getElementResistance();
         QMap<State*, int>* getStateResistance();
@@ -47,6 +46,8 @@ namespace ctbrpgsca
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
                 bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
                 QVector<Ability*>* const skills, QVector<State*>* const states, QMap<State*, int>* const stRes);
+
+        Costume(Costume& costume);
 
         ~Costume();
     private:

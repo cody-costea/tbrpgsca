@@ -24,7 +24,10 @@ namespace ctbrpgsca
 
     class State : public Costume
     {
+        #define FLAG_STUN 64;
     public:
+        static QString CausesTxt;
+
         State();
     };
 

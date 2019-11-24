@@ -21,24 +21,54 @@ limitations under the License.
 namespace ctbrpgsca
 {
 
+    class Actor;
+
     class Ability : public Role
     {
         #define FLAG_MELEE 4
         #define FLAG_STEAL 8
         #define FLAG_ABSORB 16
-        #define FLAG_TRG_ALL 32
+        #define FLAG_TRG_ALL 4
+        #define FLAG_TRG_FULL 32
         #define FLAG_TRG_SELF 64
-        #define FLAG_TRG_FULL 128
+        #define FLAG_DMG_ATK 128
+        #define FLAG_DMG_DEF 256
+        #define FLAG_DMG_SPI 512
+        #define FLAG_DMG_WIS 1024
+        #define FLAG_DMG_AGI 2048
     public:
-        static int constexpr DmgTypeAtk = 256;
-        static int constexpr DmgTypeDef = 512;
-        static int constexpr DmgTypeSpi = 1024;
-        static int constexpr DmgTypeWis = 2048;
-        static int constexpr DmgTypeAgi = 4096;
+        static QString MissesTxt;
+        static QString SuffersTxt;
+        static QString ReflectTxt;
+        static QString StolenTxt;
 
-        Ability();
+        inline int getElementType();
+        inline int getRequiredLevel();
+        inline int getMaximumUses();
+        inline int getUsesRegen();
+        int getTargetRange();
+
+        inline bool isStealing();
+        inline bool isAbsorbing();
+        inline bool isOnlyMelee();
+
+        State* getRemovedState(int n);
+        int getRemovedStatesSize();
+
+        bool canPerform(const Actor& user);
+        QString execute(const Actor& user, const Actor& target, bool const applyCosts);
+        void replenish(const Actor& user);
+
+        Ability(int const id, const QString& name, const QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq,
+                int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg,
+                int const trg, int const elm,int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates,
+                QVector<State*>* const rStates);
+
+        Ability(Ability& ability);
+
+        ~Ability();
     private:
-        int lvRq, elm, mQty, rQty;
+        int lvRq, attrInc, elm, mQty, rQty;
         QVector<State*>* rStates;
 
         friend class Costume;

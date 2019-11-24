@@ -17,19 +17,38 @@ limitations under the License.
 
 using namespace ctbrpgsca;
 
-int Role::getHpMod() const
+QString Role::HpTxt = "HP";
+QString Role::MpTxt = "MP";
+QString Role::SpTxt = "RP";
+
+inline int Role::getMaximumHp() const
 {
     return this->mHp;
 }
 
-int Role::getMpMod() const
+inline int Role::getMaximumMp() const
 {
     return this->mMp;
 }
 
-int Role::getSpMod() const
+inline int Role::getMaximumRp() const
 {
     return this->mSp;
+}
+
+inline int Role::getCurrentHp() const
+{
+    return this->hp;
+}
+
+inline int Role::getCurrentMp() const
+{
+    return this->mp;
+}
+
+inline int Role::getCurrentRp() const
+{
+    return this->sp;
 }
 
 State* Role::getAddedState(int n) const
@@ -44,27 +63,27 @@ int Role::getAddedStatesSize() const
     return aStates == nullptr ? 0 : aStates->size();
 }
 
-QString Role::getName() const
+inline QString Role::getName() const
 {
     return this->name;
 }
 
-QString Role::getSprite() const
+inline QString Role::getSprite() const
 {
     return this->sprite;
 }
 
-int Role::getId() const
+inline int Role::getId() const
 {
     return this->id;
 }
 
-bool Role::isRanged() const
+inline bool Role::isRanged() const
 {
     return (this->flags & FLAG_RANGE) == FLAG_RANGE;
 }
 
-bool Role::isReviving() const
+inline bool Role::isReviving() const
 {
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
 }

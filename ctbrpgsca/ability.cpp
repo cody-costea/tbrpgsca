@@ -17,7 +17,37 @@ limitations under the License.
 
 using namespace ctbrpgsca;
 
-Ability::Ability()
-{
+QString Ability::MissesTxt = ", but misses";
+QString Ability::SuffersTxt = ", %s suffers";
+QString Ability::ReflectTxt = ", reflected by %s";
+QString Ability::StolenTxt = ", obtaining %s from %s";
 
+Ability::Ability(int const id, const QString& name, const QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq,
+                 int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg,
+                 int const trg, int const elm,int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates,
+                 QVector<State*>* const rStates)
+    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, range, revive, aStates)
+{
+    this->lvRq = lvRq;
+    this->attrInc = attrInc;
+    this->mQty = mQty;
+    this->rQty = rQty;
+    this->elm = elm;
+    this->rStates = rStates;
+    int flags = this->flags;
+    if (melee)
+    {
+        flags |= FLAG_MELEE;
+    }
+    if (steal)
+    {
+        flags |= FLAG_STEAL;
+    }
+    if (absorb)
+    {
+        flags |= FLAG_ABSORB;
+    }
+    flags |= dmgType;
+    flags |= trg;
+    this->flags = flags;
 }
