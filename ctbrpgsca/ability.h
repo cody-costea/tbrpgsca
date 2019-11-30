@@ -52,7 +52,7 @@ namespace tbrpgsca
         inline bool isAbsorbing() const;
         inline bool isOnlyMelee() const;
 
-        State* getRemovedState(int n) const;
+        inline State* getRemovedState(int n) const;
         inline bool hasRemovedState(State* state) const;
         inline int getRemovedStatesSize() const;
 

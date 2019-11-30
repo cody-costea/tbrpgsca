@@ -36,10 +36,15 @@ namespace tbrpgsca
         inline int getWisdom() const;
         inline int getAgility() const;
 
+        inline bool isAutomated() const;
+        inline bool isConfused() const;
+        inline bool isCountering() const;
+        inline bool isReflecting() const;
+
         int getElementResistance(int element) const;
         int getStateResistance(State* state) const;
 
-        Ability* getAddedSkill(int n) const;
+        inline Ability* getAddedSkill(int n) const;
         inline bool hasAddedSkill(Ability* skill) const;
         inline int getAddedSkillsSize() const;
 

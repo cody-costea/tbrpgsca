@@ -33,7 +33,7 @@ namespace tbrpgsca
 
         inline int getRemovedSkillsSize() const;
         inline bool hasRemovedSkill(Ability* skill) const;
-        Ability* getRemovedSkill(int n) const;
+        inline Ability* getRemovedSkill(int n) const;
 
         QString inflict(const Actor& actor, bool const always, bool const indefinite);
         void disableSkills(const Actor& actor, bool const remove);
