@@ -37,7 +37,13 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define MAX_INITIATIVE 50
     public:
-        typedef void* SceneAct(Scene& scene);
+        typedef bool* SceneAct(Scene& scene);
+
+        static QString EscapeTxt;
+        static QString VictoryTxt;
+        static QString PerformsTxt;
+        static QString FallenTxt;
+        static QString FailTxt;
 
         QString escape();
         QString playAi(QString& ret);
