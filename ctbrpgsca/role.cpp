@@ -20,6 +20,7 @@ using namespace tbrpgsca;
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::SpTxt = "RP";
+QString Role::CausesTxt = " %s causes %s";
 
 inline int Role::getMaximumHp() const
 {

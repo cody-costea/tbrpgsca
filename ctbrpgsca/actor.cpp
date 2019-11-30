@@ -17,21 +17,39 @@ limitations under the License.
 
 using namespace tbrpgsca;
 
-Actor* Actor::setHpMod(const int hp)
+Actor* Actor::setCurrentHp(const int hp)
 {
-    this->mHp = hp;
+    this->hp = hp;
     return this;
 }
 
-Actor* Actor::setMpMod(const int mp)
+Actor* Actor::setCurrentMp(const int mp)
 {
-    this->mMp = mp;
+    this->mp = mp;
     return this;
 }
 
-Actor* Actor::setSpMod(const int sp)
+Actor* Actor::setCurrentRp(const int sp)
 {
-    this->mSp = sp;
+    this->sp = sp;
+    return this;
+}
+
+Actor* Actor::setMaximumHp(const int mHp)
+{
+    this->mHp = mHp;
+    return this;
+}
+
+Actor* Actor::setMaximumMp(const int mMp)
+{
+    this->mMp = mMp;
+    return this;
+}
+
+Actor* Actor::setMaximumRp(const int mMp)
+{
+    this->mSp = mMp;
     return this;
 }
 

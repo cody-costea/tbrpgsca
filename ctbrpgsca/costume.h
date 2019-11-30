@@ -30,17 +30,18 @@ namespace tbrpgsca
         #define FLAG_COUNTER 16
         #define FLAG_REFLECT 32
     public:
-        inline int getAttack();
-        inline int getDefense();
-        inline int getSpirit();
-        inline int getWisdom();
-        inline int getAgility();
+        inline int getAttack() const;
+        inline int getDefense() const;
+        inline int getSpirit() const;
+        inline int getWisdom() const;
+        inline int getAgility() const;
 
-        QMap<int, int>* getElementResistance();
-        QMap<State*, int>* getStateResistance();
+        int getElementResistance(int element) const;
+        int getStateResistance(State* state) const;
 
-        int getAddedSkillsSize();
-        Ability* getAddedSkill(int n);
+        Ability* getAddedSkill(int n) const;
+        inline bool hasAddedSkill(Ability* skill) const;
+        inline int getAddedSkillsSize() const;
 
         Costume(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,

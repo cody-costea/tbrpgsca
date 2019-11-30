@@ -42,18 +42,19 @@ namespace tbrpgsca
         static QString ReflectTxt;
         static QString StolenTxt;
 
-        inline int getElementType();
-        inline int getRequiredLevel();
-        inline int getMaximumUses();
-        inline int getUsesRegen();
+        inline int getElementType() const;
+        inline int getRequiredLevel() const;
+        inline int getMaximumUses() const;
+        inline int getUsesRegen() const;
         int getTargetRange();
 
-        inline bool isStealing();
-        inline bool isAbsorbing();
-        inline bool isOnlyMelee();
+        inline bool isStealing() const;
+        inline bool isAbsorbing() const;
+        inline bool isOnlyMelee() const;
 
-        State* getRemovedState(int n);
-        int getRemovedStatesSize();
+        State* getRemovedState(int n) const;
+        inline bool hasRemovedState(State* state) const;
+        inline int getRemovedStatesSize() const;
 
         bool canPerform(const Actor& user);
         QString execute(const Actor& user, const Actor& target, bool const applyCosts);

@@ -46,7 +46,8 @@ namespace tbrpgsca
         inline int getCurrentRp() const;
 
         State* getAddedState(int n) const;
-        int getAddedStatesSize() const;
+        inline bool hasAddedState(State* state) const;
+        inline int getAddedStatesSize() const;
 
         Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, bool const range, bool const revive, QVector<State*>* const states);
