@@ -17,7 +17,91 @@ limitations under the License.
 
 using namespace tbrpgsca;
 
-Scene::Scene()
+bool Scene::actorAgiComp(const Actor& a, const Actor& b)
 {
+    return (a.agi > b.agi);
+}
 
+Scene& Scene::setNext(const QString& ret, bool const endTurn)
+{
+    Scene& scene = *this;
+    int current = scene.current;
+    QVector<Actor*>& players = *(scene.players);
+    int playersSize = players.size();
+    Actor* crActor = players[current];
+    if ((--(crActor->actions)) < 1)
+    {
+        int mInit = scene.mInit;
+        if (mInit > 0)
+        {
+            int next = current;
+            int cInit = crActor->init - mInit;
+            crActor->init = cInit;
+            do
+            {
+                for (int i = 0; i < playersSize; i++)
+                {
+                    crActor = players[i];
+                    if (crActor->hp > 0)
+                    {
+                        int iInit = crActor->init + crActor->agi;
+                        crActor->init = iInit;
+                        if (iInit > cInit)
+                        {
+                            cInit = iInit;
+                            next = i;
+                        }
+                    }
+                }
+            }
+            while (crActor->init < mInit);
+            current = next;
+        }
+        else
+        {
+            do
+            {
+                if (++current == playersSize)
+                {
+                    current = 0;
+                }
+                crActor = players[current];
+            }
+            while (crActor->hp < 1);
+        }
+        crActor->actions = crActor->mActions;
+        this->current = current;
+    }
+    return scene;
+}
+
+Scene::Scene(const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit)
+{
+    Scene& scene = *this;
+    scene.mInit = mInit;
+    scene.events = events;
+    scene.parties = parties;
+    int partiesSize = parties.size();
+    QVector<Actor*>& players = *(scene.players);
+    for (int i = 0; i < partiesSize; i++)
+    {
+        bool aiPlayer = i > 0;
+        bool surprised = (surprise == i);
+        QVector<Actor*>& party = *(parties[i]);
+        int pSize = party.size();
+        for (int j = 0; j < pSize; j++)
+        {
+            Actor& player = *(party[j]);
+            player.actions = surprised ? 0 : player.mActions;
+            if (aiPlayer)
+            {
+                player.setAiPlayer(true);
+            }
+            player.side = i;
+        }
+        players.append(party);
+    }
+    QString ret = "";
+    std::sort(players.begin(), players.end(), Scene::actorAgiComp);
+    scene.setNext(ret, false);
 }

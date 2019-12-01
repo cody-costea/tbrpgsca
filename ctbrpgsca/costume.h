@@ -35,7 +35,7 @@ namespace tbrpgsca
         inline int getSpirit() const;
         inline int getWisdom() const;
         inline int getAgility() const;
-
+        inline int getMaximumActions() const;
         inline bool isAutomated() const;
         inline bool isConfused() const;
         inline bool isCountering() const;
@@ -57,7 +57,7 @@ namespace tbrpgsca
 
         ~Costume();
     private:
-        int atk, def, spi, wis, agi;
+        int atk, def, spi, wis, agi, mActions;
         QVector<Ability*>* aSkills;
         QMap<State*, int>* stRes;
         QMap<int, int>* res;

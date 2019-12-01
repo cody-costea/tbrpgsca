@@ -42,10 +42,11 @@ namespace tbrpgsca
         inline int getLevel() const;
         inline int getMaximumLevel() const;
         inline int getMaximumExperience() const;
+        inline int getCurrentActions() const;
         inline int getExperience() const;
         inline int getInitiative() const;
+        inline int getPartySide() const;
 
-        int getPartySide() const;
         int getRemainingSkillUses(Ability* const skill) const;
         int getRegeneratingSkillTurn(Ability* const skill) const;
 
@@ -53,41 +54,41 @@ namespace tbrpgsca
         Costume* equipItem(char const pos, Costume* const item);
         char unequipItem(Costume* const item);
 
-        Actor* recover();
-        Actor* checkStatus(const QString& ret);
-        Actor* setJob(Costume* const job);
-        Actor* setRace(Costume* const race);
-        Actor* setName(const QString& value);
-        Actor* setSprite(const QString& value);
-        Actor* setLevel(int const level);
-        Actor* setMaximumLevel(int const maxLv);
-        Actor* setMaximumHp(int const mHp);
-        Actor* setMaximumMp(int const mMp);
-        Actor* setMaximumRp(int const mSp);
-        Actor* setCurrentHp(int const hp);
-        Actor* setCurrentMp(int const mp);
-        Actor* setCurrentRp(int const sp);
-        Actor* setInitiative(int const init);
-        Actor* setRanged(bool const range);
-        Actor* setGuarding(bool const guards);
-        Actor* setCountering(bool const counters);
-        Actor* setReflecting(bool const reflects);
-        Actor* setShapeShifet(bool const shapeshift);
-        Actor* setAutomated(bool const automated);
-        Actor* setConfused(bool const confused);
-        Actor* setAiPlayer(bool const aiPlayer);
-        Actor* setReviving(bool const revive);
-        Actor* setElementResistance(int const element, int const res);
-        Actor* setStateResistance(State* const state, int const res);
-        Actor* applyStates(QString& ret, bool const consume);
-        Actor* applyRole(QString& ret, Role* const role);
-        Actor* switchCostume(Costume* const oldCostume, Costume* const newCostume);
-        Actor* updateSkills(bool const remove, const QVector<Ability*>& skills);
-        Actor* updateResistance(bool const remove, const QMap<int, int>& elmRes, QMap<State*, int>& stRes);
-        Actor* updateStates(bool const remove, const QVector<State*>& states);
-        Actor* updateAttributes(bool const remove, const Costume& costume);
-        Actor* checkRegSkill(Ability* const skill);
-        Actor* applyRoles(QString& ret);
+        Actor& recover();
+        Actor& checkStatus(const QString& ret);
+        Actor& setJob(Costume* const job);
+        Actor& setRace(Costume* const race);
+        Actor& setName(const QString& value);
+        Actor& setSprite(const QString& value);
+        Actor& setLevel(int const level);
+        Actor& setMaximumLevel(int const maxLv);
+        Actor& setMaximumHp(int const mHp);
+        Actor& setMaximumMp(int const mMp);
+        Actor& setMaximumRp(int const mSp);
+        Actor& setCurrentHp(int const hp);
+        Actor& setCurrentMp(int const mp);
+        Actor& setCurrentRp(int const sp);
+        Actor& setInitiative(int const init);
+        Actor& setRanged(bool const range);
+        Actor& setGuarding(bool const guards);
+        Actor& setCountering(bool const counters);
+        Actor& setReflecting(bool const reflects);
+        Actor& setShapeShifet(bool const shapeshift);
+        Actor& setAutomated(bool const automated);
+        Actor& setConfused(bool const confused);
+        Actor& setAiPlayer(bool const aiPlayer);
+        Actor& setReviving(bool const revive);
+        Actor& setElementResistance(int const element, int const res);
+        Actor& setStateResistance(State* const state, int const res);
+        Actor& switchCostume(Costume* const oldCostume, Costume* const newCostume);
+        Actor& updateSkills(bool const remove, const QVector<Ability*>& skills);
+        Actor& updateResistance(bool const remove, const QMap<int, int>& elmRes, QMap<State*, int>& stRes);
+        Actor& updateStates(bool const remove, const QVector<State*>& states);
+        Actor& updateAttributes(bool const remove, const Costume& costume);
+        Actor& applyStates(const QString& ret, bool const consume);
+        Actor& applyRole(const QString& ret, Role* const role);
+        Actor& checkRegSkill(Ability* const skill);
+        Actor& applyRoles(const QString& ret);
 
         Actor(int const id, const QString& name, Costume* const race, Costume* const job, int const level, int const maxLv, int const mHp,
               int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
@@ -98,7 +99,7 @@ namespace tbrpgsca
         ~Actor();
     private:
         Costume* race, job;
-        int lv, maxLv, xp, maxp, init, side;
+        int lv, maxLv, xp, maxp, init, side, actions;
         QMap<Ability*, int>* skillsCrQty, skillsRgTurn, items;
         QMap<char, Costume*>* equipment;
         QMap<State*, int>* stateDur;

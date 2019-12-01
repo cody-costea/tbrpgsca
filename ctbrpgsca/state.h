@@ -32,12 +32,12 @@ namespace tbrpgsca
         inline bool isStunning() const;
 
         inline int getRemovedSkillsSize() const;
-        inline bool hasRemovedSkill(Ability* skill) const;
-        inline Ability* getRemovedSkill(int n) const;
+        inline bool hasRemovedSkill(Ability* const skill) const;
+        inline Ability& getRemovedSkill(int const n) const;
 
-        QString inflict(const Actor& actor, bool const always, bool const indefinite);
-        void disableSkills(const Actor& actor, bool const remove);
-        QString apply(const Actor& actor, bool const consume);
+        State& inflict(QString& ret, Actor& actor, bool const always, bool const indefinite);
+        State& disableSkills(Actor& actor, bool const remove);
+        State& apply(QString& ret, Actor& actor, bool const consume);
 
         State(int const id, const QString& name, const QString& sprite, int dur, int sRes, int const hpDmg, int const mpDmg, int const spDmg,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,

@@ -46,19 +46,19 @@ namespace tbrpgsca
         inline int getRequiredLevel() const;
         inline int getMaximumUses() const;
         inline int getUsesRegen() const;
-        int getTargetRange();
+        int getTargetRange() const;
 
         inline bool isStealing() const;
         inline bool isAbsorbing() const;
         inline bool isOnlyMelee() const;
 
-        inline State* getRemovedState(int n) const;
-        inline bool hasRemovedState(State* state) const;
+        inline State& getRemovedState(int const n) const;
+        inline bool hasRemovedState(State* const state) const;
         inline int getRemovedStatesSize() const;
 
-        bool canPerform(const Actor& user);
-        QString execute(const Actor& user, const Actor& target, bool const applyCosts);
-        void replenish(const Actor& user);
+        bool canPerform(Actor& user);
+        Ability& execute(QString& ret, Actor& user, const Actor& target, bool const applyCosts);
+        Ability& replenish(Actor& user);
 
         Ability(int const id, const QString& name, const QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq,
                 int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg,

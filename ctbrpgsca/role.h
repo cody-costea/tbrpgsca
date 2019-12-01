@@ -45,7 +45,7 @@ namespace tbrpgsca
         inline int getCurrentMp() const;
         inline int getCurrentRp() const;
 
-        State* getAddedState(int n) const;
+        inline State& getAddedState(int n) const;
         inline bool hasAddedState(State* state) const;
         inline int getAddedStatesSize() const;
 

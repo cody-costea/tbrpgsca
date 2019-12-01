@@ -35,9 +35,8 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
-        #define MAX_INITIATIVE 50
     public:
-        typedef bool* SceneAct(Scene& scene);
+        typedef bool SceneAct(Scene& scene);
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -45,36 +44,41 @@ namespace tbrpgsca
         static QString FallenTxt;
         static QString FailTxt;
 
-        QString escape();
-        QString playAi(QString& ret);
-        QString setNext(QString& ret, bool const endTurn);
-        QString perform(QString& ret, Ability& ability, Actor& target, bool const item);
+        static bool actorAgiComp(const Actor& a, const Actor& b);
 
-        int getAiSkill(Ability& defSkill, bool const nRestore) const;
-        int getGuardian(Actor& target, Ability& skill) const;
+        Scene& escape(const QString& ret);
+        Scene& playAi(const QString& ret);
+        Scene& setNext(const QString& ret, bool const endTurn);
+        Scene& perform(const QString& ret, const Ability& ability, const Actor& target, bool const item);
+        Scene& checkStatus(const QString& ret);
 
-        inline Actor* getPartyPlayer(int party, int player) const;
-        inline bool hasPartyPlayer(int party, Actor* player) const;
+        int getAiSkill(const Ability& defSkill, bool const nRestore) const;
+        int getGuardian(const Actor& target, Ability& skill) const;
+
+        inline Actor& getPartyPlayer(int const party, int const player) const;
+        inline bool hasPartyPlayer(int const party, Actor* const player) const;
         inline int getPartyPlayersSize(int party) const;
         inline int getPartiesSize() const;
 
-        inline Actor* getOrderedPlayer(int n) const;
-        inline bool hasOrderedPlayer(Actor* player) const;
+        inline Actor& getOrderedPlayer(int const n) const;
+        inline bool hasOrderedPlayer(Actor* const player) const;
         inline int getOrderedPlayersSize() const;
 
-        inline Ability* getLastAbility() const;
+        inline Ability& getLastAbility() const;
         inline int getFirstTarget() const;
         inline int getLastTarget() const;
         inline int getCurrent() const;
         inline int getStatus() const;
 
-        Scene(QVector<Actor*>& parties, QVector<SceneAct>* const events, int const surprise);
+        Scene(const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit);
+
+        ~Scene();
     private:
         Ability* lastAbility;
         QVector<SceneAct>* events;
-        int current, surprise, fTarget, lTarget, status;
-        QVector<QVector<Actor*>> parties;
-        QVector<Actor*> players;
+        int current, surprise, fTarget, lTarget, status, mInit;
+        QVector<QVector<Actor*>*> parties;
+        QVector<Actor*>* players;
     };
 
 }
