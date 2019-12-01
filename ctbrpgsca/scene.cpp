@@ -41,14 +41,15 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
             {
                 for (int i = 0; i < playersSize; i++)
                 {
-                    crActor = players[i];
-                    if (crActor->hp > 0)
+                    Actor* iPlayer = players[i];
+                    if (iPlayer->hp > 0)
                     {
-                        int iInit = crActor->init + crActor->agi;
-                        crActor->init = iInit;
+                        int iInit = iPlayer->init + iPlayer->agi;
+                        iPlayer->init = iInit;
                         if (iInit > cInit)
                         {
                             cInit = iInit;
+                            crActor = iPlayer;
                             next = i;
                         }
                     }
@@ -77,11 +78,12 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
 
 Scene::Scene(const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit)
 {
+    int partiesSize = parties.size();
+    assert(partiesSize > 1);
     Scene& scene = *this;
     scene.mInit = mInit;
     scene.events = events;
     scene.parties = parties;
-    int partiesSize = parties.size();
     QVector<Actor*>& players = *(scene.players);
     for (int i = 0; i < partiesSize; i++)
     {
