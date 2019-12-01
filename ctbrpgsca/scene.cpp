@@ -29,12 +29,13 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
     QVector<Actor*>& players = *(scene.players);
     int playersSize = players.size();
     Actor* crActor = players[current];
-    if ((--(crActor->actions)) < 1)
+    while (crActor->actions < 1)
     {
         int mInit = scene.mInit;
         if (mInit > 0)
         {
             int next = current;
+            Actor* nxActor = crActor;
             int cInit = crActor->init - mInit;
             crActor->init = cInit;
             do
@@ -49,13 +50,14 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
                         if (iInit > cInit)
                         {
                             cInit = iInit;
-                            crActor = iPlayer;
+                            nxActor = iPlayer;
                             next = i;
                         }
                     }
                 }
             }
-            while (crActor->init < mInit);
+            while (nxActor->init < mInit);
+            crActor = nxActor;
             current = next;
         }
         else
@@ -71,8 +73,9 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
             while (crActor->hp < 1);
         }
         crActor->actions = crActor->mActions;
-        this->current = current;
+        crActor->applyStates(ret, false);
     }
+    this->current = current;
     return scene;
 }
 
