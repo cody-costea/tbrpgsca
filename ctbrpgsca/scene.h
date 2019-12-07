@@ -36,7 +36,7 @@ namespace tbrpgsca
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
     public:
-        typedef bool SceneAct(Scene& scene);
+        typedef bool SceneAct(Scene& scene, QString& ret);
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -46,14 +46,14 @@ namespace tbrpgsca
 
         static bool actorAgiComp(const Actor& a, const Actor& b);
 
-        Scene& escape(const QString& ret);
-        Scene& playAi(const QString& ret);
-        Scene& setNext(const QString& ret, bool const endTurn);
-        Scene& perform(const QString& ret, const Ability& ability, const Actor& target, bool const item);
-        Scene& checkStatus(const QString& ret);
+        Scene& playAi(QString& ret);
+        Scene& endTurn(QString& ret);
+        Scene& perform(QString& ret, const Ability& ability, Actor& target, bool const item);
+        Scene& checkStatus(QString& ret);
+        Scene& escape(QString& ret);
 
         int getAiSkill(const Ability& defSkill, bool const nRestore) const;
-        int getGuardian(const Actor& target, Ability& skill) const;
+        int getGuardian(const Actor& target, const Ability& skill) const;
 
         inline Actor& getPartyPlayer(int const party, int const player) const;
         inline bool hasPartyPlayer(int const party, Actor* const player) const;
@@ -70,7 +70,7 @@ namespace tbrpgsca
         inline int getCurrent() const;
         inline int getStatus() const;
 
-        Scene(const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit);
+        Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit);
 
         ~Scene();
     private:

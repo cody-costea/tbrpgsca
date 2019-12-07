@@ -52,10 +52,10 @@ inline int Role::getCurrentRp() const
     return this->sp;
 }
 
-State* Role::getAddedState(int n) const
+State& Role::getAddedState(int n) const
 {
     QVector<State*>* aStates = this->aStates;
-    return aStates == nullptr || n < 0 || n >= aStates->size() ? nullptr : aStates->at(n);
+    return *(aStates == nullptr || n < 0 || n >= aStates->size() ? nullptr : aStates->at(n));
 }
 
 int Role::getAddedStatesSize() const

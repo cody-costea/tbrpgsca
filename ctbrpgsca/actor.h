@@ -86,7 +86,6 @@ namespace tbrpgsca
         Actor& updateStates(bool const remove, const QVector<State*>& states);
         Actor& updateAttributes(bool const remove, const Costume& costume);
         Actor& applyStates(const QString& ret, bool const consume);
-        Actor& applyRole(const QString& ret, Role* const role);
         Actor& checkRegSkill(Ability* const skill);
         Actor& applyRoles(const QString& ret);
 
@@ -98,9 +97,9 @@ namespace tbrpgsca
 
         ~Actor();
     private:
-        Costume* race, job;
+        Costume* race,* job;
         int lv, maxLv, xp, maxp, init, side, actions;
-        QMap<Ability*, int>* skillsCrQty, skillsRgTurn, items;
+        QMap<Ability*, int>* skillsCrQty,* skillsRgTurn,* items;
         QMap<char, Costume*>* equipment;
         QMap<State*, int>* stateDur;
 

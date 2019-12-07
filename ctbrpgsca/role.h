@@ -21,6 +21,7 @@ limitations under the License.
 
 namespace tbrpgsca
 {
+    class Actor;
     class State;
 
     class Role
@@ -48,6 +49,8 @@ namespace tbrpgsca
         inline State& getAddedState(int n) const;
         inline bool hasAddedState(State* state) const;
         inline int getAddedStatesSize() const;
+
+        Role& apply(QString& ret, Actor& actor, bool const consume);
 
         Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, bool const range, bool const revive, QVector<State*>* const states);

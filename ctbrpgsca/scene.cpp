@@ -22,20 +22,21 @@ bool Scene::actorAgiComp(const Actor& a, const Actor& b)
     return (a.agi > b.agi);
 }
 
-Scene& Scene::setNext(const QString& ret, bool const endTurn)
+Scene& Scene::endTurn(QString& ret)
 {
     Scene& scene = *this;
     int current = scene.current;
     QVector<Actor*>& players = *(scene.players);
     int playersSize = players.size();
     Actor* crActor = players[current];
+    crActor->actions--;
     while (crActor->actions < 1)
     {
         int mInit = scene.mInit;
         if (mInit > 0)
         {
-            int next = current;
-            Actor* nxActor = crActor;
+            //int next = current;
+            //Actor* nxActor = crActor;
             int cInit = crActor->init - mInit;
             crActor->init = cInit;
             do
@@ -50,15 +51,15 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
                         if (iInit > cInit)
                         {
                             cInit = iInit;
-                            nxActor = iPlayer;
-                            next = i;
+                            crActor = iPlayer;
+                            current = i;
                         }
                     }
                 }
             }
-            while (nxActor->init < mInit);
-            crActor = nxActor;
-            current = next;
+            while (crActor->init < mInit);
+            //crActor = nxActor;
+            //current = next;
         }
         else
         {
@@ -75,11 +76,48 @@ Scene& Scene::setNext(const QString& ret, bool const endTurn)
         crActor->actions = crActor->mActions;
         crActor->applyStates(ret, false);
     }
-    this->current = current;
+    QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
+    if (regSkills != nullptr)
+    {
+        QMap<Ability*, int>* skillsQty = crActor->skillsCrQty;
+        if (skillsQty == nullptr)
+        {
+            skillsQty = new QMap<Ability*, int>();
+            crActor->skillsCrQty = skillsQty;
+        }
+        for (Ability* skill : regSkills->keys())
+        {
+            int skillMaxQty = skill->mQty;
+            int skillCrQty = skillsQty->value(skill, skillMaxQty);
+            if (skillCrQty < skillMaxQty)
+            {
+                int skillRgTurn = regSkills->value(skill, 0);
+                if (skillRgTurn == skill->rQty)
+                {
+                    skillsQty->operator[](skill) = skillCrQty + 1;
+                    regSkills->operator[](skill) = 0;
+                }
+                else
+                {
+                    regSkills->operator[](skill) = skillRgTurn + 1;
+                }
+            }
+        }
+    }
+    QVector<SceneAct>* events = scene.events;
+    if (events != nullptr && events->size() > 1)
+    {
+        auto event = events->at(2);
+        if (event != nullptr && event(scene, ret) && crActor->isAutomated())
+        {
+            scene.playAi(ret);
+        }
+    }
+    scene.current = current;
     return scene;
 }
 
-Scene::Scene(const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit)
+Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
     assert(partiesSize > 1);
@@ -106,7 +144,6 @@ Scene::Scene(const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const 
         }
         players.append(party);
     }
-    QString ret = "";
     std::sort(players.begin(), players.end(), Scene::actorAgiComp);
-    scene.setNext(ret, false);
+    scene.endTurn(ret);
 }
