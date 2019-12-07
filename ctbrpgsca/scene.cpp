@@ -104,7 +104,7 @@ Scene& Scene::endTurn(QString& ret)
             }
         }
     }
-    QVector<SceneAct>* events = scene.events;
+    QVector<SceneAct*>* events = scene.events;
     if (events != nullptr && events->size() > 1)
     {
         auto event = events->at(2);
@@ -117,7 +117,46 @@ Scene& Scene::endTurn(QString& ret)
     return scene;
 }
 
-Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct>* const events, int const surprise, int const mInit)
+Actor& Scene::getGuardian(Actor& target, const Ability& skill) const
+{
+    if (!skill.isRanged())
+    {
+        int side = target.side;
+        //Actor* guardian = &target
+        QVector<Actor*>& party = *(this->parties[side]);
+        int pos = party.indexOf(&target);
+        int pSize = party.size() - 1;
+        if (pos > 0 && pos < pSize)
+        {
+            Actor* fGuard = nullptr,* lGuard = nullptr;
+            for (int i = 0; i < pos; i++)
+            {
+                Actor* guardian = party[i];
+                if (guardian->isGuarding())
+                {
+                    fGuard = guardian;
+                    break;
+                }
+            }
+            for (int j = pSize; j > pos; j--)
+            {
+                Actor* guardian = party[j];
+                if (guardian->isGuarding())
+                {
+                    lGuard = guardian;
+                    break;
+                }
+            }
+            if (fGuard != nullptr && lGuard != nullptr)
+            {
+                return *((pos > pSize / 2) ? lGuard : fGuard);
+            }
+        }
+    }
+    return target;
+}
+
+Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
     assert(partiesSize > 1);
