@@ -117,43 +117,133 @@ Scene& Scene::endTurn(QString& ret)
     return scene;
 }
 
-Actor& Scene::getGuardian(Actor& target, const Ability& skill) const
+Actor& Scene::getGuardian(Actor& user, Actor& target, const Ability& skill) const
 {
-    if (!skill.isRanged())
+    if (!user.isRanged() || (skill.isOnlyMelee() && !skill.isRanged()))
     {
+        int pos = -1;
         int side = target.side;
-        //Actor* guardian = &target
+        Actor* fGuard = nullptr,* lGuard = nullptr;
+        Actor** guardPos = &fGuard;
         QVector<Actor*>& party = *(this->parties[side]);
-        int pos = party.indexOf(&target);
-        int pSize = party.size() - 1;
-        if (pos > 0 && pos < pSize)
+        int pSize = party.size();
+        for (int i = 0; i < pSize; i++)
         {
-            Actor* fGuard = nullptr,* lGuard = nullptr;
-            for (int i = 0; i < pos; i++)
+            Actor* const guardian = party[i];
+            if (guardian == &target)
             {
-                Actor* guardian = party[i];
-                if (guardian->isGuarding())
+                if (fGuard == nullptr || i == pSize - 1)
                 {
-                    fGuard = guardian;
                     break;
                 }
-            }
-            for (int j = pSize; j > pos; j--)
-            {
-                Actor* guardian = party[j];
-                if (guardian->isGuarding())
+                else
                 {
-                    lGuard = guardian;
-                    break;
+                    pos = i;
+                    guardPos = &lGuard;
+                    continue;
                 }
             }
-            if (fGuard != nullptr && lGuard != nullptr)
+            else if ((fGuard == nullptr || pos != -1) && guardian->isGuarding())
             {
-                return *((pos > pSize / 2) ? lGuard : fGuard);
+                (*guardPos) = guardian;
             }
+        }
+        if (fGuard != nullptr && lGuard != nullptr)
+        {
+            return *((pos < (pSize / 2)) ? fGuard : lGuard);
         }
     }
     return target;
+}
+
+Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts)
+{
+    Scene& scene = *this;
+    bool healing = ability.mHp < 0;
+    if ((healing && ability.isReviving()) || target->hp > 0)
+    {
+        ability.execute(ret, user, *target, applyCosts);
+        if ((!healing) && target != &user && target->hp > 0 && target->isCountering() && target->isGuarding())
+        {
+            //TODO: counter.execute(ret, user, target, false);
+        }
+    }
+    return scene;
+}
+
+Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item)
+{
+    Scene& scene = *this;
+    QVector<SceneAct*>* events = scene.events;
+    if (events != nullptr && events->size() > 0)
+    {
+        auto event = events->at(1);
+        if (event != nullptr && event(scene, ret))
+        {
+            return scene;
+        }
+    }
+    if (ability.isRanged() && ability.targetsAll())
+    {
+        bool applyCosts = true;
+        int pSize = scene.players->size();
+        bool sideTarget = ability.targetsSide();
+        bool noSelfTarget = !ability.targetsSelf();
+        for (int i = 0; i < pSize; i++)
+        {
+            Actor* trg = players->at(i);
+            if (sideTarget && noSelfTarget && trg->side == user.side)
+            {
+                continue;
+            }
+            else if (trg == &user)
+            {
+                if (noSelfTarget)
+                {
+                    continue;
+                }
+                else
+                {
+                    ability.execute(ret, user, user, applyCosts);
+                }
+            }
+            else
+            {
+                scene.execute(ret, user, trg, ability, applyCosts);
+            }
+            applyCosts = false;
+        }
+    }
+    else if (ability.targetsSide())
+    {
+        int side = ability.targetsSelf() ? user.side : target.side;
+        QVector<Actor*>& party = *(scene.parties[side]);
+        int pSize = party.size();
+        for (int i = 0; i < pSize; i++)
+        {
+            scene.execute(ret, user, party[i], ability, i == 0);
+        }
+    }
+    else
+    {
+        if (&user == &target || ability.targetsSelf())
+        {
+            ability.execute(ret, user, user, true);
+        }
+        else
+        {
+            scene.execute(ret, user, &(scene.getGuardian(user, target, ability)), ability, true);
+        }
+    }
+    if (item)
+    {
+        QMap<Ability*, int>* items = user.items;
+        if (items != nullptr)
+        {
+            items->operator[](&ability) = items->value(&ability, 1) - 1;
+        }
+    }
+    return scene;
 }
 
 Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)

@@ -48,12 +48,12 @@ namespace tbrpgsca
 
         Scene& playAi(QString& ret);
         Scene& endTurn(QString& ret);
-        Scene& perform(QString& ret, const Ability& ability, Actor& target, bool const item);
+        Scene& perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
         Scene& checkStatus(QString& ret);
         Scene& escape(QString& ret);
 
         Ability& getAiSkill(Ability& defSkill, bool const nRestore) const;
-        Actor& getGuardian(Actor& target, const Ability& skill) const;
+        Actor& getGuardian(Actor& user, Actor& target, const Ability& skill) const;
 
         inline Actor& getPartyPlayer(int const party, int const player) const;
         inline bool hasPartyPlayer(int const party, Actor* const player) const;
@@ -74,6 +74,8 @@ namespace tbrpgsca
 
         ~Scene();
     private:
+        Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+
         Ability* lastAbility;
         QVector<SceneAct*>* events;
         int current, surprise, fTarget, lTarget, status, mInit;

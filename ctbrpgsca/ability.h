@@ -29,7 +29,7 @@ namespace tbrpgsca
         #define FLAG_STEAL 8
         #define FLAG_ABSORB 16
         #define FLAG_TRG_ALL 4
-        #define FLAG_TRG_FULL 32
+        #define FLAG_TRG_SIDE 32
         #define FLAG_TRG_SELF 64
         #define FLAG_DMG_ATK 128
         #define FLAG_DMG_DEF 256
@@ -51,12 +51,15 @@ namespace tbrpgsca
         inline bool isStealing() const;
         inline bool isAbsorbing() const;
         inline bool isOnlyMelee() const;
+        inline bool targetsSide() const;
+        inline bool targetsSelf() const;
+        inline bool targetsAll() const;
 
         inline State& getRemovedState(int const n) const;
         inline bool hasRemovedState(State* const state) const;
         inline int getRemovedStatesSize() const;
 
-        bool canPerform(Actor& user);
+        bool canPerform(const Actor& user);
         Ability& execute(QString& ret, Actor& user, const Actor& target, bool const applyCosts);
         Ability& replenish(Actor& user);
 
