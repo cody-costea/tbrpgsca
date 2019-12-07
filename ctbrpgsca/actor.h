@@ -61,6 +61,7 @@ namespace tbrpgsca
         Actor& setName(const QString& value);
         Actor& setSprite(const QString& value);
         Actor& setLevel(int const level);
+        Actor& setExperience(int const xp);
         Actor& setMaximumLevel(int const maxLv);
         Actor& setMaximumHp(int const mHp);
         Actor& setMaximumMp(int const mMp);

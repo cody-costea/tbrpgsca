@@ -105,9 +105,9 @@ Scene& Scene::endTurn(QString& ret)
         }
     }
     QVector<SceneAct*>* events = scene.events;
-    if (events != nullptr && events->size() > 1)
+    if (events != nullptr && events->size() > 3)
     {
-        auto event = events->at(2);
+        auto event = events->at(3);
         if (event != nullptr && event(scene, ret) && crActor->isAutomated())
         {
             scene.playAi(ret);
@@ -175,10 +175,10 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
 {
     Scene& scene = *this;
     QVector<SceneAct*>* events = scene.events;
-    if (events != nullptr && events->size() > 0)
+    if (events != nullptr && events->size() > 1)
     {
         auto event = events->at(1);
-        if (event != nullptr && event(scene, ret))
+        if (event != nullptr && !event(scene, ret))
         {
             return scene;
         }
@@ -186,13 +186,14 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     if (ability.isRanged() && ability.targetsAll())
     {
         bool applyCosts = true;
-        int pSize = scene.players->size();
+        int usrSide = user.side;
         bool sideTarget = ability.targetsSide();
         bool noSelfTarget = !ability.targetsSelf();
+        int pSize = scene.players->size();
         for (int i = 0; i < pSize; i++)
         {
             Actor* trg = players->at(i);
-            if (sideTarget && noSelfTarget && trg->side == user.side)
+            if (sideTarget && noSelfTarget && trg->side == usrSide)
             {
                 continue;
             }
@@ -243,6 +244,16 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
             items->operator[](&ability) = items->value(&ability, 1) - 1;
         }
     }
+    this->lastAbility = &ability;
+    if (events->size() > 2)
+    {
+        auto event = events->at(2);
+        if (event != nullptr && !event(scene, ret))
+        {
+            return scene;
+        }
+    }
+    user.setExperience(user.xp + 1);
     return scene;
 }
 
@@ -273,6 +284,10 @@ Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<Sce
         }
         players.append(party);
     }
+    SceneAct* event;
     std::sort(players.begin(), players.end(), Scene::actorAgiComp);
-    scene.endTurn(ret);
+    if (events == nullptr || events->size() == 0 || ((event = events->at(0)) == nullptr) || event(scene, ret))
+    {
+        scene.endTurn(ret);
+    }
 }
