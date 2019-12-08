@@ -46,13 +46,13 @@ namespace tbrpgsca
 
         static bool actorAgiComp(const Actor& a, const Actor& b);
 
-        Scene& playAi(QString& ret);
         Scene& endTurn(QString& ret);
+        Scene& playAi(QString& ret, Actor& player);
         Scene& perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
         Scene& checkStatus(QString& ret);
         Scene& escape(QString& ret);
 
-        Ability& getAiSkill(Ability& defSkill, bool const nRestore) const;
+        Ability& getAiSkill(Actor& user, const QVector<Ability*>& skills, int const index, bool const nRestore) const;
         Actor& getGuardian(Actor& user, Actor& target, const Ability& skill) const;
 
         inline Actor& getPartyPlayer(int const party, int const player) const;
