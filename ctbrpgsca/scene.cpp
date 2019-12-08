@@ -22,189 +22,6 @@ bool Scene::actorAgiComp(const Actor& a, const Actor& b)
     return (a.agi > b.agi);
 }
 
-Ability& Scene::getAiSkill(Actor& user, const QVector<Ability*>& skills, int const defSkill, bool const restore) const
-{
-    int sSize = skills.size();
-    Ability* s = skills[defSkill];
-    for (int i = 0; i < sSize; i++)
-    {
-        Ability* a = skills[i];
-        if (a->canPerform(user) && ((defSkill > 0 && (a->mHp < s->mHp)
-            && (a->isReviving() || !restore)) || (a->mHp > s->mHp)))
-        {
-            s = a;
-        }
-    }
-    return *s;
-}
-
-Scene& Scene::playAi(QString& ret, Actor& player)
-{
-    Scene& scene = *this;
-    int side = player.side, skillIndex = 0, heal = -1;
-    QVector<Actor*>& party = *(scene.parties[side]);
-    int partySize = party.size();
-    for (int i = 0; i < partySize; i++)
-    {
-        Actor& iPlayer = *(party.at(i));
-        int iHp = iPlayer.hp;
-        if (iHp < 1)
-        {
-            heal = 1;
-        }
-        else if (iHp < (iPlayer.mHp / 3))
-        {
-            heal = 0;
-        }
-    }
-    const QVector<Ability*>& skills = *(player.aSkills);
-    if (heal > -1)
-    {
-        int skillsSize = skills.size();
-        for (int i = 0; i < skillsSize; i++)
-        {
-            Ability& s = *(skills[i]);
-            if (s.canPerform(player) && (s.mHp < 0 && ((heal == 0) || s.isReviving())))
-            {
-                skillIndex = 0;
-                break;
-            }
-        }
-    }
-    Actor* target;
-    Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
-    if (ability.mHp > -1)
-    {
-        int trg = 0;
-        QVector<Actor*>& players = *(scene.players);
-        int playerSize = players.size();
-        do
-        {
-            target = players.at(trg);
-        } while ((target->hp < 1 || target->side == side) && ((++trg) < playerSize));
-        for (int i = trg; i < playerSize; i++)
-        {
-            int iHp;
-            Actor* iPlayer = players.at(i);
-            if (iPlayer->side != side && (iHp = iPlayer->hp) > 0 && iHp < target->hp)
-            {
-                target = iPlayer;
-            }
-        }
-    }
-    else
-    {
-        target = party.at(0);
-        bool restore = ability.isReviving();
-        for (int i = 1; i < partySize; i++)
-        {
-            Actor* iPlayer = party.at(i);
-            int iHp = iPlayer->hp;
-            if (iHp < target->hp && (restore || iHp > 0))
-            {
-                target = iPlayer;
-            }
-        }
-    }
-    scene.perform(ret, player, *target, ability, false);
-    return scene;
-}
-
-Scene& Scene::endTurn(QString& ret)
-{
-    Scene& scene = *this;
-    int current = scene.current;
-    QVector<Actor*>& players = *(scene.players);
-    int playersSize = players.size();
-    Actor* crActor = players[current];
-    crActor->actions--;
-    while (crActor->actions < 1)
-    {
-        int mInit = scene.mInit;
-        if (mInit > 0)
-        {
-            //int next = current;
-            //Actor* nxActor = crActor;
-            int cInit = crActor->init - mInit;
-            crActor->init = cInit;
-            do
-            {
-                for (int i = 0; i < playersSize; i++)
-                {
-                    Actor* iPlayer = players[i];
-                    if (iPlayer->hp > 0)
-                    {
-                        int iInit = iPlayer->init + iPlayer->agi;
-                        iPlayer->init = iInit;
-                        if (iInit > cInit)
-                        {
-                            cInit = iInit;
-                            crActor = iPlayer;
-                            current = i;
-                        }
-                    }
-                }
-            }
-            while (crActor->init < mInit);
-            //crActor = nxActor;
-            //current = next;
-        }
-        else
-        {
-            do
-            {
-                if (++current == playersSize)
-                {
-                    current = 0;
-                }
-                crActor = players[current];
-            }
-            while (crActor->hp < 1);
-        }
-        crActor->actions = crActor->mActions;
-        crActor->applyStates(ret, false);
-    }
-    QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
-    if (regSkills != nullptr)
-    {
-        QMap<Ability*, int>* skillsQty = crActor->skillsCrQty;
-        if (skillsQty == nullptr)
-        {
-            skillsQty = new QMap<Ability*, int>();
-            crActor->skillsCrQty = skillsQty;
-        }
-        for (Ability* skill : regSkills->keys())
-        {
-            int skillMaxQty = skill->mQty;
-            int skillCrQty = skillsQty->value(skill, skillMaxQty);
-            if (skillCrQty < skillMaxQty)
-            {
-                int skillRgTurn = regSkills->value(skill, 0);
-                if (skillRgTurn == skill->rQty)
-                {
-                    skillsQty->operator[](skill) = skillCrQty + 1;
-                    regSkills->operator[](skill) = 0;
-                }
-                else
-                {
-                    regSkills->operator[](skill) = skillRgTurn + 1;
-                }
-            }
-        }
-    }
-    QVector<SceneAct*>* events = scene.events;
-    if (events != nullptr && events->size() > 3)
-    {
-        auto event = events->at(3);
-        if (event != nullptr && event(scene, ret) && crActor->isAutomated())
-        {
-            scene.playAi(ret, (*crActor));
-        }
-    }
-    scene.current = current;
-    return scene;
-}
-
 Actor& Scene::getGuardian(Actor& user, Actor& target, const Ability& skill) const
 {
     if (!user.isRanged() || (skill.isOnlyMelee() && !skill.isRanged()))
@@ -342,6 +159,189 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
         }
     }
     user.setExperience(user.xp + 1);
+    return scene;
+}
+
+Ability& Scene::getAiSkill(Actor& user, const QVector<Ability*>& skills, int const defSkill, bool const restore) const
+{
+    int sSize = skills.size();
+    Ability* s = skills[defSkill];
+    for (int i = 0; i < sSize; i++)
+    {
+        Ability* a = skills[i];
+        if (a->canPerform(user) && ((defSkill > 0 && (a->mHp < s->mHp)
+            && (a->isReviving() || !restore)) || (a->mHp > s->mHp)))
+        {
+            s = a;
+        }
+    }
+    return *s;
+}
+
+Scene& Scene::playAi(QString& ret, Actor& player)
+{
+    Scene& scene = *this;
+    int side = player.side, skillIndex = 0, heal = -1;
+    QVector<Actor*>& party = *(scene.parties[side]);
+    int partySize = party.size();
+    for (int i = 0; i < partySize; i++)
+    {
+        Actor& iPlayer = *(party.at(i));
+        int iHp = iPlayer.hp;
+        if (iHp < 1)
+        {
+            heal = 1;
+        }
+        else if (iHp < (iPlayer.mHp / 3))
+        {
+            heal = 0;
+        }
+    }
+    const QVector<Ability*>& skills = *(player.aSkills);
+    if (heal > -1)
+    {
+        int skillsSize = skills.size();
+        for (int i = 0; i < skillsSize; i++)
+        {
+            Ability& s = *(skills[i]);
+            if (s.canPerform(player) && (s.mHp < 0 && ((heal == 0) || s.isReviving())))
+            {
+                skillIndex = 0;
+                break;
+            }
+        }
+    }
+    Actor* target;
+    Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
+    if (ability.mHp > -1)
+    {
+        int trg = 0;
+        QVector<Actor*>& players = *(scene.players);
+        int playerSize = players.size();
+        do
+        {
+            target = players.at(trg);
+        } while (((++trg) < playerSize) && (target->hp < 1 || target->side == side));
+        for (int i = trg; i < playerSize; i++)
+        {
+            int iHp;
+            Actor* iPlayer = players.at(i);
+            if (iPlayer->side != side && (iHp = iPlayer->hp) > 0 && iHp < target->hp)
+            {
+                target = iPlayer;
+            }
+        }
+    }
+    else
+    {
+        target = party.at(0);
+        bool restore = ability.isReviving();
+        for (int i = 1; i < partySize; i++)
+        {
+            Actor* iPlayer = party.at(i);
+            int iHp = iPlayer->hp;
+            if (iHp < target->hp && (restore || iHp > 0))
+            {
+                target = iPlayer;
+            }
+        }
+    }
+    scene.perform(ret, player, *target, ability, false);
+    return scene;
+}
+
+Scene& Scene::endTurn(QString& ret)
+{
+    Scene& scene = *this;
+    int current = scene.current;
+    QVector<Actor*>& players = *(scene.players);
+    int playersSize = players.size();
+    Actor* crActor = players[current];
+    crActor->actions--;
+    while (crActor->actions < 1)
+    {
+        int mInit = scene.mInit;
+        if (mInit > 0)
+        {
+            //int next = current;
+            //Actor* nxActor = crActor;
+            int cInit = crActor->init - mInit;
+            crActor->init = cInit;
+            do
+            {
+                for (int i = 0; i < playersSize; i++)
+                {
+                    Actor* iPlayer = players[i];
+                    if (iPlayer->hp > 0)
+                    {
+                        int iInit = iPlayer->init + iPlayer->agi;
+                        iPlayer->init = iInit;
+                        if (iInit > cInit)
+                        {
+                            cInit = iInit;
+                            crActor = iPlayer;
+                            current = i;
+                        }
+                    }
+                }
+            }
+            while (crActor->init < mInit);
+            //crActor = nxActor;
+            //current = next;
+        }
+        else
+        {
+            do
+            {
+                if (++current == playersSize)
+                {
+                    current = 0;
+                }
+                crActor = players[current];
+            }
+            while (crActor->hp < 1);
+        }
+        crActor->actions = crActor->mActions;
+        crActor->applyStates(ret, false);
+    }
+    QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
+    if (regSkills != nullptr)
+    {
+        QMap<Ability*, int>* skillsQty = crActor->skillsCrQty;
+        if (skillsQty == nullptr)
+        {
+            skillsQty = new QMap<Ability*, int>();
+            crActor->skillsCrQty = skillsQty;
+        }
+        for (Ability* skill : regSkills->keys())
+        {
+            int skillMaxQty = skill->mQty;
+            int skillCrQty = skillsQty->value(skill, skillMaxQty);
+            if (skillCrQty < skillMaxQty)
+            {
+                int skillRgTurn = regSkills->value(skill, 0);
+                if (skillRgTurn == skill->rQty)
+                {
+                    skillsQty->operator[](skill) = skillCrQty + 1;
+                    regSkills->operator[](skill) = 0;
+                }
+                else
+                {
+                    regSkills->operator[](skill) = skillRgTurn + 1;
+                }
+            }
+        }
+    }
+    QVector<SceneAct*>* events = scene.events;
+    if (events != nullptr && events->size() > 3)
+    {
+        auto event = events->at(3);
+        if (event != nullptr && event(scene, ret) && crActor->isAutomated())
+        {
+            scene.playAi(ret, (*crActor));
+        }
+    }
+    scene.current = current;
     return scene;
 }
 
