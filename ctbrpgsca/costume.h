@@ -48,6 +48,10 @@ namespace tbrpgsca
         inline bool hasAddedSkill(Ability* skill) const;
         inline int getAddedSkillsSize() const;
 
+        inline Ability* getCounterSkill(int n) const;
+        inline bool hasCounterSkill(Ability* skill) const;
+        inline int getCounterSkillsSize() const;
+
         Costume(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
                 bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
@@ -58,7 +62,7 @@ namespace tbrpgsca
         ~Costume();
     private:
         int atk, def, spi, wis, agi, mActions;
-        QVector<Ability*>* aSkills;
+        QVector<Ability*>* aSkills, *counters;
         QMap<State*, int>* stRes;
         QMap<int, int>* res;
 

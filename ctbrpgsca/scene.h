@@ -64,9 +64,11 @@ namespace tbrpgsca
         inline bool hasOrderedPlayer(Actor* const player) const;
         inline int getOrderedPlayersSize() const;
 
+        inline Actor& getTargetedPlayer(int const n) const;
+        inline bool hasTargetedPlayer(Actor* const player) const;
+        inline int getTargetedPlayersSize() const;
+
         inline Ability& getLastAbility() const;
-        inline int getFirstTarget() const;
-        inline int getLastTarget() const;
         inline int getCurrent() const;
         inline int getStatus() const;
 
@@ -81,6 +83,7 @@ namespace tbrpgsca
         int current, surprise, fTarget, lTarget, status, mInit;
         QVector<QVector<Actor*>*> parties;
         QVector<Actor*>* players;
+        QVector<Actor*>* targets;
     };
 
 }

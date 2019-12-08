@@ -67,10 +67,26 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
     bool healing = ability.mHp < 0;
     if ((healing && ability.isReviving()) || target->hp > 0)
     {
+        int cntSize;
+        QVector<Ability*>* counters;
         ability.execute(ret, user, *target, applyCosts);
-        if ((!healing) && target != &user && target->hp > 0 && target->isCountering() && target->isGuarding())
+        if ((!healing) && target != &user && target->hp > 0 && target->isGuarding()
+                && (counters = target->counters) != nullptr && (cntSize = counters->size()) > 0)
         {
-            //TODO: counter.execute(ret, user, target, false);
+            Ability* counter = counters->at(0);
+            if (cntSize > 1)
+            {
+                for (int i = 1; i < cntSize; i++)
+                {
+                    Ability* cntSkill = counters->at(i);
+                    if (/*counter->flags*/ cntSkill->mHp > counter->mHp)
+                    {
+                        counter = cntSkill;
+                    }
+                }
+            }
+            //TODO: dmgType check
+            counter->execute(ret, *target, user, false);
         }
     }
     return scene;
