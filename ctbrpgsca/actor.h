@@ -32,8 +32,8 @@ namespace tbrpgsca
         static QString KoTxt;
         static QString RiseTxt;
 
-        inline Costume* getJob() const;
-        inline Costume* getRace() const;
+        inline Costume& getJob() const;
+        inline Costume& getRace() const;
 
         inline bool isGuarding() const;
         inline bool isShapeShifted() const;
@@ -46,20 +46,22 @@ namespace tbrpgsca
         inline int getExperience() const;
         inline int getInitiative() const;
         inline int getPartySide() const;
+        inline void* getExtra() const;
 
-        int getRemainingSkillUses(Ability* const skill) const;
-        int getRegeneratingSkillTurn(Ability* const skill) const;
+        int getRemainingSkillUses(const Ability& skill) const;
+        int getRegeneratingSkillTurn(const Ability& skill) const;
 
         Costume* unequipPos(int const pos);
         Costume* equipItem(char const pos, Costume* const item);
-        char unequipItem(Costume* const item);
+        char unequipItem(const Costume& item);
 
         Actor& recover();
         Actor& checkStatus(const QString& ret);
-        Actor& setJob(Costume* const job);
-        Actor& setRace(Costume* const race);
-        Actor& setName(const QString& value);
+        Actor& setExtra(void* const extra);
+        Actor& setJob(const Costume& job);
+        Actor& setRace(const Costume& race);
         Actor& setSprite(const QString& value);
+        Actor& setName(const QString& value);
         Actor& setLevel(int const level);
         Actor& setExperience(int const xp);
         Actor& setMaximumLevel(int const maxLv);
@@ -80,17 +82,17 @@ namespace tbrpgsca
         Actor& setAiPlayer(bool const aiPlayer);
         Actor& setReviving(bool const revive);
         Actor& setElementResistance(int const element, int const res);
-        Actor& setStateResistance(State* const state, int const res);
+        Actor& setStateResistance(const State* state, int const res);
         Actor& switchCostume(Costume* const oldCostume, Costume* const newCostume);
         Actor& updateSkills(bool const remove, const QVector<Ability*>& skills);
         Actor& updateResistance(bool const remove, const QMap<int, int>& elmRes, QMap<State*, int>& stRes);
         Actor& updateStates(bool const remove, const QVector<State*>& states);
         Actor& updateAttributes(bool const remove, const Costume& costume);
         Actor& applyStates(const QString& ret, bool const consume);
-        Actor& checkRegSkill(Ability* const skill);
+        Actor& checkRegSkill(const Ability& skill);
         Actor& applyRoles(const QString& ret);
 
-        Actor(int const id, const QString& name, Costume* const race, Costume* const job, int const level, int const maxLv, int const mHp,
+        Actor(int const id, const QString& name, const Costume& race, const Costume& job, int const level, int const maxLv, int const mHp,
               int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
               QVector<State*>* const states, QMap<int, int>* const res, QMap<State*, int> const stRes, QMap<Ability*, int> const items);
 
@@ -103,6 +105,7 @@ namespace tbrpgsca
         QMap<Ability*, int>* skillsCrQty,* skillsRgTurn,* items;
         QMap<char, Costume*>* equipment;
         QMap<State*, int>* stateDur;
+        void* extra;
 
         friend class Scene;
         friend class Ability;

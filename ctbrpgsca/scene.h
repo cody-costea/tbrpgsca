@@ -56,16 +56,16 @@ namespace tbrpgsca
         Actor& getGuardian(Actor& user, Actor& target, const Ability& skill) const;
 
         inline Actor& getPartyPlayer(int const party, int const player) const;
-        inline bool hasPartyPlayer(int const party, Actor* const player) const;
+        inline bool hasPartyPlayer(int const party, const Actor& player) const;
         inline int getPartyPlayersSize(int party) const;
         inline int getPartiesSize() const;
 
         inline Actor& getOrderedPlayer(int const n) const;
-        inline bool hasOrderedPlayer(Actor* const player) const;
+        inline bool hasOrderedPlayer(const Actor& player) const;
         inline int getOrderedPlayersSize() const;
 
         inline Actor& getTargetedPlayer(int const n) const;
-        inline bool hasTargetedPlayer(Actor* const player) const;
+        inline bool hasTargetedPlayer(const Actor& player) const;
         inline int getTargetedPlayersSize() const;
 
         inline Ability& getLastAbility() const;
@@ -81,9 +81,8 @@ namespace tbrpgsca
         Ability* lastAbility;
         QVector<SceneAct*>* events;
         int current, surprise, fTarget, lTarget, status, mInit;
+        QVector<Actor*>* players,* targets;
         QVector<QVector<Actor*>*> parties;
-        QVector<Actor*>* players;
-        QVector<Actor*>* targets;
     };
 
 }

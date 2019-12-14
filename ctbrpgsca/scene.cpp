@@ -39,7 +39,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, const Ability& skill) cons
             {
                 if (fGuard == nullptr || i == pSize - 1)
                 {
-                    break;
+                    return target;//break;
                 }
                 else
                 {
@@ -276,6 +276,7 @@ Scene& Scene::endTurn(QString& ret)
     crActor->actions--;
     while (crActor->actions < 1)
     {
+        crActor->applyStates(ret, true);
         int mInit = scene.mInit;
         if (mInit > 0)
         {
@@ -318,36 +319,37 @@ Scene& Scene::endTurn(QString& ret)
             while (crActor->hp < 1);
         }
         crActor->actions = crActor->mActions;
-        crActor->applyStates(ret, false);
-    }
-    QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
-    if (regSkills != nullptr)
-    {
-        QMap<Ability*, int>* skillsQty = crActor->skillsCrQty;
-        if (skillsQty == nullptr)
+        QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
+        if (regSkills != nullptr)
         {
-            skillsQty = new QMap<Ability*, int>();
-            crActor->skillsCrQty = skillsQty;
-        }
-        for (Ability* skill : regSkills->keys())
-        {
-            int skillMaxQty = skill->mQty;
-            int skillCrQty = skillsQty->value(skill, skillMaxQty);
-            if (skillCrQty < skillMaxQty)
+            QMap<Ability*, int>* skillsQty = crActor->skillsCrQty;
+            if (skillsQty == nullptr)
             {
-                int skillRgTurn = regSkills->value(skill, 0);
-                if (skillRgTurn == skill->rQty)
+                skillsQty = new QMap<Ability*, int>();
+                crActor->skillsCrQty = skillsQty;
+            }
+            for (Ability* skill : regSkills->keys())
+            {
+                int skillMaxQty = skill->mQty;
+                int skillCrQty = skillsQty->value(skill, skillMaxQty);
+                if (skillCrQty < skillMaxQty)
                 {
-                    skillsQty->operator[](skill) = skillCrQty + 1;
-                    regSkills->operator[](skill) = 0;
-                }
-                else
-                {
-                    regSkills->operator[](skill) = skillRgTurn + 1;
+                    int skillRgTurn = regSkills->value(skill, 0);
+                    if (skillRgTurn == skill->rQty)
+                    {
+                        skillsQty->operator[](skill) = skillCrQty + 1;
+                        regSkills->operator[](skill) = 0;
+                    }
+                    else
+                    {
+                        regSkills->operator[](skill) = skillRgTurn + 1;
+                    }
                 }
             }
         }
+        crActor->applyStates(ret, false);
     }
+    scene.current = current;
     QVector<SceneAct*>* events = scene.events;
     if (events != nullptr && events->size() > 3)
     {
@@ -357,7 +359,6 @@ Scene& Scene::endTurn(QString& ret)
             scene.playAi(ret, (*crActor));
         }
     }
-    scene.current = current;
     return scene;
 }
 

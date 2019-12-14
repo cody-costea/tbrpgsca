@@ -65,14 +65,14 @@ namespace tbrpgsca
 
         Ability(int const id, const QString& name, const QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq,
                 int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg,
-                int const trg, int const elm,int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates,
+                int const trg, int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates,
                 QVector<State*>* const rStates);
 
         Ability(Ability& ability);
 
         ~Ability();
     private:
-        int lvRq, attrInc, elm, mQty, rQty;
+        int lvRq, attrInc, dmgType, mQty, rQty;
         QVector<State*>* rStates;
 
         friend class Costume;

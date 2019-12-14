@@ -26,7 +26,7 @@ Ability::Ability(int const id, const QString& name, const QString& sprite, bool 
                  int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg,
                  int const trg, int const elm,int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates,
                  QVector<State*>* const rStates)
-    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, range, revive, aStates)
+    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, elm, range, revive, aStates)
 {
     this->lvRq = lvRq;
     this->attrInc = attrInc;

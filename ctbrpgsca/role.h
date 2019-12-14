@@ -45,22 +45,23 @@ namespace tbrpgsca
         inline int getCurrentHp() const;
         inline int getCurrentMp() const;
         inline int getCurrentRp() const;
+        inline int getElement() const;
 
         inline State& getAddedState(int n) const;
-        inline bool hasAddedState(State* state) const;
+        inline bool hasAddedState(State& state) const;
         inline int getAddedStatesSize() const;
 
         Role& apply(QString& ret, Actor& actor, bool const consume);
 
-        Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
-             int const mHp, int const mMp, int const mSp, bool const range, bool const revive, QVector<State*>* const states);
+        Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+             int const mMp, int const mSp, int const element, bool const range, bool const revive, QVector<State*>* const states);
 
         Role(Role& role);
 
         ~Role();
     private:
         QString name, sprite;
-        int id, hp, mp, sp, mHp, mMp, mSp, flags;
+        int id, hp, mp, sp, mHp, mMp, mSp, elm, flags;
         QVector<State*>* aStates;
 
         friend class Ability;
