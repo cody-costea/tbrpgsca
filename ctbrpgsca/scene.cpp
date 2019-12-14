@@ -61,6 +61,48 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, const Ability& skill) cons
     return target;
 }
 
+Scene& Scene::checkStatus(QString& ret)
+{
+    Scene& scene = *this;
+    if (scene.status == 0)
+    {
+        auto parties = scene.parties;
+        auto party = parties[0];
+        int partySize = party->size();
+        {
+            for (int k = 0; k < partySize; k++)
+            {
+                if (party->at(k)->hp > 0)
+                {
+                    goto enemyCheck;
+                }
+            }
+            scene.status = -2;
+            ret = ret % Scene::FallenTxt;
+            return scene;
+        }
+        enemyCheck:
+        {
+            int const partiesSize = parties.size();
+            for (int i = 1; i < partiesSize; i++)
+            {
+                party = parties[i];
+                partySize = party->size();
+                for (int j = 0; j < partySize; j++)
+                {
+                    if (party->at(j)->hp > 0)
+                    {
+                        return scene;
+                    }
+                }
+            }
+            ret = ret % Scene::VictoryTxt;
+            scene.status = 1;
+        }
+    }
+    return scene;
+}
+
 Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts)
 {
     Scene& scene = *this;
@@ -69,24 +111,25 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
     {
         int cntSize;
         QVector<Ability*>* counters;
-        ability.execute(ret, user, *target, applyCosts);
+        ability.execute(ret, this, user, *target, applyCosts);
         if ((!healing) && target != &user && target->hp > 0 && target->isGuarding()
                 && (counters = target->counters) != nullptr && (cntSize = counters->size()) > 0)
         {
-            Ability* counter = counters->at(0);
-            if (cntSize > 1)
+            Ability* counter = nullptr;
+            int usrDmgType = ability.dmgType;
+            for (int i = 0; i < cntSize; i++)
             {
-                for (int i = 1; i < cntSize; i++)
+                Ability* cntSkill = counters->at(i);
+                int cntDmgType = cntSkill->dmgType;
+                if (((usrDmgType & cntDmgType) == cntDmgType) && cntSkill->mHp > counter->mHp)
                 {
-                    Ability* cntSkill = counters->at(i);
-                    if (/*counter->flags*/ cntSkill->mHp > counter->mHp)
-                    {
-                        counter = cntSkill;
-                    }
+                    counter = cntSkill;
                 }
             }
-            //TODO: dmgType check
-            counter->execute(ret, *target, user, false);
+            if (counter != nullptr)
+            {
+                counter->execute(ret, *target, user, false);
+            }
         }
     }
     return scene;
@@ -126,7 +169,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
                 }
                 else
                 {
-                    ability.execute(ret, user, user, applyCosts);
+                    ability.execute(ret, this, user, user, applyCosts);
                 }
             }
             else
@@ -150,7 +193,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     {
         if (&user == &target || ability.targetsSelf())
         {
-            ability.execute(ret, user, user, true);
+            ability.execute(ret, this, user, user, true);
         }
         else
         {
@@ -351,15 +394,24 @@ Scene& Scene::endTurn(QString& ret)
     }
     scene.current = current;
     QVector<SceneAct*>* events = scene.events;
-    if (events != nullptr && events->size() > 3)
+    if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
-        auto event = events->at(3);
+        auto event = events->at(EVENT_NEW_TURN);
         if (event != nullptr && event(scene, ret) && crActor->isAutomated())
         {
             scene.playAi(ret, (*crActor));
         }
     }
     return scene;
+}
+
+inline void Scene::agiCalc()
+{
+    if (this->mInit < 1)
+    {
+        QVector<Actor*>& players = *(this->players);
+        std::sort(players.begin(), players.end(), Scene::actorAgiComp);
+    }
 }
 
 Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
@@ -390,7 +442,7 @@ Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<Sce
         players.append(party);
     }
     SceneAct* event;
-    std::sort(players.begin(), players.end(), Scene::actorAgiComp);
+    scene.agiCalc();
     if (events == nullptr || events->size() == 0 || ((event = events->at(0)) == nullptr) || event(scene, ret))
     {
         scene.endTurn(ret);

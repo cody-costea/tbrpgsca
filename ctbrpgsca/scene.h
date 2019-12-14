@@ -19,7 +19,7 @@ limitations under the License.
 #include "actor.h"
 
 #include <QVector>
-
+#include <QStringBuilder>
 
 namespace tbrpgsca
 {
@@ -76,13 +76,16 @@ namespace tbrpgsca
 
         ~Scene();
     private:
-        Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
-
         Ability* lastAbility;
         QVector<SceneAct*>* events;
         int current, surprise, fTarget, lTarget, status, mInit;
         QVector<Actor*>* players,* targets;
         QVector<QVector<Actor*>*> parties;
+
+        Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+        inline void agiCalc();
+
+        friend class Actor;
     };
 
 }

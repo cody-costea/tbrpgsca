@@ -22,6 +22,7 @@ namespace tbrpgsca
 {
 
     class Actor;
+    class Scene;
 
     class Ability : public Role
     {
@@ -74,6 +75,8 @@ namespace tbrpgsca
     private:
         int lvRq, attrInc, dmgType, mQty, rQty;
         QVector<State*>* rStates;
+
+        Ability& execute(QString& ret, Scene* scene, Actor& user, const Actor& target, bool const applyCosts);
 
         friend class Costume;
         friend class Actor;

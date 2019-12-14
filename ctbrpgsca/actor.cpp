@@ -14,83 +14,128 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "actor.h"
+#include "scene.h"
 
 using namespace tbrpgsca;
 
-Actor* Actor::setCurrentHp(const int hp)
+Actor& Actor::setAgility(const int agi)
 {
-    this->hp = hp;
-    return this;
+    this->agi = agi;
+    return *this;
 }
 
-Actor* Actor::setCurrentMp(const int mp)
+Actor& Actor::setAgility(const int agi, Scene& scene)
 {
-    this->mp = mp;
-    return this;
+    Actor& actor = this->setAgility(agi);
+    scene.agiCalc();
+    return actor;
 }
 
-Actor* Actor::setCurrentRp(const int sp)
+Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene& scene)
 {
-    this->sp = sp;
-    return this;
+    Actor& actor = this->setCurrentHp(hp);
+    if (hp < 1)
+    {
+        scene.checkStatus(ret);
+    }
+    return actor;
 }
 
-Actor* Actor::setMaximumHp(const int mHp)
+Actor& Actor::setCurrentHp(const int hp)
+{
+    int mHp = this->mHp;
+    this->hp = hp > mHp ? mHp : (hp < 0 ? 0 : hp);
+    return *this;
+}
+
+Actor& Actor::setCurrentMp(const int mp)
+{
+    int mMp = this->mMp;
+    this->mp = mp > mMp ? mMp : (mp < 0 ? 0 : mp);
+    return *this;
+}
+
+Actor& Actor::setCurrentRp(const int sp)
+{
+    int mSp = this->mSp;
+    this->sp = sp > mSp ? mSp : (sp < 0 ? 0 : sp);
+    return *this;
+}
+
+Actor& Actor::setMaximumHp(const int mHp)
 {
     this->mHp = mHp;
-    return this;
+    return *this;
 }
 
-Actor* Actor::setMaximumMp(const int mMp)
+Actor& Actor::setMaximumMp(const int mMp)
 {
     this->mMp = mMp;
-    return this;
+    return *this;
 }
 
-Actor* Actor::setMaximumRp(const int mMp)
+Actor& Actor::setMaximumRp(const int mMp)
 {
     this->mSp = mMp;
-    return this;
+    return *this;
 }
 
-Actor* Actor::setName(const QString& value)
+Actor& Actor::setName(const QString& value)
 {
     this->name = value;
-    return this;
+    return *this;
 }
 
-Actor* Actor::setSprite(const QString& value)
+Actor& Actor::setSprite(const QString& value)
 {
     this->sprite = value;
-    return this;
+    return *this;
 }
 
-int Role::getId() const
-{
-    return this->id;
-}
-
-Actor* Actor::setRanged(const bool range)
+Actor& Actor::setRanged(const bool range)
 {
     int flags = this->flags;
     if (range != ((flags & FLAG_RANGE) == FLAG_RANGE))
     {
         this->flags = flags ^ FLAG_RANGE;
     }
-    return this;
+    return *this;
 }
 
-Actor* Actor::setReviving(const bool revive)
+Actor& Actor::setReviving(const bool revive)
 {
     int flags = this->flags;
     if (revive != ((flags & FLAG_REVIVE) == FLAG_REVIVE))
     {
         this->flags = flags ^ FLAG_REVIVE;
     }
-    return this;
+    return *this;
 }
 
-Actor::Actor()
+Actor::~Actor()
 {
-
+    auto stRes = this->stRes;
+    if (stRes != nullptr)
+    {
+        this->stRes = nullptr;
+        delete stRes;
+    }
+    auto res = this->res;
+    if (res != nullptr)
+    {
+        this->res = nullptr;
+        delete res;
+    }
+    auto states = this->aStates;
+    if (states != nullptr)
+    {
+        this->aStates = nullptr;
+        delete states;
+    }
+    auto skills = this->aSkills;
+    if (skills != nullptr)
+    {
+        this->aSkills = nullptr;
+        delete skills;
+    }
 }

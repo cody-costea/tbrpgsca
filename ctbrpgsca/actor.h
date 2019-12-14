@@ -18,10 +18,10 @@ limitations under the License.
 
 #include "costume.h"
 
-#include <QStringBuilder>
-
 namespace tbrpgsca
 {
+
+    class Scene;
 
     class Actor : public Costume
     {
@@ -72,6 +72,11 @@ namespace tbrpgsca
         Actor& setCurrentMp(int const mp);
         Actor& setCurrentRp(int const sp);
         Actor& setInitiative(int const init);
+        Actor& setAttack(int const atk);
+        Actor& setDefense(int const def);
+        Actor& setSpirit(int const spi);
+        Actor& setWisdom(int const wis);
+        Actor& setAgility(int const agi);
         Actor& setRanged(bool const range);
         Actor& setGuarding(bool const guards);
         Actor& setCountering(bool const counters);
@@ -94,7 +99,7 @@ namespace tbrpgsca
 
         Actor(int const id, const QString& name, const Costume& race, const Costume& job, int const level, int const maxLv, int const mHp,
               int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range,
-              QVector<State*>* const states, QMap<int, int>* const res, QMap<State*, int> const stRes, QMap<Ability*, int> const items);
+              QVector<State*>* const states, QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items);
 
         Actor(Actor& actor);
 
@@ -106,6 +111,11 @@ namespace tbrpgsca
         QMap<char, Costume*>* equipment;
         QMap<State*, int>* stateDur;
         void* extra;
+
+        Actor& applyRoles(const QString& ret, Scene* scene);
+        Actor& applyStates(const QString& ret, Scene* scene, bool const consume);
+        Actor& setCurrentHp(int const hp, QString& ret, Scene& scene);
+        Actor& setAgility(int const agi, Scene& scene);
 
         friend class Scene;
         friend class Ability;

@@ -21,6 +21,7 @@ limitations under the License.
 
 namespace tbrpgsca
 {
+    class Scene;
 
     class State : public Costume
     {
@@ -46,6 +47,9 @@ namespace tbrpgsca
     private:
         QVector<Ability*>* rSkills;
         int dur, sRes;
+
+        State& alter(QString& ret, Scene* scene, Actor& actor, bool const consume);
+        State& inflict(QString& ret, Scene* scene, Actor& actor, bool const always, bool const indefinite);
 
         friend class Actor;
         friend class Ability;

@@ -62,7 +62,7 @@ namespace tbrpgsca
         ~Costume();
     private:
         int atk, def, spi, wis, agi, mActions;
-        QVector<Ability*>* aSkills, *counters;
+        QVector<Ability*>* aSkills,* counters;
         QMap<State*, int>* stRes;
         QMap<int, int>* res;
 
