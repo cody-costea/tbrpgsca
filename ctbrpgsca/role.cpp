@@ -14,12 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "role.h"
+#include "actor.h"
+#include "state.h"
+
+#include <QStringBuilder>
 
 using namespace tbrpgsca;
 
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
-QString Role::SpTxt = "RP";
+QString Role::RpTxt = "RP";
 QString Role::CausesTxt = " %s causes %s";
 
 inline int Role::getMaximumHp() const
@@ -74,6 +78,11 @@ inline QString Role::getSprite() const
     return this->sprite;
 }
 
+inline int Role::getElement() const
+{
+    return this->elm;
+}
+
 inline int Role::getId() const
 {
     return this->id;
@@ -87,6 +96,29 @@ inline bool Role::isRanged() const
 inline bool Role::isReviving() const
 {
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
+}
+
+inline Role& Role::apply(QString& ret, Actor& actor)
+{
+    return this->apply(ret, nullptr, actor);
+}
+
+Role& Role::apply(QString& ret, Scene* scene, Actor& actor)
+{
+    Role& role = *this;
+    int rnd = std::rand() % 3;
+    int dmgHp = (actor.mHp + rnd) * role.hp / 100;
+    int dmgMp = (actor.mMp + rnd) * role.mp / 100;
+    int dmgSp = (actor.mSp + rnd) * role.sp / 100;
+    int actorHp = actor.hp;
+    if (scene != nullptr)
+    {
+        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
+    }
+    actor.setCurrentMp(actor.mp - dmgMp);
+    actor.setCurrentRp(actor.sp - dmgSp);
+    ret = ret % QString(Role::CausesTxt).arg(role.name, actor.name) % Role::GetDmgText(dmgHp, dmgMp, dmgSp);
+    return role;
 }
 
 Role::Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,

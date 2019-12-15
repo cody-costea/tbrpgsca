@@ -86,6 +86,10 @@ namespace tbrpgsca
         inline void agiCalc();
 
         friend class Actor;
+        friend class Ability;
+        friend class Costume;
+        friend class State;
+        friend class Role;
     };
 
 }

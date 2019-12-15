@@ -23,6 +23,7 @@ namespace tbrpgsca
 {
     class Actor;
     class State;
+    class Scene;
 
     class Role
     {
@@ -31,8 +32,10 @@ namespace tbrpgsca
     public:
         static QString HpTxt;
         static QString MpTxt;
-        static QString SpTxt;
+        static QString RpTxt;
         static QString CausesTxt;
+
+        static QString& GetDmgText(int dmgHp, int dmgMp, int dmgRp);
 
         inline int getId() const;
         inline QString getName() const;
@@ -51,7 +54,7 @@ namespace tbrpgsca
         inline bool hasAddedState(State& state) const;
         inline int getAddedStatesSize() const;
 
-        Role& apply(QString& ret, Actor& actor, bool const consume);
+        inline Role& apply(QString& ret, Actor& actor);
 
         Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QVector<State*>* const states);
@@ -63,6 +66,8 @@ namespace tbrpgsca
         QString name, sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, elm, flags;
         QVector<State*>* aStates;
+
+        Role& apply(QString& ret, Scene* scene, Actor& actor);
 
         friend class Ability;
         friend class Costume;
