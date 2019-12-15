@@ -32,22 +32,21 @@ namespace tbrpgsca
         #define FLAG_TRG_ALL 4
         #define FLAG_TRG_SIDE 32
         #define FLAG_TRG_SELF 64
-        #define FLAG_DMG_ATK 128
-        #define FLAG_DMG_DEF 256
-        #define FLAG_DMG_SPI 512
-        #define FLAG_DMG_WIS 1024
-        #define FLAG_DMG_AGI 2048
+        #define DMG_TYPE_ATK 1
+        #define DMG_TYPE_DEF 2
+        #define DMG_TYPE_SPI 4
+        #define DMG_TYPE_WIS 8
+        #define DMG_TYPE_AGI 16
     public:
         static QString MissesTxt;
         static QString SuffersTxt;
         static QString ReflectTxt;
         static QString StolenTxt;
 
-        inline int getElementType() const;
+        inline int getDamageType() const;
         inline int getRequiredLevel() const;
         inline int getMaximumUses() const;
         inline int getUsesRegen() const;
-        int getTargetRange() const;
 
         inline bool isStealing() const;
         inline bool isAbsorbing() const;
@@ -57,7 +56,7 @@ namespace tbrpgsca
         inline bool targetsAll() const;
 
         inline State& getRemovedState(int const n) const;
-        inline bool hasRemovedState(State* const state) const;
+        inline bool hasRemovedState(const State& state) const;
         inline int getRemovedStatesSize() const;
 
         bool canPerform(const Actor& user);

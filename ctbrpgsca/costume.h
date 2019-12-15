@@ -27,8 +27,7 @@ namespace tbrpgsca
     {
         #define FLAG_AUTOMATE 4
         #define FLAG_CONFUSE 8
-        #define FLAG_COUNTER 16
-        #define FLAG_REFLECT 32
+        #define FLAG_REFLECT 16
     public:
         inline int getAttack() const;
         inline int getDefense() const;

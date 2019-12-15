@@ -25,7 +25,7 @@ namespace tbrpgsca
 
     class State : public Costume
     {
-        #define FLAG_STUN 64;
+        #define FLAG_STUN 32;
     public:
         inline int getDuration() const;
         inline int getStateResistance() const;
