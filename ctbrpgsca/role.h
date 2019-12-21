@@ -55,19 +55,19 @@ namespace tbrpgsca
         inline int getAddedStatesSize() const;
 
         inline Role& apply(QString& ret, Actor& actor);
-
-        Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-             int const mMp, int const mSp, int const element, bool const range, bool const revive, QVector<State*>* const states);
-
-        Role(Role& role);
-
-        ~Role();
-    private:
+    protected:
         QString name, sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, elm, flags;
         QVector<State*>* aStates;
 
         Role& apply(QString& ret, Scene* scene, Actor& actor);
+
+        Role(int const id, const QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+             int const mMp, int const mSp, int const element, bool const range, bool const revive, QVector<State*>* const states);
+
+        Role(const Role& role);
+
+        ~Role();
 
         friend class Ability;
         friend class Costume;

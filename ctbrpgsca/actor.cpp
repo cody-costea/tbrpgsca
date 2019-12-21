@@ -80,13 +80,13 @@ Actor& Actor::setMaximumRp(const int mMp)
     return *this;
 }
 
-Actor& Actor::setName(const QString& value)
+Actor& Actor::setName(QString& value)
 {
     this->name = value;
     return *this;
 }
 
-Actor& Actor::setSprite(const QString& value)
+Actor& Actor::setSprite(QString& value)
 {
     this->sprite = value;
     return *this;

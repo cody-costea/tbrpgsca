@@ -52,20 +52,20 @@ namespace tbrpgsca
         Scene& checkStatus(QString& ret);
         Scene& escape(QString& ret);
 
-        Ability& getAiSkill(Actor& user, const QVector<Ability*>& skills, int const index, bool const nRestore) const;
-        Actor& getGuardian(Actor& user, Actor& target, const Ability& skill) const;
+        Ability& getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
+        Actor& getGuardian(Actor& user, Actor& target, Ability& skill) const;
 
         inline Actor& getPartyPlayer(int const party, int const player) const;
-        inline bool hasPartyPlayer(int const party, const Actor& player) const;
-        inline int getPartyPlayersSize(int party) const;
+        inline bool hasPartyPlayer(int const party, Actor& player) const;
+        inline int getPartyPlayersSize(int const party) const;
         inline int getPartiesSize() const;
 
         inline Actor& getOrderedPlayer(int const n) const;
-        inline bool hasOrderedPlayer(const Actor& player) const;
+        inline bool hasOrderedPlayer(Actor& player) const;
         inline int getOrderedPlayersSize() const;
 
         inline Actor& getTargetedPlayer(int const n) const;
-        inline bool hasTargetedPlayer(const Actor& player) const;
+        inline bool hasTargetedPlayer(Actor& player) const;
         inline int getTargetedPlayersSize() const;
 
         inline Ability& getLastAbility() const;
@@ -75,7 +75,7 @@ namespace tbrpgsca
         Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
         ~Scene();
-    private:
+    protected:
         Ability* lastAbility;
         QVector<SceneAct*>* events;
         int current, surprise, fTarget, lTarget, status, mInit;

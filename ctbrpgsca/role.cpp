@@ -26,6 +26,26 @@ QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
 QString Role::CausesTxt = " %s causes %s";
 
+inline int Role::getId() const
+{
+    return this->id;
+}
+
+inline QString Role::getName() const
+{
+    return this->name;
+}
+
+inline QString Role::getSprite() const
+{
+    return this->sprite;
+}
+
+inline int Role::getElement() const
+{
+    return this->elm;
+}
+
 inline int Role::getMaximumHp() const
 {
     return this->mHp;
@@ -56,36 +76,21 @@ inline int Role::getCurrentRp() const
     return this->sp;
 }
 
-State& Role::getAddedState(int n) const
+inline State& Role::getAddedState(int n) const
 {
-    QVector<State*>* aStates = this->aStates;
-    return *(aStates == nullptr || n < 0 || n >= aStates->size() ? nullptr : aStates->at(n));
+    return *(this->aStates->at(n));
 }
 
-int Role::getAddedStatesSize() const
+inline bool Role::hasAddedState(State& state) const
+{
+    QVector<State*>* aStates = this->aStates;
+    return aStates != nullptr && aStates->contains(&state);
+}
+
+inline int Role::getAddedStatesSize() const
 {
     QVector<State*>* aStates = this->aStates;
     return aStates == nullptr ? 0 : aStates->size();
-}
-
-inline QString Role::getName() const
-{
-    return this->name;
-}
-
-inline QString Role::getSprite() const
-{
-    return this->sprite;
-}
-
-inline int Role::getElement() const
-{
-    return this->elm;
-}
-
-inline int Role::getId() const
-{
-    return this->id;
 }
 
 inline bool Role::isRanged() const
@@ -141,6 +146,22 @@ Role::Role(int const id, const QString& name, const QString& sprite, int const h
         flags |= FLAG_RANGE;
     }
     this->flags = flags;
+}
+
+Role::Role(const Role& role)
+{
+    this->id = role.id;
+    this->name = role.name;
+    this->sprite = role.sprite;
+    this->aStates = role.aStates;
+    this->flags = role.flags;
+    this->mHp = role.mHp;
+    this->mMp = role.mMp;
+    this->mSp = role.mSp;
+    this->elm = role.elm;
+    this->hp = role.hp;
+    this->mp = role.mp;
+    this->sp = role.sp;
 }
 
 Role::~Role()

@@ -40,21 +40,21 @@ namespace tbrpgsca
         inline bool isCountering() const;
         inline bool isReflecting() const;
 
-        int getElementResistance(int element) const;
-        int getStateResistance(State* state) const;
+        inline int getElementResistance(int const element) const;
+        inline int getStateResistance(State* const state) const;
 
-        inline Ability* getAddedSkill(int n) const;
+        inline Ability& getAddedSkill(int const n) const;
         inline bool hasAddedSkill(Ability& skill) const;
         inline int getAddedSkillsSize() const;
 
-        inline Ability* getCounterSkill(int n) const;
+        inline Ability& getCounterSkill(int const n) const;
         inline bool hasCounterSkill(Ability& skill) const;
         inline int getCounterSkillsSize() const;
 
-        Costume(int const id, const QString& name, const QString& sprite, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+        Costume(int const id, QString& name, QString& sprite, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-                bool const range, bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive,
-                QMap<int, int>* const res, QVector<Ability*>* const skills, QVector<State*>* const states, QMap<State*, int>* const stRes);
+                bool const range, bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res,
+                QVector<Ability*>* const skills, QVector<State*>* const states, QMap<State*, int>* const stRes);
 
         Costume(Costume& costume);
 

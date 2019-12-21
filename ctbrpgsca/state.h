@@ -33,7 +33,7 @@ namespace tbrpgsca
         inline bool isStunning() const;
 
         inline int getRemovedSkillsSize() const;
-        inline bool hasRemovedSkill(const Ability& skill) const;
+        inline bool hasRemovedSkill(Ability& skill) const;
         inline Ability& getRemovedSkill(int const n) const;
 
         State& alter(QString& ret, Actor& actor, bool const consume);
@@ -44,7 +44,7 @@ namespace tbrpgsca
               int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const range, bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
               QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills, QVector<State*>* const rStates);
-    private:
+    protected:
         QVector<Ability*>* rSkills;
         int dur, sRes;
 

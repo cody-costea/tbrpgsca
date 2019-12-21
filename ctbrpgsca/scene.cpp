@@ -22,7 +22,7 @@ bool Scene::actorAgiComp(const Actor& a, const Actor& b)
     return (a.agi > b.agi);
 }
 
-Actor& Scene::getGuardian(Actor& user, Actor& target, const Ability& skill) const
+Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
     if (!user.isRanged() || (skill.isOnlyMelee() && !skill.isRanged()))
     {
@@ -221,7 +221,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     return scene;
 }
 
-Ability& Scene::getAiSkill(Actor& user, const QVector<Ability*>& skills, int const defSkill, bool const restore) const
+Ability& Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const defSkill, bool const restore) const
 {
     int sSize = skills.size();
     Ability* s = skills[defSkill];
@@ -239,6 +239,7 @@ Ability& Scene::getAiSkill(Actor& user, const QVector<Ability*>& skills, int con
 
 Scene& Scene::playAi(QString& ret, Actor& player)
 {
+    //TODO: implement cases for "automatic", "confused" or both
     Scene& scene = *this;
     int side = player.side, skillIndex = 0, heal = -1;
     QVector<Actor*>& party = *(scene.parties[side]);
@@ -256,7 +257,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
             heal = 0;
         }
     }
-    const QVector<Ability*>& skills = *(player.aSkills);
+    QVector<Ability*>& skills = *(player.aSkills);
     if (heal > -1)
     {
         int skillsSize = skills.size();
@@ -397,7 +398,7 @@ Scene& Scene::endTurn(QString& ret)
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && event(scene, ret) && crActor->isAutomated())
+        if (event != nullptr && event(scene, ret) && (crActor->isAiPlayer() || crActor->isAutomated() || crActor->isConfused()))
         {
             scene.playAi(ret, (*crActor));
         }

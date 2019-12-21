@@ -45,6 +45,7 @@ namespace tbrpgsca
 
         inline int getDamageType() const;
         inline int getRequiredLevel() const;
+        inline int getAttributeIncrement() const;
         inline int getMaximumUses() const;
         inline int getUsesRegen() const;
 
@@ -56,26 +57,25 @@ namespace tbrpgsca
         inline bool targetsAll() const;
 
         inline State& getRemovedState(int const n) const;
-        inline bool hasRemovedState(const State& state) const;
+        inline bool hasRemovedState(State& state) const;
         inline int getRemovedStatesSize() const;
 
-        bool canPerform(const Actor& user);
-        Ability& execute(QString& ret, Actor& user, const Actor& target, bool const applyCosts);
+        bool canPerform(Actor& user);
+        Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
         Ability& replenish(Actor& user);
 
-        Ability(int const id, const QString& name, const QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq,
-                int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg,
-                int const trg, int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates,
-                QVector<State*>* const rStates);
+        Ability(int const id, QString& name, QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
+                int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
+                int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates, QVector<State*>* const rStates);
 
         Ability(Ability& ability);
 
         ~Ability();
-    private:
+    protected:
         int lvRq, attrInc, dmgType, mQty, rQty;
         QVector<State*>* rStates;
 
-        Ability& execute(QString& ret, Scene* scene, Actor& user, const Actor& target, bool const applyCosts);
+        Ability& execute(QString& ret, Scene* scene, Actor& user, Actor& target, bool const applyCosts);
 
         friend class Costume;
         friend class Actor;
