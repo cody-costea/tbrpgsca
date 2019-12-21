@@ -50,20 +50,15 @@ namespace tbrpgsca
         inline int getCurrentRp() const;
         inline int getElement() const;
 
-        inline State& getAddedState(int n) const;
-        inline bool hasAddedState(State& state) const;
-        inline int getAddedStatesSize() const;
-
         inline Role& apply(QString& ret, Actor& actor);
     protected:
         QString name, sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, elm, flags;
-        QVector<State*>* aStates;
 
         Role& apply(QString& ret, Scene* scene, Actor& actor);
 
-        Role(int const id, const QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-             int const mMp, int const mSp, int const element, bool const range, bool const revive, QVector<State*>* const states);
+        Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
+             int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive);
 
         Role(const Role& role);
 

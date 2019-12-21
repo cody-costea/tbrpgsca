@@ -41,6 +41,7 @@ namespace tbrpgsca
         static QString MissesTxt;
         static QString SuffersTxt;
         static QString ReflectTxt;
+        static QString ResistTxt;
         static QString StolenTxt;
 
         inline int getDamageType() const;
@@ -60,8 +61,12 @@ namespace tbrpgsca
         inline bool hasRemovedState(State& state) const;
         inline int getRemovedStatesSize() const;
 
-        bool canPerform(Actor& user);
-        Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
+        inline State& getAddedState(int n) const;
+        inline bool hasAddedState(State& state) const;
+        inline int getAddedStatesSize() const;
+
+        inline bool canPerform(Actor& user);
+        inline Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
         Ability& replenish(Actor& user);
 
         Ability(int const id, QString& name, QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
@@ -73,9 +78,9 @@ namespace tbrpgsca
         ~Ability();
     protected:
         int lvRq, attrInc, dmgType, mQty, rQty;
-        QVector<State*>* rStates;
+        QVector<State*>* aStates,* rStates;
 
-        Ability& execute(QString& ret, Scene* scene, Actor& user, Actor& target, bool const applyCosts);
+        Ability& execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts);
 
         friend class Costume;
         friend class Actor;

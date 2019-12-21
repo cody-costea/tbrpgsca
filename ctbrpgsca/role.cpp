@@ -76,23 +76,6 @@ inline int Role::getCurrentRp() const
     return this->sp;
 }
 
-inline State& Role::getAddedState(int n) const
-{
-    return *(this->aStates->at(n));
-}
-
-inline bool Role::hasAddedState(State& state) const
-{
-    QVector<State*>* aStates = this->aStates;
-    return aStates != nullptr && aStates->contains(&state);
-}
-
-inline int Role::getAddedStatesSize() const
-{
-    QVector<State*>* aStates = this->aStates;
-    return aStates == nullptr ? 0 : aStates->size();
-}
-
 inline bool Role::isRanged() const
 {
     return (this->flags & FLAG_RANGE) == FLAG_RANGE;
@@ -126,12 +109,11 @@ Role& Role::apply(QString& ret, Scene* scene, Actor& actor)
     return role;
 }
 
-Role::Role(int const id, const QString& name, const QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-           int const mMp, int const mSp, int const element, bool const range, bool const revive, QVector<State*>* const states)
+Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
+           int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive)
 {
     this->id = id;
     this->name = name;
-    this->aStates = states;
     this->sprite = sprite;
     this->mHp = mHp;
     this->mHp = mMp;
@@ -153,7 +135,6 @@ Role::Role(const Role& role)
     this->id = role.id;
     this->name = role.name;
     this->sprite = role.sprite;
-    this->aStates = role.aStates;
     this->flags = role.flags;
     this->mHp = role.mHp;
     this->mMp = role.mMp;

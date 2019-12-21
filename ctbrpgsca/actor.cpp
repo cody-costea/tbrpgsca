@@ -126,10 +126,10 @@ Actor::~Actor()
         this->res = nullptr;
         delete res;
     }
-    auto states = this->aStates;
+    auto states = this->stateDur;
     if (states != nullptr)
     {
-        this->aStates = nullptr;
+        this->stateDur = nullptr;
         delete states;
     }
     auto skills = this->aSkills;
@@ -137,5 +137,11 @@ Actor::~Actor()
     {
         this->aSkills = nullptr;
         delete skills;
+    }
+    auto equipment = this->equipment;
+    if (equipment != nullptr)
+    {
+        this->equipment = nullptr;
+        delete equipment;
     }
 }

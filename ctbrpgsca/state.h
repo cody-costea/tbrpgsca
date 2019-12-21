@@ -38,18 +38,20 @@ namespace tbrpgsca
 
         State& alter(QString& ret, Actor& actor, bool const consume);
         State& inflict(QString& ret, Actor& actor, bool const always, bool const indefinite);
-        State& disableSkills(Actor& actor, bool const remove);
+        bool disable(Actor& actor, bool const remove, bool const always);
+        State& blockSkills(Actor& actor, bool const remove);
 
         State(int const id, const QString& name, const QString& sprite, int dur, int sRes, int const elm, int const hpDmg, int const mpDmg,
               int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const range, bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
-              QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills, QVector<State*>* const rStates);
+              QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills);
     protected:
         QVector<Ability*>* rSkills;
         int dur, sRes;
 
-        State& alter(QString& ret, Scene* scene, Actor& actor, bool const consume);
-        State& inflict(QString& ret, Scene* scene, Actor& actor, bool const always, bool const indefinite);
+        State& alter(QString& ret, Scene* const scene, Actor& actor, bool const consume);
+        State& inflict(QString& ret, Scene* const scene, Actor& actor, bool const always, bool const indefinite);
+        bool disable(Scene* const scene, Actor& actor, bool const remove, bool const always);
 
         friend class Actor;
         friend class Ability;
