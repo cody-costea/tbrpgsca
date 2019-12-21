@@ -111,7 +111,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
     {
         int cntSize;
         QVector<Ability*>* counters;
-        ability.execute(ret, this, user, *target, applyCosts);
+        ability.execute(ret, this, user, target, applyCosts);
         if ((!healing) && target != &user && target->hp > 0 && target->isGuarding()
                 && (counters = target->counters) != nullptr && (cntSize = counters->size()) > 0)
         {
@@ -169,7 +169,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
                 }
                 else
                 {
-                    ability.execute(ret, this, user, user, applyCosts);
+                    ability.execute(ret, this, user, &user, applyCosts);
                 }
             }
             else
@@ -193,7 +193,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     {
         if (&user == &target || ability.targetsSelf())
         {
-            ability.execute(ret, this, user, user, true);
+            ability.execute(ret, this, user, &user, true);
         }
         else
         {
@@ -239,74 +239,108 @@ Ability& Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const def
 
 Scene& Scene::playAi(QString& ret, Actor& player)
 {
-    //TODO: implement cases for "automatic", "confused" or both
     Scene& scene = *this;
-    int side = player.side, skillIndex = 0, heal = -1;
-    QVector<Actor*>& party = *(scene.parties[side]);
-    int partySize = party.size();
-    for (int i = 0; i < partySize; i++)
+    QVector<Actor*>* party;
+    int side, partySize, skillIndex = 0, heal = -1;
     {
-        Actor& iPlayer = *(party.at(i));
-        int iHp = iPlayer.hp;
-        if (iHp < 1)
+        bool enraged = player.isAutomated();
         {
-            heal = 1;
-        }
-        else if (iHp < (iPlayer.mHp / 3))
-        {
-            heal = 0;
-        }
-    }
-    QVector<Ability*>& skills = *(player.aSkills);
-    if (heal > -1)
-    {
-        int skillsSize = skills.size();
-        for (int i = 0; i < skillsSize; i++)
-        {
-            Ability& s = *(skills[i]);
-            if (s.canPerform(player) && (s.mHp < 0 && ((heal == 0) || s.isReviving())))
+            auto parties = scene.parties;
+            if (player.isConfused())
             {
-                skillIndex = 0;
-                break;
+                if (enraged)
+                {
+                    side = -1;
+                    party = nullptr;
+                    partySize = 0;
+                    goto chooseSkill;
+                }
+                else
+                {
+                    side = player.side + 1;
+                    if (side >= parties.size())
+                    {
+                        side = 0;
+                    }
+                }
+            }
+            else
+            {
+                side = player.side;
+            }
+            party = parties[side];
+            partySize = party->size();
+        }
+        if (!enraged)
+        {
+            for (int i = 0; i < partySize; i++)
+            {
+                Actor& iPlayer = *(party->at(i));
+                int iHp = iPlayer.hp;
+                if (iHp < 1)
+                {
+                    heal = 1;
+                }
+                else if (iHp < (iPlayer.mHp / 3))
+                {
+                    heal = 0;
+                }
             }
         }
     }
-    Actor* target;
-    Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
-    if (ability.mHp > -1)
+    chooseSkill:
     {
-        int trg = 0;
-        QVector<Actor*>& players = *(scene.players);
-        int playerSize = players.size();
-        do
+        QVector<Ability*>& skills = *(player.aSkills);
+        if (heal > -1)
         {
-            target = players.at(trg);
-        } while (((++trg) < playerSize) && (target->hp < 1 || target->side == side));
-        for (int i = trg; i < playerSize; i++)
-        {
-            int iHp;
-            Actor* iPlayer = players.at(i);
-            if (iPlayer->side != side && (iHp = iPlayer->hp) > 0 && iHp < target->hp)
+            int skillsSize = skills.size();
+            for (int i = 0; i < skillsSize; i++)
             {
-                target = iPlayer;
+                Ability& s = *(skills[i]);
+                if (s.canPerform(player) && (s.mHp < 0 && ((heal == 0) || s.isReviving())))
+                {
+                    skillIndex = 0;
+                    break;
+                }
             }
         }
-    }
-    else
-    {
-        target = party.at(0);
-        bool restore = ability.isReviving();
-        for (int i = 1; i < partySize; i++)
+        Actor* target;
+        Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
+        if (ability.mHp > -1 || party == nullptr)
         {
-            Actor* iPlayer = party.at(i);
-            int iHp = iPlayer->hp;
-            if (iHp < target->hp && (restore || iHp > 0))
+            int trg = 0;
+            QVector<Actor*>& players = *(scene.players);
+            int playerSize = players.size();
+            do
             {
-                target = iPlayer;
+                target = players.at(trg);
+            } while (((++trg) < playerSize) && (target->hp < 1 || target->side == side));
+            for (int i = trg; i < playerSize; i++)
+            {
+                int iHp;
+                Actor* iPlayer = players.at(i);
+                if (iPlayer->side != side && (iHp = iPlayer->hp) > 0 && iHp < target->hp)
+                {
+                    target = iPlayer;
+                }
             }
         }
+        else
+        {
+            target = party->at(0);
+            bool restore = ability.isReviving();
+            for (int i = 1; i < partySize; i++)
+            {
+                Actor* iPlayer = party->at(i);
+                int iHp = iPlayer->hp;
+                if (iHp < target->hp && (restore || iHp > 0))
+                {
+                    target = iPlayer;
+                }
+            }
+        }
+        scene.perform(ret, player, *target, ability, false);
     }
-    scene.perform(ret, player, *target, ability, false);
     return scene;
 }
 

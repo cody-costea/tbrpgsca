@@ -145,7 +145,7 @@ inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool 
     return this->execute(ret, nullptr, user, &target, applyCosts);
 }
 
-Ability& Ability::execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts)
+Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
     Ability& ability = *this;
     int const dmgType = ability.dmgType;
@@ -214,20 +214,29 @@ Ability& Ability::execute(QString& ret, Scene* scene, Actor& user, Actor* target
         {
             {
                 int dmgHp = ability.mHp, dmgMp = ability.mMp, dmgSp = ability.mSp;
-                dmgHp = dmgHp == 0 ? 0 : ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
-                dmgMp = dmgMp == 0 ? 0 : ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
-                dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
-                target->hp -= dmgHp;
-                target->mp -= dmgMp;
-                target->sp -= dmgSp;
-                if (ability.isAbsorbing())
+                if (dmgHp != 0)
                 {
-                    user.hp += dmgHp / 2;
-                    user.mp += dmgMp / 2;
-                    user.sp += dmgSp / 2;
+                    dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
+                    target->hp -= dmgHp;
+                }
+                if (dmgMp != 0)
+                {
+                    dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
+                    target->mp -= dmgMp;
+                }
+                if (dmgSp != 0)
+                {
+                    dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
+                    target->sp -= dmgSp;
                 }
                 if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
                 {
+                    if (ability.isAbsorbing())
+                    {
+                        user.hp += dmgHp / 2;
+                        user.mp += dmgMp / 2;
+                        user.sp += dmgSp / 2;
+                    }
                     ret = ret % Ability::SuffersTxt.arg(target->name) % Role::GetDmgText(dmgHp, dmgMp, dmgSp);
                 }
             }
@@ -297,7 +306,7 @@ Ability& Ability::execute(QString& ret, Scene* scene, Actor& user, Actor* target
         }
         if (ko && target->hp > 0)
         {
-            target->applyRoles(ret, scene);
+            target->applyStates(ret, scene, false);
         }
     }
     costs:
