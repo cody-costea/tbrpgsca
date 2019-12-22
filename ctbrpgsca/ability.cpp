@@ -148,30 +148,35 @@ inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool 
 Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
     Ability& ability = *this;
-    int const dmgType = ability.dmgType;
-    if (target->isReflecting() && dmgType == DMG_TYPE_WIS)
     {
-        ret = ret % Ability::ReflectTxt.arg(target->name);
-        target = &user;
-    }
-    QMap<int, int>* trgResMap = target->res;
-    int res = trgResMap == nullptr ? 3 : trgResMap->value(ability.elm, 3);
-    if (res > 6)
-    {
-        if (res == 7)
+        int const dmgType = ability.dmgType;
+        if (dmgType == DMG_TYPE_WIS && target != &user &&target->isReflecting())
         {
-            ret = ret % Ability::ResistTxt.arg(target->name);
-            goto costs;
-        }
-        res = -7 + (res - 7);
-        if (res > -1)
-        {
-            res = -1;
+            ret = ret % Ability::ReflectTxt.arg(target->name);
+            target = &user;
         }
     }
-    else if (res < 1)
+    int res;
     {
-        res = 1;
+        QMap<int, int>* trgResMap = target->res;
+        res = trgResMap == nullptr ? 3 : trgResMap->value(ability.elm, 3);
+        if (res > 6)
+        {
+            if (res == 7)
+            {
+                ret = ret % Ability::ResistTxt.arg(target->name);
+                goto costs;
+            }
+            res = -7 + (res - 7);
+            if (res > -1)
+            {
+                res = -1;
+            }
+        }
+        else if (res < 1)
+        {
+            res = 1;
+        }
     }
     {
         bool ko = target->hp < 1;
@@ -362,4 +367,21 @@ Ability::Ability(int const id, QString& name, QString& sprite, bool const steal,
     }
     flags |= trg;
     this->flags = flags;
+}
+
+Ability::Ability(Ability& ability) : Role(ability)
+{
+    this->elm = ability.elm;
+    this->lvRq = ability.lvRq;
+    this->mQty = ability.mQty;
+    this->rQty = ability.rQty;
+    this->dmgType = ability.dmgType;
+    this->attrInc = ability.attrInc;
+    this->aStates = ability.aStates;
+    this->rStates = ability.rStates;
+}
+
+Ability::~Ability()
+{
+
 }

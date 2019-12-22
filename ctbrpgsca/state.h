@@ -25,10 +25,10 @@ namespace tbrpgsca
 
     class State : public Costume
     {
-        #define FLAG_STUN 32;
+        #define FLAG_STUN 32
     public:
         inline int getDuration() const;
-        inline int getStateResistance() const;
+        inline int getResistance() const;
 
         inline bool isStunning() const;
 
@@ -36,15 +36,19 @@ namespace tbrpgsca
         inline bool hasRemovedSkill(Ability& skill) const;
         inline Ability& getRemovedSkill(int const n) const;
 
-        State& alter(QString& ret, Actor& actor, bool const consume);
-        State& inflict(QString& ret, Actor& actor, bool const always, bool const indefinite);
-        bool disable(Actor& actor, bool const remove, bool const always);
+        inline State& alter(QString& ret, Actor& actor, bool const consume);
+        inline State& inflict(QString& ret, Actor& actor, bool const always, bool const indefinite);
+        inline bool disable(Actor& actor, bool const remove, bool const always);
         State& blockSkills(Actor& actor, bool const remove);
 
-        State(int const id, const QString& name, const QString& sprite, int dur, int sRes, int const elm, int const hpDmg, int const mpDmg,
-              int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              bool const range, bool const automate, bool const confuse, bool const reflect, bool const counter, bool const revive, QMap<int, int>* const res,
-              QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills);
+        State(int const id, QString& name, QString& sprite, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
+              bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const stRes,
+              QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills);
+
+        State(State& state);
+
+        ~State();
     protected:
         QVector<Ability*>* rSkills;
         int dur, sRes;

@@ -27,8 +27,8 @@ namespace tbrpgsca
 
     class Role
     {
-    #define FLAG_REVIVE 1
-    #define FLAG_RANGE 2
+        #define FLAG_REVIVE 1
+        #define FLAG_RANGE 2
     public:
         static QString HpTxt;
         static QString MpTxt;
@@ -54,6 +54,10 @@ namespace tbrpgsca
     protected:
         QString name, sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, elm, flags;
+
+        inline Role& adopt(Actor& actor);
+
+        inline Role& abandon(Actor& actor);
 
         Role& apply(QString& ret, Scene* scene, Actor& actor);
 

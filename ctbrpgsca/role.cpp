@@ -135,6 +135,24 @@ inline Role& Role::apply(QString& ret, Actor& actor)
     return this->apply(ret, nullptr, actor);
 }
 
+inline Role& Role::adopt(Actor& actor)
+{
+    Role& role = *this;
+    actor.elm |= role.elm;
+    return role;
+}
+
+inline Role& Role::abandon(Actor& actor)
+{
+    Role& role = *this;
+    int const elm = role.elm;
+    if ((actor.elm & elm) == elm)
+    {
+        actor.elm ^= elm;
+    }
+    return role;
+}
+
 Role& Role::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Role& role = *this;
@@ -149,7 +167,8 @@ Role& Role::apply(QString& ret, Scene* scene, Actor& actor)
     }
     actor.setCurrentMp(actor.mp - dmgMp);
     actor.setCurrentRp(actor.sp - dmgSp);
-    ret = ret % QString(Role::CausesTxt).arg(role.name, actor.name) % Role::GetDmgText(dmgHp, dmgMp, dmgSp);
+    ret = ret % QString(Role::CausesTxt).arg(role.name, actor.name);
+    Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
     return role;
 }
 
