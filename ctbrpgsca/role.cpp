@@ -85,9 +85,9 @@ inline QString Role::getSprite() const
     return this->sprite;
 }
 
-inline int Role::getElement() const
+inline int Role::getDmgElement() const
 {
-    return this->elm;
+    return this->dmgType;
 }
 
 inline int Role::getMaximumHp() const
@@ -138,17 +138,37 @@ inline Role& Role::apply(QString& ret, Actor& actor)
 inline Role& Role::adopt(Actor& actor)
 {
     Role& role = *this;
-    actor.elm |= role.elm;
+    actor.dmgType |= role.dmgType;
+    actor.flags |= role.flags;
     return role;
 }
 
-inline Role& Role::abandon(Actor& actor)
+Role& Role::abandon(Actor& actor)
 {
     Role& role = *this;
-    int const elm = role.elm;
-    if ((actor.elm & elm) == elm)
     {
-        actor.elm ^= elm;
+        int const roleElm = role.dmgType;
+        int const actorElm = actor.dmgType;
+        if ((actorElm & roleElm) == roleElm)
+        {
+            actor.dmgType = actorElm ^ roleElm;
+        }
+    }
+    {
+        int const roleFlags = role.flags;
+        int const actorFlags = actor.flags;
+        if ((actorFlags & roleFlags) == roleFlags)
+        {
+            actor.flags = actorFlags ^ roleFlags;
+        }
+        /*if ((roleFlags & FLAG_RANGE) == FLAG_RANGE && (actorFlags & FLAG_RANGE) == FLAG_RANGE)
+        {
+            actor.flags = actorFlags ^ FLAG_RANGE;
+        }
+        if ((roleFlags & FLAG_REVIVE) == FLAG_REVIVE && (actorFlags & FLAG_REVIVE) == FLAG_REVIVE)
+        {
+            actor.flags = actorFlags ^ FLAG_REVIVE;
+        }*/
     }
     return role;
 }
@@ -177,14 +197,17 @@ Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int co
 {
     this->id = id;
     this->name = name;
-    this->sprite = sprite;
+    if (sprite.length() > 0)
+    {
+        this->sprite = new QString(sprite);
+    }
     this->mHp = mHp;
     this->mHp = mMp;
     this->mSp = mSp;
     this->hp = hpDmg;
     this->mp = mpDmg;
     this->sp = spDmg;
-    this->elm = element;
+    this->dmgType = element;
     int flags = revive ? FLAG_REVIVE : 0;
     if (range)
     {
@@ -193,7 +216,7 @@ Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int co
     this->flags = flags;
 }
 
-Role::Role(const Role& role)
+Role::Role(Role& role)
 {
     this->id = role.id;
     this->name = role.name;
@@ -202,7 +225,7 @@ Role::Role(const Role& role)
     this->mHp = role.mHp;
     this->mMp = role.mMp;
     this->mSp = role.mSp;
-    this->elm = role.elm;
+    this->dmgType = role.dmgType;
     this->hp = role.hp;
     this->mp = role.mp;
     this->sp = role.sp;
@@ -210,5 +233,10 @@ Role::Role(const Role& role)
 
 Role::~Role()
 {
-    //delete this->name;
+    QString* sprite = this->sprite;
+    if (sprite != nullptr)
+    {
+        this->sprite = nullptr;
+        delete sprite;
+    }
 }

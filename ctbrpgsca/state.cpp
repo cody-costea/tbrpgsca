@@ -36,6 +36,54 @@ inline bool State::isStunning() const
     return (this->flags & FLAG_STUN) == FLAG_STUN;
 }
 
+inline State& State::inflict(QString &ret, Actor &actor, const bool always, const bool indefinite)
+{
+    return this->inflict(ret, nullptr, actor, always, indefinite);
+}
+
+State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool always, const bool indefinite)
+{
+    State& state = *this;
+    QMap<State*, int>* stRes = actor.stRes;
+    int const stateRes = state.sRes;
+    if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0)) + stateRes)))
+    {
+        state.adopt(actor);
+        QMap<State*, int>* trgStates = actor.stateDur;
+        if (trgStates == nullptr)
+        {
+            trgStates = new QMap<State*, int>();
+            actor.stateDur = trgStates;
+        }
+        if (indefinite)
+        {
+            trgStates->operator[](this) = -2;
+        }
+        else
+        {
+            int const stateDur = state.dur;
+            int const crDur = trgStates->value(this, 0);
+            if (crDur < stateDur || (crDur > -1 && stateDur < 0))
+            {
+                trgStates->operator[](this) = stateDur;
+            }
+            actor.updateAttributes(false, scene, state);
+            actor.updateResistance(false, state.res, state.stRes);
+            actor.updateSkills(false, *(state.aSkills));
+            state.blockSkills(actor, false);
+            QString* sprite = state.sprite;
+            if (sprite != nullptr && sprite->size() > 0)
+            {
+                actor.sprite = sprite;
+                actor.setShapeShifted(true);
+                //TODO: actor.resetSprites();
+            }
+            //state.apply(ret, scene, actor);
+        }
+    }
+    return state;
+}
+
 State::State(int const id, QString& name, QString& sprite, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
              bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const stRes,

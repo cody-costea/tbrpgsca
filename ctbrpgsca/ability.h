@@ -32,11 +32,6 @@ namespace tbrpgsca
         #define FLAG_TRG_ALL 4
         #define FLAG_TRG_SIDE 32
         #define FLAG_TRG_SELF 64
-        #define DMG_TYPE_ATK 1
-        #define DMG_TYPE_DEF 2
-        #define DMG_TYPE_SPI 4
-        #define DMG_TYPE_WIS 8
-        #define DMG_TYPE_AGI 16
     public:
         static QString MissesTxt;
         static QString SuffersTxt;
@@ -77,7 +72,7 @@ namespace tbrpgsca
 
         ~Ability();
     protected:
-        int lvRq, attrInc, dmgType, mQty, rQty;
+        int lvRq, attrInc, mQty, rQty;
         QVector<State*>* aStates,* rStates;
 
         Ability& execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts);

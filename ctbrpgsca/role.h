@@ -21,6 +21,7 @@ limitations under the License.
 
 namespace tbrpgsca
 {
+
     class Actor;
     class State;
     class Scene;
@@ -29,6 +30,17 @@ namespace tbrpgsca
     {
         #define FLAG_REVIVE 1
         #define FLAG_RANGE 2
+        #define DMG_TYPE_ATK 1
+        #define DMG_TYPE_DEF 2
+        #define DMG_TYPE_SPI 4
+        #define DMG_TYPE_WIS 8
+        #define DMG_TYPE_AGI 16
+        #define ELM_TYPE_FIRE 32
+        #define ELM_TYPE_WATER 64
+        #define ELM_TYPE_THUNDER 128
+        #define ELM_TYPE_EARTH 256
+        #define ELM_TYPE_PSYCHIC 512
+        #define ELM_TYPE_LIGHT 1024
     public:
         static QString HpTxt;
         static QString MpTxt;
@@ -48,23 +60,21 @@ namespace tbrpgsca
         inline int getCurrentHp() const;
         inline int getCurrentMp() const;
         inline int getCurrentRp() const;
-        inline int getElement() const;
+        inline int getDmgElement() const;
 
+        Role& abandon(Actor& actor);
+        inline Role& adopt(Actor& actor);
         inline Role& apply(QString& ret, Actor& actor);
     protected:
-        QString name, sprite;
-        int id, hp, mp, sp, mHp, mMp, mSp, elm, flags;
-
-        inline Role& adopt(Actor& actor);
-
-        inline Role& abandon(Actor& actor);
+        QString name,* sprite;
+        int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
 
         Role& apply(QString& ret, Scene* scene, Actor& actor);
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive);
 
-        Role(const Role& role);
+        Role(Role& role);
 
         ~Role();
 
@@ -74,5 +84,6 @@ namespace tbrpgsca
         friend class Actor;
         friend class Scene;
     };
+
 }
 #endif // ROLE_H

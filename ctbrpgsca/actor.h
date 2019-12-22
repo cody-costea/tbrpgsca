@@ -25,9 +25,9 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_GUARDS 32
-        #define FLAG_AI_PLAYER 64
-        #define FLAG_SHAPE_SHIFT 128
+        #define FLAG_GUARDS 64
+        #define FLAG_AI_PLAYER 128
+        #define FLAG_SHAPE_SHIFT 256
     public:
         static QString KoTxt;
         static QString RiseTxt;
@@ -108,11 +108,11 @@ namespace tbrpgsca
         Actor& checkRegSkill(Ability& skill);
         Actor& applyRoles(QString& ret, Scene* scene);
         Actor& applyStates(QString& ret, Scene* scene, bool const consume);
-        Actor& updateResistance(bool const remove, QMap<int, int>& elmRes, QMap<State*, int>& stRes);
+        Actor& updateResistance(bool const remove, QMap<int, int>* elmRes, QMap<State*, int>* stRes);
         Actor& switchCostume(Costume* const oldCostume, Costume* const newCostume);
         Actor& updateSkills(bool const remove, QVector<Ability*>& skills);
         Actor& updateStates(bool const remove, QVector<State*>& states);
-        Actor& updateAttributes(bool const remove, Costume& costume);
+        Actor& updateAttributes(bool const remove, Scene* scene, Costume& costume);
         Actor& setCurrentHp(int const hp, QString& ret, Scene& scene);
         Actor& setAgility(int const agi, Scene& scene);
 

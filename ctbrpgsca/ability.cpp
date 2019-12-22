@@ -147,6 +147,7 @@ inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool 
 
 Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
+    int res = 3;
     Ability& ability = *this;
     {
         int const dmgType = ability.dmgType;
@@ -155,24 +156,20 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             ret = ret % Ability::ReflectTxt.arg(target->name);
             target = &user;
         }
-    }
-    int res = 3;
-    {
         QMap<int, int>* trgResMap = target->res;
         if (trgResMap != nullptr)
         {
             {
-                int aElm = ability.elm;
                 for (int elm : trgResMap->values())
                 {
-                    if ((aElm & elm) == elm)
+                    if ((dmgType & elm) == elm)
                     {
                         res += trgResMap->value(elm);
                     }
                 }
             }
             if (res > 6)
-            {
+                {
                 if (res == 7)
                 {
                     ret = ret % Ability::ResistTxt.arg(target->name);
@@ -354,9 +351,8 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
 Ability::Ability(int const id, QString& name, QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
                  int const elm,int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates, QVector<State*>* const rStates)
-    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, elm, range, revive)
+    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, (elm | dmgType), range, revive)
 {
-    this->elm = elm;
     this->lvRq = lvRq;
     this->mQty = mQty;
     this->rQty = rQty;
@@ -383,7 +379,7 @@ Ability::Ability(int const id, QString& name, QString& sprite, bool const steal,
 
 Ability::Ability(Ability& ability) : Role(ability)
 {
-    this->elm = ability.elm;
+    this->dmgType = ability.dmgType;
     this->lvRq = ability.lvRq;
     this->mQty = ability.mQty;
     this->rQty = ability.rQty;
