@@ -26,6 +26,50 @@ QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
 QString Role::CausesTxt = " %s causes %s";
 
+QString& Role::AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgSp)
+{
+    bool c = false;
+    if (dmgHp != 0)
+    {
+        ret = ret % " ";
+        if (dmgHp < 0)
+        {
+            ret = ret % "+";
+        }
+        ret = ret % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
+        c = true;
+    }
+    if (dmgMp != 0)
+    {
+        if (c)
+        {
+            ret = ret % ",";
+        }
+        ret = ret % " ";
+        if (dmgMp < 0)
+        {
+            ret = ret % "+";
+        }
+        ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
+        c = true;
+    }
+    if (dmgSp != 0)
+    {
+        if (c)
+        {
+            ret = ret % ",";
+        }
+        ret = ret % " ";
+        if (dmgSp < 0)
+        {
+            ret = ret % "+";
+        }
+        ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
+        c = true;
+    }
+    return ret;
+}
+
 inline int Role::getId() const
 {
     return this->id;

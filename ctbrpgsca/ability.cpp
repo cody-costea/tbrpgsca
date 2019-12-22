@@ -237,7 +237,8 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                         user.mp += dmgMp / 2;
                         user.sp += dmgSp / 2;
                     }
-                    ret = ret % Ability::SuffersTxt.arg(target->name) % Role::GetDmgText(dmgHp, dmgMp, dmgSp);
+                    ret = ret % Ability::SuffersTxt.arg(target->name);
+                    Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
                 }
             }
             {

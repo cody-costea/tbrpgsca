@@ -35,7 +35,7 @@ namespace tbrpgsca
         static QString RpTxt;
         static QString CausesTxt;
 
-        static QString& GetDmgText(int dmgHp, int dmgMp, int dmgRp);
+        static QString& AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgRp);
 
         inline int getId() const;
         inline QString getName() const;
