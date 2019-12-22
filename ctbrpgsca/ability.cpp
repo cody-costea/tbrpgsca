@@ -156,26 +156,38 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             target = &user;
         }
     }
-    int res;
+    int res = 3;
     {
         QMap<int, int>* trgResMap = target->res;
-        res = trgResMap == nullptr ? 3 : trgResMap->value(ability.elm, 3);
-        if (res > 6)
+        if (trgResMap != nullptr)
         {
-            if (res == 7)
             {
-                ret = ret % Ability::ResistTxt.arg(target->name);
-                goto costs;
+                int aElm = ability.elm;
+                for (int elm : trgResMap->values())
+                {
+                    if ((aElm & elm) == elm)
+                    {
+                        res += trgResMap->value(elm);
+                    }
+                }
             }
-            res = -7 + (res - 7);
-            if (res > -1)
+            if (res > 6)
             {
-                res = -1;
+                if (res == 7)
+                {
+                    ret = ret % Ability::ResistTxt.arg(target->name);
+                    goto costs;
+                }
+                res = -7 + (res - 7);
+                if (res > -1)
+                {
+                    res = -1;
+                }
             }
-        }
-        else if (res < 1)
-        {
-            res = 1;
+            else if (res < 1)
+            {
+                res = 1;
+            }
         }
     }
     {
