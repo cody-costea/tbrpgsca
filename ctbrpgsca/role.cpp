@@ -170,6 +170,7 @@ Role& Role::abandon(Actor& actor)
             actor.flags = actorFlags ^ FLAG_REVIVE;
         }*/
     }
+    //TODO: actor.updateFlags();
     return role;
 }
 
@@ -181,7 +182,11 @@ Role& Role::apply(QString& ret, Scene* scene, Actor& actor)
     int dmgMp = (actor.mMp + rnd) * role.mp / 100;
     int dmgSp = (actor.mSp + rnd) * role.sp / 100;
     int actorHp = actor.hp;
-    if (scene != nullptr)
+    if (scene == nullptr)
+    {
+        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
+    }
+    else
     {
         actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
     }

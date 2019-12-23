@@ -56,6 +56,7 @@ namespace tbrpgsca
         State& alter(QString& ret, Scene* const scene, Actor& actor, bool const consume);
         State& inflict(QString& ret, Scene* const scene, Actor& actor, bool const always, bool const indefinite);
         bool disable(Scene* const scene, Actor& actor, bool const remove, bool const always);
+        State& remove(Scene* const scene, Actor& actor);
 
         friend class Actor;
         friend class Ability;

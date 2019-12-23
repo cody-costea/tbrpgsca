@@ -159,17 +159,15 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         QMap<int, int>* trgResMap = target->res;
         if (trgResMap != nullptr)
         {
+            for (int elm : trgResMap->values())
             {
-                for (int elm : trgResMap->values())
+                if ((dmgType & elm) == elm)
                 {
-                    if ((dmgType & elm) == elm)
-                    {
-                        res += trgResMap->value(elm);
-                    }
+                    res += trgResMap->value(elm);
                 }
             }
             if (res > 6)
-                {
+            {
                 if (res == 7)
                 {
                     ret = ret % Ability::ResistTxt.arg(target->name);
@@ -231,25 +229,25 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                 if (dmgHp != 0)
                 {
                     dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
-                    target->hp -= dmgHp;
+                    target->setCurrentHp(target->hp - dmgHp, ret, *scene);
                 }
                 if (dmgMp != 0)
                 {
                     dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
-                    target->mp -= dmgMp;
+                    target->setCurrentMp(target->mp - dmgMp);
                 }
                 if (dmgSp != 0)
                 {
                     dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
-                    target->sp -= dmgSp;
+                    target->setCurrentRp(target->sp - dmgSp);
                 }
                 if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
                 {
                     if (ability.isAbsorbing())
                     {
-                        user.hp += dmgHp / 2;
-                        user.mp += dmgMp / 2;
-                        user.sp += dmgSp / 2;
+                        user.setCurrentHp(user.hp + dmgHp / 2);
+                        user.setCurrentMp(user.mp + dmgMp / 2);
+                        user.setCurrentRp(user.sp + dmgSp / 2);
                     }
                     ret = ret % Ability::SuffersTxt.arg(target->name);
                     Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);

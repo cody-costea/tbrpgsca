@@ -78,9 +78,110 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
                 actor.setShapeShifted(true);
                 //TODO: actor.resetSprites();
             }
-            //state.apply(ret, scene, actor);
+            state.alter(ret, scene, actor, false);
         }
     }
+    return state;
+}
+
+State& State::remove(Scene* const scene, Actor& actor)
+{
+    State& state = *this;
+    actor.updateAttributes(true, scene, state);
+    actor.updateResistance(true, state.res, state.stRes);
+    actor.updateSkills(true, *(state.aSkills));
+    state.blockSkills(actor, true);
+    state.abandon(actor);
+    /*if (state.isReflecting())
+    {
+        actor.applyStates(ret, scene, false);
+    }*/
+    return state;
+}
+
+inline bool State::disable(Actor& actor, const bool remove, const bool always)
+{
+    return this->disable(nullptr, actor, remove, always);
+}
+
+bool State::disable(Scene* const scene, Actor& actor, const bool remove, const bool always)
+{
+    QMap<State*, int>* sDur = actor.stateDur;
+    if (sDur != nullptr && (always || (sDur->value(this, -2) != -2)))
+    {
+        if (sDur->value(this, -3) > -3)
+        {
+            this->remove(scene, actor);
+        }
+        if (remove)
+        {
+            sDur->remove(this);
+        }
+        else
+        {
+            sDur->operator[](this) = -3;
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+inline State& State::alter(QString& ret, Actor& actor, const bool consume)
+{
+    return this->alter(ret, nullptr, actor, consume);
+}
+
+State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool consume)
+{
+    State& state = *this;
+    QMap<State*, int>* sDur = actor.stateDur;
+    if (sDur != nullptr && actor.hp > 0)
+    {
+        int const d = sDur->value(this, -3);
+        if (d == 0)
+        {
+            state.remove(scene, actor);
+            sDur->operator[](this) = -3;
+        }
+        else if (d > -3)
+        {
+            if (consume)
+            {
+                state.apply(ret, scene, actor);
+                if (d > 0)
+                {
+                    sDur->operator[](this) = d - 1;
+                }
+            }
+            else
+            {
+                QString* sprite = state.sprite;
+                if (sprite != nullptr && sprite->length() > 0)
+                {
+                    actor.sprite = sprite;
+                }
+                if (state.isStunning())
+                {
+                    if (d > 0 && actor.actions > 0)
+                    {
+                        sDur->operator[](this) = d - 1;
+                    }
+                    actor.setGuarding(false);
+                    actor.actions = 0;
+                }
+            }
+        }
+    }
+    return state;
+}
+
+State& State::blockSkills(Actor& actor, const bool remove)
+{
+    State& state = *this;
+
     return state;
 }
 
