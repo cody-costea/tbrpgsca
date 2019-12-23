@@ -181,7 +181,40 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
 State& State::blockSkills(Actor& actor, const bool remove)
 {
     State& state = *this;
-
+    QVector<Ability*>* rSkills = state.rSkills;
+    if (rSkills != nullptr)
+    {
+        QMap<Ability*, int>* iSkills = actor.skillsCrQty;
+        if (remove)
+        {
+            if (iSkills != nullptr)
+            {
+                for (Ability* const skill : *rSkills)
+                {
+                    if (skill->mQty > 0)
+                    {
+                        iSkills->operator[](skill) = -1 * iSkills->value(skill, 0);
+                    }
+                    else
+                    {
+                        iSkills->remove(skill);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (iSkills == nullptr)
+            {
+                iSkills = new QMap<Ability*, int>();
+                actor.skillsCrQty = iSkills;
+            }
+            for (Ability* const skill : *rSkills)
+            {
+                iSkills->operator[](skill) = skill->mQty > 0 ? -1 * iSkills->value(skill, 0) : 0;
+            }
+        }
+    }
     return state;
 }
 
