@@ -48,7 +48,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
     int const stateRes = state.sRes;
     if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0)) + stateRes)))
     {
-        state.adopt(actor);
+        state.adopt(scene, actor);
         QMap<State*, int>* trgStates = actor.stateDur;
         if (trgStates == nullptr)
         {
@@ -67,9 +67,6 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
             {
                 trgStates->operator[](this) = stateDur;
             }
-            actor.updateAttributes(false, scene, state);
-            actor.updateResistance(false, state.res, state.stRes);
-            actor.updateSkills(false, *(state.aSkills));
             state.blockSkills(actor, false);
             QString* sprite = state.sprite;
             if (sprite != nullptr && sprite->size() > 0)
@@ -87,11 +84,8 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
 State& State::remove(Scene* const scene, Actor& actor)
 {
     State& state = *this;
-    actor.updateAttributes(true, scene, state);
-    actor.updateResistance(true, state.res, state.stRes);
-    actor.updateSkills(true, *(state.aSkills));
     state.blockSkills(actor, true);
-    state.abandon(actor);
+    state.abandon(scene, actor);
     /*if (state.isReflecting())
     {
         actor.applyStates(ret, scene, false);

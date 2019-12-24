@@ -29,6 +29,8 @@ namespace tbrpgsca
         #define FLAG_CONFUSE 8
         #define FLAG_REFLECT 16
     public:
+        static QString CausesTxt;
+
         inline int getAttack() const;
         inline int getDefense() const;
         inline int getSpirit() const;
@@ -51,6 +53,10 @@ namespace tbrpgsca
         inline bool hasCounterSkill(Ability& skill) const;
         inline int getCounterSkillsSize() const;
 
+        inline Costume& abandon(Actor& actor);
+        inline Costume& adopt(Actor& actor);
+        inline Costume& apply(QString& ret, Actor& actor);
+
         Costume(int const id, QString& name, QString& sprite, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
                 int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate, bool const confuse,
                 bool const reflect, bool const revive, QMap<int, int>* const res, QVector<Ability*>* const skills, QMap<State*, int>* const stRes);
@@ -63,6 +69,10 @@ namespace tbrpgsca
         QVector<Ability*>* aSkills,* counters;
         QMap<State*, int>* stRes;
         QMap<int, int>* res;
+
+        Costume& adopt(Scene* scene, Actor& actor);
+        Costume& apply(QString& ret, Scene* scene, Actor& actor);
+        Costume& abandon(Scene* scene, Actor& actor);
 
         friend class Actor;
         friend class Ability;

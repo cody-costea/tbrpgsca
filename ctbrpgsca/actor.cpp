@@ -14,7 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "actor.h"
+#include "ability.h"
+#include "costume.h"
+#include "state.h"
 #include "scene.h"
+
 
 using namespace tbrpgsca;
 
@@ -88,7 +92,13 @@ Actor& Actor::setName(QString& value)
 
 Actor& Actor::setSprite(QString& value)
 {
-    this->sprite = value;
+    Actor& actor = *this;
+    QString* sprite = actor.sprite;
+    if (sprite != nullptr)
+    {
+        delete sprite;
+    }
+    actor.sprite = new QString(value);
     return *this;
 }
 
@@ -110,6 +120,29 @@ Actor& Actor::setReviving(const bool revive)
         this->flags = flags ^ FLAG_REVIVE;
     }
     return *this;
+}
+
+Actor& Actor::refreshFlags()
+{
+    Actor& actor = *this;
+    int flags = actor.flags;
+    for (Costume* const costume : actor.equipment.values())
+    {
+        flags |= costume->flags;
+    }
+    QMap<State*, int>* stateDur = actor.stateDur;
+    if (stateDur != nullptr)
+    {
+        for (State* const state : stateDur->keys())
+        {
+            if (stateDur->value(state, -3) > -3)
+            {
+                flags |= state->flags;
+            }
+        }
+    }
+    actor.flags = flags;
+    return actor;
 }
 
 Actor::~Actor()
@@ -138,10 +171,10 @@ Actor::~Actor()
         this->aSkills = nullptr;
         delete skills;
     }
-    auto equipment = this->equipment;
+    /*auto equipment = this->equipment;
     if (equipment != nullptr)
     {
         this->equipment = nullptr;
         delete equipment;
-    }
+    }*/
 }

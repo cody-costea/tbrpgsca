@@ -1,6 +1,12 @@
 #include "costume.h"
+#include "actor.h"
+#include "role.h"
+
+#include <QStringBuilder>
 
 using namespace tbrpgsca;
+
+QString Costume::CausesTxt = " %s causes %s";
 
 inline int Costume::getAttack() const
 {
@@ -97,6 +103,91 @@ inline bool Costume::isAutomated() const
 inline bool Costume::isConfused() const
 {
     return (this->flags & FLAG_CONFUSE) == FLAG_CONFUSE;
+}
+
+inline Costume& Costume::adopt(Actor& actor)
+{
+    return this->adopt(nullptr, actor);
+}
+
+inline Costume& Costume::abandon(Actor& actor)
+{
+    return this->abandon(nullptr, actor);
+}
+
+inline Costume& Costume::apply(QString& ret, Actor& actor)
+{
+    return this->apply(ret, nullptr, actor);
+}
+
+Costume& Costume::adopt(Scene* scene, Actor& actor)
+{
+    Costume& costume = *this;
+    actor.dmgType |= costume.dmgType;
+    actor.flags |= costume.flags;
+    actor.updateAttributes(false, scene, costume);
+    actor.updateResistance(false, costume.res, costume.stRes);
+    actor.updateCounters(false, *(costume.counters));
+    actor.updateSkills(false, *(costume.aSkills));
+    return costume;
+}
+
+Costume& Costume::abandon(Scene* scene, Actor& actor)
+{
+    Costume& costume = *this;
+    {
+        int const roleElm = costume.dmgType;
+        int const actorElm = actor.dmgType;
+        if ((actorElm & roleElm) == roleElm)
+        {
+            actor.dmgType = actorElm ^ roleElm;
+        }
+    }
+    {
+        int const roleFlags = costume.flags;
+        int const actorFlags = actor.flags;
+        if ((actorFlags & roleFlags) == roleFlags)
+        {
+            actor.flags = actorFlags ^ roleFlags;
+        }
+        /*if ((roleFlags & FLAG_RANGE) == FLAG_RANGE && (actorFlags & FLAG_RANGE) == FLAG_RANGE)
+        {
+            actor.flags = actorFlags ^ FLAG_RANGE;
+        }
+        if ((roleFlags & FLAG_REVIVE) == FLAG_REVIVE && (actorFlags & FLAG_REVIVE) == FLAG_REVIVE)
+        {
+            actor.flags = actorFlags ^ FLAG_REVIVE;
+        }*/
+    }
+    actor.updateAttributes(true, scene, costume);
+    actor.updateResistance(true, costume.res, costume.stRes);
+    actor.updateCounters(true, *(costume.counters));
+    actor.updateSkills(true, *(costume.aSkills));
+    actor.refreshFlags();
+    return costume;
+}
+
+Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
+{
+    Costume& role = *this;
+    int rnd = std::rand() % 3;
+    int dmgHp = (actor.mHp + rnd) * role.hp / 100;
+    int dmgMp = (actor.mMp + rnd) * role.mp / 100;
+    int dmgSp = (actor.mSp + rnd) * role.sp / 100;
+    int actorHp = actor.hp;
+    if (scene == nullptr)
+    {
+        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
+    }
+    else
+    {
+        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
+    }
+    actor.setCurrentMp(actor.mp - dmgMp);
+    actor.setCurrentRp(actor.sp - dmgSp);
+    ret = ret % QString(Costume::CausesTxt).arg(role.name, actor.name);
+    Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
+    return role;
 }
 
 Costume::Costume(int const id, QString& name, QString& sprite, int const elm, int const hpDmg, int const mpDmg, int const spDmg,

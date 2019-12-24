@@ -24,19 +24,13 @@ using namespace tbrpgsca;
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
-QString Role::CausesTxt = " %s causes %s";
 
 QString& Role::AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgSp)
 {
     bool c = false;
     if (dmgHp != 0)
     {
-        ret = ret % " ";
-        if (dmgHp < 0)
-        {
-            ret = ret % "+";
-        }
-        ret = ret % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
+        ret = ret % (dmgHp < 0 ? " +" : " ") % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
         c = true;
     }
     if (dmgMp != 0)
@@ -45,13 +39,11 @@ QString& Role::AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgSp)
         {
             ret = ret % ",";
         }
-        ret = ret % " ";
-        if (dmgMp < 0)
+        else
         {
-            ret = ret % "+";
+            c = true;
         }
-        ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
-        c = true;
+        ret = ret % (dmgMp < 0 ? " +" : " ") % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
     }
     if (dmgSp != 0)
     {
@@ -59,13 +51,11 @@ QString& Role::AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgSp)
         {
             ret = ret % ",";
         }
-        ret = ret % " ";
-        if (dmgSp < 0)
+        else
         {
-            ret = ret % "+";
+            c = true;
         }
-        ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
-        c = true;
+        ret = ret % (dmgSp < 0 ? " +" : " ") % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
     }
     return ret;
 }
@@ -80,7 +70,7 @@ inline QString Role::getName() const
     return this->name;
 }
 
-inline QString Role::getSprite() const
+inline QString* Role::getSprite() const
 {
     return this->sprite;
 }
@@ -128,73 +118,6 @@ inline bool Role::isRanged() const
 inline bool Role::isReviving() const
 {
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
-}
-
-inline Role& Role::apply(QString& ret, Actor& actor)
-{
-    return this->apply(ret, nullptr, actor);
-}
-
-inline Role& Role::adopt(Actor& actor)
-{
-    Role& role = *this;
-    actor.dmgType |= role.dmgType;
-    actor.flags |= role.flags;
-    return role;
-}
-
-Role& Role::abandon(Actor& actor)
-{
-    Role& role = *this;
-    {
-        int const roleElm = role.dmgType;
-        int const actorElm = actor.dmgType;
-        if ((actorElm & roleElm) == roleElm)
-        {
-            actor.dmgType = actorElm ^ roleElm;
-        }
-    }
-    {
-        int const roleFlags = role.flags;
-        int const actorFlags = actor.flags;
-        if ((actorFlags & roleFlags) == roleFlags)
-        {
-            actor.flags = actorFlags ^ roleFlags;
-        }
-        /*if ((roleFlags & FLAG_RANGE) == FLAG_RANGE && (actorFlags & FLAG_RANGE) == FLAG_RANGE)
-        {
-            actor.flags = actorFlags ^ FLAG_RANGE;
-        }
-        if ((roleFlags & FLAG_REVIVE) == FLAG_REVIVE && (actorFlags & FLAG_REVIVE) == FLAG_REVIVE)
-        {
-            actor.flags = actorFlags ^ FLAG_REVIVE;
-        }*/
-    }
-    //TODO: actor.updateFlags();
-    return role;
-}
-
-Role& Role::apply(QString& ret, Scene* scene, Actor& actor)
-{
-    Role& role = *this;
-    int rnd = std::rand() % 3;
-    int dmgHp = (actor.mHp + rnd) * role.hp / 100;
-    int dmgMp = (actor.mMp + rnd) * role.mp / 100;
-    int dmgSp = (actor.mSp + rnd) * role.sp / 100;
-    int actorHp = actor.hp;
-    if (scene == nullptr)
-    {
-        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
-    }
-    else
-    {
-        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
-    }
-    actor.setCurrentMp(actor.mp - dmgMp);
-    actor.setCurrentRp(actor.sp - dmgSp);
-    ret = ret % QString(Role::CausesTxt).arg(role.name, actor.name);
-    Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
-    return role;
 }
 
 Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,

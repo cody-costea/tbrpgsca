@@ -45,13 +45,12 @@ namespace tbrpgsca
         static QString HpTxt;
         static QString MpTxt;
         static QString RpTxt;
-        static QString CausesTxt;
 
         static QString& AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgRp);
 
         inline int getId() const;
         inline QString getName() const;
-        inline QString getSprite() const;
+        inline QString* getSprite() const;
         inline bool isReviving() const;
         inline bool isRanged() const;
         inline int getMaximumHp() const;
@@ -61,15 +60,9 @@ namespace tbrpgsca
         inline int getCurrentMp() const;
         inline int getCurrentRp() const;
         inline int getDmgElement() const;
-
-        Role& abandon(Actor& actor);
-        inline Role& adopt(Actor& actor);
-        inline Role& apply(QString& ret, Actor& actor);
     protected:
         QString name,* sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
-
-        Role& apply(QString& ret, Scene* scene, Actor& actor);
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive);

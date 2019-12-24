@@ -205,7 +205,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)
             {
-                int res = 3;
+                int res = DEFAULT_RES;
                 for (int elm : trgResMap->values())
                 {
                     if ((dmgType & elm) == elm)
@@ -231,7 +231,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                         }
                         if (res > -1)
                         {
-                            dmg *= -1 * (res + 1);
+                            dmg *= -1 * (res + 2);
                         }
                         else
                         {
@@ -240,42 +240,74 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     }
                     else
                     {
-                        dmg *= -1 * (res - 1);
+                        dmg *= -1 * (res - 2);
                     }
                 }
             }
             else
             {
-                dmg = ((ability.attrInc + (dmg / i)) / (def / i)) / 3;
+                dmg = ((ability.attrInc + (dmg / i)) / (def / i)) / DEFAULT_RES;
             }
         }
         if (canMiss == 0 || target == &user || ((std::rand() % 13) + user.agi / canMiss) > 2 + target->agi / 4)
         {
-            if (dmgHp != 0)
+            //if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
             {
-                dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
-                target->setCurrentHp(target->hp - dmgHp, ret, *scene);
-            }
-            if (dmgMp != 0)
-            {
-                dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
-                target->setCurrentMp(target->mp - dmgMp);
-            }
-            if (dmgSp != 0)
-            {
-                dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
-                target->setCurrentRp(target->sp - dmgSp);
-            }
-            if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
-            {
-                if (ability.isAbsorbing())
+                bool c = false;
+                if (dmgHp != 0)
                 {
-                    user.setCurrentHp(user.hp + dmgHp / 2);
-                    user.setCurrentMp(user.mp + dmgMp / 2);
-                    user.setCurrentRp(user.sp + dmgSp / 2);
+                    c = true;
+                    dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
+                    target->setCurrentHp(target->hp - dmgHp, ret, *scene);
+                    ret = ret % Ability::SuffersTxt.arg(target->name) % (dmgHp < 0 ? " +" : " ")
+                            % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
                 }
-                ret = ret % Ability::SuffersTxt.arg(target->name);
-                Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
+                if (dmgMp != 0)
+                {
+                    if (c)
+                    {
+                        ret = ret % ", ";
+                    }
+                    else
+                    {
+                        ret = ret % Ability::SuffersTxt.arg(target->name) % " ";
+                        c = true;
+                    }
+                    if (dmgMp < 0)
+                    {
+                        ret = ret % "+";
+                    }
+                    dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
+                    target->setCurrentMp(target->mp - dmgMp);
+                    ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
+                }
+                if (dmgSp != 0)
+                {
+                    if (c)
+                    {
+                        ret = ret % ", ";
+                    }
+                    else
+                    {
+                        ret = ret % Ability::SuffersTxt.arg(target->name) % " ";
+                        c = true;
+                    }
+                    dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
+                    target->setCurrentRp(target->sp - dmgSp);
+                    if (dmgSp < 0)
+                    {
+                        ret = ret % "+";
+                    }
+                    ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
+                }
+                //ret = ret % Ability::SuffersTxt.arg(target->name);
+                //Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
+            }
+            if (ability.isAbsorbing())
+            {
+                user.setCurrentHp(user.hp + dmgHp / 2);
+                user.setCurrentMp(user.mp + dmgMp / 2);
+                user.setCurrentRp(user.sp + dmgSp / 2);
             }
             {
                 QVector<State*>* aStates = ability.aStates;

@@ -36,7 +36,7 @@ namespace tbrpgsca
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
     public:
-        typedef bool (* SceneAct)(Scene& scene, QString& ret);
+        typedef bool SceneAct(Scene& scene, QString& ret);
 
         static QString EscapeTxt;
         static QString VictoryTxt;
