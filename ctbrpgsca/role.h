@@ -35,12 +35,12 @@ namespace tbrpgsca
         #define DMG_TYPE_SPI 4
         #define DMG_TYPE_WIS 8
         #define DMG_TYPE_AGI 16
-        #define ELM_TYPE_FIRE 32
-        #define ELM_TYPE_WATER 64
-        #define ELM_TYPE_THUNDER 128
-        #define ELM_TYPE_EARTH 256
-        #define ELM_TYPE_PSYCHIC 512
-        #define ELM_TYPE_LIGHT 1024
+        #define ELEMENT_FIRE 32
+        #define ELEMENT_WATER 64
+        #define ELEMENT_THUNDER 128
+        #define ELEMENT_EARTH 256
+        #define ELEMENT_PSYCHIC 512
+        #define ELEMENT_LIGHT 1024
     public:
         static QString HpTxt;
         static QString MpTxt;

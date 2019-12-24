@@ -147,43 +147,12 @@ inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool 
 
 Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
-    int res = 3;
     Ability& ability = *this;
+    int const dmgType = ability.dmgType;
+    if (dmgType == DMG_TYPE_WIS && target != &user &&target->isReflecting())
     {
-        int const dmgType = ability.dmgType;
-        if (dmgType == DMG_TYPE_WIS && target != &user &&target->isReflecting())
-        {
-            ret = ret % Ability::ReflectTxt.arg(target->name);
-            target = &user;
-        }
-        QMap<int, int>* trgResMap = target->res;
-        if (trgResMap != nullptr)
-        {
-            for (int elm : trgResMap->values())
-            {
-                if ((dmgType & elm) == elm)
-                {
-                    res += trgResMap->value(elm);
-                }
-            }
-            if (res > 6)
-            {
-                if (res == 7)
-                {
-                    ret = ret % Ability::ResistTxt.arg(target->name);
-                    goto costs;
-                }
-                res = -7 + (res - 7);
-                if (res > -1)
-                {
-                    res = -1;
-                }
-            }
-            else if (res < 1)
-            {
-                res = 1;
-            }
-        }
+        ret = ret % Ability::ReflectTxt.arg(target->name);
+        target = &user;
     }
     {
         bool ko = target->hp < 1;
@@ -221,37 +190,92 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 4;
             i++;
         }
-        dmg = i == 0 ? 0 : (((ability.attrInc + (dmg / i)) / (def / i)) / res);
+        int dmgHp, dmgMp, dmgSp;
+        if (i == 0)
+        {
+            dmgHp = 0;
+            dmgMp = 0;
+            dmgSp = 0;
+        }
+        else
+        {
+            dmgHp = ability.mHp;
+            dmgMp = ability.mMp;
+            dmgSp = ability.mSp;
+            QMap<int, int>* trgResMap = target->res;
+            if (trgResMap != nullptr)
+            {
+                int res = 3;
+                for (int elm : trgResMap->values())
+                {
+                    if ((dmgType & elm) == elm)
+                    {
+                        res += trgResMap->value(elm);
+                    }
+                }
+                if (res == 7)
+                {
+                    dmgHp = 0;
+                    dmgMp = 0;
+                    dmgSp = 0;
+                    ret = ret % Ability::ResistTxt.arg(target->name);
+                }
+                else
+                {
+                    dmg = (ability.attrInc + (dmg / i)) / (def / i);
+                    if (res > 0)
+                    {
+                        if (res > 7)
+                        {
+                            res = -7 + (res - 7);
+                        }
+                        if (res > -1)
+                        {
+                            dmg *= -1 * (res + 1);
+                        }
+                        else
+                        {
+                            dmg /= res;
+                        }
+                    }
+                    else
+                    {
+                        dmg *= -1 * (res - 1);
+                    }
+                }
+            }
+            else
+            {
+                dmg = ((ability.attrInc + (dmg / i)) / (def / i)) / 3;
+            }
+        }
         if (canMiss == 0 || target == &user || ((std::rand() % 13) + user.agi / canMiss) > 2 + target->agi / 4)
         {
+            if (dmgHp != 0)
             {
-                int dmgHp = ability.mHp, dmgMp = ability.mMp, dmgSp = ability.mSp;
-                if (dmgHp != 0)
+                dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
+                target->setCurrentHp(target->hp - dmgHp, ret, *scene);
+            }
+            if (dmgMp != 0)
+            {
+                dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
+                target->setCurrentMp(target->mp - dmgMp);
+            }
+            if (dmgSp != 0)
+            {
+                dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
+                target->setCurrentRp(target->sp - dmgSp);
+            }
+            if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
+            {
+                if (ability.isAbsorbing())
                 {
-                    dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
-                    target->setCurrentHp(target->hp - dmgHp, ret, *scene);
+                    user.setCurrentHp(user.hp + dmgHp / 2);
+                    user.setCurrentMp(user.mp + dmgMp / 2);
+                    user.setCurrentRp(user.sp + dmgSp / 2);
                 }
-                if (dmgMp != 0)
-                {
-                    dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
-                    target->setCurrentMp(target->mp - dmgMp);
-                }
-                if (dmgSp != 0)
-                {
-                    dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
-                    target->setCurrentRp(target->sp - dmgSp);
-                }
-                if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
-                {
-                    if (ability.isAbsorbing())
-                    {
-                        user.setCurrentHp(user.hp + dmgHp / 2);
-                        user.setCurrentMp(user.mp + dmgMp / 2);
-                        user.setCurrentRp(user.sp + dmgSp / 2);
-                    }
-                    ret = ret % Ability::SuffersTxt.arg(target->name);
-                    Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
-                }
+                ret = ret % Ability::SuffersTxt.arg(target->name);
+                Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
             }
             {
                 QVector<State*>* aStates = ability.aStates;
@@ -322,27 +346,24 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             target->applyStates(ret, scene, false);
         }
     }
-    costs:
+    if (applyCosts)
     {
-        if (applyCosts)
+        user.hp -= ability.hp;
+        user.mp -= ability.mp;
+        user.sp -= ability.sp;
+        int mQty = ability.mQty;
+        if (mQty > 0)
         {
-            user.hp -= ability.hp;
-            user.mp -= ability.mp;
-            user.sp -= ability.sp;
-            int mQty = ability.mQty;
-            if (mQty > 0)
+            QMap<Ability*, int>* usrSkillsQty = user.skillsCrQty;
+            if (usrSkillsQty == nullptr)
             {
-                QMap<Ability*, int>* usrSkillsQty = user.skillsCrQty;
-                if (usrSkillsQty == nullptr)
-                {
-                    usrSkillsQty = new QMap<Ability*, int>();
-                    user.skillsCrQty = usrSkillsQty;
-                }
-                usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
+                usrSkillsQty = new QMap<Ability*, int>();
+                user.skillsCrQty = usrSkillsQty;
             }
+            usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
-        user.checkStatus(ret);
     }
+    user.checkStatus(ret);
     return ability;
 }
 
