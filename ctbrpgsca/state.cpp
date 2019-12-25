@@ -31,12 +31,7 @@ inline int State::getResistance() const
     return this->sRes;
 }
 
-inline bool State::isStunning() const
-{
-    return (this->flags & FLAG_STUN) == FLAG_STUN;
-}
-
-inline State& State::inflict(QString &ret, Actor &actor, const bool always, const bool indefinite)
+inline State& State::inflict(QString& ret, Actor& actor, const bool always, const bool indefinite)
 {
     return this->inflict(ret, nullptr, actor, always, indefinite);
 }
@@ -46,7 +41,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
     State& state = *this;
     QMap<State*, int>* stRes = actor.stRes;
     int const stateRes = state.sRes;
-    if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0)) + stateRes)))
+    if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
     {
         state.adopt(scene, actor);
         QMap<State*, int>* trgStates = actor.stateDur;
@@ -67,16 +62,9 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
             {
                 trgStates->operator[](this) = stateDur;
             }
-            state.blockSkills(actor, false);
-            QString* sprite = state.sprite;
-            if (sprite != nullptr && sprite->size() > 0)
-            {
-                actor.sprite = sprite;
-                actor.setShapeShifted(true);
-                //TODO: actor.resetSprites();
-            }
-            state.alter(ret, scene, actor, false);
         }
+        state.blockSkills(actor, false);
+        //state.alter(ret, scene, actor, false);
     }
     return state;
 }
@@ -135,38 +123,41 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
     if (sDur != nullptr && actor.hp > 0)
     {
         int const d = sDur->value(this, -3);
-        if (d == 0)
+        if (consume)
         {
-            state.remove(scene, actor);
-            sDur->operator[](this) = -3;
-        }
-        else if (d > -3)
-        {
-            if (consume)
+            if (d > -3)
             {
-                state.apply(ret, scene, actor);
-                if (d > 0)
-                {
-                    sDur->operator[](this) = d - 1;
-                }
-            }
-            else
-            {
-                QString* sprite = state.sprite;
-                if (sprite != nullptr && sprite->length() > 0)
-                {
-                    actor.sprite = sprite;
-                }
-                if (state.isStunning())
-                {
-                    if (d > 0 && actor.actions > 0)
+                /*if (consume)
+                {*/
+                    //state.apply(ret, scene, actor);
+                    if (d > 0)
                     {
                         sDur->operator[](this) = d - 1;
                     }
-                    actor.setGuarding(false);
-                    actor.actions = 0;
-                }
+                /*}
+                else
+                {
+                    QString* sprite = state.sprite;
+                    if (sprite != nullptr && sprite->length() > 0)
+                    {
+                        actor.sprite = sprite;
+                    }
+                    if (state.isStunned())
+                    {
+                        if (d > 0 && actor.actions > 0)
+                        {
+                            sDur->operator[](this) = d - 1;
+                        }
+                        actor.setGuarding(false);
+                        actor.actions = 0;
+                    }
+                }*/
             }
+        }
+        else if (d == 0)
+        {
+            state.remove(scene, actor);
+            sDur->operator[](this) = -3;
         }
     }
     return state;

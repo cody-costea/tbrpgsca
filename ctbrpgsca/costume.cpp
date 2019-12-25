@@ -105,6 +105,11 @@ inline bool Costume::isConfused() const
     return (this->flags & FLAG_CONFUSE) == FLAG_CONFUSE;
 }
 
+inline bool Costume::isStunned() const
+{
+    return (this->flags & FLAG_STUN) == FLAG_STUN;
+}
+
 inline Costume& Costume::adopt(Actor& actor)
 {
     return this->adopt(nullptr, actor);
@@ -123,11 +128,9 @@ inline Costume& Costume::apply(QString& ret, Actor& actor)
 Costume& Costume::adopt(Scene* scene, Actor& actor)
 {
     Costume& costume = *this;
-    actor.dmgType |= costume.dmgType;
-    actor.flags |= costume.flags;
     actor.updateAttributes(false, scene, costume);
     actor.updateResistance(false, costume.res, costume.stRes);
-    {
+    /*{
         QVector<Ability*>* cSkills = costume.aSkills;
         if (cSkills != nullptr)
         {
@@ -138,7 +141,7 @@ Costume& Costume::adopt(Scene* scene, Actor& actor)
         {
             actor.updateSkills(false, false, *cSkills);
         }
-    }
+    }*/
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
     {
         QVector<Costume*>* dmgRoles = actor.dmgRoles;
@@ -149,6 +152,7 @@ Costume& Costume::adopt(Scene* scene, Actor& actor)
         }
         dmgRoles->append(&costume);
     }
+    actor.refreshCostume(actor);
     return costume;
 }
 
@@ -197,6 +201,18 @@ Costume& Costume::abandon(Scene* scene, Actor& actor)
             {
                 actor.updateSkills(true, true, *cSkills);
             }
+        }
+    }
+    /*if (costume.isStunned())
+    {
+        actor.setGuarding(true);
+    }*/
+    if (costume.isShapeShifted())
+    {
+        QString* spr = costume.sprite;
+        if (spr != nullptr)
+        {
+            actor.sprite = actor.getJob().sprite;
         }
     }
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)

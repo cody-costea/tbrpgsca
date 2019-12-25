@@ -25,9 +25,7 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_GUARDS 64
         #define FLAG_AI_PLAYER 128
-        #define FLAG_SHAPE_SHIFT 256
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -37,18 +35,14 @@ namespace tbrpgsca
 
         inline Costume& getJob() const;
         inline Costume& getRace() const;
-
-        inline bool isGuarding() const;
-        inline bool isShapeShifted() const;
         inline bool isAiPlayer() const;
-
         inline int getLevel() const;
         inline int getMaximumLevel() const;
         inline int getMaximumExperience() const;
         inline int getCurrentActions() const;
         inline int getExperience() const;
         inline int getInitiative() const;
-        inline int getPartySide() const;
+        //inline int getPartySide() const;
         inline void* getExtra() const;
 
         int getRemainingSkillUses(Ability& skill) const;
@@ -59,7 +53,7 @@ namespace tbrpgsca
         char unequipItem(Costume& item);
 
         Actor& recover();
-        Actor& applyRoles(QString& ret);
+        //Actor& applyRoles(QString& ret);
         Actor& checkStatus(QString& ret);
         Actor& applyStates(QString& ret, bool const consume);
         Actor& setElementResistance(int const element, int const res);
@@ -109,7 +103,7 @@ namespace tbrpgsca
         void* extra;
 
         Actor& checkRegSkill(Ability& skill);
-        Actor& applyRoles(QString& ret, Scene* scene);
+        Actor& applyDmgRoles(QString& ret, Scene* scene);
         Actor& applyStates(QString& ret, Scene* scene, bool const consume);
         Actor& updateAttributes(bool const remove, Scene* scene, Costume& costume);
         Actor& updateResistance(bool const remove, QMap<int, int>* elmRes, QMap<State*, int>* stRes);

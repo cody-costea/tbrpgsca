@@ -28,6 +28,8 @@ namespace tbrpgsca
         #define FLAG_AUTOMATE 4
         #define FLAG_CONFUSE 8
         #define FLAG_REFLECT 16
+        #define FLAG_SHAPE_SHIFT 32
+        #define FLAG_STUN 64
     public:
         static QString CausesTxt;
 
@@ -37,10 +39,13 @@ namespace tbrpgsca
         inline int getWisdom() const;
         inline int getAgility() const;
         inline int getMaximumActions() const;
+
         inline bool isAutomated() const;
         inline bool isConfused() const;
         inline bool isCountering() const;
-        inline bool isReflecting() const;
+        inline bool isShapeShifted() const;
+        inline bool isReflecting() const;        
+        inline bool isStunned() const;
 
         inline int getElementResistance(int const element) const;
         inline int getStateResistance(State* const state) const;
@@ -53,8 +58,8 @@ namespace tbrpgsca
         inline bool hasCounterSkill(Ability& skill) const;
         inline int getCounterSkillsSize() const;
 
-        inline Costume& abandon(Actor& actor);
         inline Costume& adopt(Actor& actor);
+        inline Costume& abandon(Actor& actor);
         inline Costume& apply(QString& ret, Actor& actor);
 
         Costume(int const id, QString& name, QString& sprite, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
@@ -70,9 +75,9 @@ namespace tbrpgsca
         QMap<State*, int>* stRes;
         QMap<int, int>* res;
 
-        Costume& adopt(Scene* scene, Actor& actor);
-        Costume& apply(QString& ret, Scene* scene, Actor& actor);
-        Costume& abandon(Scene* scene, Actor& actor);
+        Costume& adopt(Scene* const scene, Actor& actor);
+        Costume& apply(QString& ret, Scene* const scene, Actor& actor);
+        Costume& abandon(Scene* const scene, Actor& actor);
 
         friend class Actor;
         friend class Ability;

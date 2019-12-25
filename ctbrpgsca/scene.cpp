@@ -48,7 +48,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
                     continue;
                 }
             }
-            else if ((fGuard == nullptr || pos != -1) && guardian->isGuarding())
+            else if ((fGuard == nullptr || pos != -1) && (!guardian->isStunned()))
             {
                 (*guardPos) = guardian;
             }
@@ -112,7 +112,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
         int cntSize;
         QVector<Ability*>* counters;
         ability.execute(ret, this, user, target, applyCosts);
-        if ((!healing) && target != &user && target->hp > 0 && target->isGuarding()
+        if ((!healing) && target != &user && target->hp > 0 && (!target->isStunned())
                 && (counters = target->counters) != nullptr && (cntSize = counters->size()) > 0)
         {
             Ability* counter = nullptr;
@@ -426,6 +426,10 @@ Scene& Scene::endTurn(QString& ret)
             }
         }
         crActor->applyStates(ret, false);
+        if (crActor->isStunned())
+        {
+            crActor->actions = 0;
+        }
     }
     scene.current = current;
     QVector<SceneAct*>* events = scene.events;

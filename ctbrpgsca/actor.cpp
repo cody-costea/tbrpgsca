@@ -49,6 +49,11 @@ inline int Actor::getCurrentActions() const
     return this->actions;
 }
 
+inline int Actor::getInitiative() const
+{
+    return this->init;
+}
+
 inline Costume& Actor::getRace() const
 {
     return *(this->equipment[CHAR_RACE]);
@@ -226,6 +231,49 @@ Actor& Actor::setReviving(const bool revive)
     return *this;
 }
 
+Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
+{
+    Actor& actor = *this;
+    QVector<Costume*>* dmgRoles = actor.dmgRoles;
+    if (dmgRoles != nullptr)
+    {
+        for (Costume* const role : *dmgRoles)
+        {
+            role->apply(ret, scene, actor);
+        }
+    }
+    return actor;
+}
+
+Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
+{
+    Actor& actor = *this;
+    if (consume)
+    {
+        /*QVector<Costume*>* dmgRoles = actor.dmgRoles;
+        if (dmgRoles != nullptr)
+        {
+            for (Costume* const role : *dmgRoles)
+            {
+                role->apply(ret, scene, actor);
+            }
+        }*/
+        actor.applyDmgRoles(ret, scene);
+    }
+    QMap<State*, int>* stateDur = actor.stateDur;
+    if (stateDur != nullptr)
+    {
+        for (State* const state : stateDur->keys())
+        {
+            if (stateDur->value(state, -3) > -3)
+            {
+                state->alter(ret, scene, actor, consume);
+            }
+        }
+    }
+    return actor;
+}
+
 Actor& Actor::switchCostume(Scene* const scene, Costume* const oldCost, Costume* const newCost)
 {
     Actor& actor = *this;
@@ -320,6 +368,18 @@ Actor& Actor::refreshCostume(Costume& costume)
     if (skills != nullptr)
     {
         actor.updateSkills(false, true, *skills);
+    }
+    /*if (costume.isStunned())
+    {
+        actor.setGuarding(false);
+    }*/
+    if (costume.isShapeShifted())
+    {
+        QString* spr = costume.sprite;
+        if (spr != nullptr)
+        {
+            actor.sprite = spr;
+        }
     }
     return actor;
 }

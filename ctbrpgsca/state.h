@@ -25,12 +25,9 @@ namespace tbrpgsca
 
     class State : public Costume
     {
-        #define FLAG_STUN 32
     public:
         inline int getDuration() const;
         inline int getResistance() const;
-
-        inline bool isStunning() const;
 
         inline int getRemovedSkillsSize() const;
         inline bool hasRemovedSkill(Ability& skill) const;
