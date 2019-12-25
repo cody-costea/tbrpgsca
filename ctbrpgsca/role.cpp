@@ -120,6 +120,11 @@ inline bool Role::isReviving() const
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
 }
 
+inline bool Role::operator==(Role& role) const
+{
+    return this->id == role.id;
+}
+
 Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
            int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive)
 {

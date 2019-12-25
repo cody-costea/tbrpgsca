@@ -127,8 +127,28 @@ Costume& Costume::adopt(Scene* scene, Actor& actor)
     actor.flags |= costume.flags;
     actor.updateAttributes(false, scene, costume);
     actor.updateResistance(false, costume.res, costume.stRes);
-    actor.updateCounters(false, *(costume.counters));
-    actor.updateSkills(false, *(costume.aSkills));
+    {
+        QVector<Ability*>* cSkills = costume.aSkills;
+        if (cSkills != nullptr)
+        {
+            actor.updateSkills(false, false, *cSkills);
+        }
+        cSkills = costume.counters;
+        if (cSkills != nullptr)
+        {
+            actor.updateSkills(false, false, *cSkills);
+        }
+    }
+    if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
+    {
+        QVector<Costume*>* dmgRoles = actor.dmgRoles;
+        if (dmgRoles == nullptr)
+        {
+            dmgRoles = new QVector<Costume*>();
+            actor.dmgRoles = dmgRoles;
+        }
+        dmgRoles->append(&costume);
+    }
     return costume;
 }
 
@@ -161,30 +181,62 @@ Costume& Costume::abandon(Scene* scene, Actor& actor)
     }
     actor.updateAttributes(true, scene, costume);
     actor.updateResistance(true, costume.res, costume.stRes);
-    actor.updateCounters(true, *(costume.counters));
-    actor.updateSkills(true, *(costume.aSkills));
-    actor.refreshFlags();
+    {
+        QVector<Ability*>* cSkills = costume.aSkills;
+        if (cSkills != nullptr)
+        {
+            if (actor.aSkills != nullptr)
+            {
+                actor.updateSkills(true, false, *cSkills);
+            }
+        }
+        cSkills = costume.counters;
+        if (cSkills != nullptr)
+        {
+            if (actor.counters != nullptr)
+            {
+                actor.updateSkills(true, true, *cSkills);
+            }
+        }
+    }
+    if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
+    {
+        QVector<Costume*>* dmgRoles = actor.dmgRoles;
+        if (dmgRoles != nullptr)
+        {
+            dmgRoles->removeOne(&costume);
+        }
+    }
+    actor.refreshCostumes();
     return costume;
 }
 
 Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
-    int rnd = std::rand() % 3;
+    int actorHp = actor.hp, rnd = std::rand() % 3; //roleHp = roleHp, roleMp = role.mp, roleSp = role.sp;
     int dmgHp = (actor.mHp + rnd) * role.hp / 100;
     int dmgMp = (actor.mMp + rnd) * role.mp / 100;
     int dmgSp = (actor.mSp + rnd) * role.sp / 100;
-    int actorHp = actor.hp;
-    if (scene == nullptr)
+    if (dmgHp != 0)
     {
-        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
+        if (scene == nullptr)
+        {
+            actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
+        }
+        else
+        {
+            actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
+        }
     }
-    else
+    if (dmgMp != 0)
     {
-        actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
+        actor.setCurrentMp(actor.mp - dmgMp);
     }
-    actor.setCurrentMp(actor.mp - dmgMp);
-    actor.setCurrentRp(actor.sp - dmgSp);
+    if (dmgSp != 0)
+    {
+        actor.setCurrentRp(actor.sp - dmgSp);
+    }
     ret = ret % QString(Costume::CausesTxt).arg(role.name, actor.name);
     Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
     return role;

@@ -142,7 +142,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     if (events != nullptr && events->size() > 1)
     {
         auto event = events->at(1);
-        if (event != nullptr && !event(scene, ret))
+        if (event != nullptr && !((*event)(scene, ret)))
         {
             return scene;
         }
@@ -212,7 +212,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     if (events->size() > 2)
     {
         auto event = events->at(2);
-        if (event != nullptr && !event(scene, ret))
+        if (event != nullptr && !((*event)(scene, ret)))
         {
             return scene;
         }
@@ -432,7 +432,7 @@ Scene& Scene::endTurn(QString& ret)
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && event(scene, ret) && (crActor->isAiPlayer() || crActor->isAutomated() || crActor->isConfused()))
+        if (event != nullptr && (*event)(scene, ret) && (crActor->isAiPlayer() || crActor->isAutomated() || crActor->isConfused()))
         {
             scene.playAi(ret, (*crActor));
         }
@@ -449,7 +449,7 @@ inline void Scene::agiCalc()
     }
 }
 
-Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
     assert(partiesSize > 1);
@@ -478,7 +478,7 @@ Scene::Scene(QString& ret, const QVector<QVector<Actor*>*>& parties, QVector<Sce
     }
     SceneAct* event;
     scene.agiCalc();
-    if (events == nullptr || events->size() == 0 || ((event = events->at(0)) == nullptr) || event(scene, ret))
+    if (events == nullptr || events->size() == 0 || ((event = events->at(0)) == nullptr) || (*event)(scene, ret))
     {
         scene.endTurn(ret);
     }

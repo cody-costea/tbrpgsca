@@ -18,7 +18,9 @@ limitations under the License.
 #include "costume.h"
 #include "state.h"
 #include "scene.h"
+#include "role.h"
 
+#include <QStringBuilder>
 
 using namespace tbrpgsca;
 
@@ -122,13 +124,96 @@ Actor& Actor::setReviving(const bool revive)
     return *this;
 }
 
-Actor& Actor::refreshFlags()
+Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)
 {
     Actor& actor = *this;
-    int flags = actor.flags;
+    QVector<Ability*>* aSkills = counters ? actor.counters : actor.aSkills;
+    if (remove)
+    {
+        if (aSkills != nullptr)
+        {
+            for (Ability* const ability : skills)
+            {
+                aSkills->removeOne(ability);
+                if (ability->rQty > 0)
+                {
+                    QMap<Ability*, int>* regTurn = actor.skillsRgTurn;
+                    if (regTurn != nullptr)
+                    {
+                        regTurn->remove(ability);
+                    }
+                }
+                if (ability->mQty > 0)
+                {
+                    QMap<Ability*, int>* crQty = actor.skillsCrQty;
+                    if (crQty != nullptr)
+                    {
+                        crQty->remove(ability);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        if (aSkills == nullptr)
+        {
+            aSkills = new QVector<Ability*>();
+            if (counters)
+            {
+                this->counters = aSkills;
+            }
+            else
+            {
+                this->aSkills = aSkills;
+            }
+        }
+        for (Ability* const ability : skills)
+        {
+            if (!aSkills->contains(ability))
+            {
+                aSkills->append(ability);
+                /*int const mQty = ability->mQty;
+                if (mQty > 0)
+                {
+                    QMap<Ability*, int>* crQty = actor.skillsCrQty;
+                    if (crQty == nullptr)
+                    {
+                        crQty = new QMap<Ability*, int>();
+                        actor.skillsCrQty = crQty;
+                    }
+                    crQty->operator[](ability) = mQty;
+                }*/
+            }
+        }
+    }
+    return actor;
+}
+
+Actor& Actor::refreshCostume(Costume& costume)
+{
+    Actor& actor = *this;
+    actor.dmgType |= costume.dmgType;
+    actor.flags |= costume.flags;
+    QVector<Ability*>* skills = costume.aSkills;
+    if (skills != nullptr)
+    {
+        actor.updateSkills(false, false, *skills);
+    }
+    skills = costume.counters;
+    if (skills != nullptr)
+    {
+        actor.updateSkills(false, true, *skills);
+    }
+    return actor;
+}
+
+Actor& Actor::refreshCostumes()
+{
+    Actor& actor = *this;
     for (Costume* const costume : actor.equipment.values())
     {
-        flags |= costume->flags;
+        actor.refreshCostume(*costume);
     }
     QMap<State*, int>* stateDur = actor.stateDur;
     if (stateDur != nullptr)
@@ -137,11 +222,10 @@ Actor& Actor::refreshFlags()
         {
             if (stateDur->value(state, -3) > -3)
             {
-                flags |= state->flags;
+                actor.refreshCostume(*state);
             }
         }
     }
-    actor.flags = flags;
     return actor;
 }
 
@@ -171,10 +255,10 @@ Actor::~Actor()
         this->aSkills = nullptr;
         delete skills;
     }
-    /*auto equipment = this->equipment;
-    if (equipment != nullptr)
+    auto dmgRoles = this->dmgRoles;
+    if (dmgRoles != nullptr)
     {
-        this->equipment = nullptr;
-        delete equipment;
-    }*/
+        this->dmgRoles = nullptr;
+        delete dmgRoles;
+    }
 }
