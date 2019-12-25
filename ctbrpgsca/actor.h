@@ -28,6 +28,9 @@ namespace tbrpgsca
         #define FLAG_GUARDS 64
         #define FLAG_AI_PLAYER 128
         #define FLAG_SHAPE_SHIFT 256
+        #define CHAR_NONE 0
+        #define CHAR_RACE 1
+        #define CHAR_JOB 2
     public:
         static QString KoTxt;
         static QString RiseTxt;
@@ -51,7 +54,7 @@ namespace tbrpgsca
         int getRemainingSkillUses(Ability& skill) const;
         int getRegeneratingSkillTurn(Ability& skill) const;
 
-        Costume* unequipPos(int const pos);
+        Costume* unequipPos(char const pos);
         Costume* equipItem(char const pos, Costume* const item);
         char unequipItem(Costume& item);
 
@@ -111,10 +114,18 @@ namespace tbrpgsca
         Actor& updateAttributes(bool const remove, Scene* scene, Costume& costume);
         Actor& updateResistance(bool const remove, QMap<int, int>* elmRes, QMap<State*, int>* stRes);
         Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
-        Actor& switchCostume(Costume* const oldCostume, Costume* const newCostume);
+        Actor& switchCostume(Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
         //Actor& updateStates(bool const remove, QVector<State*>& states);
         Actor& setCurrentHp(int const hp, QString& ret, Scene& scene);
         Actor& setAgility(int const agi, Scene& scene);
+        inline Actor& setJob(Scene* const scene, Costume& job);
+        inline Actor& setRace(Scene* const scene, Costume& race);
+        Actor& setLevel(Scene* const scene, int const level);
+        Actor& setExperience(Scene* const scene, int const xp);
+        Actor& levelUp(Scene* const scene, int const level);
+        Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
+        Costume* unequipPos(Scene* const scene, char const pos);
+        char unequipItem(Scene* const scene, Costume& item);
         Actor& refreshCostume(Costume& costume);
         Actor& refreshCostumes();
 

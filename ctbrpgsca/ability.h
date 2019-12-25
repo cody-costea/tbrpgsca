@@ -78,8 +78,8 @@ namespace tbrpgsca
 
         Ability& execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts);
 
-        friend class Costume;
         friend class Actor;
+        friend class Costume;
         friend class State;
         friend class Scene;
     };

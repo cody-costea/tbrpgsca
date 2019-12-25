@@ -24,6 +24,108 @@ limitations under the License.
 
 using namespace tbrpgsca;
 
+inline int Actor::getLevel() const
+{
+    return this->lv;
+}
+
+inline int Actor::getExperience() const
+{
+    return this->xp;
+}
+
+inline int Actor::getMaximumLevel() const
+{
+    return this->maxLv;
+}
+
+inline int Actor::getMaximumExperience() const
+{
+    return this->maxp;
+}
+
+inline int Actor::getCurrentActions() const
+{
+    return this->actions;
+}
+
+inline Costume& Actor::getRace() const
+{
+    return *(this->equipment[CHAR_RACE]);
+}
+
+inline Costume& Actor::getJob() const
+{
+    return *(this->equipment[CHAR_JOB]);
+}
+
+inline Costume* Actor::equipItem(const char pos, Costume* const item)
+{
+    assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
+    return this->equipItem(nullptr, pos, item);
+}
+
+inline char Actor::unequipItem(Costume& item)
+{
+    return this->unequipItem(nullptr, item);
+}
+
+inline Costume* Actor::unequipPos(const char pos)
+{
+    assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
+    return this->equipItem(nullptr, pos, nullptr);
+}
+
+inline Costume* Actor::unequipPos(Scene* scene, const char pos)
+{
+    return this->equipItem(scene, pos, nullptr);
+}
+
+char Actor::unequipItem(Scene* const scene, Costume& item)
+{
+    QMap<char, Costume*>& equipment = this->equipment;
+    char const old = equipment.key(&item, CHAR_NONE);
+    this->equipItem(scene, old, nullptr);
+    return old;
+}
+
+Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const item)
+{
+    QMap<char, Costume*>& equipment = this->equipment;
+    Costume* old = equipment.value(pos, nullptr);
+    switchCostume(scene, old, item);
+    equipment[pos] = item;
+    return old;
+}
+
+inline Actor& Actor::setRace(Costume& race)
+{
+    return this->setRace(nullptr, race);
+}
+
+inline Actor& Actor::setJob(Costume& job)
+{
+    return this->setJob(nullptr, job);
+}
+
+inline Actor& Actor::setRace(Scene* scene, Costume& race)
+{
+    Actor& actor = *this;
+    actor.equipItem(scene, CHAR_RACE, &race);
+    return actor;
+}
+
+inline Actor& Actor::setJob(Scene* scene, Costume& job)
+{
+    Actor& actor = *this;
+    actor.equipItem(scene, CHAR_JOB, &job);
+    if (!actor.isShapeShifted())
+    {
+        actor.sprite = job.sprite;
+    }
+    return actor;
+}
+
 Actor& Actor::setAgility(const int agi)
 {
     this->agi = agi;
@@ -122,6 +224,20 @@ Actor& Actor::setReviving(const bool revive)
         this->flags = flags ^ FLAG_REVIVE;
     }
     return *this;
+}
+
+Actor& Actor::switchCostume(Scene* const scene, Costume* const oldCost, Costume* const newCost)
+{
+    Actor& actor = *this;
+    if (oldCost != nullptr)
+    {
+        oldCost->abandon(scene, actor);
+    }
+    if (newCost != nullptr)
+    {
+        newCost->adopt(scene, actor);
+    }
+    return actor;
 }
 
 Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)

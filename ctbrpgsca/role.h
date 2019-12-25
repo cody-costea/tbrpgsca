@@ -61,7 +61,7 @@ namespace tbrpgsca
         inline int getCurrentRp() const;
         inline int getDmgElement() const;
 
-        inline bool operator== (Role& role) const;
+        inline bool operator==(Role& role) const;
     protected:
         QString name,* sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
