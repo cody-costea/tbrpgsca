@@ -75,7 +75,7 @@ inline int Costume::getCounterSkillsSize() const
 inline int Costume::getElementResistance(const int element) const
 {
     QMap<int, int>* res = this->res;
-    return res == nullptr ? 3 : res->value(element, 3);
+    return res == nullptr ? 0 : res->value(element, 0);
 }
 
 inline int Costume::getStateResistance(State* const state) const

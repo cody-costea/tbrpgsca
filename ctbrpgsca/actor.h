@@ -52,7 +52,7 @@ namespace tbrpgsca
         Costume* equipItem(char const pos, Costume* const item);
         char unequipItem(Costume& item);
 
-        Actor& recover();
+        inline Actor& recover();
         //Actor& applyRoles(QString& ret);
         Actor& applyStates(QString& ret, bool const consume);
         Actor& setElementResistance(int const element, int const res);
@@ -78,11 +78,11 @@ namespace tbrpgsca
         Actor& setAgility(int const agi);
         Actor& setInitiative(int const init);
         Actor& setRanged(bool const range);
-        Actor& setGuarding(bool const guards);
+        Actor& setStunned(bool const stun);
         Actor& setReflecting(bool const reflects);
         Actor& setShapeShifted(bool const shapeshift);
-        Actor& setAutomated(bool const automated);
-        Actor& setConfused(bool const confused);
+        Actor& setAutomated(bool const automate);
+        Actor& setConfused(bool const confuse);
         Actor& setAiPlayer(bool const aiPlayer);
         Actor& setReviving(bool const revive);
 
@@ -101,6 +101,8 @@ namespace tbrpgsca
         QVector<Costume*>* dmgRoles;
         void* extra;
 
+        Actor& recover(Scene* const scene);
+        Actor& levelUp(Scene* const scene);
         Actor& checkRegSkill(Ability& skill);
         Actor& checkStatus(Scene* const scene, QString& ret);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
@@ -116,7 +118,6 @@ namespace tbrpgsca
         inline Actor& setRace(Scene* const scene, Costume& race);
         Actor& setLevel(Scene* const scene, int const level);
         Actor& setExperience(Scene* const scene, int const xp);
-        Actor& levelUp(Scene* const scene, int const level);
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
         Costume* unequipPos(Scene* const scene, char const pos);
         char unequipItem(Scene* const scene, Costume& item);

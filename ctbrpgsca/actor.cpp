@@ -135,6 +135,30 @@ inline Actor& Actor::setJob(Scene* const scene, Costume& job)
     return actor;
 }
 
+Actor& Actor::setAttack(const int atk)
+{
+    this->atk = atk;
+    return *this;
+}
+
+Actor& Actor::setDefense(const int def)
+{
+    this->def = def;
+    return *this;
+}
+
+Actor& Actor::setSpirit(const int spi)
+{
+    this->spi = spi;
+    return *this;
+}
+
+Actor& Actor::setWisdom(const int wis)
+{
+    this->wis = wis;
+    return *this;
+}
+
 Actor& Actor::setAgility(const int agi)
 {
     this->agi = agi;
@@ -250,6 +274,128 @@ Actor& Actor::setReviving(const bool revive)
     return *this;
 }
 
+Actor& Actor::setAutomated(const bool automate)
+{
+    int flags = this->flags;
+    if (automate != ((flags & FLAG_AUTOMATE) == FLAG_AUTOMATE))
+    {
+        this->flags = flags ^ FLAG_AUTOMATE;
+    }
+    return *this;
+}
+
+Actor& Actor::setConfused(const bool confuse)
+{
+    int flags = this->flags;
+    if (confuse != ((flags & FLAG_CONFUSE) == FLAG_CONFUSE))
+    {
+        this->flags = flags ^ FLAG_CONFUSE;
+    }
+    return *this;
+}
+
+Actor& Actor::setAiPlayer(const bool aiPlayer)
+{
+    int flags = this->flags;
+    if (aiPlayer != ((flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER))
+    {
+        this->flags = flags ^ FLAG_AI_PLAYER;
+    }
+    return *this;
+}
+
+Actor& Actor::setReflecting(const bool reflect)
+{
+    int flags = this->flags;
+    if (reflect != ((flags & FLAG_REFLECT) == FLAG_REFLECT))
+    {
+        this->flags = flags ^ FLAG_REFLECT;
+    }
+    return *this;
+}
+
+Actor& Actor::setShapeShifted(const bool shapeshift)
+{
+    int flags = this->flags;
+    if (shapeshift != ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT))
+    {
+        this->flags = flags ^ FLAG_SHAPE_SHIFT;
+    }
+    return *this;
+}
+
+Actor& Actor::setStunned(const bool stun)
+{
+    int flags = this->flags;
+    if (stun != ((flags & FLAG_STUN) == FLAG_STUN))
+    {
+        this->flags = flags ^ FLAG_STUN;
+    }
+    return *this;
+}
+
+inline Actor& Actor::setMaximumLevel(const int maxLv)
+{
+    this->maxLv = maxLv;
+    return *this;
+}
+
+inline Actor& Actor::setLevel(const int level)
+{
+    return this->setLevel(nullptr, level);
+}
+
+Actor& Actor::setLevel(Scene* const scene, const int level)
+{
+    Actor& actor = *this;
+    while (level > actor.lv)
+    {
+        actor.xp = actor.maxp;
+        actor.levelUp(scene);
+    }
+    actor.lv = level;
+    return actor;
+}
+
+inline Actor& Actor::setExperience(const int xp)
+{
+    return this->setExperience(nullptr, xp);
+}
+
+Actor& Actor::setExperience(Scene* const scene, const int xp)
+{
+    Actor& actor = *this;
+    actor.xp = xp;
+    actor.levelUp(scene);
+    return actor;
+}
+
+Actor& Actor::setElementResistance(const int element, const int res)
+{
+    Actor& actor = *this;
+    QMap<int, int>* rMap = actor.res;
+    if (rMap == nullptr)
+    {
+        rMap = new QMap<int, int>();
+        actor.res = rMap;
+    }
+    rMap->operator[](element) = res;
+    return actor;
+}
+
+Actor& Actor::setStateResistance(State* const state, const int res)
+{
+    Actor& actor = *this;
+    QMap<State*, int>* stRes = actor.stRes;
+    if (stRes == nullptr)
+    {
+        stRes = new QMap<State*, int>();
+        actor.stRes = stRes;
+    }
+    stRes->operator[](state) = res;
+    return actor;
+}
+
 Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
@@ -286,6 +432,22 @@ Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
     return actor;
 }
 
+Actor& Actor::checkRegSkill(Ability& skill)
+{
+    Actor& actor = *this;
+    if (skill.rQty > 0)
+    {
+        QMap<Ability*, int>* regSkills = actor.skillsRgTurn;
+        if (regSkills == nullptr)
+        {
+            regSkills = new QMap<Ability*, int>();
+            actor.skillsRgTurn = regSkills;
+        }
+        regSkills->operator[](&skill) = 0;
+    }
+    return actor;
+}
+
 Actor& Actor::checkStatus(Scene* const scene, QString& ret)
 {
     Actor& actor = *this;
@@ -306,7 +468,7 @@ Actor& Actor::checkStatus(Scene* const scene, QString& ret)
             {
                 for (State* const state : stateDur->keys())
                 {
-                    state->disable(scene, actor, true, true);
+                    state->disable(scene, actor, false, false);
                 }
             }
         }
@@ -323,22 +485,109 @@ Actor& Actor::checkStatus(Scene* const scene, QString& ret)
     return actor;
 }
 
-Actor& Actor::levelUp(Scene* const scene, const int level)
+inline Actor& Actor::recover()
 {
-    Actor& actor = *actor;
-    while (this->maxp <= this->xp && this->lv < this->maxLv)
+    return this->recover(nullptr);
+}
+
+Actor& Actor::recover(Scene* const scene)
+{
+    Actor& actor = *this;
+    actor.actions = actor.mActions;
+    actor.hp = actor.mHp;
+    actor.mp = actor.mMp;
+    actor.sp = 0;
     {
-        this->maxp *= 2;
-        this->lv++;
-        this->mHp += 3;
-        this->mMp += 2;
-        this->mSp += 2;
-        this->atk++;
-        this->def++;
-        this->wis++;
-        this->spi++;
-        this->agi++;
+        QMap<State*, int>* const sDur = actor.stateDur;
+        if (sDur != nullptr)
+        {
+            for (State* const state : sDur->keys())
+            {
+                state->disable(scene, actor, true, false);
+            }
+            if (sDur->size() == 0)
+            {
+                actor.stateDur = nullptr;
+                delete sDur;
+            }
+        }
     }
+    //actor.setShapeShifted(false);
+    actor.refreshCostumes();
+    {
+        QMap<int, int>* const res = actor.res;
+        if (res != nullptr)
+        {
+            for (int const r : res->keys())
+            {
+                if (res->value(r) == 0)
+                {
+                    res->remove(r);
+                }
+            }
+            if (res->size() == 0)
+            {
+                actor.res = nullptr;
+                delete res;
+            }
+        }
+    }
+    {
+        QMap<State*, int>* const stRes = actor.stRes;
+        if (stRes != nullptr)
+        {
+            for (State* const r : stRes->keys())
+            {
+                if (stRes->value(r) == 0)
+                {
+                    stRes->remove(r);
+                }
+            }
+            if (stRes->size() == 0)
+            {
+                actor.stRes = nullptr;
+                delete stRes;
+            }
+        }
+    }
+    {
+        QMap<Ability*, int>* skillsQty = actor.skillsCrQty;
+        if (skillsQty != nullptr)
+        {
+            for (Ability* const ability : skillsQty->keys())
+            {
+                skillsQty->operator[](ability) = ability->mQty;
+            }
+        }
+    }
+    return actor;
+}
+
+Actor& Actor::levelUp(Scene* const scene)
+{
+    Actor& actor = *this;
+    //int const i = remove ? -1 : 1;
+    while (actor.maxp <= actor.xp && actor.lv < actor.maxLv)
+    {
+        actor.maxp *= 2;
+        actor.lv++;
+        actor.mHp += 3;
+        actor.mMp += 2;
+        actor.mSp += 2;
+        actor.atk++;
+        actor.def++;
+        actor.wis++;
+        actor.spi++;
+        if (scene == nullptr)
+        {
+            actor.agi++;
+        }
+        else
+        {
+            actor.setAgility(actor.agi + 1, *scene);
+        }
+    }
+    return actor;
 }
 
 Actor& Actor::switchCostume(Scene* const scene, Costume* const oldCost, Costume* const newCost)
@@ -498,6 +747,7 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
                         actor.skillsCrQty = crQty;
                     }
                     crQty->operator[](ability) = mQty;
+                    actor.checkRegSkill(*ability);
                 }*/
             }
         }
