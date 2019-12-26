@@ -54,7 +54,6 @@ namespace tbrpgsca
 
         Actor& recover();
         //Actor& applyRoles(QString& ret);
-        Actor& checkStatus(QString& ret);
         Actor& applyStates(QString& ret, bool const consume);
         Actor& setElementResistance(int const element, int const res);
         Actor& setStateResistance(State* const state, int const res);
@@ -103,10 +102,11 @@ namespace tbrpgsca
         void* extra;
 
         Actor& checkRegSkill(Ability& skill);
-        Actor& applyDmgRoles(QString& ret, Scene* scene);
-        Actor& applyStates(QString& ret, Scene* scene, bool const consume);
-        Actor& updateAttributes(bool const remove, Scene* scene, Costume& costume);
-        Actor& updateResistance(bool const remove, QMap<int, int>* elmRes, QMap<State*, int>* stRes);
+        Actor& checkStatus(Scene* const scene, QString& ret);
+        Actor& applyDmgRoles(QString& ret, Scene* const scene);
+        Actor& applyStates(QString& ret, Scene* const scene, bool const consume);
+        Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
+        Actor& updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
         Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
         Actor& switchCostume(Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
         //Actor& updateStates(bool const remove, QVector<State*>& states);

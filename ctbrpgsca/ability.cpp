@@ -372,10 +372,15 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     }
                 }
             }
+            target->checkStatus(scene, ret);
+            if (ko && target->hp > 0)
+            {
+                target->applyStates(ret, scene, false);
+            }
         }
-        if (ko && target->hp > 0)
+        else
         {
-            target->applyStates(ret, scene, false);
+            ret = ret % Ability::MissesTxt;
         }
     }
     if (applyCosts)
@@ -395,7 +400,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
     }
-    user.checkStatus(ret);
+    user.checkStatus(scene, ret);
     return ability;
 }
 

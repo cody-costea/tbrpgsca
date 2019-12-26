@@ -48,7 +48,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
                     continue;
                 }
             }
-            else if ((fGuard == nullptr || pos != -1) && (!guardian->isStunned()))
+            else if ((fGuard == nullptr || pos != -1) && guardian->hp > 0 && (!guardian->isStunned()))
             {
                 (*guardPos) = guardian;
             }

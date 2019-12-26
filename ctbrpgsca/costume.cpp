@@ -125,7 +125,7 @@ inline Costume& Costume::apply(QString& ret, Actor& actor)
     return this->apply(ret, nullptr, actor);
 }
 
-Costume& Costume::adopt(Scene* scene, Actor& actor)
+Costume& Costume::adopt(Scene* const scene, Actor& actor)
 {
     Costume& costume = *this;
     actor.updateAttributes(false, scene, costume);
@@ -156,7 +156,7 @@ Costume& Costume::adopt(Scene* scene, Actor& actor)
     return costume;
 }
 
-Costume& Costume::abandon(Scene* scene, Actor& actor)
+Costume& Costume::abandon(Scene* const scene, Actor& actor)
 {
     Costume& costume = *this;
     {
@@ -212,7 +212,7 @@ Costume& Costume::abandon(Scene* scene, Actor& actor)
         QString* spr = costume.sprite;
         if (spr != nullptr)
         {
-            actor.sprite = actor.getJob().sprite;
+            (*actor.sprite) = *(actor.getJob().sprite);
         }
     }
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)

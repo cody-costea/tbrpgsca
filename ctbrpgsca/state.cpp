@@ -64,7 +64,6 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
             }
         }
         state.blockSkills(actor, false);
-        //state.alter(ret, scene, actor, false);
     }
     return state;
 }
@@ -74,10 +73,6 @@ State& State::remove(Scene* const scene, Actor& actor)
     State& state = *this;
     state.blockSkills(actor, true);
     state.abandon(scene, actor);
-    /*if (state.isReflecting())
-    {
-        actor.applyStates(ret, scene, false);
-    }*/
     return state;
 }
 
@@ -120,38 +115,14 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
 {
     State& state = *this;
     QMap<State*, int>* sDur = actor.stateDur;
-    if (sDur != nullptr && actor.hp > 0)
+    if (sDur != nullptr /*&& actor.hp > 0*/)
     {
         int const d = sDur->value(this, -3);
         if (consume)
         {
-            if (d > -3)
+            if (d > 0)
             {
-                /*if (consume)
-                {*/
-                    //state.apply(ret, scene, actor);
-                    if (d > 0)
-                    {
-                        sDur->operator[](this) = d - 1;
-                    }
-                /*}
-                else
-                {
-                    QString* sprite = state.sprite;
-                    if (sprite != nullptr && sprite->length() > 0)
-                    {
-                        actor.sprite = sprite;
-                    }
-                    if (state.isStunned())
-                    {
-                        if (d > 0 && actor.actions > 0)
-                        {
-                            sDur->operator[](this) = d - 1;
-                        }
-                        actor.setGuarding(false);
-                        actor.actions = 0;
-                    }
-                }*/
+                sDur->operator[](this) = d - 1;
             }
         }
         else if (d == 0)
