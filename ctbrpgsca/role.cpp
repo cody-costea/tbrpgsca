@@ -125,14 +125,14 @@ inline bool Role::operator==(Role& role) const
     return this->id == role.id;
 }
 
-Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
+Role::Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg,
            int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive)
 {
     this->id = id;
     this->name = name;
-    if (sprite.length() > 0)
+    if (sprite != nullptr && sprite->length() > 0)
     {
-        this->sprite = new QString(sprite);
+        this->sprite = new QString(*sprite);
     }
     this->mHp = mHp;
     this->mHp = mMp;

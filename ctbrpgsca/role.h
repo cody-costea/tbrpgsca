@@ -66,7 +66,7 @@ namespace tbrpgsca
         QString name,* sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
 
-        Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg,
+        Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg,
              int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive);
 
         Role(Role& role);

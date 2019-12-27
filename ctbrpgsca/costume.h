@@ -38,7 +38,6 @@ namespace tbrpgsca
         inline int getSpirit() const;
         inline int getWisdom() const;
         inline int getAgility() const;
-        inline int getMaximumActions() const;
 
         inline bool isAutomated() const;
         inline bool isConfused() const;
@@ -47,6 +46,7 @@ namespace tbrpgsca
         inline bool isReflecting() const;        
         inline bool isStunned() const;
 
+        inline int getMaximumActions() const;
         inline int getElementResistance(int const element) const;
         inline int getStateResistance(State* const state) const;
 
@@ -62,14 +62,15 @@ namespace tbrpgsca
         inline Costume& abandon(Actor& actor);
         inline Costume& apply(QString& ret, Actor& actor);
 
-        Costume(int const id, QString& name, QString& sprite, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-                int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate, bool const confuse,
-                bool const reflect, bool const revive, QMap<int, int>* const res, QVector<Ability*>* const skills, QMap<State*, int>* const stRes);
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+                int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
+                bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                QMap<State*, int>* const stRes);
 
         Costume(Costume& costume);
 
         ~Costume();
-    private:
+    protected:
         int atk, def, spi, wis, agi, mActions;
         QVector<Ability*>* aSkills,* counters;
         QMap<State*, int>* stRes;
@@ -78,6 +79,11 @@ namespace tbrpgsca
         Costume& adopt(Scene* const scene, Actor& actor);
         Costume& apply(QString& ret, Scene* const scene, Actor& actor);
         Costume& abandon(Scene* const scene, Actor& actor);
+
+        Costume(int const id, QString& name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+                int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate,
+                bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                QMap<State*, int>* const stRes);
 
         friend class Actor;
         friend class Ability;

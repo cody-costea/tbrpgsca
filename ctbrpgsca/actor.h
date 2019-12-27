@@ -65,6 +65,7 @@ namespace tbrpgsca
         Actor& setLevel(int const level);
         Actor& setExperience(int const xp);
         Actor& setMaximumLevel(int const maxLv);
+        Actor& setMaximumActions(int const mActions);
         Actor& setMaximumHp(int const mHp);
         Actor& setMaximumMp(int const mMp);
         Actor& setMaximumRp(int const mSp);
@@ -86,9 +87,8 @@ namespace tbrpgsca
         Actor& setAiPlayer(bool const aiPlayer);
         Actor& setReviving(bool const revive);
 
-        Actor(int const id, QString& name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp,
-              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, QMap<int, int>* const res,
-              QMap<State*, int>* const stRes, QMap<Ability*, int>* const items);
+        Actor(int const id, QString& name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp, int const mSp, int const atk,
+              int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items);
 
         Actor(Actor& actor);
 

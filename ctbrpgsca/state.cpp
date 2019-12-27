@@ -174,21 +174,16 @@ State& State::blockSkills(Actor& actor, const bool remove)
     return state;
 }
 
-State::State(int const id, QString& name, QString& sprite, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
-             int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
-             bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const stRes,
-             QVector<Ability*>* const aSkills, QVector<Ability*>* const rSkills)
-    : Costume(id, name, sprite, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, range, automate, confuse, reflect, revive, res, aSkills, stRes)
+State::State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
+             int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun,
+             bool const range, bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const stRes,
+             QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills)
+    : Costume(id, name, sprite, shapeShift, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, revive, res, aSkills,
+              counters, stRes)
 {
     this->dur = dur;
     this->sRes = sRes;
     this->rSkills = rSkills;
-    int flags = this->flags;
-    if (stun)
-    {
-        flags |= FLAG_STUN;
-    }
-    this->flags = flags;
 }
 
 State::State(State& state) : Costume(state)

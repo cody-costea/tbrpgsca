@@ -54,6 +54,18 @@ inline int Actor::getInitiative() const
     return this->init;
 }
 
+int Actor::getRemainingSkillUses(Ability& skill) const
+{
+    QMap<Ability*, int>* crQty = this->skillsCrQty;
+    return crQty == nullptr ? 0 : crQty->value(&skill, 0);
+}
+
+int Actor::getRegeneratingSkillTurn(Ability& skill) const
+{
+    QMap<Ability*, int>* regTurn = this->skillsRgTurn;
+    return regTurn == nullptr ? 0 : regTurn->value(&skill, 0);
+}
+
 inline Costume& Actor::getRace() const
 {
     return *(this->equipment[CHAR_RACE]);
@@ -201,6 +213,17 @@ Actor& Actor::setCurrentRp(const int sp)
     int mSp = this->mSp;
     this->sp = sp > mSp ? mSp : (sp < 0 ? 0 : sp);
     return *this;
+}
+
+Actor& Actor::setMaximumActions(const int mActions)
+{
+    Actor& actor = *this;
+    actor.mActions = mActions;
+    if (mActions < actor.actions)
+    {
+        actor.actions = mActions;
+    }
+    return actor;
 }
 
 Actor& Actor::setMaximumHp(const int mHp)
@@ -611,6 +634,7 @@ Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& c
     actor.setMaximumHp(actor.mHp + (i * costume.mHp));
     actor.setMaximumMp(actor.mMp + (i * costume.mMp));
     actor.setMaximumRp(actor.mSp + (i * costume.mSp));
+    actor.setMaximumActions(actor.mActions + (i * costume.mActions));
     actor.atk += i * costume.atk;
     actor.def += i * costume.def;
     actor.mSp += i * costume.spi;
@@ -800,6 +824,116 @@ Actor& Actor::refreshCostumes()
         }
     }
     return actor;
+}
+
+Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp, int const mSp, int const atk,
+             int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items)
+    : Costume(id, name, nullptr, false, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, res, new QVector<Ability*>(),
+              nullptr, stRes)
+{
+    this->setRace(race);
+    this->setJob(job);
+    this->maxLv = maxLv;
+    this->setLevel(level);
+    this->items = items;
+    this->dmgRoles = nullptr;
+    this->skillsRgTurn = nullptr;
+    this->skillsCrQty = nullptr;
+    this->stateDur = nullptr;
+    this->side = 0;
+    this->init = 0;
+    this->recover();
+}
+
+Actor::Actor(Actor& actor) : Costume(actor)
+{
+    this->side = 0;//actor.side;
+    this->init = 0;//actor.init;
+    this->xp = actor.xp;
+    this->maxp = actor.maxp;
+    this->lv = actor.lv;
+    this->maxLv = actor.lv;
+    this->items = actor.items;
+    this->equipment = actor.equipment;
+    {
+        QMap<Ability*, int>* crSkillsQty = actor.skillsCrQty;
+        if (crSkillsQty == nullptr)
+        {
+            this->skillsCrQty = nullptr;
+        }
+        else
+        {
+            QMap<Ability*, int>* nSkillsQty = new QMap<Ability*, int>();
+            (*nSkillsQty) = (*crSkillsQty);
+            this->skillsCrQty = nSkillsQty;
+        }
+
+    }
+    {
+        QMap<Ability*, int>* skillsRgTurn = actor.skillsRgTurn;
+        if (skillsRgTurn == nullptr)
+        {
+            this->skillsRgTurn = nullptr;
+        }
+        else
+        {
+            QMap<Ability*, int>* nSkillsRgTurn = new QMap<Ability*, int>();
+            (*nSkillsRgTurn) = (*skillsRgTurn);
+            this->skillsRgTurn = nSkillsRgTurn;
+        }
+    }
+    {
+        QMap<State*, int>* crSkillsQty = actor.stateDur;
+        if (crSkillsQty == nullptr)
+        {
+            this->stateDur = nullptr;
+        }
+        else
+        {
+            QMap<State*, int>* nSkillsQty = new QMap<State*, int>();
+            (*nSkillsQty) = (*crSkillsQty);
+            this->stateDur = nSkillsQty;
+        }
+    }
+    {
+        QVector<Costume*>* skillsRgTurn = actor.dmgRoles;
+        if (skillsRgTurn == nullptr)
+        {
+            this->dmgRoles = nullptr;
+        }
+        else
+        {
+            QVector<Costume*>* nSkillsRgTurn = new QVector<Costume*>();
+            (*nSkillsRgTurn) = (*skillsRgTurn);
+            this->dmgRoles = nSkillsRgTurn;
+        }
+    }
+    {
+        QVector<Ability*>* skillsRgTurn = actor.aSkills;
+        if (skillsRgTurn == nullptr)
+        {
+            this->aSkills = nullptr;
+        }
+        else
+        {
+            QVector<Ability*>* nSkillsRgTurn = new QVector<Ability*>();
+            (*nSkillsRgTurn) = (*skillsRgTurn);
+            this->aSkills = nSkillsRgTurn;
+        }
+    }
+    {
+        QVector<Ability*>* skillsRgTurn = actor.counters;
+        if (skillsRgTurn == nullptr)
+        {
+            this->counters = nullptr;
+        }
+        else
+        {
+            QVector<Ability*>* nSkillsRgTurn = new QVector<Ability*>();
+            (*nSkillsRgTurn) = (*skillsRgTurn);
+            this->counters = nSkillsRgTurn;
+        }
+    }
 }
 
 Actor::~Actor()
