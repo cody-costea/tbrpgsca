@@ -31,12 +31,12 @@ inline int State::getResistance() const
     return this->sRes;
 }
 
-inline State& State::inflict(QString& ret, Actor& actor, const bool always, const bool indefinite)
+inline State& State::inflict(QString& ret, Actor& actor, int dur, const bool always, const bool indefinite)
 {
-    return this->inflict(ret, nullptr, actor, always, indefinite);
+    return this->inflict(ret, nullptr, actor, dur, always, indefinite);
 }
 
-State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool always, const bool indefinite)
+State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, const bool always, const bool indefinite)
 {
     State& state = *this;
     QMap<State*, int>* stRes = actor.stRes;
@@ -56,7 +56,10 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, const bool alway
         }
         else
         {
-            int const stateDur = state.dur;
+            if (stateDur == 0)
+            {
+                stateDur = state.dur;
+            }
             int const crDur = trgStates->value(this, 0);
             if (crDur < stateDur || (crDur > -1 && stateDur < 0))
             {

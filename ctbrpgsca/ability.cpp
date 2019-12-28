@@ -52,20 +52,27 @@ inline int Ability::getDamageType() const
     return this->dmgType;
 }
 
-inline State& Ability::getAddedState(int n) const
+inline int Ability::getAddedStateDuration(State& state) const
 {
-    return *(this->aStates->at(n));
+    QMap<State*, int>* aStates = this->stateDur;
+    return aStates == nullptr ? 0 : aStates->value(&state, 0);
+}
+
+inline QList<State*> Ability::getAddedStatesList() const
+{
+    QMap<State*, int>* aStates = this->stateDur;
+    return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
 inline bool Ability::hasAddedState(State& state) const
 {
-    QVector<State*>* aStates = this->aStates;
+    QMap<State*, int>* aStates = this->stateDur;
     return aStates != nullptr && aStates->contains(&state);
 }
 
 inline int Ability::getAddedStatesSize() const
 {
-    QVector<State*>* aStates = this->aStates;
+    QMap<State*, int>* aStates = this->stateDur;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
@@ -310,12 +317,14 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                 user.setCurrentRp(user.sp + dmgSp / 2);
             }
             {
-                QVector<State*>* aStates = ability.aStates;
+                QMap<State*, int>* aStates = ability.stateDur;
                 if (aStates != nullptr)
                 {
-                    for (State* state : *aStates)
+                    auto const last = aStates->cend();
+                    for (auto it = aStates->cbegin(); it != last; ++it)
                     {
-                        state->inflict(ret, scene, *target, false, false);
+                        State* const state = it.key();
+                        state->inflict(ret, scene, *target, it.value(), false, false);
                     }
                 }
             }
@@ -328,8 +337,10 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     {
                         for (State* rState : *rStates)
                         {
-                            for (State* aState : stateDur->keys())
+                            auto const last = stateDur->cend();
+                            for (auto it = stateDur->cbegin(); it != last; ++it)
                             {
+                                State* const aState = it.key();
                                 if (aState == rState)
                                 {
                                     rState->disable(scene, *target, false, false);
@@ -353,8 +364,22 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                         int const itemId = std::rand() % trgItemsSize;
                         if (itemId < trgItemsSize)
                         {
-                            Ability* stolen = trgItems->keys().at(itemId);
-                            int trgItemQty = trgItems->values().at(itemId);
+                            int trgItemQty = 0;
+                            Ability* stolen = nullptr;
+                            //Ability* stolen = trgItems->keys().at(itemId);
+                            {
+                                int i = 0;
+                                auto const last = trgItems->cend();
+                                for (auto it = trgItems->cbegin(); it != last; ++it, i++)
+                                {
+                                    if (i == itemId)
+                                    {
+                                        stolen = it.key();
+                                        trgItemQty = it.value();
+                                        break;
+                                    }
+                                }
+                            }
                             if (trgItemQty > 0)
                             {
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
@@ -404,17 +429,16 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
     return ability;
 }
 
-Ability::Ability(int const id, QString& name, QString& sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC,
-                 int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
-                 int const elm,int const mQty, int const rQty, bool const absorb, bool const revive, QVector<State*>* const aStates, QVector<State*>* const rStates)
-    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, (elm | dmgType), range, revive)
+Ability::Ability(int const id, QString& name, QString* sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
+                 int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,int const mQty,
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QVector<State*>* const rStates)
+    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, (elm | dmgType), range, revive, aStates)
 {
     this->lvRq = lvRq;
     this->mQty = mQty;
     this->rQty = rQty;
     this->dmgType = dmgType;
     this->attrInc = attrInc;
-    this->aStates = aStates;
     this->rStates = rStates;
     int flags = this->flags;
     if (melee)
@@ -441,7 +465,7 @@ Ability::Ability(Ability& ability) : Role(ability)
     this->rQty = ability.rQty;
     this->dmgType = ability.dmgType;
     this->attrInc = ability.attrInc;
-    this->aStates = ability.aStates;
+    this->stateDur = ability.stateDur;
     this->rStates = ability.rStates;
 }
 

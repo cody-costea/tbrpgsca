@@ -97,7 +97,6 @@ namespace tbrpgsca
         int lv, maxLv, xp, maxp, init, side, actions;
         QMap<Ability*, int>* skillsCrQty,* skillsRgTurn,* items;
         QMap<char, Costume*> equipment;
-        QMap<State*, int>* stateDur;
         QVector<Costume*>* dmgRoles;
         void* extra;
 

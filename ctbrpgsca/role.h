@@ -65,9 +65,10 @@ namespace tbrpgsca
     protected:
         QString name,* sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
+        QMap<State*, int>* stateDur;
 
-        Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg,
-             int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive);
+        Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+             int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const aStates);
 
         Role(Role& role);
 

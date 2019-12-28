@@ -125,8 +125,8 @@ inline bool Role::operator==(Role& role) const
     return this->id == role.id;
 }
 
-Role::Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg,
-           int const mHp, int const mMp, int const mSp, int const element, bool const range, bool const revive)
+Role::Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+           int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates)
 {
     this->id = id;
     this->name = name;
@@ -146,6 +146,7 @@ Role::Role(int const id, QString& name, QString* sprite, int const hpDmg, int co
     {
         flags |= FLAG_RANGE;
     }
+    this->stateDur = aStates;
     this->flags = flags;
 }
 
@@ -155,10 +156,11 @@ Role::Role(Role& role)
     this->name = role.name;
     this->sprite = role.sprite;
     this->flags = role.flags;
+    this->stateDur = role.stateDur;
+    this->dmgType = role.dmgType;
     this->mHp = role.mHp;
     this->mMp = role.mMp;
     this->mSp = role.mSp;
-    this->dmgType = role.dmgType;
     this->hp = role.hp;
     this->mp = role.mp;
     this->sp = role.sp;
