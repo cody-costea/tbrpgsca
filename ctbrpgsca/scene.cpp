@@ -70,7 +70,7 @@ Scene& Scene::checkStatus(QString& ret)
         auto party = parties[0];
         int partySize = party->size();
         {
-            for (int k = 0; k < partySize; k++)
+            for (int k = 0; k < partySize; ++k)
             {
                 if (party->at(k)->hp > 0)
                 {
@@ -84,11 +84,11 @@ Scene& Scene::checkStatus(QString& ret)
         enemyCheck:
         {
             int const partiesSize = parties.size();
-            for (int i = 1; i < partiesSize; i++)
+            for (int i = 1; i < partiesSize; ++i)
             {
                 party = parties[i];
                 partySize = party->size();
-                for (int j = 0; j < partySize; j++)
+                for (int j = 0; j < partySize; ++j)
                 {
                     if (party->at(j)->hp > 0)
                     {
@@ -117,7 +117,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
         {
             Ability* counter = nullptr;
             int usrDmgType = ability.dmgType;
-            for (int i = 0; i < cntSize; i++)
+            for (int i = 0; i < cntSize; ++i)
             {
                 Ability* cntSkill = counters->at(i);
                 int cntDmgType = cntSkill->dmgType;
@@ -154,7 +154,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
         bool sideTarget = ability.targetsSide();
         bool noSelfTarget = !ability.targetsSelf();
         int pSize = scene.players->size();
-        for (int i = 0; i < pSize; i++)
+        for (int i = 0; i < pSize; ++i)
         {
             Actor* trg = players->at(i);
             if (sideTarget && noSelfTarget && trg->side == usrSide)
@@ -184,7 +184,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
         int side = ability.targetsSelf() ? user.side : target.side;
         QVector<Actor*>& party = *(scene.parties[side]);
         int pSize = party.size();
-        for (int i = 0; i < pSize; i++)
+        for (int i = 0; i < pSize; ++i)
         {
             scene.execute(ret, user, party[i], ability, i == 0);
         }
@@ -225,7 +225,7 @@ Ability& Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const def
 {
     int sSize = skills.size();
     Ability* s = skills[defSkill];
-    for (int i = 0; i < sSize; i++)
+    for (int i = 0; i < sSize; ++i)
     {
         Ability* a = skills[i];
         if (a->canPerform(user) && ((defSkill > 0 && (a->mHp < s->mHp)
@@ -273,7 +273,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
         }
         if (!enraged)
         {
-            for (int i = 0; i < partySize; i++)
+            for (int i = 0; i < partySize; ++i)
             {
                 Actor& iPlayer = *(party->at(i));
                 int iHp = iPlayer.hp;
@@ -294,7 +294,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
         if (heal > -1)
         {
             int skillsSize = skills.size();
-            for (int i = 0; i < skillsSize; i++)
+            for (int i = 0; i < skillsSize; ++i)
             {
                 Ability& s = *(skills[i]);
                 if (s.canPerform(player) && (s.mHp < 0 && ((heal == 0) || s.isReviving())))
@@ -315,7 +315,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
             {
                 target = players.at(trg);
             } while (((++trg) < playerSize) && (target->hp < 1 || target->side == side));
-            for (int i = trg; i < playerSize; i++)
+            for (int i = trg; i < playerSize; ++i)
             {
                 int iHp;
                 Actor* iPlayer = players.at(i);
@@ -329,7 +329,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
         {
             target = party->at(0);
             bool restore = ability.isReviving();
-            for (int i = 1; i < partySize; i++)
+            for (int i = 1; i < partySize; ++i)
             {
                 Actor* iPlayer = party->at(i);
                 int iHp = iPlayer->hp;
@@ -364,7 +364,7 @@ Scene& Scene::endTurn(QString& ret)
             crActor->init = cInit;
             do
             {
-                for (int i = 0; i < playersSize; i++)
+                for (int i = 0; i < playersSize; ++i)
                 {
                     Actor* iPlayer = players[i];
                     if (iPlayer->hp > 0)
@@ -406,13 +406,15 @@ Scene& Scene::endTurn(QString& ret)
                 skillsQty = new QMap<Ability*, int>();
                 crActor->skillsCrQty = skillsQty;
             }
-            for (Ability* skill : regSkills->keys())
+            auto const last = regSkills->cend();
+            for (auto it = regSkills->cbegin(); it != last; ++it)
             {
+                Ability* const skill = it.key();
                 int skillMaxQty = skill->mQty;
                 int skillCrQty = skillsQty->value(skill, skillMaxQty);
                 if (skillCrQty < skillMaxQty)
                 {
-                    int skillRgTurn = regSkills->value(skill, 0);
+                    int skillRgTurn = it.value();//regSkills->value(skill, 0);
                     if (skillRgTurn == skill->rQty)
                     {
                         skillsQty->operator[](skill) = skillCrQty + 1;
@@ -462,13 +464,13 @@ Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*
     scene.events = events;
     scene.parties = parties;
     QVector<Actor*>& players = *(scene.players);
-    for (int i = 0; i < partiesSize; i++)
+    for (int i = 0; i < partiesSize; ++i)
     {
         bool aiPlayer = i > 0;
         bool surprised = (surprise == i);
         QVector<Actor*>& party = *(parties[i]);
         int pSize = party.size();
-        for (int j = 0; j < pSize; j++)
+        for (int j = 0; j < pSize; ++j)
         {
             Actor& player = *(party[j]);
             player.actions = surprised ? 0 : player.mActions;

@@ -444,11 +444,12 @@ Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
     QMap<State*, int>* stateDur = actor.stateDur;
     if (stateDur != nullptr)
     {
-        for (State* const state : stateDur->keys())
+        auto const last = stateDur->cend();
+        for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (stateDur->value(state, -3) > -3)
+            if (it.value() > -3)
             {
-                state->alter(ret, scene, actor, consume);
+                it.key()->alter(ret, scene, actor, consume);
             }
         }
     }
@@ -489,9 +490,10 @@ Actor& Actor::checkStatus(Scene* const scene, QString& ret)
             QMap<State*, int>* stateDur = actor.stateDur;
             if (stateDur != nullptr)
             {
-                for (State* const state : stateDur->keys())
+                auto const last = stateDur->cend();
+                for (auto it = stateDur->cbegin(); it != last; ++it)
                 {
-                    state->disable(scene, actor, false, false);
+                    it.key()->disable(scene, actor, false, false);
                 }
             }
         }
@@ -524,9 +526,12 @@ Actor& Actor::recover(Scene* const scene)
         QMap<State*, int>* const sDur = actor.stateDur;
         if (sDur != nullptr)
         {
-            for (State* const state : sDur->keys())
             {
-                state->disable(scene, actor, true, false);
+                auto const last = stateDur->cend();
+                for (auto it = stateDur->cbegin(); it != last; ++it)
+                {
+                    it.key()->disable(scene, actor, true, false);
+                }
             }
             if (sDur->size() == 0)
             {
@@ -541,11 +546,14 @@ Actor& Actor::recover(Scene* const scene)
         QMap<int, int>* const res = actor.res;
         if (res != nullptr)
         {
-            for (int const r : res->keys())
             {
-                if (res->value(r) == 0)
+                auto const last = res->cend();
+                for (auto it = res->cbegin(); it != last; ++it)
                 {
-                    res->remove(r);
+                    if (it.value() == 0)
+                    {
+                        res->remove(it.key());
+                    }
                 }
             }
             if (res->size() == 0)
@@ -559,11 +567,14 @@ Actor& Actor::recover(Scene* const scene)
         QMap<State*, int>* const stRes = actor.stRes;
         if (stRes != nullptr)
         {
-            for (State* const r : stRes->keys())
             {
-                if (stRes->value(r) == 0)
+                auto const last = stRes->cend();
+                for (auto it = stRes->cbegin(); it != last; ++it)
                 {
-                    stRes->remove(r);
+                    if (it.value() == 0)
+                    {
+                        stRes->remove(it.key());
+                    }
                 }
             }
             if (stRes->size() == 0)
@@ -577,8 +588,10 @@ Actor& Actor::recover(Scene* const scene)
         QMap<Ability*, int>* skillsQty = actor.skillsCrQty;
         if (skillsQty != nullptr)
         {
-            for (Ability* const ability : skillsQty->keys())
+            auto const last = skillsQty->cend();
+            for (auto it = skillsQty->cbegin(); it != last; ++it)
             {
+                Ability* const ability = it.key();
                 skillsQty->operator[](ability) = ability->mQty;
             }
         }
@@ -593,17 +606,17 @@ Actor& Actor::levelUp(Scene* const scene)
     while (actor.maxp <= actor.xp && actor.lv < actor.maxLv)
     {
         actor.maxp *= 2;
-        actor.lv++;
+        ++(actor.lv);
         actor.mHp += 3;
         actor.mMp += 2;
         actor.mSp += 2;
-        actor.atk++;
-        actor.def++;
-        actor.wis++;
-        actor.spi++;
+        ++(actor.atk);
+        ++(actor.def);
+        ++(actor.wis);
+        ++(actor.spi);
         if (scene == nullptr)
         {
-            actor.agi++;
+            ++(actor.agi);
         }
         else
         {
@@ -660,9 +673,10 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
         {
             if (aElmRes != nullptr)
             {
-                for (int const i : elmRes->keys())
+                auto const last = elmRes->cend();
+                for (auto it = elmRes->cbegin(); it != last; ++it)
                 {
-                    int const v = elmRes->value(i);
+                    int const i = it.key(), v = it.value();
                     aElmRes->operator[](i) = aElmRes->value(i, v) - v;
                 }
             }
@@ -674,9 +688,10 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
                 aElmRes = new QMap<int, int>();
                 actor.res = aElmRes;
             }
-            for (int const i : elmRes->keys())
+            auto const last = elmRes->cend();
+            for (auto it = elmRes->cbegin(); it != last; ++it)
             {
-                int const v = elmRes->value(i);
+                int const i = it.key(), v = it.value();
                 aElmRes->operator[](i) = aElmRes->value(i, v) + v;
             }
         }
@@ -688,9 +703,11 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
         {
             if (aStateRes != nullptr)
             {
-                for (State* const i : stRes->keys())
+                auto const last = stRes->cend();
+                for (auto it = stRes->cbegin(); it != last; ++it)
                 {
-                    int const v = stRes->value(i);
+                    int v = it.value();
+                    State* const i = it.key();
                     aStateRes->operator[](i) = aStateRes->value(i, v) - v;
                 }
             }
@@ -702,9 +719,11 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
                 aStateRes = new QMap<State*, int>();
                 actor.stRes = aStateRes;
             }
-            for (State* const i : stRes->keys())
+            auto const last = stRes->cend();
+            for (auto it = stRes->cbegin(); it != last; ++it)
             {
-                int const v = stRes->value(i);
+                int v = it.value();
+                State* const i = it.key();
                 aStateRes->operator[](i) = aStateRes->value(i, v) + v;
             }
         }
@@ -808,18 +827,23 @@ Actor& Actor::refreshCostume(Costume& costume)
 Actor& Actor::refreshCostumes()
 {
     Actor& actor = *this;
-    for (Costume* const costume : actor.equipment.values())
     {
-        actor.refreshCostume(*costume);
+        QMap<char, Costume*>& equipment = actor.equipment;
+        auto const last = equipment.cend();
+        for (auto it = equipment.cbegin(); it != last; ++it)
+        {
+            actor.refreshCostume(*(it.value()));
+        }
     }
     QMap<State*, int>* stateDur = actor.stateDur;
     if (stateDur != nullptr)
     {
-        for (State* const state : stateDur->keys())
+        auto const last = stateDur->cend();
+        for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (stateDur->value(state, -3) > -3)
+            if (it.value() > -3)
             {
-                actor.refreshCostume(*state);
+                actor.refreshCostume(*(it.key()));
             }
         }
     }

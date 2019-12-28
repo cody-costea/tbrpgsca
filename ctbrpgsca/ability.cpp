@@ -170,32 +170,32 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             dmg += user.atk;
             def += target->def;
             canMiss = 2;
-            i++;
+            ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
         {
             dmg += user.def;
             def += target->def;
-            i++;
+            ++i;
         }
         if ((dmgType & DMG_TYPE_SPI) == DMG_TYPE_SPI)
         {
             dmg += user.spi;
             def += target->wis;
-            i++;
+            ++i;
         }
         if ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)
         {
             dmg += user.wis;
             def += target->spi;
-            i++;
+            ++i;
         }
         if ((dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI)
         {
             dmg += user.agi;
             def += target->agi;
             canMiss = 4;
-            i++;
+            ++i;
         }
         int dmgHp, dmgMp, dmgSp;
         if (i == 0)
@@ -213,11 +213,15 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             if (trgResMap != nullptr)
             {
                 int res = DEFAULT_RES;
-                for (int elm : trgResMap->values())
                 {
-                    if ((dmgType & elm) == elm)
+                    auto const last = trgResMap->cend();
+                    for (auto it = trgResMap->cbegin(); it != last; ++it)
                     {
-                        res += trgResMap->value(elm);
+                        int const elm = it.key();
+                        if ((dmgType & elm) == elm)
+                        {
+                            res += it.value();
+                        }
                     }
                 }
                 if (res == 7)
@@ -370,7 +374,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                             {
                                 int i = 0;
                                 auto const last = trgItems->cend();
-                                for (auto it = trgItems->cbegin(); it != last; ++it, i++)
+                                for (auto it = trgItems->cbegin(); it != last; ++it, ++i)
                                 {
                                     if (i == itemId)
                                     {
