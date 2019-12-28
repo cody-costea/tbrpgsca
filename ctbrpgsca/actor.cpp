@@ -111,7 +111,7 @@ Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const ite
 {
     QMap<char, Costume*>& equipment = this->equipment;
     Costume* old = equipment.value(pos, nullptr);
-    switchCostume(scene, old, item);
+    switchCostume(nullptr, scene, old, item);
     equipment[pos] = item;
     return old;
 }
@@ -513,16 +513,17 @@ Actor& Actor::checkStatus(QString& ret, Scene* const scene)
 
 inline Actor& Actor::recover(QString& ret)
 {
-    return this->recover(ret, nullptr);
+    return this->recover(&ret, nullptr);
 }
 
-Actor& Actor::recover(QString& ret, Scene* const scene)
+Actor& Actor::recover(QString* ret, Scene* const scene)
 {
     Actor& actor = *this;
     actor.actions = actor.mActions;
     actor.hp = actor.mHp;
     actor.mp = actor.mMp;
     actor.sp = 0;
+    if (ret != nullptr)
     {
         QMap<State*, int>* const sDur = actor.stateDur;
         if (sDur != nullptr)
@@ -531,7 +532,7 @@ Actor& Actor::recover(QString& ret, Scene* const scene)
                 auto const last = stateDur->cend();
                 for (auto it = stateDur->cbegin(); it != last; ++it)
                 {
-                    it.key()->disable(ret, scene, actor, -1, false);
+                    it.key()->disable(*ret, scene, actor, -1, false);
                 }
             }
             if (sDur->size() == 0)
@@ -627,16 +628,16 @@ Actor& Actor::levelUp(Scene* const scene)
     return actor;
 }
 
-Actor& Actor::switchCostume(QString& ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
+Actor& Actor::switchCostume(QString* ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
 {
     Actor& actor = *this;
     if (oldCost != nullptr)
     {
-        oldCost->abandon(ret, scene, actor);
+        oldCost->abandon(ret, scene, actor, true);
     }
     if (newCost != nullptr)
     {
-        newCost->adopt(ret, scene, actor);
+        newCost->adopt(ret, scene, actor, true);
     }
     return actor;
 }
@@ -825,14 +826,14 @@ Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, 
             int const dur = it.value();
             if (dur != -1)
             {
-                it.key()->inflict(ret, scene, actor, dur, true, false);
+                it.key()->inflict(ret, scene, actor, dur, true);
             }
         }
     }
     return actor;
 }
 
-Actor& Actor::refreshCostume(QString& ret, Scene* scene, Costume& costume)
+Actor& Actor::refreshCostume(QString* ret, Scene* scene, Costume& costume)
 {
     Actor& actor = *this;
     actor.dmgType |= costume.dmgType;
@@ -857,22 +858,25 @@ Actor& Actor::refreshCostume(QString& ret, Scene* scene, Costume& costume)
             (*actor.sprite) = *spr;
         }
     }
-    QMap<State*, int>* cStates = costume.stateDur;
-    if (cStates != nullptr)
+    if (ret != nullptr)
     {
-        auto const last = cStates->cend();
-        for (auto it = cStates->cbegin(); it != last; ++it)
+        QMap<State*, int>* cStates = costume.stateDur;
+        if (cStates != nullptr)
         {
-            if (it.value() == -1)
+            auto const last = cStates->cend();
+            for (auto it = cStates->cbegin(); it != last; ++it)
             {
-                it.key()->inflict(ret, scene, actor, -1, true, false);
+                if (it.value() == -1)
+                {
+                    it.key()->inflict(*ret, scene, actor, -1, true);
+                }
             }
         }
     }
     return actor;
 }
 
-Actor& Actor::refreshCostumes(QString& ret, Scene* scene)
+Actor& Actor::refreshCostumes(QString* ret, Scene* scene)
 {
     Actor& actor = *this;
     {
@@ -914,7 +918,7 @@ Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const
     this->stateDur = nullptr;
     this->side = 0;
     this->init = 0;
-    this->recover();
+    this->recover(nullptr, nullptr);
 }
 
 Actor::Actor(Actor& actor) : Costume(actor)

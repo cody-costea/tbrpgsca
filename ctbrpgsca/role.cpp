@@ -70,9 +70,10 @@ inline QString Role::getName() const
     return this->name;
 }
 
-inline QString* Role::getSprite() const
+inline QString Role::getSprite() const
 {
-    return this->sprite;
+    QString* spr = this->sprite;
+    return spr == nullptr ? QString() : *(this->sprite);
 }
 
 inline int Role::getDamageElement() const
@@ -118,6 +119,30 @@ inline bool Role::isRanged() const
 inline bool Role::isReviving() const
 {
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
+}
+
+inline int Role::getStateDuration(State& state) const
+{
+    QMap<State*, int>* aStates = this->stateDur;
+    return aStates == nullptr ? 0 : aStates->value(&state, 0);
+}
+
+inline QList<State*> Role::getStatesList() const
+{
+    QMap<State*, int>* aStates = this->stateDur;
+    return aStates == nullptr ? QList<State*>() : aStates->keys();
+}
+
+inline bool Role::hasState(State& state) const
+{
+    QMap<State*, int>* aStates = this->stateDur;
+    return aStates != nullptr && aStates->contains(&state);
+}
+
+inline int Role::getStatesSize() const
+{
+    QMap<State*, int>* aStates = this->stateDur;
+    return aStates == nullptr ? 0 : aStates->size();
 }
 
 inline bool Role::operator==(Role& role) const

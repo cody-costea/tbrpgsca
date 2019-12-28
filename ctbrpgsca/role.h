@@ -50,7 +50,7 @@ namespace tbrpgsca
 
         inline int getId() const;
         inline QString getName() const;
-        inline QString* getSprite() const;
+        inline QString getSprite() const;
         inline int getDamageElement() const;
         inline int getMaximumHp() const;
         inline int getMaximumMp() const;
@@ -60,6 +60,11 @@ namespace tbrpgsca
         inline int getCurrentRp() const;
         inline bool isReviving() const;
         inline bool isRanged() const;
+
+        inline QList<State*> getStatesList() const;
+        inline int getStateDuration(State& state) const;
+        inline bool hasState(State& state) const;
+        inline int getStatesSize() const;
 
         inline bool operator==(Role& role) const;
     protected:

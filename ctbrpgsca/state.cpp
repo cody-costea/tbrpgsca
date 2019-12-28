@@ -31,42 +31,80 @@ inline int State::getResistance() const
     return this->sRes;
 }
 
-inline State& State::inflict(QString& ret, Actor& actor, int dur, const bool always, const bool indefinite)
+inline State& State::inflict(QString& ret, Actor& actor, int dur, const bool always)
 {
-    return this->inflict(ret, nullptr, actor, dur, always, indefinite);
+    return this->inflict(ret, nullptr, actor, dur, always);
 }
 
-State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, const bool always, const bool indefinite)
+State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, const bool always)
 {
     State& state = *this;
-    int const stateRes = state.sRes;
-    QMap<State*, int>* stRes = actor.stRes;
-    if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
+    if (stateDur == 0)
     {
-        state.adopt(ret, scene, actor);
-        QMap<State*, int>* trgStates = actor.stateDur;
-        if (trgStates == nullptr)
+        stateDur = state.dur;
+        if (stateDur == 0)
         {
-            trgStates = new QMap<State*, int>();
-            actor.stateDur = trgStates;
+            return state;
         }
-        if (indefinite)
+    }
+    if (stateDur > -3)
+    {
+        int const stateRes = state.sRes;
+        QMap<State*, int>* stRes = actor.stRes;
+        if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
-            trgStates->operator[](this) = -2;
-        }
-        else
-        {
-            if (stateDur == 0)
+            QMap<State*, int>* trgStates = actor.stateDur;
+            if (trgStates == nullptr)
             {
-                stateDur = state.dur;
+                trgStates = new QMap<State*, int>();
+                actor.stateDur = trgStates;
             }
+            else
+            {
+                QMap<State*, int>* rStates = state.stateDur;
+                if (rStates != nullptr)
+                {
+                    auto const rLast = rStates->cend();
+                    for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
+                    {
+                        State* const rState = rIt.key();
+                        auto const last = trgStates->cend();
+                        for (auto it = trgStates->cbegin(); it != last; ++it)
+                        {
+                            State* const aState = it.key();
+                            if (aState == rState)
+                            {
+                                int const rDur = it.value();
+                                if (rDur == -3)
+                                {
+                                    continue;
+                                }
+                                rState->disable(ret, scene, actor, rDur, false);
+                                if (stateDur > 0 && rDur > 0)
+                                {
+                                    stateDur -= rDur;
+                                    if (stateDur < 1)
+                                    {
+                                        return state;
+                                    }
+                                }
+                                else if (rDur < 0)
+                                {
+                                    return state;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            state.adopt(&ret, scene, actor, false);
             int const crDur = trgStates->value(this, 0);
             if (crDur < stateDur || (crDur > -1 && stateDur < 0))
             {
                 trgStates->operator[](this) = stateDur;
             }
+            state.blockSkills(actor, false);
         }
-        state.blockSkills(actor, false);
     }
     return state;
 }
@@ -75,7 +113,7 @@ State& State::remove(QString& ret, Scene* const scene, Actor& actor)
 {
     State& state = *this;
     state.blockSkills(actor, true);
-    state.abandon(ret, scene, actor);
+    state.abandon(&ret, scene, actor, false);
     return state;
 }
 
@@ -195,10 +233,10 @@ State& State::blockSkills(Actor& actor, const bool remove)
 
 State::State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
              int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun,
-             bool const range, bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const stRes,
-             QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills)
-    : Costume(id, name, sprite, shapeShift, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, revive, res, aSkills,
-              counters, stRes)
+             bool const range, bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const states,
+             QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills)
+    : Costume(id, name, sprite, shapeShift, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, revive, res, states,
+              aSkills, counters, stRes)
 {
     this->dur = dur;
     this->sRes = sRes;

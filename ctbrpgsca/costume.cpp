@@ -112,12 +112,12 @@ inline bool Costume::isStunned() const
 
 inline Costume& Costume::adopt(QString& ret, Actor& actor)
 {
-    return this->adopt(ret, nullptr, actor);
+    return this->adopt(&ret, nullptr, actor, true);
 }
 
 inline Costume& Costume::abandon(QString& ret, Actor& actor)
 {
-    return this->abandon(ret, nullptr, actor);
+    return this->abandon(&ret, nullptr, actor, true);
 }
 
 inline Costume& Costume::apply(QString& ret, Actor& actor)
@@ -125,16 +125,17 @@ inline Costume& Costume::apply(QString& ret, Actor& actor)
     return this->apply(ret, nullptr, actor);
 }
 
-Costume& Costume::adopt(QString& ret, Scene* const scene, Actor& actor)
+Costume& Costume::adopt(QString* ret, Scene* const scene, Actor& actor, bool const addStates)
 {
     Costume& costume = *this;
     actor.updateAttributes(false, scene, costume);
     actor.updateResistance(false, costume.res, costume.stRes);
+    if (addStates && ret != nullptr)
     {
         QMap<State*, int>* cStates = costume.stateDur;
         if (cStates != nullptr)
         {
-            actor.updateStates(false, ret, scene, *cStates);
+            actor.updateStates(false, *ret, scene, *cStates);
         }
     }
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
@@ -151,7 +152,7 @@ Costume& Costume::adopt(QString& ret, Scene* const scene, Actor& actor)
     return costume;
 }
 
-Costume& Costume::abandon(QString& ret, Scene* const scene, Actor& actor)
+Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool const delStates)
 {
     Costume& costume = *this;
     {
@@ -198,11 +199,12 @@ Costume& Costume::abandon(QString& ret, Scene* const scene, Actor& actor)
             }
         }
     }
+    if (delStates && ret != nullptr)
     {
         QMap<State*, int>* cStates = costume.stateDur;
         if (cStates != nullptr)
         {
-            actor.updateStates(true, ret, scene, *cStates);
+            actor.updateStates(true, *ret, scene, *cStates);
         }
     }
     if (costume.isShapeShifted())
@@ -213,6 +215,7 @@ Costume& Costume::abandon(QString& ret, Scene* const scene, Actor& actor)
             (*actor.sprite) = *(actor.getJob().sprite);
         }
     }
+    actor.refreshCostumes(ret, scene);
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
     {
         QVector<Costume*>* dmgRoles = actor.dmgRoles;
@@ -221,7 +224,6 @@ Costume& Costume::abandon(QString& ret, Scene* const scene, Actor& actor)
             dmgRoles->removeOne(&costume);
         }
     }
-    actor.refreshCostumes(ret, scene);
     return costume;
 }
 

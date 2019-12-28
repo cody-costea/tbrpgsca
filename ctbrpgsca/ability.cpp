@@ -47,45 +47,28 @@ inline int Ability::getRequiredLevel() const
     return this->lvRq;
 }
 
-inline int Ability::getAddedStateDuration(State& state) const
+inline int Ability::getRemovedStateDuration(State& state) const
 {
-    QMap<State*, int>* aStates = this->stateDur;
+    QMap<State*, int>* aStates = this->rStates;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-inline QList<State*> Ability::getAddedStatesList() const
+inline QList<State*> Ability::getRemovedStatesList() const
 {
-    QMap<State*, int>* aStates = this->stateDur;
+    QMap<State*, int>* aStates = this->rStates;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
-}
-
-inline bool Ability::hasAddedState(State& state) const
-{
-    QMap<State*, int>* aStates = this->stateDur;
-    return aStates != nullptr && aStates->contains(&state);
-}
-
-inline int Ability::getAddedStatesSize() const
-{
-    QMap<State*, int>* aStates = this->stateDur;
-    return aStates == nullptr ? 0 : aStates->size();
-}
-
-inline State& Ability::getRemovedState(int const n) const
-{
-    return *(this->rStates->at(n));
 }
 
 inline bool Ability::hasRemovedState(State& state) const
 {
-    QVector<State*>* rStates = this->rStates;
-    return rStates != nullptr && rStates->contains(&state);
+    QMap<State*, int>* aStates = this->rStates;
+    return aStates != nullptr && aStates->contains(&state);
 }
 
 inline int Ability::getRemovedStatesSize() const
 {
-    QVector<State*>* rStates = this->rStates;
-    return rStates == nullptr ? 0 : rStates->size();
+    QMap<State*, int>* aStates = this->rStates;
+    return aStates == nullptr ? 0 : aStates->size();
 }
 
 inline bool Ability::isStealing() const
@@ -150,7 +133,7 @@ inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool 
 Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
     Ability& ability = *this;
-    int const dmgType = ability.dmgType;
+    int const dmgType = ability.dmgType | user.dmgType;
     if (dmgType == DMG_TYPE_WIS && target != &user &&target->isReflecting())
     {
         ret = ret % Ability::ReflectTxt.arg(target->name);
@@ -164,7 +147,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         {
             dmg += user.atk;
             def += target->def;
-            canMiss = 2;
+            canMiss = 4;
             ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
@@ -189,7 +172,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         {
             dmg += user.agi;
             def += target->agi;
-            canMiss = 4;
+            canMiss = 2;
             ++i;
         }
         int dmgHp, dmgMp, dmgSp;
@@ -323,7 +306,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     for (auto it = aStates->cbegin(); it != last; ++it)
                     {
                         State* const state = it.key();
-                        state->inflict(ret, scene, *target, it.value(), false, false);
+                        state->inflict(ret, scene, *target, it.value(), false);
                     }
                 }
             }
@@ -331,11 +314,13 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                 QMap<State*, int>* stateDur = target->stateDur;
                 if (stateDur != nullptr)
                 {
-                    QVector<State*>* rStates = ability.rStates;
+                    QMap<State*, int>* rStates = ability.rStates;
                     if (rStates != nullptr)
                     {
-                        for (State* rState : *rStates)
+                        auto const rLast = rStates->cend();
+                        for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                         {
+                            State* const rState = rIt.key();
                             auto const last = stateDur->cend();
                             for (auto it = stateDur->cbegin(); it != last; ++it)
                             {
@@ -430,7 +415,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
 
 Ability::Ability(int const id, QString& name, QString* sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
                  int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QVector<State*>* const rStates)
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
     : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, (elm | dmgType), range, revive, aStates)
 {
     this->lvRq = lvRq;

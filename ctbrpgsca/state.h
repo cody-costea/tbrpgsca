@@ -34,14 +34,14 @@ namespace tbrpgsca
         inline Ability& getRemovedSkill(int const n) const;
 
         inline State& alter(QString& ret, Actor& actor, bool const consume);
-        inline State& inflict(QString& ret, Actor& actor, int dur, bool const always, bool const indefinite);
+        inline State& inflict(QString& ret, Actor& actor, int dur, bool const always);
         inline bool disable(QString& ret, Actor& actor, int const dur, bool const remove);
         State& blockSkills(Actor& actor, bool const remove);
 
         State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
               int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun,
-              bool const range, bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const stRes,
-              QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills);
+              bool const range, bool const automate, bool const confuse, bool const reflect, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const states,
+              QMap<State*, int>* const stRes, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills);
 
         State(State& state);
 
@@ -51,8 +51,8 @@ namespace tbrpgsca
         int dur, sRes;
 
         State& alter(QString& ret, Scene* const scene, Actor& actor, bool const consume);
-        State& inflict(QString& ret, Scene* const scene, Actor& actor, int dur, bool const always, bool const indefinite);
-        bool disable(QString& ret, Scene* const scene, Actor& actor, int const dur, bool const remove);
+        State& inflict(QString& ret, Scene* const scene, Actor& actor, int dur, bool const always);
+        bool disable(QString& ret, Scene* const scene, Actor& actor, int dur, bool const remove);
         State& remove(QString& ret, Scene* const scene, Actor& actor);
 
         friend class Actor;

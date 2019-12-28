@@ -76,8 +76,8 @@ namespace tbrpgsca
         QMap<State*, int>* stRes;
         QMap<int, int>* res;
 
-        Costume& adopt(QString& ret, Scene* const scene, Actor& actor);
-        Costume& abandon(QString& ret, Scene* const scene, Actor& actor);
+        Costume& adopt(QString* ret, Scene* const scene, Actor& actor, bool const addStates);
+        Costume& abandon(QString* ret, Scene* const scene, Actor& actor, bool const delStates);
         Costume& apply(QString& ret, Scene* const scene, Actor& actor);
 
         Costume(int const id, QString& name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,

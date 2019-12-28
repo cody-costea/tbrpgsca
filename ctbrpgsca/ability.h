@@ -52,14 +52,10 @@ namespace tbrpgsca
         inline bool targetsSelf() const;
         inline bool targetsAll() const;
 
-        inline State& getRemovedState(int const n) const;
+        inline QList<State*> getRemovedStatesList() const;
+        inline int getRemovedStateDuration(State& state) const;
         inline bool hasRemovedState(State& state) const;
         inline int getRemovedStatesSize() const;
-
-        inline QList<State*> getAddedStatesList() const;
-        inline int getAddedStateDuration(State& state) const;
-        inline bool hasAddedState(State& state) const;
-        inline int getAddedStatesSize() const;
 
         inline bool canPerform(Actor& user);
         inline Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
@@ -67,14 +63,14 @@ namespace tbrpgsca
 
         Ability(int const id, QString& name, QString* sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
                 int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QVector<State*>* const rStates);
+                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 
         Ability(Ability& ability);
 
         ~Ability();
     protected:
         int lvRq, attrInc, mQty, rQty;
-        QVector<State*>* rStates;
+        QMap<State*, int>* rStates;
 
         Ability& execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts);
 
