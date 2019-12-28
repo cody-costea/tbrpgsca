@@ -342,7 +342,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                                 State* const aState = it.key();
                                 if (aState == rState)
                                 {
-                                    rState->disable(ret, scene, *target, false, false);
+                                    rState->disable(ret, scene, *target, -1, false);
                                     break;
                                 }
                             }
@@ -396,7 +396,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     }
                 }
             }
-            target->checkStatus(scene, ret);
+            target->checkStatus(ret, scene);
             if (ko && target->hp > 0)
             {
                 target->applyStates(ret, scene, false);
@@ -424,7 +424,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
     }
-    user.checkStatus(scene, ret);
+    user.checkStatus(ret, scene);
     return ability;
 }
 

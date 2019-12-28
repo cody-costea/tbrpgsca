@@ -52,7 +52,7 @@ namespace tbrpgsca
         Costume* equipItem(char const pos, Costume* const item);
         char unequipItem(Costume& item);
 
-        inline Actor& recover();
+        inline Actor& recover(QString& ret);
         //Actor& applyRoles(QString& ret);
         Actor& applyStates(QString& ret, bool const consume);
         Actor& setElementResistance(int const element, int const res);
@@ -100,10 +100,10 @@ namespace tbrpgsca
         QVector<Costume*>* dmgRoles;
         void* extra;
 
-        Actor& recover(Scene* const scene);
         Actor& levelUp(Scene* const scene);
         Actor& checkRegSkill(Ability& skill);
-        Actor& checkStatus(Scene* const scene, QString& ret);
+        Actor& recover(QString& ret, Scene* const scene);
+        Actor& checkStatus(QString& ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
         Actor& applyStates(QString& ret, Scene* const scene, bool const consume);
         Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);

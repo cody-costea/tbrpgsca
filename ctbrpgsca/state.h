@@ -35,7 +35,7 @@ namespace tbrpgsca
 
         inline State& alter(QString& ret, Actor& actor, bool const consume);
         inline State& inflict(QString& ret, Actor& actor, int dur, bool const always, bool const indefinite);
-        inline bool disable(QString& ret, Actor& actor, bool const remove, bool const always);
+        inline bool disable(QString& ret, Actor& actor, int const dur, bool const remove);
         State& blockSkills(Actor& actor, bool const remove);
 
         State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
@@ -52,7 +52,7 @@ namespace tbrpgsca
 
         State& alter(QString& ret, Scene* const scene, Actor& actor, bool const consume);
         State& inflict(QString& ret, Scene* const scene, Actor& actor, int dur, bool const always, bool const indefinite);
-        bool disable(QString& ret, Scene* const scene, Actor& actor, bool const remove, bool const always);
+        bool disable(QString& ret, Scene* const scene, Actor& actor, int const dur, bool const remove);
         State& remove(QString& ret, Scene* const scene, Actor& actor);
 
         friend class Actor;

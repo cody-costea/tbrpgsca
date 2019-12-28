@@ -431,7 +431,7 @@ Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
             role->apply(ret, scene, actor);
         }
     }
-    actor.checkStatus(scene, ret);
+    actor.checkStatus(ret, scene);
     return actor;
 }
 
@@ -473,7 +473,7 @@ Actor& Actor::checkRegSkill(Ability& skill)
     return actor;
 }
 
-Actor& Actor::checkStatus(Scene* const scene, QString& ret)
+Actor& Actor::checkStatus(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
     if (actor.hp < 1)
@@ -494,7 +494,7 @@ Actor& Actor::checkStatus(Scene* const scene, QString& ret)
                 auto const last = stateDur->cend();
                 for (auto it = stateDur->cbegin(); it != last; ++it)
                 {
-                    it.key()->disable(scene, actor, false, false);
+                    it.key()->disable(ret, scene, actor, -1, false);
                 }
             }
         }
@@ -511,12 +511,12 @@ Actor& Actor::checkStatus(Scene* const scene, QString& ret)
     return actor;
 }
 
-inline Actor& Actor::recover()
+inline Actor& Actor::recover(QString& ret)
 {
-    return this->recover(nullptr);
+    return this->recover(ret, nullptr);
 }
 
-Actor& Actor::recover(Scene* const scene)
+Actor& Actor::recover(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
     actor.actions = actor.mActions;
@@ -531,7 +531,7 @@ Actor& Actor::recover(Scene* const scene)
                 auto const last = stateDur->cend();
                 for (auto it = stateDur->cbegin(); it != last; ++it)
                 {
-                    it.key()->disable(scene, actor, true, false);
+                    it.key()->disable(ret, scene, actor, -1, false);
                 }
             }
             if (sDur->size() == 0)
@@ -542,7 +542,7 @@ Actor& Actor::recover(Scene* const scene)
         }
     }
     //actor.setShapeShifted(false);
-    actor.refreshCostumes();
+    actor.refreshCostumes(ret, scene);
     {
         QMap<int, int>* const res = actor.res;
         if (res != nullptr)
@@ -810,10 +810,10 @@ Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, 
             auto const last = states.cend();
             for (auto it = states.cbegin(); it != last; ++it)
             {
-                if (it.value() == -1)
-                {
-                    it.key()->disable(ret, scene, actor, false, false);
-                }
+                //if (it.value() == -1)
+                //{
+                    it.key()->disable(ret, scene, actor, it.value(), false);
+                //}
             }
         }
     }

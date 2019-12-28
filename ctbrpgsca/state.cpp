@@ -79,34 +79,50 @@ State& State::remove(QString& ret, Scene* const scene, Actor& actor)
     return state;
 }
 
-inline bool State::disable(QString& ret, Actor& actor, const bool remove, const bool always)
+inline bool State::disable(QString& ret, Actor& actor, int const dur, const bool remove)
 {
-    return this->disable(ret, nullptr, actor, remove, always);
+    return this->disable(ret, nullptr, actor, remove, dur);
 }
 
-bool State::disable(QString& ret, Scene* const scene, Actor& actor, const bool remove, const bool always)
+bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, const bool remove)
 {
+    if (dur == 0)
+    {
+        dur = this->dur;
+    }
     QMap<State*, int>* sDur = actor.stateDur;
-    if (sDur != nullptr && (always || (sDur->value(this, -2) != -2)))
+    if (sDur != nullptr)
     {
-        if (sDur->value(this, -3) > -3)
+        int crDur = sDur->value(this, -3);
+        if (dur == -2 || crDur != -2)
         {
-            this->remove(ret, scene, actor);
+            if (dur > 0 && crDur > 0)
+            {
+                crDur = crDur > dur ? crDur - dur : 0;
+            }
+            if (crDur < 1 || dur < 0)
+            {
+                if (crDur > -3)
+                {
+                    this->remove(ret, scene, actor);
+                }
+                if (remove)
+                {
+                    sDur->remove(this);
+                }
+                else
+                {
+                    sDur->operator[](this) = -3;
+                }
+            }
+            else
+            {
+                sDur->operator[](this) = crDur;
+            }
+            return true;
         }
-        if (remove)
-        {
-            sDur->remove(this);
-        }
-        else
-        {
-            sDur->operator[](this) = -3;
-        }
-        return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 inline State& State::alter(QString& ret, Actor& actor, const bool consume)
