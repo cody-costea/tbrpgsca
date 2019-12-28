@@ -75,7 +75,7 @@ inline QString* Role::getSprite() const
     return this->sprite;
 }
 
-inline int Role::getDmgElement() const
+inline int Role::getDamageElement() const
 {
     return this->dmgType;
 }

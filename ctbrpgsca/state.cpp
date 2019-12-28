@@ -39,11 +39,11 @@ inline State& State::inflict(QString& ret, Actor& actor, int dur, const bool alw
 State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, const bool always, const bool indefinite)
 {
     State& state = *this;
-    QMap<State*, int>* stRes = actor.stRes;
     int const stateRes = state.sRes;
+    QMap<State*, int>* stRes = actor.stRes;
     if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
     {
-        state.adopt(scene, actor);
+        state.adopt(ret, scene, actor);
         QMap<State*, int>* trgStates = actor.stateDur;
         if (trgStates == nullptr)
         {
@@ -71,27 +71,27 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
     return state;
 }
 
-State& State::remove(Scene* const scene, Actor& actor)
+State& State::remove(QString& ret, Scene* const scene, Actor& actor)
 {
     State& state = *this;
     state.blockSkills(actor, true);
-    state.abandon(scene, actor);
+    state.abandon(ret, scene, actor);
     return state;
 }
 
-inline bool State::disable(Actor& actor, const bool remove, const bool always)
+inline bool State::disable(QString& ret, Actor& actor, const bool remove, const bool always)
 {
-    return this->disable(nullptr, actor, remove, always);
+    return this->disable(ret, nullptr, actor, remove, always);
 }
 
-bool State::disable(Scene* const scene, Actor& actor, const bool remove, const bool always)
+bool State::disable(QString& ret, Scene* const scene, Actor& actor, const bool remove, const bool always)
 {
     QMap<State*, int>* sDur = actor.stateDur;
     if (sDur != nullptr && (always || (sDur->value(this, -2) != -2)))
     {
         if (sDur->value(this, -3) > -3)
         {
-            this->remove(scene, actor);
+            this->remove(ret, scene, actor);
         }
         if (remove)
         {
@@ -130,7 +130,7 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
         }
         else if (d == 0)
         {
-            state.remove(scene, actor);
+            state.remove(ret, scene, actor);
             sDur->operator[](this) = -3;
         }
     }

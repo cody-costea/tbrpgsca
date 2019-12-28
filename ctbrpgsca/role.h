@@ -51,15 +51,15 @@ namespace tbrpgsca
         inline int getId() const;
         inline QString getName() const;
         inline QString* getSprite() const;
-        inline bool isReviving() const;
-        inline bool isRanged() const;
+        inline int getDamageElement() const;
         inline int getMaximumHp() const;
         inline int getMaximumMp() const;
         inline int getMaximumRp() const;
         inline int getCurrentHp() const;
         inline int getCurrentMp() const;
         inline int getCurrentRp() const;
-        inline int getDmgElement() const;
+        inline bool isReviving() const;
+        inline bool isRanged() const;
 
         inline bool operator==(Role& role) const;
     protected:
@@ -68,7 +68,7 @@ namespace tbrpgsca
         QMap<State*, int>* stateDur;
 
         Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-             int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const aStates);
+             int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);
 
         Role(Role& role);
 

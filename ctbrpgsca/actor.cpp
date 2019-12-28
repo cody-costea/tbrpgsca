@@ -21,6 +21,7 @@ limitations under the License.
 #include "role.h"
 
 #include <QStringBuilder>
+#include <QString>
 
 using namespace tbrpgsca;
 
@@ -626,16 +627,16 @@ Actor& Actor::levelUp(Scene* const scene)
     return actor;
 }
 
-Actor& Actor::switchCostume(Scene* const scene, Costume* const oldCost, Costume* const newCost)
+Actor& Actor::switchCostume(QString& ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
 {
     Actor& actor = *this;
     if (oldCost != nullptr)
     {
-        oldCost->abandon(scene, actor);
+        oldCost->abandon(ret, scene, actor);
     }
     if (newCost != nullptr)
     {
-        newCost->adopt(scene, actor);
+        newCost->adopt(ret, scene, actor);
     }
     return actor;
 }
@@ -798,20 +799,55 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
     return actor;
 }
 
-Actor& Actor::refreshCostume(Costume& costume)
+Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, QMap<State*, int>& states)
+{
+    Actor& actor = *this;
+    if (remove)
+    {
+        QMap<State*, int>* stateDur = actor.stateDur;
+        if (stateDur != nullptr)
+        {
+            auto const last = states.cend();
+            for (auto it = states.cbegin(); it != last; ++it)
+            {
+                if (it.value() == -1)
+                {
+                    it.key()->disable(ret, scene, actor, false, false);
+                }
+            }
+        }
+    }
+    else
+    {
+        auto const last = states.cend();
+        for (auto it = states.cbegin(); it != last; ++it)
+        {
+            int const dur = it.value();
+            if (dur != -1)
+            {
+                it.key()->inflict(ret, scene, actor, dur, true, false);
+            }
+        }
+    }
+    return actor;
+}
+
+Actor& Actor::refreshCostume(QString& ret, Scene* scene, Costume& costume)
 {
     Actor& actor = *this;
     actor.dmgType |= costume.dmgType;
     actor.flags |= costume.flags;
-    QVector<Ability*>* skills = costume.aSkills;
-    if (skills != nullptr)
     {
-        actor.updateSkills(false, false, *skills);
-    }
-    skills = costume.counters;
-    if (skills != nullptr)
-    {
-        actor.updateSkills(false, true, *skills);
+        QVector<Ability*>* skills = costume.aSkills;
+        if (skills != nullptr)
+        {
+            actor.updateSkills(false, false, *skills);
+        }
+        skills = costume.counters;
+        if (skills != nullptr)
+        {
+            actor.updateSkills(false, true, *skills);
+        }
     }
     if (costume.isShapeShifted())
     {
@@ -821,10 +857,22 @@ Actor& Actor::refreshCostume(Costume& costume)
             (*actor.sprite) = *spr;
         }
     }
+    QMap<State*, int>* cStates = costume.stateDur;
+    if (cStates != nullptr)
+    {
+        auto const last = cStates->cend();
+        for (auto it = cStates->cbegin(); it != last; ++it)
+        {
+            if (it.value() == -1)
+            {
+                it.key()->inflict(ret, scene, actor, -1, true, false);
+            }
+        }
+    }
     return actor;
 }
 
-Actor& Actor::refreshCostumes()
+Actor& Actor::refreshCostumes(QString& ret, Scene* scene)
 {
     Actor& actor = *this;
     {
@@ -832,7 +880,7 @@ Actor& Actor::refreshCostumes()
         auto const last = equipment.cend();
         for (auto it = equipment.cbegin(); it != last; ++it)
         {
-            actor.refreshCostume(*(it.value()));
+            actor.refreshCostume(ret, scene, *(it.value()));
         }
     }
     QMap<State*, int>* stateDur = actor.stateDur;
@@ -843,7 +891,7 @@ Actor& Actor::refreshCostumes()
         {
             if (it.value() > -3)
             {
-                actor.refreshCostume(*(it.key()));
+                actor.refreshCostume(ret, scene, *(it.key()));
             }
         }
     }
@@ -852,8 +900,8 @@ Actor& Actor::refreshCostumes()
 
 Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp, int const mSp, int const atk,
              int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items)
-    : Costume(id, name, nullptr, false, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, res, new QVector<Ability*>(),
-              nullptr, stRes)
+    : Costume(id, name, nullptr, false, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, res, nullptr,
+              new QVector<Ability*>(), nullptr, stRes)
 {
     this->setRace(race);
     this->setJob(job);

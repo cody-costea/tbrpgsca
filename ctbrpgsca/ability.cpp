@@ -47,11 +47,6 @@ inline int Ability::getRequiredLevel() const
     return this->lvRq;
 }
 
-inline int Ability::getDamageType() const
-{
-    return this->dmgType;
-}
-
 inline int Ability::getAddedStateDuration(State& state) const
 {
     QMap<State*, int>* aStates = this->stateDur;
@@ -347,7 +342,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                                 State* const aState = it.key();
                                 if (aState == rState)
                                 {
-                                    rState->disable(scene, *target, false, false);
+                                    rState->disable(ret, scene, *target, false, false);
                                     break;
                                 }
                             }

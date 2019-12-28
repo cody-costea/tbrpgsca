@@ -40,7 +40,6 @@ namespace tbrpgsca
         static QString ResistTxt;
         static QString StolenTxt;
 
-        inline int getDamageType() const;
         inline int getRequiredLevel() const;
         inline int getAttributeIncrement() const;
         inline int getMaximumUses() const;
