@@ -67,30 +67,34 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
                     auto const rLast = rStates->cend();
                     for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                     {
+                        int rDur = rIt.value();
                         State* const rState = rIt.key();
+                        if (rDur == 0 || rDur < -2)
+                        {
+                            rDur = rState->dur;
+                        }
                         auto const last = trgStates->cend();
                         for (auto it = trgStates->cbegin(); it != last; ++it)
                         {
                             State* const aState = it.key();
                             if (aState == rState)
                             {
-                                int const rDur = it.value();
-                                if (rDur == -3)
+                                int const aDur = it.value();
+                                if (aDur > -3)
                                 {
-                                    continue;
-                                }
-                                rState->disable(ret, scene, actor, stateDur, false);
-                                if (stateDur > 0 && rDur > 0)
-                                {
-                                    stateDur -= rDur;
-                                    if (stateDur < 1)
+                                    if (aDur < 0 && rDur > aDur)
                                     {
                                         return state;
                                     }
-                                }
-                                else if (rDur < 0)
-                                {
-                                    return state;
+                                    rState->disable(ret, scene, actor, rDur, false);
+                                    if (rDur > 0 && aDur > 0)
+                                    {
+                                        stateDur -= aDur < rDur ? aDur : rDur;
+                                        if (stateDur < 1)
+                                        {
+                                            return state;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -129,16 +133,21 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
         dur = this->dur;
     }
     QMap<State*, int>* sDur = actor.stateDur;
-    if (sDur != nullptr)
+    if (sDur == nullptr)
+    {
+        return true;
+    }
+    else
     {
         int crDur = sDur->value(this, -3);
-        if (dur == -2 || crDur != -2)
+        if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
         {
-            if (dur > 0 && crDur > 0)
+            crDur = dur > 0 && crDur > 0 && crDur > dur ? crDur - dur : 0;
+            if (crDur > 0)
             {
-                crDur = crDur > dur ? crDur - dur : 0;
+                sDur->operator[](this) = crDur;
             }
-            if (crDur < 1 || dur < 0)
+            else
             {
                 if (crDur > -3)
                 {
@@ -152,15 +161,11 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
                 {
                     sDur->operator[](this) = -3;
                 }
+                return true;
             }
-            else
-            {
-                sDur->operator[](this) = crDur;
-            }
-            return true;
         }
+        return crDur < -2;
     }
-    return false;
 }
 
 inline State& State::alter(QString& ret, Actor& actor, const bool consume)
