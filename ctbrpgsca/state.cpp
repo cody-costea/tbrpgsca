@@ -140,12 +140,12 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
     else
     {
         int crDur = sDur->value(this, -3);
-        if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
+        //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
+        if (crDur > -1 || (dur <= crDur))
         {
-            crDur = dur > 0 && crDur > 0 && crDur > dur ? crDur - dur : 0;
-            if (crDur > 0)
+            if (dur > 0 && crDur > 0 && crDur > dur)
             {
-                sDur->operator[](this) = crDur;
+                sDur->operator[](this) = crDur - dur;
             }
             else
             {
