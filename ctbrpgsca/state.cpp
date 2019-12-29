@@ -79,7 +79,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
                                 {
                                     continue;
                                 }
-                                rState->disable(ret, scene, actor, rDur, false);
+                                rState->disable(ret, scene, actor, stateDur, false);
                                 if (stateDur > 0 && rDur > 0)
                                 {
                                     stateDur -= rDur;
