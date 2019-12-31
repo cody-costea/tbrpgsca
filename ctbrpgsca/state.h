@@ -41,8 +41,8 @@ namespace tbrpgsca
 
         State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
               int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun,
-              bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const revive,  QVector<Ability*>* const aSkills,
-              QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<int, int>* const res, QMap<State*, int>* const states, QMap<State*, int>* const stRes);
+              bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const revive, QVector<Ability*>* const aSkills,
+              QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res);
 
         State(State& state);
 
