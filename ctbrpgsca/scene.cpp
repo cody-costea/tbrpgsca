@@ -243,52 +243,36 @@ Scene& Scene::playAi(QString& ret, Actor& player)
     QVector<Actor*>* party;
     int side, partySize, skillIndex = 0, heal = -1;
     {
-        bool enraged = player.isAutomated();
+        auto parties = scene.parties;
+        if (player.isConfused())
         {
-            auto parties = scene.parties;
-            if (player.isConfused())
-            {
-                if (enraged)
-                {
-                    side = -1;
-                    party = nullptr;
-                    partySize = 0;
-                    goto chooseSkill;
-                }
-                else
-                {
-                    side = player.side + 1;
-                    if (side >= parties.size())
-                    {
-                        side = 0;
-                    }
-                }
-            }
-            else
-            {
-                side = player.side;
-            }
-            party = parties[side];
-            partySize = party->size();
+            side = -1;
+            party = nullptr;
+            partySize = 0;
         }
-        if (!enraged)
+        else
         {
-            for (int i = 0; i < partySize; ++i)
+            side = player.side;
+        }
+        party = parties[side];
+        partySize = party->size();
+    }
+    if (!(player.isAutomated()))
+    {
+        for (int i = 0; i < partySize; ++i)
+        {
+            Actor& iPlayer = *(party->at(i));
+            int iHp = iPlayer.hp;
+            if (iHp < 1)
             {
-                Actor& iPlayer = *(party->at(i));
-                int iHp = iPlayer.hp;
-                if (iHp < 1)
-                {
-                    heal = 1;
-                }
-                else if (iHp < (iPlayer.mHp / 3))
-                {
-                    heal = 0;
-                }
+                heal = 1;
+            }
+            else if (iHp < (iPlayer.mHp / 3))
+            {
+                heal = 0;
             }
         }
     }
-    chooseSkill:
     {
         QVector<Ability*>& skills = *(player.aSkills);
         if (heal > -1)

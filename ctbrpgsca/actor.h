@@ -25,7 +25,7 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_AI_PLAYER 128
+        #define FLAG_AI_PLAYER 256
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -122,6 +122,9 @@ namespace tbrpgsca
         char unequipItem(Scene* const scene, Costume& item);
         Actor& refreshCostume(QString* ret, Scene* scene, Costume& costume);
         Actor& refreshCostumes(QString* ret, Scene* scene);
+
+    private:
+        signed char oldSide;
 
         friend class Scene;
         friend class Ability;

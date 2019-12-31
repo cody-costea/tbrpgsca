@@ -916,15 +916,17 @@ Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const
     this->skillsRgTurn = nullptr;
     this->skillsCrQty = nullptr;
     this->stateDur = nullptr;
-    this->side = 0;
+    this->tmpSide = -1;
+    this->side = -1;
     this->init = 0;
     this->recover(nullptr, nullptr);
 }
 
 Actor::Actor(Actor& actor) : Costume(actor)
 {
-    this->side = 0;//actor.side;
     this->init = 0;//actor.init;
+    this->side = -1;//actor.side;
+    this->tmpSide = -1;
     this->xp = actor.xp;
     this->maxp = actor.maxp;
     this->lv = actor.lv;

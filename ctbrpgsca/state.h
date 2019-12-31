@@ -35,7 +35,7 @@ namespace tbrpgsca
         inline Ability& getRemovedSkill(int const n) const;
 
         inline State& alter(QString& ret, Actor& actor, bool const consume);
-        inline State& inflict(QString& ret, Actor& actor, int dur, bool const always);
+        inline State& inflict(QString& ret, Actor& user, Actor& target, int dur, bool const always);
         inline bool disable(QString& ret, Actor& actor, int const dur, bool const remove);
         State& blockSkills(Actor& actor, bool const remove);
 
@@ -52,7 +52,7 @@ namespace tbrpgsca
         int dur, sRes;
 
         State& alter(QString& ret, Scene* const scene, Actor& actor, bool const consume);
-        State& inflict(QString& ret, Scene* const scene, Actor& actor, int dur, bool const always);
+        State& inflict(QString& ret, Scene* const scene, Actor& user, Actor& target, int dur, bool const always);
         bool disable(QString& ret, Scene* const scene, Actor& actor, int dur, bool const remove);
         State& remove(QString& ret, Scene* const scene, Actor& actor);
 

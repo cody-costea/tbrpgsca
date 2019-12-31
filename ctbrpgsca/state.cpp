@@ -31,12 +31,12 @@ inline int State::getResistance() const
     return this->sRes;
 }
 
-inline State& State::inflict(QString& ret, Actor& actor, int dur, const bool always)
+inline State& State::inflict(QString& ret, Actor& user, Actor& target, int dur, const bool always)
 {
-    return this->inflict(ret, nullptr, actor, dur, always);
+    return this->inflict(ret, nullptr, user, target, dur, always);
 }
 
-State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, const bool always)
+State& State::inflict(QString& ret, Scene* scene, Actor& user, Actor& target, int stateDur, const bool always)
 {
     State& state = *this;
     if (stateDur == 0)
@@ -50,49 +50,51 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
     if (stateDur > STATE_END_DUR)
     {
         int const stateRes = state.sRes;
-        QMap<State*, int>* stRes = actor.stRes;
+        QMap<State*, int>* stRes = target.stRes;
         if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
-            QMap<State*, int>* trgStates = actor.stateDur;
-            if (trgStates == nullptr)
             {
-                trgStates = new QMap<State*, int>();
-                actor.stateDur = trgStates;
-            }
-            else
-            {
-                QMap<State*, int>* rStates = state.stateDur;
-                if (rStates != nullptr)
+                QMap<State*, int>* trgStates = target.stateDur;
+                if (trgStates == nullptr)
                 {
-                    auto const rLast = rStates->cend();
-                    for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
+                    trgStates = new QMap<State*, int>();
+                    target.stateDur = trgStates;
+                }
+                else
+                {
+                    QMap<State*, int>* rStates = state.stateDur;
+                    if (rStates != nullptr)
                     {
-                        int rDur = rIt.value();
-                        State* const rState = rIt.key();
-                        if (rDur == 0 || rDur <= STATE_END_DUR)
+                        auto const rLast = rStates->cend();
+                        for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                         {
-                            rDur = rState->dur;
-                        }
-                        auto const last = trgStates->cend();
-                        for (auto it = trgStates->cbegin(); it != last; ++it)
-                        {
-                            State* const aState = it.key();
-                            if (aState == rState)
+                            int rDur = rIt.value();
+                            State* const rState = rIt.key();
+                            if (rDur == 0 || rDur <= STATE_END_DUR)
                             {
-                                int const aDur = it.value();
-                                if (aDur > STATE_END_DUR)
+                                rDur = rState->dur;
+                            }
+                            auto const last = trgStates->cend();
+                            for (auto it = trgStates->cbegin(); it != last; ++it)
+                            {
+                                State* const aState = it.key();
+                                if (aState == rState)
                                 {
-                                    if (aDur < 0 && rDur > aDur)
+                                    int const aDur = it.value();
+                                    if (aDur > STATE_END_DUR)
                                     {
-                                        return state;
-                                    }
-                                    rState->disable(ret, scene, actor, rDur, false);
-                                    if (rDur > 0 && aDur > 0)
-                                    {
-                                        stateDur -= aDur < rDur ? aDur : rDur;
-                                        if (stateDur < 1)
+                                        if (aDur < 0 && rDur > aDur)
                                         {
                                             return state;
+                                        }
+                                        rState->disable(ret, scene, target, rDur, false);
+                                        if (rDur > 0 && aDur > 0)
+                                        {
+                                            stateDur -= aDur < rDur ? aDur : rDur;
+                                            if (stateDur < 1)
+                                            {
+                                                return state;
+                                            }
                                         }
                                     }
                                 }
@@ -100,14 +102,26 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
                         }
                     }
                 }
+                int const crDur = trgStates->value(this, -3);
+                if (crDur == STATE_END_DUR)
+                {
+                    state.adopt(&ret, scene, target, false);
+                    trgStates->operator[](this) = stateDur;
+                    state.blockSkills(target, false);
+                }
+                else if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
+                {
+                    trgStates->operator[](this) = stateDur;
+                }
             }
-            state.adopt(&ret, scene, actor, false);
-            int const crDur = trgStates->value(this, 0);
-            if (crDur < stateDur || (crDur > -1 && stateDur < 0))
+            if (this->isConverted())
             {
-                trgStates->operator[](this) = stateDur;
+                if (target.oldSide == -1)
+                {
+                    target.oldSide = static_cast<signed char>(target.side);
+                }
+                target.side = user.side;
             }
-            state.blockSkills(actor, false);
         }
     }
     return state;
@@ -118,6 +132,11 @@ State& State::remove(QString& ret, Scene* const scene, Actor& actor)
     State& state = *this;
     state.blockSkills(actor, true);
     state.abandon(&ret, scene, actor, false);
+    if (this->isConverted() && (!actor.isConverted()))
+    {
+        actor.side = static_cast<int>(actor.oldSide);
+        actor.oldSide = -1;
+    }
     return state;
 }
 

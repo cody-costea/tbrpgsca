@@ -27,9 +27,10 @@ namespace tbrpgsca
     {
         #define FLAG_AUTOMATE 4
         #define FLAG_CONFUSE 8
-        #define FLAG_REFLECT 16
-        #define FLAG_SHAPE_SHIFT 32
-        #define FLAG_STUN 64
+        #define FLAG_CONVERT 16
+        #define FLAG_REFLECT 32
+        #define FLAG_SHAPE_SHIFT 64
+        #define FLAG_STUN 128
     public:
         static QString CausesTxt;
 
@@ -41,6 +42,7 @@ namespace tbrpgsca
 
         inline bool isAutomated() const;
         inline bool isConfused() const;
+        inline bool isConverted() const;
         inline bool isCountering() const;
         inline bool isShapeShifted() const;
         inline bool isReflecting() const;        

@@ -105,6 +105,11 @@ inline bool Costume::isConfused() const
     return (this->flags & FLAG_CONFUSE) == FLAG_CONFUSE;
 }
 
+inline bool Costume::isConverted() const
+{
+    return (this->flags & FLAG_CONVERT) == FLAG_CONVERT;
+}
+
 inline bool Costume::isStunned() const
 {
     return (this->flags & FLAG_STUN) == FLAG_STUN;
