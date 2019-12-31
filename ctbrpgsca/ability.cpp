@@ -320,15 +320,22 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                         auto const rLast = rStates->cend();
                         for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                         {
-                            State* const rState = rIt.key();
-                            auto const last = stateDur->cend();
-                            for (auto it = stateDur->cbegin(); it != last; ++it)
+                            int const rDur = rIt.value();
+                            if (rDur > STATE_END_DUR)
                             {
-                                State* const aState = it.key();
-                                if (aState == rState)
+                                State* const rState = rIt.key();
+                                auto const last = stateDur->cend();
+                                for (auto it = stateDur->cbegin(); it != last; ++it)
                                 {
-                                    rState->disable(ret, scene, *target, -1, false);
-                                    break;
+                                    State* const aState = it.key();
+                                    if (aState == rState)
+                                    {
+                                        if (it.value() > STATE_END_DUR)
+                                        {
+                                            rState->disable(ret, scene, *target, rDur, false);
+                                        }
+                                        break;
+                                    }
                                 }
                             }
                         }

@@ -448,7 +448,7 @@ Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (it.value() > -3)
+            if (it.value() > STATE_END_DUR)
             {
                 it.key()->alter(ret, scene, actor, consume);
             }
@@ -893,7 +893,7 @@ Actor& Actor::refreshCostumes(QString* ret, Scene* scene)
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (it.value() > -3)
+            if (it.value() > STATE_END_DUR)
             {
                 actor.refreshCostume(ret, scene, *(it.key()));
             }

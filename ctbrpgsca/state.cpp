@@ -47,7 +47,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
             return state;
         }
     }
-    if (stateDur > -3)
+    if (stateDur > STATE_END_DUR)
     {
         int const stateRes = state.sRes;
         QMap<State*, int>* stRes = actor.stRes;
@@ -69,7 +69,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
                     {
                         int rDur = rIt.value();
                         State* const rState = rIt.key();
-                        if (rDur == 0 || rDur < -2)
+                        if (rDur == 0 || rDur <= STATE_END_DUR)
                         {
                             rDur = rState->dur;
                         }
@@ -80,7 +80,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor& actor, int stateDur, co
                             if (aState == rState)
                             {
                                 int const aDur = it.value();
-                                if (aDur > -3)
+                                if (aDur > STATE_END_DUR)
                                 {
                                     if (aDur < 0 && rDur > aDur)
                                     {
@@ -132,39 +132,47 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
     {
         dur = this->dur;
     }
-    QMap<State*, int>* sDur = actor.stateDur;
-    if (sDur == nullptr)
+    if (dur > STATE_END_DUR)
     {
-        return true;
-    }
-    else
-    {
-        int crDur = sDur->value(this, -3);
-        //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
-        if (crDur > -1 || (dur <= crDur))
+        QMap<State*, int>* sDur = actor.stateDur;
+        if (sDur == nullptr)
         {
-            if (dur > 0 && crDur > 0 && crDur > dur)
+            return true;
+        }
+        else
+        {
+            int crDur = sDur->value(this, STATE_END_DUR);
+            //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
+            if (crDur > -1 || (dur <= crDur))
             {
-                sDur->operator[](this) = crDur - dur;
-            }
-            else
-            {
-                if (crDur > -3)
+                if (dur > 0 && crDur > 0 && crDur > dur)
                 {
-                    this->remove(ret, scene, actor);
-                }
-                if (remove)
-                {
-                    sDur->remove(this);
+                    sDur->operator[](this) = crDur - dur;
+                    return false;
                 }
                 else
                 {
-                    sDur->operator[](this) = -3;
+                    if (crDur > STATE_END_DUR)
+                    {
+                        this->remove(ret, scene, actor);
+                    }
+                    if (remove)
+                    {
+                        sDur->remove(this);
+                    }
+                    else
+                    {
+                        sDur->operator[](this) = STATE_END_DUR;
+                    }
+                    return true;
                 }
-                return true;
             }
+            return crDur <= STATE_END_DUR;
         }
-        return crDur < -2;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -179,7 +187,7 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
     QMap<State*, int>* sDur = actor.stateDur;
     if (sDur != nullptr /*&& actor.hp > 0*/)
     {
-        int const d = sDur->value(this, -3);
+        int const d = sDur->value(this, STATE_END_DUR);
         if (consume)
         {
             if (d > 0)
@@ -190,7 +198,7 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
         else if (d == 0)
         {
             state.remove(ret, scene, actor);
-            sDur->operator[](this) = -3;
+            sDur->operator[](this) = STATE_END_DUR;
         }
     }
     return state;

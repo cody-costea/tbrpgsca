@@ -25,6 +25,7 @@ namespace tbrpgsca
 
     class State : public Costume
     {
+        #define STATE_END_DUR -3
     public:
         inline int getDuration() const;
         inline int getResistance() const;
