@@ -257,7 +257,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
         party = parties[side];
         partySize = party->size();
     }
-    if (!(player.isAutomated()))
+    if (!(player.isEnraged()))
     {
         for (int i = 0; i < partySize; ++i)
         {
@@ -422,7 +422,7 @@ Scene& Scene::endTurn(QString& ret)
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && (*event)(scene, ret) && (crActor->isAiPlayer() || crActor->isAutomated() || crActor->isConfused()))
+        if (event != nullptr && (*event)(scene, ret) && (crActor->isAiPlayer() || crActor->isEnraged() || crActor->isConfused()))
         {
             scene.playAi(ret, (*crActor));
         }
@@ -462,6 +462,7 @@ Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*
             {
                 player.setAiPlayer(true);
             }
+            player.oldSide = static_cast<unsigned char>(i);
             player.side = i;
         }
         players.append(party);

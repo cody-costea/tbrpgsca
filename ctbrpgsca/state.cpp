@@ -112,10 +112,6 @@ State& State::inflict(QString& ret, Scene* scene, Actor* user, Actor& target, in
                 trgStates->operator[](this) = stateDur;
                 if (user != nullptr && this->isConverted() && target.side != user->side)
                 {
-                    if (target.oldSide == -1)
-                    {
-                        target.oldSide = static_cast<signed char>(target.side);
-                    }
                     target.side = user->side;
                 }
             }
@@ -132,7 +128,6 @@ State& State::remove(QString& ret, Scene* const scene, Actor& actor)
     if (this->isConverted() && (!actor.isConverted()))
     {
         actor.side = static_cast<int>(actor.oldSide);
-        actor.oldSide = -1;
     }
     return state;
 }

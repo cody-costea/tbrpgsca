@@ -25,7 +25,7 @@ namespace tbrpgsca
 {
     class Costume : public Role
     {
-        #define FLAG_AUTOMATE 4
+        #define FLAG_ENRAGED 4
         #define FLAG_CONFUSE 8
         #define FLAG_CONVERT 16
         #define FLAG_REFLECT 32
@@ -40,7 +40,7 @@ namespace tbrpgsca
         inline int getWisdom() const;
         inline int getAgility() const;
 
-        inline bool isAutomated() const;
+        inline bool isEnraged() const;
         inline bool isConfused() const;
         inline bool isConverted() const;
         inline bool isCountering() const;

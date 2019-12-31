@@ -298,12 +298,12 @@ Actor& Actor::setReviving(const bool revive)
     return *this;
 }
 
-Actor& Actor::setAutomated(const bool automate)
+Actor& Actor::setEnraged(const bool automate)
 {
     int flags = this->flags;
-    if (automate != ((flags & FLAG_AUTOMATE) == FLAG_AUTOMATE))
+    if (automate != ((flags & FLAG_ENRAGED) == FLAG_ENRAGED))
     {
-        this->flags = flags ^ FLAG_AUTOMATE;
+        this->flags = flags ^ FLAG_ENRAGED;
     }
     return *this;
 }
@@ -916,8 +916,8 @@ Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const
     this->skillsRgTurn = nullptr;
     this->skillsCrQty = nullptr;
     this->stateDur = nullptr;
-    this->tmpSide = -1;
-    this->side = -1;
+    this->oldSide = 0;
+    this->side = 0;
     this->init = 0;
     this->recover(nullptr, nullptr);
 }
@@ -925,8 +925,8 @@ Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const
 Actor::Actor(Actor& actor) : Costume(actor)
 {
     this->init = 0;//actor.init;
-    this->side = -1;//actor.side;
-    this->tmpSide = -1;
+    this->side = 0;//actor.side;
+    this->oldSide = 0;
     this->xp = actor.xp;
     this->maxp = actor.maxp;
     this->lv = actor.lv;

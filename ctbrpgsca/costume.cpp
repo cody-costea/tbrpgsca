@@ -95,9 +95,9 @@ inline bool Costume::isCountering() const
     return counters != nullptr && counters->size() > 0;
 }
 
-inline bool Costume::isAutomated() const
+inline bool Costume::isEnraged() const
 {
-    return (this->flags & FLAG_AUTOMATE) == FLAG_AUTOMATE;
+    return (this->flags & FLAG_ENRAGED) == FLAG_ENRAGED;
 }
 
 inline bool Costume::isConfused() const
@@ -294,7 +294,7 @@ Costume::Costume(int const id, QString& name, QString* sprite, bool const shapeS
     }
     if (automate)
     {
-        flags |= FLAG_AUTOMATE;
+        flags |= FLAG_ENRAGED;
     }
     if (confuse)
     {

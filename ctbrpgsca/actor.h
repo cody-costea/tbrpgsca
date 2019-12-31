@@ -82,7 +82,7 @@ namespace tbrpgsca
         Actor& setStunned(bool const stun);
         Actor& setReflecting(bool const reflects);
         Actor& setShapeShifted(bool const shapeshift);
-        Actor& setAutomated(bool const automate);
+        Actor& setEnraged(bool const automate);
         Actor& setConfused(bool const confuse);
         Actor& setAiPlayer(bool const aiPlayer);
         Actor& setReviving(bool const revive);
@@ -124,7 +124,7 @@ namespace tbrpgsca
         Actor& refreshCostumes(QString* ret, Scene* scene);
 
     private:
-        signed char oldSide;
+        unsigned char oldSide;
 
         friend class Scene;
         friend class Ability;
