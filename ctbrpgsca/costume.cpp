@@ -122,6 +122,11 @@ inline bool Costume::isStunned() const
     return (this->flags & FLAG_STUN) == FLAG_STUN;
 }
 
+inline bool Costume::isKnockedOut() const
+{
+    return (this->flags & FLAG_KO) == FLAG_KO;
+}
+
 inline Costume& Costume::adopt(QString& ret, Actor& actor)
 {
     return this->adopt(&ret, nullptr, actor, true);

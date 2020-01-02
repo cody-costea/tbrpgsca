@@ -187,15 +187,15 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
     Actor& actor = *this;
     if (hp < 1)
     {
-        if (this->hp != 0)
+        if (actor.hp != 0)
         {
             if (survive)
             {
-                this->hp = 1;
+                actor.hp = 1;
             }
             else
             {
-                this->hp = 0;
+                actor.hp = 0;
                 bool const revives = actor.isReviving();
                 ret = ret % Actor::KoTxt.arg(actor.name);
                 actor.actions = 0;
@@ -221,18 +221,33 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
                     ret = ret % Actor::RiseTxt;
                     actor.hp = actor.mHp;
                 }
-                else if (scene != nullptr)
+                else
                 {
-                    //actor.setSunned(true);
-                    scene->checkStatus(ret);
+                    actor.setStunned(true);
+                    actor.setKnockedOut(true);
+                    if (scene != nullptr)
+                    {
+                        scene->checkStatus(ret);
+                    }
                 }
             }
         }
     }
     else
     {
-        int const mHp = actor.mHp;
-        this->hp = hp > mHp ? mHp : hp;
+        int const oHp = actor.hp, mHp = actor.mHp;
+        actor.hp = hp > mHp ? mHp : hp;
+        if (oHp < 1)
+        {
+            actor.setStunned(false);
+            actor.setKnockedOut(false);
+            actor.refreshCostumes(&ret, scene);
+            actor.applyStates(ret, scene, false);
+            if (scene != nullptr)
+            {
+                scene->resetActions();
+            }
+        }
     }
     return actor;
 }
@@ -386,6 +401,16 @@ Actor& Actor::setShapeShifted(const bool shapeshift)
     if (shapeshift != ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT))
     {
         this->flags = flags ^ FLAG_SHAPE_SHIFT;
+    }
+    return *this;
+}
+
+Actor& Actor::setKnockedOut(const bool ko)
+{
+    int flags = this->flags;
+    if (ko != ((flags & FLAG_KO) == FLAG_KO))
+    {
+        this->flags = flags ^ FLAG_KO;
     }
     return *this;
 }

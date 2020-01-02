@@ -64,7 +64,8 @@ Scene& Scene::checkStatus(QString& ret)
         {
             for (int k = 0; k < partySize; ++k)
             {
-                if (party->at(k)->hp > 0)
+                //if (party->at(k)->hp > 0)
+                if (!(party->at(k)->isKnockedOut()))
                 {
                     goto enemyCheck;
                 }
@@ -82,7 +83,8 @@ Scene& Scene::checkStatus(QString& ret)
                 partySize = party->size();
                 for (int j = 0; j < partySize; ++j)
                 {
-                    if (party->at(j)->hp > 0)
+                    //if (party->at(j)->hp > 0)
+                    if (!(party->at(j)->isKnockedOut()))
                     {
                         return scene;
                     }
@@ -104,7 +106,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
         int cntSize;
         QVector<Ability*>* counters;
         ability.execute(ret, this, user, target, applyCosts);
-        if ((!healing) && target != &user && target->hp > 0 && (!target->isStunned())
+        if ((!healing) && target->side != user.side && target->hp > 0 && (!target->isStunned())
                 && (counters = target->counters) != nullptr && (cntSize = counters->size()) > 0)
         {
             Ability* counter = nullptr;
@@ -327,7 +329,7 @@ Scene& Scene::endTurn(QString& ret)
     QVector<Actor*>& players = *(scene.players);
     int playersSize = players.size();
     Actor* crActor = players[current];
-    crActor->actions--;
+    --(crActor->actions);
     while (crActor->actions < 1)
     {
         crActor->applyStates(ret, true);
@@ -357,11 +359,13 @@ Scene& Scene::endTurn(QString& ret)
                 }
             }
             while (crActor->init < mInit);
+            crActor->actions = crActor->mActions;
             //crActor = nxActor;
             //current = next;
         }
         else
         {
+            crActor->actions = crActor->mActions;
             do
             {
                 if (++current == playersSize)
@@ -369,10 +373,14 @@ Scene& Scene::endTurn(QString& ret)
                     current = 0;
                 }
                 crActor = players[current];
+                if (crActor->actions < 1)
+                {
+                    crActor->actions = crActor->mActions;
+                    continue;
+                }
             }
             while (crActor->hp < 1);
         }
-        crActor->actions = crActor->mActions;
         QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
         if (regSkills != nullptr)
         {
@@ -428,6 +436,22 @@ inline void Scene::agiCalc()
     {
         QVector<Actor*>& players = *(this->players);
         std::sort(players.begin(), players.end(), Scene::actorAgiComp);
+    }
+}
+
+inline void Scene::resetActions()
+{
+    if (this->mInit < 1)
+    {
+        int const current = this->current;
+        QVector<Actor*>& players = *(this->players);
+        for (int i = 0; i < current; ++i)
+        {
+            if (players[i]->actions < 1)
+            {
+                players[i]->actions = players[i]->mActions;
+            }
+        }
     }
 }
 

@@ -17,7 +17,7 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_AI_PLAYER 256
+        #define FLAG_AI_PLAYER 512
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -75,6 +75,7 @@ namespace tbrpgsca
         Actor& setStunned(bool const stun);
         Actor& setReflecting(bool const reflects);
         Actor& setShapeShifted(bool const shapeshift);
+        Actor& setKnockedOut(bool const knockOut);
         Actor& setEnraged(bool const automate);
         Actor& setConfused(bool const confuse);
         Actor& setAiPlayer(bool const aiPlayer);

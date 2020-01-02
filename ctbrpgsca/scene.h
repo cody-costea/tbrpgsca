@@ -75,6 +75,7 @@ namespace tbrpgsca
         QVector<QVector<Actor*>*> parties;
 
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+        inline void resetActions();
         inline void agiCalc();
 
         friend class Actor;
