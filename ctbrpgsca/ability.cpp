@@ -189,33 +189,29 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                         }
                     }
                 }
-                if (res == 7)
+                if (res > 0)
                 {
-                    ret = ret % Ability::ResistTxt.arg(target->name);
-                    goto applyStates;
-                }
-                else
-                {
-                    dmg = (ability.attrInc + (dmg / i)) / (def / i);
-                    if (res > 0)
+                    if (res > 7)
                     {
-                        if (res > 7)
-                        {
-                            res = -7 + (res - 7);
-                        }
+                        res = -7 + (res - 7);
                         if (res > -1)
                         {
                             dmg *= -1 * (res + 2);
                         }
-                        else
-                        {
-                            dmg /= res;
-                        }
+                    }
+                    else if (res == 7)
+                    {
+                        ret = ret % Ability::ResistTxt.arg(target->name);
+                        goto applyStates;
                     }
                     else
                     {
-                        dmg *= -1 * (res - 2);
+                        dmg /= res;
                     }
+                }
+                else
+                {
+                    dmg *= -1 * (res - 2);
                 }
             }
             else
@@ -326,9 +322,9 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
     }
     if (applyCosts)
     {
+        user.setCurrentRp(user.sp - ability.mSp);
         user.setCurrentMp(user.mp - ability.mMp);
         user.setCurrentHp(user.hp - ability.mHp, ret, scene, false);
-        user.setCurrentRp(user.sp - ability.mSp);
         int mQty = ability.mQty;
         if (mQty > 0)
         {

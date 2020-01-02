@@ -97,8 +97,8 @@ State& State::inflict(QString& ret, Scene* scene, Actor* user, Actor& target, in
             if (crDur == STATE_END_DUR)
             {
                 state.adopt(&ret, scene, target, false);
-                state.blockSkills(target, false);
             }
+            state.blockSkills(target, false);
             if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
             {
                 trgStates->operator[](this) = stateDur;
