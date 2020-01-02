@@ -332,7 +332,7 @@ Scene& Scene::endTurn(QString& ret)
     --(crActor->actions);
     while (crActor->actions < 1)
     {
-        crActor->applyStates(ret, true);
+        crActor->applyStates(ret, this, true);
         int mInit = scene.mInit;
         if (mInit > 0)
         {
@@ -411,7 +411,7 @@ Scene& Scene::endTurn(QString& ret)
                 }
             }
         }
-        crActor->applyStates(ret, false);
+        crActor->applyStates(ret, this, false);
         if (crActor->isStunned())
         {
             crActor->actions = 0;

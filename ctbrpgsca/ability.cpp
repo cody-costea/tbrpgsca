@@ -133,7 +133,6 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        bool ko = target->hp < 1;
         int dmg = std::rand() % 4;
         int canMiss = 0, def = 0, i = 0;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
@@ -309,10 +308,6 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                         }
                     }
                 }
-            }
-            if (ko && target->hp > 0)
-            {
-                target->applyStates(ret, scene, false);
             }
         }
         else
