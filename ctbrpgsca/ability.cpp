@@ -1,17 +1,9 @@
 /*
-Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "ability.h"
 #include "actor.h"
@@ -121,7 +113,7 @@ Ability& Ability::replenish(Actor& user)
 inline bool Ability::canPerform(Actor& actor)
 {
     QMap<Ability*, int>* skillsQty = actor.skillsCrQty;
-    return this->mp <= actor.mp && this->hp < actor.hp && this->sp <= actor.sp && actor.lv >= this->lvRq
+    return this->mMp <= actor.mp && this->mHp < actor.hp && this->mSp <= actor.sp && actor.lv >= this->lvRq
                     && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
 
@@ -132,9 +124,10 @@ inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool 
 
 Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
+    assert(target != nullptr);
     Ability& ability = *this;
     int const dmgType = ability.dmgType | user.dmgType;
-    if (dmgType == DMG_TYPE_WIS && target != &user &&target->isReflecting())
+    if (dmgType == DMG_TYPE_WIS && target != &user && target->isReflecting())
     {
         ret = ret % Ability::ReflectTxt.arg(target->name);
         target = &user;
@@ -175,18 +168,12 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 2;
             ++i;
         }
-        int dmgHp, dmgMp, dmgSp;
-        if (i == 0)
+        if (canMiss == 0 || target == &user || ((std::rand() % 13) + user.agi / canMiss) > 2 + target->agi / 4)
         {
-            dmgHp = 0;
-            dmgMp = 0;
-            dmgSp = 0;
-        }
-        else
-        {
-            dmgHp = ability.mHp;
-            dmgMp = ability.mMp;
-            dmgSp = ability.mSp;
+            if (i != 0)
+            {
+                dmg = (ability.attrInc + (dmg / i)) / (def / i);
+            }
             QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)
             {
@@ -204,10 +191,8 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                 }
                 if (res == 7)
                 {
-                    dmgHp = 0;
-                    dmgMp = 0;
-                    dmgSp = 0;
                     ret = ret % Ability::ResistTxt.arg(target->name);
+                    goto applyStates;
                 }
                 else
                 {
@@ -235,69 +220,10 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             }
             else
             {
-                dmg = ((ability.attrInc + (dmg / i)) / (def / i)) / DEFAULT_RES;
+                dmg /= DEFAULT_RES;
             }
-        }
-        if (canMiss == 0 || target == &user || ((std::rand() % 13) + user.agi / canMiss) > 2 + target->agi / 4)
-        {
-            //if (dmgHp != 0 || dmgMp != 0 || dmgSp != 0)
-            {
-                bool c = false;
-                if (dmgHp != 0)
-                {
-                    c = true;
-                    dmgHp = ((dmgHp < 0 ? -1 : 1) * dmg + dmgHp);
-                    target->setCurrentHp(target->hp - dmgHp, ret, *scene);
-                    ret = ret % Ability::SuffersTxt.arg(target->name) % (dmgHp < 0 ? " +" : " ")
-                            % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
-                }
-                if (dmgMp != 0)
-                {
-                    if (c)
-                    {
-                        ret = ret % ", ";
-                    }
-                    else
-                    {
-                        ret = ret % Ability::SuffersTxt.arg(target->name) % " ";
-                        c = true;
-                    }
-                    if (dmgMp < 0)
-                    {
-                        ret = ret % "+";
-                    }
-                    dmgMp = ((dmgMp < 0 ? -1 : 1) * dmg + dmgMp);
-                    target->setCurrentMp(target->mp - dmgMp);
-                    ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
-                }
-                if (dmgSp != 0)
-                {
-                    if (c)
-                    {
-                        ret = ret % ", ";
-                    }
-                    else
-                    {
-                        ret = ret % Ability::SuffersTxt.arg(target->name) % " ";
-                        c = true;
-                    }
-                    dmgSp = dmgSp == 0 ? 0 : ((dmgSp < 0 ? -1 : 1) * dmg + dmgSp);
-                    target->setCurrentRp(target->sp - dmgSp);
-                    if (dmgSp < 0)
-                    {
-                        ret = ret % "+";
-                    }
-                    ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
-                }
-                //ret = ret % Ability::SuffersTxt.arg(target->name);
-                //Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
-            }
-            if (ability.isAbsorbing())
-            {
-                user.setCurrentHp(user.hp + dmgHp / 2);
-                user.setCurrentMp(user.mp + dmgMp / 2);
-                user.setCurrentRp(user.sp + dmgSp / 2);
-            }
+            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
+            applyStates:
             {
                 QMap<State*, int>* aStates = ability.stateDur;
                 if (aStates != nullptr)
@@ -388,7 +314,6 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     }
                 }
             }
-            target->checkStatus(ret, scene);
             if (ko && target->hp > 0)
             {
                 target->applyStates(ret, scene, false);
@@ -401,9 +326,9 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
     }
     if (applyCosts)
     {
-        user.hp -= ability.hp;
-        user.mp -= ability.mp;
-        user.sp -= ability.sp;
+        user.setCurrentMp(user.mp - ability.mMp);
+        user.setCurrentHp(user.hp - ability.mHp, ret, scene, false);
+        user.setCurrentRp(user.sp - ability.mSp);
         int mQty = ability.mQty;
         if (mQty > 0)
         {
@@ -416,14 +341,13 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
     }
-    user.checkStatus(ret, scene);
     return ability;
 }
 
 Ability::Ability(int const id, QString& name, QString* sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
                  int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,int const mQty,
                  int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
-    : Role(id, name, sprite, hpC, mpC, spC, hpDmg, mpDmg, spDmg, (elm | dmgType), range, revive, aStates)
+    : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, revive, aStates)
 {
     this->lvRq = lvRq;
     this->mQty = mQty;

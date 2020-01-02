@@ -1,17 +1,9 @@
 /*
-Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #ifndef ACTOR_H
 #define ACTOR_H
@@ -58,26 +50,27 @@ namespace tbrpgsca
         Actor& setElementResistance(int const element, int const res);
         Actor& setStateResistance(State* const state, int const res);
         Actor& setExtra(void* const extra);
-        Actor& setSprite(QString& value);
-        Actor& setName(QString& value);
-        Actor& setJob(Costume& job);
-        Actor& setRace(Costume& race);
         Actor& setLevel(int const level);
         Actor& setExperience(int const xp);
-        Actor& setMaximumLevel(int const maxLv);
-        Actor& setMaximumActions(int const mActions);
-        Actor& setMaximumHp(int const mHp);
-        Actor& setMaximumMp(int const mMp);
-        Actor& setMaximumRp(int const mSp);
-        Actor& setCurrentHp(int const hp);
-        Actor& setCurrentMp(int const mp);
-        Actor& setCurrentRp(int const sp);
-        Actor& setAttack(int const atk);
-        Actor& setDefense(int const def);
-        Actor& setSpirit(int const spi);
-        Actor& setWisdom(int const wis);
-        Actor& setAgility(int const agi);
-        Actor& setInitiative(int const init);
+        inline Actor& setSprite(QString& value);
+        inline Actor& setName(QString& value);
+        inline Actor& setJob(Costume& job);
+        inline Actor& setRace(Costume& race);
+        inline Actor& setMaximumLevel(int const maxLv);
+        inline Actor& setMaximumActions(int const mActions);
+        inline Actor& setMaximumHp(int const mHp);
+        inline Actor& setMaximumMp(int const mMp);
+        inline Actor& setMaximumRp(int const mSp);
+        inline Actor& setCurrentHp(int const hp, QString& ret, bool const survive);
+        inline Actor& setCurrentHp(int const hp);
+        inline Actor& setCurrentMp(int const mp);
+        inline Actor& setCurrentRp(int const sp);
+        inline Actor& setAttack(int const atk);
+        inline Actor& setDefense(int const def);
+        inline Actor& setSpirit(int const spi);
+        inline Actor& setWisdom(int const wis);
+        inline Actor& setAgility(int const agi);
+        inline Actor& setInitiative(int const init);
         Actor& setRanged(bool const range);
         Actor& setStunned(bool const stun);
         Actor& setReflecting(bool const reflects);
@@ -103,7 +96,6 @@ namespace tbrpgsca
         Actor& levelUp(Scene* const scene);
         Actor& checkRegSkill(Ability& skill);
         Actor& recover(QString* ret, Scene* const scene);
-        Actor& checkStatus(QString& ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
         Actor& applyStates(QString& ret, Scene* const scene, bool const consume);
         Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
@@ -111,7 +103,7 @@ namespace tbrpgsca
         Actor& updateStates(bool const remove, QString& ret, Scene* const scene, QMap<State*, int>& states);
         Actor& updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
         Actor& switchCostume(QString* ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
-        Actor& setCurrentHp(int const hp, QString& ret, Scene& scene);
+        Actor& setCurrentHp(int const hp, QString& ret, Scene* scene, bool const survive);
         Actor& setAgility(int const agi, Scene& scene);
         inline Actor& setJob(Scene* const scene, Costume& job);
         inline Actor& setRace(Scene* const scene, Costume& race);
@@ -128,8 +120,9 @@ namespace tbrpgsca
 
         friend class Scene;
         friend class Ability;
-        friend class State;
         friend class Costume;
+        friend class State;
+        friend class Role;
     };
 
 }

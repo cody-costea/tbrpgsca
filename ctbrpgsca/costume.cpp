@@ -1,3 +1,10 @@
+/*
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
 #include "costume.h"
 #include "actor.h"
 #include "role.h"
@@ -6,7 +13,7 @@
 
 using namespace tbrpgsca;
 
-QString Costume::CausesTxt = " %s causes %s";
+QString Costume::CausesTxt = " %s is affected by %s";
 
 inline int Costume::getAttack() const
 {
@@ -235,31 +242,8 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
 Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
-    int actorHp = actor.hp, rnd = std::rand() % 3; //roleHp = roleHp, roleMp = role.mp, roleSp = role.sp;
-    int dmgHp = (actor.mHp + rnd) * role.hp / 100;
-    int dmgMp = (actor.mMp + rnd) * role.mp / 100;
-    int dmgSp = (actor.mSp + rnd) * role.sp / 100;
-    if (dmgHp != 0)
-    {
-        if (scene == nullptr)
-        {
-            actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1);
-        }
-        else
-        {
-            actor.setCurrentHp(actorHp > dmgHp ? actorHp - dmgHp : 1, ret, *scene);
-        }
-    }
-    if (dmgMp != 0)
-    {
-        actor.setCurrentMp(actor.mp - dmgMp);
-    }
-    if (dmgSp != 0)
-    {
-        actor.setCurrentRp(actor.sp - dmgSp);
-    }
-    ret = ret % QString(Costume::CausesTxt).arg(role.name, actor.name);
-    Role::AddDmgText(ret, dmgHp, dmgMp, dmgSp);
+    ret = ret % QString(Costume::CausesTxt).arg(actor.name, role.name);
+    role.damage(ret, scene, nullptr, actor, std::rand() % 3, true);
     return role;
 }
 

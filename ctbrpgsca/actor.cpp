@@ -1,17 +1,9 @@
 /*
-Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "actor.h"
 #include "ability.h"
@@ -185,12 +177,59 @@ Actor& Actor::setAgility(const int agi, Scene& scene)
     return actor;
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene& scene)
+Actor& Actor::setCurrentHp(const int hp, QString &ret, const bool survive)
 {
-    Actor& actor = this->setCurrentHp(hp);
+    return this->setCurrentHp(hp, ret, nullptr, survive);
+}
+
+Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const survive)
+{
+    Actor& actor = *this;
     if (hp < 1)
     {
-        scene.checkStatus(ret);
+        if (survive)
+        {
+            this->hp = 1;
+        }
+        else
+        {
+            this->hp = 0;
+            bool const revives = actor.isReviving();
+            ret = ret % Actor::KoTxt.arg(actor.name);
+            actor.actions = 0;
+            /*if (actor.isShapeShifted())
+            {
+                actor.setShapeShifted(false);
+                (*actor.sprite) = (*actor.getJob().sprite);
+            }*/
+            actor.sp = 0;
+            {
+                QMap<State*, int>* stateDur = actor.stateDur;
+                if (stateDur != nullptr)
+                {
+                    auto const last = stateDur->cend();
+                    for (auto it = stateDur->cbegin(); it != last; ++it)
+                    {
+                        it.key()->disable(ret, scene, actor, -1, false);
+                    }
+                }
+            }
+            if (revives)
+            {
+                ret = ret % Actor::RiseTxt;
+                actor.hp = actor.mHp;
+            }
+            else if (scene != nullptr)
+            {
+                //actor.setSunned(true);
+                scene->checkStatus(ret);
+            }
+        }
+    }
+    else
+    {
+        int const mHp = actor.mHp;
+        this->hp = hp > mHp ? mHp : hp;
     }
     return actor;
 }
@@ -469,44 +508,6 @@ Actor& Actor::checkRegSkill(Ability& skill)
             actor.skillsRgTurn = regSkills;
         }
         regSkills->operator[](&skill) = 0;
-    }
-    return actor;
-}
-
-Actor& Actor::checkStatus(QString& ret, Scene* const scene)
-{
-    Actor& actor = *this;
-    if (actor.hp < 1)
-    {
-        bool const revives = actor.isReviving();
-        ret = ret % Actor::KoTxt.arg(actor.name);
-        actor.actions = 0;
-        /*if (actor.isShapeShifted())
-        {
-            actor.setShapeShifted(false);
-            (*actor.sprite) = (*actor.getJob().sprite);
-        }*/
-        actor.sp = 0;
-        {
-            QMap<State*, int>* stateDur = actor.stateDur;
-            if (stateDur != nullptr)
-            {
-                auto const last = stateDur->cend();
-                for (auto it = stateDur->cbegin(); it != last; ++it)
-                {
-                    it.key()->disable(ret, scene, actor, -1, false);
-                }
-            }
-        }
-        if (revives)
-        {
-            ret = ret % Actor::RiseTxt;
-            actor.hp = actor.mHp;
-        }
-        /*else
-        {
-            actor.setSunned(true);
-        }*/
     }
     return actor;
 }
@@ -826,7 +827,7 @@ Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, 
             int const dur = it.value();
             if (dur != -1)
             {
-                it.key()->inflict(ret, scene, actor, dur, true);
+                it.key()->inflict(ret, scene, nullptr, actor, dur, true);
             }
         }
     }
@@ -868,7 +869,7 @@ Actor& Actor::refreshCostume(QString* ret, Scene* scene, Costume& costume)
             {
                 if (it.value() == -1)
                 {
-                    it.key()->inflict(*ret, scene, actor, -1, true);
+                    it.key()->inflict(*ret, scene, nullptr, actor, -1, true);
                 }
             }
         }

@@ -1,22 +1,14 @@
 Turn-Based RPG Simple Combat Arena
 
-Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use anything from this project, except in compliance
-with the License. You may obtain a copy of the License at
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-The purpose of this project is to implement an open-source turn-based RPG combat engine (similar
-to those found in various RPGs, such as "Final Fantasy" by Square Enix), and to offer a simple
-demonstration of its capabilities. A full RPG is beyond the scope of this application, but it
-may be used in more complex projects, compatible with its licenses.
+The purpose of this project is to implement an open-source turn-based RPG combat
+engine (similar to those found in various RPGs), and to offer a simple demonstration
+of its capabilities. A full RPG is beyond the scope of this application, but it may
+be used in more complex projects, compatible with its licenses.
 
 Thank you for your interest.

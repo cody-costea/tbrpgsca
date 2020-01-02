@@ -1,17 +1,9 @@
 /*
-Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #ifndef ROLE_H
 #define ROLE_H
@@ -46,8 +38,6 @@ namespace tbrpgsca
         static QString MpTxt;
         static QString RpTxt;
 
-        static QString& AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgRp);
-
         inline int getId() const;
         inline QString getName() const;
         inline QString getSprite() const;
@@ -66,11 +56,15 @@ namespace tbrpgsca
         inline bool hasState(State& state) const;
         inline int getStatesSize() const;
 
+        inline Role& damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
+
         inline bool operator==(Role& role) const;
     protected:
         QString name,* sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
         QMap<State*, int>* stateDur;
+
+        Role& damage(QString& ret, Scene* scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
 
         Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);
@@ -79,10 +73,10 @@ namespace tbrpgsca
 
         ~Role();
 
+        friend class Actor;
         friend class Ability;
         friend class Costume;
         friend class State;
-        friend class Actor;
         friend class Scene;
     };
 

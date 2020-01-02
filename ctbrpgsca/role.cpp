@@ -1,17 +1,9 @@
 /*
-Copyright (C) AD 2013-2019 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "role.h"
 #include "actor.h"
@@ -24,41 +16,6 @@ using namespace tbrpgsca;
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
-
-QString& Role::AddDmgText(QString& ret, int dmgHp, int dmgMp, int dmgSp)
-{
-    bool c = false;
-    if (dmgHp != 0)
-    {
-        ret = ret % (dmgHp < 0 ? " +" : " ") % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
-        c = true;
-    }
-    if (dmgMp != 0)
-    {
-        if (c)
-        {
-            ret = ret % ",";
-        }
-        else
-        {
-            c = true;
-        }
-        ret = ret % (dmgMp < 0 ? " +" : " ") % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
-    }
-    if (dmgSp != 0)
-    {
-        if (c)
-        {
-            ret = ret % ",";
-        }
-        else
-        {
-            c = true;
-        }
-        ret = ret % (dmgSp < 0 ? " +" : " ") % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
-    }
-    return ret;
-}
 
 inline int Role::getId() const
 {
@@ -148,6 +105,101 @@ inline int Role::getStatesSize() const
 inline bool Role::operator==(Role& role) const
 {
     return this->id == role.id;
+}
+
+inline Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
+{
+    return this->damage(ret, nullptr, absorber, target, dmg, percent);
+}
+
+Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& actor, int dmg, bool const percent)
+{
+    Role& role = *this;
+    int dmgHp, dmgMp, dmgSp;
+    if (percent)
+    {
+        dmgHp = (actor.mHp + dmg) * role.hp / 100;
+        dmgMp = (actor.mMp + dmg) * role.mp / 100;
+        dmgSp = (actor.mSp + dmg) * role.sp / 100;
+    }
+    else
+    {
+        dmgHp = role.hp;
+        dmgMp = role.mp;
+        dmgSp = role.sp;
+    }
+    {
+        bool c = false;
+        if (dmgHp != 0)
+        {
+            c = true;
+            ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+            if (dmgHp < 0)
+            {
+                dmg =  -1 * dmg + dmgHp;
+                ret = ret % "+";
+            }
+            else
+            {
+                dmg += dmgHp;
+            }
+            actor.setCurrentHp(actor.hp - dmgHp, ret, scene, percent);
+            ret = ret % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
+        }
+        if (dmgMp != 0)
+        {
+            if (c)
+            {
+                ret = ret % ", ";
+            }
+            else
+            {
+                ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+                c = true;
+            }
+            if (dmgMp < 0)
+            {
+                dmg =  -1 * dmg + dmgMp;
+                ret = ret % "+";
+            }
+            else
+            {
+                dmg += dmgMp;
+            }
+            actor.setCurrentMp(actor.mp - dmgMp);
+            ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
+        }
+        if (dmgSp != 0)
+        {
+            if (c)
+            {
+                ret = ret % ", ";
+            }
+            else
+            {
+                ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+                c = true;
+            }
+            if (dmgSp < 0)
+            {
+                dmg =  -1 * dmg + dmgSp;
+                ret = ret % "+";
+            }
+            else
+            {
+                dmg += dmgSp;
+            }
+            actor.setCurrentRp(actor.sp - dmgSp);
+            ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
+        }
+    }
+    if (absorber != nullptr)
+    {
+        absorber->setCurrentMp(absorber->mp + dmgMp / 2);
+        absorber->setCurrentHp(absorber->hp + dmgHp / 2, ret, scene, true);
+        absorber->setCurrentRp(absorber->sp + dmgSp / 2);
+    }
+    return role;
 }
 
 Role::Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
