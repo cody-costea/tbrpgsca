@@ -242,10 +242,10 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
             actor.setStunned(false);
             actor.setKnockedOut(false);
             actor.refreshCostumes(&ret, scene);
-            actor.applyStates(ret, scene, false);
+            //actor.applyStates(ret, scene, false);
             if (scene != nullptr)
             {
-                scene->resetActions();
+                scene->resetActions(this);
             }
         }
     }

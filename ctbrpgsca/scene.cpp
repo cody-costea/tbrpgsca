@@ -439,19 +439,11 @@ inline void Scene::agiCalc()
     }
 }
 
-inline void Scene::resetActions()
+inline void Scene::resetActions(Actor* const actor)
 {
-    if (this->mInit < 1)
+    if (this->mInit < 1 && this->players->indexOf(actor) < this->current)
     {
-        int const current = this->current;
-        QVector<Actor*>& players = *(this->players);
-        for (int i = 0; i < current; ++i)
-        {
-            if (players[i]->actions < 1)
-            {
-                players[i]->actions = players[i]->mActions;
-            }
-        }
+        actor->actions = actor->mActions;
     }
 }
 
