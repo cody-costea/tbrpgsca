@@ -129,7 +129,7 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
         dmgSp = role.sp;
     }
     bool c = false;
-    if (dmgHp != 0)
+    if (dmgSp != 0)
     {
         c = true;
         ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
