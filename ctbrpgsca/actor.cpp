@@ -245,7 +245,7 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
             //actor.applyStates(ret, scene, false);
             if (scene != nullptr)
             {
-                scene->resetActions(this);
+                scene->resetTurn();
             }
         }
     }

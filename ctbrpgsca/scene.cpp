@@ -359,28 +359,26 @@ Scene& Scene::endTurn(QString& ret)
                 }
             }
             while (crActor->init < mInit);
-            crActor->actions = crActor->mActions;
             //crActor = nxActor;
             //current = next;
         }
         else
         {
-            crActor->actions = crActor->mActions;
+            current = scene.oldCurrent;
+            crActor->init = mInit - 1;
             do
             {
                 if (++current == playersSize)
                 {
+                    scene.mInit = --mInit;
                     current = 0;
                 }
                 crActor = players[current];
-                if (crActor->actions < 1)
-                {
-                    crActor->actions = crActor->mActions;
-                    continue;
-                }
             }
-            while (crActor->hp < 1);
+            while (crActor->init < mInit || crActor->hp < 1);
+            scene.oldCurrent = current;
         }
+        crActor->actions = crActor->mActions;
         QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
         if (regSkills != nullptr)
         {
@@ -436,14 +434,15 @@ inline void Scene::agiCalc()
     {
         QVector<Actor*>& players = *(this->players);
         std::sort(players.begin(), players.end(), Scene::actorAgiComp);
+        this->current = 0;
     }
 }
 
-inline void Scene::resetActions(Actor* const actor)
+inline void Scene::resetTurn()
 {
-    if (this->mInit < 1 && this->players->indexOf(actor) < this->current)
+    if (this->mInit < 1)
     {
-        actor->actions = actor->mActions;
+        this->oldCurrent = 0;
     }
 }
 
@@ -452,10 +451,11 @@ Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*
     int partiesSize = parties.size();
     assert(partiesSize > 1);
     Scene& scene = *this;
-    scene.mInit = mInit;
+    scene.mInit = mInit > 0 ? mInit : 0;
     scene.events = events;
     scene.parties = parties;
     QVector<Actor*>& players = *(scene.players);
+    scene.current = scene.oldCurrent = 0;
     for (int i = 0; i < partiesSize; ++i)
     {
         bool aiPlayer = i > 0;

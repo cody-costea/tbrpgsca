@@ -70,12 +70,12 @@ namespace tbrpgsca
     protected:
         Ability* lastAbility;
         QVector<SceneAct*>* events;
-        int current, surprise, fTarget, lTarget, status, mInit;
+        int current, oldCurrent, surprise, fTarget, lTarget, status, mInit;
         QVector<Actor*>* players,* targets;
         QVector<QVector<Actor*>*> parties;
 
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
-        inline void resetActions(Actor* const actor);
+        inline void resetTurn();
         inline void agiCalc();
 
         friend class Actor;
