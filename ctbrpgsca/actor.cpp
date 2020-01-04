@@ -245,7 +245,7 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
             //actor.applyStates(ret, scene, false);
             if (scene != nullptr)
             {
-                scene->resetTurn();
+                scene->resetTurn(actor);
             }
         }
     }
@@ -865,7 +865,8 @@ Actor& Actor::refreshCostume(QString* ret, Scene* scene, Costume& costume)
 {
     Actor& actor = *this;
     actor.dmgType |= costume.dmgType;
-    actor.flags |= costume.flags;
+    int const cFlags = costume.flags;
+    actor.flags |= cFlags;
     {
         QVector<Ability*>* skills = costume.aSkills;
         if (skills != nullptr)
@@ -876,6 +877,18 @@ Actor& Actor::refreshCostume(QString* ret, Scene* scene, Costume& costume)
         if (skills != nullptr)
         {
             actor.updateSkills(false, true, *skills);
+        }
+    }
+    if ((cFlags & FLAG_KO) == FLAG_KO)
+    {
+        if (ret == nullptr)
+        {
+            QString tmp = QString();
+            scene->checkStatus(tmp);
+        }
+        else
+        {
+            scene->checkStatus(*ret);
         }
     }
     if (costume.isShapeShifted())

@@ -14,6 +14,33 @@ bool Scene::actorAgiComp(const Actor& a, const Actor& b)
     return (a.agi > b.agi);
 }
 
+inline int Scene::getCurrent() const
+{
+    return this->current;
+}
+
+inline int Scene::getStatus() const
+{
+    return this->status;
+}
+
+inline Actor& Scene::getOrderedPlayer(int const n) const
+{
+    return *(this->players->at(n));
+}
+
+inline bool Scene::hasOrderedPlayer(Actor& player) const
+{
+    QVector<Actor*>* players = this->players;
+    return players != nullptr && players->contains(&player);
+}
+
+inline int Scene::getOrderedPlayersSize() const
+{
+    QVector<Actor*>* players = this->players;
+    return players == nullptr ? 0 : players->size();
+}
+
 Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
     if (!user.isRanged() || (skill.isOnlyMelee() && !skill.isRanged()))
@@ -365,18 +392,22 @@ Scene& Scene::endTurn(QString& ret)
         else
         {
             current = scene.oldCurrent;
-            crActor->init = mInit - 1;
+            int nInit = mInit - 1;
+            if (nInit == MIN_ROUND)
+            {
+                nInit = 0;
+            }
+            crActor->init = nInit;
             do
             {
                 if (++current == playersSize)
                 {
-                    scene.mInit = --mInit;
+                    scene.mInit = mInit = nInit;
                     current = 0;
                 }
                 crActor = players[current];
             }
-            while (crActor->init < mInit || crActor->hp < 1);
-            scene.oldCurrent = current;
+            while (crActor->init != mInit || crActor->hp < 1);
         }
         crActor->actions = crActor->mActions;
         QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
@@ -416,6 +447,7 @@ Scene& Scene::endTurn(QString& ret)
         }
     }
     scene.current = current;
+    scene.oldCurrent = current;
     QVector<SceneAct*>* events = scene.events;
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
@@ -434,14 +466,23 @@ inline void Scene::agiCalc()
     {
         QVector<Actor*>& players = *(this->players);
         std::sort(players.begin(), players.end(), Scene::actorAgiComp);
-        this->current = 0;
+        this->oldCurrent = 0;
     }
 }
 
-inline void Scene::resetTurn()
+inline void Scene::resetTurn(Actor& actor)
 {
-    if (this->mInit < 1)
+    int const mInit = this->mInit + 1;
+    if (mInit < 2)
     {
+        if (actor.init > mInit)
+        {
+            actor.init = mInit;
+        }
+        else if (mInit == 1 && actor.init < -1)
+        {
+            actor.init = 0;
+        }
         this->oldCurrent = 0;
     }
 }
@@ -451,7 +492,7 @@ Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*
     int partiesSize = parties.size();
     assert(partiesSize > 1);
     Scene& scene = *this;
-    scene.mInit = mInit > 0 ? mInit : 0;
+    scene.mInit = mInit > 0 ? mInit : -1;
     scene.events = events;
     scene.parties = parties;
     QVector<Actor*>& players = *(scene.players);

@@ -27,6 +27,7 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
+        #define MIN_ROUND INT_MIN
     public:
         typedef bool (* SceneAct)(Scene& scene, QString& ret);
 
@@ -75,7 +76,7 @@ namespace tbrpgsca
         QVector<QVector<Actor*>*> parties;
 
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
-        inline void resetTurn();
+        inline void resetTurn(Actor& actor);
         inline void agiCalc();
 
         friend class Actor;
