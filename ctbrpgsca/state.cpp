@@ -23,6 +23,23 @@ inline int State::getResistance() const
     return this->sRes;
 }
 
+inline Ability& State::getRemovedSkill(int const n) const
+{
+    return *(this->rSkills->at(n));
+}
+
+inline bool State::hasRemovedSkill(Ability& skill) const
+{
+    QVector<Ability*>* aSkills = this->rSkills;
+    return aSkills != nullptr && aSkills->contains(&skill);
+}
+
+inline int State::getRemovedSkillsSize() const
+{
+    QVector<Ability*>* aSkills = this->rSkills;
+    return aSkills == nullptr ? 0 : aSkills->size();
+}
+
 inline State& State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
 {
     return this->inflict(ret, nullptr, user, target, dur, always);

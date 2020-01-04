@@ -117,6 +117,11 @@ inline bool Costume::isConverted() const
     return (this->flags & FLAG_CONVERT) == FLAG_CONVERT;
 }
 
+inline bool Costume::isInvincible() const
+{
+    return (this->flags & FLAG_INVINCIBLE) == FLAG_INVINCIBLE;
+}
+
 inline bool Costume::isStunned() const
 {
     return (this->flags & FLAG_STUN) == FLAG_STUN;
@@ -279,7 +284,6 @@ Costume::Costume(int const id, QString& name, QString* sprite, bool const shapeS
         {
             flags |= FLAG_SHAPE_SHIFT;
         }
-
     }
     if (automate)
     {

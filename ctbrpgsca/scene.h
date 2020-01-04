@@ -61,7 +61,7 @@ namespace tbrpgsca
         inline bool hasTargetedPlayer(Actor& player) const;
         inline int getTargetedPlayersSize() const;
 
-        inline Ability& getLastAbility() const;
+        inline Ability* getLastAbility() const;
         inline int getCurrent() const;
         inline int getStatus() const;
 

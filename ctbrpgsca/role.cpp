@@ -115,87 +115,90 @@ inline Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, in
 Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& actor, int dmg, bool const percent)
 {
     Role& role = *this;
-    int dmgHp, dmgMp, dmgSp;
-    if (percent)
+    if (!actor.isInvincible())
     {
-        dmgHp = (actor.mHp + dmg) * role.hp / 100;
-        dmgMp = (actor.mMp + dmg) * role.mp / 100;
-        dmgSp = (actor.mSp + dmg) * role.sp / 100;
-    }
-    else
-    {
-        dmgHp = role.hp;
-        dmgMp = role.mp;
-        dmgSp = role.sp;
-    }
-    bool c = false;
-    if (dmgSp != 0)
-    {
-        c = true;
-        ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
-        if (dmgSp < 0)
+        int dmgHp, dmgMp, dmgSp;
+        if (percent)
         {
-            dmg =  -1 * dmg + dmgSp;
-            ret = ret % "+";
+            dmgHp = (actor.mHp + dmg) * role.hp / 100;
+            dmgMp = (actor.mMp + dmg) * role.mp / 100;
+            dmgSp = (actor.mSp + dmg) * role.sp / 100;
         }
         else
         {
-            dmg += dmgSp;
+            dmgHp = role.hp;
+            dmgMp = role.mp;
+            dmgSp = role.sp;
         }
-        actor.setCurrentRp(actor.sp - dmgSp);
-        ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
-    }
-    if (dmgMp != 0)
-    {
-        if (c)
+        bool c = false;
+        if (dmgSp != 0)
         {
-            ret = ret % ", ";
-        }
-        else
-        {
-            ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
             c = true;
-        }
-        if (dmgMp < 0)
-        {
-            dmg =  -1 * dmg + dmgMp;
-            ret = ret % "+";
-        }
-        else
-        {
-            dmg += dmgMp;
-        }
-        actor.setCurrentMp(actor.mp - dmgMp);
-        ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
-    }
-    if (dmgHp != 0)
-    {
-        if (c)
-        {
-            ret = ret % ", ";
-        }
-        else
-        {
             ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
-            c = true;
+            if (dmgSp < 0)
+            {
+                dmg =  -1 * dmg + dmgSp;
+                ret = ret % "+";
+            }
+            else
+            {
+                dmg += dmgSp;
+            }
+            actor.setCurrentRp(actor.sp - dmgSp);
+            ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
         }
-        if (dmgHp < 0)
+        if (dmgMp != 0)
         {
-            dmg =  -1 * dmg + dmgSp;
-            ret = ret % "+";
+            if (c)
+            {
+                ret = ret % ", ";
+            }
+            else
+            {
+                ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+                c = true;
+            }
+            if (dmgMp < 0)
+            {
+                dmg =  -1 * dmg + dmgMp;
+                ret = ret % "+";
+            }
+            else
+            {
+                dmg += dmgMp;
+            }
+            actor.setCurrentMp(actor.mp - dmgMp);
+            ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
         }
-        else
+        if (dmgHp != 0)
         {
-            dmg += dmgHp;
+            if (c)
+            {
+                ret = ret % ", ";
+            }
+            else
+            {
+                ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+                c = true;
+            }
+            if (dmgHp < 0)
+            {
+                dmg =  -1 * dmg + dmgSp;
+                ret = ret % "+";
+            }
+            else
+            {
+                dmg += dmgHp;
+            }
+            actor.setCurrentHp(actor.hp - dmgHp, ret, scene, percent);
+            ret = ret % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
         }
-        actor.setCurrentHp(actor.hp - dmgHp, ret, scene, percent);
-        ret = ret % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
-    }
-    if (c && absorber != nullptr)
-    {
-        absorber->setCurrentRp(absorber->sp + dmgSp / 2);
-        absorber->setCurrentMp(absorber->mp + dmgMp / 2);
-        absorber->setCurrentHp(absorber->hp + dmgHp / 2, ret, scene, true);
+        if (c && absorber != nullptr)
+        {
+            absorber->setCurrentRp(absorber->sp + dmgSp / 2);
+            absorber->setCurrentMp(absorber->mp + dmgMp / 2);
+            absorber->setCurrentHp(absorber->hp + dmgHp / 2, ret, scene, true);
+        }
     }
     return role;
 }

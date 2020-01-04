@@ -22,8 +22,9 @@ namespace tbrpgsca
         #define FLAG_CONVERT 16
         #define FLAG_REFLECT 32
         #define FLAG_SHAPE_SHIFT 64
-        #define FLAG_STUN 128
-        #define FLAG_KO 256
+        #define FLAG_INVINCIBLE 128
+        #define FLAG_STUN 256
+        #define FLAG_KO 512
     public:
         static QString CausesTxt;
 
@@ -39,6 +40,7 @@ namespace tbrpgsca
         inline bool isCountering() const;
         inline bool isShapeShifted() const;
         inline bool isKnockedOut() const;
+        inline bool isInvincible() const;
         inline bool isReflecting() const;
         inline bool isStunned() const;
 

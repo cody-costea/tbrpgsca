@@ -189,7 +189,7 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
     {
         if (actor.hp != 0)
         {
-            if (survive)
+            if (survive || actor.isInvincible())
             {
                 actor.hp = 1;
             }
@@ -198,7 +198,7 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
                 actor.hp = 0;
                 bool const revives = actor.isReviving();
                 ret = ret % Actor::KoTxt.arg(actor.name);
-                actor.actions = 0;
+                //actor.actions = 0;
                 /*if (actor.isShapeShifted())
                 {
                     actor.setShapeShifted(false);
@@ -411,6 +411,16 @@ Actor& Actor::setKnockedOut(const bool ko)
     if (ko != ((flags & FLAG_KO) == FLAG_KO))
     {
         this->flags = flags ^ FLAG_KO;
+    }
+    return *this;
+}
+
+Actor& Actor::setInvincible(const bool invincible)
+{
+    int flags = this->flags;
+    if (invincible != ((flags & FLAG_INVINCIBLE) == FLAG_INVINCIBLE))
+    {
+        this->flags = flags ^ FLAG_INVINCIBLE;
     }
     return *this;
 }
