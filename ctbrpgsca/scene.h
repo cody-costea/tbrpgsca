@@ -40,7 +40,7 @@ namespace tbrpgsca
 
         static bool actorAgiComp(const Actor& a, const Actor& b);
 
-        Scene& endTurn(QString& ret);
+        Scene& endTurn(QString& ret, Actor* actor);
         Scene& playAi(QString& ret, Actor& player);
         Scene& perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
         Scene& checkStatus(QString& ret);
@@ -63,6 +63,8 @@ namespace tbrpgsca
         inline int getTargetedPlayersSize() const;
 
         inline Ability* getLastAbility() const;
+        inline Actor* getCurrentPlayer() const;
+        inline int getCurrentParty() const;
         inline int getCurrent() const;
         inline int getStatus() const;
 
@@ -78,7 +80,7 @@ namespace tbrpgsca
         QVector<Actor*>* players,* targets;
         QVector<QVector<Actor*>*> parties;
         ActorAct* actorEvent;
-        //Actor* crActor;
+        Actor* crActor;
 
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         inline void resetTurn(Actor& actor);
