@@ -29,7 +29,8 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define MIN_ROUND INT_MIN
     public:
-        typedef bool (* SceneAct)(Scene& scene, QString& ret);
+        typedef std::function<bool(Scene& scene, QString& ret)> SceneAct;
+        typedef std::function<bool(Scene& scene, Actor& user, Ability& ability, Actor& target, Ability* counter)> ActorAct;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -65,7 +66,9 @@ namespace tbrpgsca
         inline int getCurrent() const;
         inline int getStatus() const;
 
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+
+        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
         ~Scene();
     protected:
@@ -74,6 +77,8 @@ namespace tbrpgsca
         int current, oldCurrent, surprise, fTarget, lTarget, status, mInit;
         QVector<Actor*>* players,* targets;
         QVector<QVector<Actor*>*> parties;
+        ActorAct* actorEvent;
+        //Actor* crActor;
 
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         inline void resetTurn(Actor& actor);
