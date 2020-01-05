@@ -632,37 +632,30 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     assert(partiesSize > 1);
     QVector<Actor*>* players;
     Scene& scene = *this;
+    bool useInit;
     if (mInit > 0)
     {
         scene.mInit = mInit;
         players = new QVector<Actor*>();
+        useInit = true;
     }
     else
     {
         players = nullptr;
-        scene.mInit = -1;
+        scene.mInit = 0;
+        useInit = false;
     }
     scene.events = events;
     scene.parties = parties;
     scene.players = players;
     scene.actorEvent = actorEvent;
     scene.current = scene.oldCurrent = 0;
-    /*State* surprised;
-    if (surprise > -1)
-    {
-        QString nameTxt = "Surprised";
-        State* surprised = new State(0, nameTxt, nullptr, false, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true, false, false,
-                                     false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-    }
-    else
-    {
-        surprised = nullptr;
-    }*/
+    int current = 0;
     Actor* crActor = nullptr;
     for (int i = 0; i < partiesSize; ++i)
     {
         bool const aiPlayer = i > 0;
-        //bool const surprised = (surprise == i);
+        bool const surprised = (surprise == i);
         QVector<Actor*>& party = *(parties[i]);
         int const pSize = party.size();
         if (crActor == nullptr)
@@ -673,25 +666,25 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
         {
             Actor& player = *(party[j]);
             player.actions = 0;
-            player.init = 0;
-            /*if (surprised)
+            if (surprised)
             {
-                if (mInit > 0)
+                player.init = useInit ? -(mInit + 1) : -2;
+            }
+            else
+            {
+                player.init = -1;
+                if (player.agi < crActor->agi)
                 {
-                    player.init = -mInit;
+                    crActor = &player;
+                    if (useInit)
+                    {
+                        current = j;
+                    }
                 }
-                else
-                {
-                    player.init = -2;
-                }
-            }*/
+            }
             if (aiPlayer)
             {
                 player.setAiPlayer(true);
-            }
-            if (player.agi < crActor->agi)
-            {
-                crActor = &player;
             }
             player.oldSide = static_cast<unsigned char>(i);
             player.side = i;
@@ -703,12 +696,17 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     }
     scene.crActor = crActor;
     scene.agiCalc();
-    if (mInit > 0)
+    if (useInit)
     {
-        crActor->actions = 1;
         crActor->init = mInit;
     }
+    else
+    {
+        current = players->indexOf(crActor);
+    }
     SceneAct* event;
+    scene.current = current;
+    scene.oldCurrent = current;
     if (events == nullptr || events->size() == EVENT_BEGIN_SCENE || ((event = events->at(EVENT_BEGIN_SCENE)) == nullptr) || (*event)(scene, ret))
     {
         scene.endTurn(ret, crActor);
