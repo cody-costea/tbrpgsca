@@ -38,7 +38,7 @@ namespace tbrpgsca
         static QString FallenTxt;
         static QString FailTxt;
 
-        static bool actorAgiComp(const Actor& a, const Actor& b);
+        static bool actorAgiComp(Actor* const a, Actor* const b);
 
         Scene& endTurn(QString& ret, Actor* actor);
         Scene& playAi(QString& ret, Actor& player);

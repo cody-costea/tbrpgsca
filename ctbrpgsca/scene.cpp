@@ -6,13 +6,17 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "scene.h"
+#include "ability.h"
+#include "costume.h"
 #include "state.h"
+#include "scene.h"
+#include "role.h"
 
 using namespace tbrpgsca;
 
-bool Scene::actorAgiComp(const Actor& a, const Actor& b)
+bool Scene::actorAgiComp(Actor* const a, Actor* const b)
 {
-    return (a.agi > b.agi);
+    return (a->agi > b->agi);
 }
 
 inline int Scene::getCurrent() const
@@ -712,4 +716,14 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
         scene.endTurn(ret, crActor);
     }
     return scene;
+}
+
+Scene::~Scene()
+{
+    auto players = this->players;
+    if (players != nullptr)
+    {
+        this->players = nullptr;
+        delete players;
+    }
 }

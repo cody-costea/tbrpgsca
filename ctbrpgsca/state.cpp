@@ -7,7 +7,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "state.h"
 #include "ability.h"
+#include "costume.h"
 #include "actor.h"
+#include "scene.h"
+#include "role.h"
 
 #include <QStringBuilder>
 

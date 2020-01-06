@@ -6,8 +6,11 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "ability.h"
+#include "costume.h"
 #include "actor.h"
 #include "state.h"
+#include "scene.h"
+#include "role.h"
 
 #include <QStringBuilder>
 
