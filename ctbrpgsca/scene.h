@@ -49,24 +49,24 @@ namespace tbrpgsca
         Ability& getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
         Actor& getGuardian(Actor& user, Actor& target, Ability& skill) const;
 
-        inline Actor& getPartyPlayer(int const party, int const player) const;
-        inline bool hasPartyPlayer(int const party, Actor& player) const;
-        inline int getPartyPlayersSize(int const party) const;
-        inline int getPartiesSize() const;
+        Actor& getPartyPlayer(int const party, int const player) const;
+        bool hasPartyPlayer(int const party, Actor& player) const;
+        int getPartyPlayersSize(int const party) const;
+        int getPartiesSize() const;
 
-        inline Actor& getOrderedPlayer(int const n) const;
-        inline bool hasOrderedPlayer(Actor& player) const;
-        inline int getOrderedPlayersSize() const;
+        Actor& getOrderedPlayer(int const n) const;
+        bool hasOrderedPlayer(Actor& player) const;
+        int getOrderedPlayersSize() const;
 
-        inline Actor& getTargetedPlayer(int const n) const;
-        inline bool hasTargetedPlayer(Actor& player) const;
-        inline int getTargetedPlayersSize() const;
+        Actor& getTargetedPlayer(int const n) const;
+        bool hasTargetedPlayer(Actor& player) const;
+        int getTargetedPlayersSize() const;
 
-        inline Ability* getLastAbility() const;
-        inline Actor* getCurrentPlayer() const;
-        inline int getCurrentParty() const;
-        inline int getCurrent() const;
-        inline int getStatus() const;
+        Ability* getLastAbility() const;
+        Actor* getCurrentPlayer() const;
+        int getCurrentParty() const;
+        int getCurrent() const;
+        int getStatus() const;
 
         Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
@@ -83,8 +83,8 @@ namespace tbrpgsca
         Actor* crActor;
 
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
-        inline void resetTurn(Actor& actor);
-        inline void agiCalc();
+        void resetTurn(Actor& actor);
+        void agiCalc();
 
         friend class Actor;
         friend class Ability;

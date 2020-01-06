@@ -38,27 +38,27 @@ namespace tbrpgsca
         static QString MpTxt;
         static QString RpTxt;
 
-        inline int getId() const;
-        inline QString getName() const;
-        inline QString getSprite() const;
-        inline int getDamageElement() const;
-        inline int getMaximumHp() const;
-        inline int getMaximumMp() const;
-        inline int getMaximumRp() const;
-        inline int getCurrentHp() const;
-        inline int getCurrentMp() const;
-        inline int getCurrentRp() const;
-        inline bool isReviving() const;
-        inline bool isRanged() const;
+        int getId() const;
+        QString getName() const;
+        QString getSprite() const;
+        int getDamageElement() const;
+        int getMaximumHp() const;
+        int getMaximumMp() const;
+        int getMaximumRp() const;
+        int getCurrentHp() const;
+        int getCurrentMp() const;
+        int getCurrentRp() const;
+        bool isReviving() const;
+        bool isRanged() const;
 
-        inline QList<State*> getStatesList() const;
-        inline int getStateDuration(State& state) const;
-        inline bool hasState(State& state) const;
-        inline int getStatesSize() const;
+        QList<State*> getStatesList() const;
+        int getStateDuration(State& state) const;
+        bool hasState(State& state) const;
+        int getStatesSize() const;
 
-        inline Role& damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
+        Role& damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
 
-        inline bool operator==(Role& role) const;
+        bool operator==(Role& role) const;
     protected:
         QString name,* sprite;
         int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;

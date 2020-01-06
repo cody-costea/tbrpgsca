@@ -18,134 +18,139 @@ using namespace tbrpgsca;
 
 QString Costume::CausesTxt = " %s is affected by %s";
 
-inline int Costume::getAttack() const
+int Costume::getAttack() const
 {
     return this->atk;
 }
 
-inline int Costume::getDefense() const
+int Costume::getDefense() const
 {
     return this->def;
 }
 
-inline int Costume::getSpirit() const
+int Costume::getSpirit() const
 {
     return this->spi;
 }
 
-inline int Costume::getWisdom() const
+int Costume::getWisdom() const
 {
     return this->wis;
 }
 
-inline int Costume::getAgility() const
+int Costume::getAgility() const
 {
     return this->agi;
 }
 
-inline int Costume::getMaximumActions() const
+int Costume::getMaximumActions() const
 {
     return this->mActions;
 }
 
-inline Ability& Costume::getAddedSkill(int const n) const
+Ability& Costume::getAddedSkill(int const n) const
 {
     return *(this->aSkills->at(n));
 }
 
-inline bool Costume::hasAddedSkill(Ability& skill) const
+bool Costume::hasAddedSkill(Ability& skill) const
 {
     QVector<Ability*>* aSkills = this->aSkills;
     return aSkills != nullptr && aSkills->contains(&skill);
 }
 
-inline int Costume::getAddedSkillsSize() const
+int Costume::getAddedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->aSkills;
     return aSkills == nullptr ? 0 : aSkills->size();
 }
 
-inline Ability& Costume::getCounterSkill(int const n) const
+Ability& Costume::getCounterSkill(int const n) const
 {
     return *(this->counters->at(n));
 }
 
-inline bool Costume::hasCounterSkill(Ability& skill) const
+bool Costume::hasCounterSkill(Ability& skill) const
 {
     QVector<Ability*>* counters = this->counters;
     return counters != nullptr && counters->contains(&skill);
 }
 
-inline int Costume::getCounterSkillsSize() const
+int Costume::getCounterSkillsSize() const
 {
     QVector<Ability*>* counters = this->counters;
     return counters == nullptr ? 0 : counters->size();
 }
 
-inline int Costume::getElementResistance(const int element) const
+int Costume::getElementResistance(const int element) const
 {
     QMap<int, int>* res = this->res;
     return res == nullptr ? 0 : res->value(element, 0);
 }
 
-inline int Costume::getStateResistance(State* const state) const
+int Costume::getStateResistance(State* const state) const
 {
     QMap<State*, int>* stRes = this->stRes;
     return stRes == nullptr ? 0 : stRes->value(state, 0);
 }
 
-inline bool Costume::isReflecting() const
+bool Costume::isReflecting() const
 {
     return (this->flags & FLAG_REFLECT) == FLAG_REFLECT;
 }
 
-inline bool Costume::isCountering() const
+bool Costume::isCountering() const
 {
     QVector<Ability*>* counters = this->counters;
     return counters != nullptr && counters->size() > 0;
 }
 
-inline bool Costume::isEnraged() const
+bool Costume::isShapeShifted() const
+{
+    return (this->flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT;
+}
+
+bool Costume::isEnraged() const
 {
     return (this->flags & FLAG_ENRAGED) == FLAG_ENRAGED;
 }
 
-inline bool Costume::isConfused() const
+bool Costume::isConfused() const
 {
     return (this->flags & FLAG_CONFUSE) == FLAG_CONFUSE;
 }
 
-inline bool Costume::isConverted() const
+bool Costume::isConverted() const
 {
     return (this->flags & FLAG_CONVERT) == FLAG_CONVERT;
 }
 
-inline bool Costume::isInvincible() const
+bool Costume::isInvincible() const
 {
     return (this->flags & FLAG_INVINCIBLE) == FLAG_INVINCIBLE;
 }
 
-inline bool Costume::isStunned() const
+bool Costume::isStunned() const
 {
     return (this->flags & FLAG_STUN) == FLAG_STUN;
 }
 
-inline bool Costume::isKnockedOut() const
+bool Costume::isKnockedOut() const
 {
     return (this->flags & FLAG_KO) == FLAG_KO;
 }
 
-inline Costume& Costume::adopt(QString& ret, Actor& actor)
+Costume& Costume::adopt(QString& ret, Actor& actor)
 {
     return this->adopt(&ret, nullptr, actor, true);
 }
 
-inline Costume& Costume::abandon(QString& ret, Actor& actor)
+Costume& Costume::abandon(QString& ret, Actor& actor)
 {
     return this->abandon(&ret, nullptr, actor, true);
 }
 
-inline Costume& Costume::apply(QString& ret, Actor& actor)
+Costume& Costume::apply(QString& ret, Actor& actor)
 {
     return this->apply(ret, nullptr, actor);
 }

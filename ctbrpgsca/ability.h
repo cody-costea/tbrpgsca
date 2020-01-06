@@ -32,25 +32,25 @@ namespace tbrpgsca
         static QString ResistTxt;
         static QString StolenTxt;
 
-        inline int getRequiredLevel() const;
-        inline int getAttributeIncrement() const;
-        inline int getMaximumUses() const;
-        inline int getUsesRegen() const;
+        int getRequiredLevel() const;
+        int getAttributeIncrement() const;
+        int getMaximumUses() const;
+        int getUsesRegen() const;
 
-        inline bool isStealing() const;
-        inline bool isAbsorbing() const;
-        inline bool isOnlyMelee() const;
-        inline bool targetsSide() const;
-        inline bool targetsSelf() const;
-        inline bool targetsAll() const;
+        bool isStealing() const;
+        bool isAbsorbing() const;
+        bool isOnlyMelee() const;
+        bool targetsSide() const;
+        bool targetsSelf() const;
+        bool targetsAll() const;
 
-        inline QList<State*> getRemovedStatesList() const;
-        inline int getRemovedStateDuration(State& state) const;
-        inline bool hasRemovedState(State& state) const;
-        inline int getRemovedStatesSize() const;
+        QList<State*> getRemovedStatesList() const;
+        int getRemovedStateDuration(State& state) const;
+        bool hasRemovedState(State& state) const;
+        int getRemovedStatesSize() const;
 
-        inline bool canPerform(Actor& user);
-        inline Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
+        bool canPerform(Actor& user);
+        Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
         Ability& replenish(Actor& user);
 
         Ability(int const id, QString& name, QString* sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,

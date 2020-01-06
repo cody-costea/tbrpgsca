@@ -14,86 +14,92 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
+QString Scene::PerformsTxt = "%s performs %s";
+QString Scene::VictoryTxt = "The party has won!";
+QString Scene::FallenTxt = "The party has fallen!";
+QString Scene::EscapeTxt = "The party has escaped!";
+QString Scene::FailTxt = "The party attempted to escape, but failed.";
+
 bool Scene::actorAgiComp(Actor* const a, Actor* const b)
 {
     return (a->agi > b->agi);
 }
 
-inline int Scene::getCurrent() const
+int Scene::getCurrent() const
 {
     return this->current;
 }
 
-inline int Scene::getStatus() const
+int Scene::getStatus() const
 {
     return this->status;
 }
 
-inline Actor* Scene::getCurrentPlayer() const
+Actor* Scene::getCurrentPlayer() const
 {
     return this->crActor;
 }
 
-inline int Scene::getCurrentParty() const
+int Scene::getCurrentParty() const
 {
     Actor* const crActor = this->crActor;
     return crActor == nullptr ? -1 : crActor->side;
 }
 
-inline Ability* Scene::getLastAbility() const
+Ability* Scene::getLastAbility() const
 {
     return this->lastAbility;
 }
 
-inline int Scene::getPartiesSize() const
+int Scene::getPartiesSize() const
 {
     return this->parties.size();
 }
 
-inline int Scene::getPartyPlayersSize(const int party) const
+int Scene::getPartyPlayersSize(const int party) const
 {
     return this->parties[party]->size();
 }
 
-inline Actor& Scene::getPartyPlayer(const int party, const int player) const
+Actor& Scene::getPartyPlayer(const int party, const int player) const
 {
     return *(this->parties[party]->at(player));
 }
 
-inline bool Scene::hasPartyPlayer(int const party, Actor& player) const
+bool Scene::hasPartyPlayer(int const party, Actor& player) const
 {
     return this->parties[party]->contains(&player);
 }
 
-inline Actor& Scene::getOrderedPlayer(int const n) const
+Actor& Scene::getOrderedPlayer(int const n) const
 {
     return *(this->players->at(n));
 }
 
-inline bool Scene::hasOrderedPlayer(Actor& player) const
+bool Scene::hasOrderedPlayer(Actor& player) const
 {
     QVector<Actor*>* players = this->players;
     return players != nullptr && players->contains(&player);
 }
 
-inline int Scene::getOrderedPlayersSize() const
+int Scene::getOrderedPlayersSize() const
 {
     QVector<Actor*>* players = this->players;
     return players == nullptr ? 0 : players->size();
 }
 
-inline int Scene::getTargetedPlayersSize() const
+int Scene::getTargetedPlayersSize() const
 {
     QVector<Actor*>* players = this->targets;
     return players == nullptr ? 0 : players->size();
 }
 
-inline Actor& Scene::getTargetedPlayer(int const n) const
+Actor& Scene::getTargetedPlayer(int const n) const
 {
     return *(this->targets->at(n));
 }
 
-inline bool Scene::hasTargetedPlayer(Actor& player) const
+bool Scene::hasTargetedPlayer(Actor& player) const
 {
     QVector<Actor*>* players = this->targets;
     return players != nullptr && players->contains(&player);
@@ -597,7 +603,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     return scene;
 }
 
-inline void Scene::agiCalc()
+void Scene::agiCalc()
 {
     if (this->mInit < 1)
     {
@@ -607,7 +613,7 @@ inline void Scene::agiCalc()
     }
 }
 
-inline void Scene::resetTurn(Actor& actor)
+void Scene::resetTurn(Actor& actor)
 {
     int const mInit = this->mInit + 1;
     if (mInit < 2)

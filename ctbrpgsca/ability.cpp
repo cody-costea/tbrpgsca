@@ -22,76 +22,76 @@ QString Ability::ReflectTxt = ", reflected by %s";
 QString Ability::ResistTxt = ", resisted by %s";
 QString Ability::StolenTxt = ", obtaining %s from %s";
 
-inline int Ability::getUsesRegen() const
+int Ability::getUsesRegen() const
 {
     return this->rQty;
 }
 
-inline int Ability::getMaximumUses() const
+int Ability::getMaximumUses() const
 {
     return this->mQty;
 }
 
-inline int Ability::getAttributeIncrement() const
+int Ability::getAttributeIncrement() const
 {
     return this->attrInc;
 }
 
-inline int Ability::getRequiredLevel() const
+int Ability::getRequiredLevel() const
 {
     return this->lvRq;
 }
 
-inline int Ability::getRemovedStateDuration(State& state) const
+int Ability::getRemovedStateDuration(State& state) const
 {
     QMap<State*, int>* aStates = this->rStates;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-inline QList<State*> Ability::getRemovedStatesList() const
+QList<State*> Ability::getRemovedStatesList() const
 {
     QMap<State*, int>* aStates = this->rStates;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
-inline bool Ability::hasRemovedState(State& state) const
+bool Ability::hasRemovedState(State& state) const
 {
     QMap<State*, int>* aStates = this->rStates;
     return aStates != nullptr && aStates->contains(&state);
 }
 
-inline int Ability::getRemovedStatesSize() const
+int Ability::getRemovedStatesSize() const
 {
     QMap<State*, int>* aStates = this->rStates;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
-inline bool Ability::isStealing() const
+bool Ability::isStealing() const
 {
     return (this->flags & FLAG_STEAL) == FLAG_STEAL;
 }
 
-inline bool Ability::isAbsorbing() const
+bool Ability::isAbsorbing() const
 {
     return (this->flags & FLAG_ABSORB) == FLAG_ABSORB;
 }
 
-inline bool Ability::isOnlyMelee() const
+bool Ability::isOnlyMelee() const
 {
     return (this->flags & FLAG_MELEE) == FLAG_MELEE;
 }
 
-inline bool Ability::targetsSide() const
+bool Ability::targetsSide() const
 {
     return (this->flags & FLAG_TRG_SIDE) == FLAG_TRG_SIDE;
 }
 
-inline bool Ability::targetsSelf() const
+bool Ability::targetsSelf() const
 {
     return (this->flags & FLAG_TRG_SELF) == FLAG_TRG_SELF;
 }
 
-inline bool Ability::targetsAll() const
+bool Ability::targetsAll() const
 {
     return (this->flags & FLAG_TRG_ALL) == FLAG_TRG_ALL;
 }
@@ -113,14 +113,14 @@ Ability& Ability::replenish(Actor& user)
     return ability;
 }
 
-inline bool Ability::canPerform(Actor& actor)
+bool Ability::canPerform(Actor& actor)
 {
     QMap<Ability*, int>* skillsQty = actor.skillsCrQty;
     return this->mMp <= actor.mp && this->mHp < actor.hp && this->mSp <= actor.sp && actor.lv >= this->lvRq
                     && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
 
-inline Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
+Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
     return this->execute(ret, nullptr, user, &target, applyCosts);
 }

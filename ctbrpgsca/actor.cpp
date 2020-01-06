@@ -17,32 +17,35 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-inline int Actor::getLevel() const
+QString Actor::KoTxt = ", %s falls unconscious";
+QString Actor::RiseTxt = ", but rises again";
+
+int Actor::getLevel() const
 {
     return this->lv;
 }
 
-inline int Actor::getExperience() const
+int Actor::getExperience() const
 {
     return this->xp;
 }
 
-inline int Actor::getMaximumLevel() const
+int Actor::getMaximumLevel() const
 {
     return this->maxLv;
 }
 
-inline int Actor::getMaximumExperience() const
+int Actor::getMaximumExperience() const
 {
     return this->maxp;
 }
 
-inline int Actor::getCurrentActions() const
+int Actor::getCurrentActions() const
 {
     return this->actions;
 }
 
-inline int Actor::getInitiative() const
+int Actor::getInitiative() const
 {
     return this->init;
 }
@@ -59,34 +62,39 @@ int Actor::getRegeneratingSkillTurn(Ability& skill) const
     return regTurn == nullptr ? 0 : regTurn->value(&skill, 0);
 }
 
-inline Costume& Actor::getRace() const
+Costume& Actor::getRace() const
 {
     return *(this->equipment[CHAR_RACE]);
 }
 
-inline Costume& Actor::getJob() const
+Costume& Actor::getJob() const
 {
     return *(this->equipment[CHAR_JOB]);
 }
 
-inline Costume* Actor::equipItem(const char pos, Costume* const item)
+bool Actor::isAiPlayer() const
+{
+    return (this->flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER;
+}
+
+Costume* Actor::equipItem(const char pos, Costume* const item)
 {
     assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
     return this->equipItem(nullptr, pos, item);
 }
 
-inline char Actor::unequipItem(Costume& item)
+char Actor::unequipItem(Costume& item)
 {
     return this->unequipItem(nullptr, item);
 }
 
-inline Costume* Actor::unequipPos(const char pos)
+Costume* Actor::unequipPos(const char pos)
 {
     assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
     return this->equipItem(nullptr, pos, nullptr);
 }
 
-inline Costume* Actor::unequipPos(Scene* scene, const char pos)
+Costume* Actor::unequipPos(Scene* scene, const char pos)
 {
     return this->equipItem(scene, pos, nullptr);
 }
@@ -108,24 +116,24 @@ Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const ite
     return old;
 }
 
-inline Actor& Actor::setRace(Costume& race)
+Actor& Actor::setRace(Costume& race)
 {
     return this->setRace(nullptr, race);
 }
 
-inline Actor& Actor::setJob(Costume& job)
+Actor& Actor::setJob(Costume& job)
 {
     return this->setJob(nullptr, job);
 }
 
-inline Actor& Actor::setRace(Scene* const scene, Costume& race)
+Actor& Actor::setRace(Scene* const scene, Costume& race)
 {
     Actor& actor = *this;
     actor.equipItem(scene, CHAR_RACE, &race);
     return actor;
 }
 
-inline Actor& Actor::setJob(Scene* const scene, Costume& job)
+Actor& Actor::setJob(Scene* const scene, Costume& job)
 {
     Actor& actor = *this;
     actor.equipItem(scene, CHAR_JOB, &job);
@@ -252,21 +260,21 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
     return actor;
 }
 
-inline Actor& Actor::setCurrentHp(const int hp)
+Actor& Actor::setCurrentHp(const int hp)
 {
     int mHp = this->mHp;
     this->hp = hp > mHp ? mHp : (hp < 0 ? 0 : hp);
     return *this;
 }
 
-inline Actor& Actor::setCurrentMp(const int mp)
+Actor& Actor::setCurrentMp(const int mp)
 {
     int mMp = this->mMp;
     this->mp = mp > mMp ? mMp : (mp < 0 ? 0 : mp);
     return *this;
 }
 
-inline Actor& Actor::setCurrentRp(const int sp)
+Actor& Actor::setCurrentRp(const int sp)
 {
     int mSp = this->mSp;
     this->sp = sp > mSp ? mSp : (sp < 0 ? 0 : sp);
@@ -435,13 +443,13 @@ Actor& Actor::setStunned(const bool stun)
     return *this;
 }
 
-inline Actor& Actor::setMaximumLevel(const int maxLv)
+Actor& Actor::setMaximumLevel(const int maxLv)
 {
     this->maxLv = maxLv;
     return *this;
 }
 
-inline Actor& Actor::setLevel(const int level)
+Actor& Actor::setLevel(const int level)
 {
     return this->setLevel(nullptr, level);
 }
@@ -458,7 +466,7 @@ Actor& Actor::setLevel(Scene* const scene, const int level)
     return actor;
 }
 
-inline Actor& Actor::setExperience(const int xp)
+Actor& Actor::setExperience(const int xp)
 {
     return this->setExperience(nullptr, xp);
 }
@@ -549,7 +557,7 @@ Actor& Actor::checkRegSkill(Ability& skill)
     return actor;
 }
 
-inline Actor& Actor::recover(QString& ret)
+Actor& Actor::recover(QString& ret)
 {
     return this->recover(&ret, nullptr);
 }

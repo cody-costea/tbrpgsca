@@ -28,37 +28,37 @@ namespace tbrpgsca
     public:
         static QString CausesTxt;
 
-        inline int getAttack() const;
-        inline int getDefense() const;
-        inline int getSpirit() const;
-        inline int getWisdom() const;
-        inline int getAgility() const;
+        int getAttack() const;
+        int getDefense() const;
+        int getSpirit() const;
+        int getWisdom() const;
+        int getAgility() const;
 
-        inline bool isEnraged() const;
-        inline bool isConfused() const;
-        inline bool isConverted() const;
-        inline bool isCountering() const;
-        inline bool isShapeShifted() const;
-        inline bool isKnockedOut() const;
-        inline bool isInvincible() const;
-        inline bool isReflecting() const;
-        inline bool isStunned() const;
+        bool isEnraged() const;
+        bool isConfused() const;
+        bool isConverted() const;
+        bool isCountering() const;
+        bool isShapeShifted() const;
+        bool isKnockedOut() const;
+        bool isInvincible() const;
+        bool isReflecting() const;
+        bool isStunned() const;
 
-        inline int getMaximumActions() const;
-        inline int getElementResistance(int const element) const;
-        inline int getStateResistance(State* const state) const;
+        int getMaximumActions() const;
+        int getElementResistance(int const element) const;
+        int getStateResistance(State* const state) const;
 
-        inline Ability& getAddedSkill(int const n) const;
-        inline bool hasAddedSkill(Ability& skill) const;
-        inline int getAddedSkillsSize() const;
+        Ability& getAddedSkill(int const n) const;
+        bool hasAddedSkill(Ability& skill) const;
+        int getAddedSkillsSize() const;
 
-        inline Ability& getCounterSkill(int const n) const;
-        inline bool hasCounterSkill(Ability& skill) const;
-        inline int getCounterSkillsSize() const;
+        Ability& getCounterSkill(int const n) const;
+        bool hasCounterSkill(Ability& skill) const;
+        int getCounterSkillsSize() const;
 
-        inline Costume& adopt(QString& ret, Actor& actor);
-        inline Costume& abandon(QString& ret, Actor& actor);
-        inline Costume& apply(QString& ret, Actor& actor);
+        Costume& adopt(QString& ret, Actor& actor);
+        Costume& abandon(QString& ret, Actor& actor);
+        Costume& apply(QString& ret, Actor& actor);
 
         Costume(int const id, QString& name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,

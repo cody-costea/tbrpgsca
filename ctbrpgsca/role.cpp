@@ -20,97 +20,97 @@ QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
 
-inline int Role::getId() const
+int Role::getId() const
 {
     return this->id;
 }
 
-inline QString Role::getName() const
+QString Role::getName() const
 {
     return this->name;
 }
 
-inline QString Role::getSprite() const
+QString Role::getSprite() const
 {
     QString* spr = this->sprite;
     return spr == nullptr ? QString() : *(this->sprite);
 }
 
-inline int Role::getDamageElement() const
+int Role::getDamageElement() const
 {
     return this->dmgType;
 }
 
-inline int Role::getMaximumHp() const
+int Role::getMaximumHp() const
 {
     return this->mHp;
 }
 
-inline int Role::getMaximumMp() const
+int Role::getMaximumMp() const
 {
     return this->mMp;
 }
 
-inline int Role::getMaximumRp() const
+int Role::getMaximumRp() const
 {
     return this->mSp;
 }
 
-inline int Role::getCurrentHp() const
+int Role::getCurrentHp() const
 {
     return this->hp;
 }
 
-inline int Role::getCurrentMp() const
+int Role::getCurrentMp() const
 {
     return this->mp;
 }
 
-inline int Role::getCurrentRp() const
+int Role::getCurrentRp() const
 {
     return this->sp;
 }
 
-inline bool Role::isRanged() const
+bool Role::isRanged() const
 {
     return (this->flags & FLAG_RANGE) == FLAG_RANGE;
 }
 
-inline bool Role::isReviving() const
+bool Role::isReviving() const
 {
     return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
 }
 
-inline int Role::getStateDuration(State& state) const
+int Role::getStateDuration(State& state) const
 {
     QMap<State*, int>* aStates = this->stateDur;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-inline QList<State*> Role::getStatesList() const
+QList<State*> Role::getStatesList() const
 {
     QMap<State*, int>* aStates = this->stateDur;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
-inline bool Role::hasState(State& state) const
+bool Role::hasState(State& state) const
 {
     QMap<State*, int>* aStates = this->stateDur;
     return aStates != nullptr && aStates->contains(&state);
 }
 
-inline int Role::getStatesSize() const
+int Role::getStatesSize() const
 {
     QMap<State*, int>* aStates = this->stateDur;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
-inline bool Role::operator==(Role& role) const
+bool Role::operator==(Role& role) const
 {
     return this->id == role.id;
 }
 
-inline Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
+Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
 {
     return this->damage(ret, nullptr, absorber, target, dmg, percent);
 }

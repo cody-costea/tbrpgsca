@@ -16,34 +16,34 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-inline int State::getDuration() const
+int State::getDuration() const
 {
     return this->dur;
 }
 
-inline int State::getResistance() const
+int State::getResistance() const
 {
     return this->sRes;
 }
 
-inline Ability& State::getRemovedSkill(int const n) const
+Ability& State::getRemovedSkill(int const n) const
 {
     return *(this->rSkills->at(n));
 }
 
-inline bool State::hasRemovedSkill(Ability& skill) const
+bool State::hasRemovedSkill(Ability& skill) const
 {
     QVector<Ability*>* aSkills = this->rSkills;
     return aSkills != nullptr && aSkills->contains(&skill);
 }
 
-inline int State::getRemovedSkillsSize() const
+int State::getRemovedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->rSkills;
     return aSkills == nullptr ? 0 : aSkills->size();
 }
 
-inline State& State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
+State& State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
 {
     return this->inflict(ret, nullptr, user, target, dur, always);
 }
@@ -144,7 +144,7 @@ State& State::remove(QString& ret, Scene* const scene, Actor& actor)
     return state;
 }
 
-inline bool State::disable(QString& ret, Actor& actor, int const dur, const bool remove)
+bool State::disable(QString& ret, Actor& actor, int const dur, const bool remove)
 {
     return this->disable(ret, nullptr, actor, remove, dur);
 }
@@ -199,7 +199,7 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
     }
 }
 
-inline State& State::alter(QString& ret, Actor& actor, const bool consume)
+State& State::alter(QString& ret, Actor& actor, const bool consume)
 {
     return this->alter(ret, nullptr, actor, consume);
 }

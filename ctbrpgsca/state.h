@@ -19,16 +19,16 @@ namespace tbrpgsca
     {
         #define STATE_END_DUR -3
     public:
-        inline int getDuration() const;
-        inline int getResistance() const;
+        int getDuration() const;
+        int getResistance() const;
 
-        inline int getRemovedSkillsSize() const;
-        inline bool hasRemovedSkill(Ability& skill) const;
-        inline Ability& getRemovedSkill(int const n) const;
+        int getRemovedSkillsSize() const;
+        bool hasRemovedSkill(Ability& skill) const;
+        Ability& getRemovedSkill(int const n) const;
 
-        inline State& alter(QString& ret, Actor& actor, bool const consume);
-        inline State& inflict(QString& ret, Actor* user, Actor& target, int dur, bool const always);
-        inline bool disable(QString& ret, Actor& actor, int const dur, bool const remove);
+        State& alter(QString& ret, Actor& actor, bool const consume);
+        State& inflict(QString& ret, Actor* user, Actor& target, int dur, bool const always);
+        bool disable(QString& ret, Actor& actor, int const dur, bool const remove);
         State& blockSkills(Actor& actor, bool const remove);
 
         State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
