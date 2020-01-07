@@ -53,7 +53,7 @@ namespace tbrpgsca
         Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
         Ability& replenish(Actor& user);
 
-        Ability(int const id, QString name, QString* sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
+        Ability(int const id, QString name, QString sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
                 int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 

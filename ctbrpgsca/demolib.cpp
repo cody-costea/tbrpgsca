@@ -42,8 +42,8 @@ QVector<Costume*>& DemoLib::getRaces()
     if (races.size() == 0)
     {
         QVector<Ability*>* abilities = this->getAbilities().at(0);
-        races.append(new Costume(1, tr("Human"), nullptr, false, 0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false, false,
-                                 false, false, false, false, false, nullptr, nullptr, abilities, nullptr, nullptr));
+        races.append(new Costume(1, tr("Human"), "", false, 0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
     }
     return races;
 }
@@ -54,8 +54,8 @@ QVector<Costume*>& DemoLib::getJobs()
     if (jobs.size() == 0)
     {
         QVector<QVector<Ability*>*>& abilities = this->getAbilities();
-        jobs.append(new Costume(1, tr("Hero"), new QString("Hero"), false, 0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false,
-                                 false, false, false, false, false, nullptr, nullptr, abilities[1], nullptr, nullptr));
+        jobs.append(new Costume(1, tr("Hero"), "hero", false, 0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
     }
     return jobs;
 }
@@ -68,7 +68,7 @@ QVector<Actor*>& DemoLib::getPlayers()
         QVector<Costume*>& jobs = this->getJobs();
         QVector<Costume*>& races = this->getRaces();
 
-        players.append(new Actor(1, tr("Cody"), (*races[0]), (*jobs[0]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(1, tr("Cody"), "", (*races[0]), (*jobs[0]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
     }
     return players;
 }
@@ -82,5 +82,36 @@ DemoLib::DemoLib()
 
 DemoLib::~DemoLib()
 {
-
+    for (auto job : this->jobs)
+    {
+        delete job;
+    }
+    for (auto race : this->races)
+    {
+        delete race;
+    }
+    for (auto actor : this->players)
+    {
+        delete actor;
+    }
+    for (auto abilities : this->abilities)
+    {
+        for (auto ability : (*abilities))
+        {
+            delete ability;
+        }
+        delete abilities;
+    }
+    for (auto enemies : this->enemies)
+    {
+        for (auto enemy : *enemies)
+        {
+            delete enemy;
+        }
+        delete enemies;
+    }
+    for (auto state : this->states)
+    {
+        delete state;
+    }
 }
