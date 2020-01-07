@@ -325,7 +325,7 @@ Actor& Actor::setMaximumRp(const int mRp)
     return actor;
 }
 
-Actor& Actor::setName(QString& value)
+Actor& Actor::setName(QString value)
 {
     this->name = value;
     return *this;
@@ -962,7 +962,7 @@ Actor& Actor::refreshCostumes(QString* ret, Scene* scene)
     return actor;
 }
 
-Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp, int const mSp, int const atk,
+Actor::Actor(int const id, QString name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp, int const mSp, int const atk,
              int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items)
     : Costume(id, name, nullptr, false, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, res, nullptr,
               new QVector<Ability*>(), nullptr, stRes)
@@ -987,8 +987,14 @@ Actor::Actor(Actor& actor) : Costume(actor)
     this->init = 0;//actor.init;
     this->side = 0;//actor.side;
     this->oldSide = 0;
-    this->xp = actor.xp;
+    /*this->setJob(actor.getJob());
+    this->setRace(actor.getRace());
+    this->setExperience(actor.xp);*/
+    QVector<Ability*>* aSkills = new QVector<Ability*>();
+    *(aSkills) = *(actor.aSkills);
+    this->aSkills = aSkills;
     this->maxp = actor.maxp;
+    this->xp = actor.xp;
     this->lv = actor.lv;
     this->maxLv = actor.lv;
     this->items = actor.items;

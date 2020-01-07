@@ -31,7 +31,7 @@ namespace tbrpgsca
         bool disable(QString& ret, Actor& actor, int const dur, bool const remove);
         State& blockSkills(Actor& actor, bool const remove);
 
-        State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg,
+        State(int const id, QString name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis,
               int const agi, bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect,
               bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters,
@@ -41,8 +41,8 @@ namespace tbrpgsca
 
         ~State();
     protected:
-        QVector<Ability*>* rSkills;
         int dur, sRes;
+        QVector<Ability*>* rSkills;
 
         State& alter(QString& ret, Scene* const scene, Actor& actor, bool const consume);
         State& inflict(QString& ret, Scene* const scene, Actor* user, Actor& target, int dur, bool const always);

@@ -60,7 +60,7 @@ namespace tbrpgsca
         Costume& abandon(QString& ret, Actor& actor);
         Costume& apply(QString& ret, Actor& actor);
 
-        Costume(int const id, QString& name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+        Costume(int const id, QString name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const states,
                 QVector<Ability*>* const skills, QVector<Ability*>* const counters, QMap<State*, int>* const stRes);
@@ -78,13 +78,14 @@ namespace tbrpgsca
         Costume& abandon(QString* ret, Scene* const scene, Actor& actor, bool const delStates);
         Costume& apply(QString& ret, Scene* const scene, Actor& actor);
 
-        Costume(int const id, QString& name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+        Costume(int const id, QString name, QString* sprite, bool const shapeShift, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate,
                 bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QMap<int, int>* const res, QMap<State*, int>* const states,
                 QVector<Ability*>* const skills, QVector<Ability*>* const counters, QMap<State*, int>* const stRes);
 
         friend class Actor;
         friend class Ability;
+        friend class DemoLib;
         friend class State;
         friend class Scene;
     };

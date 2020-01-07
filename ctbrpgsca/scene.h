@@ -72,6 +72,8 @@ namespace tbrpgsca
 
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
+        Scene();
+
         ~Scene();
     protected:
         Ability* lastAbility;

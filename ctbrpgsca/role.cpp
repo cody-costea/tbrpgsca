@@ -206,15 +206,12 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
     return role;
 }
 
-Role::Role(int const id, QString& name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+Role::Role(int const id, QString name, QString* sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
            int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates)
 {
     this->id = id;
     this->name = name;
-    if (sprite != nullptr && sprite->length() > 0)
-    {
-        this->sprite = new QString(*sprite);
-    }
+    this->sprite = sprite;
     this->mHp = mHp;
     this->mHp = mMp;
     this->mSp = mSp;
