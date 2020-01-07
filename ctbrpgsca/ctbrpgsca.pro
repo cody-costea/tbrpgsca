@@ -29,6 +29,7 @@ SOURCES += \
         ability.cpp \
         actor.cpp \
         costume.cpp \
+        demolib.cpp \
         main.cpp \
         mainwindow.cpp \
         role.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
         ability.h \
         actor.h \
         costume.h \
+        demolib.h \
         mainwindow.h \
         role.h \
         scene.h \

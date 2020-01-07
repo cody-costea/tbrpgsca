@@ -964,7 +964,7 @@ Actor& Actor::refreshCostumes(QString* ret, Scene* scene)
 
 Actor::Actor(int const id, QString& name, Costume& race, Costume& job, int const level, int const maxLv, int const mHp, int const mMp, int const mSp, int const atk,
              int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items)
-    : Costume(id, name, nullptr, false, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, res, nullptr,
+    : Costume(id, name, nullptr, false, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, res, nullptr,
               new QVector<Ability*>(), nullptr, stRes)
 {
     this->setRace(race);

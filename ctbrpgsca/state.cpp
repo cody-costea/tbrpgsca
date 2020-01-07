@@ -269,10 +269,11 @@ State& State::blockSkills(Actor& actor, const bool remove)
 
 State::State(int const id, QString& name, QString* sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const hpDmg, int const mpDmg,
              int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun,
-             bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const revive, QVector<Ability*>* const aSkills,
-             QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res)
-    : Costume(id, name, sprite, shapeShift, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, revive, res, states,
-              aSkills, counters, stRes)
+             bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive,
+             QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
+             QMap<State*, int>* const stRes, QMap<int, int>* const res)
+    : Costume(id, name, sprite, shapeShift, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko, invincible,
+              revive, res, states, aSkills, counters, stRes)
 {
     if (convert)
     {
