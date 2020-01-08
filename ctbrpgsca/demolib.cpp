@@ -20,9 +20,58 @@ QVector<State*>& DemoLib::getStates()
     QVector<State*>& states = this->states;
     if (states.size() == 0)
     {
+        states.append(new State(1, tr("Regen"), "", false, 7,-1,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, false, false, false, true, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(2, tr("Poison"), "", false, 7,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(3, tr("Clarity"), "", false, 7,-1,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(4, tr("Dizziness"), "", false, 7,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(5, tr("Vigour"), "", false, 7,-1,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(6, tr("Weakness"), "", false, 7,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(7, tr("Reflect"), "", false, 3,-1,ELEMENT_LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                false, true, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(8, tr("Conversion"), "", false, 5,3,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+                                true, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(9, tr("Confusion"), "", false, 5,3,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(10, tr("Berserk"), "", false, 5,1,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(11, tr("Sleep"), "", false, 3,2,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
+        states.append(new State(12, tr("Stun"), "", false, 1,1,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+                                false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
 
     }
     return states;
+}
+
+QVector<QMap<State*, int>*>& DemoLib::getStateMasks()
+{
+    QVector<QMap<State*, int>*>& stateMasks = this->stateMasks;
+    if (stateMasks.size() == 0)
+    {
+        QVector<State*>& states = this->getStates();
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[0], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[1], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[2], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[3], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[4], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[5], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[6], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[7], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[8], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[9], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[10], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[11], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[0], 0}, {states[2], 0}, {states[4], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[1], 0}, {states[3], 0}, {states[5], 0}}));
+        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[7], 0}, {states[8], 0}, {states[9], 0}}));
+    }
+    return stateMasks;
 }
 
 QVector<QVector<Ability*>*>& DemoLib::getAbilities()
@@ -30,8 +79,14 @@ QVector<QVector<Ability*>*>& DemoLib::getAbilities()
     QVector<QVector<Ability*>*>& abilities = this->abilities;
     if (abilities.size() == 0)
     {
-        QVector<State*>& states = this->getStates();
-
+        QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
+        QVector<Ability*>* skillSet = new QVector<Ability*>();
+        skillSet->append(new Ability(1, tr("Attack"), "", false, false, false, 0, 0,0,0, 0,0, 10,0,0, 0,0, -1,-1, false, false, nullptr, stateMasks[10]));
+        skillSet->append(new Ability(2, tr("Defense"), "", false, false, false, 0, 0,0,0, 0,0, 0,-1,-2, FLAG_TRG_SELF,0, -1,-1, false, false, nullptr, nullptr));
+        abilities.append(skillSet);
+        skillSet = new QVector<Ability*>();
+        skillSet->append(new Ability(3, tr("Heal"), "", false, false, false, 0, 0,3,0, 0,0, -13,0,0, 0,0, -1,-1, false, false, nullptr, nullptr));
+        abilities.append(skillSet);
     }
     return abilities;
 }
@@ -109,6 +164,10 @@ DemoLib::~DemoLib()
             delete enemy;
         }
         delete enemies;
+    }
+    for (auto mask : this->stateMasks)
+    {
+        delete mask;
     }
     for (auto state : this->states)
     {

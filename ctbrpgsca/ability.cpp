@@ -230,7 +230,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     for (auto it = aStates->cbegin(); it != last; ++it)
                     {
                         State* const state = it.key();
-                        state->inflict(ret, scene, &user, *target, it.value(), false);
+                        state->inflict(ret, scene, &user, *target, it.value(), user.side == target->side);
                     }
                 }
             }
