@@ -28,6 +28,7 @@ CONFIG += c++17
 SOURCES += \
         ability.cpp \
         actor.cpp \
+        arenawidget.cpp \
         costume.cpp \
         demolib.cpp \
         main.cpp \
@@ -39,6 +40,7 @@ SOURCES += \
 HEADERS += \
         ability.h \
         actor.h \
+        arenawidget.h \
         costume.h \
         demolib.h \
         mainwindow.h \

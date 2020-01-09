@@ -630,12 +630,6 @@ void Scene::resetTurn(Actor& actor)
     }
 }
 
-
-Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit)
-{
-    this->operator()(ret, parties, actorEvent, events, surprise, mInit);
-}
-
 Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
@@ -722,6 +716,16 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
         scene.endTurn(ret, crActor);
     }
     return scene;
+}
+
+Scene::Scene()
+{
+
+}
+
+Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+{
+    this->operator()(ret, parties, actorEvent, events, surprise, mInit);
 }
 
 Scene::~Scene()
