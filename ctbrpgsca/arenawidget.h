@@ -47,11 +47,16 @@ namespace tbrpgsca
         public:
             void play(int const spr, int const pos);
 
-            ActorSprite(Actor* actor, QMovie* movie);
+            ActorSprite(Actor* actor, QLabel* label);
+
+            ~ActorSprite();
         protected:
             Actor* actor;
             QMovie* movie;
+            QLabel* label;
             int spr, pos;
+
+            friend class ArenaWidget;
         };
         ActorSprite* sprites[SPR_SIZE];
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;

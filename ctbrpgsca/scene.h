@@ -90,6 +90,7 @@ namespace tbrpgsca
 
         friend class Actor;
         friend class Ability;
+        friend class ArenaWidget;
         friend class Costume;
         friend class State;
         friend class Role;

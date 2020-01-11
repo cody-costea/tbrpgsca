@@ -122,6 +122,7 @@ namespace tbrpgsca
 
         friend class Scene;
         friend class Ability;
+        friend class ArenaWidget;
         friend class Costume;
         friend class State;
         friend class Role;

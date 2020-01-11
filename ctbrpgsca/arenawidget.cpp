@@ -17,11 +17,21 @@ void ArenaWidget::ActorSprite::play(int const spr, int const pos)
     this->movie->start();
 }
 
-ArenaWidget::ActorSprite::ActorSprite(Actor* actor, QMovie* movie)
+ArenaWidget::ActorSprite::ActorSprite(Actor* actor, QLabel* label)
 {
     this->actor = actor;
+    QMovie* movie = new QMovie();
+    label->setMovie(movie);
     this->movie = movie;
-    actor->setExtra(this);
+    this->label = label;
+    actor->extra = this;
+}
+
+ArenaWidget::ActorSprite::~ActorSprite()
+{
+    QMovie* movie = this->movie;
+    this->movie = nullptr;
+    delete movie;
 }
 
 ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
@@ -35,15 +45,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     {
         int const sprSize = SPR_SIZE / 2;
         ActorSprite** sprites = this->sprites;
-        //QVector<QVector<Actor*>*>& parties = parties;
-        {
-            QVector<Actor*>& party = *(parties[0]);
-            int const pSize = party.size();
-            for (int i = 0; i < pSize; ++i)
-            {
-                sprites[i] = i < sprSize ? (new ActorSprite(party[i], new QMovie())) : nullptr;
-            }
-        }
+        //QVector<QVector<Actor*>*>& parties = par
         {
             int k = 0;
             int const pSize = parties.size();
@@ -54,14 +56,11 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                 for (int i = 0; i < sSize; ++i)
                 {
                     if (i < sprSize)
-                    {
-                        QMovie* movie = new QMovie();
-                        ActorSprite* spr = new ActorSprite(party[i], movie);
-                        sprites[i] = spr;
+                    {                        
                         QLabel* img = new QLabel();
-                        movie->setScaledSize(QSize(128, 128));
-                        img->setMovie(movie);
+                        ActorSprite* spr = new ActorSprite(party[i], img);
                         gridLayout->addWidget(img);
+                        sprites[i] = spr;
                         spr->play(0, 0);
                     }
                     else
@@ -95,5 +94,15 @@ ArenaWidget::ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*
 
 ArenaWidget::~ArenaWidget()
 {
+    delete this->actBtn;
+    delete this->useBtn;
+    delete this->fleeBtn;
+    delete this->autoBtn;
+    delete this->skills;
+    delete this->items;
+    for (auto spr : this->sprites)
+    {
+        delete spr->label;
 
+    }
 }
