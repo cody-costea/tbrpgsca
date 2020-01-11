@@ -8,7 +8,11 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef ARENAWIDGET_H
 #define ARENAWIDGET_H
 
+#include <QMovie>
+#include <QComboBox>
+#include <QPushButton>
 #include <QWidget>
+#include <QLabel>
 #include "scene.h"
 
 namespace tbrpgsca
@@ -17,10 +21,42 @@ namespace tbrpgsca
     class ArenaWidget : public QWidget, public Scene
     {
         Q_OBJECT
+        #define SPR_SIZE 8
+        #define SPR_IDLE 0;
+        #define SPR_KO 1;
+        #define SPR_HIT 2;
+        #define SPR_FALLEN 3;
+        #define SPR_RISEN 4;
+        #define SPR_ACT 5;
+        #define SPR_CAST 6;
+        #define POS_LEFT 0;
+        #define POS_RIGHT 1;
     public:
         explicit ArenaWidget(QWidget* parent = nullptr);
+
         ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
                     QVector<SceneAct*>* const events, int const surprise, int const mInit);
+
+        ~ArenaWidget();
+
+        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
+                                QVector<SceneAct*>* const events, int const surprise, int const mInit);
+    protected:
+        struct ActorSprite
+        {
+        public:
+            void play(int const spr, int const pos);
+
+            ActorSprite(Actor* actor, QMovie* movie);
+        protected:
+            Actor* actor;
+            QMovie* movie;
+            int spr, pos;
+        };
+        ActorSprite* sprites[SPR_SIZE];
+        QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
+        QLabel* infoTxt,* actionsTxt;
+        QComboBox* skills,* items;
 
     signals:
 

@@ -72,6 +72,11 @@ Costume& Actor::getJob() const
     return *(this->equipment[CHAR_JOB]);
 }
 
+void* Actor::getExtra() const
+{
+    return this->extra;
+}
+
 bool Actor::isAiPlayer() const
 {
     return (this->flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER;
@@ -114,6 +119,12 @@ Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const ite
     switchCostume(nullptr, scene, old, item);
     equipment[pos] = item;
     return old;
+}
+
+Actor& Actor::setExtra(void* const extra)
+{
+    this->extra = extra;
+    return *this;
 }
 
 Actor& Actor::setRace(Costume& race)

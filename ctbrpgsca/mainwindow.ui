@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QOpenGLWidget" name="openGLWidget">
+   <widget class="ArenaWidget" name="arenaWidget" native="true">
     <property name="geometry">
      <rect>
       <x>-1</x>
@@ -27,6 +27,14 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ArenaWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">arenawidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
