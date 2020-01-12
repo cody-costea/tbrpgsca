@@ -11,7 +11,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-void ArenaWidget::ActorSprite::play(int const spr, int const pos)
+void ArenaWidget::ActorSprite::play(int const spr, char const pos)
 {
     this->movie->setFileName(":/sprites/gif/Hero/bt_l_act.gif");
     this->movie->start();
@@ -37,8 +37,17 @@ ArenaWidget::ActorSprite::~ActorSprite()
 ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
                         QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
+    return this->operator()(ret, parties, actorEvent, events, surprise, mInit, false);
+}
+
+ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
+                        QVector<SceneAct*>* const events, int const surprise, int const mInit, bool const doScene)
+{
     ArenaWidget& arena = *this;
-    //arena.Scene::operator()(ret, parties, actorEvent, events, surprise, mInit);
+    if (doScene)
+    {
+        arena.Scene::operator()(ret, parties, actorEvent, events, surprise, mInit);
+    }
     bool const portrait = this->height() > this->width();
     QGridLayout* gridLayout = new QGridLayout(this);
     this->setLayout(gridLayout);
@@ -89,7 +98,7 @@ ArenaWidget::ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*
                          QVector<SceneAct*>* const events, int const surprise, int const mInit)
     : QWidget(parent), Scene(ret, parties, actorEvent, events, surprise, mInit)
 {
-    this->operator()(ret, parties, actorEvent, events, surprise, mInit);
+    this->operator()(ret, parties, actorEvent, events, surprise, mInit, false);
 }
 
 ArenaWidget::~ArenaWidget()
@@ -100,9 +109,11 @@ ArenaWidget::~ArenaWidget()
     delete this->autoBtn;
     delete this->skills;
     delete this->items;
+    delete this->infoTxt;
+    delete this->actionsTxt;
     for (auto spr : this->sprites)
     {
         delete spr->label;
-
+        delete spr;
     }
 }

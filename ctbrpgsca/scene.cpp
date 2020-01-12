@@ -640,12 +640,12 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     if (mInit > 0)
     {
         scene.mInit = mInit;
-        players = new QVector<Actor*>();
+        players = nullptr;
         useInit = true;
     }
     else
     {
-        players = nullptr;
+        players = new QVector<Actor*>();
         scene.mInit = 0;
         useInit = false;
     }
