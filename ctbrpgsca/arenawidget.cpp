@@ -13,7 +13,8 @@ using namespace tbrpgsca;
 
 void ArenaWidget::ActorSprite::play(int const spr, char const pos)
 {
-    this->movie->setFileName(":/sprites/gif/Hero/bt_l_act.gif");
+    QString s = QString(":/sprites/%1/%2/bt_%3_act.%1").arg(SPR_EXT, *(this->actor->sprite), QString(pos));
+    this->movie->setFileName(QString(":/sprites/%1/%2/bt_%3_act.%1").arg(SPR_EXT, *(this->actor->sprite), QString(pos)));
     this->movie->start();
 }
 
@@ -37,7 +38,7 @@ ArenaWidget::ActorSprite::~ActorSprite()
 ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
                         QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
-    return this->operator()(ret, parties, actorEvent, events, surprise, mInit, false);
+    return this->operator()(ret, parties, actorEvent, events, surprise, mInit, true);
 }
 
 ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
@@ -70,7 +71,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                         ActorSprite* spr = new ActorSprite(party[i], img);
                         gridLayout->addWidget(img);
                         sprites[i] = spr;
-                        spr->play(0, 0);
+                        spr->play(0, 'l');
                     }
                     else
                     {

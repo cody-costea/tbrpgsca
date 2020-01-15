@@ -20,29 +20,29 @@ QVector<State*>& DemoLib::getStates()
     QVector<State*>& states = this->states;
     if (states.size() == 0)
     {
-        states.append(new State(1, tr("Regen"), "", false, 7,-1,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(1, tr("Regen"), "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, true, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(2, tr("Poison"), "", false, 7,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(2, tr("Poison"), "", false, 7,0,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(3, tr("Clarity"), "", false, 7,-1,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(3, tr("Clarity"), "", false, 7,-1,0,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(4, tr("Dizziness"), "", false, 7,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(4, tr("Dizziness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(5, tr("Vigour"), "", false, 7,-1,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(5, tr("Vigour"), "", false, 7,-1,0,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(6, tr("Weakness"), "", false, 7,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(6, tr("Weakness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(7, tr("Reflect"), "", false, 3,-1,ELEMENT_LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(7, tr("Reflect"), "", false, 3,-1,0,ELEMENT_LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, true, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(8, tr("Conversion"), "", false, 5,3,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(8, tr("Conversion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 true, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(9, tr("Confusion"), "", false, 5,3,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
+        states.append(new State(9, tr("Confusion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(10, tr("Berserk"), "", false, 5,1,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
+        states.append(new State(10, tr("Berserk"), "", false, 5,1,0,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(11, tr("Sleep"), "", false, 3,2,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+        states.append(new State(11, tr("Sleep"), "", false, 3,2,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(12, tr("Stun"), "", false, 1,1,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+        states.append(new State(12, tr("Stun"), "", false, 1,1,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
 
     }
@@ -97,7 +97,7 @@ QVector<Costume*>& DemoLib::getRaces()
     if (races.size() == 0)
     {
         QVector<Ability*>* abilities = this->getAbilities().at(0);
-        races.append(new Costume(1, tr("Human"), "", false, 0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(1, tr("Human"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
     }
     return races;
@@ -109,7 +109,7 @@ QVector<Costume*>& DemoLib::getJobs()
     if (jobs.size() == 0)
     {
         QVector<QVector<Ability*>*>& abilities = this->getAbilities();
-        jobs.append(new Costume(1, tr("Hero"), "hero", false, 0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(1, tr("Hero"), "Hero", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
     }
     return jobs;
@@ -123,7 +123,7 @@ QVector<Actor*>& DemoLib::getPlayers()
         QVector<Costume*>& jobs = this->getJobs();
         QVector<Costume*>& races = this->getRaces();
 
-        players.append(new Actor(1, tr("Cody"), "", (*races[0]), (*jobs[0]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(1, tr("Cody"), "", (*races[0]), (*jobs[0]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
     }
     return players;
 }

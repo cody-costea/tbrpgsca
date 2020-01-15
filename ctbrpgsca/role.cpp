@@ -213,7 +213,7 @@ Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int co
     this->name = name;
     this->sprite = sprite.length() == 0 ? nullptr : new QString(sprite);
     this->mHp = mHp;
-    this->mHp = mMp;
+    this->mMp = mMp;
     this->mSp = mSp;
     this->hp = hpDmg;
     this->mp = mpDmg;

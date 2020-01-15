@@ -22,15 +22,16 @@ namespace tbrpgsca
     {
         Q_OBJECT
         #define SPR_SIZE 8
-        #define SPR_IDLE 0;
-        #define SPR_KO 1;
-        #define SPR_HIT 2;
-        #define SPR_FALLEN 3;
-        #define SPR_RISEN 4;
-        #define SPR_ACT 5;
-        #define SPR_CAST 6;
-        #define POS_LEFT 'l';
-        #define POS_RIGHT 'r';
+        #define SPR_IDLE 0
+        #define SPR_KO 1
+        #define SPR_HIT 2
+        #define SPR_FALLEN 3
+        #define SPR_RISEN 4
+        #define SPR_ACT 5
+        #define SPR_CAST 6
+        #define POS_LEFT 'l'
+        #define POS_RIGHT 'r'
+        #define SPR_EXT "gif"
     public:
         explicit ArenaWidget(QWidget* parent = nullptr);
 
