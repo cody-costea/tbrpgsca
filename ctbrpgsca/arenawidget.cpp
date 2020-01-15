@@ -55,6 +55,10 @@ ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QLabel* const label, A
     this->actor = actor;
     this->arena = arena;
     QMovie* movie = new QMovie();
+    connect(movie, &QMovie::finished, [arena]()
+    {
+        --(arena->sprRuns);
+    });
     label->setMovie(movie);
     this->movie = movie;
     this->label = label;
@@ -105,7 +109,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                         ActorSprite* spr = new ActorSprite(party[i], img, this);
                         gridLayout->addWidget(img);
                         sprites[i] = spr;
-                        spr->play(SPR_CAST, 'l');
+                        spr->play(SPR_CAST, POS_LEFT);
                     }
                     else
                     {

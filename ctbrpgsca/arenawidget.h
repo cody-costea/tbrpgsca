@@ -43,7 +43,7 @@ namespace tbrpgsca
         ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
                                 QVector<SceneAct*>* const events, int const surprise, int const mInit);
     protected:
-        struct ActorSprite
+        struct ActorSprite : QObject
         {
         public:
             void play(int const spr, int const pos);
