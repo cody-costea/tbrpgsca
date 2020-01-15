@@ -11,16 +11,49 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-void ArenaWidget::ActorSprite::play(int const spr, char const pos)
+void ArenaWidget::ActorSprite::play(int const spr, int const pos)
 {
-    QString s = QString(":/sprites/%1/%2/bt_%3_act.%1").arg(SPR_EXT, *(this->actor->sprite), QString(pos));
-    this->movie->setFileName(QString(":/sprites/%1/%2/bt_%3_act.%1").arg(SPR_EXT, *(this->actor->sprite), QString(pos)));
+    if (this->spr != spr || this->pos != pos)
+    {
+        QString s;
+        switch (spr)
+        {
+        case SPR_IDLE:
+            s = "idle";
+            break;
+        case SPR_KO:
+            s = "ko";
+            break;
+        case SPR_HIT:
+            s = "hit";
+        break;
+        case SPR_FALLEN:
+            s = "fallen";
+            break;
+        case SPR_RISEN:
+            s = "restored";
+            break;
+        case SPR_ACT:
+            s = "act";
+            break;
+        case SPR_CAST:
+            s = "cast";
+            break;
+        default:
+            return;
+        }
+        this->spr = spr;
+        this->pos = pos;
+        this->movie->setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s));
+    }
+    ++(this->arena->sprRuns);
     this->movie->start();
 }
 
-ArenaWidget::ActorSprite::ActorSprite(Actor* actor, QLabel* label)
+ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QLabel* const label, ArenaWidget* const arena)
 {
     this->actor = actor;
+    this->arena = arena;
     QMovie* movie = new QMovie();
     label->setMovie(movie);
     this->movie = movie;
@@ -49,6 +82,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     {
         arena.Scene::operator()(ret, parties, actorEvent, events, surprise, mInit);
     }
+    arena.sprRuns = 0;
     bool const portrait = this->height() > this->width();
     QGridLayout* gridLayout = new QGridLayout(this);
     this->setLayout(gridLayout);
@@ -68,10 +102,10 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     if (i < sprSize)
                     {                        
                         QLabel* img = new QLabel();
-                        ActorSprite* spr = new ActorSprite(party[i], img);
+                        ActorSprite* spr = new ActorSprite(party[i], img, this);
                         gridLayout->addWidget(img);
                         sprites[i] = spr;
-                        spr->play(0, 'l');
+                        spr->play(SPR_CAST, 'l');
                     }
                     else
                     {
