@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget* parent) :
     QString ret;
     QVector<QVector<Actor*>*> parties;
     parties.append(&(this->getPlayers()));
-    parties.append(&(this->getPlayers()));
+    parties.append(this->getEnemies().at(0));
     ui->arenaWidget->operator()(ret, parties, nullptr, nullptr, -1, 0);
 }
 

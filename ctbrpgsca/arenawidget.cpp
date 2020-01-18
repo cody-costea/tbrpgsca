@@ -109,7 +109,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                         ActorSprite* spr = new ActorSprite(party[i], img, this);
                         gridLayout->addWidget(img);
                         sprites[i] = spr;
-                        spr->play(SPR_CAST, POS_LEFT);
+                        spr->play(SPR_CAST, party[i]->side == 0 ? POS_LEFT : POS_RIGHT);
                     }
                     else
                     {
