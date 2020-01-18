@@ -73,7 +73,7 @@ ArenaWidget::ActorSprite::~ActorSprite()
 }
 
 ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
-                        QVector<SceneAct*>* const events, int const surprise, int const mInit)
+                                     QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
     return this->operator()(ret, parties, actorEvent, events, surprise, mInit, true);
 }

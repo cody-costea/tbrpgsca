@@ -97,7 +97,21 @@ QVector<Costume*>& DemoLib::getRaces()
     if (races.size() == 0)
     {
         QVector<Ability*>* abilities = this->getAbilities().at(0);
-        races.append(new Costume(1, tr("Human"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(1, tr("Elf"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(2, tr("Gnome"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(3, tr("Human"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(4, tr("Half-Orc"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(5, tr("Goblin"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(6, tr("Lizard"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(7, tr("Ogre"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+                                 false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
+        races.append(new Costume(8, tr("Troll"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
     }
     return races;
@@ -109,7 +123,43 @@ QVector<Costume*>& DemoLib::getJobs()
     if (jobs.size() == 0)
     {
         QVector<QVector<Ability*>*>& abilities = this->getAbilities();
-        jobs.append(new Costume(1, tr("Hero"), "Hero", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(1, tr("Alchemist"), "Alchemist", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(2, tr("Berserker"), "Berserker", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(3, tr("Crusader"), "Crusader", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(4, tr("Corsair"), "Corsair", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(5, tr("Dragoon"), "Dragoon", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(6, tr("Druid"), "Druid", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(7, tr("Hesychast"), "Hesychast", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(8, tr("Paladin"), "Knight", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(9, tr("Gladiator"), "Hero", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(10, tr("Ninja"), "Ninja", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(11, tr("Ranger"), "Ranger", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(12, tr("Reaver"), "Reaver", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(13, tr("Shaman"), "Shaman", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(14, tr("Warmage"), "Warmage", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(15, tr("Wizard"), "Wizard", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(16, tr("Cleric"), "Santa", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(17, tr("Valkyrie"), "Valkyrie", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(18, tr("Sorceress"), "Sorceress", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(19, tr("Bard"), "Bard", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
     }
     return jobs;
@@ -123,7 +173,10 @@ QVector<Actor*>& DemoLib::getPlayers()
         QVector<Costume*>& jobs = this->getJobs();
         QVector<Costume*>& races = this->getRaces();
 
-        players.append(new Actor(1, tr("Cody"), "", (*races[0]), (*jobs[0]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(1, tr("Cody"), "", (*races[3]), (*jobs[7]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(2, tr("Victoria"), "", (*races[0]), (*jobs[16]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(1, tr("George"), "", (*races[1]), (*jobs[2]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(1, tr("Stephanie"), "", (*races[2]), (*jobs[17]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
     }
     return players;
 }
