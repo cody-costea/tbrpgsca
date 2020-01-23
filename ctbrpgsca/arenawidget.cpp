@@ -7,6 +7,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "arenawidget.h"
 
+#include <QGraphicsAnchorLayout>
 #include <QGridLayout>
 
 using namespace tbrpgsca;
@@ -88,7 +89,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     }
     arena.sprRuns = 0;
     bool const portrait = this->height() > this->width();
-    QGridLayout* gridLayout = new QGridLayout(this);
+    QGraphicsAnchorLayout* gridLayout = new QGraphicsAnchorLayout();
     this->setLayout(gridLayout);
     {
         int const sprSize = SPR_SIZE / 2;

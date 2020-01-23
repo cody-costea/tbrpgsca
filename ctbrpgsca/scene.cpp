@@ -110,7 +110,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
     if (!user.isRanged() || (skill.isOnlyMelee() && !skill.isRanged()))
     {
         int pos = -1;
-        int side = target.side;
+        int side = target.oldSide;
         Actor* fGuard = nullptr,* lGuard = nullptr;
         Actor** guardPos = &fGuard;
         QVector<Actor*>& party = *(this->parties[side]);
@@ -690,7 +690,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
             {
                 player.setAiPlayer(true);
             }
-            player.oldSide = static_cast<unsigned char>(i);
+            player.oldSide = i;
             player.side = i;
         }
         if (players != nullptr)

@@ -119,7 +119,7 @@ namespace tbrpgsca
         Actor& refreshCostumes(QString* ret, Scene* scene);
 
     private:
-        unsigned char oldSide;
+        int oldSide;
 
         friend class Scene;
         friend class Ability;
