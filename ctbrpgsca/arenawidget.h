@@ -13,6 +13,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>
+#include <QLayout>
 #include "scene.h"
 
 namespace tbrpgsca
@@ -66,9 +67,12 @@ namespace tbrpgsca
 
         int sprRuns;
         ActorSprite* sprites[SPR_SIZE];
+
+        QWidget* ctrWidget;
+        QLayout* ctrLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
+        QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* actionsTxt;
-        QComboBox* skills,* items;
 
     signals:
 

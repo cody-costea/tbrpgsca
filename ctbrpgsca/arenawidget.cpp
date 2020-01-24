@@ -86,13 +86,69 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     {
         arena.Scene::operator()(ret, parties, actorEvent, events, surprise, mInit);
     }
+    int sprWidth;
     arena.sprRuns = 0;
-    bool const portrait = this->height() > this->width();
-    QGridLayout* gridLayout = new QGridLayout(this);
-    this->setLayout(gridLayout);
+    int const width = arena.width();
+    int const height = arena.height();
+    QWidget* ctrWidget = new QWidget(this);
+    QLayout* ctrLayout;
+    {
+        QLabel* infoTxt = new QLabel(this);
+        QLabel* actionsTxt = new QLabel(this);
+        QPushButton* actBtn = new QPushButton(this);
+        QPushButton* autoBtn = new QPushButton(this);
+        QPushButton* fleeBtn = new QPushButton(this);
+        QPushButton* useBtn = new QPushButton(this);
+        QComboBox* targetBox = new QComboBox(this);
+        QComboBox* skillsBox = new QComboBox(this);
+        QComboBox* itemsBox = new QComboBox(this);
+        //bool portrait;
+        if (height > width)
+        {
+            if (height < 640 || height > 1024)
+            {
+                sprWidth = height / 5;
+            }
+            else
+            {
+                sprWidth = 128;
+            }
+            ctrLayout = new QGridLayout(this);
+            //portrait = true;
+        }
+        else
+        {
+            if (width < 640 || width > 1024)
+            {
+                sprWidth = width / 5;
+            }
+            else
+            {
+                sprWidth = 128;
+            }
+            ctrLayout = new QVBoxLayout(ctrWidget);
+            ctrLayout->addWidget(autoBtn);
+            ctrLayout->addWidget(skillsBox);
+            ctrLayout->addWidget(actBtn);
+            ctrLayout->addWidget(targetBox);
+            ctrLayout->addWidget(useBtn);
+            ctrLayout->addWidget(itemsBox);
+            ctrLayout->addWidget(fleeBtn);
+            //ctrLayout->setGeometry(QRect(0, 0, sprWidth, height));
+            ctrWidget->setMaximumWidth(sprWidth);
+            ctrWidget->setLayout(ctrLayout);
+            arena.ctrWidget = ctrWidget;
+            arena.ctrLayout = ctrLayout;
+            //portrait = false;
+        }
+    }
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->addWidget(ctrWidget);
+    arena.mainLayout = layout;
+    arena.setLayout(layout);
     {
         int const sprSize = SPR_SIZE / 2;
-        ActorSprite** sprites = this->sprites;
+        ActorSprite** sprites = arena.sprites;
         //QVector<QVector<Actor*>*>& parties = par
         {
             int k = 0;
@@ -105,11 +161,12 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                 {
                     if (i < sprSize)
                     {                        
-                        QLabel* img = new QLabel();
+                        QLabel* img = new QLabel(this);
                         ActorSprite* spr = new ActorSprite(party[i], img, this);
-                        gridLayout->addWidget(img);
-                        sprites[i] = spr;
+                        img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
                         spr->play(SPR_CAST, party[i]->side == 0 ? POS_LEFT : POS_RIGHT);
+                        //layout->addWidget(img);
+                        sprites[i] = spr;
                     }
                     else
                     {
@@ -121,7 +178,6 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     }
                 }
             }
-
         }
     }
     after:
@@ -146,10 +202,14 @@ ArenaWidget::~ArenaWidget()
     delete this->useBtn;
     delete this->fleeBtn;
     delete this->autoBtn;
-    delete this->skills;
-    delete this->items;
+    delete this->skillsBox;
+    delete this->targetBox;
+    delete this->itemsBox;
     delete this->infoTxt;
     delete this->actionsTxt;
+    delete this->ctrLayout;
+    delete this->ctrWidget;
+    delete this->mainLayout;
     for (auto spr : this->sprites)
     {
         delete spr->label;
