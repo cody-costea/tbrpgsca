@@ -68,11 +68,11 @@ namespace tbrpgsca
         int sprRuns;
         ActorSprite* sprites[SPR_SIZE];
 
-        QWidget* ctrWidget;
-        QLayout* ctrLayout,* mainLayout;
+        QWidget* ctrWidget,* actWidget;
+        QLayout* ctrLayout,*actLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
-        QLabel* infoTxt,* actionsTxt;
+        QLabel* infoTxt,* actionsTxt,* arenaImg;
 
     signals:
 

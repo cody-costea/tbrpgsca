@@ -88,11 +88,14 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     }
     int sprWidth;
     arena.sprRuns = 0;
-    int const width = arena.width();
-    int const height = arena.height();
+    QLabel* arenaImg = new QLabel(this);
+    QWidget* actWidget = new QWidget(this);
     QWidget* ctrWidget = new QWidget(this);
-    QLayout* ctrLayout;
+    QLayout* layout;
     {
+        QLayout* ctrLayout;
+        int const width = arena.width();
+        int const height = arena.height();
         QLabel* infoTxt = new QLabel(this);
         QLabel* actionsTxt = new QLabel(this);
         QPushButton* actBtn = new QPushButton(this);
@@ -102,6 +105,25 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
         QComboBox* targetBox = new QComboBox(this);
         QComboBox* skillsBox = new QComboBox(this);
         QComboBox* itemsBox = new QComboBox(this);
+        QVBoxLayout* actLayout = new QVBoxLayout(this);
+        arena.targetBox = targetBox;
+        arena.skillsBox = skillsBox;
+        arena.itemsBox = itemsBox;
+        arena.arenaImg = arenaImg;
+        arena.actionsTxt = actionsTxt;
+        arena.infoTxt = infoTxt;
+        arena.fleeBtn = fleeBtn;
+        arena.autoBtn = autoBtn;
+        arena.actBtn = actBtn;
+        arena.useBtn = useBtn;
+        {
+            int const actionsHeight = height / 10;
+            arenaImg->setMaximumHeight(height - actionsHeight);
+            actionsTxt->setMaximumHeight(actionsHeight);
+            actLayout->addWidget(arenaImg);
+            actLayout->addWidget(actionsTxt);
+            actWidget->setLayout(actLayout);
+        }
         //bool portrait;
         if (height > width)
         {
@@ -114,6 +136,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                 sprWidth = 128;
             }
             ctrLayout = new QGridLayout(this);
+            layout = new QVBoxLayout(this);
             //portrait = true;
         }
         else
@@ -126,6 +149,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             {
                 sprWidth = 128;
             }
+            layout = new QHBoxLayout(this);
             ctrLayout = new QVBoxLayout(ctrWidget);
             ctrLayout->addWidget(autoBtn);
             ctrLayout->addWidget(skillsBox);
@@ -142,8 +166,8 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             //portrait = false;
         }
     }
-    QHBoxLayout* layout = new QHBoxLayout(this);
     layout->addWidget(ctrWidget);
+    layout->addWidget(actWidget);
     arena.mainLayout = layout;
     arena.setLayout(layout);
     {
@@ -161,22 +185,28 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                 {
                     if (i < sprSize)
                     {                        
-                        QLabel* img = new QLabel(this);
+                        QLabel* img = new QLabel(arenaImg);
                         ActorSprite* spr = new ActorSprite(party[i], img, this);
+                        /*switch (k)
+                        {
+                        case 0:
+
+                            break;
+                        }*/
                         img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
                         spr->play(SPR_CAST, party[i]->side == 0 ? POS_LEFT : POS_RIGHT);
-                        //layout->addWidget(img);
-                        sprites[i] = spr;
-                    }
-                    else
-                    {
-                        sprites[i] = nullptr;
+                        //actLayout->addWidget(img);
+                        sprites[k] = spr;
                     }
                     if ((++k) == SPR_SIZE)
                     {
                         goto after;
                     }
                 }
+            }
+            for (;k < SPR_SIZE; ++k)
+            {
+                sprites[k] = nullptr;
             }
         }
     }
@@ -206,9 +236,12 @@ ArenaWidget::~ArenaWidget()
     delete this->targetBox;
     delete this->itemsBox;
     delete this->infoTxt;
+    delete this->arenaImg;
     delete this->actionsTxt;
     delete this->ctrLayout;
     delete this->ctrWidget;
+    delete this->actWidget;
+    delete this->actLayout;
     delete this->mainLayout;
     for (auto spr : this->sprites)
     {
