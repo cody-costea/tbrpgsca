@@ -8,6 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "arenawidget.h"
 
 #include <QGridLayout>
+#include <QDebug>
 
 using namespace tbrpgsca;
 
@@ -86,8 +87,8 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     {
         arena.Scene::operator()(ret, parties, actorEvent, events, surprise, mInit);
     }
-    int sprWidth;
     arena.sprRuns = 0;
+    int sprWidth, imgWidth, imgHeight;
     QLabel* arenaImg = new QLabel(this);
     QWidget* actWidget = new QWidget(this);
     QWidget* ctrWidget = new QWidget(this);
@@ -117,9 +118,12 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
         arena.actBtn = actBtn;
         arena.useBtn = useBtn;
         {
-            int const actionsHeight = height / 10;
-            arenaImg->setMaximumHeight(height - actionsHeight);
-            actionsTxt->setMaximumHeight(actionsHeight);
+            int const actHeight = height / 10;
+            imgHeight = height - actHeight;
+            arenaImg->setMaximumHeight(imgHeight);
+            arenaImg->setMinimumHeight(imgHeight);
+            actionsTxt->setMaximumHeight(actHeight);
+            actionsTxt->setMinimumHeight(actHeight);
             actLayout->addWidget(arenaImg);
             actLayout->addWidget(actionsTxt);
             actWidget->setLayout(actLayout);
@@ -137,6 +141,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             }
             ctrLayout = new QGridLayout(this);
             layout = new QVBoxLayout(this);
+            imgWidth = width;
             //portrait = true;
         }
         else
@@ -159,12 +164,20 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             ctrLayout->addWidget(itemsBox);
             ctrLayout->addWidget(fleeBtn);
             //ctrLayout->setGeometry(QRect(0, 0, sprWidth, height));
+            ctrWidget->setMinimumWidth(sprWidth);
             ctrWidget->setMaximumWidth(sprWidth);
             ctrWidget->setLayout(ctrLayout);
             arena.ctrWidget = ctrWidget;
             arena.ctrLayout = ctrLayout;
+            imgWidth = width - sprWidth;
             //portrait = false;
         }
+        actWidget->setMaximumWidth(imgWidth);
+        actWidget->setMinimumWidth(imgWidth);
+        actionsTxt->setMaximumWidth(imgWidth);
+        actionsTxt->setMinimumWidth(imgWidth);
+        arenaImg->setMaximumWidth(imgWidth);
+        arenaImg->setMinimumWidth(imgWidth);
     }
     layout->addWidget(ctrWidget);
     layout->addWidget(actWidget);
@@ -173,12 +186,18 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     {
         int const sprSize = SPR_SIZE / 2;
         ActorSprite** sprites = arena.sprites;
+        qDebug() << "arenaImg->width(): " << arenaImg->width();
+        qDebug() << "sprWidth: " << sprWidth;
         //QVector<QVector<Actor*>*>& parties = par
         {
             int k = 0;
-            int const pSize = parties.size();
+            int const pSize = parties.size(), xCentre = imgWidth / 3, yCentre = imgHeight / 3, sprFactor = sprWidth / 2;
+            qDebug() << "sprFactor: " << sprFactor;
+            qDebug() << "xCentre: " << xCentre;
+            qDebug() << "yCentre: " << yCentre;
             for (int j = 0; j < pSize; ++j)
             {
+                int x = j == 0 ? 1 : -1;
                 QVector<Actor*>& party = *(parties[j]);
                 int const sSize = party.size();
                 for (int i = 0; i < sSize; ++i)
@@ -187,13 +206,22 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     {                        
                         QLabel* img = new QLabel(arenaImg);
                         ActorSprite* spr = new ActorSprite(party[i], img, this);
-                        /*switch (k)
+                        switch (i)
                         {
                         case 0:
-
+                            img->setGeometry(xCentre - (sprFactor * x), yCentre - (sprFactor * x), sprWidth, sprWidth);
                             break;
-                        }*/
-                        img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
+                        case 1:
+                            img->setGeometry(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth);
+                            break;
+                        case 2:
+                            img->setGeometry(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprFactor * -1 * x), sprWidth, sprWidth);
+                            break;
+                        case 3:
+                            img->setGeometry(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth);
+                            break;
+                        }
+                        //img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
                         spr->play(SPR_CAST, party[i]->side == 0 ? POS_LEFT : POS_RIGHT);
                         //actLayout->addWidget(img);
                         sprites[k] = spr;

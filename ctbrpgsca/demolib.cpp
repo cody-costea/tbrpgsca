@@ -175,8 +175,8 @@ QVector<QVector<Actor*>*>& DemoLib::getEnemies()
         QVector<Actor*>* enemy = new QVector<Actor*>();
         enemy->append(new Actor(5, tr("Goblin"), "", (*races[4]), (*jobs[9]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         enemy->append(new Actor(6, tr("Lizard"), "", (*races[5]), (*jobs[13]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
-        enemy->append(new Actor(7, tr("Ogre"), "", (*races[6]), (*jobs[1]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
-        enemy->append(new Actor(8, tr("Troll"), "", (*races[2]), (*jobs[12]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        enemy->append(new Actor(7, tr("Troll"), "", (*races[2]), (*jobs[12]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        enemy->append(new Actor(8, tr("Ogre"), "", (*races[6]), (*jobs[1]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         enemies.append(enemy);
     }
     return enemies;
@@ -191,8 +191,8 @@ QVector<Actor*>& DemoLib::getPlayers()
         QVector<Costume*>& races = this->getRaces();
         players.append(new Actor(1, tr("Cody"), "", (*races[3]), (*jobs[7]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         players.append(new Actor(2, tr("Victoria"), "", (*races[0]), (*jobs[16]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
-        players.append(new Actor(3, tr("George"), "", (*races[1]), (*jobs[2]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         players.append(new Actor(4, tr("Stephanie"), "", (*races[2]), (*jobs[17]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(3, tr("George"), "", (*races[1]), (*jobs[2]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
     }
     return players;
 }
