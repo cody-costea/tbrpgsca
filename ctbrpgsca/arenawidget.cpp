@@ -20,18 +20,20 @@ void ArenaWidget::ActorSprite::play(int const spr, int const pos)
         switch (spr)
         {
         case SPR_IDLE:
-            s = "idle";
+            s = "hit";
+            //label->setPixmap(QPixmap(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s)));
+            //return;
             break;
         case SPR_KO:
-            s = "ko";
+            s = "restored";
             break;
         case SPR_HIT:
             s = "hit";
         break;
-        case SPR_FALLEN:
+        case SPR_FALL:
             s = "fallen";
             break;
-        case SPR_RISEN:
+        case SPR_RISE:
             s = "restored";
             break;
         case SPR_ACT:
@@ -46,9 +48,18 @@ void ArenaWidget::ActorSprite::play(int const spr, int const pos)
         this->spr = spr;
         this->pos = pos;
         this->movie->setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s));
+        //this->label->setPixmap(QPixmap());
     }
-    ++(this->arena->sprRuns);
-    this->movie->start();
+    this->movie->jumpToFrame(0);
+    if (spr != SPR_IDLE && spr != SPR_KO)
+    {
+        ++(this->arena->sprRuns);
+        this->movie->start();
+    }
+    else
+    {
+        this->movie->setPaused(true);
+    }
 }
 
 ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QLabel* const label, ArenaWidget* const arena)
@@ -56,6 +67,7 @@ ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QLabel* const label, A
     this->actor = actor;
     this->arena = arena;
     QMovie* movie = new QMovie();
+    movie->setCacheMode(QMovie::CacheAll);
     connect(movie, &QMovie::finished, [arena]()
     {
         --(arena->sprRuns);
@@ -197,32 +209,73 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             qDebug() << "yCentre: " << yCentre;
             for (int j = 0; j < pSize; ++j)
             {
-                int x = j == 0 ? 1 : -1;
+                int x, pos;
+                if (j == 0)
+                {
+                    if (surprise == 0)
+                    {
+                        x = -1;
+                        pos = POS_RIGHT;
+                    }
+                    else
+                    {
+                        x = 1;
+                        pos = POS_LEFT;
+                    }
+                }
+                else
+                {
+                    if (surprise == 0)
+                    {
+                        x = 1;
+                        pos = POS_LEFT;
+                    }
+                    else
+                    {
+                        x = -1;
+                        pos = POS_RIGHT;
+                    }
+                }
                 QVector<Actor*>& party = *(parties[j]);
                 int const sSize = party.size();
                 for (int i = 0; i < sSize; ++i)
                 {
                     if (i < sprSize)
-                    {                        
-                        QLabel* img = new QLabel(arenaImg);
-                        ActorSprite* spr = new ActorSprite(party[i], img, this);
-                        switch (i)
+                    {
+                        Actor* const actor = party[i];
+                        QLabel* const img = new QLabel(arenaImg);
+                        ActorSprite* const spr = new ActorSprite(actor, img, this);
+                        switch (j > 1 ? k : i)
                         {
                         case 0:
+                        case 4:
                             img->setGeometry(xCentre - (sprFactor * x), yCentre - (sprFactor * x), sprWidth, sprWidth);
                             break;
                         case 1:
+                        case 5:
                             img->setGeometry(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth);
                             break;
                         case 2:
+                        case 6:
                             img->setGeometry(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprFactor * -1 * x), sprWidth, sprWidth);
                             break;
                         case 3:
+                        case 7:
                             img->setGeometry(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth);
                             break;
                         }
                         //img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
-                        spr->play(SPR_CAST, party[i]->side == 0 ? POS_LEFT : POS_RIGHT);
+                        if (actor->hp > 0)
+                        {
+                            spr->play(SPR_IDLE, pos);
+                            spr->play(SPR_IDLE, pos);
+                        }
+                        else
+                        {
+                            spr->play(SPR_KO, pos);
+                            spr->play(SPR_KO, pos);
+                        }
+                        //spr->play(actor->hp > 0 ? SPR_IDLE : SPR_KO, pos);
                         //actLayout->addWidget(img);
                         sprites[k] = spr;
                     }

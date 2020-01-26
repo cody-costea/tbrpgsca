@@ -26,8 +26,8 @@ namespace tbrpgsca
         #define SPR_IDLE 0
         #define SPR_KO 1
         #define SPR_HIT 2
-        #define SPR_FALLEN 3
-        #define SPR_RISEN 4
+        #define SPR_FALL 3
+        #define SPR_RISE 4
         #define SPR_ACT 5
         #define SPR_CAST 6
         #define POS_LEFT 0
@@ -69,7 +69,7 @@ namespace tbrpgsca
         ActorSprite* sprites[SPR_SIZE];
 
         QWidget* ctrWidget,* actWidget;
-        QLayout* ctrLayout,*actLayout,* mainLayout;
+        QLayout* ctrLayout,* actLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* actionsTxt,* arenaImg;
