@@ -12,9 +12,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-void ArenaWidget::ActorSprite::play(int const spr, int const pos)
+void ArenaWidget::ActorSprite::playActor(int const spr, int const pos)
 {
-    QMovie& movie = *(this->movie);
+    QMovie& movie = *(this->actorMovie);
     if (this->spr != spr || this->pos != pos)
     {
         QString s;
@@ -52,35 +52,59 @@ void ArenaWidget::ActorSprite::play(int const spr, int const pos)
         movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s));
     }
     movie.jumpToFrame(0);
-    if (spr != SPR_IDLE && spr != SPR_KO)
+    if (spr == SPR_IDLE || spr == SPR_KO)
+    {
+        this->actorLabel->update();
+    }
+    else
     {
         ++(this->arena->sprRuns);
         movie.start();
     }
 }
 
-ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QLabel* const label, ArenaWidget* const arena)
+ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget, QRect location, ArenaWidget* const arena)
 {
     this->actor = actor;
     this->arena = arena;
-    QMovie* movie = new QMovie();
-    movie->setCacheMode(QMovie::CacheAll);
-    connect(movie, &QMovie::finished, [arena]()
+    QMovie* const actorMovie = new QMovie(),* skillMovie = new QMovie();
+    QLabel* const actorLabel = new QLabel(widget),* skillLabel = new QLabel(actorLabel);
+    actorMovie->setCacheMode(QMovie::CacheAll);
+    skillMovie->setCacheMode(QMovie::CacheAll);
+    auto run = [arena]()
     {
-        --(arena->sprRuns);
-    });
-    label->setMovie(movie);
-    this->movie = movie;
-    this->label = label;
+       if ((--(arena->sprRuns)) < 1)
+       {
+
+       }
+    };
+    connect(actorMovie, &QMovie::finished, run);
+    connect(skillMovie, &QMovie::finished, run);
+    skillLabel->setGeometry(0, 0, 128, 128);
+    actorLabel->setGeometry(location);
+    actorLabel->setMovie(actorMovie);
+    skillLabel->setMovie(skillMovie);
+    this->actorMovie = actorMovie;
+    this->actorLabel = actorLabel;
+    this->skillMovie = skillMovie;
+    this->skillLabel = skillLabel;
     actor->extra = this;
-    label->show();
+    actorLabel->show();
+    skillLabel->show();
 }
 
 ArenaWidget::ActorSprite::~ActorSprite()
 {
-    QMovie* movie = this->movie;
-    this->movie = nullptr;
-    delete movie;
+    QMovie* const actorMovie = this->actorMovie,* skillMovie = this->skillMovie;
+    QLabel* const actorLabel = this->actorLabel,* skillLabel = this->skillLabel;
+    this->actorLabel = nullptr;
+    this->actorMovie = nullptr;
+    this->skillLabel = nullptr;
+    this->skillMovie = nullptr;
+    delete actorLabel;
+    delete actorMovie;
+    delete skillLabel;
+    delete skillMovie;
 }
 
 ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
@@ -244,43 +268,41 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                 {
                     if (i < sprSize)
                     {
+                        ActorSprite* spr;
                         Actor* const actor = party[i];
-                        QLabel* const img = new QLabel(arenaImg);
-                        ActorSprite* const spr = new ActorSprite(actor, img, this);
                         switch (j > 1 ? k : i)
                         {
                         case 0:
                         case 4:
-                            img->setGeometry(xCentre - (sprFactor * x), yCentre - (sprFactor * x), sprWidth, sprWidth);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprFactor * x), sprWidth, sprWidth), this);
                             break;
                         case 1:
                         case 5:
-                            img->setGeometry(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth), this);
                             break;
                         case 2:
                         case 6:
-                            img->setGeometry(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprFactor * -1 * x), sprWidth, sprWidth);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprFactor * -1 * x), sprWidth, sprWidth), this);
                             break;
                         case 3:
                         case 7:
-                            img->setGeometry(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth), this);
                             break;
                         }
                         //img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
                         if (actor->hp > 0)
                         {
-                            spr->play(SPR_IDLE, pos);
+                            spr->playActor(SPR_CAST, pos);
                             //spr->play(SPR_IDLE, pos);
                         }
                         else
                         {
-                            spr->play(SPR_KO, pos);
+                            spr->playActor(SPR_KO, pos);
                             //spr->play(SPR_KO, pos);
                         }
                         //spr->play(actor->hp > 0 ? SPR_IDLE : SPR_KO, pos);
                         //actLayout->addWidget(img);
                         sprites[k] = spr;
-                        img->update();
                     }
                     if ((++k) == SPR_SIZE)
                     {
@@ -329,7 +351,9 @@ ArenaWidget::~ArenaWidget()
     delete this->mainLayout;
     for (auto spr : this->sprites)
     {
-        delete spr->label;
-        delete spr;
+        if (spr != nullptr)
+        {
+            delete spr;
+        }
     }
 }

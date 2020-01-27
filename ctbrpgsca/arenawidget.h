@@ -47,16 +47,17 @@ namespace tbrpgsca
         struct ActorSprite : QObject
         {
         public:
-            void play(int const spr, int const pos);
+            void playSkill(QString skillPath);
+            void playActor(int const spr, int const pos);
 
-            ActorSprite(Actor* const actor, QLabel* const label, ArenaWidget* const arena);
+            ActorSprite(Actor* const actor, QWidget* const widget, QRect size, ArenaWidget* const arena);
 
             ~ActorSprite();
         protected:
             Actor* actor;
             ArenaWidget* arena;
-            QMovie* movie;
-            QLabel* label;
+            QMovie* actorMovie,* skillMovie;
+            QLabel* actorLabel,* skillLabel;
             int spr, pos;
 
             friend class ArenaWidget;
