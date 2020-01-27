@@ -14,6 +14,7 @@ using namespace tbrpgsca;
 
 void ArenaWidget::ActorSprite::play(int const spr, int const pos)
 {
+    QMovie& movie = *(this->movie);
     if (this->spr != spr || this->pos != pos)
     {
         QString s;
@@ -47,18 +48,14 @@ void ArenaWidget::ActorSprite::play(int const spr, int const pos)
         }
         this->spr = spr;
         this->pos = pos;
-        this->movie->setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s));
-        //this->label->setPixmap(QPixmap());
+        movie.stop();
+        movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s));
     }
-    this->movie->jumpToFrame(0);
+    movie.jumpToFrame(0);
     if (spr != SPR_IDLE && spr != SPR_KO)
     {
         ++(this->arena->sprRuns);
-        this->movie->start();
-    }
-    else
-    {
-        this->movie->setPaused(true);
+        movie.start();
     }
 }
 
@@ -76,6 +73,7 @@ ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QLabel* const label, A
     this->movie = movie;
     this->label = label;
     actor->extra = this;
+    label->show();
 }
 
 ArenaWidget::ActorSprite::~ActorSprite()
@@ -112,9 +110,13 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
         QLabel* infoTxt = new QLabel(this);
         QLabel* actionsTxt = new QLabel(this);
         QPushButton* actBtn = new QPushButton(this);
+        actBtn->setText(tr("Execute"));
         QPushButton* autoBtn = new QPushButton(this);
+        autoBtn->setText(tr("Auto"));
         QPushButton* fleeBtn = new QPushButton(this);
+        fleeBtn->setText(tr("Flee"));
         QPushButton* useBtn = new QPushButton(this);
+        useBtn->setText(tr("Use"));
         QComboBox* targetBox = new QComboBox(this);
         QComboBox* skillsBox = new QComboBox(this);
         QComboBox* itemsBox = new QComboBox(this);
@@ -268,16 +270,17 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                         if (actor->hp > 0)
                         {
                             spr->play(SPR_IDLE, pos);
-                            spr->play(SPR_IDLE, pos);
+                            //spr->play(SPR_IDLE, pos);
                         }
                         else
                         {
                             spr->play(SPR_KO, pos);
-                            spr->play(SPR_KO, pos);
+                            //spr->play(SPR_KO, pos);
                         }
                         //spr->play(actor->hp > 0 ? SPR_IDLE : SPR_KO, pos);
                         //actLayout->addWidget(img);
                         sprites[k] = spr;
+                        img->update();
                     }
                     if ((++k) == SPR_SIZE)
                     {
