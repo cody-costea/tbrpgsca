@@ -30,7 +30,7 @@ namespace tbrpgsca
         #define MIN_ROUND INT_MIN
     public:
         typedef std::function<bool(Scene& scene, QString& ret)> SceneAct;
-        typedef std::function<bool(Scene& scene, Actor& user, Ability& ability, Actor& target, Ability* counter)> ActorAct;
+        typedef std::function<bool(Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* counter)> ActorAct;
 
         static QString EscapeTxt;
         static QString VictoryTxt;

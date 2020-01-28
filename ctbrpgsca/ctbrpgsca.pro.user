@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-01-26T22:53:44. -->
+<!-- Written by QtCreator 4.11.0, 2020-01-28T13:02:10. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -511,6 +511,11 @@
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.PluginSettings">
+    <valuelist type="QVariantList" key="AndroidDeviceAbis">
+     <value type="QString">arm64-v8a</value>
+     <value type="QString">armeabi-v7a</value>
+     <value type="QString">armeabi</value>
+    </valuelist>
     <value type="QString" key="AndroidDeviceSerialNumber">A798XXBM941100A2</value>
     <value type="int" key="AndroidVersion.ApiLevel">28</value>
    </valuemap>

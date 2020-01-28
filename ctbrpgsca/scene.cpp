@@ -197,6 +197,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
         int cntSize;
         Ability* counter = nullptr;
         QVector<Ability*>* counters;
+        bool const ko = target->hp < 1;
         ability.execute(ret, this, user, target, applyCosts);
         if ((!healing) && ((counters = target->counters) != nullptr) && (cntSize = counters->size()) > 0
                 && (!target->isStunned()) && (target->side != user.side || target->isConfused()))
@@ -217,7 +218,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
             }
         }
         ActorAct* actorEvent = scene.actorEvent;
-        if (actorEvent == nullptr || ((*actorEvent)(scene, user, ability, *target, counter)))
+        if (actorEvent == nullptr || ((*actorEvent)(scene, user, ability, (ko && target->hp > 0), *target, counter)))
         {
             QVector<Actor*>* targets = scene.targets;
             if (targets == nullptr)

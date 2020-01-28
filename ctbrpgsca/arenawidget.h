@@ -34,23 +34,24 @@ namespace tbrpgsca
         #define POS_RIGHT 1
         #define SPR_EXT "gif"
     public:
+        ArenaWidget& afterAct();
+        ArenaWidget& enableControls(bool const enable);
+
         explicit ArenaWidget(QWidget* parent = nullptr);
 
-        ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
-                    QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
         ~ArenaWidget();
 
-        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
-                                QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
         {
         public:
-            void playSkill(QString skillPath);
-            void playActor(int const spr, int const pos);
+            ActorSprite& playSkill(QString& sprPath);
+            ActorSprite& playActor(int const spr, int const pos);
 
-            ActorSprite(Actor* const actor, QWidget* const widget, QRect size, ArenaWidget* const arena);
+            ActorSprite(Actor* const actor, QWidget* const widget, QRect size, ArenaWidget& arena);
 
             ~ActorSprite();
         protected:
@@ -63,8 +64,7 @@ namespace tbrpgsca
             friend class ArenaWidget;
         };        
 
-        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent,
-                                QVector<SceneAct*>* const events, int const surprise, int const mInit, bool const doScene);
+        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit, bool const doScene);
 
         int sprRuns;
         ActorSprite* sprites[SPR_SIZE];
