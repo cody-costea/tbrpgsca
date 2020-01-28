@@ -223,7 +223,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
             QVector<Actor*>* targets = scene.targets;
             if (targets == nullptr)
             {
-                targets = new QVector<Actor*>(scene.parties[target->side]->size());
+                targets = new QVector<Actor*>(scene.parties[target->oldSide]->size());
                 scene.targets = targets;
             }
             targets->append(target);
@@ -293,7 +293,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     }
     else if (ability.targetsSide())
     {
-        int side = ability.targetsSelf() ? user.side : target.side;
+        int side = ability.targetsSelf() ? user.side : target.oldSide;
         QVector<Actor*>& party = *(scene.parties[side]);
         int pSize = party.size();
         for (int i = 0; i < pSize; ++i)
