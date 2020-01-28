@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QtOpenGL/QGL>
+#include <QGraphicsProxyWidget>
 #include <QScreen>
 
 int main(int argc, char* argv[])
@@ -18,17 +19,19 @@ int main(int argc, char* argv[])
     QVector<QVector<Actor*>*> parties;
     parties.append(&(demoLib.getPlayers()));
     parties.append(demoLib.getEnemies().at(0));
-    /*const QSize& size = QApplication::screens().at(0)->availableSize();
+    const QSize& size = QApplication::screens().at(0)->availableSize();
     QRect geometry(0, 0, size.width(), size.height());
-    scene.setSceneRect(geometry);*/
+    scene.setSceneRect(geometry);
     ArenaWidget arena(nullptr, ret, parties, nullptr, -1, 0);
     //arena.setGeometry(geometry);
-    scene.addWidget(&arena);
+    QGraphicsProxyWidget* arenaProxy = scene.addWidget(&arena);
     QGraphicsView view(&scene);
-    /*view.fitInView(geometry, Qt::KeepAspectRatioByExpanding);
+    arenaProxy->setScale(3);
+    arenaProxy->update();
+    view.fitInView(geometry, Qt::KeepAspectRatio);
     view.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
     view.setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
-    view.update();*/
+    view.update();
     view.show();
 
     return a.exec();

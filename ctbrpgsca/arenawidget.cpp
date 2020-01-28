@@ -198,10 +198,8 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
         {
             int const actHeight = height / 10;
             imgHeight = height - actHeight;
-            arenaImg->setMaximumHeight(imgHeight);
-            arenaImg->setMinimumHeight(imgHeight);
-            actionsTxt->setMaximumHeight(actHeight);
-            actionsTxt->setMinimumHeight(actHeight);
+            arenaImg->setFixedHeight(imgHeight);
+            actionsTxt->setFixedHeight(actHeight);
             actLayout->addWidget(arenaImg);
             actLayout->addWidget(actionsTxt);
             actWidget->setLayout(actLayout);
@@ -242,20 +240,24 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             ctrLayout->addWidget(itemsBox);
             ctrLayout->addWidget(fleeBtn);
             //ctrLayout->setGeometry(QRect(0, 0, sprWidth, height));
-            ctrWidget->setMinimumWidth(sprWidth);
-            ctrWidget->setMaximumWidth(sprWidth);
+            ctrWidget->setFixedWidth(sprWidth);
             ctrWidget->setLayout(ctrLayout);
             arena.ctrWidget = ctrWidget;
             arena.ctrLayout = ctrLayout;
             imgWidth = width - sprWidth;
             //portrait = false;
         }
-        actWidget->setMaximumWidth(imgWidth);
-        actWidget->setMinimumWidth(imgWidth);
-        actionsTxt->setMaximumWidth(imgWidth);
-        actionsTxt->setMinimumWidth(imgWidth);
-        arenaImg->setMaximumWidth(imgWidth);
-        arenaImg->setMinimumWidth(imgWidth);
+        int const btnHeight = height / 7;
+        actWidget->setFixedWidth(imgWidth);
+        actionsTxt->setFixedWidth(imgWidth);
+        arenaImg->setFixedWidth(imgWidth);
+        skillsBox->setFixedHeight(btnHeight);
+        targetBox->setFixedHeight(btnHeight);
+        itemsBox->setFixedHeight(btnHeight);
+        actBtn->setFixedHeight(btnHeight);
+        autoBtn->setFixedHeight(btnHeight);
+        fleeBtn->setFixedHeight(btnHeight);
+        useBtn->setFixedHeight(btnHeight);
     }
     layout->addWidget(ctrWidget);
     layout->addWidget(actWidget);
