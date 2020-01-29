@@ -44,12 +44,12 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int
         switch (spr)
         {
         case SPR_IDLE:
-            s = "hit";
+            s = "idle";
             //label->setPixmap(QPixmap(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s)));
             //return;
             break;
         case SPR_KO:
-            s = "restored";
+            s = "ko";
             break;
         case SPR_HIT:
             s = "hit";
@@ -89,6 +89,8 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int
 
 ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget, QRect location, ArenaWidget& arena)
 {
+    this->spr = -1;
+    this->pos = -1;
     this->actor = actor;
     this->arena = &arena;
     QMovie* const actorMovie = new QMovie(),* skillMovie = new QMovie();
@@ -335,7 +337,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                         //img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
                         if (actor->hp > 0)
                         {
-                            spr->playActor(SPR_CAST, pos);
+                            spr->playActor(SPR_IDLE, pos);
                             //spr->play(SPR_IDLE, pos);
                         }
                         else
