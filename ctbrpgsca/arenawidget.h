@@ -39,11 +39,11 @@ namespace tbrpgsca
 
         explicit ArenaWidget(QWidget* parent = nullptr);
 
-        ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget(QWidget* parent, QRect location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
         ~ArenaWidget();
 
-        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget& operator()(QRect location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
         {
@@ -51,7 +51,7 @@ namespace tbrpgsca
             ActorSprite& playActor(int const spr);
             ActorSprite& playSkill(QString& sprPath);
 
-            ActorSprite(Actor* const actor, QWidget* const widget, QRect size, ArenaWidget& arena, QString& pos);
+            ActorSprite(Actor& actor, QWidget* const widget, QRect size, ArenaWidget& arena, QString& pos);
 
             ~ActorSprite();
         protected:
@@ -65,7 +65,8 @@ namespace tbrpgsca
             friend class ArenaWidget;
         };        
 
-        ArenaWidget& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit, bool const doScene);
+        ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+                                int const surprise, int const mInit, bool const doScene);
 
         int sprRuns;
         ActorSprite* sprites[SPR_SIZE];

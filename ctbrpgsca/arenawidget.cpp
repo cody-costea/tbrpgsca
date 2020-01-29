@@ -89,11 +89,11 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr)
     return actSprite;
 }
 
-ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget, QRect location, ArenaWidget& arena, QString& pos)
+ArenaWidget::ActorSprite::ActorSprite(Actor& actor, QWidget* const widget, QRect location, ArenaWidget& arena, QString& pos)
 {
     this->spr = -1;
     this->pos = pos;
-    this->actor = actor;
+    this->actor = &actor;
     this->arena = &arena;
     QMovie* const actorMovie = new QMovie(),* skillMovie = new QMovie();
     QLabel* const actorLabel = new QLabel(widget),* skillLabel = new QLabel(actorLabel);
@@ -116,9 +116,18 @@ ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget,
            }
        }
     };
+    actorLabel->setScaledContents(true);
+    skillLabel->setScaledContents(true);
     connect(actorMovie, &QMovie::finished, run);
     connect(skillMovie, &QMovie::finished, run);
-    skillLabel->setGeometry(0, 0, location.width(), location.height());
+    int const width = location.width(), height = location.height();
+    if (width != 128 || height != 128)
+    {
+        QSize size(width, height);
+        actorMovie->setScaledSize(size);
+        skillMovie->setScaledSize(size);
+    }
+    skillLabel->setGeometry(0, 0, width, height);
     actorLabel->setGeometry(location);
     actorLabel->setMovie(actorMovie);
     skillLabel->setMovie(skillMovie);
@@ -126,7 +135,7 @@ ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget,
     this->actorLabel = actorLabel;
     this->skillMovie = skillMovie;
     this->skillLabel = skillLabel;
-    actor->extra = this;
+    actor.extra = this;
     actorLabel->show();
     skillLabel->show();
 }
@@ -157,12 +166,12 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
     return arena;
 }
 
-ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+ArenaWidget& ArenaWidget::operator()(QRect size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
-    return this->operator()(ret, parties, events, surprise, mInit, true);
+    return this->operator()(size, ret, parties, events, surprise, mInit, true);
 }
 
-ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                      int const surprise, int const mInit, bool const doScene)
 {
     ArenaWidget& arena = *this;
@@ -170,11 +179,12 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     QLabel* arenaImg = new QLabel(this);
     QWidget* actWidget = new QWidget(this);
     QWidget* ctrWidget = new QWidget(this);
+    arena.setGeometry(size);
     QLayout* layout;
     {
         QLayout* ctrLayout;
-        int const width = arena.width();
-        int const height = arena.height();
+        int const width = size.width();
+        int const height = size.height();
         QLabel* infoTxt = new QLabel(this);
         QLabel* actionsTxt = new QLabel(this);
         QPushButton* actBtn = new QPushButton(this);
@@ -208,10 +218,9 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             actLayout->addWidget(actionsTxt);
             actWidget->setLayout(actLayout);
         }
-        //bool portrait;
-        if (height > width)
+        if (height > width) //portrait
         {
-            if (height < 640 || height > 1024)
+            if (height < 640 || height > 800)
             {
                 sprWidth = height / 5;
             }
@@ -222,11 +231,10 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             ctrLayout = new QGridLayout(this);
             layout = new QVBoxLayout(this);
             imgWidth = width;
-            //portrait = true;
         }
-        else
+        else //landscape
         {
-            if (width < 640 || width > 1024)
+            if (width < 640 || width > 800)
             {
                 sprWidth = width / 5;
             }
@@ -243,13 +251,11 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             ctrLayout->addWidget(useBtn);
             ctrLayout->addWidget(itemsBox);
             ctrLayout->addWidget(fleeBtn);
-            //ctrLayout->setGeometry(QRect(0, 0, sprWidth, height));
             ctrWidget->setFixedWidth(sprWidth);
             ctrWidget->setLayout(ctrLayout);
             arena.ctrWidget = ctrWidget;
             arena.ctrLayout = ctrLayout;
             imgWidth = width - sprWidth;
-            //portrait = false;
         }
         int const btnHeight = height / 7;
         actWidget->setFixedWidth(imgWidth);
@@ -273,7 +279,6 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
         ActorSprite** sprites = arena.sprites;
         qDebug() << "arenaImg->width(): " << arenaImg->width();
         qDebug() << "sprWidth: " << sprWidth;
-        //QVector<QVector<Actor*>*>& parties = par
         {
             int k = 0;
             int const pSize = parties.size(), xCentre = imgWidth / 3, yCentre = imgHeight / 3, sprFactor = sprWidth / 2;
@@ -317,7 +322,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     if (i < sprSize)
                     {
                         ActorSprite* spr;
-                        Actor* const actor = party[i];
+                        Actor& actor = *(party[i]);
                         switch (j > 1 ? k : i)
                         {
                         case 0:
@@ -337,19 +342,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                             spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth), arena, pos);
                             break;
                         }
-                        //img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
-                        if (actor->hp > 0)
-                        {
-                            spr->playActor(SPR_IDLE);
-                            //spr->play(SPR_IDLE, pos);
-                        }
-                        else
-                        {
-                            spr->playActor(SPR_KO);
-                            //spr->play(SPR_KO, pos);
-                        }
-                        //spr->play(actor->hp > 0 ? SPR_IDLE : SPR_KO, pos);
-                        //actLayout->addWidget(img);
+                        spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
                         sprites[k] = spr;
                     }
                     if ((++k) == SPR_SIZE)
@@ -395,10 +388,10 @@ ArenaWidget::ArenaWidget(QWidget* parent) : QWidget(parent), Scene()
 
 }
 
-ArenaWidget::ArenaWidget(QWidget* parent, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+ArenaWidget::ArenaWidget(QWidget* parent, QRect size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
     : QWidget(parent), Scene(ret, parties, nullptr, events, surprise, mInit)
 {
-    this->operator()(ret, parties, events, surprise, mInit, false);
+    this->operator()(size, ret, parties, events, surprise, mInit, false);
 }
 
 ArenaWidget::~ArenaWidget()

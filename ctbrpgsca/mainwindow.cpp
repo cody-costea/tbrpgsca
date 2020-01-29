@@ -11,12 +11,13 @@ MainWindow::MainWindow(QWidget* parent) :
     DemoLib(),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
     QString ret;
+    ui->setupUi(this);
+    QRect location(0, 0, 640, 480);
     QVector<QVector<Actor*>*> parties;
     parties.append(&(this->getPlayers()));
     parties.append(this->getEnemies().at(0));
-    ui->arenaWidget->operator()(ret, parties, nullptr, -1, 0);
+    ui->arenaWidget->operator()(location, ret, parties, nullptr, -1, 0);
     //ui->arenaWidget->operator()(ret, parties, nullptr, 0, 0);
 }
 
