@@ -38,7 +38,7 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int
 {
     ActorSprite& actSprite = *this;
     QMovie& movie = *(actSprite.actorMovie);
-    if (actSprite.spr != spr || actSprite.pos != pos)
+    if (actSprite.spr != spr || actSprite.pos != pos || actSprite.actor->isShapeShifted())
     {
         QString s;
         switch (spr)
@@ -72,7 +72,7 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int
         actSprite.spr = spr;
         actSprite.pos = pos;
         movie.stop();
-        movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(actSprite.actor->sprite), pos == POS_LEFT ? "l" : "r", s));
+        movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(actSprite.actor->sprite), arena->sidePos[pos], s));
     }
     movie.jumpToFrame(0);
     if (spr == SPR_IDLE || spr == SPR_KO)
@@ -286,11 +286,13 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     if (surprise == 0)
                     {
                         x = -1;
+                        arena.sidePos[0] = "r";
                         pos = POS_RIGHT;
                     }
                     else
                     {
                         x = 1;
+                        arena.sidePos[0] = "l";
                         pos = POS_LEFT;
                     }
                 }
@@ -299,11 +301,19 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     if (surprise == 0)
                     {
                         x = 1;
+                        if (j < 2)
+                        {
+                            arena.sidePos[1] = "l";
+                        }
                         pos = POS_LEFT;
                     }
                     else
                     {
                         x = -1;
+                        if (j < 2)
+                        {
+                            arena.sidePos[1] = "r";
+                        }
                         pos = POS_RIGHT;
                     }
                 }

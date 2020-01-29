@@ -74,6 +74,7 @@ namespace tbrpgsca
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* actionsTxt,* arenaImg;
+        QString sidePos[2];
 
     signals:
 
