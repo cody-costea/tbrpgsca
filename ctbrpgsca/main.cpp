@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
     const QSize& size = QApplication::screens().at(0)->availableSize();
     QRect geometry(0, 0, size.width(), size.height());
     scene.setSceneRect(geometry);
-    ArenaWidget arena(nullptr, ret, parties, nullptr, -1, 0);
+    ArenaWidget arena(nullptr, ret, parties, nullptr, 0, 0);
     //arena.setGeometry(geometry);
     QGraphicsProxyWidget* arenaProxy = scene.addWidget(&arena);
     QGraphicsView view(&scene);

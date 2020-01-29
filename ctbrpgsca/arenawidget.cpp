@@ -34,11 +34,12 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playSkill(QString& sprName)
     return actSprite;
 }
 
-ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int const pos)
+ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr)
 {
     ActorSprite& actSprite = *this;
     QMovie& movie = *(actSprite.actorMovie);
-    if (actSprite.spr != spr || actSprite.pos != pos || actSprite.actor->isShapeShifted())
+    Actor& sprActor = *(actSprite.actor);
+    if (actSprite.spr != spr || sprActor.isShapeShifted())
     {
         QString s;
         switch (spr)
@@ -69,10 +70,11 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int
         default:
             return actSprite;
         }
-        actSprite.spr = spr;
-        actSprite.pos = pos;
         movie.stop();
-        movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(actSprite.actor->sprite), arena->sidePos[pos], s));
+        actSprite.spr = spr;
+        movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(sprActor.sprite), actSprite.pos, s));
+        /*movie.setFileName(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(sprActor.sprite), (actSprite.arena->surprise == 0
+            ? (sprActor.oldSide == 0 ? POS_RIGHT : POS_LEFT) : (sprActor.oldSide == 0 ? POS_LEFT : POS_RIGHT)), s));*/
     }
     movie.jumpToFrame(0);
     if (spr == SPR_IDLE || spr == SPR_KO)
@@ -87,10 +89,10 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr, int
     return actSprite;
 }
 
-ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget, QRect location, ArenaWidget& arena)
+ArenaWidget::ActorSprite::ActorSprite(Actor* const actor, QWidget* const widget, QRect location, ArenaWidget& arena, QString& pos)
 {
     this->spr = -1;
-    this->pos = -1;
+    this->pos = pos;
     this->actor = actor;
     this->arena = &arena;
     QMovie* const actorMovie = new QMovie(),* skillMovie = new QMovie();
@@ -280,19 +282,18 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             qDebug() << "yCentre: " << yCentre;
             for (int j = 0; j < pSize; ++j)
             {
-                int x, pos;
+                int x;
+                QString pos;
                 if (j == 0)
                 {
                     if (surprise == 0)
                     {
                         x = -1;
-                        arena.sidePos[0] = "r";
                         pos = POS_RIGHT;
                     }
                     else
                     {
                         x = 1;
-                        arena.sidePos[0] = "l";
                         pos = POS_LEFT;
                     }
                 }
@@ -301,19 +302,11 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                     if (surprise == 0)
                     {
                         x = 1;
-                        if (j < 2)
-                        {
-                            arena.sidePos[1] = "l";
-                        }
                         pos = POS_LEFT;
                     }
                     else
                     {
                         x = -1;
-                        if (j < 2)
-                        {
-                            arena.sidePos[1] = "r";
-                        }
                         pos = POS_RIGHT;
                     }
                 }
@@ -329,30 +322,30 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
                         {
                         case 0:
                         case 4:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprFactor * x), sprWidth, sprWidth), arena);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprFactor * x), sprWidth, sprWidth), arena, pos);
                             break;
                         case 1:
                         case 5:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth), arena);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth), arena, pos);
                             break;
                         case 2:
                         case 6:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprFactor * -1 * x), sprWidth, sprWidth), arena);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprFactor * -1 * x), sprWidth, sprWidth), arena, pos);
                             break;
                         case 3:
                         case 7:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth), arena);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth), arena, pos);
                             break;
                         }
                         //img->setGeometry(sprWidth * (i), sprWidth * (j + i), sprWidth, sprWidth);
                         if (actor->hp > 0)
                         {
-                            spr->playActor(SPR_IDLE, pos);
+                            spr->playActor(SPR_IDLE);
                             //spr->play(SPR_IDLE, pos);
                         }
                         else
                         {
-                            spr->playActor(SPR_KO, pos);
+                            spr->playActor(SPR_KO);
                             //spr->play(SPR_KO, pos);
                         }
                         //spr->play(actor->hp > 0 ? SPR_IDLE : SPR_KO, pos);
@@ -375,7 +368,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
     auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* counter) -> bool
     {
         //(static_cast<ArenaWidget&>(scene)).sprRuns = 0;
-        (static_cast<ActorSprite*>(user.extra))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST, user.oldSide);
+        (static_cast<ActorSprite*>(user.extra))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
         ActorSprite& targetSpr = *(static_cast<ActorSprite*>(target.extra));
         QString* spr = ability.sprite;
         if (spr != nullptr && spr->length() > 0)
@@ -383,7 +376,7 @@ ArenaWidget& ArenaWidget::operator()(QString& ret, QVector<QVector<Actor*>*>& pa
             targetSpr.playSkill(*spr);
         }
         targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
-                                                                             ? SPR_ACT : SPR_CAST))) : SPR_FALL, target.oldSide);
+                                                                             ? SPR_ACT : SPR_CAST))) : SPR_FALL);
         return false;
     });
     if (doScene)

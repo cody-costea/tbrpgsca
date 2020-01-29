@@ -650,12 +650,13 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
         scene.mInit = 0;
         useInit = false;
     }
+    int current = 0;
     scene.events = events;
     scene.parties = parties;
     scene.players = players;
     scene.actorEvent = actorEvent;
     scene.current = scene.oldCurrent = 0;
-    int current = 0;
+    scene.surprise = surprise;
     Actor* crActor = nullptr;
     for (int i = 0; i < partiesSize; ++i)
     {

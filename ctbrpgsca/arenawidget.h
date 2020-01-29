@@ -30,8 +30,8 @@ namespace tbrpgsca
         #define SPR_RISE 4
         #define SPR_ACT 5
         #define SPR_CAST 6
-        #define POS_LEFT 0
-        #define POS_RIGHT 1
+        #define POS_LEFT "l"
+        #define POS_RIGHT "r"
         #define SPR_EXT "gif"
     public:
         ArenaWidget& afterAct();
@@ -48,10 +48,10 @@ namespace tbrpgsca
         struct ActorSprite : QObject
         {
         public:
+            ActorSprite& playActor(int const spr);
             ActorSprite& playSkill(QString& sprPath);
-            ActorSprite& playActor(int const spr, int const pos);
 
-            ActorSprite(Actor* const actor, QWidget* const widget, QRect size, ArenaWidget& arena);
+            ActorSprite(Actor* const actor, QWidget* const widget, QRect size, ArenaWidget& arena, QString& pos);
 
             ~ActorSprite();
         protected:
@@ -59,7 +59,8 @@ namespace tbrpgsca
             ArenaWidget* arena;
             QMovie* actorMovie,* skillMovie;
             QLabel* actorLabel,* skillLabel;
-            int spr, pos;
+            QString pos;
+            int spr;
 
             friend class ArenaWidget;
         };        
@@ -74,7 +75,6 @@ namespace tbrpgsca
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* actionsTxt,* arenaImg;
-        QString sidePos[2];
 
     signals:
 
