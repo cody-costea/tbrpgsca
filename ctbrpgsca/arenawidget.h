@@ -64,7 +64,11 @@ namespace tbrpgsca
             int spr;
 
             friend class ArenaWidget;
-        };        
+        };
+
+        ArenaWidget& prepareTargetBox(QVector<Actor*>& players);
+        ArenaWidget& prepareSkillsBox(QVector<Ability*>& skills);
+        ArenaWidget& prepareItemsBox(QMap<Ability*, int>& items);
 
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
@@ -75,6 +79,7 @@ namespace tbrpgsca
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* actLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
+        QStringList skillsList, targetList,* itemsList;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* arenaImg;
         QTextEdit* actionsTxt;

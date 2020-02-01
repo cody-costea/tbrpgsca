@@ -113,6 +113,7 @@ ArenaWidget::ActorSprite::ActorSprite(Actor& actor, QWidget* const widget, QRect
            else
            {
                arena.enableControls(true);
+               arena.afterAct();
            }
        }
     };
@@ -163,6 +164,60 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
     arena.itemsBox->setEnabled(enable);
     arena.fleeBtn->setEnabled(enable);
     arena.useBtn->setEnabled(enable);
+    return arena;
+}
+
+ArenaWidget& ArenaWidget::prepareTargetBox(QVector<Actor *>& players)
+{
+    ArenaWidget& arena = *this;
+    QComboBox& targetBox = *(arena.targetBox);
+    targetBox.clear();
+    for (Actor* const actor : players)
+    {
+        targetBox.addItem(actor->name);
+    }
+    return arena;
+}
+
+ArenaWidget& ArenaWidget::prepareSkillsBox(QVector<Ability*>& skills)
+{
+    ArenaWidget& arena = *this;
+    QComboBox& skillBox = *(arena.skillsBox);
+    skillBox.clear();
+    for (Ability* const skill : skills)
+    {
+        skillBox.addItem(skill->name);
+    }
+    return arena;
+}
+
+ArenaWidget& ArenaWidget::prepareItemsBox(QMap<Ability*, int>& items)
+{
+    ArenaWidget& arena = *this;
+    QComboBox& itemsBox = *(arena.itemsBox);
+    itemsBox.clear();
+    auto const iLast = items.cend();
+    for (auto iIt = items.cbegin(); iIt != iLast; ++iIt)
+    {
+        itemsBox.addItem(iIt.key()->name % QString(iIt.value()));
+    }
+    return arena;
+}
+
+ArenaWidget& ArenaWidget::afterAct()
+{
+    ArenaWidget& arena = *this;
+    arena.prepareTargetBox(*players);
+    arena.prepareSkillsBox(*crActor->aSkills);
+    QMap<Ability*, int>* crItems = crActor->items;
+    if (crItems == nullptr)
+    {
+        arena.itemsList = nullptr;
+    }
+    else
+    {
+        arena.prepareItemsBox(*crItems);
+    }
     return arena;
 }
 
@@ -259,8 +314,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         int const btnHeight = height / 7;
         actWidget->setFixedWidth(imgWidth);
-        actionsTxt->setFixedWidth(imgWidth);
-        arenaImg->setFixedWidth(imgWidth);
+        //actionsTxt->setFixedWidth(imgWidth - sprWidth);
+        //arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
         targetBox->setFixedHeight(btnHeight);
         itemsBox->setFixedHeight(btnHeight);
@@ -269,14 +324,19 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         fleeBtn->setFixedHeight(btnHeight);
         useBtn->setFixedHeight(btnHeight);
         actionsTxt->setReadOnly(true);
-        auto actClick = [&arena]()
+        connect(autoBtn, &QPushButton::clicked, [&arena]()
         {
             QString ret;
-            qDebug("HERE!!!");
             arena.playAi(ret, *(arena.crActor));
             arena.actionsTxt->append(ret);
-        };
-        connect(actBtn, &QPushButton::clicked, actClick);
+        });
+        connect(actBtn, &QPushButton::clicked, [&arena]()
+        {
+            QString ret;
+            Actor& crActor = *(arena.crActor);
+            arena.perform(ret, crActor, *(arena.players->at(arena.targetBox->currentIndex())), *(crActor.aSkills->at(arena.skillsBox->currentIndex())), false);
+            arena.actionsTxt->append(ret);
+        });
     }
     layout->addWidget(ctrWidget);
     layout->addWidget(actWidget);
@@ -389,6 +449,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     {
         arena.actorEvent = actorRun;
     }
+    arena.afterAct();
     return arena;
 }
 
@@ -421,6 +482,11 @@ ArenaWidget::~ArenaWidget()
     delete this->actLayout;
     delete this->mainLayout;
     delete this->actorEvent;
+    QStringList* itemsList = this->itemsList;
+    if (itemsList != nullptr)
+    {
+        delete itemsList;
+    }
     for (auto spr : this->sprites)
     {
         if (spr != nullptr)
