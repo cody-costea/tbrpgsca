@@ -167,7 +167,7 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
     return arena;
 }
 
-ArenaWidget& ArenaWidget::prepareTargetBox(QVector<Actor *>& players)
+ArenaWidget& ArenaWidget::prepareTargetBox(QVector<Actor*>& players)
 {
     ArenaWidget& arena = *this;
     QComboBox& targetBox = *(arena.targetBox);
@@ -176,6 +176,7 @@ ArenaWidget& ArenaWidget::prepareTargetBox(QVector<Actor *>& players)
     {
         targetBox.addItem(actor->name);
     }
+    targetBox.setCurrentIndex(players.size() / 2);
     return arena;
 }
 
@@ -207,7 +208,6 @@ ArenaWidget& ArenaWidget::prepareItemsBox(QMap<Ability*, int>& items)
 ArenaWidget& ArenaWidget::afterAct()
 {
     ArenaWidget& arena = *this;
-    arena.prepareTargetBox(*players);
     arena.prepareSkillsBox(*crActor->aSkills);
     QMap<Ability*, int>* crItems = crActor->items;
     if (crItems == nullptr)
@@ -329,13 +329,16 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             QString ret;
             arena.playAi(ret, *(arena.crActor));
             arena.actionsTxt->append(ret);
+            arena.enableControls(false);
         });
         connect(actBtn, &QPushButton::clicked, [&arena]()
         {
             QString ret;
-            Actor& crActor = *(arena.crActor);
-            arena.perform(ret, crActor, *(arena.players->at(arena.targetBox->currentIndex())), *(crActor.aSkills->at(arena.skillsBox->currentIndex())), false);
+            Actor* crActor = arena.crActor;
+            arena.perform(ret, *crActor, *(arena.players->at(arena.targetBox->currentIndex())), *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
             arena.actionsTxt->append(ret);
+            arena.enableControls(false);
+            arena.endTurn(ret, crActor);
         });
     }
     layout->addWidget(ctrWidget);
@@ -450,6 +453,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.actorEvent = actorRun;
     }
     arena.afterAct();
+    arena.prepareTargetBox(*arena.players);
     return arena;
 }
 

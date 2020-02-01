@@ -107,7 +107,7 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 
 Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
-    if (!user.isRanged() || (skill.isOnlyMelee() && !skill.isRanged()))
+    if (user.oldSide != target.oldSide && (!skill.isRanged() && (!user.isRanged() || skill.isOnlyMelee())))
     {
         int pos = -1;
         int side = target.oldSide;
