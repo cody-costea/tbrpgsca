@@ -186,7 +186,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         int const width = size.width();
         int const height = size.height();
         QLabel* infoTxt = new QLabel(this);
-        QLabel* actionsTxt = new QLabel(this);
+        QTextEdit* actionsTxt = new QTextEdit(this);
         QPushButton* actBtn = new QPushButton(this);
         actBtn->setText(tr("Execute"));
         QPushButton* autoBtn = new QPushButton(this);
@@ -268,6 +268,15 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         autoBtn->setFixedHeight(btnHeight);
         fleeBtn->setFixedHeight(btnHeight);
         useBtn->setFixedHeight(btnHeight);
+        actionsTxt->setReadOnly(true);
+        auto actClick = [&arena]()
+        {
+            QString ret;
+            qDebug("HERE!!!");
+            arena.playAi(ret, *(arena.crActor));
+            arena.actionsTxt->append(ret);
+        };
+        connect(actBtn, &QPushButton::clicked, actClick);
     }
     layout->addWidget(ctrWidget);
     layout->addWidget(actWidget);

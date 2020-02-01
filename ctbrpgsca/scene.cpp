@@ -654,6 +654,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     scene.events = events;
     scene.parties = parties;
     scene.players = players;
+    scene.targets = nullptr;
     scene.actorEvent = actorEvent;
     scene.current = scene.oldCurrent = 0;
     scene.surprise = surprise;

@@ -11,9 +11,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QMovie>
 #include <QComboBox>
 #include <QPushButton>
+#include <QTextEdit>
+#include <QLayout>
 #include <QWidget>
 #include <QLabel>
-#include <QLayout>
 #include "scene.h"
 
 namespace tbrpgsca
@@ -75,7 +76,8 @@ namespace tbrpgsca
         QLayout* ctrLayout,* actLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
-        QLabel* infoTxt,* actionsTxt,* arenaImg;
+        QLabel* infoTxt,* arenaImg;
+        QTextEdit* actionsTxt;
 
     signals:
 
