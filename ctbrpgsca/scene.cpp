@@ -191,7 +191,7 @@ Scene& Scene::checkStatus(QString& ret)
 Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts)
 {
     Scene& scene = *this;
-    bool const healing = ability.mHp < 0;
+    bool const healing = ability.hp < 0;
     if ((healing && ability.isReviving()) || target->hp > 0)
     {
         int cntSize;
