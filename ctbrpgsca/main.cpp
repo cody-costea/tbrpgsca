@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
     int const width = size.width(), height = size.height();
     QRect geometry(0, 0, (width / 2), (height / 2));*/
     //QRect geometry(0, 0, 1280, 800);
-    QRect geometry(0, 0, 800, 480);
-    //QRect geometry(0, 0, 640, 480);
+    //QRect geometry(0, 0, 800, 480);
+    QRect geometry(0, 0, 640, 480);
     //QRect geometry(0, 0, 320, 240);
     ArenaWidget arena(nullptr, geometry, ret, parties, nullptr, 0, 0);
     //arena.setGeometry(geometry);

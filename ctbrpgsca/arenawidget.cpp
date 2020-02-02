@@ -355,8 +355,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             int k = 0;
             //imgWidth = arenaImg->width();
             //imgHeight = arenaImg->height();
-            int const pSize = parties.size(), xCentre = imgWidth / 3, yCentre = imgHeight / 3, sprWidth = (sprLength / 3) + (sprLength / 2),
-                    sprFactor = sprLength / 2, sprHeight = (sprFactor / 3) + (sprFactor / 4);
+            int const pSize = parties.size(), sprFactor = sprLength / 2, sprWidth = (sprLength / 3) + (sprLength / 2) + sprFactor,
+                    sprHeight = imgHeight / 12, sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 3, yCentre = imgHeight / 3;
             for (int j = 0; j < pSize; ++j)
             {
                 int x;
@@ -403,15 +403,15 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                             break;
                         case 1:
                         case 5:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprFactor + sprWidth) * x), yCentre - (sprWidth * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprDistance * x), sprLength, sprLength), arena, pos);
                             break;
                         case 2:
                         case 6:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprFactor + sprWidth) * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
                             break;
                         case 3:
                         case 7:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprDistance * -1 * x), sprLength, sprLength), arena, pos);
                             break;
                         }
                         spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
