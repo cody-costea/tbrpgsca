@@ -265,7 +265,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.actBtn = actBtn;
         arena.useBtn = useBtn;
         {
-            int const actHeight = height / 8;
+            int const actHeight = height / 5;
             imgHeight = height - actHeight;
             arenaImg->setFixedHeight(imgHeight);
             actionsTxt->setFixedHeight(actHeight);
@@ -352,7 +352,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         {
             int k = 0;
             int const pSize = parties.size(), xCentre = imgWidth / 3, yCentre = imgHeight / 3,
-                    sprFactor = sprWidth / 2, sprHeight = (sprFactor / 2) + (sprFactor / 5);
+                    sprFactor = (sprWidth / 2) + (sprWidth / 5), sprHeight = (sprFactor / 3) + (sprFactor / 5);
             for (int j = 0; j < pSize; ++j)
             {
                 int x;
