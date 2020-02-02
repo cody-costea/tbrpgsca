@@ -148,7 +148,7 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
                 dmg += dmgSp;
             }
             actor.setCurrentRp(actor.sp - dmgSp);
-            ret = ret % (QString("%d %s").arg(QString(-dmgSp), Role::RpTxt));
+            ret = ret % (QString("%1 %2").arg(QString::number(-dmgSp), Role::RpTxt));
         }
         if (dmgMp != 0)
         {
@@ -171,7 +171,7 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
                 dmg += dmgMp;
             }
             actor.setCurrentMp(actor.mp - dmgMp);
-            ret = ret % (QString("%d %s").arg(QString(-dmgMp), Role::MpTxt));
+            ret = ret % (QString("%1 %2").arg(QString::number(-dmgMp), Role::MpTxt));
         }
         if (dmgHp != 0)
         {
@@ -194,7 +194,7 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
                 dmg += dmgHp;
             }
             actor.setCurrentHp(actor.hp - dmgHp, ret, scene, percent);
-            ret = ret % (QString("%d %s").arg(QString(-dmgHp), Role::HpTxt));
+            ret = ret % (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
         }
         if (c && absorber != nullptr)
         {

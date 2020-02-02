@@ -115,6 +115,7 @@ ArenaWidget::ActorSprite::ActorSprite(Actor& actor, QWidget* const widget, QRect
                arena.enableControls(true);
                arena.afterAct();
            }
+           arena.actionsTxt->append(ret);
        }
     };
     actorLabel->setScaledContents(true);
@@ -265,10 +266,13 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.actBtn = actBtn;
         arena.useBtn = useBtn;
         {
-            int const actHeight = height / 5;
-            imgHeight = height - actHeight;
+            //int const actHeight = height / 8 + height / 80, infoHeight = height / 16;
+            int const actHeight = height / 5, infoHeight = height / 16;
+            imgHeight = height - actHeight - infoHeight;
             arenaImg->setFixedHeight(imgHeight);
             actionsTxt->setFixedHeight(actHeight);
+            infoTxt->setFixedHeight(infoHeight);
+            infoTxt->setText("INFO TEXT TEST!!!");
         }
         if (height > width) //portrait
         {
@@ -286,14 +290,6 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         else //landscape
         {
-            /*if (width != 640)
-            {
-                sprLength = width / 5;
-            }
-            else
-            {
-                sprLength = 128;
-            }*/
             sprLength = width / 5;
             layout = new QHBoxLayout(this);
             ctrLayout = new QVBoxLayout(ctrWidget);
@@ -309,12 +305,13 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             arena.ctrWidget = ctrWidget;
             arena.ctrLayout = ctrLayout;
             imgWidth = width - sprLength;
+            sprLength = (imgHeight + imgHeight / 11) / 3;
         }
         int const btnHeight = height / 7;
         actWidget->setFixedWidth(imgWidth);
         //imgWidth = arenaImg->width();
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
-        arenaImg->setFixedWidth(imgWidth);
+        //arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
         targetBox->setFixedHeight(btnHeight);
         itemsBox->setFixedHeight(btnHeight);
@@ -323,6 +320,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         fleeBtn->setFixedHeight(btnHeight);
         useBtn->setFixedHeight(btnHeight);
         actionsTxt->setReadOnly(true);
+        actLayout->addWidget(infoTxt);
         actLayout->addWidget(arenaImg);
         actLayout->addWidget(actionsTxt);
         actWidget->setLayout(actLayout);
@@ -338,9 +336,9 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             QString ret;
             Actor* crActor = arena.crActor;
             arena.perform(ret, *crActor, *(arena.players->at(arena.targetBox->currentIndex())), *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
-            arena.actionsTxt->append(ret);
             arena.enableControls(false);
             arena.endTurn(ret, crActor);
+            arena.actionsTxt->append(ret);
         });
     }
     layout->addWidget(ctrWidget);
@@ -353,11 +351,12 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         ActorSprite** sprites = arena.sprites;
         {
             int k = 0;
-            imgWidth = arenaImg->width();
-            imgHeight = arenaImg->height();
+            //imgWidth = arenaImg->width();
+            //imgHeight = arenaImg->height();
             qDebug() << "imgWidth: " << imgWidth;
             qDebug() << "imgHeight: " << imgHeight;
-            int const pSize = parties.size(), sprFactor = sprLength / 2, sprWidth = (sprLength / 3) + (sprLength / 2) + sprFactor, sprHeight = imgHeight / 12,
+            //sprLength = (imgHeight > imgWidth ? imgWidth : imgHeight) / 3;
+            int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 12,
                     sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
             //sprLength = 128;
             for (int j = 0; j < pSize; ++j)

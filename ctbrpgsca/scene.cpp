@@ -14,7 +14,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Scene::PerformsTxt = "%s performs %s";
+QString Scene::PerformsTxt = "%1 performs %2";
 QString Scene::VictoryTxt = "The party has won!";
 QString Scene::FallenTxt = "The party has fallen!";
 QString Scene::EscapeTxt = "The party has escaped!";

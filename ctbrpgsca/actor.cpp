@@ -17,7 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Actor::KoTxt = ", %s falls unconscious";
+QString Actor::KoTxt = ", %1 falls unconscious";
 QString Actor::RiseTxt = ", but rises again";
 
 int Actor::getLevel() const
