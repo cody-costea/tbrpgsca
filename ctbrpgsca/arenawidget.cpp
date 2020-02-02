@@ -230,7 +230,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                                      int const surprise, int const mInit, bool const doScene)
 {
     ArenaWidget& arena = *this;
-    int sprWidth, imgWidth, imgHeight;
+    int sprLength, imgWidth, imgHeight;
     QLabel* arenaImg = new QLabel(this);
     QWidget* actWidget = new QWidget(this);
     QWidget* ctrWidget = new QWidget(this);
@@ -275,13 +275,13 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         if (height > width) //portrait
         {
-            if (height < 640 || height > 800)
+            if (height < 480 || height > 1080)
             {
-                sprWidth = height / 5;
+                sprLength = height / 5;
             }
             else
             {
-                sprWidth = 128;
+                sprLength = 128;
             }
             ctrLayout = new QGridLayout(this);
             layout = new QVBoxLayout(this);
@@ -289,14 +289,15 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         else //landscape
         {
-            if (width < 640 || width > 800)
+            /*if (width != 640)
             {
-                sprWidth = width / 5;
+                sprLength = width / 5;
             }
             else
             {
-                sprWidth = 128;
-            }
+                sprLength = 128;
+            }*/
+            sprLength = width / 5;
             layout = new QHBoxLayout(this);
             ctrLayout = new QVBoxLayout(ctrWidget);
             ctrLayout->addWidget(autoBtn);
@@ -306,14 +307,15 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             ctrLayout->addWidget(useBtn);
             ctrLayout->addWidget(itemsBox);
             ctrLayout->addWidget(fleeBtn);
-            ctrWidget->setFixedWidth(sprWidth);
+            ctrWidget->setFixedWidth(sprLength);
             ctrWidget->setLayout(ctrLayout);
             arena.ctrWidget = ctrWidget;
             arena.ctrLayout = ctrLayout;
-            imgWidth = width - sprWidth;
+            imgWidth = width - sprLength;
         }
         int const btnHeight = height / 7;
-        actWidget->setFixedWidth(imgWidth);
+        //actWidget->setFixedWidth(imgWidth);
+        //imgWidth = arenaImg->width();
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
         //arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
@@ -351,8 +353,10 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         ActorSprite** sprites = arena.sprites;
         {
             int k = 0;
-            int const pSize = parties.size(), xCentre = imgWidth / 3, yCentre = imgHeight / 3,
-                    sprFactor = (sprWidth / 2) + (sprWidth / 5), sprHeight = (sprFactor / 3) + (sprFactor / 5);
+            //imgWidth = arenaImg->width();
+            //imgHeight = arenaImg->height();
+            int const pSize = parties.size(), xCentre = imgWidth / 3, yCentre = imgHeight / 3, sprWidth = (sprLength / 3) + (sprLength / 2),
+                    sprFactor = sprLength / 2, sprHeight = (sprFactor / 3) + (sprFactor / 4);
             for (int j = 0; j < pSize; ++j)
             {
                 int x;
@@ -395,19 +399,19 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                         {
                         case 0:
                         case 4:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprWidth, sprWidth), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprLength, sprLength), arena, pos);
                             break;
                         case 1:
                         case 5:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprWidth * x), sprWidth, sprWidth), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprFactor + sprWidth) * x), yCentre - (sprWidth * x), sprLength, sprLength), arena, pos);
                             break;
                         case 2:
                         case 6:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprWidth + sprFactor) * x), yCentre - (sprHeight * -1 * x), sprWidth, sprWidth), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - ((sprFactor + sprWidth) * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
                             break;
                         case 3:
                         case 7:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprWidth, sprWidth), arena, pos);
+                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprWidth * -1 * x), sprLength, sprLength), arena, pos);
                             break;
                         }
                         spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
