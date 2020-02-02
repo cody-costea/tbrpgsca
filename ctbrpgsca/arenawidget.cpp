@@ -269,9 +269,6 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             imgHeight = height - actHeight;
             arenaImg->setFixedHeight(imgHeight);
             actionsTxt->setFixedHeight(actHeight);
-            actLayout->addWidget(arenaImg);
-            actLayout->addWidget(actionsTxt);
-            actWidget->setLayout(actLayout);
         }
         if (height > width) //portrait
         {
@@ -314,10 +311,10 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             imgWidth = width - sprLength;
         }
         int const btnHeight = height / 7;
-        //actWidget->setFixedWidth(imgWidth);
+        actWidget->setFixedWidth(imgWidth);
         //imgWidth = arenaImg->width();
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
-        //arenaImg->setFixedWidth(imgWidth);
+        arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
         targetBox->setFixedHeight(btnHeight);
         itemsBox->setFixedHeight(btnHeight);
@@ -326,6 +323,9 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         fleeBtn->setFixedHeight(btnHeight);
         useBtn->setFixedHeight(btnHeight);
         actionsTxt->setReadOnly(true);
+        actLayout->addWidget(arenaImg);
+        actLayout->addWidget(actionsTxt);
+        actWidget->setLayout(actLayout);
         connect(autoBtn, &QPushButton::clicked, [&arena]()
         {
             QString ret;
@@ -353,10 +353,13 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         ActorSprite** sprites = arena.sprites;
         {
             int k = 0;
-            //imgWidth = arenaImg->width();
-            //imgHeight = arenaImg->height();
-            int const pSize = parties.size(), sprFactor = sprLength / 2, sprWidth = (sprLength / 3) + (sprLength / 2) + sprFactor,
-                    sprHeight = imgHeight / 12, sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 3, yCentre = imgHeight / 3;
+            imgWidth = arenaImg->width();
+            imgHeight = arenaImg->height();
+            qDebug() << "imgWidth: " << imgWidth;
+            qDebug() << "imgHeight: " << imgHeight;
+            int const pSize = parties.size(), sprFactor = sprLength / 2, sprWidth = (sprLength / 3) + (sprLength / 2) + sprFactor, sprHeight = imgHeight / 12,
+                    sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
+            //sprLength = 128;
             for (int j = 0; j < pSize; ++j)
             {
                 int x;
