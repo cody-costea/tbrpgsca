@@ -440,8 +440,11 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         {
             targetSpr.playSkill(*spr);
         }
-        targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
-                                                                             ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+        if (&target != &user)
+        {
+            targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
+                                                                                 ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+        }
         return false;
     });
     if (doScene)
