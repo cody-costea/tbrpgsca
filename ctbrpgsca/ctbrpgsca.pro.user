@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-02-01T22:25:10. -->
+<!-- Written by QtCreator 4.11.0, 2020-02-02T22:18:37. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -582,7 +582,6 @@
     <valuelist type="QVariantList" key="Android.PreStartShellCmdListKey"/>
     <value type="int" key="PE.EnvironmentAspect.Base">0</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">ctbrpgsca</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.AndroidRunConfiguration:C:/Users/codyc/Documents/Projects/tbrpgsca/qtcppjs/ctbrpgsca/ctbrpgsca.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/codyc/Documents/Projects/tbrpgsca/qtcppjs/ctbrpgsca/ctbrpgsca.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
@@ -875,7 +874,6 @@
     <valuelist type="QVariantList" key="Android.PreStartShellCmdListKey"/>
     <value type="int" key="PE.EnvironmentAspect.Base">0</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">ctbrpgsca</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.AndroidRunConfiguration:C:/Users/codyc/Documents/Projects/tbrpgsca/qtcppjs/ctbrpgsca/ctbrpgsca.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/codyc/Documents/Projects/tbrpgsca/qtcppjs/ctbrpgsca/ctbrpgsca.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>

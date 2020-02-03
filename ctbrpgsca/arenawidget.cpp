@@ -356,7 +356,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             qDebug() << "imgWidth: " << imgWidth;
             qDebug() << "imgHeight: " << imgHeight;
             //sprLength = (imgHeight > imgWidth ? imgWidth : imgHeight) / 3;
-            int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 12,
+            int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 10,
                     sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
             //sprLength = 128;
             for (int j = 0; j < pSize; ++j)
