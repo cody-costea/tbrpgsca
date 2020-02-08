@@ -224,7 +224,6 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
             {
                 actor.hp = 0;
                 bool const revives = actor.isReviving();
-                ret = ret % Actor::KoTxt.arg(actor.name);
                 //actor.actions = 0;
                 /*if (actor.isShapeShifted())
                 {

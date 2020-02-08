@@ -155,7 +155,6 @@ Scene& Scene::checkStatus(QString& ret)
         {
             for (int k = 0; k < partySize; ++k)
             {
-                //if (party->at(k)->hp > 0)
                 if (!(party->at(k)->isKnockedOut()))
                 {
                     goto enemyCheck;
@@ -174,7 +173,6 @@ Scene& Scene::checkStatus(QString& ret)
                 partySize = party->size();
                 for (int j = 0; j < partySize; ++j)
                 {
-                    //if (party->at(j)->hp > 0)
                     if (!(party->at(j)->isKnockedOut()))
                     {
                         return scene;
@@ -235,6 +233,7 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
 Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item)
 {
     Scene& scene = *this;
+    ret = ret % Scene::PerformsTxt.arg(user.name, ability.name);
     {
         QVector<Actor*>* targets = scene.targets;
         if (targets != nullptr)
@@ -279,12 +278,10 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
                     else
                     {
                         scene.execute(ret, user, &user, ability, applyCosts);
-                        //ability.execute(ret, this, user, &user, applyCosts);
                     }
                 }
                 else
                 {
-                    //targets->append(trg);
                     scene.execute(ret, user, trg, ability, applyCosts);
                 }
                 applyCosts = false;
@@ -307,13 +304,10 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     {
         if (&user == &target || ability.targetsSelf())
         {
-            //targets->append(&user);
-            //ability.execute(ret, this, user, &user, true);
             scene.execute(ret, user, &user, ability, true);
         }
         else
         {
-            //targets->append(&target);
             scene.execute(ret, user, &(scene.getGuardian(user, target, ability)), ability, true);
         }
     }
@@ -601,6 +595,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
             scene.playAi(ret, (*crActor));
         }
     }
+    ret = ret % ".";
     return scene;
 }
 

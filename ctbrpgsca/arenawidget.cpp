@@ -49,17 +49,6 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playSkill(QString& sprName)
 {
     ActorSprite& actSprite = *this;
     QMovie& movie = *(actSprite.skillMovie);
-    /*if (movie == nullptr)
-    {
-        QLabel* label = actSprite.skillLabel;
-        if (label == nullptr)
-        {
-            label = new QLabel(actSprite.actorLabel);
-            actSprite.skillLabel = label;
-        }
-        movie = new QMovie();
-        actSprite.skillMovie = movie;
-    }*/
     movie.stop();
     movie.setFileName(QString(":/sprites/%1/abilities/%2.%1").arg(SPR_EXT, sprName));
     movie.jumpToFrame(0);
@@ -79,8 +68,6 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr)
         {
         case SPR_IDLE:
             s = "idle";
-            //label->setPixmap(QPixmap(QString(":/sprites/%1/%2/bt_%3_%4.%1").arg(SPR_EXT, *(this->actor->sprite), pos == POS_LEFT ? "l" : "r", s)));
-            //return;
             break;
         case SPR_KO:
             s = "ko";
@@ -138,17 +125,17 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
        if ((--(arena.sprRuns)) < 1)
        {
            QString ret;
-           arena.endTurn(ret, arena.crActor);
+           //arena.endTurn(ret, arena.crActor);
            Actor& crActor = *(arena.crActor);
            if (arena.isAutomatic() || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
            {
-               arena.setAiTurn(true).playAi(ret, crActor);
+               arena.setAiTurn(true).playAi(ret, crActor).endTurn(ret, arena.crActor);
+               arena.actionsTxt->append(ret);
            }
            else
            {
                arena.setAiTurn(false).enableControls(true).afterAct();
            }
-           arena.actionsTxt->append(ret);
        }
     };
     actorLabel->setScaledContents(true);
@@ -215,25 +202,25 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
         arena.actBtn->setEnabled(false);
         arena.useBtn->setEnabled(false);
     }
-    /*else
-    {
-
-    }*/
     arena.itemsBox->setEnabled(enable);
     arena.fleeBtn->setEnabled(enable);
     return arena;
 }
 
-ArenaWidget& ArenaWidget::prepareTargetBox(QVector<Actor*>& players)
+ArenaWidget& ArenaWidget::prepareTargetBox(QVector<QVector<Actor*>*>& parties)
 {
     ArenaWidget& arena = *this;
     QComboBox& targetBox = *(arena.targetBox);
     targetBox.clear();
-    for (Actor* const actor : players)
+    for (QVector<Actor*>* const party : parties)
     {
-        targetBox.addItem(actor->name);
+        for (Actor* const actor : *party)
+        {
+            targetBox.addItem(actor->name);
+        }
     }
-    targetBox.setCurrentIndex(players.size() / 2);
+    //targetBox.setCurrentIndex(players.size() / 2);
+    targetBox.setCurrentIndex(targetBox.count() / 2);
     return arena;
 }
 
@@ -262,13 +249,31 @@ ArenaWidget& ArenaWidget::prepareItemsBox(QMap<Ability*, int>& items)
     return arena;
 }
 
+Actor& ArenaWidget::getPlayerFromTargetBox(int index)
+{
+    QVector<QVector<Actor*>*>& parties = this->parties;
+    for (QVector<Actor*>* party : parties)
+    {
+        int const size = party->size();
+        if (index < size)
+        {
+            return *(party->at(index));
+        }
+        else
+        {
+            index -= size;
+        }
+    }
+    return *(parties[0]->at(0));
+}
+
 inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
 {
     ArenaWidget& arena = *this;
     if ((!arena.isAiTurn()) && trgIndex > -1)
     {
         Actor& crActor = *(arena.crActor);
-        Actor& target = *(arena.players->at(trgIndex));
+        Actor& target = arena.getPlayerFromTargetBox(trgIndex);
         if (skillIndex > -1)
         {
             arena.actBtn->setEnabled(arena.canTarget(crActor, *(crActor.aSkills->at(skillIndex)), target));
@@ -342,7 +347,6 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.actBtn = actBtn;
         arena.useBtn = useBtn;
         {
-            //int const actHeight = height / 8 + height / 80, infoHeight = height / 16;
             int const actHeight = height / 5, infoHeight = height / 16;
             imgHeight = height - actHeight - infoHeight;
             arenaImg->setFixedHeight(imgHeight);
@@ -385,7 +389,6 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         int const btnHeight = height / 7;
         actWidget->setFixedWidth(imgWidth);
-        //imgWidth = arenaImg->width();
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
         //arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
@@ -410,7 +413,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             }
             else
             {
-                arena.setAutomatic(true).playAi(ret, *(arena.crActor));
+                Actor* const crActor = arena.crActor;
+                arena.setAutomatic(true).playAi(ret, *crActor).endTurn(ret, crActor);
                 arena.enableControls(false).actionsTxt->append(ret);
             }
         });
@@ -447,14 +451,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         ActorSprite** sprites = arena.sprites;
         {
             int k = 0;
-            //imgWidth = arenaImg->width();
-            //imgHeight = arenaImg->height();
-            qDebug() << "imgWidth: " << imgWidth;
-            qDebug() << "imgHeight: " << imgHeight;
-            //sprLength = (imgHeight > imgWidth ? imgWidth : imgHeight) / 3;
             int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 10,
                     sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
-            //sprLength = 128;
             for (int j = 0; j < pSize; ++j)
             {
                 int x;
@@ -554,7 +552,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.actorEvent = actorRun;
     }
     arena.afterAct();
-    arena.prepareTargetBox(*arena.players);
+    arena.prepareTargetBox(parties);
     return arena;
 }
 

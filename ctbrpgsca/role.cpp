@@ -195,6 +195,10 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
             }
             actor.setCurrentHp(actor.hp - dmgHp, ret, scene, percent);
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
+            if (actor.hp < 1)
+            {
+                ret = ret % Actor::KoTxt.arg(actor.name);
+            }
         }
         if (c && absorber != nullptr)
         {
