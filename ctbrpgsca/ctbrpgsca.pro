@@ -35,6 +35,7 @@ SOURCES += \
         ability.cpp \
         actor.cpp \
         arenawidget.cpp \
+        clickablelabel.cpp \
         costume.cpp \
         demolib.cpp \
         main.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
         ability.h \
         actor.h \
         arenawidget.h \
+        clickablelabel.h \
         costume.h \
         demolib.h \
         mainwindow.h \

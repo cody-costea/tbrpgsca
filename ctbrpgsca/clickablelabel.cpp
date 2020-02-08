@@ -1,0 +1,17 @@
+//source: https://wiki.qt.io/index.php?title=Clickable_QLabel&oldid=30963
+#include "clickablelabel.h"
+
+ClickableLabel::ClickableLabel(QWidget* parent, Qt::WindowFlags f) : QLabel(parent)
+{
+
+}
+
+ClickableLabel::~ClickableLabel()
+{
+
+}
+
+void ClickableLabel::mousePressEvent(QMouseEvent* event)
+{
+    emit clicked();
+}

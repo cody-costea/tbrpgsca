@@ -89,14 +89,15 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr)
     return actSprite;
 }
 
-ArenaWidget::ActorSprite::ActorSprite(Actor& actor, QWidget* const widget, QRect location, ArenaWidget& arena, QString& pos)
+ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* const widget, QRect location, ArenaWidget& arena, QString& pos)
 {
     this->spr = -1;
     this->pos = pos;
     this->actor = &actor;
     this->arena = &arena;
+    QLabel* const actorLabel = new QLabel(widget);
+    ClickableLabel* skillLabel = new ClickableLabel(actorLabel);
     QMovie* const actorMovie = new QMovie(),* skillMovie = new QMovie();
-    QLabel* const actorLabel = new QLabel(widget),* skillLabel = new QLabel(actorLabel);
     actorMovie->setCacheMode(QMovie::CacheAll);
     skillMovie->setCacheMode(QMovie::CacheAll);
     auto run = [&arena]()
@@ -122,6 +123,18 @@ ArenaWidget::ActorSprite::ActorSprite(Actor& actor, QWidget* const widget, QRect
     skillLabel->setScaledContents(true);
     connect(actorMovie, &QMovie::finished, run);
     connect(skillMovie, &QMovie::finished, run);
+    connect(skillLabel, &ClickableLabel::clicked, [&arena, index]()
+    {
+        QComboBox& targetBox = *(arena.targetBox);
+        if (targetBox.currentIndex() == index)
+        {
+            arena.actBtn->click();
+        }
+        else
+        {
+            targetBox.setCurrentIndex(index);
+        }
+    });
     int const width = location.width(), height = location.height();
     if (width != 128 || height != 128)
     {
@@ -401,19 +414,19 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                         {
                         case 0:
                         case 4:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprLength, sprLength), arena, pos);
                             break;
                         case 1:
                         case 5:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprDistance * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprDistance * x), sprLength, sprLength), arena, pos);
                             break;
                         case 2:
                         case 6:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
                             break;
                         case 3:
                         case 7:
-                            spr = new ActorSprite(actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprDistance * -1 * x), sprLength, sprLength), arena, pos);
+                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprDistance * -1 * x), sprLength, sprLength), arena, pos);
                             break;
                         }
                         spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
