@@ -46,6 +46,8 @@ namespace tbrpgsca
         Scene& checkStatus(QString& ret);
         Scene& escape(QString& ret);
 
+        bool canTarget(Actor& user, Ability& ability, Actor& target);
+
         Ability& getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
         Actor& getGuardian(Actor& user, Actor& target, Ability& skill) const;
 

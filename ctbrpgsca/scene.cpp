@@ -604,6 +604,12 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     return scene;
 }
 
+bool Scene::canTarget(Actor& user, Ability& ability, Actor& target)
+{
+    return ability.canPerform(user) && (ability.targetsSelf() || ((target.hp > 0 || ability.isReviving())
+            && (&(this->getGuardian(user, target, ability))) == &target));
+}
+
 void Scene::agiCalc()
 {
     if (this->mInit < 1)

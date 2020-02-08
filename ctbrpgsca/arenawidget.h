@@ -71,12 +71,14 @@ namespace tbrpgsca
         ArenaWidget& prepareTargetBox(QVector<Actor*>& players);
         ArenaWidget& prepareSkillsBox(QVector<Ability*>& skills);
         ArenaWidget& prepareItemsBox(QMap<Ability*, int>& items);
+        ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
 
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
 
         int sprRuns;
         ActorSprite* sprites[SPR_SIZE];
+        bool aiTurn, automatic;
 
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* actLayout,* mainLayout;

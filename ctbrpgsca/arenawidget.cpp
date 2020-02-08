@@ -8,6 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "arenawidget.h"
 
 #include <QGridLayout>
+#include <QComboBox>
 #include <QDebug>
 
 using namespace tbrpgsca;
@@ -107,7 +108,7 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
            QString ret;
            arena.endTurn(ret, arena.crActor);
            Actor& crActor = *(arena.crActor);
-           if (crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
+           if ((arena.aiTurn = crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged()))
            {
                arena.playAi(ret, crActor);
            }
@@ -172,12 +173,19 @@ ArenaWidget::ActorSprite::~ActorSprite()
 ArenaWidget& ArenaWidget::enableControls(bool const enable)
 {
     ArenaWidget& arena = *this;
-    arena.actBtn->setEnabled(enable);
     arena.autoBtn->setEnabled(enable);
     arena.skillsBox->setEnabled(enable);
+    if (!enable)
+    {
+        arena.actBtn->setEnabled(false);
+        arena.useBtn->setEnabled(false);
+    }
+    /*else
+    {
+        arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+    }*/
     arena.itemsBox->setEnabled(enable);
     arena.fleeBtn->setEnabled(enable);
-    arena.useBtn->setEnabled(enable);
     return arena;
 }
 
@@ -215,6 +223,25 @@ ArenaWidget& ArenaWidget::prepareItemsBox(QMap<Ability*, int>& items)
     for (auto iIt = items.cbegin(); iIt != iLast; ++iIt)
     {
         itemsBox.addItem(iIt.key()->name % QString(iIt.value()));
+    }
+    return arena;
+}
+
+ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
+{
+    ArenaWidget& arena = *this;
+    if ((!arena.aiTurn) && trgIndex > -1)
+    {
+        Actor& crActor = *(arena.crActor);
+        Actor& target = *(arena.players->at(trgIndex));
+        if (skillIndex > -1)
+        {
+            arena.actBtn->setEnabled(arena.canTarget(crActor, *(crActor.aSkills->at(skillIndex)), target));
+        }
+        if (itemIndex > -1)
+        {
+
+        }
     }
     return arena;
 }
@@ -352,6 +379,19 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             arena.enableControls(false);
             arena.endTurn(ret, crActor);
             arena.actionsTxt->append(ret);
+        });
+        connect(targetBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
+        {
+            arena.recheckTargeting(i, arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+        });
+
+        connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
+        {
+            arena.recheckTargeting(arena.targetBox->currentIndex(), i, arena.itemsBox->currentIndex());
+        });
+        connect(itemsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
+        {
+            arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), i);
         });
     }
     layout->addWidget(ctrWidget);
