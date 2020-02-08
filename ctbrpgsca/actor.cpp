@@ -364,7 +364,7 @@ Actor& Actor::setSprite(QString& value)
 
 Actor& Actor::setRanged(const bool range)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (range != ((flags & FLAG_RANGE) == FLAG_RANGE))
     {
         this->flags = flags ^ FLAG_RANGE;
@@ -374,7 +374,7 @@ Actor& Actor::setRanged(const bool range)
 
 Actor& Actor::setReviving(const bool revive)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (revive != ((flags & FLAG_REVIVE) == FLAG_REVIVE))
     {
         this->flags = flags ^ FLAG_REVIVE;
@@ -384,7 +384,7 @@ Actor& Actor::setReviving(const bool revive)
 
 Actor& Actor::setEnraged(const bool automate)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (automate != ((flags & FLAG_ENRAGED) == FLAG_ENRAGED))
     {
         this->flags = flags ^ FLAG_ENRAGED;
@@ -394,7 +394,7 @@ Actor& Actor::setEnraged(const bool automate)
 
 Actor& Actor::setConfused(const bool confuse)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (confuse != ((flags & FLAG_CONFUSE) == FLAG_CONFUSE))
     {
         this->flags = flags ^ FLAG_CONFUSE;
@@ -404,7 +404,7 @@ Actor& Actor::setConfused(const bool confuse)
 
 Actor& Actor::setAiPlayer(const bool aiPlayer)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (aiPlayer != ((flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER))
     {
         this->flags = flags ^ FLAG_AI_PLAYER;
@@ -414,7 +414,7 @@ Actor& Actor::setAiPlayer(const bool aiPlayer)
 
 Actor& Actor::setReflecting(const bool reflect)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (reflect != ((flags & FLAG_REFLECT) == FLAG_REFLECT))
     {
         this->flags = flags ^ FLAG_REFLECT;
@@ -424,7 +424,7 @@ Actor& Actor::setReflecting(const bool reflect)
 
 Actor& Actor::setShapeShifted(const bool shapeshift)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (shapeshift != ((flags & FLAG_SHAPE_SHIFT) == FLAG_SHAPE_SHIFT))
     {
         this->flags = flags ^ FLAG_SHAPE_SHIFT;
@@ -434,7 +434,7 @@ Actor& Actor::setShapeShifted(const bool shapeshift)
 
 Actor& Actor::setKnockedOut(const bool ko)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (ko != ((flags & FLAG_KO) == FLAG_KO))
     {
         this->flags = flags ^ FLAG_KO;
@@ -444,7 +444,7 @@ Actor& Actor::setKnockedOut(const bool ko)
 
 Actor& Actor::setInvincible(const bool invincible)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (invincible != ((flags & FLAG_INVINCIBLE) == FLAG_INVINCIBLE))
     {
         this->flags = flags ^ FLAG_INVINCIBLE;
@@ -454,7 +454,7 @@ Actor& Actor::setInvincible(const bool invincible)
 
 Actor& Actor::setStunned(const bool stun)
 {
-    int flags = this->flags;
+    int const flags = this->flags;
     if (stun != ((flags & FLAG_STUN) == FLAG_STUN))
     {
         this->flags = flags ^ FLAG_STUN;

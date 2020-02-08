@@ -13,6 +13,38 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
+bool ArenaWidget::isAiTurn() const
+{
+    return (this->flags & FLAG_AI_TURN) == FLAG_AI_TURN;
+}
+
+bool ArenaWidget::isAutomatic() const
+{
+    return (this->flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC;
+}
+
+ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
+{
+    ArenaWidget& arena = *this;
+    int const flags = arena.flags;
+    if (aiTurn != ((flags & FLAG_AI_TURN) == FLAG_AI_TURN))
+    {
+        arena.flags = flags ^ FLAG_AI_TURN;
+    }
+    return arena;
+}
+
+ArenaWidget& ArenaWidget::setAutomatic(const bool automatic)
+{
+    ArenaWidget& arena = *this;
+    int const flags = arena.flags;
+    if (automatic != ((flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC))
+    {
+        arena.flags = flags ^ FLAG_AUTOMATIC;
+    }
+    return arena;
+}
+
 ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playSkill(QString& sprName)
 {
     ActorSprite& actSprite = *this;
@@ -108,14 +140,13 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
            QString ret;
            arena.endTurn(ret, arena.crActor);
            Actor& crActor = *(arena.crActor);
-           if ((arena.aiTurn = crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged()))
+           if (arena.isAutomatic() || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
            {
-               arena.playAi(ret, crActor);
+               arena.setAiTurn(true).playAi(ret, crActor);
            }
            else
            {
-               arena.enableControls(true);
-               arena.afterAct();
+               arena.setAiTurn(false).enableControls(true).afterAct();
            }
            arena.actionsTxt->append(ret);
        }
@@ -173,16 +204,20 @@ ArenaWidget::ActorSprite::~ActorSprite()
 ArenaWidget& ArenaWidget::enableControls(bool const enable)
 {
     ArenaWidget& arena = *this;
-    arena.autoBtn->setEnabled(enable);
     arena.skillsBox->setEnabled(enable);
-    if (!enable)
+    if (enable)
+    {
+        //arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+        arena.autoBtn->setEnabled(true);
+    }
+    else
     {
         arena.actBtn->setEnabled(false);
         arena.useBtn->setEnabled(false);
     }
     /*else
     {
-        arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+
     }*/
     arena.itemsBox->setEnabled(enable);
     arena.fleeBtn->setEnabled(enable);
@@ -227,10 +262,10 @@ ArenaWidget& ArenaWidget::prepareItemsBox(QMap<Ability*, int>& items)
     return arena;
 }
 
-ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
+inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
 {
     ArenaWidget& arena = *this;
-    if ((!arena.aiTurn) && trgIndex > -1)
+    if ((!arena.isAiTurn()) && trgIndex > -1)
     {
         Actor& crActor = *(arena.crActor);
         Actor& target = *(arena.players->at(trgIndex));
@@ -276,6 +311,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     QWidget* actWidget = new QWidget(this);
     QWidget* ctrWidget = new QWidget(this);
     arena.setGeometry(size);
+    arena.flags = 0;
     QLayout* layout;
     {
         QLayout* ctrLayout;
@@ -367,9 +403,16 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         connect(autoBtn, &QPushButton::clicked, [&arena]()
         {
             QString ret;
-            arena.playAi(ret, *(arena.crActor));
-            arena.actionsTxt->append(ret);
-            arena.enableControls(false);
+            bool const automatic = arena.isAutomatic();
+            if (automatic)
+            {
+                arena.setAutomatic(false).autoBtn->setEnabled(false);
+            }
+            else
+            {
+                arena.setAutomatic(true).playAi(ret, *(arena.crActor));
+                arena.enableControls(false).actionsTxt->append(ret);
+            }
         });
         connect(actBtn, &QPushButton::clicked, [&arena]()
         {
