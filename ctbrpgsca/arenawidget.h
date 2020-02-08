@@ -38,8 +38,8 @@ namespace tbrpgsca
         #define FLAG_AUTOMATIC 1
         #define FLAG_AI_TURN 2
     public:
-        bool isAiTurn() const;
-        bool isAutomatic() const;
+        inline bool isAiTurn() const;
+        inline bool isAutomatic() const;
 
         ArenaWidget& afterAct();
         ArenaWidget& enableControls(bool const enable);
@@ -77,8 +77,8 @@ namespace tbrpgsca
         ArenaWidget& prepareSkillsBox(QVector<Ability*>& skills);
         ArenaWidget& prepareItemsBox(QMap<Ability*, int>& items);
         inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
-        ArenaWidget& setAutomatic(bool const automatic);
-        ArenaWidget& setAiTurn(bool const aiTurn);
+        inline ArenaWidget& setAutomatic(bool const automatic);
+        inline ArenaWidget& setAiTurn(bool const aiTurn);
 
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);

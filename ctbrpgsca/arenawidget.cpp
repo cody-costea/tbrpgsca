@@ -13,17 +13,17 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-bool ArenaWidget::isAiTurn() const
+inline bool ArenaWidget::isAiTurn() const
 {
     return (this->flags & FLAG_AI_TURN) == FLAG_AI_TURN;
 }
 
-bool ArenaWidget::isAutomatic() const
+inline bool ArenaWidget::isAutomatic() const
 {
     return (this->flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC;
 }
 
-ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
+inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
 {
     ArenaWidget& arena = *this;
     int const flags = arena.flags;
@@ -34,7 +34,7 @@ ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
     return arena;
 }
 
-ArenaWidget& ArenaWidget::setAutomatic(const bool automatic)
+inline ArenaWidget& ArenaWidget::setAutomatic(const bool automatic)
 {
     ArenaWidget& arena = *this;
     int const flags = arena.flags;
