@@ -72,7 +72,7 @@ namespace tbrpgsca
 
             friend class ArenaWidget;
         };
-        Actor& getPlayerFromTargetBox(int const index);
+        Actor* getPlayerFromTargetBox(int const index);
         ArenaWidget& prepareSkillsBox(QVector<Ability*>& skills);
         ArenaWidget& prepareItemsBox(QMap<Ability*, int>& items);        
         ArenaWidget& prepareTargetBox(QVector<QVector<Actor*>*>& players);
@@ -93,6 +93,7 @@ namespace tbrpgsca
         QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* arenaImg;
         QTextEdit* actionsTxt;
+        Actor* trgActor;
 
     signals:
 

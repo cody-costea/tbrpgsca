@@ -249,22 +249,21 @@ ArenaWidget& ArenaWidget::prepareItemsBox(QMap<Ability*, int>& items)
     return arena;
 }
 
-Actor& ArenaWidget::getPlayerFromTargetBox(int index)
+Actor* ArenaWidget::getPlayerFromTargetBox(int index)
 {
-    QVector<QVector<Actor*>*>& parties = this->parties;
-    for (QVector<Actor*>* party : parties)
+    for (QVector<Actor*>* party : this->parties)
     {
         int const size = party->size();
         if (index < size)
         {
-            return *(party->at(index));
+            return party->at(index);
         }
         else
         {
             index -= size;
         }
     }
-    return *(parties[0]->at(0));
+    return nullptr;
 }
 
 inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
@@ -273,10 +272,11 @@ inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const 
     if ((!arena.isAiTurn()) && trgIndex > -1)
     {
         Actor& crActor = *(arena.crActor);
-        Actor& target = arena.getPlayerFromTargetBox(trgIndex);
+        Actor* target = arena.getPlayerFromTargetBox(trgIndex);
+        arena.trgActor = target;
         if (skillIndex > -1)
         {
-            arena.actBtn->setEnabled(arena.canTarget(crActor, *(crActor.aSkills->at(skillIndex)), target));
+            arena.actBtn->setEnabled(arena.canTarget(crActor, *(crActor.aSkills->at(skillIndex)), *target));
         }
         if (itemIndex > -1)
         {
@@ -422,7 +422,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         {
             QString ret;
             Actor* crActor = arena.crActor;
-            arena.perform(ret, *crActor, *(arena.players->at(arena.targetBox->currentIndex())), *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
+            arena.perform(ret, *crActor, *(arena.trgActor), *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
             arena.enableControls(false);
             arena.endTurn(ret, crActor);
             arena.actionsTxt->append(ret);
