@@ -429,7 +429,11 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         });
         connect(targetBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
-            arena.recheckTargeting(i, arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+            //arena.recheckTargeting(i, arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+            Actor& crActor = *(arena.crActor);
+            bool const restore = i < arena.targetBox->count() / 2;
+            Ability& ability = arena.getAiSkill(crActor, *(crActor.aSkills), restore ? 1 : 0, restore);
+            arena.skillsBox->setCurrentIndex(crActor.aSkills->indexOf(&ability));
         });
 
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)

@@ -339,8 +339,8 @@ Ability& Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const def
     for (int i = defSkill + 1; i < sSize; ++i)
     {
         Ability* a = skills[i];
-        if (a->canPerform(user) && ((defSkill > 0 && (a->mHp < s->mHp)
-            && (a->isReviving() || !restore)) || (a->mHp > s->mHp)))
+        if (a->canPerform(user) && ((defSkill > 0 && (a->hp < s->hp)
+            && (a->isReviving() || !restore)) || (a->hp > s->hp)))
         {
             s = a;
         }
