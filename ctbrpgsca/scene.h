@@ -48,7 +48,7 @@ namespace tbrpgsca
 
         bool canTarget(Actor& user, Ability& ability, Actor& target);
 
-        Ability& getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
+        int getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
         Actor& getGuardian(Actor& user, Actor& target, Ability& skill) const;
 
         Actor& getPartyPlayer(int const party, int const player) const;

@@ -210,21 +210,33 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
 ArenaWidget& ArenaWidget::prepareTargetBox(QVector<QVector<Actor*>*>& parties)
 {
     ArenaWidget& arena = *this;
-    QComboBox& targetBox = *(arena.targetBox);
-    targetBox.clear();
+    QComboBox* targetBox = arena.targetBox;
+    targetBox->clear();
     for (QVector<Actor*>* const party : parties)
     {
         for (Actor* const actor : *party)
         {
-            targetBox.addItem(actor->name);
+            targetBox->addItem(actor->name);
         }
     }
-    //targetBox.setCurrentIndex(players.size() / 2);
-    targetBox.setCurrentIndex(targetBox.count() / 2);
+    connect(targetBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
+    {
+        Actor& crActor = *(arena.crActor);
+        QComboBox& skillsBox = *(arena.skillsBox);
+        int const oldSkillIndex = skillsBox.currentIndex();
+        bool const restore = i < arena.targetBox->count() / 2;
+        int const newSkillIndex = arena.getAiSkill(crActor, *(crActor.aSkills), restore ? 1 : 0, restore);
+        arena.skillsBox->setCurrentIndex(newSkillIndex);
+        if (newSkillIndex == oldSkillIndex)
+        {
+            arena.recheckTargeting(i, newSkillIndex, arena.itemsBox->currentIndex());
+        }
+    });
+    targetBox->setCurrentIndex(targetBox->count() / 2);
     return arena;
 }
 
-ArenaWidget& ArenaWidget::prepareSkillsBox(QVector<Ability*>& skills)
+ArenaWidget& ArenaWidget::prepareSkillsBox(Actor& actor, QVector<Ability*>& skills)
 {
     ArenaWidget& arena = *this;
     QComboBox& skillBox = *(arena.skillsBox);
@@ -233,6 +245,9 @@ ArenaWidget& ArenaWidget::prepareSkillsBox(QVector<Ability*>& skills)
     {
         skillBox.addItem(skill->name);
     }
+    QComboBox& targetBox = *(arena.targetBox);
+    bool const restore = targetBox.currentIndex() < targetBox.count() / 2;
+    skillBox.setCurrentIndex(arena.getAiSkill(actor, *(actor.aSkills), restore ? 1 : 0, restore));
     return arena;
 }
 
@@ -289,8 +304,9 @@ inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const 
 ArenaWidget& ArenaWidget::afterAct()
 {
     ArenaWidget& arena = *this;
-    arena.prepareSkillsBox(*crActor->aSkills);
-    QMap<Ability*, int>* crItems = crActor->items;
+    Actor& crActor = *(arena.crActor);
+    arena.prepareSkillsBox(crActor, *(crActor.aSkills));
+    QMap<Ability*, int>* crItems = crActor.items;
     if (crItems == nullptr)
     {
         arena.itemsList = nullptr;
@@ -427,15 +443,6 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             arena.endTurn(ret, crActor);
             arena.actionsTxt->append(ret);
         });
-        connect(targetBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
-        {
-            //arena.recheckTargeting(i, arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
-            Actor& crActor = *(arena.crActor);
-            bool const restore = i < arena.targetBox->count() / 2;
-            Ability& ability = arena.getAiSkill(crActor, *(crActor.aSkills), restore ? 1 : 0, restore);
-            arena.skillsBox->setCurrentIndex(crActor.aSkills->indexOf(&ability));
-        });
-
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
             arena.recheckTargeting(arena.targetBox->currentIndex(), i, arena.itemsBox->currentIndex());
@@ -555,8 +562,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     {
         arena.actorEvent = actorRun;
     }
-    arena.afterAct();
     arena.prepareTargetBox(parties);
+    arena.afterAct();
     return arena;
 }
 

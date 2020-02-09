@@ -73,9 +73,9 @@ namespace tbrpgsca
             friend class ArenaWidget;
         };
         Actor* getPlayerFromTargetBox(int const index);
-        ArenaWidget& prepareSkillsBox(QVector<Ability*>& skills);
         ArenaWidget& prepareItemsBox(QMap<Ability*, int>& items);        
         ArenaWidget& prepareTargetBox(QVector<QVector<Actor*>*>& players);
+        ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
         inline ArenaWidget& setAutomatic(bool const automatic);
         inline ArenaWidget& setAiTurn(bool const aiTurn);
