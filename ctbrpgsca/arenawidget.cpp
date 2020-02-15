@@ -51,7 +51,8 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playSkill(QString& sprName)
     QMovie& movie = *(actSprite.skillMovie);
     movie.stop();
     movie.setFileName(QString(":/sprites/%1/abilities/%2.%1").arg(SPR_EXT, sprName));
-    movie.jumpToFrame(0);
+    movie.jumpToFrame(0);    
+    ++(actSprite.arena->sprRuns);
     movie.start();
     return actSprite;
 }
@@ -540,18 +541,18 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* counter) -> bool
     {
         //(static_cast<ArenaWidget&>(scene)).sprRuns = 0;
-        (static_cast<ActorSprite*>(user.extra))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
+        if (&target != &user)
+        {
+            (static_cast<ActorSprite*>(user.extra))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
+        }
         ActorSprite& targetSpr = *(static_cast<ActorSprite*>(target.extra));
         QString* spr = ability.sprite;
         if (spr != nullptr && spr->length() > 0)
         {
             targetSpr.playSkill(*spr);
         }
-        if (&target != &user)
-        {
-            targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
-                                                                                 ? SPR_ACT : SPR_CAST))) : SPR_FALL);
-        }
+        targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
+                                                                             ? SPR_ACT : SPR_CAST))) : SPR_FALL);
         return false;
     });
     if (doScene)
