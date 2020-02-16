@@ -86,9 +86,9 @@ namespace tbrpgsca
         ActorAct* actorEvent;
         Actor* crActor;
 
+        void agiCalc();
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
-        void agiCalc();
 
         friend class Actor;
         friend class Ability;
