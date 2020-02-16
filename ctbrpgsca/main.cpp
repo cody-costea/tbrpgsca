@@ -28,8 +28,10 @@ int main(int argc, char* argv[])
     //QRect geometry(0, 0, 1024, 600);
     //QRect geometry(0, 0, 800, 480);
     //QRect geometry(0, 0, 640, 480);
-    QRect geometry(0, 0, 480, 640);
+    QRect geometry(0, 0, 480, 800);
+    //QRect geometry(0, 0, 480, 640);
     //QRect geometry(0, 0, 320, 240);
+    //QRect geometry(0, 0, 240, 320);
     //QRect geometry(0, 0, 256, 256);
     ArenaWidget arena(nullptr, geometry, ret, parties, nullptr, 0, 0);
     //arena.setGeometry(geometry);

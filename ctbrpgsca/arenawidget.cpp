@@ -336,8 +336,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     arena.flags = 0;
     QLayout* layout;
     {
-        int btnHeight;
         QLayout* ctrLayout;
+        int btnHeight, actHeight, infoHeight;
         int const width = size.width(), height = size.height();
         QLabel* infoTxt = new QLabel(this);
         QTextEdit* actionsTxt = new QTextEdit(this);
@@ -363,18 +363,12 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.autoBtn = autoBtn;
         arena.actBtn = actBtn;
         arena.useBtn = useBtn;
-        {
-            int const actHeight = height / 5, infoHeight = height / 16;
-            imgHeight = height - actHeight - infoHeight;
-            arenaImg->setFixedHeight(imgHeight);
-            actionsTxt->setFixedHeight(actHeight);
-            infoTxt->setFixedHeight(infoHeight);
-            infoTxt->setText("INFO TEXT TEST!!!");
-        }
         if (height > width) //portrait
         {
-            btnHeight = width / 7;
-            sprLength = btnHeight * 3;
+            actHeight = height / 5;
+            btnHeight = infoHeight = height / 16;
+            sprLength = btnHeight * 3 + (btnHeight / 2);
+            imgHeight = height - actHeight - infoHeight - sprLength;
             layout = new QVBoxLayout(this);
             ctrLayout = new QGridLayout(ctrWidget);
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(skillsBox, 1, 0, 1, 2);
@@ -385,7 +379,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(itemsBox, 3, 0, 1, 2);
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(useBtn, 3, 2, 1, 2);
             ctrWidget->setFixedHeight(sprLength);
-            sprLength = (width + width / 11) / 3;
+            sprLength = (width + width / 3) / 5;
             layout->addWidget(actWidget);
             layout->addWidget(ctrWidget);
             imgWidth = width;
@@ -394,6 +388,9 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         {
             sprLength = width / 5;
             btnHeight = height / 7;
+            actHeight = height / 5;
+            infoHeight = height / 16;
+            imgHeight = height - actHeight - infoHeight;
             layout = new QHBoxLayout(this);
             ctrLayout = new QVBoxLayout(ctrWidget);
             ctrLayout->addWidget(autoBtn);
@@ -413,6 +410,10 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.ctrWidget = ctrWidget;
         arena.ctrLayout = ctrLayout;
         actWidget->setFixedWidth(imgWidth);
+        arenaImg->setFixedHeight(imgHeight);
+        actionsTxt->setFixedHeight(actHeight);
+        infoTxt->setFixedHeight(infoHeight);
+        infoTxt->setText("INFO TEXT TEST!!!");
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
         //arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
@@ -434,12 +435,18 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             if (automatic)
             {
                 arena.setAutomatic(false).autoBtn->setEnabled(false);
+                arena.autoBtn->setText(tr("Auto"));
             }
             else
             {
+                arena.setAutomatic(true);
+                arena.autoBtn->setText(tr("Manual"));
                 Actor* const crActor = arena.crActor;
-                arena.setAutomatic(true).playAi(ret, *crActor).endTurn(ret, crActor);
-                arena.enableControls(false).actionsTxt->append(ret);
+                if (!(crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged()))
+                {
+                    arena.setAutomatic(true).playAi(ret, *crActor).endTurn(ret, crActor);
+                    arena.enableControls(false).actionsTxt->append(ret);
+                }
             }
         });
         connect(actBtn, &QPushButton::clicked, [&arena]()
