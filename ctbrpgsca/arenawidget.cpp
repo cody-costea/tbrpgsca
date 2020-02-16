@@ -336,9 +336,9 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     arena.flags = 0;
     QLayout* layout;
     {
+        int btnHeight;
         QLayout* ctrLayout;
-        int const width = size.width();
-        int const height = size.height();
+        int const width = size.width(), height = size.height();
         QLabel* infoTxt = new QLabel(this);
         QTextEdit* actionsTxt = new QTextEdit(this);
         QPushButton* actBtn = new QPushButton(this);
@@ -373,8 +373,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         if (height > width) //portrait
         {
-
-            sprLength = height / 5;
+            btnHeight = width / 7;
+            sprLength = btnHeight * 3;
             layout = new QVBoxLayout(this);
             ctrLayout = new QGridLayout(ctrWidget);
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(skillsBox, 1, 0, 1, 2);
@@ -384,15 +384,16 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(fleeBtn, 2, 3, 1, 1);
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(itemsBox, 3, 0, 1, 2);
             (static_cast<QGridLayout*>(ctrLayout))->addWidget(useBtn, 3, 2, 1, 2);
-            //ctrWidget->setFixedHeight(sprLength);
-            sprLength = (imgHeight + imgHeight / 11) / 3;
-            imgWidth = width;
+            ctrWidget->setFixedHeight(sprLength);
+            sprLength = (width + width / 11) / 3;
             layout->addWidget(actWidget);
             layout->addWidget(ctrWidget);
+            imgWidth = width;
         }
         else //landscape
         {
             sprLength = width / 5;
+            btnHeight = height / 7;
             layout = new QHBoxLayout(this);
             ctrLayout = new QVBoxLayout(ctrWidget);
             ctrLayout->addWidget(autoBtn);
@@ -411,7 +412,6 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         ctrWidget->setLayout(ctrLayout);
         arena.ctrWidget = ctrWidget;
         arena.ctrLayout = ctrLayout;
-        int const btnHeight = height / 7;
         actWidget->setFixedWidth(imgWidth);
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
         //arenaImg->setFixedWidth(imgWidth);
