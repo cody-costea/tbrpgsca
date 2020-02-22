@@ -6,7 +6,6 @@ using namespace tbrpgsca;
 TargetsModel::TargetsModel(ArenaWidget& scene, QObject* const parent) : QAbstractListModel(parent)
 {
     this->scene = &scene;
-    this->trgCount = -1;
 }
 
 TargetsModel::~TargetsModel()
