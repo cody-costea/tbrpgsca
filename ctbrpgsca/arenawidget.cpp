@@ -588,7 +588,9 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         arena.actorEvent = actorRun;
     }
     arena.skillsList = new QVector<SkillsModel*>();
-    arena.prepareTargetBox(parties);
+    //arena.prepareTargetBox(parties);
+    arena.targetsModel = new TargetsModel(arena);
+    arena.targetBox->setModel(targetsModel);
     arena.afterAct();
     return arena;
 }
@@ -622,6 +624,7 @@ ArenaWidget::~ArenaWidget()
     delete this->actLayout;
     delete this->mainLayout;
     delete this->actorEvent;
+    delete this->targetsModel;
     //for (QVector<Actor*>* const party : this->parties)
     {
         //for (Actor* const player : *party)

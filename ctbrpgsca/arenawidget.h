@@ -19,6 +19,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "clickablelabel.h"
 #include "skillsmodel.h"
 #include "scene.h"
+#include "targetsmodel.h"
 
 namespace tbrpgsca
 {
@@ -91,11 +92,14 @@ namespace tbrpgsca
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QVector<SkillsModel*>* skillsList,* itemsList;
         QComboBox* skillsBox,* itemsBox,* targetBox;
+        TargetsModel* targetsModel;
         QLabel* infoTxt,* arenaImg;
         QTextEdit* actionsTxt;
         Actor* trgActor;
 
     signals:
+
+        friend class TargetsModel;
 
     };
 

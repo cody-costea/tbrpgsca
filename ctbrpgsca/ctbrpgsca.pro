@@ -43,7 +43,8 @@ SOURCES += \
         role.cpp \
         scene.cpp \
         skillsmodel.cpp \
-        state.cpp
+        state.cpp \
+        targetsmodel.cpp
 
 HEADERS += \
         ability.h \
@@ -56,7 +57,8 @@ HEADERS += \
         role.h \
         scene.h \
         skillsmodel.h \
-        state.h
+        state.h \
+        targetsmodel.h
 
 FORMS += \
         mainwindow.ui
