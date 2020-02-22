@@ -130,6 +130,7 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
            Actor& crActor = *(arena.crActor);
            if (arena.isAutomatic() || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
            {
+               arena.infoTxt->setText("");
                arena.setAiTurn(true).playAi(ret, crActor).endTurn(ret, arena.crActor);
                arena.actionsTxt->append(ret);
            }
@@ -213,12 +214,6 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
 ArenaWidget& ArenaWidget::prepareTargetBox(QVector<QVector<Actor*>*>& parties)
 {
     ArenaWidget& arena = *this;
-    /*QVector<QVector<QString>*>* skillsList = arena.skillsList;
-    for (QVector<QString>* const skillSet : *skillsList)
-    {
-        delete skillSet;
-    }
-    skillsList->clear();*/
     QComboBox* targetBox = arena.targetBox;
     targetBox->clear();
     for (QVector<Actor*>* const party : parties)
@@ -226,13 +221,6 @@ ArenaWidget& ArenaWidget::prepareTargetBox(QVector<QVector<Actor*>*>& parties)
         for (Actor* const actor : *party)
         {
             targetBox->addItem(actor->name);
-            /*QVector<QString>* skillsTxt = new QVector<QString>();
-            for (Ability* const ability : *(actor->aSkills))
-            {
-                skillsTxt->append(QString("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5)").arg(ability->name,
-                    QString(ability->lvRq), QString(ability->mHp), QString(ability->mMp), QString(ability->mSp)));
-            }
-            skillsList->append(skillsTxt);*/
         }
     }
     connect(targetBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
@@ -258,14 +246,6 @@ ArenaWidget& ArenaWidget::prepareSkillsBox(Actor& actor, QVector<Ability*>& skil
     QComboBox& skillBox = *(arena.skillsBox);
     skillsBox->setModel(static_cast<SkillsModel*>(static_cast<void**>(actor.extra)[1]));
     QComboBox& targetBox = *(arena.targetBox);
-    /*int sSize = skills.size();
-    skillBox.clear();
-    for (int i = 0; i < sSize; ++i)
-    {
-        Ability& skill = *skills[i];
-        skillBox.addItem(skill.name);
-        skillBox.setItemData(i, QBrush(skill.canPerform(actor) ? Qt::black : Qt::gray), Qt::TextColorRole);
-    }*/
     bool const restore = targetBox.currentIndex() < targetBox.count() / 2;
     skillBox.setCurrentIndex(arena.getAiSkill(actor, skills, restore ? 1 : 0, restore));
     return arena;
@@ -325,6 +305,9 @@ ArenaWidget& ArenaWidget::afterAct()
 {
     ArenaWidget& arena = *this;
     Actor& crActor = *(arena.crActor);
+    arena.infoTxt->setText(QString(tr("%1 (HP: %2/%3, MP: %4/%5, RP: %6/%7)")).arg(crActor.name,
+         QString::number(crActor.hp), QString::number(crActor.mHp), QString::number(crActor.mp),
+         QString::number(crActor.mMp), QString::number(crActor.sp), QString::number(crActor.mSp)));
     arena.prepareSkillsBox(crActor, *(crActor.aSkills));
     QMap<Ability*, int>* crItems = crActor.items;
     if (crItems == nullptr)
