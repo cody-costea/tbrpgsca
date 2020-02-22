@@ -305,9 +305,9 @@ ArenaWidget& ArenaWidget::afterAct()
 {
     ArenaWidget& arena = *this;
     Actor& crActor = *(arena.crActor);
-    arena.infoTxt->setText(QString(tr("%1 (HP: %2/%3, MP: %4/%5, RP: %6/%7)")).arg(crActor.name,
-         QString::number(crActor.hp), QString::number(crActor.mHp), QString::number(crActor.mp),
-         QString::number(crActor.mMp), QString::number(crActor.sp), QString::number(crActor.mSp)));
+    arena.infoTxt->setText(QString(tr("%1 (Lv: %2/%3, %4, XP: %5/%6)")).arg(crActor.name, QString::number(crActor.lv), QString::number(crActor.maxLv),
+         QString(tr("HP: %1/%2, MP: %3/%4, RP: %5/%6")).arg(QString::number(crActor.hp), QString::number(crActor.mHp), QString::number(crActor.mp),
+         QString::number(crActor.mMp), QString::number(crActor.sp), QString::number(crActor.mSp)), QString::number(crActor.xp), QString::number(crActor.maxp)));
     arena.prepareSkillsBox(crActor, *(crActor.aSkills));
     QMap<Ability*, int>* crItems = crActor.items;
     if (crItems == nullptr)

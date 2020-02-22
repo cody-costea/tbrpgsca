@@ -21,7 +21,6 @@ namespace tbrpgsca
         QVariant data(const QModelIndex& index, int role) const;
 
      private:
-        int trgCount;
         ArenaWidget* scene;
     };
 
