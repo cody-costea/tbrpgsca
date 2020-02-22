@@ -15,7 +15,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QLayout>
 #include <QWidget>
 #include <QLabel>
+
 #include "clickablelabel.h"
+#include "skillsmodel.h"
 #include "scene.h"
 
 namespace tbrpgsca
@@ -84,12 +86,10 @@ namespace tbrpgsca
                                 int const surprise, int const mInit, bool const doScene);
 
         int sprRuns, flags;
-        ActorSprite* sprites[SPR_SIZE];
-
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* actLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
-        QStringList skillsList, targetList,* itemsList;
+        QVector<SkillsModel*>* skillsList,* itemsList;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         QLabel* infoTxt,* arenaImg;
         QTextEdit* actionsTxt;

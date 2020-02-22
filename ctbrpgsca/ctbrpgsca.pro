@@ -42,6 +42,7 @@ SOURCES += \
         mainwindow.cpp \
         role.cpp \
         scene.cpp \
+        skillsmodel.cpp \
         state.cpp
 
 HEADERS += \
@@ -54,6 +55,7 @@ HEADERS += \
         mainwindow.h \
         role.h \
         scene.h \
+        skillsmodel.h \
         state.h
 
 FORMS += \

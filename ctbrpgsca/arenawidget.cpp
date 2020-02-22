@@ -170,7 +170,7 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
     this->actorLabel = actorLabel;
     this->skillMovie = skillMovie;
     this->skillLabel = skillLabel;
-    actor.extra = this;
+    //actor.extra = this;
     actorLabel->show();
     skillLabel->show();
 }
@@ -195,7 +195,7 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
     arena.skillsBox->setEnabled(enable);
     if (enable)
     {
-        //arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+        arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
         arena.autoBtn->setEnabled(true);
     }
     else
@@ -211,6 +211,12 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
 ArenaWidget& ArenaWidget::prepareTargetBox(QVector<QVector<Actor*>*>& parties)
 {
     ArenaWidget& arena = *this;
+    /*QVector<QVector<QString>*>* skillsList = arena.skillsList;
+    for (QVector<QString>* const skillSet : *skillsList)
+    {
+        delete skillSet;
+    }
+    skillsList->clear();*/
     QComboBox* targetBox = arena.targetBox;
     targetBox->clear();
     for (QVector<Actor*>* const party : parties)
@@ -218,6 +224,13 @@ ArenaWidget& ArenaWidget::prepareTargetBox(QVector<QVector<Actor*>*>& parties)
         for (Actor* const actor : *party)
         {
             targetBox->addItem(actor->name);
+            /*QVector<QString>* skillsTxt = new QVector<QString>();
+            for (Ability* const ability : *(actor->aSkills))
+            {
+                skillsTxt->append(QString("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5)").arg(ability->name,
+                    QString(ability->lvRq), QString(ability->mHp), QString(ability->mMp), QString(ability->mSp)));
+            }
+            skillsList->append(skillsTxt);*/
         }
     }
     connect(targetBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
@@ -241,14 +254,18 @@ ArenaWidget& ArenaWidget::prepareSkillsBox(Actor& actor, QVector<Ability*>& skil
 {
     ArenaWidget& arena = *this;
     QComboBox& skillBox = *(arena.skillsBox);
-    skillBox.clear();
-    for (Ability* const skill : skills)
-    {
-        skillBox.addItem(skill->name);
-    }
+    skillsBox->setModel(static_cast<SkillsModel*>(static_cast<void**>(actor.extra)[1]));
     QComboBox& targetBox = *(arena.targetBox);
+    /*int sSize = skills.size();
+    skillBox.clear();
+    for (int i = 0; i < sSize; ++i)
+    {
+        Ability& skill = *skills[i];
+        skillBox.addItem(skill.name);
+        skillBox.setItemData(i, QBrush(skill.canPerform(actor) ? Qt::black : Qt::gray), Qt::TextColorRole);
+    }*/
     bool const restore = targetBox.currentIndex() < targetBox.count() / 2;
-    skillBox.setCurrentIndex(arena.getAiSkill(actor, *(actor.aSkills), restore ? 1 : 0, restore));
+    skillBox.setCurrentIndex(arena.getAiSkill(actor, skills, restore ? 1 : 0, restore));
     return arena;
 }
 
@@ -288,7 +305,7 @@ inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const 
     if ((!arena.isAiTurn()) && trgIndex > -1)
     {
         Actor& crActor = *(arena.crActor);
-        Actor* target = arena.getPlayerFromTargetBox(trgIndex);
+        Actor* const target = arena.getPlayerFromTargetBox(trgIndex);
         arena.trgActor = target;
         if (skillIndex > -1)
         {
@@ -471,7 +488,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     arena.sprRuns = 0;
     {
         int const sprSize = SPR_SIZE / 2;
-        ActorSprite** sprites = arena.sprites;
+        //ActorSprite** sprites = arena.sprites;
         {
             int k = 0;
             int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 10,
@@ -510,54 +527,65 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                 int const sSize = party.size();
                 for (int i = 0; i < sSize; ++i)
                 {
-                    if (i < sprSize)
+                    Actor& actor = *(party[i]);
+                    void** extra = new void*[2];
+                    actor.extra = extra;
+                    if (k < SPR_SIZE)
                     {
-                        ActorSprite* spr;
-                        Actor& actor = *(party[i]);
-                        switch (j > 1 ? k : i)
+                        if (i < sprSize)
                         {
-                        case 0:
-                        case 4:
-                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprLength, sprLength), arena, pos);
-                            break;
-                        case 1:
-                        case 5:
-                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprDistance * x), sprLength, sprLength), arena, pos);
-                            break;
-                        case 2:
-                        case 6:
-                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
-                            break;
-                        case 3:
-                        case 7:
-                            spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprDistance * -1 * x), sprLength, sprLength), arena, pos);
-                            break;
+                            ActorSprite* spr;
+                            switch (j > 1 ? k : i)
+                            {
+                            case 0:
+                            case 4:
+                                spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprLength, sprLength), arena, pos);
+                                break;
+                            case 1:
+                            case 5:
+                                spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprDistance * x), sprLength, sprLength), arena, pos);
+                                break;
+                            case 2:
+                            case 6:
+                                spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprWidth * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength), arena, pos);
+                                break;
+                            case 3:
+                            case 7:
+                                spr = new ActorSprite(k, actor, arenaImg, QRect(xCentre - (sprFactor * x), yCentre - (sprDistance * -1 * x), sprLength, sprLength), arena, pos);
+                                break;
+                            }
+                            spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
+                            //sprites[k] = spr;
+                            extra[0] = spr;
                         }
-                        spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
-                        sprites[k] = spr;
+                        ++k;
                     }
-                    if ((++k) == SPR_SIZE)
+                    else
+                    {
+                        extra[0] = nullptr;
+                    }
+                    extra[1] = i == 0 ? new SkillsModel(actor, *(actor.aSkills)) : nullptr;
+                    /*if ((++k) == SPR_SIZE)
                     {
                         goto after;
-                    }
+                    }*/
                 }
             }
-            for (;k < SPR_SIZE; ++k)
+            /*for (;k < SPR_SIZE; ++k)
             {
                 sprites[k] = nullptr;
-            }
+            }*/
         }
     }
-    after:
-    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* counter) -> bool
+    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* const counter) -> bool
     {
         //(static_cast<ArenaWidget&>(scene)).sprRuns = 0;
         if (&target != &user)
         {
-            (static_cast<ActorSprite*>(user.extra))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
+            (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
         }
-        ActorSprite& targetSpr = *(static_cast<ActorSprite*>(target.extra));
-        QString* spr = ability.sprite;
+        QString* const spr = ability.sprite;
+        ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target.extra)[0]));
         if (spr != nullptr && spr->length() > 0)
         {
             targetSpr.playSkill(*spr);
@@ -574,6 +602,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     {
         arena.actorEvent = actorRun;
     }
+    arena.skillsList = new QVector<SkillsModel*>();
     arena.prepareTargetBox(parties);
     arena.afterAct();
     return arena;
@@ -608,16 +637,38 @@ ArenaWidget::~ArenaWidget()
     delete this->actLayout;
     delete this->mainLayout;
     delete this->actorEvent;
-    QStringList* itemsList = this->itemsList;
+    //for (QVector<Actor*>* const party : this->parties)
+    {
+        //for (Actor* const player : *party)
+        for (Actor* const player : *(this->parties[0]))
+        {
+            void** const extra = static_cast<void**>(player->extra);
+            player->extra = nullptr;
+            ActorSprite* const spr = static_cast<ActorSprite*>(extra[0]);
+            if (spr != nullptr)
+            {
+                delete spr;
+            }
+            delete (static_cast<SkillsModel*>(extra[1]));
+            delete[] extra;
+        }
+    }
+    QVector<SkillsModel*>* const skillsList = this->skillsList;
+    if (skillsList != nullptr)
+    {
+        for (SkillsModel* const skillSet : *skillsList)
+        {
+            delete skillSet;
+        }
+        delete skillsList;
+    }
+    QVector<SkillsModel*>* const itemsList = this->itemsList;
     if (itemsList != nullptr)
     {
-        delete itemsList;
-    }
-    for (auto spr : this->sprites)
-    {
-        if (spr != nullptr)
+        for (SkillsModel* const itemSet : *itemsList)
         {
-            delete spr;
+            delete itemSet;
         }
+        delete itemsList;
     }
 }
