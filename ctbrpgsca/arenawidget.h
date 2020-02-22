@@ -17,9 +17,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QLabel>
 
 #include "clickablelabel.h"
+#include "targetsmodel.h"
 #include "skillsmodel.h"
 #include "scene.h"
-#include "targetsmodel.h"
 
 namespace tbrpgsca
 {
@@ -86,7 +86,7 @@ namespace tbrpgsca
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
 
-        int sprRuns, flags;
+        int sprRuns, flags, trgCount;
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* actLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;

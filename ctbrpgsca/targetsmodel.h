@@ -3,11 +3,12 @@
 
 #include <QAbstractListModel>
 
-#include "arenawidget.h"
 #include "actor.h"
 
 namespace tbrpgsca
 {
+
+    class ArenaWidget;
 
     class TargetsModel : public QAbstractListModel
     {

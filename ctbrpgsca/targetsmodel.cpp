@@ -1,4 +1,5 @@
 #include "targetsmodel.h"
+#include "arenawidget.h"
 
 using namespace tbrpgsca;
 
@@ -15,16 +16,14 @@ TargetsModel::~TargetsModel()
 
 int TargetsModel::rowCount(const QModelIndex& parent) const
 {
-    int count = 0;//this->trgCount;
-    //if (count < 0)
+    /*int count = 0;
     {
         for (auto party : this->scene->parties)
         {
             count += party->size();
         }
-        //this->trgCount = count;
-    }
-    return count;
+    }*/
+    return this->scene->trgCount;//count;
 }
 
 QVariant TargetsModel::data(const QModelIndex& index, int role) const
@@ -39,8 +38,8 @@ QVariant TargetsModel::data(const QModelIndex& index, int role) const
 
    switch (role)
    {
-   /*case Qt::TextColorRole:
-       return QBrush(Qt::black);*/
+   case Qt::TextColorRole:
+       return QBrush(actor.hp > 0 ? Qt::black : Qt::gray);
    case Qt::DisplayRole:
    {
        return row < this->scene->parties[0]->size() ? QString(tr("%1 (HP: %2/%3, MP: %4/%5, RPc: %6/%7)")).arg(actor.name, QString::number(actor.hp),

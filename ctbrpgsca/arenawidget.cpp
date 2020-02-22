@@ -475,7 +475,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         int const sprSize = SPR_SIZE / 2;
         //ActorSprite** sprites = arena.sprites;
         {
-            int k = 0;
+            int k = 0, trgCount = 0;
             int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 10,
                     sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
             for (int j = 0; j < pSize; ++j)
@@ -510,6 +510,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                 }
                 QVector<Actor*>& party = *(parties[j]);
                 int const sSize = party.size();
+                trgCount += sSize;
                 for (int i = 0; i < sSize; ++i)
                 {
                     Actor& actor = *(party[i]);
@@ -556,6 +557,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                     }*/
                 }
             }
+            this->trgCount = trgCount;
             /*for (;k < SPR_SIZE; ++k)
             {
                 sprites[k] = nullptr;
