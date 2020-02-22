@@ -178,7 +178,7 @@ Costume& Costume::adopt(QString* ret, Scene* const scene, Actor& actor, bool con
         }
         dmgRoles->append(&costume);
     }
-    actor.refreshCostume(ret, scene, actor);
+    actor.refreshCostume(ret, scene, costume);
     return costume;
 }
 

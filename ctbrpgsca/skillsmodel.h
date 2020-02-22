@@ -6,6 +6,7 @@
 #include <QColor>
 
 #include "ability.h"
+#include "actor.h"
 
 namespace tbrpgsca
 {
@@ -14,14 +15,13 @@ namespace tbrpgsca
     {
         Q_OBJECT
     public:
-       SkillsModel(Actor& actor, QVector<Ability*>& abilities, QObject* const parent = 0);
+       SkillsModel(Actor& actor, QObject* const parent = 0);
        ~SkillsModel();
 
        int rowCount(const QModelIndex& parent = QModelIndex()) const;
        QVariant data(const QModelIndex& index, int role) const;
 
     private:
-       QVector<Ability*>* abilities;
        Actor* actor;
     };
 

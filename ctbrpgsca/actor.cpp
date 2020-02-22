@@ -846,7 +846,7 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
             if (!aSkills->contains(ability))
             {
                 aSkills->append(ability);
-                /*int const mQty = ability->mQty;
+                int const mQty = ability->mQty;
                 if (mQty > 0)
                 {
                     QMap<Ability*, int>* crQty = actor.skillsCrQty;
@@ -857,7 +857,7 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
                     }
                     crQty->operator[](ability) = mQty;
                     actor.checkRegSkill(*ability);
-                }*/
+                }
             }
         }
     }
@@ -993,16 +993,16 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->init = 0;
     this->side = 0;
     this->oldSide = 0;
-    this->actions = mActions;
-    this->maxLv = maxLv;
-    this->setRace(race);
-    this->setJob(job);
-    this->setLevel(level);
-    this->items = items;
     this->dmgRoles = nullptr;
     this->skillsRgTurn = nullptr;
     this->skillsCrQty = nullptr;
     this->stateDur = nullptr;
+    this->actions = mActions;
+    this->maxLv = maxLv;
+    this->setRace(race);
+    this->setJob(job);
+    this->items = items;
+    this->setLevel(level);
     this->recover(nullptr, nullptr);
 }
 

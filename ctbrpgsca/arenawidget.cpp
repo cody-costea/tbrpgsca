@@ -192,10 +192,12 @@ ArenaWidget::ActorSprite::~ActorSprite()
 ArenaWidget& ArenaWidget::enableControls(bool const enable)
 {
     ArenaWidget& arena = *this;
-    arena.skillsBox->setEnabled(enable);
+    QComboBox& skillsBox = *(arena.skillsBox);
+    QComboBox& itemsBox = *(arena.itemsBox);
+    skillsBox.setEnabled(enable);
     if (enable)
     {
-        arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), arena.itemsBox->currentIndex());
+        arena.recheckTargeting(arena.targetBox->currentIndex(), skillsBox.currentIndex(), itemsBox.currentIndex());
         arena.autoBtn->setEnabled(true);
     }
     else
@@ -203,8 +205,8 @@ ArenaWidget& ArenaWidget::enableControls(bool const enable)
         arena.actBtn->setEnabled(false);
         arena.useBtn->setEnabled(false);
     }
-    arena.itemsBox->setEnabled(enable);
     arena.fleeBtn->setEnabled(enable);
+    itemsBox.setEnabled(enable);
     return arena;
 }
 
@@ -564,7 +566,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                     {
                         extra[0] = nullptr;
                     }
-                    extra[1] = i == 0 ? new SkillsModel(actor, *(actor.aSkills)) : nullptr;
+                    extra[1] = j == 0 ? new SkillsModel(actor) : nullptr;
                     /*if ((++k) == SPR_SIZE)
                     {
                         goto after;
