@@ -439,12 +439,11 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             }
             else
             {
-                arena.setAutomatic(true);
-                arena.autoBtn->setText(tr("Manual"));
                 Actor* const crActor = arena.crActor;
+                arena.setAutomatic(true).autoBtn->setText(tr("Manual"));
                 if (!(crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged()))
                 {
-                    arena.setAutomatic(true).playAi(ret, *crActor).endTurn(ret, crActor);
+                    arena.playAi(ret, *crActor).endTurn(ret, crActor);
                     arena.enableControls(false).actionsTxt->append(ret);
                 }
             }
@@ -452,7 +451,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         connect(actBtn, &QPushButton::clicked, [&arena]()
         {
             QString ret;
-            Actor* crActor = arena.crActor;
+            Actor* const crActor = arena.crActor;
             arena.perform(ret, *crActor, *(arena.trgActor), *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
             arena.enableControls(false);
             arena.endTurn(ret, crActor);
