@@ -24,15 +24,16 @@ int main(int argc, char* argv[])
     int const width = size.width(), height = size.height();
     //QRect geometry(0, 0, (width / 2), (height / 2));
     //QRect geometry(0, 0, 1440, 1080);
+    //QRect geometry(0, 0, 1440, 720);
     //QRect geometry(0, 0, 1280, 800);
     //QRect geometry(0, 0, 1280, 720);
     //QRect geometry(0, 0, 1024, 600);
-    QRect geometry(0, 0, 800, 480);
+    //QRect geometry(0, 0, 800, 480);
     //QRect geometry(0, 0, 1080, 1440);
     //QRect geometry(0, 0, 924, 1104);
     //QRect geometry(0, 0, 796, 976);
     //QRect geometry(0, 0, 720, 1440);
-    //QRect geometry(0, 0, 720, 1280);
+    QRect geometry(0, 0, 720, 1280);
     //QRect geometry(0, 0, 540, 1080);
     //QRect geometry(0, 0, 480, 1080);
     //QRect geometry(0, 0, 360, 720);

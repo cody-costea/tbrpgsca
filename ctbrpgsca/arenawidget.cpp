@@ -579,14 +579,16 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
 
 void ArenaWidget::resizeEvent(QResizeEvent* const event)
 {
-    int resizeCtr = this->resizeCtr;
-    if (resizeCtr++ == 0)
+    /*int resizeCtr = this->resizeCtr;
+    if (resizeCtr++ > 0)*/
+    if (++this->resizeCtr > 2)
     {
         const QSize& newSize = event->size();
         int const width = newSize.width(), height = newSize.height();
         this->resizeScene(QSize(width - width / 18, height - height / 18), &(event->oldSize()));
+        this->resizeCtr = 0;
     }
-    this->resizeCtr = resizeCtr > 2 ? 0 : resizeCtr;
+    //this->resizeCtr = resizeCtr > 2 ? 0 : resizeCtr;
     QWidget::resizeEvent(event);
 }
 
