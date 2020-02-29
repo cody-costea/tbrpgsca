@@ -38,7 +38,7 @@ QVariant TargetsModel::data(const QModelIndex& index, int role) const
    switch (role)
    {
    case Qt::TextColorRole:
-       return QBrush(actor.hp > 0 ? Qt::color0 : Qt::gray);
+       return QBrush(actor.hp > 0 ? Qt::yellow : Qt::gray);
    case Qt::DisplayRole:
    {
        return row < this->scene->parties[0]->size() ? QString(tr("%1 (HP: %2/%3, MP: %4/%5, RP: %6/%7)")).arg(actor.name, QString::number(actor.hp),

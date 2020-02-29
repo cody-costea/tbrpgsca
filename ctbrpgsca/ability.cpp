@@ -174,7 +174,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         {
             if (i != 0)
             {
-                dmg -= (ability.attrInc + (dmg / i)) / (def / i);
+                dmg += (ability.attrInc + (dmg / i)) / (def / i);
             }
             QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)
