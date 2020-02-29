@@ -23,6 +23,11 @@ inline bool ArenaWidget::isAutomatic() const
     return (this->flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC;
 }
 
+/*inline bool ArenaWidget::isResizing() const
+{
+    return (this->flags & FLAG_RESIZING) == FLAG_RESIZING;
+}*/
+
 inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
 {
     ArenaWidget& arena = *this;
@@ -44,6 +49,17 @@ inline ArenaWidget& ArenaWidget::setAutomatic(const bool automatic)
     }
     return arena;
 }
+
+/*inline ArenaWidget& ArenaWidget::setResizing(const bool resizing)
+{
+    ArenaWidget& arena = *this;
+    int const flags = arena.flags;
+    if (resizing != ((flags & FLAG_RESIZING) == FLAG_RESIZING))
+    {
+        arena.flags = flags ^ FLAG_RESIZING;
+    }
+    return arena;
+}*/
 
 ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playSkill(QString& sprName)
 {
@@ -110,7 +126,21 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playActor(int const spr)
     return actSprite;
 }
 
-ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* const widget, QRect location, ArenaWidget& arena, QString& pos)
+ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::relocate(QRect& location)
+{
+    ActorSprite& actSprite = *this;
+    int const width = location.width(), height = location.height();
+    {
+        QSize size(width, height);
+        actSprite.actorMovie->setScaledSize(size);
+        actSprite.skillMovie->setScaledSize(size);
+    }
+    actSprite.skillLabel->setGeometry(0, 0, width, height);
+    actSprite.actorLabel->setGeometry(location);
+    return actSprite;
+}
+
+ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* const widget, QRect& location, ArenaWidget& arena, QString& pos)
 {
     this->spr = -1;
     this->pos = pos;
@@ -156,21 +186,13 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
             targetBox.setCurrentIndex(index);
         }
     });
-    int const width = location.width(), height = location.height();
-    if (width != 128 || height != 128)
-    {
-        QSize size(width, height);
-        actorMovie->setScaledSize(size);
-        skillMovie->setScaledSize(size);
-    }
-    skillLabel->setGeometry(0, 0, width, height);
-    actorLabel->setGeometry(location);
     actorLabel->setMovie(actorMovie);
     skillLabel->setMovie(skillMovie);
     this->actorMovie = actorMovie;
     this->actorLabel = actorLabel;
     this->skillMovie = skillMovie;
     this->skillLabel = skillLabel;
+    this->relocate(location);
     //actor.extra = this;
     actorLabel->show();
     skillLabel->show();
@@ -321,6 +343,249 @@ ArenaWidget& ArenaWidget::afterAct()
     return arena;
 }
 
+ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
+{
+    ArenaWidget& arena = *this;
+    //arena.setResizing(true);
+    {
+        int sprLength, imgWidth, imgHeight, btnHeight, actHeight, infoHeight;
+        int const width = newSize.width(), height = newSize.height();
+        {
+            QLabel* infoTxt = arena.infoTxt;
+            QPushButton* actBtn = arena.actBtn;
+            QPushButton* useBtn = arena.useBtn;
+            QPushButton* autoBtn = arena.autoBtn;
+            QPushButton* fleeBtn = arena.fleeBtn;
+            QComboBox* itemsBox = arena.itemsBox;
+            QTextEdit* actionsTxt = arena.actionsTxt;
+            QLayout* layout = arena.mainLayout,* ctrLayout = arena.ctrLayout;
+            QComboBox* targetBox = arena.targetBox;
+            QComboBox* skillsBox = arena.skillsBox;
+            bool portrait = height > width, deleted;
+            if ((deleted = (oldSize == nullptr || (portrait != (oldSize->height() > oldSize->width())))))
+            {
+                if (layout != nullptr)
+                {
+                    delete layout;
+                }
+                if (ctrLayout != nullptr)
+                {
+                    delete ctrLayout;
+                }
+            }
+            if (portrait)
+            {
+                actHeight = height / 5;
+                btnHeight = infoHeight = height / 16;
+                sprLength = btnHeight * 3 + (btnHeight / 2);
+                imgHeight = height - actHeight - infoHeight - sprLength;
+                if (deleted)
+                {
+                    ctrLayout = new QGridLayout(ctrWidget);
+                    layout = new QVBoxLayout(this);
+                }
+                else
+                {
+                    ctrLayout = arena.ctrLayout;
+                    layout = arena.mainLayout;
+                }
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(skillsBox, 1, 0, 1, 2);
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(actBtn, 1, 2, 1, 2);
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(targetBox, 2, 0, 1, 2);
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(autoBtn, 2, 2, 1, 1);
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(fleeBtn, 2, 3, 1, 1);
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(itemsBox, 3, 0, 1, 2);
+                (static_cast<QGridLayout*>(ctrLayout))->addWidget(useBtn, 3, 2, 1, 2);
+                ctrWidget->setFixedHeight(sprLength);
+                sprLength = (width + width / 3) / 5;
+                layout->addWidget(actWidget);
+                layout->addWidget(ctrWidget);
+                imgWidth = width;
+            }
+            else //landscape
+            {
+                sprLength = width / 5;
+                btnHeight = height / 7;
+                actHeight = height / 5;
+                infoHeight = height / 16;
+                imgHeight = height - actHeight - infoHeight;
+                if (deleted)
+                {
+                    ctrLayout = new QVBoxLayout(ctrWidget);
+                    layout = new QHBoxLayout(this);
+                }
+                else
+                {
+                    ctrLayout = arena.ctrLayout;
+                    layout = arena.mainLayout;
+                }
+                ctrLayout->addWidget(autoBtn);
+                ctrLayout->addWidget(skillsBox);
+                ctrLayout->addWidget(actBtn);
+                ctrLayout->addWidget(targetBox);
+                ctrLayout->addWidget(useBtn);
+                ctrLayout->addWidget(itemsBox);
+                ctrLayout->addWidget(fleeBtn);
+                ctrWidget->setFixedWidth(sprLength);
+                imgWidth = width - sprLength;
+                sprLength = (imgHeight + imgHeight / 11) / 3;
+                layout->addWidget(ctrWidget);
+                layout->addWidget(actWidget);
+            }
+            if (deleted)
+            {
+                ctrWidget->setLayout(ctrLayout);
+                //arena.ctrWidget = ctrWidget;
+                arena.ctrLayout = ctrLayout;
+                arena.mainLayout = layout;
+                arena.setLayout(layout);
+            }
+            actWidget->setFixedWidth(imgWidth);
+            arenaImg->setFixedHeight(imgHeight);
+            actionsTxt->setFixedHeight(actHeight);
+            infoTxt->setFixedHeight(infoHeight);
+            skillsBox->setFixedHeight(btnHeight);
+            targetBox->setFixedHeight(btnHeight);
+            itemsBox->setFixedHeight(btnHeight);
+            actBtn->setFixedHeight(btnHeight);
+            autoBtn->setFixedHeight(btnHeight);
+            fleeBtn->setFixedHeight(btnHeight);
+            useBtn->setFixedHeight(btnHeight);
+            actionsTxt->setReadOnly(true);
+        }
+        {
+            int const sprSize = SPR_SIZE / 2;
+            //ActorSprite** sprites = arena.sprites;
+            {
+                int k = 0, trgCount = 0;
+                int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 10,
+                        sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
+                for (int j = 0; j < pSize; ++j)
+                {
+                    int x;
+                    QString pos;
+                    if (j == 0)
+                    {
+                        if (surprise == 0)
+                        {
+                            x = -1;
+                            pos = POS_RIGHT;
+                        }
+                        else
+                        {
+                            x = 1;
+                            pos = POS_LEFT;
+                        }
+                    }
+                    else
+                    {
+                        if (surprise == 0)
+                        {
+                            x = 1;
+                            pos = POS_LEFT;
+                        }
+                        else
+                        {
+                            x = -1;
+                            pos = POS_RIGHT;
+                        }
+                    }
+                    QVector<Actor*>& party = *(parties[j]);
+                    int const sSize = party.size();
+                    trgCount += sSize;
+                    for (int i = 0; i < sSize; ++i)
+                    {
+                        void** extras;
+                        Actor& actor = *(party[i]);
+                        {
+                            void* const extra = actor.extra;
+                            if (extra == nullptr)
+                            {
+                                extras = new void*[2] { nullptr, nullptr };
+                                actor.extra = extras;
+                            }
+                            else
+                            {
+                                extras = (static_cast<void**>(extra));
+                            }
+                        }
+                        if (k < SPR_SIZE)
+                        {
+                            if (i < sprSize)
+                            {
+                                QRect loc;
+                                switch (j > 1 ? k : i)
+                                {
+                                case 0:
+                                case 4:
+                                    loc.setRect(xCentre - (sprFactor * x), yCentre - (sprHeight * x), sprLength, sprLength);
+                                    break;
+                                case 1:
+                                case 5:
+                                    loc.setRect(xCentre - (sprWidth * x), yCentre - (sprDistance * x), sprLength, sprLength);
+                                    break;
+                                case 2:
+                                case 6:
+                                    loc.setRect(xCentre - (sprWidth * x), yCentre - (sprHeight * -1 * x), sprLength, sprLength);
+                                    break;
+                                case 3:
+                                case 7:
+                                    loc.setRect(xCentre - (sprFactor * x), yCentre - (sprDistance * -1 * x), sprLength, sprLength);
+                                    break;
+                                }
+                                void* sprExtra;
+                                ActorSprite* spr;
+                                if ((sprExtra = extras[0]) == nullptr)
+                                {
+                                    spr = new ActorSprite(k, actor, arenaImg, loc, arena, pos);
+                                    spr->playActor(actor.hp > 0 ? SPR_IDLE : SPR_KO);
+                                    extras[0] = spr;
+                                }
+                                else
+                                {
+                                    spr = static_cast<ActorSprite*>(sprExtra);
+                                    spr->relocate(loc);
+                                }
+                                //sprites[k] = spr;
+                            }
+                            ++k;
+                        }
+                        /*else
+                        {
+                            (static_cast<void**>(extra))[0] = nullptr;
+                        }*/
+                        //(static_cast<void**>(extra))[1] = j == 0 ? new SkillsModel(actor) : nullptr;
+                        if (j == 0 && extras[1] == nullptr)
+                        {
+                            extras[1] = new SkillsModel(actor);
+                        }
+                        /*if ((++k) == SPR_SIZE)
+                        {
+                            goto after;
+                        }*/
+                    }
+                }
+                this->trgCount = trgCount;
+                /*for (;k < SPR_SIZE; ++k)
+                {
+                    sprites[k] = nullptr;
+                }*/
+            }
+        }
+    }
+    //arena.setResizing(false);
+    return arena;
+}
+
+/*void ArenaWidget::resizeEvent(QResizeEvent* const event)
+{
+    if (!this->isResizing())
+    {
+        this->resizeScene(event->size(), &(event->oldSize()));
+    }
+    QWidget::resizeEvent(event);
+}*/
+
 ArenaWidget& ArenaWidget::operator()(QRect size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
     return this->operator()(size, ret, parties, events, surprise, mInit, true);
@@ -330,34 +595,32 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                                      int const surprise, int const mInit, bool const doScene)
 {
     ArenaWidget& arena = *this;
-    int sprLength, imgWidth, imgHeight;
-    QPalette palette = arena.palette();
-    QLabel* arenaImg = new QLabel(this);
-    QWidget* actWidget = new QWidget(this);
-    QWidget* ctrWidget = new QWidget(this);
-    palette.setColor(QPalette::Base, Qt::black);
-    palette.setColor(QPalette::Window, Qt::black);
-    palette.setColor(QPalette::Button, Qt::black);
-    palette.setColor(QPalette::Background, Qt::black);
-    palette.setColor(QPalette::ToolTipBase, Qt::black);
-    palette.setColor(QPalette::Highlight, Qt::darkYellow);
-    palette.setColor(QPalette::HighlightedText, Qt::black);
-    palette.setColor(QPalette::AlternateBase, Qt::black);
-    palette.setColor(QPalette::WindowText, Qt::yellow);
-    palette.setColor(QPalette::ToolTipText, Qt::yellow);
-    palette.setColor(QPalette::Foreground, Qt::yellow);
-    palette.setColor(QPalette::ButtonText, Qt::yellow);
-    palette.setColor(QPalette::BrightText, Qt::white);
-    palette.setColor(QPalette::Text, Qt::yellow);
     arena.setAutoFillBackground(true);
-    arena.setPalette(palette);
-    arena.setGeometry(size);
     arena.flags = 0;
-    QLayout* layout;
+    //int sprLength, imgWidth, imgHeight;
     {
-        QLayout* ctrLayout;
-        int btnHeight, actHeight, infoHeight;
-        int const width = size.width(), height = size.height();
+        QPalette palette = arena.palette();
+        QLabel* arenaImg = new QLabel(this);
+        QWidget* actWidget = new QWidget(this);
+        QWidget* ctrWidget = new QWidget(this);
+        palette.setColor(QPalette::Base, Qt::black);
+        palette.setColor(QPalette::Window, Qt::black);
+        palette.setColor(QPalette::Button, Qt::black);
+        palette.setColor(QPalette::Background, Qt::black);
+        palette.setColor(QPalette::ToolTipBase, Qt::black);
+        palette.setColor(QPalette::Highlight, Qt::darkYellow);
+        palette.setColor(QPalette::HighlightedText, Qt::black);
+        palette.setColor(QPalette::AlternateBase, Qt::black);
+        palette.setColor(QPalette::WindowText, Qt::yellow);
+        palette.setColor(QPalette::ToolTipText, Qt::yellow);
+        palette.setColor(QPalette::Foreground, Qt::yellow);
+        palette.setColor(QPalette::ButtonText, Qt::yellow);
+        palette.setColor(QPalette::BrightText, Qt::white);
+        palette.setColor(QPalette::Text, Qt::yellow);
+        //QLayout* layout;
+        //QLayout* ctrLayout;
+        //int btnHeight, actHeight, infoHeight;
+        //int const width = size.width(), height = size.height();
         QLabel* infoTxt = new QLabel(this);
         QTextEdit* actionsTxt = new QTextEdit(this);
         QPushButton* actBtn = new QPushButton(this);
@@ -385,6 +648,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         useBtn->setText(tr("Use"));
         useBtn->setPalette(palette);
         infoTxt->setPalette(palette);
+        arena.setPalette(palette);
         autoBtn->setFlat(true);
         actBtn->setFlat(true);
         useBtn->setFlat(true);
@@ -392,17 +656,26 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         targetBox->setStyleSheet("background-color: black; color: yellow;");
         skillsBox->setStyleSheet("background-color: black; color: yellow;");
         itemsBox->setStyleSheet("background-color: black; color: yellow;");
+        actLayout->addWidget(infoTxt);
+        actLayout->addWidget(arenaImg);
+        actLayout->addWidget(actionsTxt);
+        actWidget->setLayout(actLayout);
+        arena.actionsTxt = actionsTxt;
+        arena.actLayout = actLayout;
+        arena.actWidget = actWidget;
+        arena.ctrWidget = ctrWidget;
         arena.targetBox = targetBox;
         arena.skillsBox = skillsBox;
+        arena.mainLayout = nullptr;
+        arena.ctrLayout = nullptr;
         arena.itemsBox = itemsBox;
         arena.arenaImg = arenaImg;
-        arena.actionsTxt = actionsTxt;
         arena.infoTxt = infoTxt;
         arena.fleeBtn = fleeBtn;
         arena.autoBtn = autoBtn;
         arena.actBtn = actBtn;
         arena.useBtn = useBtn;
-        if (height > width) //portrait
+        /*if (height > width) //portrait
         {
             actHeight = height / 5;
             btnHeight = infoHeight = height / 16;
@@ -445,14 +718,13 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             layout->addWidget(ctrWidget);
             layout->addWidget(actWidget);
         }
-        ctrWidget->setLayout(ctrLayout);
         arena.ctrWidget = ctrWidget;
         arena.ctrLayout = ctrLayout;
+        ctrWidget->setLayout(ctrLayout);
         actWidget->setFixedWidth(imgWidth);
         arenaImg->setFixedHeight(imgHeight);
         actionsTxt->setFixedHeight(actHeight);
         infoTxt->setFixedHeight(infoHeight);
-        infoTxt->setText("INFO TEXT TEST!!!");
         //actionsTxt->setFixedWidth(imgWidth - sprWidth);
         //arenaImg->setFixedWidth(imgWidth);
         skillsBox->setFixedHeight(btnHeight);
@@ -466,7 +738,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         actLayout->addWidget(infoTxt);
         actLayout->addWidget(arenaImg);
         actLayout->addWidget(actionsTxt);
-        actWidget->setLayout(actLayout);
+        actWidget->setLayout(actLayout);*/
         connect(autoBtn, &QPushButton::clicked, [&arena]()
         {
             QString ret;
@@ -505,9 +777,9 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             arena.recheckTargeting(arena.targetBox->currentIndex(), arena.skillsBox->currentIndex(), i);
         });
     }
-    arena.mainLayout = layout;
-    arena.setLayout(layout);
     arena.sprRuns = 0;
+    /*arena.mainLayout = layout;
+    arena.setLayout(layout);
     {
         int const sprSize = SPR_SIZE / 2;
         //ActorSprite** sprites = arena.sprites;
@@ -588,19 +860,11 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                         extra[0] = nullptr;
                     }
                     extra[1] = j == 0 ? new SkillsModel(actor) : nullptr;
-                    /*if ((++k) == SPR_SIZE)
-                    {
-                        goto after;
-                    }*/
                 }
             }
             this->trgCount = trgCount;
-            /*for (;k < SPR_SIZE; ++k)
-            {
-                sprites[k] = nullptr;
-            }*/
         }
-    }
+    }*/
     auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* const counter) -> bool
     {
         //(static_cast<ArenaWidget&>(scene)).sprRuns = 0;
@@ -618,6 +882,8 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
                                                                              ? SPR_ACT : SPR_CAST))) : SPR_FALL);
         return false;
     });
+    //arena.setGeometry(size);
+    arena.resizeScene(QSize(size.width(), size.height()), nullptr);
     if (doScene)
     {
         arena.Scene::operator()(ret, parties, actorRun, events, surprise, mInit);

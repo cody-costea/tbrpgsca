@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "arenawidget.h"
 #include "demolib.h"
 #include <QMainWindow>
 
@@ -11,16 +12,19 @@ namespace Ui
     class MainWindow;
 }
 
-class MainWindow : public QMainWindow, public DemoLib
+class MainWindow : public QMainWindow//, public DemoLib
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
+    void resizeEvent(QResizeEvent* const event) override;
+
+    explicit MainWindow(ArenaWidget* const arena, QWidget* parent = nullptr);
     ~MainWindow();
 
 private:
-    Ui::MainWindow* ui;
+    ArenaWidget* arena;
+    //Ui::MainWindow* ui;
 };
 
 

@@ -11,6 +11,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QMovie>
 #include <QComboBox>
 #include <QPushButton>
+#include <QResizeEvent>
 #include <QTextEdit>
 #include <QLayout>
 #include <QWidget>
@@ -43,11 +44,16 @@ namespace tbrpgsca
     public:
         inline bool isAiTurn() const;
         inline bool isAutomatic() const;
+        //inline bool isResizing() const;
 
         ArenaWidget& afterAct();
         ArenaWidget& enableControls(bool const enable);
 
-        explicit ArenaWidget(QWidget* parent = nullptr);
+        //void resizeEvent(QResizeEvent* const event) override;
+
+        ArenaWidget& resizeScene(const QSize& newSize, const QSize* const oldSize);
+
+        explicit ArenaWidget(QWidget* const parent = nullptr);
 
         ArenaWidget(QWidget* parent, QRect location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
@@ -61,7 +67,9 @@ namespace tbrpgsca
             ActorSprite& playActor(int const spr);
             ActorSprite& playSkill(QString& sprPath);
 
-            ActorSprite(int const index, Actor& actor, QWidget* const widget, QRect size, ArenaWidget& arena, QString& pos);
+            ActorSprite& relocate(QRect& location);
+
+            ActorSprite(int const index, Actor& actor, QWidget* const widget, QRect& size, ArenaWidget& arena, QString& pos);
 
             ~ActorSprite();
         protected:
@@ -81,6 +89,7 @@ namespace tbrpgsca
         ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
         inline ArenaWidget& setAutomatic(bool const automatic);
+        //inline ArenaWidget& setResizing(bool const resizing);
         inline ArenaWidget& setAiTurn(bool const aiTurn);
 
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
@@ -88,12 +97,13 @@ namespace tbrpgsca
 
         int sprRuns, flags, trgCount;
         QWidget* ctrWidget,* actWidget;
-        QLayout* ctrLayout,* actLayout,* mainLayout;
+        QLayout* ctrLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QVector<SkillsModel*>* skillsList,* itemsList;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         TargetsModel* targetsModel;
         QLabel* infoTxt,* arenaImg;
+        QVBoxLayout* actLayout;
         QTextEdit* actionsTxt;
         Actor* trgActor;
 

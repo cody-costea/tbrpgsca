@@ -1004,6 +1004,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->items = items;
     this->setLevel(level);
     this->recover(nullptr, nullptr);
+    this->extra = nullptr;
 }
 
 Actor::Actor(Actor& actor) : Costume(actor)
@@ -1102,6 +1103,7 @@ Actor::Actor(Actor& actor) : Costume(actor)
             this->counters = nSkillsRgTurn;
         }
     }
+    this->extra = actor.extra;
 }
 
 Actor::~Actor()
