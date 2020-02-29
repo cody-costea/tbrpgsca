@@ -577,14 +577,18 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
     return arena;
 }
 
-/*void ArenaWidget::resizeEvent(QResizeEvent* const event)
+void ArenaWidget::resizeEvent(QResizeEvent* const event)
 {
-    if (!this->isResizing())
+    int resizeCtr = this->resizeCtr;
+    if (resizeCtr++ == 0)
     {
-        this->resizeScene(event->size(), &(event->oldSize()));
+        const QSize& newSize = event->size();
+        int const width = newSize.width(), height = newSize.height();
+        this->resizeScene(QSize(width - width / 18, height - height / 18), &(event->oldSize()));
     }
+    this->resizeCtr = resizeCtr > 2 ? 0 : resizeCtr;
     QWidget::resizeEvent(event);
-}*/
+}
 
 ArenaWidget& ArenaWidget::operator()(QRect size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
@@ -596,6 +600,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
 {
     ArenaWidget& arena = *this;
     arena.setAutoFillBackground(true);
+    arena.resizeCtr = 0;
     arena.flags = 0;
     //int sprLength, imgWidth, imgHeight;
     {
@@ -925,8 +930,8 @@ ArenaWidget::~ArenaWidget()
     delete this->actionsTxt;
     delete this->ctrLayout;
     delete this->ctrWidget;
-    delete this->actWidget;
     delete this->actLayout;
+    delete this->actWidget;
     delete this->mainLayout;
     delete this->actorEvent;
     delete this->targetsModel;

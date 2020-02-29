@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     //QRect geometry(0, 0, 1280, 800);
     //QRect geometry(0, 0, 1280, 720);
     //QRect geometry(0, 0, 1024, 600);
-    //QRect geometry(0, 0, 800, 480);
+    QRect geometry(0, 0, 800, 480);
     //QRect geometry(0, 0, 1080, 1440);
     //QRect geometry(0, 0, 924, 1104);
     //QRect geometry(0, 0, 796, 976);
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     //QRect geometry(0, 0, 360, 720);
     //QRect geometry(0, 0, 640, 480);
     //QRect geometry(0, 0, 600, 1024);
-    QRect geometry(0, 0, 480, 800);
+    //QRect geometry(0, 0, 480, 800);
     //QRect geometry(0, 0, 480, 640);
     //QRect geometry(0, 0, 320, 240);
     //QRect geometry(0, 0, 240, 320);

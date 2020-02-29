@@ -49,7 +49,7 @@ namespace tbrpgsca
         ArenaWidget& afterAct();
         ArenaWidget& enableControls(bool const enable);
 
-        //void resizeEvent(QResizeEvent* const event) override;
+        void resizeEvent(QResizeEvent* const event) override;
 
         ArenaWidget& resizeScene(const QSize& newSize, const QSize* const oldSize);
 
@@ -95,9 +95,9 @@ namespace tbrpgsca
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
 
-        int sprRuns, flags, trgCount;
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;
+        int sprRuns, flags, trgCount, resizeCtr;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QVector<SkillsModel*>* skillsList,* itemsList;
         QComboBox* skillsBox,* itemsBox,* targetBox;
