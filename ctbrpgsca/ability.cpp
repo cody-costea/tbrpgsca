@@ -136,7 +136,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int dmg = std::rand() % 4;
+        int dmg = std::rand() % 7;
         int canMiss = 0, def = 0, i = 0;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
@@ -174,7 +174,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         {
             if (i != 0)
             {
-                dmg = (ability.attrInc + (dmg / i)) / (def / i);
+                dmg -= (ability.attrInc + (dmg / i)) / (def / i);
             }
             QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)
