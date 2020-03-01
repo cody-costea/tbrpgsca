@@ -655,7 +655,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     else
     {
         players = new QVector<Actor*>();
-        scene.mInit = -1;
+        scene.mInit = 0;
         useInit = false;
     }
     int current = 0;
@@ -683,12 +683,12 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
             player.actions = 0;
             if (surprised)
             {
-                player.init = useInit ? -(mInit + 1) : -2;
+                player.init = useInit ? -(mInit + 1) : -1;
             }
             else
             {
-                player.init = -1;
-                if (player.agi < crActor->agi)
+                player.init = 0;
+                if (player.agi > crActor->agi || crActor->init < 0)
                 {
                     crActor = &player;
                     if (useInit)
@@ -722,7 +722,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     SceneAct* event;
     scene.current = current;
     scene.oldCurrent = current;
-    if (events == nullptr || events->size() == EVENT_BEGIN_SCENE || ((event = events->at(EVENT_BEGIN_SCENE)) == nullptr) || (*event)(scene, ret))
+    if (events != nullptr && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE)) != nullptr) && (*event)(scene, ret))
     {
         scene.endTurn(ret, crActor);
     }

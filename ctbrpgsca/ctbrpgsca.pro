@@ -38,6 +38,7 @@ SOURCES += \
         clickablelabel.cpp \
         costume.cpp \
         demolib.cpp \
+        itemsmodel.cpp \
         main.cpp \
         mainwindow.cpp \
         role.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
         clickablelabel.h \
         costume.h \
         demolib.h \
+        itemsmodel.h \
         mainwindow.h \
         role.h \
         scene.h \

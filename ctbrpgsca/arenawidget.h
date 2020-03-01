@@ -21,6 +21,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "targetsmodel.h"
 #include "skillsmodel.h"
 #include "scene.h"
+#include "itemsmodel.h"
 
 namespace tbrpgsca
 {
@@ -83,14 +84,14 @@ namespace tbrpgsca
 
             friend class ArenaWidget;
         };
-        Actor* getPlayerFromTargetBox(int const index);
-        ArenaWidget& prepareItemsBox(QMap<Ability*, int>& items);        
-        ArenaWidget& prepareTargetBox(QVector<QVector<Actor*>*>& players);
+        ArenaWidget& prepareItemsBox(Actor& actor);
+        ArenaWidget& prepareTargetBox(bool const freeMemory);
         ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
         inline ArenaWidget& setAutomatic(bool const automatic);
         //inline ArenaWidget& setResizing(bool const resizing);
         inline ArenaWidget& setAiTurn(bool const aiTurn);
+        Actor* getPlayerFromTargetBox(int const index);
 
         ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
@@ -99,7 +100,6 @@ namespace tbrpgsca
         QLayout* ctrLayout,* mainLayout;
         int sprRuns, flags, trgCount, resizeCtr;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
-        QVector<SkillsModel*>* skillsList,* itemsList;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         TargetsModel* targetsModel;
         QLabel* infoTxt,* arenaImg;

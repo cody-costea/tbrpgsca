@@ -70,6 +70,7 @@ namespace tbrpgsca
         friend class Costume;
         friend class ArenaWidget;
         friend class SkillsModel;
+        friend class ItemsModel;
         friend class State;
         friend class Scene;
     };

@@ -126,6 +126,7 @@ namespace tbrpgsca
         friend class ArenaWidget;
         friend class TargetsModel;
         friend class SkillsModel;
+        friend class ItemsModel;
         friend class Costume;
         friend class State;
         friend class Role;

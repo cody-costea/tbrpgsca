@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     //QRect geometry(0, 0, 320, 240);
     //QRect geometry(0, 0, 240, 320);
     //QRect geometry(0, 0, 256, 256);
-    ArenaWidget arena(nullptr, geometry, ret, parties, nullptr, 0, 0);
+    ArenaWidget arena(nullptr, geometry, ret, parties, nullptr, -1, 0);
     QStackedLayout layout;
     layout.addWidget(&arena);
     MainWindow window(&arena);
