@@ -158,7 +158,7 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
            QString ret;
            //arena.endTurn(ret, arena.crActor);
            Actor& crActor = *(arena.crActor);
-           if (arena.isAutomatic() || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
+           if (arena.isAutomatic() || crActor.side != 0 || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
            {
                arena.infoTxt->setText("");
                arena.setAiTurn(true).playAi(ret, crActor).endTurn(ret, arena.crActor);
@@ -674,7 +674,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
             {
                 Actor* const crActor = arena.crActor;
                 arena.setAutomatic(true).autoBtn->setText(tr("Manual"));
-                if (!(crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged()))
+                if (crActor->side == 0 || !(crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged()))
                 {
                     arena.playAi(ret, *crActor).endTurn(ret, crActor);
                     arena.enableControls(false).actionsTxt->append(ret);
@@ -728,7 +728,15 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     arena.skillsList = new QVector<SkillsModel*>();
     arena.targetsModel = new TargetsModel(arena);
     arena.targetBox->setModel(targetsModel);
-    arena.afterAct();
+    if (crActor->side != 0 || crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged())
+    {
+        arena.playAi(ret, *crActor).endTurn(ret, crActor);
+        arena.enableControls(false).actionsTxt->append(ret);
+    }
+    else
+    {
+        arena.afterAct();
+    }
     return arena;
 }
 
