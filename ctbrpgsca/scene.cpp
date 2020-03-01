@@ -655,7 +655,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     else
     {
         players = new QVector<Actor*>();
-        scene.mInit = 0;
+        scene.mInit = -1;
         useInit = false;
     }
     int current = 0;
