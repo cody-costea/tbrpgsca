@@ -396,8 +396,10 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 (static_cast<QGridLayout*>(ctrLayout))->addWidget(fleeBtn, 2, 3, 1, 1);
                 (static_cast<QGridLayout*>(ctrLayout))->addWidget(itemsBox, 3, 0, 1, 2);
                 (static_cast<QGridLayout*>(ctrLayout))->addWidget(useBtn, 3, 2, 1, 2);
+                ctrWidget->setFixedHeight(height - imgHeight);
                 ctrWidget->setFixedHeight(sprLength);
                 sprLength = (width + width / 3) / 5;
+                ctrWidget->setFixedWidth(width);
                 layout->addWidget(actWidget);
                 layout->addWidget(ctrWidget);
                 imgWidth = width;
@@ -428,6 +430,8 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 ctrLayout->addWidget(fleeBtn);
                 ctrWidget->setFixedWidth(sprLength);
                 sprLength = (imgHeight + imgHeight / 11) / 3;
+                actWidget->setFixedHeight(height);
+                ctrWidget->setFixedHeight(height);
                 imgWidth = width - sprLength;
                 layout->addWidget(ctrWidget);
                 layout->addWidget(actWidget);
@@ -444,9 +448,9 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             actWidget->setFixedWidth(imgWidth);
             actionsTxt->setFixedHeight(actHeight);
             actionsTxt->setFixedWidth(imgWidth - imgWidth / 10);
-            infoTxt->setFixedHeight(infoHeight);
             skillsBox->setFixedHeight(btnHeight);
             targetBox->setFixedHeight(btnHeight);
+            infoTxt->setFixedHeight(infoHeight);
             itemsBox->setFixedHeight(btnHeight);
             autoBtn->setFixedHeight(btnHeight);
             fleeBtn->setFixedHeight(btnHeight);
