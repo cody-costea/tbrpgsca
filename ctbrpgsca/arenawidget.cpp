@@ -130,11 +130,11 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::relocate(QRect& location)
 {
     ActorSprite& actSprite = *this;
     int const width = location.width(), height = location.height();
-    {
+    /*{
         QSize size(width, height);
         actSprite.actorMovie->setScaledSize(size);
         actSprite.skillMovie->setScaledSize(size);
-    }
+    }*/
     actSprite.skillLabel->setGeometry(0, 0, width, height);
     actSprite.actorLabel->setGeometry(location);
     return actSprite;
@@ -427,8 +427,8 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 ctrLayout->addWidget(itemsBox);
                 ctrLayout->addWidget(fleeBtn);
                 ctrWidget->setFixedWidth(sprLength);
-                imgWidth = width - sprLength;
                 sprLength = (imgHeight + imgHeight / 11) / 3;
+                imgWidth = width - sprLength;
                 layout->addWidget(ctrWidget);
                 layout->addWidget(actWidget);
             }
@@ -439,18 +439,20 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 arena.mainLayout = layout;
                 arena.setLayout(layout);
             }
-            actWidget->setFixedWidth(imgWidth);
+            arenaImg->setFixedWidth(imgWidth);
             arenaImg->setFixedHeight(imgHeight);
+            actWidget->setFixedWidth(imgWidth);
             actionsTxt->setFixedHeight(actHeight);
+            actionsTxt->setFixedWidth(imgWidth - imgWidth / 10);
             infoTxt->setFixedHeight(infoHeight);
             skillsBox->setFixedHeight(btnHeight);
             targetBox->setFixedHeight(btnHeight);
             itemsBox->setFixedHeight(btnHeight);
-            actBtn->setFixedHeight(btnHeight);
             autoBtn->setFixedHeight(btnHeight);
             fleeBtn->setFixedHeight(btnHeight);
+            actBtn->setFixedHeight(btnHeight);
             useBtn->setFixedHeight(btnHeight);
-            /*actWidget->update();
+            actWidget->update();
             ctrLayout->update();
             targetBox->update();
             skillsBox->update();
@@ -459,7 +461,7 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             fleeBtn->update();
             useBtn->update();
             actBtn->update();
-            layout->update();*/
+            layout->update();
         }
         {
             int const sprSize = SPR_SIZE / 2;
@@ -571,17 +573,22 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             }
         }
     }
+    //arena.setResizing(false);
     return arena;
 }
 
 void ArenaWidget::resizeEvent(QResizeEvent* const event)
 {
-    if (++this->resizeCtr > 2)
+    const QSize& newSize = event->size();
+    const QSize& oldSize = (event->oldSize());
+    int const width = newSize.width(), height = newSize.height();
+    if ((width > height) != (oldSize.width() > oldSize.height()))
+    //if (++this->resizeCtr > 2)
+    //if (!this->isResizing())
     {
-        const QSize& newSize = event->size();
-        int const width = newSize.width(), height = newSize.height();
-        this->resizeScene(QSize(width - width / 18, height - height / 18), &(event->oldSize()));
-        this->resizeCtr = 0;
+        this->resizeScene(newSize, &oldSize);
+        //this->resizeScene(QSize(width - width / 12, height - height / 12), &oldSize);
+        //this->resizeCtr = 0;
     }
     QWidget::resizeEvent(event);
 }
@@ -596,7 +603,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
 {
     ArenaWidget& arena = *this;
     arena.setAutoFillBackground(true);
-    arena.resizeCtr = 0;
+    //arena.resizeCtr = 0;
     arena.flags = 0;
     {
         QPalette palette = arena.palette();
@@ -729,6 +736,17 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         }
         return false;
     });
+    /*{
+        int const height = size.height(), width = size.width();
+        if (height > width)
+        {
+            arena.setMaximumSize(height, height);
+        }
+        else
+        {
+            arena.setMaximumSize(width, width);
+        }
+    }*/
     arena.resizeScene(size, nullptr);
     arena.prepareTargetBox(false);
     if (doScene)

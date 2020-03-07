@@ -14,7 +14,7 @@ using namespace tbrpgsca;
 
 int main(int argc, char* argv[])
 {
-    QSize size;
+    QSize size;//(480, 800);
     QString ret;
     DemoLib demoLib;
     QApplication a(argc, argv);

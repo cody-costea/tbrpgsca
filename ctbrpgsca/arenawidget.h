@@ -20,8 +20,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "clickablelabel.h"
 #include "targetsmodel.h"
 #include "skillsmodel.h"
-#include "scene.h"
 #include "itemsmodel.h"
+#include "scene.h"
 
 namespace tbrpgsca
 {
@@ -42,6 +42,7 @@ namespace tbrpgsca
         #define SPR_EXT "gif"
         #define FLAG_AUTOMATIC 1
         #define FLAG_AI_TURN 2
+        //#define FLAG_RESIZING 4
     public:
         inline bool isAiTurn() const;
         inline bool isAutomatic() const;
@@ -98,7 +99,7 @@ namespace tbrpgsca
 
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;
-        int sprRuns, flags, trgCount, resizeCtr;
+        int sprRuns, flags, trgCount;//, resizeCtr;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         TargetsModel* targetsModel;
