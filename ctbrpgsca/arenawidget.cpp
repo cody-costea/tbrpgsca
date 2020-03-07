@@ -696,7 +696,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         {
             QString ret;
             Actor* const crActor = arena.crActor;
-            Actor* const trgActor = arena.getPlayerFromTargetBox(arena.targetBox->currentIndex());
+            Actor* const trgActor = arena.trgActor;
             arena.perform(ret, *crActor, *trgActor, *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
             arena.enableControls(false);
             arena.endTurn(ret, crActor);
@@ -714,18 +714,19 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
     arena.sprRuns = 0;
     auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* const counter) -> bool
     {
-        if (&target != &user)
-        {
-            (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]))->playActor((ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
-        }
+        (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]))->playActor(user.hp < 1 ? SPR_FALL
+            : (ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
         QString* const spr = ability.sprite;
         ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target.extra)[0]));
         if (spr != nullptr && spr->length() > 0)
         {
             targetSpr.playSkill(*spr);
+        }        
+        if (&target != &user)
+        {
+            targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
+                : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
         }
-        targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? (&user == &target ? SPR_CAST : SPR_HIT)
-                    : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
         return false;
     });
     arena.resizeScene(QSize(size.width(), size.height()), nullptr);
