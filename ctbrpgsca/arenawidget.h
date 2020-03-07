@@ -56,11 +56,11 @@ namespace tbrpgsca
 
         explicit ArenaWidget(QWidget* const parent = nullptr);
 
-        ArenaWidget(QWidget* parent, QRect location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
 
         ~ArenaWidget();
 
-        ArenaWidget& operator()(QRect location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget& operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
         {
@@ -93,7 +93,7 @@ namespace tbrpgsca
         inline ArenaWidget& setAiTurn(bool const aiTurn);
         Actor* getPlayerFromTargetBox(int const index);
 
-        ArenaWidget& operator()(QRect& location, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+        ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
 
         QWidget* ctrWidget,* actWidget;

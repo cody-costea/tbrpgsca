@@ -40,7 +40,6 @@ SOURCES += \
         demolib.cpp \
         itemsmodel.cpp \
         main.cpp \
-        mainwindow.cpp \
         role.cpp \
         scene.cpp \
         skillsmodel.cpp \
@@ -55,15 +54,13 @@ HEADERS += \
         costume.h \
         demolib.h \
         itemsmodel.h \
-        mainwindow.h \
         role.h \
         scene.h \
         skillsmodel.h \
         state.h \
         targetsmodel.h
 
-FORMS += \
-        mainwindow.ui
+FORMS +=
 
 CONFIG += mobility
 MOBILITY = 

@@ -586,12 +586,12 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
     QWidget::resizeEvent(event);
 }
 
-ArenaWidget& ArenaWidget::operator()(QRect size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+ArenaWidget& ArenaWidget::operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
 {
     return this->operator()(size, ret, parties, events, surprise, mInit, true);
 }
 
-ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                      int const surprise, int const mInit, bool const doScene)
 {
     ArenaWidget& arena = *this;
@@ -729,7 +729,7 @@ ArenaWidget& ArenaWidget::operator()(QRect& size, QString& ret, QVector<QVector<
         }
         return false;
     });
-    arena.resizeScene(QSize(size.width(), size.height()), nullptr);
+    arena.resizeScene(size, nullptr);
     arena.prepareTargetBox(false);
     if (doScene)
     {
@@ -756,7 +756,7 @@ ArenaWidget::ArenaWidget(QWidget* parent) : QWidget(parent), Scene()
 
 }
 
-ArenaWidget::ArenaWidget(QWidget* parent, QRect size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+ArenaWidget::ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit)
     : QWidget(parent), Scene(ret, parties, nullptr, events, surprise, mInit)
 {
     this->operator()(size, ret, parties, events, surprise, mInit, false);
