@@ -130,11 +130,11 @@ ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::relocate(QRect& location)
 {
     ActorSprite& actSprite = *this;
     int const width = location.width(), height = location.height();
-    /*{
+    {
         QSize size(width, height);
         actSprite.actorMovie->setScaledSize(size);
         actSprite.skillMovie->setScaledSize(size);
-    }*/
+    }
     actSprite.skillLabel->setGeometry(0, 0, width, height);
     actSprite.actorLabel->setGeometry(location);
     return actSprite;
@@ -352,17 +352,18 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
     ArenaWidget& arena = *this;
     //arena.setResizing(true);
     {
-        int sprLength, imgWidth, imgHeight, btnHeight, actHeight, infoHeight;
+        int sprLength, imgWidth, imgHeight, btnHeight, infoHeight;
         int const width = newSize.width(), height = newSize.height();
-        bool portrait = height > width, deleted;
+        arena.setGeometry(0, 0, width, height);
         {
             QLabel* infoTxt = arena.infoTxt;
             QTextEdit* actionsTxt = arena.actionsTxt;
-            QLayout* layout = arena.mainLayout,* ctrLayout = arena.ctrLayout;
             QWidget* ctrWidget = arena.ctrWidget,* actWidget = arena.actWidget;
-            QPushButton* actBtn = arena.actBtn,* useBtn = arena.useBtn,* autoBtn = arena.autoBtn,* fleeBtn = arena.fleeBtn;
+            QLayout* layout = arena.mainLayout,* ctrLayout = arena.ctrLayout,* actLayout = arena.actLayout;
             QComboBox* itemsBox = arena.itemsBox,* targetBox = arena.targetBox,* skillsBox = arena.skillsBox;
-            if ((deleted = (oldSize == nullptr || (portrait != (oldSize->height() > oldSize->width())))))
+            QPushButton* actBtn = arena.actBtn,* useBtn = arena.useBtn,* autoBtn = arena.autoBtn,* fleeBtn = arena.fleeBtn;
+            bool const portrait = height > width, deleted = (oldSize == nullptr || (portrait != (oldSize->height() > oldSize->width())));
+            if (deleted)
             {
                 if (layout != nullptr)
                 {
@@ -372,47 +373,55 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 {
                     delete ctrLayout;
                 }
+                /*if (actLayout != nullptr)
+                {
+                    delete actLayout;
+                    actLayout = new QVBoxLayout();
+                }*/
+                actLayout->removeWidget(infoTxt);
+                actLayout->removeWidget(arenaImg);
+                actLayout->removeWidget(actionsTxt);
             }
-            /*actLayout->removeWidget(infoTxt);
-            actLayout->removeWidget(arenaImg);
-            actLayout->removeWidget(actionsTxt);*/
             if (portrait)
             {
-                actHeight = height / 5;
                 btnHeight = infoHeight = height / 16;
-                sprLength = btnHeight * 3 + (btnHeight / 2);
-                imgHeight = height - actHeight - infoHeight - sprLength;
+                sprLength = (btnHeight * 4 + (btnHeight / 3));
+                imgHeight = height - infoHeight - (sprLength += sprLength / 3);
                 if (deleted)
                 {
                     layout = new QVBoxLayout(this);
                     ctrLayout = new QGridLayout(ctrWidget);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(skillsBox, 1, 0, 1, 2);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(actBtn, 1, 2, 1, 2);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(targetBox, 2, 0, 1, 2);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(autoBtn, 2, 2, 1, 1);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(fleeBtn, 2, 3, 1, 1);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(itemsBox, 3, 0, 1, 2);
-                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(useBtn, 3, 2, 1, 2);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(actionsTxt, 1, 0, 1, 4);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(skillsBox, 2, 0, 1, 2);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(actBtn, 2, 2, 1, 2);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(targetBox, 3, 0, 1, 2);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(autoBtn, 3, 2, 1, 1);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(fleeBtn, 3, 3, 1, 1);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(itemsBox, 4, 0, 1, 2);
+                    (static_cast<QGridLayout*>(ctrLayout))->addWidget(useBtn, 4, 2, 1, 2);
+                    actLayout->addWidget(infoTxt);
+                    actLayout->addWidget(arenaImg);
+                    layout->addWidget(actWidget);
+                    layout->addWidget(ctrWidget);
                 }
                 else
                 {
                     ctrLayout = arena.ctrLayout;
                     layout = arena.mainLayout;
                 }
-                actWidget->setFixedHeight(actHeight + imgHeight + infoHeight);
                 ctrWidget->setFixedHeight(sprLength);
+                actWidget->setFixedHeight(imgHeight + infoHeight);
+                actionsTxt->setGeometry(0, 0, 0, sprLength / 2);
                 sprLength = (width + width / 3) / 5;
                 ctrWidget->setFixedWidth(width);
-                layout->addWidget(actWidget);
-                layout->addWidget(ctrWidget);
                 imgWidth = width;
             }
             else //landscape
             {
                 sprLength = width / 5;
                 btnHeight = height / 7;
-                actHeight = height / 5;
                 infoHeight = height / 16;
+                int const actHeight = height / 5;
                 imgHeight = height - actHeight - infoHeight;
                 if (deleted)
                 {
@@ -425,6 +434,11 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                     ctrLayout->addWidget(useBtn);
                     ctrLayout->addWidget(itemsBox);
                     ctrLayout->addWidget(fleeBtn);
+                    actLayout->addWidget(infoTxt);
+                    actLayout->addWidget(arenaImg);
+                    actLayout->addWidget(actionsTxt);
+                    layout->addWidget(ctrWidget);
+                    layout->addWidget(actWidget);
                 }
                 else
                 {
@@ -433,15 +447,17 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 }
                 ctrWidget->setFixedWidth(sprLength);
                 sprLength = (imgHeight + imgHeight / 11) / 3;
+                actionsTxt->setFixedHeight(actHeight);
                 actWidget->setFixedHeight(height);
                 ctrWidget->setFixedHeight(height);
                 imgWidth = width - sprLength;
-                layout->addWidget(ctrWidget);
-                layout->addWidget(actWidget);
             }
             if (deleted)
             {
+                ctrLayout->setSpacing(1);
+                actWidget->setLayout(actLayout);
                 ctrWidget->setLayout(ctrLayout);
+                arena.actLayout = static_cast<QVBoxLayout*>(actLayout);
                 arena.ctrLayout = ctrLayout;
                 arena.mainLayout = layout;
                 arena.setLayout(layout);
@@ -449,9 +465,8 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             arenaImg->setFixedWidth(imgWidth);
             arenaImg->setFixedHeight(imgHeight);
             actWidget->setFixedWidth(imgWidth);
-            actionsTxt->setFixedHeight(actHeight);
-            actionsTxt->setFixedWidth(imgWidth - imgWidth / 10);
             skillsBox->setFixedHeight(btnHeight);
+            actionsTxt->setFixedWidth(imgWidth - imgWidth / 10);
             targetBox->setFixedHeight(btnHeight);
             infoTxt->setFixedHeight(infoHeight);
             itemsBox->setFixedHeight(btnHeight);
@@ -459,7 +474,7 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             fleeBtn->setFixedHeight(btnHeight);
             actBtn->setFixedHeight(btnHeight);
             useBtn->setFixedHeight(btnHeight);
-            actWidget->update();
+            /*actWidget->update();
             ctrLayout->update();
             targetBox->update();
             skillsBox->update();
@@ -468,10 +483,7 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             fleeBtn->update();
             useBtn->update();
             actBtn->update();
-            layout->update();
-            /*actLayout->addWidget(infoTxt);
-            actLayout->addWidget(arenaImg);
-            actLayout->addWidget(actionsTxt);*/
+            layout->update();*/
         }
         {
             int const sprSize = SPR_SIZE / 2;
@@ -591,14 +603,34 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
 {
     const QSize& newSize = event->size();
     const QSize& oldSize = (event->oldSize());
-    int const width = newSize.width(), height = newSize.height();
-    if ((width > height) != (oldSize.width() > oldSize.height()))
+    int width = newSize.width(), height = newSize.height();
+    bool const landscape = (width > height);
+    if (landscape != (oldSize.width() > oldSize.height()))
     //if (++this->resizeCtr > 2)
     //if (!this->isResizing())
     {
+        /*width = this->width();
+        height = this->height();
+        if (landscape)
+        {
+            if (width < height)
+            {
+                int const tmp = height;
+                height = width;
+                width = tmp;
+            }
+        }
+        else
+        {
+            if (height < width)
+            {
+                int const tmp = width;
+                width = height;
+                height = tmp;
+            }
+        }
+        this->resizeScene(QSize(width, height), &oldSize);*/
         this->resizeScene(newSize, &oldSize);
-        //this->resizeScene(QSize(width - width / 12, height - height / 12), &oldSize);
-        //this->resizeCtr = 0;
     }
     QWidget::resizeEvent(event);
 }
@@ -670,9 +702,9 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         targetBox->setStyleSheet("background-color: black; color: yellow;");
         skillsBox->setStyleSheet("background-color: black; color: yellow;");
         itemsBox->setStyleSheet("background-color: black; color: yellow;");
-        actLayout->addWidget(infoTxt);
+        /*actLayout->addWidget(infoTxt);
         actLayout->addWidget(arenaImg);
-        actLayout->addWidget(actionsTxt);
+        actLayout->addWidget(actionsTxt);*/
         actWidget->setLayout(actLayout);
         arena.actionsTxt = actionsTxt;
         arena.actLayout = actLayout;

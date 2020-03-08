@@ -8,7 +8,7 @@ using namespace tbrpgsca;
 
 int main(int argc, char* argv[])
 {
-    QSize size;//(480, 800);
+    QSize size;//(240, 320);
     QString ret;
     DemoLib demoLib;
     QApplication a(argc, argv);
@@ -32,5 +32,6 @@ int main(int argc, char* argv[])
     window.setCentralWidget(&arena);
     //window.showMaximized();
     window.showFullScreen();
+    //window.show();
     return a.exec();
 }
