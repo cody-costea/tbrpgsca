@@ -28,6 +28,12 @@ inline bool ArenaWidget::isAutomatic() const
     return (this->flags & FLAG_RESIZING) == FLAG_RESIZING;
 }*/
 
+
+inline bool ArenaWidget::isEndTurn() const
+{
+    return (this->flags & FLAG_END_TURN) == FLAG_END_TURN;
+}
+
 inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
 {
     ArenaWidget& arena = *this;
@@ -35,6 +41,17 @@ inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
     if (aiTurn != ((flags & FLAG_AI_TURN) == FLAG_AI_TURN))
     {
         arena.flags = flags ^ FLAG_AI_TURN;
+    }
+    return arena;
+}
+
+inline ArenaWidget& ArenaWidget::setEndTurn(const bool endTurn)
+{
+    ArenaWidget& arena = *this;
+    int const flags = arena.flags;
+    if (endTurn != ((flags & FLAG_END_TURN) == FLAG_END_TURN))
+    {
+        arena.flags = flags ^ FLAG_END_TURN;
     }
     return arena;
 }
@@ -153,10 +170,11 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
     skillMovie->setCacheMode(QMovie::CacheAll);
     auto run = [&arena]()
     {
-       if ((--(arena.sprRuns)) < 1)
+       if ((--(arena.sprRuns)) < 1 && arena.isEndTurn())
        {
            QString ret;
            //arena.endTurn(ret, arena.crActor);
+           arena.setEndTurn(false);
            Actor& crActor = *(arena.crActor);
            if (arena.isAutomatic() || crActor.side != 0 || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
            {
@@ -761,21 +779,43 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         });
     }
     arena.sprRuns = 0;
-    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* const counter) -> bool
+    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability* const ability, bool const revive,
+                                 Actor* const target, Ability* const counter) -> bool
     {
-        (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]))->playActor(user.hp < 1 ? SPR_FALL
-            : (ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
-        QString* const spr = ability.sprite;
-        ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target.extra)[0]));
-        if (spr != nullptr && spr->length() > 0)
+        ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]));
+        if (target == nullptr)
         {
-            targetSpr.playSkill(*spr);
-        }        
-        if (&target != &user)
-        {
-            targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
-                : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+            static_cast<ArenaWidget*>(&scene)->setEndTurn(true);
         }
+        else
+        {
+            ActorSprite* targetSpr;
+            if (target == &user)
+            {
+                targetSpr = userSpr;
+            }
+            else
+            {
+                targetSpr = (static_cast<ActorSprite*>(static_cast<void**>(target->extra)[0]));
+                targetSpr->playActor(target->hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
+                    : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+            }
+            if (ability != nullptr)
+            {
+                QString* const spr = ability->sprite;
+                if (spr != nullptr && spr->length() > 0)
+                {
+                    targetSpr->playSkill(*spr);
+                }
+            }
+            QVector<Costume*>* usrRoles;
+            if (user.actions > 1 || ((usrRoles = user.dmgRoles) == nullptr) || usrRoles->size() < 1)
+            {
+                static_cast<ArenaWidget*>(&scene)->setEndTurn(true);
+            }
+        }
+        userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? SPR_HIT
+            : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
         return false;
     });
     /*{

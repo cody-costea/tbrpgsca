@@ -209,7 +209,7 @@ Actor& Actor::setCurrentHp(const int hp, QString &ret, const bool survive)
     return this->setCurrentHp(hp, ret, nullptr, survive);
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const survive)
+Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool const survive)
 {
     Actor& actor = *this;
     if (hp < 1)
@@ -526,12 +526,30 @@ Actor& Actor::setStateResistance(State* const state, const int res)
 Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
-    QVector<Costume*>* dmgRoles = actor.dmgRoles;
-    if (dmgRoles != nullptr)
+    QVector<Costume*>* const dmgRoles = actor.dmgRoles;
+    if (dmgRoles != nullptr && dmgRoles->size() > 0)
     {
         for (Costume* const role : *dmgRoles)
         {
             role->apply(ret, scene, actor);
+        }
+        if (scene != nullptr)
+        {
+            Scene::ActorAct* const actorEvent = scene->actorEvent;
+            if (actorEvent == nullptr || ((*actorEvent)(*scene, actor, nullptr, false, nullptr, nullptr)))
+            {
+                QVector<Actor*>* targets = scene->targets;
+                if (targets == nullptr)
+                {
+                    targets = new QVector<Actor*>(1);
+                    scene->targets = targets;
+                }
+                else
+                {
+                    targets->clear();
+                }
+                targets->append(this);
+            }
         }
     }
     return actor;
@@ -544,7 +562,7 @@ Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
     {
         actor.applyDmgRoles(ret, scene);
     }
-    QMap<State*, int>* stateDur = actor.stateDur;
+    QMap<State*, int>* const stateDur = actor.stateDur;
     if (stateDur != nullptr)
     {
         auto const last = stateDur->cend();

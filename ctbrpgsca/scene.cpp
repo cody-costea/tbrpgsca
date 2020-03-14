@@ -215,8 +215,8 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
                 counter->execute(ret, *target, user, false);
             }
         }
-        ActorAct* actorEvent = scene.actorEvent;
-        if (actorEvent == nullptr || ((*actorEvent)(scene, user, ability, (ko && target->hp > 0), *target, counter)))
+        ActorAct* const actorEvent = scene.actorEvent;
+        if (actorEvent == nullptr || ((*actorEvent)(scene, user, &ability, (ko && target->hp > 0), target, counter)))
         {
             QVector<Actor*>* targets = scene.targets;
             if (targets == nullptr)
@@ -268,7 +268,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
             }
             for (int i = 0; i < sSize; ++i)
             {
-                Actor* trg = players->at(i);
+                Actor* const trg = players->at(i);
                 if (trg == &user)
                 {
                     if (noSelfTarget)
@@ -487,7 +487,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                         int sSize = players.size();
                         for (int i = 0; i < sSize; ++i)
                         {
-                            Actor* iPlayer = players[i];
+                            Actor* const iPlayer = players[i];
                             if (iPlayer->hp > 0)
                             {
                                 int iInit = iPlayer->init + iPlayer->agi;
@@ -593,7 +593,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     scene.crActor = crActor;
     scene.current = current;
     scene.oldCurrent = current;
-    QVector<SceneAct*>* events = scene.events;
+    QVector<SceneAct*>* const events = scene.events;
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
