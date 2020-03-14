@@ -231,7 +231,7 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
     }
     if (delStates && ret != nullptr)
     {
-        QMap<State*, int>* cStates = costume.stateDur;
+        QMap<State*, int>* const cStates = costume.stateDur;
         if (cStates != nullptr)
         {
             actor.updateStates(true, *ret, scene, *cStates);
@@ -239,7 +239,7 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
     }
     if (costume.isShapeShifted())
     {
-        QString* spr = costume.sprite;
+        QString* const spr = costume.sprite;
         if (spr != nullptr)
         {
             (*actor.sprite) = *(actor.getJob().sprite);
@@ -248,7 +248,7 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
     actor.refreshCostumes(ret, scene);
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
     {
-        QVector<Costume*>* dmgRoles = actor.dmgRoles;
+        QVector<Costume*>* const dmgRoles = actor.dmgRoles;
         if (dmgRoles != nullptr)
         {
             dmgRoles->removeOne(&costume);

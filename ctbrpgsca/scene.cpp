@@ -584,7 +584,18 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                 }
             }
         }
-        crActor->applyStates(ret, this, false);
+        {
+            bool const shapeShifted = crActor->isShapeShifted();
+            crActor->applyStates(ret, this, false);
+            if (shapeShifted && (!crActor->isShapeShifted()))
+            {
+                ActorAct* const actorEvent = scene.actorEvent;
+                if (actorEvent != nullptr)
+                {
+                    ((*actorEvent)(scene, *crActor, nullptr, true, nullptr, nullptr));
+                }
+            }
+        }
         if (crActor->isStunned())
         {
             crActor->actions = 0;

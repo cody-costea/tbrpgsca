@@ -776,6 +776,17 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
             arena.enableControls(false);
             //arena.endTurn(ret, crActor);
             //arena.actionsTxt->append(ret);
+        });        
+        connect(useBtn, &QPushButton::clicked, [&arena]()
+        {
+            Actor* const crActor = arena.crActor;
+            Actor* const trgActor = arena.trgActor;
+            QString& ret = *(arena.returnTxt); ret.clear();
+            QMap<Ability*, int>* const items = crActor->items;
+            auto const it = items->cbegin() + arena.itemsBox->currentIndex();
+            Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
+            arena.perform(ret, *crActor, *trgActor, *ability, false);
+            arena.enableControls(false);
         });
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
@@ -827,21 +838,10 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                 ret.clear();
             }
         }
-        userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? SPR_HIT
+        userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
             : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
         return false;
     });
-    /*{
-        int const height = size.height(), width = size.width();
-        if (height > width)
-        {
-            arena.setMaximumSize(height, height);
-        }
-        else
-        {
-            arena.setMaximumSize(width, width);
-        }
-    }*/
     QString* const returnTxt = new QString(ret);
     arena.resizeScene(size, nullptr);
     arena.prepareTargetBox(false);
