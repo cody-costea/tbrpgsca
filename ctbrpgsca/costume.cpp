@@ -16,7 +16,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Costume::CausesTxt = " %1 is affected by %2";
+QString Costume::CausesTxt = "%1 is affected by %2";
 
 int Costume::getAttack() const
 {

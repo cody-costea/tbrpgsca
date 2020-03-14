@@ -99,6 +99,7 @@ namespace tbrpgsca
         ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
 
+        QString* returnTxt;
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;
         int sprRuns, flags, trgCount;//, resizeCtr;
