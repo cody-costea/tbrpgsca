@@ -727,7 +727,7 @@ Actor& Actor::switchCostume(QString* ret, Scene* const scene, Costume* const old
 Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
-    int i = remove ? -1 : 1;
+    int const i = remove ? -1 : 1;
     actor.setMaximumHp(actor.mHp + (i * costume.mHp));
     actor.setMaximumMp(actor.mMp + (i * costume.mMp));
     actor.setMaximumRp(actor.mSp + (i * costume.mSp));
@@ -915,7 +915,7 @@ Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, 
     return actor;
 }
 
-Actor& Actor::refreshCostume(QString* ret, Scene* scene, Costume& costume)
+Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
     actor.dmgType |= costume.dmgType;

@@ -85,7 +85,7 @@ QVector<QVector<Ability*>*>& DemoLib::getAbilities()
         skillSet->append(new Ability(2, tr("Defend"), "", false, false, false, 0, 0,0,0, 0,0, 0,-1,-2, FLAG_TRG_SELF,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
         skillSet = new QVector<Ability*>();
-        skillSet->append(new Ability(3, tr("Heal"), "", false, true, false, 0, 0,3,0, 0,0, -13,0,0, 0,0, -1,-1, false, true, nullptr, nullptr));
+        skillSet->append(new Ability(3, tr("Heal"), "", false, true, false, 0, 0,3,0, 0,0, -13,0,0, 0,0, -1,-1, false, true, stateMasks[0], nullptr));
         abilities.append(skillSet);
     }
     return abilities;
@@ -119,6 +119,7 @@ QVector<Costume*>& DemoLib::getRaces()
 
 QVector<Costume*>& DemoLib::getJobs()
 {
+    //auto& stateMasks = this->getStateMasks();
     QVector<Costume*>& jobs = this->jobs;
     if (jobs.size() == 0)
     {
@@ -138,7 +139,7 @@ QVector<Costume*>& DemoLib::getJobs()
         jobs.append(new Costume(7, tr("Hesychast"), "Hesychast", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(8, tr("Paladin"), "Knight", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
-                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+                                false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(9, tr("Gladiator"), "Hero", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(10, tr("Ninja"), "Ninja", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,

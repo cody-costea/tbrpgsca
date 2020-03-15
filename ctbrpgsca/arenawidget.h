@@ -46,7 +46,6 @@ namespace tbrpgsca
     public:
         inline bool isAiTurn() const;
         inline bool isAutomatic() const;
-        //inline bool isResizing() const;
         inline bool isEndTurn() const;
 
         ArenaWidget& afterAct();
@@ -91,7 +90,6 @@ namespace tbrpgsca
         ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
         inline ArenaWidget& setAutomatic(bool const automatic);
-        //inline ArenaWidget& setResizing(bool const resizing);
         inline ArenaWidget& setEndTurn(bool const endTurn);
         inline ArenaWidget& setAiTurn(bool const aiTurn);
         Actor* getPlayerFromTargetBox(int const index);
@@ -100,9 +98,9 @@ namespace tbrpgsca
                                 int const surprise, int const mInit, bool const doScene);
 
         QString* returnTxt;
+        int sprRuns, flags, trgCount;
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;
-        int sprRuns, flags, trgCount;//, resizeCtr;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         TargetsModel* targetsModel;

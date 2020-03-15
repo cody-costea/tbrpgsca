@@ -48,7 +48,7 @@ State& State::inflict(QString& ret, Actor* user, Actor& target, int dur, const b
     return this->inflict(ret, nullptr, user, target, dur, always);
 }
 
-State& State::inflict(QString& ret, Scene* scene, Actor* user, Actor& target, int stateDur, const bool always)
+State& State::inflict(QString& ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always)
 {
     State& state = *this;
     if (stateDur == 0)
@@ -73,7 +73,7 @@ State& State::inflict(QString& ret, Scene* scene, Actor* user, Actor& target, in
             }
             else
             {
-                QMap<State*, int>* rStates = state.stateDur;
+                QMap<State*, int>* const rStates = state.stateDur;
                 if (rStates != nullptr)
                 {
                     auto const rLast = rStates->cend();
@@ -113,19 +113,20 @@ State& State::inflict(QString& ret, Scene* scene, Actor* user, Actor& target, in
                     }
                 }
             }
-            int const crDur = trgStates->value(this, -3);
+            state.blockSkills(target, false);
+            int const crDur = trgStates->value(this, STATE_END_DUR);
             if (crDur == STATE_END_DUR)
             {
                 state.adopt(&ret, scene, target, false);
+                trgStates->operator[](this) = stateDur;
             }
-            state.blockSkills(target, false);
-            if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
+            else if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
             {
                 trgStates->operator[](this) = stateDur;
-                if (user != nullptr && this->isConverted() && target.side != user->side)
-                {
-                    target.side = user->side;
-                }
+            }
+            if (user != nullptr && this->isConverted() && target.side != user->side)
+            {
+                target.side = user->side;
             }
         }
     }

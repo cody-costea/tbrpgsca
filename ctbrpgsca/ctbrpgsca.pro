@@ -28,9 +28,6 @@ CONFIG += c++17
 CONFIG += resources_big
 CONFIG += qtquickcompiler
 
-QTPLUGIN += qgif
-QTPLUGIN += gif
-
 SOURCES += \
         ability.cpp \
         actor.cpp \
