@@ -159,21 +159,34 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
            arena.sprRuns = sprRuns;
            if (sprRuns == 0)
            {
+               Actor* crActor;
                QString& ret = *(arena.returnTxt);
-               if (arena.isEndTurn())
                {
-                   arena.setEndTurn(false);
-                   arena.endTurn(ret, arena.crActor);
-                   arena.actionsTxt->append(ret);
-               }
-               else
-               {
-                   Actor& crActor = *(arena.crActor);
-                   if (arena.isAutomatic() || crActor.side != 0 || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
+                   if (arena.isEndTurn())
                    {
-                       ret.clear();
+                       arena.setEndTurn(false);
+                   }
+                   else
+                   {
+                       crActor = arena.crActor;
+                       QVector<Costume*>* usrRoles;
+                       if (((usrRoles = crActor->dmgRoles) != nullptr) && usrRoles->size() > 0)
+                       {
+                           arena.setEndTurn(true);
+                           arena.endTurn(ret, crActor);
+                           return;
+                       }
+                       else
+                       {
+                           arena.endTurn(ret, crActor);
+                       }
+                   }
+                   crActor = arena.crActor;
+                   arena.actionsTxt->append(ret); ret.clear();
+                   if (arena.isAutomatic() || crActor->side != 0 || crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged())
+                   {
                        arena.infoTxt->setText("");
-                       arena.setAiTurn(true).playAi(ret, crActor);
+                       arena.setAiTurn(true).playAi(ret, *crActor);
                    }
                    else
                    {
@@ -702,8 +715,8 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                 arena.setAutomatic(true).autoBtn->setText(tr("Manual"));
                 if (crActor->side == 0 || !(crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged()))
                 {
-                    arena.playAi(ret, *crActor);//.endTurn(ret, crActor);
-                    arena.enableControls(false);//.actionsTxt->append(ret);
+                    arena.playAi(ret, *crActor);
+                    arena.enableControls(false);
                 }
             }
         });
@@ -714,8 +727,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
             QString& ret = *(arena.returnTxt); ret.clear();
             arena.perform(ret, *crActor, *trgActor, *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
             arena.enableControls(false);
-            //arena.endTurn(ret, crActor);
-            //arena.actionsTxt->append(ret);
         });        
         connect(useBtn, &QPushButton::clicked, [&arena]()
         {
@@ -745,7 +756,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         if (target != nullptr)
         {
             ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
-            QString& ret = *(arena.returnTxt);
+            //QString& ret = *(arena.returnTxt);
             ActorSprite* targetSpr;
             if (target == &user)
             {
@@ -765,7 +776,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                     targetSpr->playSkill(*spr);
                 }
             }
-            QVector<Costume*>* usrRoles;
+            /*QVector<Costume*>* usrRoles;
             if (user.actions > 1 || ((usrRoles = user.dmgRoles) == nullptr) || usrRoles->size() < 1)
             {
                 arena.endTurn(ret, &user);
@@ -776,7 +787,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                 arena.actionsTxt->append(ret % ".");
                 arena.setEndTurn(true);
                 ret.clear();
-            }
+            }*/
         }
         userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
             : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));

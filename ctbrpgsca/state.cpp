@@ -176,10 +176,6 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
                 }
                 else
                 {
-                    if (crDur > STATE_END_DUR)
-                    {
-                        this->remove(ret, scene, actor);
-                    }
                     if (remove)
                     {
                         sDur->remove(this);
@@ -187,6 +183,10 @@ bool State::disable(QString& ret, Scene* const scene, Actor& actor, int dur, con
                     else
                     {
                         sDur->operator[](this) = STATE_END_DUR;
+                    }
+                    if (crDur > STATE_END_DUR)
+                    {
+                        this->remove(ret, scene, actor);
                     }
                     return true;
                 }
@@ -221,8 +221,8 @@ State& State::alter(QString& ret, Scene* const scene, Actor& actor, const bool c
         }
         else if (d == 0)
         {
-            state.remove(ret, scene, actor);
             sDur->operator[](this) = STATE_END_DUR;
+            state.remove(ret, scene, actor);
         }
     }
     return state;

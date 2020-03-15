@@ -20,7 +20,7 @@ QVector<State*>& DemoLib::getStates()
     QVector<State*>& states = this->states;
     if (states.size() == 0)
     {
-        states.append(new State(1, tr("Regen"), "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(1, tr("Regen"), "Hero", true, 1,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, true, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
         states.append(new State(2, tr("Poison"), "", false, 7,0,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));

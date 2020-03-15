@@ -223,13 +223,16 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool 
             else
             {
                 actor.hp = 0;
-                bool const revives = actor.isReviving();
-                //actor.actions = 0;
-                /*if (actor.isShapeShifted())
+                bool revives, shapeShifted;
+                if (actor.isReviving())
                 {
-                    actor.setShapeShifted(false);
-                    (*actor.sprite) = (*actor.getJob().sprite);
-                }*/
+                    shapeShifted = scene != nullptr && actor.isShapeShifted();
+                    revives = true;
+                }
+                else
+                {
+                    revives = false;
+                }
                 actor.sp = 0;
                 {
                     QMap<State*, int>* stateDur = actor.stateDur;
@@ -246,6 +249,14 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool 
                 {
                     ret = ret % Actor::RiseTxt;
                     actor.hp = actor.mHp;
+                    if (shapeShifted)
+                    {
+                        Scene::ActorAct* const actorEvent = scene->actorEvent;
+                        if (actorEvent != nullptr)
+                        {
+                            ((*actorEvent)(*scene, actor, nullptr, true, nullptr, nullptr));
+                        }
+                    }
                 }
                 else
                 {
