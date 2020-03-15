@@ -23,10 +23,10 @@ inline bool ArenaWidget::isAutomatic() const
     return (this->flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC;
 }
 
-/*inline bool ArenaWidget::isResizing() const
+inline bool ArenaWidget::isEndTurn() const
 {
-    return (this->flags & FLAG_RESIZING) == FLAG_RESIZING;
-}*/
+    return (this->flags & FLAG_END_TURN) == FLAG_END_TURN;
+}
 
 inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
 {
@@ -35,6 +35,17 @@ inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
     if (aiTurn != ((flags & FLAG_AI_TURN) == FLAG_AI_TURN))
     {
         arena.flags = flags ^ FLAG_AI_TURN;
+    }
+    return arena;
+}
+
+inline ArenaWidget& ArenaWidget::setEndTurn(const bool endTurn)
+{
+    ArenaWidget& arena = *this;
+    int const flags = arena.flags;
+    if (endTurn != ((flags & FLAG_END_TURN) == FLAG_END_TURN))
+    {
+        arena.flags = flags ^ FLAG_END_TURN;
     }
     return arena;
 }
@@ -49,17 +60,6 @@ inline ArenaWidget& ArenaWidget::setAutomatic(const bool automatic)
     }
     return arena;
 }
-
-/*inline ArenaWidget& ArenaWidget::setResizing(const bool resizing)
-{
-    ArenaWidget& arena = *this;
-    int const flags = arena.flags;
-    if (resizing != ((flags & FLAG_RESIZING) == FLAG_RESIZING))
-    {
-        arena.flags = flags ^ FLAG_RESIZING;
-    }
-    return arena;
-}*/
 
 ArenaWidget::ActorSprite& ArenaWidget::ActorSprite::playSkill(QString& sprName)
 {
@@ -153,20 +153,46 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
     skillMovie->setCacheMode(QMovie::CacheAll);
     auto run = [&arena]()
     {
-       if ((--(arena.sprRuns)) < 1)
+       int const sprRuns = arena.sprRuns - 1;
+       if (sprRuns > -1)
        {
-           QString ret;
-           //arena.endTurn(ret, arena.crActor);
-           Actor& crActor = *(arena.crActor);
-           if (arena.isAutomatic() || crActor.side != 0 || crActor.isAiPlayer() || crActor.isConfused() || crActor.isEnraged())
+           arena.sprRuns = sprRuns;
+           if (sprRuns == 0)
            {
-               arena.infoTxt->setText("");
-               arena.setAiTurn(true).playAi(ret, crActor).endTurn(ret, arena.crActor);
-               arena.actionsTxt->append(ret);
-           }
-           else
-           {
-               arena.setAiTurn(false).enableControls(true).afterAct();
+               Actor* crActor;
+               QString& ret = *(arena.returnTxt);
+               {
+                   if (arena.isEndTurn())
+                   {
+                       arena.setEndTurn(false);
+                   }
+                   else
+                   {
+                       crActor = arena.crActor;
+                       QVector<Costume*>* usrRoles;
+                       if (((usrRoles = crActor->dmgRoles) != nullptr) && usrRoles->size() > 0)
+                       {
+                           arena.setEndTurn(true);
+                           arena.endTurn(ret, crActor);
+                           return;
+                       }
+                       else
+                       {
+                           arena.endTurn(ret, crActor);
+                       }
+                   }
+                   crActor = arena.crActor;
+                   arena.actionsTxt->append(ret); ret.clear();
+                   if (arena.isAutomatic() || crActor->side != 0 || crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged())
+                   {
+                       arena.infoTxt->setText("");
+                       arena.setAiTurn(true).playAi(ret, *crActor);
+                   }
+                   else
+                   {
+                       arena.setAiTurn(false).enableControls(true).afterAct();
+                   }
+               }
            }
        }
     };
@@ -201,14 +227,11 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
 ArenaWidget::ActorSprite::~ActorSprite()
 {
     QMovie* const actorMovie = this->actorMovie,* skillMovie = this->skillMovie;
-    //QLabel* const actorLabel = this->actorLabel,* skillLabel = this->skillLabel;
     this->actorLabel = nullptr;
     this->actorMovie = nullptr;
     this->skillLabel = nullptr;
     this->skillMovie = nullptr;
-    //delete actorLabel;
     delete actorMovie;
-    //delete skillLabel;
     delete skillMovie;
 }
 
@@ -350,7 +373,6 @@ ArenaWidget& ArenaWidget::afterAct()
 ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
 {
     ArenaWidget& arena = *this;
-    //arena.setResizing(true);
     {
         int sprLength, imgWidth, imgHeight, btnHeight, infoHeight;
         int const width = newSize.width(), height = newSize.height();
@@ -373,11 +395,6 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
                 {
                     delete ctrLayout;
                 }
-                /*if (actLayout != nullptr)
-                {
-                    delete actLayout;
-                    actLayout = new QVBoxLayout();
-                }*/
                 actLayout->removeWidget(infoTxt);
                 actLayout->removeWidget(arenaImg);
                 actLayout->removeWidget(actionsTxt);
@@ -474,16 +491,6 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             fleeBtn->setFixedHeight(btnHeight);
             actBtn->setFixedHeight(btnHeight);
             useBtn->setFixedHeight(btnHeight);
-            /*actWidget->update();
-            ctrLayout->update();
-            targetBox->update();
-            skillsBox->update();
-            itemsBox->update();
-            autoBtn->update();
-            fleeBtn->update();
-            useBtn->update();
-            actBtn->update();
-            layout->update();*/
         }
         {
             int const sprSize = SPR_SIZE / 2;
@@ -595,7 +602,6 @@ ArenaWidget& ArenaWidget::resizeScene(const QSize& newSize, const QSize* const o
             }
         }
     }
-    //arena.setResizing(false);
     return arena;
 }
 
@@ -606,30 +612,7 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
     int width = newSize.width(), height = newSize.height();
     bool const landscape = (width > height);
     if (landscape != (oldSize.width() > oldSize.height()))
-    //if (++this->resizeCtr > 2)
-    //if (!this->isResizing())
     {
-        /*width = this->width();
-        height = this->height();
-        if (landscape)
-        {
-            if (width < height)
-            {
-                int const tmp = height;
-                height = width;
-                width = tmp;
-            }
-        }
-        else
-        {
-            if (height < width)
-            {
-                int const tmp = width;
-                width = height;
-                height = tmp;
-            }
-        }
-        this->resizeScene(QSize(width, height), &oldSize);*/
         this->resizeScene(newSize, &oldSize);
     }
     QWidget::resizeEvent(event);
@@ -645,7 +628,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
 {
     ArenaWidget& arena = *this;
     arena.setAutoFillBackground(true);
-    //arena.resizeCtr = 0;
     arena.flags = 0;
     {
         QPalette palette = arena.palette();
@@ -702,9 +684,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         targetBox->setStyleSheet("background-color: black; color: yellow;");
         skillsBox->setStyleSheet("background-color: black; color: yellow;");
         itemsBox->setStyleSheet("background-color: black; color: yellow;");
-        /*actLayout->addWidget(infoTxt);
-        actLayout->addWidget(arenaImg);
-        actLayout->addWidget(actionsTxt);*/
         actWidget->setLayout(actLayout);
         arena.actionsTxt = actionsTxt;
         arena.actLayout = actLayout;
@@ -723,7 +702,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         arena.useBtn = useBtn;
         connect(autoBtn, &QPushButton::clicked, [&arena]()
         {
-            QString ret;
             bool const automatic = arena.isAutomatic();
             if (automatic)
             {
@@ -733,23 +711,33 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
             else
             {
                 Actor* const crActor = arena.crActor;
+                QString& ret = *(arena.returnTxt); ret.clear();
                 arena.setAutomatic(true).autoBtn->setText(tr("Manual"));
                 if (crActor->side == 0 || !(crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged()))
                 {
-                    arena.playAi(ret, *crActor).endTurn(ret, crActor);
-                    arena.enableControls(false).actionsTxt->append(ret);
+                    arena.playAi(ret, *crActor);
+                    arena.enableControls(false);
                 }
             }
         });
         connect(actBtn, &QPushButton::clicked, [&arena]()
         {
-            QString ret;
             Actor* const crActor = arena.crActor;
             Actor* const trgActor = arena.trgActor;
+            QString& ret = *(arena.returnTxt); ret.clear();
             arena.perform(ret, *crActor, *trgActor, *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
             arena.enableControls(false);
-            arena.endTurn(ret, crActor);
-            arena.actionsTxt->append(ret);
+        });        
+        connect(useBtn, &QPushButton::clicked, [&arena]()
+        {
+            Actor* const crActor = arena.crActor;
+            Actor* const trgActor = arena.trgActor;
+            QString& ret = *(arena.returnTxt); ret.clear();
+            QMap<Ability*, int>* const items = crActor->items;
+            auto const it = items->cbegin() + arena.itemsBox->currentIndex();
+            Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
+            arena.perform(ret, *crActor, *trgActor, *ability, false);
+            arena.enableControls(false);
         });
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
@@ -761,39 +749,57 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         });
     }
     arena.sprRuns = 0;
-    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability& ability, bool const revive, Actor& target, Ability* const counter) -> bool
+    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability* const ability, bool const revive,
+                                 Actor* const target, Ability* const counter) -> bool
     {
-        (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]))->playActor(user.hp < 1 ? SPR_FALL
-            : (ability.dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST);
-        QString* const spr = ability.sprite;
-        ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target.extra)[0]));
-        if (spr != nullptr && spr->length() > 0)
+        ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]));
+        if (target != nullptr)
         {
-            targetSpr.playSkill(*spr);
-        }        
-        if (&target != &user)
-        {
-            targetSpr.playActor(target.hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
-                : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+            ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
+            //QString& ret = *(arena.returnTxt);
+            ActorSprite* targetSpr;
+            if (target == &user)
+            {
+                targetSpr = userSpr;
+            }
+            else
+            {
+                targetSpr = (static_cast<ActorSprite*>(static_cast<void**>(target->extra)[0]));
+                targetSpr->playActor(target->hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
+                    : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+            }
+            if (ability != nullptr)
+            {
+                QString* const spr = ability->sprite;
+                if (spr != nullptr && spr->length() > 0)
+                {
+                    targetSpr->playSkill(*spr);
+                }
+            }
+            /*QVector<Costume*>* usrRoles;
+            if (user.actions > 1 || ((usrRoles = user.dmgRoles) == nullptr) || usrRoles->size() < 1)
+            {
+                arena.endTurn(ret, &user);
+                arena.actionsTxt->append(ret);
+            }
+            else
+            {
+                arena.actionsTxt->append(ret % ".");
+                arena.setEndTurn(true);
+                ret.clear();
+            }*/
         }
+        userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
+            : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
         return false;
     });
-    /*{
-        int const height = size.height(), width = size.width();
-        if (height > width)
-        {
-            arena.setMaximumSize(height, height);
-        }
-        else
-        {
-            arena.setMaximumSize(width, width);
-        }
-    }*/
+    QString* const returnTxt = new QString(ret);
     arena.resizeScene(size, nullptr);
     arena.prepareTargetBox(false);
+    arena.returnTxt = returnTxt;
     if (doScene)
     {
-        arena.Scene::operator()(ret, parties, actorRun, events, surprise, mInit);
+        arena.Scene::operator()(*returnTxt, parties, actorRun, events, surprise, mInit);
     }
     else
     {
@@ -801,8 +807,8 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
     }
     if (crActor->side != 0 || crActor->isAiPlayer() || crActor->isConfused() || crActor->isEnraged())
     {
-        arena.playAi(ret, *crActor).endTurn(ret, crActor);
-        arena.enableControls(false).actionsTxt->append(ret);
+        arena.playAi(*returnTxt, *crActor);
+        arena.enableControls(false);
     }
     else
     {
@@ -824,23 +830,9 @@ ArenaWidget::ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVec
 
 ArenaWidget::~ArenaWidget()
 {
-    /*delete this->actBtn;
-    delete this->useBtn;
-    delete this->fleeBtn;
-    delete this->autoBtn;
-    delete this->skillsBox;
-    delete this->targetBox;
-    delete this->itemsBox;
-    delete this->infoTxt;
-    delete this->arenaImg;
-    delete this->actionsTxt;
-    delete this->ctrLayout;
-    delete this->ctrWidget;
-    delete this->actLayout;
-    delete this->actWidget;
-    delete this->mainLayout;*/
     delete this->actorEvent;
     delete this->targetsModel;
+    delete this->returnTxt;
     //for (QVector<Actor*>* const party : this->parties)
     {
         //for (Actor* const player : *party)

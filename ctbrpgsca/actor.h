@@ -98,14 +98,14 @@ namespace tbrpgsca
 
         Actor& levelUp(Scene* const scene);
         Actor& checkRegSkill(Ability& skill);
-        Actor& recover(QString* ret, Scene* const scene);
+        Actor& recover(QString* const ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
         Actor& applyStates(QString& ret, Scene* const scene, bool const consume);
         Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
         Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
         Actor& updateStates(bool const remove, QString& ret, Scene* const scene, QMap<State*, int>& states);
         Actor& updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
-        Actor& switchCostume(QString* ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
+        Actor& switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
         Actor& setCurrentHp(int const hp, QString& ret, Scene* const scene, bool const survive);
         Actor& setAgility(int const agi, Scene& scene);
         Actor& setJob(Scene* const scene, Costume& job);
@@ -115,8 +115,8 @@ namespace tbrpgsca
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
         Costume* unequipPos(Scene* const scene, char const pos);
         char unequipItem(Scene* const scene, Costume& item);
-        Actor& refreshCostume(QString* ret, Scene* const scene, Costume& costume);
-        Actor& refreshCostumes(QString* ret, Scene* const scene);
+        Actor& refreshCostume(QString* const ret, Scene* const scene, Costume& costume);
+        Actor& refreshCostumes(QString* const ret, Scene* const scene);
 
     private:
         int oldSide;

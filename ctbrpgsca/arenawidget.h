@@ -42,11 +42,11 @@ namespace tbrpgsca
         #define SPR_EXT "gif"
         #define FLAG_AUTOMATIC 1
         #define FLAG_AI_TURN 2
-        //#define FLAG_RESIZING 4
+        #define FLAG_END_TURN 4
     public:
         inline bool isAiTurn() const;
         inline bool isAutomatic() const;
-        //inline bool isResizing() const;
+        inline bool isEndTurn() const;
 
         ArenaWidget& afterAct();
         ArenaWidget& enableControls(bool const enable);
@@ -90,16 +90,17 @@ namespace tbrpgsca
         ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
         inline ArenaWidget& setAutomatic(bool const automatic);
-        //inline ArenaWidget& setResizing(bool const resizing);
+        inline ArenaWidget& setEndTurn(bool const endTurn);
         inline ArenaWidget& setAiTurn(bool const aiTurn);
         Actor* getPlayerFromTargetBox(int const index);
 
         ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                                 int const surprise, int const mInit, bool const doScene);
 
+        QString* returnTxt;
+        int sprRuns, flags, trgCount;
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;
-        int sprRuns, flags, trgCount;//, resizeCtr;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
         TargetsModel* targetsModel;

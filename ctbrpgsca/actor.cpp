@@ -209,7 +209,7 @@ Actor& Actor::setCurrentHp(const int hp, QString &ret, const bool survive)
     return this->setCurrentHp(hp, ret, nullptr, survive);
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const survive)
+Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool const survive)
 {
     Actor& actor = *this;
     if (hp < 1)
@@ -223,13 +223,16 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
             else
             {
                 actor.hp = 0;
-                bool const revives = actor.isReviving();
-                //actor.actions = 0;
-                /*if (actor.isShapeShifted())
+                bool revives, shapeShifted;
+                if (actor.isReviving())
                 {
-                    actor.setShapeShifted(false);
-                    (*actor.sprite) = (*actor.getJob().sprite);
-                }*/
+                    shapeShifted = scene != nullptr && actor.isShapeShifted();
+                    revives = true;
+                }
+                else
+                {
+                    revives = false;
+                }
                 actor.sp = 0;
                 {
                     QMap<State*, int>* stateDur = actor.stateDur;
@@ -246,6 +249,14 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* scene, bool const 
                 {
                     ret = ret % Actor::RiseTxt;
                     actor.hp = actor.mHp;
+                    if (shapeShifted)
+                    {
+                        Scene::ActorAct* const actorEvent = scene->actorEvent;
+                        if (actorEvent != nullptr)
+                        {
+                            ((*actorEvent)(*scene, actor, nullptr, true, nullptr, nullptr));
+                        }
+                    }
                 }
                 else
                 {
@@ -526,12 +537,30 @@ Actor& Actor::setStateResistance(State* const state, const int res)
 Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
-    QVector<Costume*>* dmgRoles = actor.dmgRoles;
-    if (dmgRoles != nullptr)
+    QVector<Costume*>* const dmgRoles = actor.dmgRoles;
+    if (dmgRoles != nullptr && dmgRoles->size() > 0)
     {
         for (Costume* const role : *dmgRoles)
         {
             role->apply(ret, scene, actor);
+        }
+        if (scene != nullptr)
+        {
+            Scene::ActorAct* const actorEvent = scene->actorEvent;
+            if (actorEvent == nullptr || ((*actorEvent)(*scene, actor, nullptr, false, nullptr, nullptr)))
+            {
+                QVector<Actor*>* targets = scene->targets;
+                if (targets == nullptr)
+                {
+                    targets = new QVector<Actor*>(1);
+                    scene->targets = targets;
+                }
+                else
+                {
+                    targets->clear();
+                }
+                targets->append(this);
+            }
         }
     }
     return actor;
@@ -544,7 +573,7 @@ Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
     {
         actor.applyDmgRoles(ret, scene);
     }
-    QMap<State*, int>* stateDur = actor.stateDur;
+    QMap<State*, int>* const stateDur = actor.stateDur;
     if (stateDur != nullptr)
     {
         auto const last = stateDur->cend();
@@ -709,7 +738,7 @@ Actor& Actor::switchCostume(QString* ret, Scene* const scene, Costume* const old
 Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
-    int i = remove ? -1 : 1;
+    int const i = remove ? -1 : 1;
     actor.setMaximumHp(actor.mHp + (i * costume.mHp));
     actor.setMaximumMp(actor.mMp + (i * costume.mMp));
     actor.setMaximumRp(actor.mSp + (i * costume.mSp));
@@ -897,7 +926,7 @@ Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, 
     return actor;
 }
 
-Actor& Actor::refreshCostume(QString* ret, Scene* scene, Costume& costume)
+Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
     actor.dmgType |= costume.dmgType;
