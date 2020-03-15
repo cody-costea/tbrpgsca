@@ -119,7 +119,6 @@ QVector<Costume*>& DemoLib::getRaces()
 
 QVector<Costume*>& DemoLib::getJobs()
 {
-    auto& stateMasks = this->getStateMasks();
     QVector<Costume*>& jobs = this->jobs;
     if (jobs.size() == 0)
     {
@@ -139,7 +138,7 @@ QVector<Costume*>& DemoLib::getJobs()
         jobs.append(new Costume(7, tr("Hesychast"), "Hesychast", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(8, tr("Paladin"), "Knight", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
-                                false, false, false, false, abilities[1], nullptr, stateMasks[0], nullptr, nullptr));
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(9, tr("Gladiator"), "Hero", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(10, tr("Ninja"), "Ninja", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
