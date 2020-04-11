@@ -160,12 +160,12 @@ Costume& Costume::adopt(QString* ret, Scene* const scene, Actor& actor, bool con
     Costume& costume = *this;
     actor.updateAttributes(false, scene, costume);
     actor.updateResistance(false, costume.res, costume.stRes);
-    if (addStates && ret != nullptr)
+    if (addStates)
     {
         QMap<State*, int>* cStates = costume.stateDur;
         if (cStates != nullptr)
         {
-            actor.updateStates(false, *ret, scene, *cStates);
+            actor.updateStates(false, ret, scene, *cStates);
         }
     }
     if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
@@ -229,12 +229,12 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
             }
         }
     }
-    if (delStates && ret != nullptr)
+    if (delStates)
     {
         QMap<State*, int>* const cStates = costume.stateDur;
         if (cStates != nullptr)
         {
-            actor.updateStates(true, *ret, scene, *cStates);
+            actor.updateStates(true, ret, scene, *cStates);
         }
     }
     if (costume.isShapeShifted())

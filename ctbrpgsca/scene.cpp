@@ -245,7 +245,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     if (events != nullptr && events->size() > EVENT_BEFORE_ACT)
     {
         auto event = events->at(EVENT_BEFORE_ACT);
-        if (event != nullptr && !((*event)(scene, ret)))
+        if (event != nullptr && !((*event)(scene, &ret)))
         {
             return scene;
         }
@@ -324,7 +324,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     if (events != nullptr && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);
-        if (event != nullptr && ((*event)(scene, ret)))
+        if (event != nullptr && ((*event)(scene, &ret)))
         {
             scene.endTurn(ret, &user);
         }
@@ -465,7 +465,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     {
         if (crActor->hp > 0 && !(crActor->isInvincible() && crActor->isKnockedOut() && crActor->isStunned()))
         {
-            crActor->applyStates(ret, this, true);
+            crActor->applyStates(&ret, this, true);
         }
         int mInit = scene.mInit;
         if (mInit > 0)
@@ -586,7 +586,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
         }
         {
             bool const shapeShifted = crActor->isShapeShifted();
-            crActor->applyStates(ret, this, false);
+            crActor->applyStates(&ret, this, false);
             if (shapeShifted && (!crActor->isShapeShifted()))
             {
                 ActorAct* const actorEvent = scene.actorEvent;
@@ -608,7 +608,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && (*event)(scene, ret) && (crActor->isAiPlayer() || crActor->isEnraged() || crActor->isConfused()))
+        if (event != nullptr && (*event)(scene, &ret) && (crActor->isAiPlayer() || crActor->isEnraged() || crActor->isConfused()))
         {
             scene.playAi(ret, (*crActor));
         }
@@ -733,7 +733,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     SceneAct* event;
     scene.current = current;
     scene.oldCurrent = current;
-    if (events != nullptr && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE)) != nullptr) && (*event)(scene, ret))
+    if (events != nullptr && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE)) != nullptr) && (*event)(scene, &ret))
     {
         scene.endTurn(ret, crActor);
     }
