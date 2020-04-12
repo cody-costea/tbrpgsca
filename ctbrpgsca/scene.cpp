@@ -665,7 +665,7 @@ void Scene::agiCalc()
     {
         QVector<Actor*>& players = *(this->players);
         std::sort(players.begin(), players.end(), Scene::actorAgiComp);
-        this->oldCurrent = 0;
+        this->oldCurrent = -1;
     }
 }
 
@@ -682,7 +682,7 @@ void Scene::resetTurn(Actor& actor)
         {
             actor.init = 0;
         }
-        this->oldCurrent = 0;
+        this->oldCurrent = -1;
     }
 }
 
