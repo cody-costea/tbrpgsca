@@ -18,6 +18,7 @@ namespace tbrpgsca
     class Actor : public Costume
     {
         #define FLAG_AI_PLAYER 1024
+        #define FLAG_RANDOM_AI 2048
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -28,6 +29,7 @@ namespace tbrpgsca
         Costume& getJob() const;
         Costume& getRace() const;
         bool isAiPlayer() const;
+        bool isRandomAi() const;
         int getLevel() const;
         int getMaximumLevel() const;
         int getMaximumExperience() const;
@@ -79,6 +81,7 @@ namespace tbrpgsca
         Actor& setInvincible(bool const invincible);
         Actor& setEnraged(bool const automate);
         Actor& setConfused(bool const confuse);
+        Actor& setRandomAi(bool const randomAi);
         Actor& setAiPlayer(bool const aiPlayer);
         Actor& setReviving(bool const revive);
 
@@ -100,21 +103,21 @@ namespace tbrpgsca
         Actor& checkRegSkill(Ability& skill);
         Actor& recover(QString* const ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
-        Actor& applyStates(QString& ret, Scene* const scene, bool const consume);
+        Actor& applyStates(QString* const ret, Scene* const scene, bool const consume);
         Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
         Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
-        Actor& updateStates(bool const remove, QString& ret, Scene* const scene, QMap<State*, int>& states);
+        Actor& updateStates(bool const remove, QString* const ret, Scene* const scene, QMap<State*, int>& states);
         Actor& updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
         Actor& switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
-        Actor& setCurrentHp(int const hp, QString& ret, Scene* const scene, bool const survive);
+        Actor& setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
+        Actor& setExperience(Scene* const scene, int const xp);
+        Actor& setLevel(Scene* const scene, int const level);
+        Actor& setRace(Scene* const scene, Costume& race);
         Actor& setAgility(int const agi, Scene& scene);
         Actor& setJob(Scene* const scene, Costume& job);
-        Actor& setRace(Scene* const scene, Costume& race);
-        Actor& setLevel(Scene* const scene, int const level);
-        Actor& setExperience(Scene* const scene, int const xp);
-        Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
-        Costume* unequipPos(Scene* const scene, char const pos);
         char unequipItem(Scene* const scene, Costume& item);
+        Costume* unequipPos(Scene* const scene, char const pos);
+        Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
         Actor& refreshCostume(QString* const ret, Scene* const scene, Costume& costume);
         Actor& refreshCostumes(QString* const ret, Scene* const scene);
 

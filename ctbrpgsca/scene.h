@@ -29,7 +29,7 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define MIN_ROUND INT_MIN
     public:
-        typedef std::function<bool(Scene& scene, QString& ret)> SceneAct;
+        typedef std::function<bool(Scene& scene, QString* const ret)> SceneAct;
         typedef std::function<bool(Scene& scene, Actor& user, Ability* const ability, bool const revive,
                                    Actor* const target, Ability* const counter)> ActorAct;
 
@@ -41,8 +41,8 @@ namespace tbrpgsca
 
         static bool actorAgiComp(Actor* const a, Actor* const b);
 
-        Scene& endTurn(QString& ret, Actor* actor);
         Scene& playAi(QString& ret, Actor& player);
+        Scene& endTurn(QString& ret, Actor* const actor);
         Scene& perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
         Scene& checkStatus(QString& ret);
         Scene& escape(QString& ret);

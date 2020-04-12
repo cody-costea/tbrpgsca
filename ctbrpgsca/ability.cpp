@@ -170,7 +170,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 2;
             ++i;
         }
-        if (canMiss == 0 || target == &user || ((std::rand() % 13) + user.agi / canMiss) > 2 + target->agi / 4)
+        if (canMiss == 0 || target == &user || ((std::rand() % 8) + user.agi / canMiss) > 2 + target->agi / 4)
         {
             if (i != 0)
             {
@@ -230,7 +230,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     for (auto it = aStates->cbegin(); it != last; ++it)
                     {
                         State* const state = it.key();
-                        state->inflict(ret, scene, &user, *target, it.value(), user.side == target->side);
+                        state->inflict(&ret, scene, &user, *target, it.value(), user.side == target->side);
                     }
                 }
             }
@@ -256,7 +256,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                                     {
                                         if (it.value() > STATE_END_DUR)
                                         {
-                                            rState->disable(ret, scene, *target, rDur, false);
+                                            rState->disable(&ret, scene, *target, rDur, false);
                                         }
                                         break;
                                     }
@@ -322,7 +322,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
     {
         user.setCurrentRp(user.sp - ability.mSp);
         user.setCurrentMp(user.mp - ability.mMp);
-        user.setCurrentHp(user.hp - ability.mHp, ret, scene, false);
+        user.setCurrentHp(user.hp - ability.mHp, &ret, scene, false);
         int mQty = ability.mQty;
         if (mQty > 0)
         {

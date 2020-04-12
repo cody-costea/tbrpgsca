@@ -82,6 +82,11 @@ bool Actor::isAiPlayer() const
     return (this->flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER;
 }
 
+bool Actor::isRandomAi() const
+{
+    return (this->flags & FLAG_RANDOM_AI) == FLAG_RANDOM_AI;
+}
+
 Costume* Actor::equipItem(const char pos, Costume* const item)
 {
     assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
@@ -204,12 +209,12 @@ Actor& Actor::setAgility(const int agi, Scene& scene)
     return actor;
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString &ret, const bool survive)
+Actor& Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
 {
-    return this->setCurrentHp(hp, ret, nullptr, survive);
+    return this->setCurrentHp(hp, &ret, nullptr, survive);
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool const survive)
+Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive)
 {
     Actor& actor = *this;
     if (hp < 1)
@@ -247,7 +252,10 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool 
                 }
                 if (revives)
                 {
-                    ret = ret % Actor::RiseTxt;
+                    if (ret != nullptr)
+                    {
+                        *ret = *ret % Actor::RiseTxt;
+                    }
                     actor.hp = actor.mHp;
                     if (shapeShifted)
                     {
@@ -262,9 +270,9 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool 
                 {
                     actor.setStunned(true);
                     actor.setKnockedOut(true);
-                    if (scene != nullptr)
+                    if (scene != nullptr && ret != nullptr)
                     {
-                        scene->checkStatus(ret);
+                        scene->checkStatus(*ret);
                     }
                 }
             }
@@ -278,7 +286,7 @@ Actor& Actor::setCurrentHp(const int hp, QString& ret, Scene* const scene, bool 
         {
             actor.setStunned(false);
             actor.setKnockedOut(false);
-            actor.refreshCostumes(&ret, scene);
+            actor.refreshCostumes(ret, scene);
             //actor.applyStates(ret, scene, false);
             if (scene != nullptr)
             {
@@ -418,6 +426,16 @@ Actor& Actor::setAiPlayer(const bool aiPlayer)
     if (aiPlayer != ((flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER))
     {
         this->flags = flags ^ FLAG_AI_PLAYER;
+    }
+    return *this;
+}
+
+Actor& Actor::setRandomAi(const bool randomAi)
+{
+    int const flags = this->flags;
+    if (randomAi != ((flags & FLAG_RANDOM_AI) == FLAG_RANDOM_AI))
+    {
+        this->flags = flags ^ FLAG_RANDOM_AI;
     }
     return *this;
 }
@@ -566,12 +584,12 @@ Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
     return actor;
 }
 
-Actor& Actor::applyStates(QString& ret, Scene* const scene, const bool consume)
+Actor& Actor::applyStates(QString* const ret, Scene* const scene, const bool consume)
 {
     Actor& actor = *this;
-    if (consume)
+    if (consume && ret != nullptr)
     {
-        actor.applyDmgRoles(ret, scene);
+        actor.applyDmgRoles(*ret, scene);
     }
     QMap<State*, int>* const stateDur = actor.stateDur;
     if (stateDur != nullptr)
@@ -616,23 +634,18 @@ Actor& Actor::recover(QString* ret, Scene* const scene)
     actor.hp = actor.mHp;
     actor.mp = actor.mMp;
     actor.sp = 0;
-    if (ret != nullptr)
+    QMap<State*, int>* const sDur = actor.stateDur;
+    if (sDur != nullptr)
     {
-        QMap<State*, int>* const sDur = actor.stateDur;
-        if (sDur != nullptr)
+        auto const last = stateDur->cend();
+        for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            {
-                auto const last = stateDur->cend();
-                for (auto it = stateDur->cbegin(); it != last; ++it)
-                {
-                    it.key()->disable(*ret, scene, actor, STATE_END_DUR + 1, false);
-                }
-            }
-            if (sDur->size() == 0)
-            {
-                actor.stateDur = nullptr;
-                delete sDur;
-            }
+            it.key()->disable(ret, scene, actor, STATE_END_DUR + 1, false);
+        }
+        if (sDur->size() == 0)
+        {
+            actor.stateDur = nullptr;
+            delete sDur;
         }
     }
     //actor.setShapeShifted(false);
@@ -893,7 +906,7 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
     return actor;
 }
 
-Actor& Actor::updateStates(bool const remove, QString& ret, Scene* const scene, QMap<State*, int>& states)
+Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const scene, QMap<State*, int>& states)
 {
     Actor& actor = *this;
     if (remove)
@@ -944,17 +957,9 @@ Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& co
             actor.updateSkills(false, true, *skills);
         }
     }
-    if ((cFlags & FLAG_KO) == FLAG_KO)
+    if (scene != nullptr && ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
     {
-        if (ret == nullptr)
-        {
-            QString tmp = QString();
-            scene->checkStatus(tmp);
-        }
-        else
-        {
-            scene->checkStatus(*ret);
-        }
+        scene->checkStatus(*ret);
     }
     if (costume.isShapeShifted())
     {
@@ -964,19 +969,16 @@ Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& co
             (*actor.sprite) = *spr;
         }
     }
-    if (ret != nullptr)
+    QMap<State*, int>* cStates = costume.stateDur;
+    if (cStates != nullptr)
     {
-        QMap<State*, int>* cStates = costume.stateDur;
-        if (cStates != nullptr)
+        auto const last = cStates->cend();
+        for (auto it = cStates->cbegin(); it != last; ++it)
         {
-            auto const last = cStates->cend();
-            for (auto it = cStates->cbegin(); it != last; ++it)
+            int const rDur = it.value();
+            if (rDur < 0 && rDur > STATE_END_DUR)
             {
-                int const rDur = it.value();
-                if (rDur < 0 && rDur > STATE_END_DUR)
-                {
-                    it.key()->inflict(*ret, scene, nullptr, actor, rDur, true);
-                }
+                it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
             }
         }
     }
