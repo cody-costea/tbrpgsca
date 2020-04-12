@@ -261,7 +261,7 @@ Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
     ret = ret % QString(Costume::CausesTxt).arg(actor.name, role.name);
-    role.damage(ret, scene, nullptr, actor, std::rand() % 3, true);
+    role.damage(ret, scene, nullptr, actor, std::rand() % 4, true);
     return role;
 }
 

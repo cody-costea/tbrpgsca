@@ -170,7 +170,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 2;
             ++i;
         }
-        if (canMiss == 0 || target == &user || ((std::rand() % 13) + user.agi / canMiss) > 2 + target->agi / 4)
+        if (canMiss == 0 || target == &user || ((std::rand() % 8) + user.agi / canMiss) > 2 + target->agi / 4)
         {
             if (i != 0)
             {

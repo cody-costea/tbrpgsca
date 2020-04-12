@@ -82,6 +82,11 @@ bool Actor::isAiPlayer() const
     return (this->flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER;
 }
 
+bool Actor::isRandomAi() const
+{
+    return (this->flags & FLAG_RANDOM_AI) == FLAG_RANDOM_AI;
+}
+
 Costume* Actor::equipItem(const char pos, Costume* const item)
 {
     assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
@@ -421,6 +426,16 @@ Actor& Actor::setAiPlayer(const bool aiPlayer)
     if (aiPlayer != ((flags & FLAG_AI_PLAYER) == FLAG_AI_PLAYER))
     {
         this->flags = flags ^ FLAG_AI_PLAYER;
+    }
+    return *this;
+}
+
+Actor& Actor::setRandomAi(const bool randomAi)
+{
+    int const flags = this->flags;
+    if (randomAi != ((flags & FLAG_RANDOM_AI) == FLAG_RANDOM_AI))
+    {
+        this->flags = flags ^ FLAG_RANDOM_AI;
     }
     return *this;
 }
