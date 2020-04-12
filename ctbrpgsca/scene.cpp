@@ -356,44 +356,42 @@ Scene& Scene::playAi(QString& ret, Actor& player)
     QVector<Ability*>& skills = *(player.aSkills);
     QVector<QVector<Actor*>*>& parties = scene.parties;
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
+    if (player.isConfused())
     {
-        if (player.isConfused())
+        party = nullptr;
+        side = -1;
+    }
+    else
+    {
+        side = player.side;
+        party = parties[side];
+        sSize = party->size();
+        if (!(player.isEnraged()))
         {
-            party = nullptr;
-            side = -1;
-        }
-        else
-        {
-            side = player.side;
-            party = parties[side];
-            sSize = party->size();
-            if (!(player.isEnraged()))
+            for (int i = 0; i < sSize; ++i)
             {
-                for (int i = 0; i < sSize; ++i)
+                Actor& iPlayer = *(party->at(i));
+                int iHp = iPlayer.hp;
+                if (iHp < 1)
                 {
-                    Actor& iPlayer = *(party->at(i));
-                    int iHp = iPlayer.hp;
-                    if (iHp < 1)
-                    {
-                        heal = 1;
-                    }
-                    else if (iHp < (iPlayer.mHp / 3))
-                    {
-                        heal = 0;
-                    }
+                    heal = 1;
+                }
+                else if (iHp < (iPlayer.mHp / 3))
+                {
+                    heal = 0;
                 }
             }
-            if (heal > -1)
+        }
+        if (heal > -1)
+        {
+            int skillsSize = skills.size();
+            for (int i = 0; i < skillsSize; ++i)
             {
-                int skillsSize = skills.size();
-                for (int i = 0; i < skillsSize; ++i)
+                Ability& s = *(skills[i]);
+                if (s.canPerform(player) && (s.hp < 0 && ((heal == 0) || s.isReviving())))
                 {
-                    Ability& s = *(skills[i]);
-                    if (s.canPerform(player) && (s.hp < 0 && ((heal == 0) || s.isReviving())))
-                    {
-                        skillIndex = i;
-                        break;
-                    }
+                    skillIndex = i;
+                    break;
                 }
             }
         }
@@ -415,18 +413,11 @@ Scene& Scene::playAi(QString& ret, Actor& player)
                     else
                     {
                         trgSide = rand() % pSize;
-                        while (side == trgSide)
+                        if (side == trgSide)
                         {
-                            if (trgSide > pSize / 2)
+                            if (++trgSide == pSize)
                             {
-                                if (++trgSide == pSize)
-                                {
-                                    trgSide = 0;
-                                }
-                            }
-                            else if (--trgSide == -1)
-                            {
-                                trgSide = pSize - 1;
+                                trgSide = 0;
                             }
                         }
                     }
@@ -437,16 +428,9 @@ Scene& Scene::playAi(QString& ret, Actor& player)
                 target = party->at(trg);
                 while (target->isKnockedOut())
                 {
-                    if (trg > sSize / 2)
+                    if (++trg == sSize)
                     {
-                        if (++trg == sSize)
-                        {
-                            trg = 0;
-                        }
-                    }
-                    else if (--trg == -1)
-                    {
-                        trg = sSize - 1;
+                        trg = 0;
                     }
                     target = party->at(trg);
                 }
@@ -762,8 +746,8 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
             }
             if (aiPlayer)
             {
+                //player.setRandomAi(true);
                 player.setAiPlayer(true);
-                player.setRandomAi(true);
             }
             player.oldSide = i;
             player.side = i;
