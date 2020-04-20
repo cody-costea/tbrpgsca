@@ -88,7 +88,7 @@ namespace tbrpgsca
         ArenaWidget& prepareItemsBox(Actor& actor);
         ArenaWidget& prepareTargetBox(bool const freeMemory);
         ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
-        inline ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
+        ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
         inline ArenaWidget& setAutomatic(bool const automatic);
         inline ArenaWidget& setEndTurn(bool const endTurn);
         inline ArenaWidget& setAiTurn(bool const aiTurn);

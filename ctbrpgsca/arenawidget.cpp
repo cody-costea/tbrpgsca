@@ -153,15 +153,15 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
     skillMovie->setCacheMode(QMovie::CacheAll);
     auto run = [&arena]()
     {
-       int const sprRuns = arena.sprRuns - 1;
-       if (sprRuns > -1)
-       {
-           arena.sprRuns = sprRuns;
-           if (sprRuns == 0)
-           {
-               Actor* crActor;
-               QString& ret = *(arena.returnTxt);
-               {
+        QString& ret = *(arena.returnTxt);
+        int const sprRuns = arena.sprRuns - 1;
+        if (sprRuns > -1)
+        {
+            arena.sprRuns = sprRuns;
+            if (sprRuns == 0)
+            {
+                Actor* crActor;
+                {
                    if (arena.isEndTurn())
                    {
                        arena.setEndTurn(false);
@@ -192,9 +192,14 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
                    {
                        arena.setAiTurn(false).enableControls(true).afterAct();
                    }
-               }
-           }
-       }
+                }
+            }
+        }
+        else
+        {
+            arena.setEndTurn(false);
+            arena.endTurn(ret, arena.crActor);
+        }
     };
     actorLabel->setScaledContents(true);
     skillLabel->setScaledContents(true);
@@ -337,10 +342,10 @@ Actor* ArenaWidget::getPlayerFromTargetBox(int index)
     return nullptr;
 }
 
-inline ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
+ArenaWidget& ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex)
 {
     ArenaWidget& arena = *this;
-    if ((!arena.isAiTurn()) && trgIndex > -1)
+    if (arena.sprRuns == 0 && trgIndex > -1 && (!arena.isAiTurn()))
     {
         Actor& crActor = *(arena.crActor);
         Actor& trgActor = *(arena.trgActor);
@@ -755,8 +760,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]));
         if (target != nullptr)
         {
-            ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
-            //QString& ret = *(arena.returnTxt);
+            //ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
             ActorSprite* targetSpr;
             if (target == &user)
             {
@@ -776,18 +780,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                     targetSpr->playSkill(*spr);
                 }
             }
-            /*QVector<Costume*>* usrRoles;
-            if (user.actions > 1 || ((usrRoles = user.dmgRoles) == nullptr) || usrRoles->size() < 1)
-            {
-                arena.endTurn(ret, &user);
-                arena.actionsTxt->append(ret);
-            }
-            else
-            {
-                arena.actionsTxt->append(ret % ".");
-                arena.setEndTurn(true);
-                ret.clear();
-            }*/
         }
         userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
             : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));

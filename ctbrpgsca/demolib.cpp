@@ -85,7 +85,7 @@ QVector<QVector<Ability*>*>& DemoLib::getAbilities()
         skillSet->append(new Ability(2, tr("Defend"), "", false, false, false, 0, 0,0,0, 0,0, 0,-1,-2, FLAG_TRG_SELF,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
         skillSet = new QVector<Ability*>();
-        skillSet->append(new Ability(3, tr("Heal"), "", false, true, false, 0, 0,3,0, 0,0, -13,0,0, 0,0, -1,-1, false, true, nullptr, nullptr));
+        skillSet->append(new Ability(3, tr("Heal"), "", false, true, false, 0, 0,3,0, 0,0, -15,0,0, 0,0, -1,-1, false, true, nullptr, nullptr));
         abilities.append(skillSet);
     }
     return abilities;
