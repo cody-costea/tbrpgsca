@@ -173,11 +173,13 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
                        if (((usrRoles = crActor->dmgRoles) != nullptr) && usrRoles->size() > 0)
                        {
                            arena.setEndTurn(true);
+                           arena.sprActor = nullptr;
                            arena.endTurn(ret, crActor);
                            return;
                        }
                        else
                        {
+                           arena.sprActor = nullptr;
                            arena.endTurn(ret, crActor);
                        }
                    }
@@ -198,6 +200,7 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
         else
         {
             arena.setEndTurn(false);
+            arena.sprActor = nullptr;
             arena.endTurn(ret, arena.crActor);
         }
     };
@@ -754,13 +757,14 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         });
     }
     arena.sprRuns = 0;
+    arena.sprActor = nullptr;
     auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability* const ability, bool const revive,
                                  Actor* const target, Ability* const counter) -> bool
     {
+        ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
         ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]));
         if (target != nullptr)
         {
-            //ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
             ActorSprite* targetSpr;
             if (target == &user)
             {
@@ -781,8 +785,12 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                 }
             }
         }
-        userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
-            : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
+        if (arena.sprActor == nullptr)
+        {
+            arena.sprActor = userSpr;
+            userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
+                : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
+        }
         return false;
     });
     QString* const returnTxt = new QString(ret);

@@ -81,7 +81,7 @@ QVector<QVector<Ability*>*>& DemoLib::getAbilities()
     {
         QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
         QVector<Ability*>* skillSet = new QVector<Ability*>();
-        skillSet->append(new Ability(1, tr("Attack"), "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK,0, 10,0,0, 0,0, -1,-1, false, false, nullptr, stateMasks[10]));
+        skillSet->append(new Ability(1, tr("Attack"), "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK,0, 10,0,0, FLAG_TRG_ONE,0, -1,-1, false, false, nullptr, stateMasks[10]));
         skillSet->append(new Ability(2, tr("Defend"), "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF,0, 0,-1,-2, FLAG_TRG_SELF,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
         skillSet = new QVector<Ability*>();

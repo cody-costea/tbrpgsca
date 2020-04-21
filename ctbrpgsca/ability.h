@@ -25,6 +25,7 @@ namespace tbrpgsca
         #define FLAG_TRG_ALL 4
         #define FLAG_TRG_SIDE 128
         #define FLAG_TRG_SELF 64
+        #define FLAG_TRG_ONE 0
         #define DEFAULT_RES 3
     public:
         static QString MissesTxt;
