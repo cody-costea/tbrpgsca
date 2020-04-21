@@ -66,6 +66,11 @@ int Ability::getRemovedStatesSize() const
     return aStates == nullptr ? 0 : aStates->size();
 }
 
+bool Ability::canMiss() const
+{
+    return (this->flags & FLAG_MISSABLE) == FLAG_MISSABLE;
+}
+
 bool Ability::isStealing() const
 {
     return (this->flags & FLAG_STEAL) == FLAG_STEAL;
@@ -136,12 +141,15 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int canMiss = 0, def = 0, i = 0, dmg = 0;//std::rand() % 4;
+        int canMiss = ability.canMiss() ? 3 : 0, def = 0, i = 0, dmg = 0;//std::rand() % 4;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
             dmg += user.atk;
             def += target->def;
-            canMiss = 4;
+            if (canMiss > 0)
+            {
+                canMiss = 4;
+            }
             ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
@@ -169,13 +177,13 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 2;
             ++i;
         }
-        int trgAgiQrt = target->agi / 3, usrAgi = user.agi;
+        int trgAgiTrd = target->agi / 3, usrAgi = user.agi;
         if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
-                    > trgAgiQrt - (std::rand() % trgAgiQrt)) || target == &user)
+                    > trgAgiTrd - (std::rand() % trgAgiTrd)) || target == &user)
         {
-            if (canMiss > ((trgAgiQrt * 2) + (trgAgiQrt / 2)) - (std::rand() % trgAgiQrt))
+            if (canMiss > ((trgAgiTrd * 2) + (trgAgiTrd / 2)) - (std::rand() % trgAgiTrd))
             {
-                dmg *= 3;//+= dmg / 2; //TODO: add text for critical
+                dmg = (dmg * 2) + (dmg / 2); //TODO: add text for critical
             }
             if (i != 0)
             {
@@ -349,9 +357,9 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
     return ability;
 }
 
-Ability::Ability(int const id, QString name, QString sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
-                 int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
+Ability::Ability(int const id, QString name, QString sprite, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
+                 int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
+                 int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, revive, aStates)
 {
     this->lvRq = lvRq;
@@ -361,6 +369,10 @@ Ability::Ability(int const id, QString name, QString sprite, bool const steal, b
     this->attrInc = attrInc;
     this->rStates = rStates;
     int flags = this->flags;
+    if (canMiss)
+    {
+        flags |= FLAG_MISSABLE;
+    }
     if (melee)
     {
         flags |= FLAG_MELEE;

@@ -292,11 +292,15 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     {
         int side = ability.targetsSelf() ? user.side : target.oldSide;
         QVector<Actor*>& party = *(scene.parties[side]);
+        QVector<Actor*>* targets = scene.targets;
         int pSize = party.size();
         for (int i = 0; i < pSize; ++i)
         {
             Actor* const trg = party[i];
-            targets->append(trg);
+            if (targets != nullptr)
+            {
+                targets->append(trg);
+            }
             scene.execute(ret, user, trg, ability, i == 0);
         }
     }
