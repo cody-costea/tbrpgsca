@@ -136,8 +136,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int dmg = std::rand() % 4;
-        int canMiss = 0, def = 0, i = 0;
+        int canMiss = 0, def = 0, i = 0, dmg = 0;//std::rand() % 4;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
             dmg += user.atk;
@@ -170,16 +169,23 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 2;
             ++i;
         }
-        int trgAgi = target->agi / 4;
-        if (canMiss == 0 || ((canMiss = (std::rand() % 8) + (user.agi / canMiss)) > trgAgi - (std::rand() % 2)) || target == &user)
+        int trgAgiHalf = target->agi / 2, trgAgiQrt = trgAgiHalf / 2, usrAgi = user.agi;
+        if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
+                    > trgAgiQrt - (std::rand() % trgAgiQrt)) || target == &user)
         {
             if (i != 0)
             {
-                dmg += (ability.attrInc + (dmg / i)) / (def / i);
+                def += std::rand() % (def / 2);
+                dmg += std::rand() % (dmg / 2);
+                dmg = (ability.attrInc + (dmg / i)) - ((def / i) / 2);
+                if (dmg < 0)
+                {
+                    dmg = 0;
+                }
             }
-            if (canMiss > (trgAgi / 2) + (trgAgi * 2) + (std::rand() % 4))
+            if (canMiss > trgAgiHalf + (std::rand() % trgAgiQrt))
             {
-                dmg += dmg / 2; //TODO: add text for critical
+                dmg *= 2;//+= dmg / 2; //TODO: add text for critical
             }
             QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)

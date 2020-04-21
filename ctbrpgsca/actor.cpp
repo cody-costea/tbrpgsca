@@ -758,7 +758,7 @@ Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& c
     actor.setMaximumActions(actor.mActions + (i * costume.mActions));
     actor.atk += i * costume.atk;
     actor.def += i * costume.def;
-    actor.mSp += i * costume.spi;
+    actor.spi += i * costume.spi;
     actor.wis += i * costume.wis;
     if (scene == nullptr)
     {

@@ -3,11 +3,13 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QScreen>
+#include <time.h>
 
 using namespace tbrpgsca;
 
 int main(int argc, char* argv[])
 {
+    srand(time(0));
     QSize size;//(240, 320);
     QString ret;
     DemoLib demoLib;
