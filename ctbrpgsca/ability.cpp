@@ -141,7 +141,8 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int canMiss = ability.canMiss() ? 3 : 0, def = 0, i = 0, dmg = 0;//std::rand() % 4;
+        int canMiss = ability.canMiss() ? 3 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
+                trgAgi = target->agi, trgSpi = target->spi, usrWis = user.wis;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
             dmg += user.atk;
@@ -166,22 +167,25 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         }
         if ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)
         {
-            dmg += user.wis;
-            def += target->spi;
+            dmg += usrWis;
+            def += trgSpi;
             ++i;
         }
         if ((dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI)
         {
-            dmg += user.agi;
-            def += target->agi;
-            canMiss = 2;
+            dmg += usrAgi;
+            def += trgAgi;
+            if (canMiss > 0)
+            {
+                canMiss = 2;
+            }
             ++i;
         }
-        int trgAgiTrd = target->agi / 3, usrAgi = user.agi;
+        trgAgi = ((trgAgi + trgSpi) / 2) / 3, usrAgi = (usrAgi + usrWis) / 2;
         if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
-                    > trgAgiTrd - (std::rand() % trgAgiTrd)) || target == &user)
+                    > trgAgi - (std::rand() % trgAgi)) || target == &user)
         {
-            if (canMiss > ((trgAgiTrd * 2) + (trgAgiTrd / 2)) - (std::rand() % trgAgiTrd))
+            if (canMiss > ((trgAgi * 2) + (trgAgi / 2)) - (std::rand() % trgAgi))
             {
                 dmg = (dmg * 2) + (dmg / 2); //TODO: add text for critical
             }
@@ -195,7 +199,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     dmg = 0;
                 }
             }
-            QMap<int, int>* trgResMap = target->res;
+            /*QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)
             {
                 int res = DEFAULT_RES;
@@ -238,9 +242,9 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             else
             {
                 dmg /= DEFAULT_RES;
-            }
+            }*/
             ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
-            applyStates:
+            //applyStates:
             {
                 QMap<State*, int>* aStates = ability.stateDur;
                 if (aStates != nullptr)
