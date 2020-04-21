@@ -169,10 +169,14 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             canMiss = 2;
             ++i;
         }
-        int trgAgiHalf = target->agi / 2, trgAgiQrt = trgAgiHalf / 2, usrAgi = user.agi;
+        int trgAgiQrt = target->agi / 3, usrAgi = user.agi;
         if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
                     > trgAgiQrt - (std::rand() % trgAgiQrt)) || target == &user)
         {
+            if (canMiss > ((trgAgiQrt * 2) + (trgAgiQrt / 2)) - (std::rand() % trgAgiQrt))
+            {
+                dmg *= 3;//+= dmg / 2; //TODO: add text for critical
+            }
             if (i != 0)
             {
                 def += std::rand() % (def / 2);
@@ -182,10 +186,6 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                 {
                     dmg = 0;
                 }
-            }
-            if (canMiss > trgAgiHalf + (std::rand() % trgAgiQrt))
-            {
-                dmg *= 2;//+= dmg / 2; //TODO: add text for critical
             }
             QMap<int, int>* trgResMap = target->res;
             if (trgResMap != nullptr)
