@@ -216,7 +216,8 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability
             }
         }
         ActorAct* const actorEvent = scene.actorEvent;
-        if (actorEvent == nullptr || ((*actorEvent)(scene, user, &ability, (ko && target->hp > 0), target, counter)))
+        if (actorEvent == nullptr || ((*actorEvent)(scene, applyCosts ? &user : nullptr, &ability, (ko && target->hp > 0),
+                                                    target, &user == target ? &ability : counter)))
         {
             QVector<Actor*>* targets = scene.targets;
             if (targets == nullptr)
@@ -632,7 +633,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                 ActorAct* const actorEvent = scene.actorEvent;
                 if (actorEvent != nullptr)
                 {
-                    ((*actorEvent)(scene, *crActor, nullptr, true, nullptr, nullptr));
+                    ((*actorEvent)(scene, crActor, nullptr, true, nullptr, nullptr));
                 }
             }
         }
