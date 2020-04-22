@@ -173,13 +173,11 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
                        if (((usrRoles = crActor->dmgRoles) != nullptr) && usrRoles->size() > 0)
                        {
                            arena.setEndTurn(true);
-                           arena.sprActor = nullptr;
                            arena.endTurn(ret, crActor);
                            return;
                        }
                        else
                        {
-                           arena.sprActor = nullptr;
                            arena.endTurn(ret, crActor);
                        }
                    }
@@ -200,7 +198,6 @@ ArenaWidget::ActorSprite::ActorSprite(int const index, Actor& actor, QWidget* co
         else
         {
             arena.setEndTurn(false);
-            arena.sprActor = nullptr;
             arena.endTurn(ret, arena.crActor);
         }
     };
@@ -757,25 +754,23 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         });
     }
     arena.sprRuns = 0;
-    arena.sprActor = nullptr;
-    auto actorRun = new ActorAct([](Scene& scene, Actor& user, Ability* const ability, bool const revive,
+    auto actorRun = new ActorAct([](Scene& scene, Actor* const user, Ability* const ability, bool const revive,
                                  Actor* const target, Ability* const counter) -> bool
     {
-        ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
-        ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user.extra)[0]));
+        //ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
         if (target != nullptr)
         {
-            ActorSprite* targetSpr;
-            if (target == &user)
+            /*ActorSprite* targetSpr;
+            if (target == user)
             {
                 targetSpr = userSpr;
             }
             else
-            {
-                targetSpr = (static_cast<ActorSprite*>(static_cast<void**>(target->extra)[0]));
+            {*/
+                ActorSprite* const targetSpr = (static_cast<ActorSprite*>(static_cast<void**>(target->extra)[0]));
                 targetSpr->playActor(target->hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
                     : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
-            }
+            //}
             if (ability != nullptr)
             {
                 QString* const spr = ability->sprite;
@@ -785,10 +780,10 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                 }
             }
         }
-        if (arena.sprActor == nullptr)
+        if (user != nullptr && user != target)
         {
-            arena.sprActor = userSpr;
-            userSpr->playActor(user.hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
+            ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user->extra)[0]));
+            userSpr->playActor(user->hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
                 : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
         }
         return false;

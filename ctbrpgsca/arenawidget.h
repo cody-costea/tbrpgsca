@@ -98,7 +98,6 @@ namespace tbrpgsca
                                 int const surprise, int const mInit, bool const doScene);
 
         QString* returnTxt;
-        ActorSprite* sprActor;
         int sprRuns, flags, trgCount;
         QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;

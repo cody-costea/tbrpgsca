@@ -145,57 +145,60 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
                 dmgSp += dmgSp < 0 ? (-1 * dmg) : dmg;
             }
         }
-        QMap<int, int>* trgResMap = actor.res;
-        if (trgResMap != nullptr)
         {
-            int res = DEFAULT_RES;
+            int const dmgType = role.dmgType;
+            QMap<int, int>* trgResMap = actor.res;
+            if (trgResMap != nullptr)
             {
-                auto const last = trgResMap->cend();
-                for (auto it = trgResMap->cbegin(); it != last; ++it)
+                int res = DEFAULT_RES;
                 {
-                    int const elm = it.key();
-                    if ((dmgType & elm) == elm)
+                    auto const last = trgResMap->cend();
+                    for (auto it = trgResMap->cbegin(); it != last; ++it)
                     {
-                        res += it.value();
+                        int const elm = it.key();
+                        if ((dmgType & elm) == elm)
+                        {
+                            res += it.value();
+                        }
                     }
                 }
-            }
-            if (res > 0)
-            {
-                if (res > 7)
+                if (res > 0)
                 {
-                    res = -7 + (res - 7);
-                    if (res > -1)
+                    if (res > 7)
                     {
-                        dmgHp *= -1 * (res + 2);
-                        dmgMp *= -1 * (res + 2);
-                        dmgSp *= -1 * (res + 2);
+                        res = -7 + (res - 7);
+                        if (res > -1)
+                        {
+                            dmgHp *= -1 * (res + 2);
+                            dmgMp *= -1 * (res + 2);
+                            dmgSp *= -1 * (res + 2);
+                        }
                     }
-                }
-                else if (res == 7)
-                {
-                    ret = ret % Ability::ResistTxt.arg(actor.name);
-                    return role;
+                    else if (res == 7)
+                    {
+                        ret = ret % Ability::ResistTxt.arg(actor.name);
+                        return role;
+                    }
+                    else
+                    {
+                        dmgHp /= res;
+                        dmgMp /= res;
+                        dmgSp /= res;
+                    }
                 }
                 else
                 {
-                    dmgHp /= res;
-                    dmgMp /= res;
-                    dmgSp /= res;
+                    dmgHp *= -1 * (res - 2);
+                    dmgMp *= -1 * (res - 2);
+                    dmgSp *= -1 * (res - 2);
                 }
             }
             else
             {
-                dmgHp *= -1 * (res - 2);
-                dmgMp *= -1 * (res - 2);
-                dmgSp *= -1 * (res - 2);
+                dmgHp /= DEFAULT_RES;
+                dmgMp /= DEFAULT_RES;
+                dmgSp /= DEFAULT_RES;
             }
-        }
-        else
-        {
-            dmgHp /= DEFAULT_RES;
-            dmgMp /= DEFAULT_RES;
-            dmgSp /= DEFAULT_RES;
         }
         bool c = false;
         if (dmgSp != 0)
