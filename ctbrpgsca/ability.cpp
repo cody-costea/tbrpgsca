@@ -16,7 +16,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Ability::MissesTxt = ", but misses";
+QString Ability::MissesTxt = ", but misses %1";
 QString Ability::SuffersTxt = ", %1 suffers";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::ResistTxt = ", resisted by %1";
@@ -64,6 +64,11 @@ int Ability::getRemovedStatesSize() const
 {
     QMap<State*, int>* aStates = this->rStates;
     return aStates == nullptr ? 0 : aStates->size();
+}
+
+bool Ability::canMiss() const
+{
+    return (this->flags & FLAG_MISSABLE) == FLAG_MISSABLE;
 }
 
 bool Ability::isStealing() const
@@ -136,13 +141,16 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int dmg = std::rand() % 4;
-        int canMiss = 0, def = 0, i = 0;
+        int canMiss = ability.canMiss() ? 3 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
+                trgAgi = target->agi, trgSpi = target->spi, usrWis = user.wis;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
             dmg += user.atk;
             def += target->def;
-            canMiss = 4;
+            if (canMiss > 0)
+            {
+                canMiss = 4;
+            }
             ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
@@ -159,74 +167,39 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         }
         if ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)
         {
-            dmg += user.wis;
-            def += target->spi;
+            dmg += usrWis;
+            def += trgSpi;
             ++i;
         }
         if ((dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI)
         {
-            dmg += user.agi;
-            def += target->agi;
-            canMiss = 2;
+            dmg += usrAgi;
+            def += trgAgi;
+            if (canMiss > 0)
+            {
+                canMiss = 2;
+            }
             ++i;
         }
-        int trgAgi = target->agi / 4;
-        if (canMiss == 0 || ((canMiss = (std::rand() % 8) + (user.agi / canMiss)) > trgAgi - (std::rand() % 2)) || target == &user)
+        trgAgi = ((trgAgi + trgSpi) / 2) / 3, usrAgi = (usrAgi + usrWis) / 2;
+        if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
+                    > trgAgi - (std::rand() % trgAgi)) || target == &user)
         {
+            if (canMiss > ((trgAgi * 2) + (trgAgi / 2)) - (std::rand() % trgAgi))
+            {
+                dmg = (dmg * 2) + (dmg / 2); //TODO: add text for critical
+            }
             if (i != 0)
             {
-                dmg += (ability.attrInc + (dmg / i)) / (def / i);
-            }
-            if (canMiss > (trgAgi / 2) + (trgAgi * 2) + (std::rand() % 4))
-            {
-                dmg += dmg / 2; //TODO: add text for critical
-            }
-            QMap<int, int>* trgResMap = target->res;
-            if (trgResMap != nullptr)
-            {
-                int res = DEFAULT_RES;
+                def += std::rand() % (def / 2);
+                dmg += std::rand() % (dmg / 2);
+                dmg = (ability.attrInc + (dmg / i)) - ((def / i) / 2);
+                if (dmg < 0)
                 {
-                    auto const last = trgResMap->cend();
-                    for (auto it = trgResMap->cbegin(); it != last; ++it)
-                    {
-                        int const elm = it.key();
-                        if ((dmgType & elm) == elm)
-                        {
-                            res += it.value();
-                        }
-                    }
+                    dmg = 0;
                 }
-                if (res > 0)
-                {
-                    if (res > 7)
-                    {
-                        res = -7 + (res - 7);
-                        if (res > -1)
-                        {
-                            dmg *= -1 * (res + 2);
-                        }
-                    }
-                    else if (res == 7)
-                    {
-                        ret = ret % Ability::ResistTxt.arg(target->name);
-                        goto applyStates;
-                    }
-                    else
-                    {
-                        dmg /= res;
-                    }
-                }
-                else
-                {
-                    dmg *= -1 * (res - 2);
-                }
-            }
-            else
-            {
-                dmg /= DEFAULT_RES;
             }
             ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
-            applyStates:
             {
                 QMap<State*, int>* aStates = ability.stateDur;
                 if (aStates != nullptr)
@@ -320,7 +293,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         }
         else
         {
-            ret = ret % Ability::MissesTxt;
+            ret = ret % Ability::MissesTxt.arg(target->name);
         }
     }
     if (applyCosts)
@@ -343,9 +316,9 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
     return ability;
 }
 
-Ability::Ability(int const id, QString name, QString sprite, bool const steal, bool const range, bool const melee, int const lvRq, int const hpC, int const mpC,
-                 int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
+Ability::Ability(int const id, QString name, QString sprite, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
+                 int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
+                 int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, revive, aStates)
 {
     this->lvRq = lvRq;
@@ -355,6 +328,10 @@ Ability::Ability(int const id, QString name, QString sprite, bool const steal, b
     this->attrInc = attrInc;
     this->rStates = rStates;
     int flags = this->flags;
+    if (canMiss)
+    {
+        flags |= FLAG_MISSABLE;
+    }
     if (melee)
     {
         flags |= FLAG_MELEE;

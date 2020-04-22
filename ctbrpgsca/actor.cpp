@@ -262,7 +262,7 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                         Scene::ActorAct* const actorEvent = scene->actorEvent;
                         if (actorEvent != nullptr)
                         {
-                            ((*actorEvent)(*scene, actor, nullptr, true, nullptr, nullptr));
+                            ((*actorEvent)(*scene, &actor, nullptr, true, nullptr, nullptr));
                         }
                     }
                 }
@@ -565,7 +565,7 @@ Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
         if (scene != nullptr)
         {
             Scene::ActorAct* const actorEvent = scene->actorEvent;
-            if (actorEvent == nullptr || ((*actorEvent)(*scene, actor, nullptr, false, nullptr, nullptr)))
+            if (actorEvent == nullptr || ((*actorEvent)(*scene, &actor, nullptr, false, nullptr, nullptr)))
             {
                 QVector<Actor*>* targets = scene->targets;
                 if (targets == nullptr)
@@ -758,7 +758,7 @@ Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& c
     actor.setMaximumActions(actor.mActions + (i * costume.mActions));
     actor.atk += i * costume.atk;
     actor.def += i * costume.def;
-    actor.mSp += i * costume.spi;
+    actor.spi += i * costume.spi;
     actor.wis += i * costume.wis;
     if (scene == nullptr)
     {
@@ -942,7 +942,10 @@ Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const s
 Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
-    actor.dmgType |= costume.dmgType;
+    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
+    {
+        actor.dmgType |= costume.dmgType;
+    }
     int const cFlags = costume.flags;
     actor.flags |= cFlags;
     {

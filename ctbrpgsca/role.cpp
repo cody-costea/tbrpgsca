@@ -32,7 +32,7 @@ QString Role::getName() const
 
 QString Role::getSprite() const
 {
-    QString* spr = this->sprite;
+    QString* const spr = this->sprite;
     return spr == nullptr ? QString() : *(this->sprite);
 }
 
@@ -83,25 +83,25 @@ bool Role::isReviving() const
 
 int Role::getStateDuration(State& state) const
 {
-    QMap<State*, int>* aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->stateDur;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
 QList<State*> Role::getStatesList() const
 {
-    QMap<State*, int>* aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->stateDur;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
 bool Role::hasState(State& state) const
 {
-    QMap<State*, int>* aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->stateDur;
     return aStates != nullptr && aStates->contains(&state);
 }
 
 int Role::getStatesSize() const
 {
-    QMap<State*, int>* aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->stateDur;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
@@ -115,7 +115,7 @@ Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const
     return this->damage(ret, nullptr, absorber, target, dmg, percent);
 }
 
-Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& actor, int dmg, bool const percent)
+Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int dmg, bool const percent)
 {
     Role& role = *this;
     if (!actor.isInvincible())
@@ -144,7 +144,10 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
             {
                 dmgSp += dmgSp < 0 ? (-1 * dmg) : dmg;
             }
-            /*QMap<int, int>* trgResMap = actor.res;
+        }
+        {
+            int const dmgType = role.dmgType;
+            QMap<int, int>* trgResMap = actor.res;
             if (trgResMap != nullptr)
             {
                 int res = DEFAULT_RES;
@@ -195,7 +198,7 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
                 dmgHp /= DEFAULT_RES;
                 dmgMp /= DEFAULT_RES;
                 dmgSp /= DEFAULT_RES;
-            }*/
+            }
         }
         bool c = false;
         if (dmgSp != 0)
@@ -204,7 +207,7 @@ Role& Role::damage(QString& ret, Scene* scene, Actor* const absorber, Actor& act
             ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
             if (dmgSp < 0)
             {
-                dmg =  -1 * dmg + dmgSp;
+                dmg = -1 * dmg + dmgSp;
                 ret = ret % "+";
             }
             else
