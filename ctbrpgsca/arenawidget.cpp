@@ -760,31 +760,23 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         //ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
         if (target != nullptr)
         {
-            /*ActorSprite* targetSpr;
-            if (target == user)
-            {
-                targetSpr = userSpr;
-            }
-            else
-            {*/
-                ActorSprite* const targetSpr = (static_cast<ActorSprite*>(static_cast<void**>(target->extra)[0]));
-                targetSpr->playActor(target->hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
-                    : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
-            //}
+            ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target->extra)[0]));
+            targetSpr.playActor(target->hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
+                : (((counter->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
             if (ability != nullptr)
             {
                 QString* const spr = ability->sprite;
                 if (spr != nullptr && spr->length() > 0)
                 {
-                    targetSpr->playSkill(*spr);
+                    targetSpr.playSkill(*spr);
                 }
             }
         }
         if (user != nullptr && user != target)
         {
-            ActorSprite* const userSpr = (static_cast<ActorSprite*>(static_cast<void**>(user->extra)[0]));
-            userSpr->playActor(user->hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
-                : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
+            (*(static_cast<ActorSprite*>(static_cast<void**>(user->extra)[0]))).playActor(
+                user->hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
+            : ((ability->dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
         }
         return false;
     });

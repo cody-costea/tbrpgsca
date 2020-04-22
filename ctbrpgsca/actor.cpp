@@ -942,7 +942,10 @@ Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const s
 Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
-    actor.dmgType |= costume.dmgType;
+    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
+    {
+        actor.dmgType |= costume.dmgType;
+    }
     int const cFlags = costume.flags;
     actor.flags |= cFlags;
     {

@@ -16,7 +16,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Ability::MissesTxt = ", but misses";
+QString Ability::MissesTxt = ", but misses %1";
 QString Ability::SuffersTxt = ", %1 suffers";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::ResistTxt = ", resisted by %1";
@@ -199,52 +199,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                     dmg = 0;
                 }
             }
-            /*QMap<int, int>* trgResMap = target->res;
-            if (trgResMap != nullptr)
-            {
-                int res = DEFAULT_RES;
-                {
-                    auto const last = trgResMap->cend();
-                    for (auto it = trgResMap->cbegin(); it != last; ++it)
-                    {
-                        int const elm = it.key();
-                        if ((dmgType & elm) == elm)
-                        {
-                            res += it.value();
-                        }
-                    }
-                }
-                if (res > 0)
-                {
-                    if (res > 7)
-                    {
-                        res = -7 + (res - 7);
-                        if (res > -1)
-                        {
-                            dmg *= -1 * (res + 2);
-                        }
-                    }
-                    else if (res == 7)
-                    {
-                        ret = ret % Ability::ResistTxt.arg(target->name);
-                        goto applyStates;
-                    }
-                    else
-                    {
-                        dmg /= res;
-                    }
-                }
-                else
-                {
-                    dmg *= -1 * (res - 2);
-                }
-            }
-            else
-            {
-                dmg /= DEFAULT_RES;
-            }*/
             ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
-            //applyStates:
             {
                 QMap<State*, int>* aStates = ability.stateDur;
                 if (aStates != nullptr)
@@ -338,7 +293,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         }
         else
         {
-            ret = ret % Ability::MissesTxt;
+            ret = ret % Ability::MissesTxt.arg(target->name);
         }
     }
     if (applyCosts)
