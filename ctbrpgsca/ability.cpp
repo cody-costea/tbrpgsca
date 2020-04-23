@@ -185,7 +185,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
                     > trgAgi - (std::rand() % trgAgi)) || target == &user)
         {
-            if (canMiss > ((trgAgi * 2) + (trgAgi / 2)) - (std::rand() % trgAgi))
+            if (canMiss > (trgAgi * 2) + (std::rand() % trgAgi))
             {
                 dmg = (dmg * 2) + (dmg / 2); //TODO: add text for critical
             }
