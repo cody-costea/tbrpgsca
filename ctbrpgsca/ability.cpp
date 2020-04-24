@@ -141,16 +141,12 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int canMiss = ability.canMiss() ? 3 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
+        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
                 trgAgi = target->agi, trgSpi = target->spi, usrWis = user.wis;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
             dmg += user.atk;
             def += target->def;
-            if (canMiss > 0)
-            {
-                canMiss = 4;
-            }
             ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
@@ -177,7 +173,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             def += trgAgi;
             if (canMiss > 0)
             {
-                canMiss = 2;
+                canMiss = 3;
             }
             ++i;
         }

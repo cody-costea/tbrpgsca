@@ -230,7 +230,7 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                 actor.hp = 0;
                 if (ret != nullptr)
                 {
-                    *ret = *ret % Actor::RiseTxt;
+                    *ret = *ret % Actor::KoTxt.arg(actor.name);
                 }
                 bool revives, shapeShifted;
                 if (actor.isReviving())
