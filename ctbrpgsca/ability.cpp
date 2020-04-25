@@ -141,16 +141,12 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         target = &user;
     }
     {
-        int canMiss = ability.canMiss() ? 3 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
+        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
                 trgAgi = target->agi, trgSpi = target->spi, usrWis = user.wis;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
             dmg += user.atk;
             def += target->def;
-            if (canMiss > 0)
-            {
-                canMiss = 4;
-            }
             ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
@@ -177,7 +173,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             def += trgAgi;
             if (canMiss > 0)
             {
-                canMiss = 2;
+                canMiss = 3;
             }
             ++i;
         }
@@ -185,7 +181,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
                     > trgAgi - (std::rand() % trgAgi)) || target == &user)
         {
-            if (canMiss > ((trgAgi * 2) + (trgAgi / 2)) - (std::rand() % trgAgi))
+            if (canMiss > (trgAgi * 2) + (std::rand() % trgAgi))
             {
                 dmg = (dmg * 2) + (dmg / 2); //TODO: add text for critical
             }
@@ -247,7 +243,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             if (ability.isStealing())
             {
                 QMap<Ability*, int>* usrItems = user.items;
-                if (usrItems != nullptr)
+                //if (usrItems != nullptr)
                 {
                     int trgItemsSize;
                     QMap<Ability*, int>* trgItems = target->items;
@@ -275,6 +271,12 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                             }
                             if (trgItemQty > 0)
                             {
+                                if (usrItems == nullptr)
+                                {
+                                    usrItems = new QMap<Ability*, int>();
+                                    user.setNewItems(true);
+                                    user.items = usrItems;
+                                }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
                                 if ((--trgItemQty) == 0)
                                 {

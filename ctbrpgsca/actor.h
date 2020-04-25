@@ -19,6 +19,7 @@ namespace tbrpgsca
     {
         #define FLAG_AI_PLAYER 1024
         #define FLAG_RANDOM_AI 2048
+        #define FLAG_NEW_ITEMS 4096
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -26,17 +27,19 @@ namespace tbrpgsca
         static QString KoTxt;
         static QString RiseTxt;
 
-        Costume& getJob() const;
-        Costume& getRace() const;
-        bool isAiPlayer() const;
-        bool isRandomAi() const;
         int getLevel() const;
         int getMaximumLevel() const;
         int getMaximumExperience() const;
+        QMap<Ability*, int> getItems() const;
         int getCurrentActions() const;
         int getExperience() const;
         int getInitiative() const;
         //int getPartySide() const;
+        Costume& getRace() const;
+        Costume& getJob() const;
+        bool hasNewItems() const;
+        bool isAiPlayer() const;
+        bool isRandomAi() const;
         void* getExtra() const;
 
         int getRemainingSkillUses(Ability& skill) const;
@@ -51,6 +54,7 @@ namespace tbrpgsca
         Actor& applyStates(QString& ret, bool const consume);
         Actor& setElementResistance(int const element, int const res);
         Actor& setStateResistance(State* const state, int const res);
+        Actor& setItems(QMap<Ability*, int>* items);
         Actor& setExtra(void* const extra);
         Actor& setLevel(int const level);
         Actor& setExperience(int const xp);
@@ -123,6 +127,8 @@ namespace tbrpgsca
 
     private:
         int oldSide;
+
+        Actor& setNewItems(bool const newItems);
 
         friend class Scene;
         friend class Ability;
