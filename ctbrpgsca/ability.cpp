@@ -243,7 +243,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             if (ability.isStealing())
             {
                 QMap<Ability*, int>* usrItems = user.items;
-                if (usrItems != nullptr)
+                //if (usrItems != nullptr)
                 {
                     int trgItemsSize;
                     QMap<Ability*, int>* trgItems = target->items;
@@ -271,6 +271,12 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                             }
                             if (trgItemQty > 0)
                             {
+                                if (usrItems == nullptr)
+                                {
+                                    usrItems = new QMap<Ability*, int>();
+                                    user.setNewItems(true);
+                                    user.items = usrItems;
+                                }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
                                 if ((--trgItemQty) == 0)
                                 {

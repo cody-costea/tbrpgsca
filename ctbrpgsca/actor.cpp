@@ -62,6 +62,12 @@ int Actor::getRegeneratingSkillTurn(Ability& skill) const
     return regTurn == nullptr ? 0 : regTurn->value(&skill, 0);
 }
 
+QMap<Ability*, int> Actor::getItems() const
+{
+    QMap<Ability*, int>* items = this->items;
+    return items == nullptr? QMap<Ability*, int>() : *items;
+}
+
 Costume& Actor::getRace() const
 {
     return *(this->equipment[CHAR_RACE]);
@@ -75,6 +81,11 @@ Costume& Actor::getJob() const
 void* Actor::getExtra() const
 {
     return this->extra;
+}
+
+bool Actor::hasNewItems() const
+{
+    return (this->flags & FLAG_NEW_ITEMS) == FLAG_NEW_ITEMS;
 }
 
 bool Actor::isAiPlayer() const
@@ -444,6 +455,16 @@ Actor& Actor::setRandomAi(const bool randomAi)
     return *this;
 }
 
+Actor& Actor::setNewItems(const bool newItems)
+{
+    int const flags = this->flags;
+    if (newItems != ((flags & FLAG_NEW_ITEMS) == FLAG_NEW_ITEMS))
+    {
+        this->flags = flags ^ FLAG_NEW_ITEMS;
+    }
+    return *this;
+}
+
 Actor& Actor::setReflecting(const bool reflect)
 {
     int const flags = this->flags;
@@ -491,6 +512,21 @@ Actor& Actor::setStunned(const bool stun)
     {
         this->flags = flags ^ FLAG_STUN;
     }
+    return *this;
+}
+
+Actor& Actor::setItems(QMap<Ability*, int>* const items)
+{
+    if (this->hasNewItems())
+    {
+        this->setNewItems(false);
+        QMap<Ability*, int>* oldItems = this->items;
+        if (oldItems != nullptr)
+        {
+            delete oldItems;
+        }
+    }
+    this->items = items;
     return *this;
 }
 
@@ -1054,13 +1090,13 @@ Actor::Actor(Actor& actor) : Costume(actor)
     this->setRace(actor.getRace());
     this->setExperience(actor.xp);*/
     QVector<Ability*>* aSkills = new QVector<Ability*>();
+    this->items = actor.hasNewItems() ? new QMap<Ability*, int>(*(actor.items)) : actor.items;
     *(aSkills) = *(actor.aSkills);
     this->aSkills = aSkills;
     this->maxp = actor.maxp;
     this->xp = actor.xp;
     this->lv = actor.lv;
     this->maxLv = actor.lv;
-    this->items = actor.items;
     this->equipment = actor.equipment;
     {
         QMap<Ability*, int>* crSkillsQty = actor.skillsCrQty;
@@ -1175,5 +1211,15 @@ Actor::~Actor()
     {
         this->dmgRoles = nullptr;
         delete dmgRoles;
+    }
+    if (this->hasNewItems())
+    {
+        //this->setNewItems(false);
+        QMap<Ability*, int>* items = this->items;
+        if (items != nullptr)
+        {
+            this->items = nullptr;
+            delete items;
+        }
     }
 }

@@ -713,7 +713,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
                 arena.setAutomatic(false).autoBtn->setEnabled(false);
                 arena.autoBtn->setText(tr("Auto"));
             }
-            else
+            else if (arena.actBtn->isEnabled())
             {
                 Actor* const crActor = arena.crActor;
                 QString& ret = *(arena.returnTxt); ret.clear();
@@ -727,14 +727,15 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         });
         connect(actBtn, &QPushButton::clicked, [&arena]()
         {
+            arena.enableControls(false);
             Actor* const crActor = arena.crActor;
             Actor* const trgActor = arena.trgActor;
             QString& ret = *(arena.returnTxt); ret.clear();
             arena.perform(ret, *crActor, *trgActor, *(crActor->aSkills->at(arena.skillsBox->currentIndex())), false);
-            arena.enableControls(false);
         });        
         connect(useBtn, &QPushButton::clicked, [&arena]()
         {
+            arena.enableControls(false);
             Actor* const crActor = arena.crActor;
             Actor* const trgActor = arena.trgActor;
             QString& ret = *(arena.returnTxt); ret.clear();
@@ -742,7 +743,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
             auto const it = items->cbegin() + arena.itemsBox->currentIndex();
             Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
             arena.perform(ret, *crActor, *trgActor, *ability, false);
-            arena.enableControls(false);
         });
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
