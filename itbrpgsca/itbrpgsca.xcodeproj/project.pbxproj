@@ -15,13 +15,13 @@
 		C3AC43CB245479C600BA2C3A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C3AC43C9245479C600BA2C3A /* LaunchScreen.storyboard */; };
 		C3AC43D6245479C600BA2C3A /* itbrpgscaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43D5245479C600BA2C3A /* itbrpgscaTests.swift */; };
 		C3AC43E1245479C600BA2C3A /* itbrpgscaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43E0245479C600BA2C3A /* itbrpgscaUITests.swift */; };
-		C3AC43F524547A0E00BA2C3A /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43EE24547A0D00BA2C3A /* Library.swift */; };
-		C3AC43F624547A0E00BA2C3A /* Ability.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43EF24547A0D00BA2C3A /* Ability.swift */; };
-		C3AC43F724547A0E00BA2C3A /* Role.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43F024547A0D00BA2C3A /* Role.swift */; };
-		C3AC43F824547A0E00BA2C3A /* Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43F124547A0D00BA2C3A /* Actor.swift */; };
-		C3AC43F924547A0E00BA2C3A /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43F224547A0D00BA2C3A /* Scene.swift */; };
-		C3AC43FA24547A0E00BA2C3A /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43F324547A0E00BA2C3A /* State.swift */; };
-		C3AC43FB24547A0E00BA2C3A /* Costume.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43F424547A0E00BA2C3A /* Costume.swift */; };
+		C3AC44032454835D00BA2C3A /* Ability.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43FC2454835D00BA2C3A /* Ability.swift */; };
+		C3AC44042454835D00BA2C3A /* Costume.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43FD2454835D00BA2C3A /* Costume.swift */; };
+		C3AC44052454835D00BA2C3A /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43FE2454835D00BA2C3A /* Scene.swift */; };
+		C3AC44062454835D00BA2C3A /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC43FF2454835D00BA2C3A /* Library.swift */; };
+		C3AC44072454835D00BA2C3A /* Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC44002454835D00BA2C3A /* Actor.swift */; };
+		C3AC44082454835D00BA2C3A /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC44012454835D00BA2C3A /* State.swift */; };
+		C3AC44092454835D00BA2C3A /* Role.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AC44022454835D00BA2C3A /* Role.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,13 +56,14 @@
 		C3AC43DC245479C600BA2C3A /* itbrpgscaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = itbrpgscaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3AC43E0245479C600BA2C3A /* itbrpgscaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = itbrpgscaUITests.swift; sourceTree = "<group>"; };
 		C3AC43E2245479C600BA2C3A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C3AC43EE24547A0D00BA2C3A /* Library.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Library.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/Library.swift"; sourceTree = "<group>"; };
-		C3AC43EF24547A0D00BA2C3A /* Ability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Ability.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/Ability.swift"; sourceTree = "<group>"; };
-		C3AC43F024547A0D00BA2C3A /* Role.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Role.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/Role.swift"; sourceTree = "<group>"; };
-		C3AC43F124547A0D00BA2C3A /* Actor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Actor.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/Actor.swift"; sourceTree = "<group>"; };
-		C3AC43F224547A0D00BA2C3A /* Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Scene.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/Scene.swift"; sourceTree = "<group>"; };
-		C3AC43F324547A0E00BA2C3A /* State.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = State.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/State.swift"; sourceTree = "<group>"; };
-		C3AC43F424547A0E00BA2C3A /* Costume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Costume.swift; path = "../../../../itbrpgsca/itbrpgsca Shared/Costume.swift"; sourceTree = "<group>"; };
+		C3AC43FC2454835D00BA2C3A /* Ability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ability.swift; sourceTree = "<group>"; };
+		C3AC43FD2454835D00BA2C3A /* Costume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Costume.swift; sourceTree = "<group>"; };
+		C3AC43FE2454835D00BA2C3A /* Scene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
+		C3AC43FF2454835D00BA2C3A /* Library.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		C3AC44002454835D00BA2C3A /* Actor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actor.swift; sourceTree = "<group>"; };
+		C3AC44012454835D00BA2C3A /* State.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		C3AC44022454835D00BA2C3A /* Role.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Role.swift; sourceTree = "<group>"; };
+		C3AC440A2454841200BA2C3A /* itbrpgsca.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = itbrpgsca.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,13 +114,14 @@
 		C3AC43BD245479C400BA2C3A /* itbrpgsca */ = {
 			isa = PBXGroup;
 			children = (
-				C3AC43EF24547A0D00BA2C3A /* Ability.swift */,
-				C3AC43F124547A0D00BA2C3A /* Actor.swift */,
-				C3AC43F424547A0E00BA2C3A /* Costume.swift */,
-				C3AC43EE24547A0D00BA2C3A /* Library.swift */,
-				C3AC43F024547A0D00BA2C3A /* Role.swift */,
-				C3AC43F224547A0D00BA2C3A /* Scene.swift */,
-				C3AC43F324547A0E00BA2C3A /* State.swift */,
+				C3AC440A2454841200BA2C3A /* itbrpgsca.entitlements */,
+				C3AC43FC2454835D00BA2C3A /* Ability.swift */,
+				C3AC44002454835D00BA2C3A /* Actor.swift */,
+				C3AC43FD2454835D00BA2C3A /* Costume.swift */,
+				C3AC43FF2454835D00BA2C3A /* Library.swift */,
+				C3AC44022454835D00BA2C3A /* Role.swift */,
+				C3AC43FE2454835D00BA2C3A /* Scene.swift */,
+				C3AC44012454835D00BA2C3A /* State.swift */,
 				C3AC43BE245479C400BA2C3A /* AppDelegate.swift */,
 				C3AC43C0245479C400BA2C3A /* SceneDelegate.swift */,
 				C3AC43C2245479C400BA2C3A /* ContentView.swift */,
@@ -289,15 +291,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3AC43BF245479C400BA2C3A /* AppDelegate.swift in Sources */,
-				C3AC43F624547A0E00BA2C3A /* Ability.swift in Sources */,
-				C3AC43F524547A0E00BA2C3A /* Library.swift in Sources */,
-				C3AC43F824547A0E00BA2C3A /* Actor.swift in Sources */,
-				C3AC43F924547A0E00BA2C3A /* Scene.swift in Sources */,
-				C3AC43FA24547A0E00BA2C3A /* State.swift in Sources */,
-				C3AC43FB24547A0E00BA2C3A /* Costume.swift in Sources */,
+				C3AC44062454835D00BA2C3A /* Library.swift in Sources */,
+				C3AC44042454835D00BA2C3A /* Costume.swift in Sources */,
+				C3AC44052454835D00BA2C3A /* Scene.swift in Sources */,
 				C3AC43C1245479C400BA2C3A /* SceneDelegate.swift in Sources */,
+				C3AC44082454835D00BA2C3A /* State.swift in Sources */,
+				C3AC44032454835D00BA2C3A /* Ability.swift in Sources */,
 				C3AC43C3245479C400BA2C3A /* ContentView.swift in Sources */,
-				C3AC43F724547A0E00BA2C3A /* Role.swift in Sources */,
+				C3AC44072454835D00BA2C3A /* Actor.swift in Sources */,
+				C3AC44092454835D00BA2C3A /* Role.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -462,6 +464,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = itbrpgsca/itbrpgsca.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"itbrpgsca/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
@@ -472,6 +475,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = codycostea.itbrpgsca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -481,6 +485,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = itbrpgsca/itbrpgsca.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"itbrpgsca/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
@@ -491,6 +496,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = codycostea.itbrpgsca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
