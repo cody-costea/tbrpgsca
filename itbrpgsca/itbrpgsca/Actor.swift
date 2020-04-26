@@ -13,14 +13,119 @@ class Actor : Costume {
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"
     
-    public static let EVENT_HP = 0
-    public static let EVENT_MP = 1
-    public static let EVENT_SP = 2
+    typealias ActorRun = (Actor, Any) -> Bool
+    
+    enum EventType {
+        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType,
+             exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
+    }
     
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
                  _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: (() -> Bool)?, _dmgRoles: [Costume]?,
                  _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _items: [Ability: Int]?,
-                 _events: [Int: [(Actor) -> Bool]?]?
+                 _events: [EventType: [ActorRun]]?
+    
+    var level: Int {
+        get {
+            return self._lv
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.level, newValue: val) {
+                let mLv = self._mLv
+                self._lv = val > mLv ? mLv : (val < 2 ? 1 : val)
+            }
+        }
+    }
+    
+    var maxLevel: Int {
+        get {
+            return self._mLv
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.maxLv, newValue: val) {
+                self._mLv = val < 2 ? 1 : val
+            }
+        }
+    }
+    
+    var exp: Int {
+        get {
+            return self._xp
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.exp, newValue: val) {
+                let maXp = self._maXp
+                self._xp = val > maXp ? maXp : (val < 1 ? 0 : val)
+            }
+        }
+    }
+    
+    var maxExp: Int {
+        get {
+            return self._maXp
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.maxExp, newValue: val) {
+                self._maXp = val < 2 ? 1 : val
+            }
+        }
+    }
+    
+    var side: Int {
+        get {
+            return self._side
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.side, newValue: val) {
+                self._side = val
+            }
+        }
+    }
+    
+    var delayTrn: Int {
+        get {
+            return self._delayTrn
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.delayTrn, newValue: val) {
+                self._delayTrn = val
+            }
+        }
+    }
+    
+    var dmgChain: Int {
+        get {
+            return self._dmgChain
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.dmgChain, newValue: val) {
+                self._dmgChain = val
+            }
+        }
+    }
+    
+    var chainNr: Int {
+        get {
+            return self._chainNr
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.chainNr, newValue: val) {
+                self._chainNr = val
+            }
+        }
+    }
+    
+    var actions: Int {
+        get {
+            return self._actions
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.actions, newValue: val) {
+                let mActions = self._mActions
+                self._actions = val > mActions ? mActions : (val < 1 ? 0 : val)
+            }
+        }
+    }
     
     override var revives: Bool {
         get {
@@ -123,7 +228,9 @@ class Actor : Costume {
             return self._name
         }
         set (val) {
-            self._name = val
+            if self.runEvent(eventType: EventType.name, newValue: val) {
+                self._name = val
+            }
         }
     }
     
@@ -132,7 +239,9 @@ class Actor : Costume {
             return self._sprite
         }
         set (val) {
-            self._sprite = val
+            if self.runEvent(eventType: EventType.sprite, newValue: val) {
+                self._sprite = val
+            }
         }
     }
     
@@ -141,7 +250,9 @@ class Actor : Costume {
             return self._mHp
         }
         set(val) {
-            self._mHp = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.mHp, newValue: val) {
+                self._mHp = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -150,7 +261,9 @@ class Actor : Costume {
             return self._mMp
         }
         set(val) {
-            self._mMp = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.mMp, newValue: val) {
+                self._mMp = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -159,7 +272,9 @@ class Actor : Costume {
             return self._mSp
         }
         set(val) {
-            self._mSp = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.mSp, newValue: val) {
+                self._mSp = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -168,8 +283,10 @@ class Actor : Costume {
             return self._hp
         }
         set(val) {
-            let mHp = self._mHp
-            self._hp = val > mHp ? mHp : (val < 0 ? 0 : val)
+            if self.runEvent(eventType: EventType.hp, newValue: val) {
+                let mHp = self._mHp
+                self._hp = val > mHp ? mHp : (val < 1 ? 0 : val)
+            }
         }
     }
     
@@ -178,8 +295,10 @@ class Actor : Costume {
             return self._mp
         }
         set(val) {
-            let mMp = self._mMp
-            self._mp = val > mMp ? mMp : (val < 0 ? 0 : val)
+            if self.runEvent(eventType: EventType.mp, newValue: val) {
+                let mMp = self._mMp
+                self._mp = val > mMp ? mMp : (val < 1 ? 0 : val)
+            }
         }
     }
     
@@ -188,8 +307,10 @@ class Actor : Costume {
             return self._sp
         }
         set(val) {
-            let mSp = self._mSp
-            self._sp = val > mSp ? mSp : (val < 0 ? 0 : val)
+            if self.runEvent(eventType: EventType.sp, newValue: val) {
+                let mSp = self._mSp
+                self._sp = val > mSp ? mSp : (val < 1 ? 0 : val)
+            }
         }
     }
     
@@ -198,7 +319,9 @@ class Actor : Costume {
             return self._atk
         }
         set (val) {
-            self._atk = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.atk, newValue: val) {
+                self._atk = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -207,7 +330,9 @@ class Actor : Costume {
             return self._agi
         }
         set (val) {
-            self._agi = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.agi, newValue: val) {
+                self._agi = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -216,7 +341,9 @@ class Actor : Costume {
             return self._def
         }
         set (val) {
-            self._def = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.def, newValue: val) {
+                self._def = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -225,16 +352,20 @@ class Actor : Costume {
             return self._spi
         }
         set (val) {
-            self._spi = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.spi, newValue: val) {
+                self._spi = val < 2 ? 1 : val
+            }
         }
     }
     
     override var wis: Int {
         get {
-            return self._atk
+            return self._wis
         }
         set (val) {
-            self._atk = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.wis, newValue: val) {
+                self._wis = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -243,7 +374,9 @@ class Actor : Costume {
             return self._dmgType
         }
         set (val) {
-            self._dmgType = val
+            if self.runEvent(eventType: EventType.dmgType, newValue: val) {
+                self._dmgType = val
+            }
         }
     }
     
@@ -252,7 +385,9 @@ class Actor : Costume {
             return self._mActions
         }
         set (val) {
-            self._mActions = val < 1 ? 1 : val
+            if self.runEvent(eventType: EventType.mActions, newValue: val) {
+                self._mActions = val < 2 ? 1 : val
+            }
         }
     }
     
@@ -301,30 +436,19 @@ class Actor : Costume {
         }
     }
     
-    internal func setLv(lv: Int, scene: Scene?) -> Actor {
-        return self
-    }
-    
-    internal func setXp(xp: Int, scene: Scene?) -> Actor {
-        return self
-    }
-    
-    internal func setJob(job: Costume, scene: Scene?) -> Actor {
-        return self
-    }
-    
-    internal func setRace(race: Costume, scene: Scene?) -> Actor {
-        return self
-    }
-    
-    internal func setHp(hp: Int, ret: inout String?, scene: Scene?, survive: Bool) -> Actor {
-        self.hp = hp
-        return self
-    }
-    
-    internal func setAgi(agi: Int, scene: Scene) -> Actor {
-        self.agi = agi
-        return self
+    func runEvent(eventType: EventType, newValue: Any) -> Bool {
+        if let eventsMap = self._events {
+            if let eventList = eventsMap[eventType] {
+                var ret: Bool = true
+                for event in eventList {
+                    if !event(self, newValue) {
+                        ret = false
+                    }
+                }
+                return ret
+            }
+        }
+        return true
     }
     
     init(id: Int, name: String, sprite: String, race: Costume, job: Costume, level: Int, maxLv: Int,

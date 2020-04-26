@@ -467,12 +467,14 @@
 				CODE_SIGN_ENTITLEMENTS = itbrpgsca/itbrpgsca.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"itbrpgsca/Preview Content\"";
+				DEVELOPMENT_TEAM = J78886U9V3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = itbrpgsca/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.17;
 				PRODUCT_BUNDLE_IDENTIFIER = codycostea.itbrpgsca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
@@ -488,12 +490,14 @@
 				CODE_SIGN_ENTITLEMENTS = itbrpgsca/itbrpgsca.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"itbrpgsca/Preview Content\"";
+				DEVELOPMENT_TEAM = J78886U9V3;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = itbrpgsca/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.17;
 				PRODUCT_BUNDLE_IDENTIFIER = codycostea.itbrpgsca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
