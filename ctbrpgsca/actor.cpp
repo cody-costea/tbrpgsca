@@ -243,19 +243,19 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                 {
                     *ret = *ret % Actor::KoTxt.arg(actor.name);
                 }
-                bool revives, shapeShifted;
-                if (actor.isReviving())
+                if (actor.init > 0)
+                {
+                    actor.init = 0;
+                }
+                bool shapeShifted;
+                bool const revives = actor.isReviving();
+                if (revives)
                 {
                     shapeShifted = scene != nullptr && actor.isShapeShifted();
-                    revives = true;
-                }
-                else
-                {
-                    revives = false;
                 }
                 actor.sp = 0;
                 {
-                    QMap<State*, int>* stateDur = actor.stateDur;
+                    QMap<State*, int>* const stateDur = actor.stateDur;
                     if (stateDur != nullptr)
                     {
                         auto const last = stateDur->cend();
@@ -315,21 +315,21 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
 Actor& Actor::setCurrentHp(const int hp)
 {
     int mHp = this->mHp;
-    this->hp = hp > mHp ? mHp : (hp < 0 ? 0 : hp);
+    this->hp = hp > mHp ? mHp : (hp < 1 ? 0 : hp);
     return *this;
 }
 
 Actor& Actor::setCurrentMp(const int mp)
 {
     int mMp = this->mMp;
-    this->mp = mp > mMp ? mMp : (mp < 0 ? 0 : mp);
+    this->mp = mp > mMp ? mMp : (mp < 1 ? 0 : mp);
     return *this;
 }
 
 Actor& Actor::setCurrentRp(const int sp)
 {
     int mSp = this->mSp;
-    this->sp = sp > mSp ? mSp : (sp < 0 ? 0 : sp);
+    this->sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
     return *this;
 }
 

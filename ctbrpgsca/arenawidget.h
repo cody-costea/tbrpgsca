@@ -12,6 +12,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QComboBox>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QMediaPlaylist>
+#include <QMediaPlayer>
 #include <QTextEdit>
 #include <QLayout>
 #include <QWidget>
@@ -48,7 +50,6 @@ namespace tbrpgsca
         inline bool isAutomatic() const;
         inline bool isEndTurn() const;
 
-        ArenaWidget& afterAct();
         ArenaWidget& enableControls(bool const enable);
 
         void resizeEvent(QResizeEvent* const event) override;
@@ -57,11 +58,13 @@ namespace tbrpgsca
 
         explicit ArenaWidget(QWidget* const parent = nullptr);
 
-        ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+                    QString backImage, QString songName, int const surprise, int const mInit);
 
         ~ArenaWidget();
 
-        ArenaWidget& operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        ArenaWidget& operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+                                QString backImage, QString songName, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
         {
@@ -85,6 +88,8 @@ namespace tbrpgsca
 
             friend class ArenaWidget;
         };
+        ArenaWidget& afterAct();
+        ArenaWidget& afterPlay();
         ArenaWidget& prepareItemsBox(Actor& actor);
         ArenaWidget& prepareTargetBox(bool const freeMemory);
         ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
@@ -95,16 +100,17 @@ namespace tbrpgsca
         Actor* getPlayerFromTargetBox(int const index);
 
         ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
-                                int const surprise, int const mInit, bool const doScene);
+                                QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
 
         QString* returnTxt;
         int sprRuns, flags, trgCount;
-        QWidget* ctrWidget,* actWidget;
         QLayout* ctrLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;
+        QWidget* ctrWidget,* actWidget;
         TargetsModel* targetsModel;
-        QLabel* infoTxt,* arenaImg;
+        QLabel* infoTxt,* backImg;
+        QMediaPlayer* abilitySnd;
         QVBoxLayout* actLayout;
         QTextEdit* actionsTxt;
         Actor* trgActor;

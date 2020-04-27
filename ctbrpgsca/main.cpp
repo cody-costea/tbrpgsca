@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
         size.setHeight(480);
     }
     QMainWindow window;
-    ArenaWidget arena(nullptr, size, ret, parties, nullptr, -1, 0);
+    ArenaWidget arena(nullptr, size, ret, parties, nullptr, "", "", -1, 0);
     window.setCentralWidget(&arena);
     //window.showMaximized();
     window.showFullScreen();
