@@ -38,12 +38,11 @@ class State : Costume {
         return self
     }
     
-    open func inflict(ret: inout String, scene: Scene?, user: Actor,
-                      target: Actor, dur: Int, always: Bool) -> State {
+    open func inflict(ret: inout String, scene: Scene?, user: Actor, target: Actor, dur: Int, always: Bool) -> State {
         return self
     }
     
-    init(id: Int, name: String, sprite: String, shapeShift: Bool, dur: Int, sRes: Int, mActions: Int,
+    init(id: Int, name: String, sprite: String?, shapeShift: Bool, dur: Int, sRes: Int, mActions: Int,
          elm: Int, hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int,
          spi: Int,wis: Int, agi: Int, stun: Bool, range: Bool, enrage: Bool, confuse: Bool, convert: Bool,
          reflect: Bool, invincible: Bool, ko: Bool, revive: Bool, aSkills: [Ability]?, rSkills: [Ability]?,

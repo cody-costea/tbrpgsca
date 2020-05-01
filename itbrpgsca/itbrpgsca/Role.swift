@@ -29,7 +29,7 @@ class Role : Hashable {
     public static var MpTxt: String = "MP"
     public static var SpTxt: String = "RP"
     
-    internal var _id: Int, _name: String, _sprite: String, _hp: Int, _mp: Int,_sp: Int, _mHp: Int,
+    internal var _id: Int, _name: String, _sprite: String?, _hp: Int, _mp: Int,_sp: Int, _mHp: Int,
                  _mMp: Int, _mSp: Int, _dmgType: Int, _flags: Int, _stateDur: [State: Int]?
     
     public static func == (lhs: Role, rhs: Role) -> Bool {
@@ -80,7 +80,7 @@ class Role : Hashable {
         return self._name
     }
     
-    open var sprite: String {
+    open var sprite: String? {
         return self._sprite
     }
     
@@ -224,7 +224,7 @@ class Role : Hashable {
         return self
     }
     
-    init(id: Int, name: String, sprite: String, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int,
+    init(id: Int, name: String, sprite: String?, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int,
          mSp: Int, dmgType: Int, range: Bool, revive: Bool, stateDur: Dictionary<State, Int>?) {
         self._id = id
         self._name = name

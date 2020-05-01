@@ -89,7 +89,7 @@ class Ability : Role {
         return self
     }
     
-    init(id: Int, name: String, sprite: String, steal: Bool, range: Bool, melee: Bool, canMiss: Bool,
+    init(id: Int, name: String, sprite: String?, steal: Bool, range: Bool, melee: Bool, canMiss: Bool,
         doesCritical: Bool, canChain: Bool, lvRq: Int, hp: Int, mp: Int, sp: Int, attrInc: Int, dmgType: Int,
         mHp: Int, mMp: Int, mSp: Int, trg: Int, elm: Int, rQty: Int, mQty: Int, absorb: Bool, revive: Bool,
         aStates: [State : Int]?, rStates: [State : Int]?) {
