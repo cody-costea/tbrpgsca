@@ -25,35 +25,35 @@ class Costume : Role {
                  _aSkills: [Ability]?, _counters: [Ability]?, _stRes: [State: Int]?, _res: [Int: Int]?
     
     open var enraged: Bool {
-        return (self.flags & Costume.FLAG_ENRAGED) == Costume.FLAG_ENRAGED
+        return (self._flags & Costume.FLAG_ENRAGED) == Costume.FLAG_ENRAGED
     }
     
     open var confused: Bool {
-        return (self.flags & Costume.FLAG_CONFUSE) == Costume.FLAG_CONFUSE
+        return (self._flags & Costume.FLAG_CONFUSE) == Costume.FLAG_CONFUSE
     }
     
     open var converted: Bool {
-        return (self.flags & Costume.FLAG_CONVERT) == Costume.FLAG_CONVERT
+        return (self._flags & Costume.FLAG_CONVERT) == Costume.FLAG_CONVERT
     }
     
     open var reflects: Bool {
-        return (self.flags & Costume.FLAG_REFLECT) == Costume.FLAG_REFLECT
+        return (self._flags & Costume.FLAG_REFLECT) == Costume.FLAG_REFLECT
     }
     
     open var invincible: Bool {
-        return (self.flags & Costume.FLAG_INVINCIBLE) == Costume.FLAG_INVINCIBLE
+        return (self._flags & Costume.FLAG_INVINCIBLE) == Costume.FLAG_INVINCIBLE
     }
     
     open var shapeShifted: Bool {
-        return (self.flags & Costume.FLAG_SHAPE_SHIFT) == Costume.FLAG_SHAPE_SHIFT
+        return (self._flags & Costume.FLAG_SHAPE_SHIFT) == Costume.FLAG_SHAPE_SHIFT
     }
     
     open var stunned: Bool {
-        return (self.flags & Costume.FLAG_STUN) == Costume.FLAG_STUN
+        return (self._flags & Costume.FLAG_STUN) == Costume.FLAG_STUN
     }
     
     open var knockedOut: Bool {
-        return (self.flags & Costume.FLAG_KO) == Costume.FLAG_KO
+        return (self._flags & Costume.FLAG_KO) == Costume.FLAG_KO
     }
     
     open var counters: [Ability]? {
@@ -125,7 +125,7 @@ class Costume : Role {
         self._mActions = mActions
         super.init(id: id, name: name, sprite: sprite, hp: hpDmg, mp: mpDmg, sp: spDmg, mHp: mHp,
                    mMp: mMp, mSp: mSp, dmgType: elm, range: range, revive: revive, stateDur: states)
-        var flags = self.flags
+        var flags = self._flags
         if shapeShift {
             flags |= Costume.FLAG_SHAPE_SHIFT
         }
@@ -147,7 +147,7 @@ class Costume : Role {
         if ko {
             flags |= Costume.FLAG_KO
         }
-        self.flags = flags
+        self._flags = flags
     }
     
 }

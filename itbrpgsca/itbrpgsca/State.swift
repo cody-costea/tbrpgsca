@@ -57,7 +57,7 @@ class State : Costume {
                    confuse: confuse, reflect: reflect, invincible: invincible, ko: ko, revive: revive,
                    skills: aSkills, counters: counters, states: states, stRes: stRes, res: res)
         if convert {
-            self.flags |= State.FLAG_CONVERT
+            self._flags |= State.FLAG_CONVERT
         }
     }
     

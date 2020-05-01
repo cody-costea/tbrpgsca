@@ -29,27 +29,27 @@ class Ability : Role {
     internal var _lvRq: Int, _attrInc: Int, _mQty: Int, _rQty: Int, _rStates: [State: Int]?
     
     open var steals: Bool {
-        return (self.flags & Ability.FLAG_STEAL) == Ability.FLAG_STEAL
+        return (self._flags & Ability.FLAG_STEAL) == Ability.FLAG_STEAL
     }
     
     open var absorbs: Bool {
-        return (self.flags & Ability.FLAG_ABSORB) == Ability.FLAG_ABSORB
+        return (self._flags & Ability.FLAG_ABSORB) == Ability.FLAG_ABSORB
     }
     
     open var melee: Bool {
-        return (self.flags & Ability.FLAG_MELEE) == Ability.FLAG_MELEE
+        return (self._flags & Ability.FLAG_MELEE) == Ability.FLAG_MELEE
     }
     
     open var targetsSide: Bool {
-        return (self.flags & Ability.FLAG_TRG_SIDE) == Ability.FLAG_TRG_SIDE
+        return (self._flags & Ability.FLAG_TRG_SIDE) == Ability.FLAG_TRG_SIDE
     }
     
     open var targetsSelf: Bool {
-        return (self.flags & Ability.FLAG_TRG_SELF) == Ability.FLAG_TRG_SELF
+        return (self._flags & Ability.FLAG_TRG_SELF) == Ability.FLAG_TRG_SELF
     }
     
     open var targetsAll: Bool {
-        return (self.flags & Ability.FLAG_TRG_ALL) == Ability.FLAG_TRG_ALL
+        return (self._flags & Ability.FLAG_TRG_ALL) == Ability.FLAG_TRG_ALL
     }
     
     open var rStates: [State: Int]? {
@@ -100,7 +100,7 @@ class Ability : Role {
         self._rStates = rStates
         super.init(id: id, name: name, sprite: sprite, hp: hp, mp: mp, sp: sp, mHp: mHp, mMp: mMp,
                    mSp: mSp, dmgType: dmgType, range: range, revive: revive, stateDur: aStates)
-        var flags = self.flags
+        var flags = self._flags
         if doesCritical {
             flags |= Ability.FLAG_CRITICAL
         }

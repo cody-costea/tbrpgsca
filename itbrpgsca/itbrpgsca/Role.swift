@@ -30,33 +30,33 @@ class Role : Hashable {
     public static var SpTxt: String = "RP"
     
     internal var _id: Int, _name: String, _sprite: String, _hp: Int, _mp: Int,_sp: Int, _mHp: Int,
-                 _mMp: Int, _mSp: Int, _dmgType: Int, flags: Int, _stateDur: [State: Int]?
+                 _mMp: Int, _mSp: Int, _dmgType: Int, _flags: Int, _stateDur: [State: Int]?
     
-    static func == (lhs: Role, rhs: Role) -> Bool {
+    public static func == (lhs: Role, rhs: Role) -> Bool {
         return lhs._id == rhs._id
     }
     
-    static func != (lhs: Role, rhs: Role) -> Bool {
+    public static func != (lhs: Role, rhs: Role) -> Bool {
         return lhs._id != rhs._id
     }
     
-    static func <= (lhs: Role, rhs: Role) -> Bool {
+    public static func <= (lhs: Role, rhs: Role) -> Bool {
         return lhs._id <= rhs._id
     }
     
-    static func >= (lhs: Role, rhs: Role) -> Bool {
+    public static func >= (lhs: Role, rhs: Role) -> Bool {
         return lhs._id >= rhs._id
     }
     
-    static func < (lhs: Role, rhs: Role) -> Bool {
+    public static func < (lhs: Role, rhs: Role) -> Bool {
         return lhs._id < rhs._id
     }
     
-    static func > (lhs: Role, rhs: Role) -> Bool {
+    public static func > (lhs: Role, rhs: Role) -> Bool {
         return lhs._id > rhs._id
     }
     
-    func hash(into hasher: inout Hasher) {
+    open func hash(into hasher: inout Hasher) {
         hasher.combine(self._id)
     }
                 
@@ -69,11 +69,11 @@ class Role : Hashable {
     }
     
     open var revives: Bool {
-        return (self.flags & Role.FLAG_REVIVE) == Role.FLAG_REVIVE
+        return (self._flags & Role.FLAG_REVIVE) == Role.FLAG_REVIVE
     }
     
     open var ranged: Bool {
-        return (self.flags & Role.FLAG_RANGE) == Role.FLAG_RANGE
+        return (self._flags & Role.FLAG_RANGE) == Role.FLAG_RANGE
     }
     
     open var name: String {
@@ -245,7 +245,7 @@ class Role : Hashable {
         if revive {
             flags |= Role.FLAG_REVIVE
         }
-        self.flags = flags
+        self._flags = flags
     }
     
 }

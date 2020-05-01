@@ -10,10 +10,17 @@ import Foundation
 
 class Actor : Costume {
     
+    public static let FLAG_AI_PLAYER = 1024
+    public static let FLAG_RANDOM_AI = 2048
+    
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"
     
     typealias ActorRun = (Actor, Any) -> Bool
+    
+    enum EquipmentPos: Character {
+        case none = "0", race = "1", job = "2"
+    }
     
     enum EventType {
         case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType,
@@ -23,9 +30,20 @@ class Actor : Costume {
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
                  _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: (() -> Bool)?, _dmgRoles: [Costume]?,
                  _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _items: [Ability: Int]?,
-                 _events: [EventType: [ActorRun]]?
+                 _equipment: [Character: Costume], _events: [EventType: [ActorRun]]?
     
-    var level: Int {
+    internal var flags: Int {
+        get {
+            return self._flags
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.flags, newValue: val) {
+                self._flags = val
+            }
+        }
+    }
+    
+    open var level: Int {
         get {
             return self._lv
         }
@@ -37,7 +55,7 @@ class Actor : Costume {
         }
     }
     
-    var maxLevel: Int {
+    open var maxLevel: Int {
         get {
             return self._mLv
         }
@@ -48,7 +66,7 @@ class Actor : Costume {
         }
     }
     
-    var exp: Int {
+    open var exp: Int {
         get {
             return self._xp
         }
@@ -60,7 +78,7 @@ class Actor : Costume {
         }
     }
     
-    var maxExp: Int {
+    open var maxExp: Int {
         get {
             return self._maXp
         }
@@ -71,7 +89,7 @@ class Actor : Costume {
         }
     }
     
-    var side: Int {
+    open var side: Int {
         get {
             return self._side
         }
@@ -82,7 +100,7 @@ class Actor : Costume {
         }
     }
     
-    var delayTrn: Int {
+    open var delayTrn: Int {
         get {
             return self._delayTrn
         }
@@ -93,7 +111,7 @@ class Actor : Costume {
         }
     }
     
-    var dmgChain: Int {
+    open var dmgChain: Int {
         get {
             return self._dmgChain
         }
@@ -104,7 +122,7 @@ class Actor : Costume {
         }
     }
     
-    var chainNr: Int {
+    open var chainNr: Int {
         get {
             return self._chainNr
         }
@@ -115,7 +133,7 @@ class Actor : Costume {
         }
     }
     
-    var actions: Int {
+    open var actions: Int {
         get {
             return self._actions
         }
@@ -127,103 +145,103 @@ class Actor : Costume {
         }
     }
     
-    override var revives: Bool {
+    override open var revives: Bool {
         get {
             return super.revives
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Role.FLAG_REVIVE) == Role.FLAG_REVIVE) {
                 self.flags = flags ^ Role.FLAG_REVIVE
             }
         }
     }
     
-    override var enraged: Bool {
+    override open var enraged: Bool {
         get {
             return super.enraged
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Costume.FLAG_ENRAGED) == Costume.FLAG_ENRAGED) {
                 self.flags = flags ^ Costume.FLAG_ENRAGED
             }
         }
     }
     
-    override var ranged: Bool {
+    override open var ranged: Bool {
         get {
             return super.ranged
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Role.FLAG_RANGE) == Role.FLAG_RANGE) {
                 self.flags = flags ^ Role.FLAG_RANGE
             }
         }
     }
     
-    override var confused: Bool {
+    override open var confused: Bool {
         get {
             return super.confused
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Costume.FLAG_CONFUSE) == Costume.FLAG_CONFUSE) {
                 self.flags = flags ^ Costume.FLAG_CONFUSE
             }
         }
     }
     
-    override var converted: Bool {
+    override open var converted: Bool {
         get {
             return super.converted
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Costume.FLAG_CONVERT) == Costume.FLAG_CONVERT) {
                 self.flags = flags ^ Costume.FLAG_CONVERT
             }
         }
     }
     
-    override var shapeShifted: Bool {
+    override open var shapeShifted: Bool {
         get {
             return super.shapeShifted
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Costume.FLAG_SHAPE_SHIFT) == Costume.FLAG_SHAPE_SHIFT) {
                 self.flags = flags ^ Costume.FLAG_SHAPE_SHIFT
             }
         }
     }
     
-    override var reflects: Bool {
+    override open var reflects: Bool {
         get {
             return super.reflects
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Costume.FLAG_REFLECT) == Costume.FLAG_REFLECT) {
                 self.flags = flags ^ Costume.FLAG_REFLECT
             }
         }
     }
     
-    override var stunned: Bool {
+    override open var stunned: Bool {
         get {
             return super.stunned
         }
         set (val) {
-            let flags = self.flags
+            let flags = self._flags
             if val != ((flags & Costume.FLAG_STUN) == Costume.FLAG_STUN) {
                 self.flags = flags ^ Costume.FLAG_STUN
             }
         }
     }
     
-    override var name: String {
+    override open var name: String {
         get {
             return self._name
         }
@@ -234,7 +252,7 @@ class Actor : Costume {
         }
     }
     
-    override var sprite: String {
+    override open var sprite: String {
         get {
             return self._sprite
         }
@@ -245,7 +263,7 @@ class Actor : Costume {
         }
     }
     
-    override var mHp: Int {
+    override open var mHp: Int {
         get {
             return self._mHp
         }
@@ -256,7 +274,7 @@ class Actor : Costume {
         }
     }
     
-    override var mMp: Int {
+    override open var mMp: Int {
         get {
             return self._mMp
         }
@@ -267,7 +285,7 @@ class Actor : Costume {
         }
     }
     
-    override var mSp: Int {
+    override open var mSp: Int {
         get {
             return self._mSp
         }
@@ -278,7 +296,7 @@ class Actor : Costume {
         }
     }
     
-    override var hp: Int {
+    override open var hp: Int {
         get {
             return self._hp
         }
@@ -290,7 +308,7 @@ class Actor : Costume {
         }
     }
     
-    override var mp: Int {
+    override open var mp: Int {
         get {
             return self._mp
         }
@@ -302,7 +320,7 @@ class Actor : Costume {
         }
     }
     
-    override var sp: Int {
+    override open var sp: Int {
         get {
             return self._sp
         }
@@ -314,7 +332,7 @@ class Actor : Costume {
         }
     }
     
-    override var atk: Int {
+    override open var atk: Int {
         get {
             return self._atk
         }
@@ -325,7 +343,7 @@ class Actor : Costume {
         }
     }
     
-    override var agi: Int {
+    override open var agi: Int {
         get {
             return self._agi
         }
@@ -336,7 +354,7 @@ class Actor : Costume {
         }
     }
     
-    override var def: Int {
+    override open var def: Int {
         get {
             return self._def
         }
@@ -347,7 +365,7 @@ class Actor : Costume {
         }
     }
     
-    override var spi: Int {
+    override open var spi: Int {
         get {
             return self._spi
         }
@@ -358,7 +376,7 @@ class Actor : Costume {
         }
     }
     
-    override var wis: Int {
+    override open var wis: Int {
         get {
             return self._wis
         }
@@ -369,7 +387,7 @@ class Actor : Costume {
         }
     }
     
-    override var dmgType: Int {
+    override open var dmgType: Int {
         get {
             return self._dmgType
         }
@@ -380,7 +398,7 @@ class Actor : Costume {
         }
     }
     
-    override var mActions: Int {
+    override open var mActions: Int {
         get {
             return self._mActions
         }
@@ -391,7 +409,7 @@ class Actor : Costume {
         }
     }
     
-    override var counters: [Ability]? {
+    override open var counters: [Ability]? {
         get {
             return self._counters
         }
@@ -400,7 +418,7 @@ class Actor : Costume {
         }
     }
     
-    override var aSkills: [Ability]? {
+    override open var aSkills: [Ability]? {
         get {
             return self._aSkills
         }
@@ -409,7 +427,7 @@ class Actor : Costume {
         }
     }
     
-    override var stateDur: [State : Int]? {
+    override open var stateDur: [State : Int]? {
         get {
             return self._stateDur
         }
@@ -418,7 +436,7 @@ class Actor : Costume {
         }
     }
     
-    override var stRes: [State: Int]? {
+    override open var stRes: [State: Int]? {
         get {
             return self._stRes
         }
@@ -427,7 +445,7 @@ class Actor : Costume {
         }
     }
     
-    override var res: [Int: Int]? {
+    override open var res: [Int: Int]? {
         get {
             return self._res
         }
@@ -436,7 +454,7 @@ class Actor : Costume {
         }
     }
     
-    func runEvent(eventType: EventType, newValue: Any) -> Bool {
+    open func runEvent(eventType: EventType, newValue: Any) -> Bool {
         if let eventsMap = self._events {
             if let eventList = eventsMap[eventType] {
                 var ret: Bool = true
@@ -451,26 +469,86 @@ class Actor : Costume {
         return true
     }
     
+    open func levelUp() -> Actor {
+        return self
+    }
+    
+    open func recover(ret: inout String) -> Actor {
+        return self
+    }
+    
+    open func unequipItem(item: Costume) -> Actor {
+        return self
+    }
+    
+    open func unequipPos(pos: Character) -> Actor {
+        return self
+    }
+    
+    open func equipItem(pos: Character, item: Costume?) -> Actor {
+        return self
+    }
+    
+    open func switchCostume(oldCostume: Costume?, newCostume: Costume?) -> Actor {
+        return self
+    }
+    
+    open func updateSkills(remove: Bool, counters: Bool, skills: [Ability]) -> Actor {
+        return self
+    }
+    
+    open func updateResistance(remove: Bool, elmRes: [Int: Int]?, stRes: [State: Int]?) -> Actor {
+        return self
+    }
+    
+    open func updateAttributes(remove: Bool, costume: Costume) -> Actor {
+        return self
+    }
+    
+    open func updateStates(remove: Bool, states: [State: Int]) -> Actor {
+        return self
+    }
+    
+    open func applyDmgRoles(ret: inout String) -> Actor {
+        return self
+    }
+    
+    open func applyStates(ret: inout String) -> Actor {
+        return self
+    }
+    
+    open func checkRegSkill(ability: Ability) -> Actor {
+        return self
+    }
+    
+    open func refreshCostume(costume: Costume) -> Actor {
+        return self
+    }
+    
+    open func refreshCostumes() -> Actor {
+        return self
+    }
+    
     init(id: Int, name: String, sprite: String, race: Costume, job: Costume, level: Int, maxLv: Int,
          mActions: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int,wis: Int, agi: Int,
          res: [Int: Int]?, stRes: [State: Int]?, items: [Ability: Int]) {
+        self._actions = mActions
+        self._dmgChain = 0
+        self._oldSide = 0
+        self._mLv = maxLv
+        self._maXp = 15
+        self._init = 0
         self._lv = 1
         self._xp = 0
-        self._maXp = 15
-        self._mLv = maxLv
-        self._init = 0
         self._side = 0
-        self._oldSide = 0
-        self._dmgChain = 0
         self._chainNr = 0
         self._delayTrn = 0
-        self._delayAct = nil
-        self._actions = mActions
+        self._events = nil
         self._items = items
+        self._delayAct = nil
         self._dmgRoles = nil
         self._skillsCrQty = nil
         self._skillsRgTurn = nil
-        self._events = nil
         super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions,
                    elm: 0, hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp,
                    atk: atk, def: def, spi: spi, wis: wis, agi: agi, stun: false, range: false,
