@@ -25,14 +25,14 @@ class Actor : Costume {
     }
     
     enum EventType {
-        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, race,
-             job, exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
+        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, cover, drawn,
+             race, job, exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
     }
     
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
                  _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: (() -> Bool)?, _dmgRoles: [Costume]?,
-                 _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _items: [Ability: Int]?,
-                 _equipment: [EquipPos: Costume], _events: [EventType: [ActorRun]]?
+                 _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _drawn: Actor?, _cover: Actor?,
+                 _items: [Ability: Int]?, _equipment: [EquipPos: Costume], _events: [EventType: [ActorRun]]?
     
     internal var flags: Int {
         get {
@@ -41,6 +41,28 @@ class Actor : Costume {
         set (val) {
             if self.runEvent(eventType: EventType.flags, newValue: val) {
                 self._flags = val
+            }
+        }
+    }
+    
+    open var cover: Actor? {
+        get {
+            return self._drawn
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.cover, newValue: val as Any) {
+                self._cover = val
+            }
+        }
+    }
+    
+    open var drawn: Actor? {
+        get {
+            return self._drawn
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.flags, newValue: val as Any) {
+                self._drawn = val
             }
         }
     }
@@ -284,7 +306,7 @@ class Actor : Costume {
             return self._sprite
         }
         set (val) {
-            if self.runEvent(eventType: EventType.sprite, newValue: val) {
+            if self.runEvent(eventType: EventType.sprite, newValue: val as Any) {
                 self._sprite = val
             }
         }
@@ -496,8 +518,19 @@ class Actor : Costume {
         return true
     }
     
-    open func levelUp() -> Actor {
-        return self
+    open func levelUp() {
+        while self.maxExp <= self.exp && self.level < self.maxLevel {
+            self.maxExp *= 2
+            self.level += 1
+            self.mHp += 3
+            self.mMp += 2
+            self.mSp += 2
+            self.atk += 1
+            self.def += 1
+            self.spi += 1
+            self.wis += 1
+            self.agi += 1
+        }
     }
     
     open func recover(ret: inout String) -> Actor {
@@ -516,48 +549,106 @@ class Actor : Costume {
         }
     }
     
-    open func equipItem(pos: EquipPos, item: Costume?) -> Costume {
+    open func equipItem(pos: EquipPos, item: Costume?) -> Costume? {
         return self
     }
     
-    open func switchCostume(oldCostume: Costume?, newCostume: Costume?) -> Actor {
-        return self
+    open func switchCostume(oldCost: Costume?, newCost: Costume?) {
+        if let oldCost = oldCost {
+            oldCost.abandon(actor: self, delStates: true)
+        }
+        if let newCost = newCost {
+            newCost.adopt(actor: self, addStates: true)
+        }
     }
     
-    open func updateSkills(remove: Bool, counters: Bool, skills: [Ability]) -> Actor {
-        return self
+    open func updateSkills(remove: Bool, counters: Bool, skills: [Ability]) {
+        if remove {
+            if var aSkills = counters ? self.counters : self.aSkills {
+                for ability in skills {
+                    aSkills.removeAll(where: { $0 == ability })
+                }
+                //TODO: remove from skillsRgTurn and skillsCrQty
+            }
+        } else {
+            //TODO:
+        }
     }
     
-    open func updateResistance(remove: Bool, elmRes: [Int: Int]?, stRes: [State: Int]?) -> Actor {
-        return self
+    open func updateResistance(remove: Bool, elmRes: [Int: Int]?, stRes: [State: Int]?) {
+        if let elmRes = elmRes {
+            if remove {
+                if var aElmRes = self.res {
+                    for (key, val) in elmRes {
+                        aElmRes[key] = (aElmRes[key] ?? val) - val
+                    }
+                }
+            } else {
+                var aElmRes = self.res
+                if aElmRes == nil {
+                    aElmRes = [Int:Int]()
+                    self.res = aElmRes
+                }
+                for (key, val) in aElmRes! {
+                    aElmRes![key] = (aElmRes![key] ?? 0) + val
+                }
+            }
+        }
+        if let stRes = stRes {
+            if remove {
+                if var aStRes = self.stRes {
+                    for (key, val) in stRes {
+                        aStRes[key] = (aStRes[key] ?? val) - val
+                    }
+                }
+            } else {
+                var aStRes = self.stRes
+                if aStRes == nil {
+                    aStRes = [State:Int]()
+                    self.stRes = aStRes
+                }
+                for (key, val) in aStRes! {
+                    aStRes![key] = (aStRes![key] ?? 0) + val
+                }
+            }
+        }
     }
     
-    open func updateAttributes(remove: Bool, costume: Costume) -> Actor {
-        return self
+    open func updateAttributes(remove: Bool, costume: Costume) {
+        let i = remove ? -1 : 1
+        self.mHp = self.mHp + (i * costume.mHp)
+        self.mMp = self.mMp + (i * costume.mMp)
+        self.mSp = self.mSp + (i * costume.mSp)
+        self.mActions = self.mActions + (i * costume.mActions)
+        self.atk += costume.atk
+        self.def += costume.def
+        self.spi += costume.spi
+        self.wis += costume.wis
+        self.agi += costume.agi
     }
     
-    open func updateStates(remove: Bool, states: [State: Int]) -> Actor {
-        return self
+    open func updateStates(remove: Bool, states: [State: Int]) {
+        return
     }
     
-    open func applyDmgRoles(ret: inout String) -> Actor {
-        return self
+    open func applyDmgRoles(ret: inout String) {
+        return
     }
     
-    open func applyStates(ret: inout String) -> Actor {
-        return self
+    open func applyStates(ret: inout String) {
+        return
     }
     
-    open func checkRegSkill(ability: Ability) -> Actor {
-        return self
+    open func checkRegSkill(ability: Ability) {
+        return
     }
     
-    open func refreshCostume(costume: Costume) -> Actor {
-        return self
+    open func refreshCostume(costume: Costume) {
+        return
     }
     
-    open func refreshCostumes() -> Actor {
-        return self
+    open func refreshCostumes() {
+        return
     }
     
     init(id: Int, name: String, sprite: String?, race: Costume, job: Costume, level: Int, maxLv: Int,
@@ -566,6 +657,8 @@ class Actor : Costume {
         self._actions = mActions
         self._dmgChain = 0
         self._oldSide = 0
+        self._cover = nil
+        self._drawn = nil
         self._mLv = maxLv
         self._maXp = 15
         self._init = 0

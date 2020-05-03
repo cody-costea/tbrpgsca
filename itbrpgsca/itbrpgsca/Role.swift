@@ -116,8 +116,7 @@ class Role : Hashable {
         return self._sp
     }
     
-    open func damage(ret: inout String, scene: Scene?, absorber: Actor?,
-                actor: Actor, dmg: Int, percent: Bool) -> Role {
+    open func damage(ret: inout String, scene: Scene?, absorber: Actor?, actor: Actor, dmg: Int, percent: Bool) {
         var dmg: Int = dmg
         if !actor.invincible {
             var dmgHp: Int, dmgMp: Int, dmgSp: Int
@@ -221,7 +220,6 @@ class Role : Hashable {
                 absorber.hp = (absorber._hp + dmgHp / 2)
             }
         }
-        return self
     }
     
     init(id: Int, name: String, sprite: String?, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int,

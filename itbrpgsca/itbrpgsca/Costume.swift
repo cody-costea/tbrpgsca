@@ -96,16 +96,16 @@ class Costume : Role {
         return self._mActions
     }
     
-    open func apply(ret: inout String, scene: Scene?, actor: Actor) -> Costume {
-        return self
+    open func apply(ret: inout String, actor: Actor) {
+        return
     }
     
-    open func adopt(ret: inout String?, scene: Scene?, actor: Actor, addStates: Bool) -> Costume {
-        return self
+    open func adopt(actor: Actor, addStates: Bool) {
+        return
     }
     
-    open func abandon(ret: inout String?, scene: Scene?, actor: Actor, delStates: Bool) -> Costume {
-        return self
+    open func abandon(actor: Actor, delStates: Bool) {
+        return
     }
     
     init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, elm: Int, hpDmg: Int,

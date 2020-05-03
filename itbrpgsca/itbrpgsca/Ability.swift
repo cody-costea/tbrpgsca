@@ -72,21 +72,19 @@ class Ability : Role {
         return self._rQty
     }
     
-    open func replenish(user: Actor) -> Ability {
+    open func replenish(user: Actor) {
         let mQty = self._mQty
         if mQty > 0 {
             
         }
-        return self
     }
     
-    open func canPerform(user: Actor) -> Ability {
-        return self
+    open func canPerform(user: Actor) -> Bool {
+        return true
     }
     
-    open func execute(ret: inout String, scene: Scene?, user: Actor,
-                      target: Actor, applyCosts: Bool) -> Ability {
-        return self
+    open func execute(ret: inout String, user: Actor, target: Actor, applyCosts: Bool) {
+        return
     }
     
     init(id: Int, name: String, sprite: String?, steal: Bool, range: Bool, melee: Bool, canMiss: Bool,

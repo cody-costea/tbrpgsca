@@ -26,20 +26,20 @@ class State : Costume {
         return self._rSkills
     }
     
-    open func alter(ret: inout String, scene: Scene?, actor: Actor, consume: Bool) -> State {
-        return self
+    open func remove(actor: Actor) {
+        return
     }
     
-    open func disable(ret: inout String, scene: Scene?, actor: Actor, dur: Int, remove: Bool) -> Bool {
+    open func alter(ret: inout String, actor: Actor, consume: Bool) {
+        return
+    }
+    
+    open func disable(actor: Actor, dur: Int, remove: Bool) -> Bool {
         return true
     }
     
-    open func remove(ret: inout String, scene: Scene?, actor: Actor) -> State {
-        return self
-    }
-    
-    open func inflict(ret: inout String, scene: Scene?, user: Actor, target: Actor, dur: Int, always: Bool) -> State {
-        return self
+    open func inflict(user: Actor, target: Actor, dur: Int, always: Bool) {
+        return
     }
     
     init(id: Int, name: String, sprite: String?, shapeShift: Bool, dur: Int, sRes: Int, mActions: Int,
