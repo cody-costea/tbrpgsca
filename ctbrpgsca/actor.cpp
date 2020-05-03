@@ -840,7 +840,7 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
             for (auto it = elmRes->cbegin(); it != last; ++it)
             {
                 int const i = it.key(), v = it.value();
-                aElmRes->operator[](i) = aElmRes->value(i, v) + v;
+                aElmRes->operator[](i) = aElmRes->value(i, 0) + v;
             }
         }
     }
@@ -872,7 +872,7 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
             {
                 int v = it.value();
                 State* const i = it.key();
-                aStateRes->operator[](i) = aStateRes->value(i, v) + v;
+                aStateRes->operator[](i) = aStateRes->value(i, 0) + v;
             }
         }
     }
