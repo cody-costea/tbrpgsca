@@ -38,7 +38,7 @@ class State : Costume {
         return true
     }
     
-    open func inflict(user: Actor, target: Actor, dur: Int, always: Bool) {
+    open func inflict(user: Actor?, target: Actor, dur: Int, always: Bool) {
         return
     }
     

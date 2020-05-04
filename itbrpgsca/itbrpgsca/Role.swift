@@ -222,7 +222,7 @@ class Role : Hashable {
         }
     }
     
-    init(id: Int, name: String, sprite: String?, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int,
+    internal init(id: Int, name: String, sprite: String?, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int,
          mSp: Int, dmgType: Int, range: Bool, revive: Bool, stateDur: Dictionary<State, Int>?) {
         self._id = id
         self._name = name

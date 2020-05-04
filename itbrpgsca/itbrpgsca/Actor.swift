@@ -563,52 +563,81 @@ class Actor : Costume {
     }
     
     open func updateSkills(remove: Bool, counters: Bool, skills: [Ability]) {
+        var aSkills: [Ability]! = counters ? self.counters : self.aSkills
         if remove {
-            if var aSkills = counters ? self.counters : self.aSkills {
+            if aSkills != nil {
                 for ability in skills {
                     aSkills.removeAll(where: { $0 == ability })
+                    if ability.rQty > 0, var regTurn = self._skillsRgTurn {
+                        regTurn.removeValue(forKey: ability)
+                    }
+                    if ability.mQty > 0, var crQty = self._skillsCrQty {
+                        crQty.removeValue(forKey: ability)
+                    }
                 }
-                //TODO: remove from skillsRgTurn and skillsCrQty
             }
         } else {
             //TODO:
+            if aSkills == nil {
+                aSkills = [Ability]()
+                if counters {
+                    self.counters = aSkills
+                } else {
+                    self.aSkills = aSkills
+                }
+            }
+            for ability in skills {
+                if !aSkills.contains(ability) {
+                    aSkills.append(ability)
+                    let mQty = ability.mQty
+                    if mQty > 0 {
+                        var crQty: [Ability: Int]! = self._skillsCrQty
+                        if crQty == nil {
+                            crQty = [Ability: Int]()
+                            self._skillsCrQty = crQty
+                        }
+                        crQty[ability] = mQty
+                        self.checkRegSkill(ability: ability)
+                    }
+                }
+            }
         }
     }
     
     open func updateResistance(remove: Bool, elmRes: [Int: Int]?, stRes: [State: Int]?) {
         if let elmRes = elmRes {
+            var aElmRes: [Int: Int]! = self.res
             if remove {
-                if var aElmRes = self.res {
+                if aElmRes != nil {
                     for (key, val) in elmRes {
                         aElmRes[key] = (aElmRes[key] ?? val) - val
                     }
                 }
             } else {
-                var aElmRes = self.res
                 if aElmRes == nil {
-                    aElmRes = [Int:Int]()
+                    aElmRes = [Int: Int]()
                     self.res = aElmRes
                 }
-                for (key, val) in aElmRes! {
-                    aElmRes![key] = (aElmRes![key] ?? 0) + val
+                for (key, val) in aElmRes {
+                    aElmRes![key] = (aElmRes[key] ?? 0) + val
                 }
             }
         }
         if let stRes = stRes {
+            var aStRes: [State: Int]! = self.stRes
             if remove {
-                if var aStRes = self.stRes {
+                if aStRes != nil {
                     for (key, val) in stRes {
                         aStRes[key] = (aStRes[key] ?? val) - val
                     }
                 }
             } else {
-                var aStRes = self.stRes
                 if aStRes == nil {
-                    aStRes = [State:Int]()
+                    aStRes = [State: Int]()
                     self.stRes = aStRes
                 }
-                for (key, val) in aStRes! {
-                    aStRes![key] = (aStRes![key] ?? 0) + val
+                for (key, val) in aStRes {
+                    aStRes![key] = (aStRes[key] ?? 0) + val
                 }
             }
         }
@@ -628,7 +657,19 @@ class Actor : Costume {
     }
     
     open func updateStates(remove: Bool, states: [State: Int]) {
-        return
+        if remove {
+            if let stateDur = self.stateDur {
+                for (key, val) in stateDur {
+                    key.disable(actor: self, dur: val, remove: false)
+                }
+            }
+        } else {
+            for (key, val) in states {
+                if val != -1 { //TODO: check if ok
+                    key.inflict(user: nil, target: self, dur: val, always: true)
+                }
+            }
+        }
     }
     
     open func applyDmgRoles(ret: inout String) {
