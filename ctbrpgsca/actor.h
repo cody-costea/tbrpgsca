@@ -107,6 +107,7 @@ namespace tbrpgsca
         Actor& checkRegSkill(Ability& skill);
         Actor& recover(QString* const ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
+        Actor& removeStates(QString* const ret, Scene* const scene, bool const remove);
         Actor& applyStates(QString* const ret, Scene* const scene, bool const consume);
         Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
         Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);

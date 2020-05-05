@@ -60,9 +60,9 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
         }
     }
     if (stateDur > STATE_END_DUR)
-    {
+     {
         int const stateRes = state.sRes;
-        QMap<State*, int>* stRes = target.stRes;
+        QMap<State*, int>* const stRes = target.stRes;
         if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
             QMap<State*, int>* trgStates = target.stateDur;

@@ -155,7 +155,7 @@ Costume& Costume::apply(QString& ret, Actor& actor)
     return this->apply(ret, nullptr, actor);
 }
 
-Costume& Costume::adopt(QString* ret, Scene* const scene, Actor& actor, bool const addStates)
+Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const addStates)
 {
     Costume& costume = *this;
     actor.updateAttributes(false, scene, costume);
