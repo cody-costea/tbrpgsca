@@ -146,7 +146,7 @@ Actor& Actor::removeStates(QString* const ret, Scene* const scene, bool const re
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            it.key()->disable(ret, scene, actor, STATE_END_DUR + 1, false);
+            it.key()->disable(ret, scene, actor, STATE_END_DUR + 1, remove);
         }
         if (remove && stateDur->size() == 0)
         {
@@ -288,7 +288,7 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                 }
                 else
                 {
-                    actor.removeStates(ret, scene, true);
+                    actor.removeStates(ret, scene, false);
                     actor.setStunned(true);
                     actor.setKnockedOut(true);
                     if (scene != nullptr && ret != nullptr)
@@ -676,13 +676,12 @@ Actor& Actor::recover(QString& ret)
 Actor& Actor::recover(QString* ret, Scene* const scene)
 {
     Actor& actor = *this;
+    actor.removeStates(ret, scene, true);
+    actor.refreshCostumes(ret, scene);
     actor.actions = actor.mActions;
     actor.hp = actor.mHp;
     actor.mp = actor.mMp;
     actor.sp = 0;
-    actor.removeStates(ret, scene, true);
-    //actor.setShapeShifted(false);
-    actor.refreshCostumes(ret, scene);
     {
         QMap<int, int>* const res = actor.res;
         if (res != nullptr)
