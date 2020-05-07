@@ -533,8 +533,31 @@ class Actor : Costume {
         }
     }
     
-    open func recover(ret: inout String) -> Actor {
-        return self
+    open func recover(ret: inout String?) {
+        if let stateDur = self.stateDur {
+            self.updateStates(remove: true, states: stateDur)
+            self.stateDur = nil
+        }
+        self.refreshCostumes()
+        self.actions = self.mActions
+        self.hp = self.mHp
+        self.mp = self.mMp
+        self.sp = 0
+        if var res = self.res {
+            for (key, val) in res {
+                if val == 0 {
+                    res.removeValue(forKey: key)
+                }
+            }
+            if res.count == 0 {
+                self.res = nil
+            }
+        }
+        if var skillsQty = self._skillsCrQty {
+            for (key, _) in skillsQty {
+                skillsQty[key] = key.mQty
+            }
+        }
     }
     
     open func unequipPos(pos: EquipPos) -> Costume {
@@ -665,31 +688,77 @@ class Actor : Costume {
             }
         } else {
             for (key, val) in states {
-                if val != -1 { //TODO: check if ok
-                    key.inflict(user: nil, target: self, dur: val, always: true)
-                }
+                key.inflict(user: nil, target: self, dur: val, always: true)
             }
         }
     }
     
     open func applyDmgRoles(ret: inout String) {
-        return
+        if let dmgRoles = self._dmgRoles {
+            for costume in dmgRoles {
+                costume.apply(ret: &ret, actor: self)
+            }
+        }
     }
     
-    open func applyStates(ret: inout String) {
-        return
+    open func applyStates(ret: inout String?, consume: Bool) {
+        if consume, var ret = ret {
+            self.applyDmgRoles(ret: &ret)
+        }
+        if let stateDur = self.stateDur {
+            for (key, _) in stateDur {
+                if key.dur > State.STATE_END_DUR {
+                    key.alter(ret: &ret, actor: self, consume: consume)
+                }
+            }
+        }
     }
     
     open func checkRegSkill(ability: Ability) {
-        return
+        if ability.rQty > 0 {
+            var regSkills: [Ability : Int]! = self._skillsRgTurn
+            if regSkills == nil {
+                regSkills = [Ability : Int]()
+                self._skillsRgTurn = regSkills
+            }
+            regSkills[ability] = 0
+        }
     }
     
     open func refreshCostume(costume: Costume) {
-        return
+        if costume.hp == 0 && costume.mp == 0 && costume.sp == 0 {
+            self.dmgType |= costume.dmgType
+        }
+        self.flags |= costume._flags
+        if let skills = costume.aSkills {
+            self.updateSkills(remove: false, counters: false, skills: skills)
+        }
+        if let counters = costume.counters {
+            self.updateSkills(remove: true, counters: true, skills: counters)
+        }
+        if costume.shapeShifted, let spr = costume.sprite {
+            self.sprite = spr
+        }
+        if let cStates = costume.stateDur {
+            for (state, rDur) in cStates {
+                if rDur < 0 && rDur > State.STATE_END_DUR {
+                    state.inflict(user: nil, target: self, dur: rDur, always: true)
+                }
+            }
+        }
     }
     
     open func refreshCostumes() {
-        return
+        for (_, costume) in self._equipment {
+            self.refreshCostume(costume: costume)
+        }
+        if let stateDur = self.stateDur {
+            for (state, dur) in stateDur {
+                if dur > State.STATE_END_DUR {
+                    self.refreshCostume(costume: state)
+                }
+            }
+        }
     }
     
     init(id: Int, name: String, sprite: String?, race: Costume, job: Costume, level: Int, maxLv: Int,

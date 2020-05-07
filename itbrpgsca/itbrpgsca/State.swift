@@ -30,7 +30,7 @@ class State : Costume {
         return
     }
     
-    open func alter(ret: inout String, actor: Actor, consume: Bool) {
+    open func alter(ret: inout String?, actor: Actor, consume: Bool) {
         return
     }
     
