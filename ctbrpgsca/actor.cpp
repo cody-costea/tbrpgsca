@@ -771,11 +771,11 @@ Actor& Actor::switchCostume(QString* ret, Scene* const scene, Costume* const old
     Actor& actor = *this;
     if (oldCost != nullptr)
     {
-        oldCost->abandon(ret, scene, actor, true);
+        oldCost->adopt(ret, scene, actor, true, true);
     }
     if (newCost != nullptr)
     {
-        newCost->adopt(ret, scene, actor, true);
+        newCost->adopt(ret, scene, actor, true, false);
     }
     return actor;
 }

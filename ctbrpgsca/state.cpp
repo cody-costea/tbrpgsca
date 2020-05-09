@@ -117,7 +117,7 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
             int const crDur = trgStates->value(this, STATE_END_DUR);
             if (crDur == STATE_END_DUR)
             {
-                state.adopt(ret, scene, target, false);
+                state.adopt(ret, scene, target, false, false);
                 trgStates->operator[](this) = stateDur;
             }
             else if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
@@ -137,7 +137,7 @@ State& State::remove(QString* const ret, Scene* const scene, Actor& actor)
 {
     State& state = *this;
     state.blockSkills(actor, true);
-    state.abandon(ret, scene, actor, false);
+    state.adopt(ret, scene, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
     {
         actor.side = static_cast<int>(actor.oldSide);

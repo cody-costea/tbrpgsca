@@ -142,12 +142,12 @@ bool Costume::isKnockedOut() const
 
 Costume& Costume::adopt(QString& ret, Actor& actor)
 {
-    return this->adopt(&ret, nullptr, actor, true);
+    return this->adopt(&ret, nullptr, actor, true, false);
 }
 
 Costume& Costume::abandon(QString& ret, Actor& actor)
 {
-    return this->abandon(&ret, nullptr, actor, true);
+    return this->adopt(&ret, nullptr, actor, true, true);
 }
 
 Costume& Costume::apply(QString& ret, Actor& actor)
@@ -155,39 +155,33 @@ Costume& Costume::apply(QString& ret, Actor& actor)
     return this->apply(ret, nullptr, actor);
 }
 
-Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const addStates)
+Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)
 {
     Costume& costume = *this;
-    actor.updateAttributes(false, scene, costume);
-    actor.updateResistance(false, costume.res, costume.stRes);
-    if (addStates)
+    actor.updateAttributes(remove, scene, costume);
+    actor.updateResistance(remove, costume.res, costume.stRes);
+    if (!remove)
     {
-        QMap<State*, int>* cStates = costume.stateDur;
-        if (cStates != nullptr)
+        if (updStates)
         {
-            actor.updateStates(false, ret, scene, *cStates);
+            QMap<State*, int>* cStates = costume.stateDur;
+            if (cStates != nullptr)
+            {
+                actor.updateStates(false, ret, scene, *cStates);
+            }
+        }
+        if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
+        {
+            QVector<Costume*>* dmgRoles = actor.dmgRoles;
+            if (dmgRoles == nullptr)
+            {
+                dmgRoles = new QVector<Costume*>();
+                actor.dmgRoles = dmgRoles;
+            }
+            dmgRoles->append(&costume);
         }
     }
-    if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
-    {
-        QVector<Costume*>* dmgRoles = actor.dmgRoles;
-        if (dmgRoles == nullptr)
-        {
-            dmgRoles = new QVector<Costume*>();
-            actor.dmgRoles = dmgRoles;
-        }
-        dmgRoles->append(&costume);
-    }
-    costume.refresh(ret, scene, actor, true, false);
-    return costume;
-}
-
-Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool const delStates)
-{
-    Costume& costume = *this;
-    actor.updateAttributes(true, scene, costume);
-    actor.updateResistance(true, costume.res, costume.stRes);
-    costume.refresh(ret, scene, actor, delStates, true);
+    costume.refresh(ret, scene, actor, updStates, remove);
     return costume;
 }
 
