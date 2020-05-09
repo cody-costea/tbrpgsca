@@ -178,83 +178,16 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
         }
         dmgRoles->append(&costume);
     }
-    costume.refresh(ret, scene, actor);
+    costume.refresh(ret, scene, actor, true, false);
     return costume;
 }
 
 Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool const delStates)
 {
     Costume& costume = *this;
-    {
-        int const roleFlags = costume.flags;
-        int const actorFlags = actor.flags;
-        if ((actorFlags & roleFlags) == roleFlags)
-        {
-            actor.flags = actorFlags ^ roleFlags;
-        }
-        /*if ((roleFlags & FLAG_RANGE) == FLAG_RANGE && (actorFlags & FLAG_RANGE) == FLAG_RANGE)
-        {
-            actor.flags = actorFlags ^ FLAG_RANGE;
-        }
-        if ((roleFlags & FLAG_REVIVE) == FLAG_REVIVE && (actorFlags & FLAG_REVIVE) == FLAG_REVIVE)
-        {
-            actor.flags = actorFlags ^ FLAG_REVIVE;
-        }*/
-    }
     actor.updateAttributes(true, scene, costume);
     actor.updateResistance(true, costume.res, costume.stRes);
-    {
-        QVector<Ability*>* cSkills = costume.aSkills;
-        if (cSkills != nullptr)
-        {
-            if (actor.aSkills != nullptr)
-            {
-                actor.updateSkills(true, false, *cSkills);
-            }
-        }
-        cSkills = costume.counters;
-        if (cSkills != nullptr)
-        {
-            if (actor.counters != nullptr)
-            {
-                actor.updateSkills(true, true, *cSkills);
-            }
-        }
-    }
-    if (delStates)
-    {
-        QMap<State*, int>* const cStates = costume.stateDur;
-        if (cStates != nullptr)
-        {
-            actor.updateStates(true, ret, scene, *cStates);
-        }
-    }
-    if (costume.isShapeShifted())
-    {
-        QString* const spr = costume.sprite;
-        if (spr != nullptr)
-        {
-            (*actor.sprite) = *(actor.getJob().sprite);
-        }
-    }
-    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
-    {
-        int const roleElm = costume.dmgType;
-        int const actorElm = actor.dmgType;
-        if ((actorElm & roleElm) == roleElm)
-        {
-            actor.dmgType = actorElm ^ roleElm;
-        }
-    }
-    else
-    {
-        QVector<Costume*>* const dmgRoles = actor.dmgRoles;
-        if (dmgRoles != nullptr)
-        {
-            dmgRoles->removeOne(&costume);
-        }
-    }
-    actor.refreshCostumes(ret, scene);
+    costume.refresh(ret, scene, actor, delStates, true);
     return costume;
 }
 
@@ -266,49 +199,94 @@ Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
     return role;
 }
 
-Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor)
+Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)
 {
     Costume& costume = *this;
-    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
-    {
-        actor.dmgType |= costume.dmgType;
-    }
-    int const cFlags = costume.flags;
-    actor.flags |= cFlags;
     {
         QVector<Ability*>* skills = costume.aSkills;
         if (skills != nullptr)
         {
-            actor.updateSkills(false, false, *skills);
+            actor.updateSkills(remove, false, *skills);
         }
         skills = costume.counters;
         if (skills != nullptr)
         {
-            actor.updateSkills(false, true, *skills);
+            actor.updateSkills(remove, true, *skills);
         }
     }
-    if (scene != nullptr && ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
+    if (remove)
     {
-        scene->checkStatus(*ret);
-    }
-    if (costume.isShapeShifted())
-    {
-        QString* const spr = costume.sprite;
-        if (spr != nullptr)
+        int const roleFlags = costume.flags;
+        int const actorFlags = actor.flags;
+        if ((actorFlags & roleFlags) == roleFlags)
         {
-            (*actor.sprite) = *spr;
+            actor.flags = actorFlags ^ roleFlags;
         }
-    }
-    QMap<State*, int>* cStates = costume.stateDur;
-    if (cStates != nullptr)
-    {
-        auto const last = cStates->cend();
-        for (auto it = cStates->cbegin(); it != last; ++it)
+        if (updStates)
         {
-            int const rDur = it.value();
-            if (rDur < 0 && rDur > STATE_END_DUR)
+            QMap<State*, int>* const cStates = costume.stateDur;
+            if (cStates != nullptr)
             {
-                it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
+                actor.updateStates(true, ret, scene, *cStates);
+            }
+        }
+        if (costume.isShapeShifted() && costume.sprite != nullptr)
+        {
+            (*actor.sprite) = *(actor.getJob().sprite);
+        }
+        if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
+        {
+            int const roleElm = costume.dmgType;
+            int const actorElm = actor.dmgType;
+            if ((actorElm & roleElm) == roleElm)
+            {
+                actor.dmgType = actorElm ^ roleElm;
+            }
+        }
+        else
+        {
+            QVector<Costume*>* const dmgRoles = actor.dmgRoles;
+            if (dmgRoles != nullptr)
+            {
+                dmgRoles->removeOne(&costume);
+            }
+        }
+        actor.refreshCostumes(ret, scene);
+    }
+    else
+    {
+        int const cFlags = costume.flags;
+        if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
+        {
+            actor.dmgType |= costume.dmgType;
+        }
+        actor.flags |= cFlags;
+        if (scene != nullptr && ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
+        {
+            scene->checkStatus(*ret);
+        }
+        if (costume.isShapeShifted())
+        {
+            QString* const spr = costume.sprite;
+            if (spr != nullptr)
+            {
+                (*actor.sprite) = *spr;
+            }
+        }
+        if (updStates)
+        {
+            QMap<State*, int>* cStates = costume.stateDur;
+            if (cStates != nullptr)
+            {
+                auto const last = cStates->cend();
+                for (auto it = cStates->cbegin(); it != last; ++it)
+                {
+                    int const rDur = it.value();
+                    if (rDur < 0 && rDur > STATE_END_DUR)
+                    {
+                        it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
+                    }
+                }
             }
         }
     }

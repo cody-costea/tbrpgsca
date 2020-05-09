@@ -972,7 +972,7 @@ Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
         auto const last = equipment.cend();
         for (auto it = equipment.cbegin(); it != last; ++it)
         {
-            it.value()->refresh(ret, scene, actor);
+            it.value()->refresh(ret, scene, actor, true, false);
         }
     }
     QMap<State*, int>* const stateDur = actor.stateDur;
@@ -983,7 +983,7 @@ Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
         {
             if (it.value() > STATE_END_DUR)
             {
-                it.key()->refresh(ret, scene, actor);
+                it.key()->refresh(ret, scene, actor, true, false);
             }
         }
     }
