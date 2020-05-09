@@ -186,14 +186,6 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
 {
     Costume& costume = *this;
     {
-        int const roleElm = costume.dmgType;
-        int const actorElm = actor.dmgType;
-        if ((actorElm & roleElm) == roleElm)
-        {
-            actor.dmgType = actorElm ^ roleElm;
-        }
-    }
-    {
         int const roleFlags = costume.flags;
         int const actorFlags = actor.flags;
         if ((actorFlags & roleFlags) == roleFlags)
@@ -245,8 +237,16 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
             (*actor.sprite) = *(actor.getJob().sprite);
         }
     }
-    actor.refreshCostumes(ret, scene);
-    if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
+    if (costume.hp == 0 && costume.mp == 0 && costume.sp != 0)
+    {
+        int const roleElm = costume.dmgType;
+        int const actorElm = actor.dmgType;
+        if ((actorElm & roleElm) == roleElm)
+        {
+            actor.dmgType = actorElm ^ roleElm;
+        }
+    }
+    else
     {
         QVector<Costume*>* const dmgRoles = actor.dmgRoles;
         if (dmgRoles != nullptr)
@@ -254,6 +254,7 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
             dmgRoles->removeOne(&costume);
         }
     }
+    actor.refreshCostumes(ret, scene);
     return costume;
 }
 
