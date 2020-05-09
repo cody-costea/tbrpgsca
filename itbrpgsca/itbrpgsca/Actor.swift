@@ -560,8 +560,8 @@ class Actor : Costume {
         }
     }
     
-    open func unequipPos(pos: EquipPos) -> Costume {
-        return self
+    open func unequipPos(pos: EquipPos) -> Costume? {
+        return self.equipItem(pos: pos, item: nil)
     }
     
     open func unequipItem(item: Costume) -> EquipPos? {
@@ -573,7 +573,11 @@ class Actor : Costume {
     }
     
     open func equipItem(pos: EquipPos, item: Costume?) -> Costume? {
-        return self
+        var equipment = self._equipment
+        let oldCost = equipment[pos]
+        self.switchCostume(oldCost: oldCost, newCost: item)
+        equipment[pos] = item
+        return oldCost
     }
     
     open func switchCostume(oldCost: Costume?, newCost: Costume?) {
@@ -725,37 +729,14 @@ class Actor : Costume {
         }
     }
     
-    open func refreshCostume(costume: Costume) {
-        if costume.hp == 0 && costume.mp == 0 && costume.sp == 0 {
-            self.dmgType |= costume.dmgType
-        }
-        self.flags |= costume._flags
-        if let skills = costume.aSkills {
-            self.updateSkills(remove: false, counters: false, skills: skills)
-        }
-        if let counters = costume.counters {
-            self.updateSkills(remove: true, counters: true, skills: counters)
-        }
-        if costume.shapeShifted, let spr = costume.sprite {
-            self.sprite = spr
-        }
-        if let cStates = costume.stateDur {
-            for (state, rDur) in cStates {
-                if rDur < 0 && rDur > State.STATE_END_DUR {
-                    state.inflict(user: nil, target: self, dur: rDur, always: true)
-                }
-            }
-        }
-    }
-    
     open func refreshCostumes() {
         for (_, costume) in self._equipment {
-            self.refreshCostume(costume: costume)
+            costume.refresh(actor: self, updStates: true, remove: false)
         }
         if let stateDur = self.stateDur {
             for (state, dur) in stateDur {
                 if dur > State.STATE_END_DUR {
-                    self.refreshCostume(costume: state)
+                    state.refresh(actor: self, updStates: true, remove: false)
                 }
             }
         }
