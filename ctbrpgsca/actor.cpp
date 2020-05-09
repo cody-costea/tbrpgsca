@@ -964,55 +964,6 @@ Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const s
     return actor;
 }
 
-Actor& Actor::refreshCostume(QString* const ret, Scene* const scene, Costume& costume)
-{
-    Actor& actor = *this;
-    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
-    {
-        actor.dmgType |= costume.dmgType;
-    }
-    int const cFlags = costume.flags;
-    actor.flags |= cFlags;
-    {
-        QVector<Ability*>* skills = costume.aSkills;
-        if (skills != nullptr)
-        {
-            actor.updateSkills(false, false, *skills);
-        }
-        skills = costume.counters;
-        if (skills != nullptr)
-        {
-            actor.updateSkills(false, true, *skills);
-        }
-    }
-    if (scene != nullptr && ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
-    {
-        scene->checkStatus(*ret);
-    }
-    if (costume.isShapeShifted())
-    {
-        QString* const spr = costume.sprite;
-        if (spr != nullptr)
-        {
-            (*actor.sprite) = *spr;
-        }
-    }
-    QMap<State*, int>* cStates = costume.stateDur;
-    if (cStates != nullptr)
-    {
-        auto const last = cStates->cend();
-        for (auto it = cStates->cbegin(); it != last; ++it)
-        {
-            int const rDur = it.value();
-            if (rDur < 0 && rDur > STATE_END_DUR)
-            {
-                it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
-            }
-        }
-    }
-    return actor;
-}
-
 Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
 {
     Actor& actor = *this;
@@ -1021,7 +972,7 @@ Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
         auto const last = equipment.cend();
         for (auto it = equipment.cbegin(); it != last; ++it)
         {
-            actor.refreshCostume(ret, scene, *(it.value()));
+            it.value()->refresh(ret, scene, actor);
         }
     }
     QMap<State*, int>* const stateDur = actor.stateDur;
@@ -1032,7 +983,7 @@ Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
         {
             if (it.value() > STATE_END_DUR)
             {
-                actor.refreshCostume(ret, scene, *(it.key()));
+                it.key()->refresh(ret, scene, actor);
             }
         }
     }

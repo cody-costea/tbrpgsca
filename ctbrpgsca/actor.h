@@ -123,7 +123,6 @@ namespace tbrpgsca
         char unequipItem(Scene* const scene, Costume& item);
         Costume* unequipPos(Scene* const scene, char const pos);
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
-        Actor& refreshCostume(QString* const ret, Scene* const scene, Costume& costume);
         Actor& refreshCostumes(QString* const ret, Scene* const scene);
 
     private:

@@ -178,7 +178,7 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
         }
         dmgRoles->append(&costume);
     }
-    actor.refreshCostume(ret, scene, costume);
+    costume.refresh(ret, scene, actor);
     return costume;
 }
 
@@ -263,6 +263,55 @@ Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
     ret = ret % QString(Costume::CausesTxt).arg(actor.name, role.name);
     role.damage(ret, scene, nullptr, actor, std::rand() % 4, true);
     return role;
+}
+
+Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor)
+{
+    Costume& costume = *this;
+    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
+    {
+        actor.dmgType |= costume.dmgType;
+    }
+    int const cFlags = costume.flags;
+    actor.flags |= cFlags;
+    {
+        QVector<Ability*>* skills = costume.aSkills;
+        if (skills != nullptr)
+        {
+            actor.updateSkills(false, false, *skills);
+        }
+        skills = costume.counters;
+        if (skills != nullptr)
+        {
+            actor.updateSkills(false, true, *skills);
+        }
+    }
+    if (scene != nullptr && ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
+    {
+        scene->checkStatus(*ret);
+    }
+    if (costume.isShapeShifted())
+    {
+        QString* const spr = costume.sprite;
+        if (spr != nullptr)
+        {
+            (*actor.sprite) = *spr;
+        }
+    }
+    QMap<State*, int>* cStates = costume.stateDur;
+    if (cStates != nullptr)
+    {
+        auto const last = cStates->cend();
+        for (auto it = cStates->cbegin(); it != last; ++it)
+        {
+            int const rDur = it.value();
+            if (rDur < 0 && rDur > STATE_END_DUR)
+            {
+                it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
+            }
+        }
+    }
+    return actor;
 }
 
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
