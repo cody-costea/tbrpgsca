@@ -237,7 +237,7 @@ Costume& Costume::abandon(QString* ret, Scene* const scene, Actor& actor, bool c
             (*actor.sprite) = *(actor.getJob().sprite);
         }
     }
-    if (costume.hp == 0 && costume.mp == 0 && costume.sp != 0)
+    if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
     {
         int const roleElm = costume.dmgType;
         int const actorElm = actor.dmgType;
