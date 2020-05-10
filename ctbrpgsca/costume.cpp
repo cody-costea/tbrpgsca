@@ -162,7 +162,35 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
     actor.updateResistance(remove, costume.res, costume.stRes);
     if (remove)
     {
+        int const roleFlags = costume.flags;
+        int const actorFlags = actor.flags;
+        if ((actorFlags & roleFlags) == roleFlags)
+        {
+            actor.flags = actorFlags ^ roleFlags;
+        }
+        if (costume.isShapeShifted() && costume.sprite != nullptr)
+        {
+            (*actor.sprite) = *(actor.getJob().sprite);
+        }
+        if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
+        {
+            int const roleElm = costume.dmgType;
+            int const actorElm = actor.dmgType;
+            if ((actorElm & roleElm) == roleElm)
+            {
+                actor.dmgType = actorElm ^ roleElm;
+            }
+        }
+        else
+        {
+            QVector<Costume*>* const dmgRoles = actor.dmgRoles;
+            if (dmgRoles != nullptr)
+            {
+                dmgRoles->removeOne(&costume);
+            }
+        }
         costume.refresh(ret, scene, actor, updStates, true);
+        actor.refreshCostumes(ret, scene);
     }
     else
     {
@@ -220,38 +248,7 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
             actor.updateStates(remove, ret, scene, *cStates, false);
         }
     }
-    if (remove)
-    {
-        int const roleFlags = costume.flags;
-        int const actorFlags = actor.flags;
-        if ((actorFlags & roleFlags) == roleFlags)
-        {
-            actor.flags = actorFlags ^ roleFlags;
-        }
-        if (costume.isShapeShifted() && costume.sprite != nullptr)
-        {
-            (*actor.sprite) = *(actor.getJob().sprite);
-        }
-        if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)
-        {
-            int const roleElm = costume.dmgType;
-            int const actorElm = actor.dmgType;
-            if ((actorElm & roleElm) == roleElm)
-            {
-                actor.dmgType = actorElm ^ roleElm;
-            }
-        }
-        else
-        {
-            QVector<Costume*>* const dmgRoles = actor.dmgRoles;
-            if (dmgRoles != nullptr)
-            {
-                dmgRoles->removeOne(&costume);
-            }
-        }
-        actor.refreshCostumes(ret, scene);
-    }
-    else
+    if (!remove)
     {
         int const cFlags = costume.flags;
         if (costume.hp == 0 && costume.mp == 0 && costume.sp == 0)

@@ -988,7 +988,7 @@ Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
         {
             if (it.value() > STATE_END_DUR)
             {
-                it.key()->refresh(ret, scene, actor, true, false);
+                it.key()->refresh(ret, scene, actor, false, false);
             }
         }
     }
