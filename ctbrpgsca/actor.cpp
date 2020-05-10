@@ -143,11 +143,7 @@ Actor& Actor::removeStates(QString* const ret, Scene* const scene, bool const re
     QMap<State*, int>* const stateDur = actor.stateDur;
     if (stateDur != nullptr)
     {
-        auto const last = stateDur->cend();
-        for (auto it = stateDur->cbegin(); it != last; ++it)
-        {
-            it.key()->disable(ret, scene, actor, STATE_END_DUR + 1, remove);
-        }
+        actor.updateStates(true, ret, scene, *stateDur, true);
         if (remove && stateDur->size() == 0)
         {
             actor.stateDur = nullptr;
@@ -938,18 +934,23 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
     return actor;
 }
 
-Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const scene, QMap<State*, int>& states)
+Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const scene,
+                           QMap<State*, int>& states, bool const includeWithDur)
 {
     Actor& actor = *this;
     if (remove)
     {
-        QMap<State*, int>* stateDur = actor.stateDur;
+        QMap<State*, int>* const stateDur = actor.stateDur;
         if (stateDur != nullptr && stateDur->size() > 0)
         {
             auto const last = states.cend();
             for (auto it = states.cbegin(); it != last; ++it)
             {
-                it.key()->disable(ret, scene, actor, it.value(), false);
+                int const rDur = it.value();
+                if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
+                {
+                    it.key()->disable(ret, scene, actor, it.value(), includeWithDur);
+                }
             }
         }
     }
@@ -958,7 +959,11 @@ Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const s
         auto const last = states.cend();
         for (auto it = states.cbegin(); it != last; ++it)
         {
-            it.key()->inflict(ret, scene, nullptr, actor, it.value(), true);
+            int const rDur = it.value();
+            if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
+            {
+                it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
+            }
         }
     }
     return actor;

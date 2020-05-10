@@ -160,14 +160,18 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
     Costume& costume = *this;
     actor.updateAttributes(remove, scene, costume);
     actor.updateResistance(remove, costume.res, costume.stRes);
-    if (!remove)
+    if (remove)
+    {
+        costume.refresh(ret, scene, actor, updStates, true);
+    }
+    else
     {
         if (updStates)
         {
-            QMap<State*, int>* cStates = costume.stateDur;
+            QMap<State*, int>* const cStates = costume.stateDur;
             if (cStates != nullptr)
             {
-                actor.updateStates(false, ret, scene, *cStates);
+                actor.updateStates(false, ret, scene, *cStates, true);
             }
         }
         if (costume.hp != 0 || costume.mp != 0 || costume.sp != 0)
@@ -180,8 +184,8 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
             }
             dmgRoles->append(&costume);
         }
+        costume.refresh(ret, scene, actor, false, false);
     }
-    costume.refresh(ret, scene, actor, updStates, remove);
     return costume;
 }
 
@@ -221,7 +225,7 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
             QMap<State*, int>* const cStates = costume.stateDur;
             if (cStates != nullptr)
             {
-                actor.updateStates(true, ret, scene, *cStates);
+                actor.updateStates(true, ret, scene, *cStates, false);
             }
         }
         if (costume.isShapeShifted() && costume.sprite != nullptr)
@@ -272,15 +276,7 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
             QMap<State*, int>* cStates = costume.stateDur;
             if (cStates != nullptr)
             {
-                auto const last = cStates->cend();
-                for (auto it = cStates->cbegin(); it != last; ++it)
-                {
-                    int const rDur = it.value();
-                    if (rDur < 0 && rDur > STATE_END_DUR)
-                    {
-                        it.key()->inflict(ret, scene, nullptr, actor, rDur, true);
-                    }
-                }
+                actor.updateStates(false, ret, scene, *cStates, false);
             }
         }
     }
