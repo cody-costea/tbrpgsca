@@ -535,7 +535,7 @@ class Actor : Costume {
     
     open func recover(ret: inout String?) {
         if let stateDur = self.stateDur {
-            self.updateStates(remove: true, states: stateDur)
+            self.updateStates(remove: true, states: stateDur, withDur: true)
             self.stateDur = nil
         }
         self.refreshCostumes()
@@ -582,10 +582,10 @@ class Actor : Costume {
     
     open func switchCostume(oldCost: Costume?, newCost: Costume?) {
         if let oldCost = oldCost {
-            oldCost.abandon(actor: self, delStates: true)
+            oldCost.adopt(actor: self, updStates: true, remove: true)
         }
         if let newCost = newCost {
-            newCost.adopt(actor: self, addStates: true)
+            newCost.adopt(actor: self, updStates: true, remove: false)
         }
     }
     
@@ -683,16 +683,20 @@ class Actor : Costume {
         self.agi += costume.agi
     }
     
-    open func updateStates(remove: Bool, states: [State: Int]) {
+    open func updateStates(remove: Bool, states: [State: Int], withDur: Bool) {
         if remove {
-            if let stateDur = self.stateDur {
-                for (key, val) in stateDur {
-                    key.disable(actor: self, dur: val, remove: false)
+            if let stateDur = self.stateDur, stateDur.count > 0 {
+                for (state, rDur) in states {
+                    if withDur || (rDur < 0 && rDur > State.STATE_END_DUR) {
+                        state.disable(actor: self, dur: rDur, remove: false)
+                    }
                 }
             }
         } else {
-            for (key, val) in states {
-                key.inflict(user: nil, target: self, dur: val, always: true)
+            for (state, rDur) in states {
+                if withDur || (rDur < 0 && rDur > State.STATE_END_DUR) {
+                    state.inflict(user: nil, target: self, dur: rDur, always: true)
+                }
             }
         }
     }
@@ -736,7 +740,7 @@ class Actor : Costume {
         if let stateDur = self.stateDur {
             for (state, dur) in stateDur {
                 if dur > State.STATE_END_DUR {
-                    state.refresh(actor: self, updStates: true, remove: false)
+                    state.refresh(actor: self, updStates: false, remove: false)
                 }
             }
         }

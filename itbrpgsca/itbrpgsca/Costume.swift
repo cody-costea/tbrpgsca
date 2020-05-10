@@ -103,6 +103,9 @@ class Costume : Role {
         if let counters = self.counters {
             actor.updateSkills(remove: remove, counters: true, skills: counters)
         }
+        if updStates, let cStates = self.stateDur {
+            actor.updateStates(remove: true, states: cStates, withDur: false)
+        }
         if remove {
             let roleFlags = self._flags
             let actorFlags = actor.flags
@@ -121,9 +124,6 @@ class Costume : Role {
             } else if var dmgRoles = actor._dmgRoles {
                 dmgRoles.removeAll(where: { $0 == self })
             }
-            if updStates, let cStates = self.stateDur {
-                actor.updateStates(remove: true, states: cStates)
-            }
             actor.refreshCostumes()
         } else {
             actor.flags |= self._flags
@@ -133,33 +133,34 @@ class Costume : Role {
             if self.shapeShifted, let spr = self.sprite {
                 actor.sprite = spr
             }
-            if updStates, let cStates = self.stateDur {
-                for (state, rDur) in cStates {
-                    if rDur < 0 && rDur > State.STATE_END_DUR {
-                        state.inflict(user: nil, target: actor, dur: rDur, always: true)
-                    }
-                }
-            }
         }
     }
     
-    open func adopt(actor: Actor, addStates: Bool) {
-        actor.updateAttributes(remove: false, costume: self)
-        actor.updateResistance(remove: false, elmRes: self.res, stRes: self.stRes)
-        if addStates {
-            if let cStates = self.stateDur {
-                actor.updateStates(remove: false, states: cStates)
+    open func adopt(actor: Actor, updStates: Bool) {
+        self.adopt(actor: actor, updStates: updStates, remove: false)
+    }
+    
+    open func adopt(actor: Actor, updStates: Bool, remove: Bool) {
+        actor.updateAttributes(remove: remove, costume: self)
+        actor.updateResistance(remove: remove, elmRes: self.res, stRes: self.stRes)
+        if remove {
+            self.refresh(actor: actor, updStates: updStates, remove: true)
+        } else {
+            if updStates {
+                if let cStates = self.stateDur {
+                    actor.updateStates(remove: false, states: cStates, withDur: true)
+                }
             }
-        }
-        if self.hp != 0 || self.mp != 0 || self.sp != 0 {
-            var dmgRoles: [Costume]! = actor._dmgRoles
-            if dmgRoles == nil {
-                dmgRoles = [Costume]()
-                actor._dmgRoles = dmgRoles
+            if self.hp != 0 || self.mp != 0 || self.sp != 0 {
+                var dmgRoles: [Costume]! = actor._dmgRoles
+                if dmgRoles == nil {
+                    dmgRoles = [Costume]()
+                    actor._dmgRoles = dmgRoles
+                }
+                dmgRoles.append(self)
             }
-            dmgRoles.append(self)
+            self.refresh(actor: actor, updStates: false, remove: false)
         }
-        self.refresh(actor: actor, updStates: true, remove: false)
     }
     
     open func apply(ret: inout String, actor: Actor) {
