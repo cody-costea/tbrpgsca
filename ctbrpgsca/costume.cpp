@@ -212,6 +212,14 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
             actor.updateSkills(remove, true, *skills);
         }
     }
+    if (updStates)
+    {
+        QMap<State*, int>* cStates = costume.stateDur;
+        if (cStates != nullptr)
+        {
+            actor.updateStates(remove, ret, scene, *cStates, false);
+        }
+    }
     if (remove)
     {
         int const roleFlags = costume.flags;
@@ -219,14 +227,6 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
         if ((actorFlags & roleFlags) == roleFlags)
         {
             actor.flags = actorFlags ^ roleFlags;
-        }
-        if (updStates)
-        {
-            QMap<State*, int>* const cStates = costume.stateDur;
-            if (cStates != nullptr)
-            {
-                actor.updateStates(true, ret, scene, *cStates, false);
-            }
         }
         if (costume.isShapeShifted() && costume.sprite != nullptr)
         {
@@ -269,14 +269,6 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
             if (spr != nullptr)
             {
                 (*actor.sprite) = *spr;
-            }
-        }
-        if (updStates)
-        {
-            QMap<State*, int>* cStates = costume.stateDur;
-            if (cStates != nullptr)
-            {
-                actor.updateStates(false, ret, scene, *cStates, false);
             }
         }
     }
