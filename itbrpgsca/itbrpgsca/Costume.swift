@@ -136,8 +136,8 @@ class Costume : Role {
         }
     }
     
-    open func adopt(actor: Actor, updStates: Bool) {
-        self.adopt(actor: actor, updStates: updStates, remove: false)
+    open func adopt(actor: Actor, addStates: Bool) {
+        self.adopt(actor: actor, updStates: addStates, remove: false)
     }
     
     open func adopt(actor: Actor, updStates: Bool, remove: Bool) {
@@ -164,14 +164,12 @@ class Costume : Role {
     }
     
     open func apply(ret: inout String, actor: Actor) {
-        //TODO: append ret string
+        ret.append(String(format: Costume.CausesTxt, actor.name, self.name))
         self.damage(ret: &ret, absorber: nil, actor: actor, dmg: Int.random(in: 0...4), percent: true)
     }
     
     open func abandon(actor: Actor, delStates: Bool) {
-        actor.updateAttributes(remove: true, costume: self)
-        actor.updateResistance(remove: true, elmRes: self.res, stRes: self.stRes)
-        self.refresh(actor: actor, updStates: delStates, remove: true)
+        self.adopt(actor: actor, updStates: delStates, remove: true)
     }
     
     init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, elm: Int, hpDmg: Int,

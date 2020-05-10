@@ -30,6 +30,10 @@ class State : Costume {
         return
     }
     
+    open func blockSkills(actor: Actor, remove: Bool) {
+        return
+    }
+    
     open func alter(ret: inout String?, actor: Actor, consume: Bool) {
         return
     }

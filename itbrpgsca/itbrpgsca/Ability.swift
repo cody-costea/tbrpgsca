@@ -16,9 +16,9 @@ class Ability : Role {
     public static let FLAG_MISSABLE = 32
     public static let FLAG_CRITICAL = 64
     public static let FLAG_CHAINING = 128
-    public static let FLAG_TRG_ALL = 4
     public static let FLAG_TRG_SIDE = 256
     public static let FLAG_TRG_SELF = 512
+    public static let FLAG_TRG_ALL = 4
     
     public static var MissesTxt = ", but misses %@"
     public static var SuffersTxt = ", %@ suffers"
@@ -75,12 +75,18 @@ class Ability : Role {
     open func replenish(user: Actor) {
         let mQty = self._mQty
         if mQty > 0 {
-            
+            var usrSkills: [Ability : Int]! = user._skillsCrQty
+            if usrSkills == nil {
+                usrSkills = [Ability : Int]()
+                user._skillsCrQty = usrSkills
+            }
         }
     }
     
     open func canPerform(user: Actor) -> Bool {
-        return true
+        let skillsQty: [Ability : Int]! = user._skillsCrQty
+        return (self.mMp <= user.mp && self.mSp <= user.sp && self.mHp < user.hp && user.level >= self._lvRq
+                && (skillsQty == nil || skillsQty[self] ?? 1 > 0))
     }
     
     open func execute(ret: inout String, user: Actor, target: Actor, applyCosts: Bool) {
