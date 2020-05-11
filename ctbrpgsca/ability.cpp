@@ -178,8 +178,8 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             ++i;
         }
         trgAgi = ((trgAgi + trgSpi) / 2) / 3, usrAgi = (usrAgi + usrWis) / 2;
-        if (canMiss == 0 || ((canMiss = (std::rand() % usrAgi / 2) + (usrAgi / canMiss))
-                    > trgAgi - (std::rand() % trgAgi)) || target == &user)
+        if (canMiss == 0 || target == &user || ((canMiss = (std::rand() % usrAgi / 2)
+                + (usrAgi / canMiss)) > trgAgi - (std::rand() % trgAgi)))
         {
             if (canMiss > (trgAgi * 2) + (std::rand() % trgAgi))
             {
