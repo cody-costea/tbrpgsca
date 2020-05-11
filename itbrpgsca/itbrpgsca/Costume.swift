@@ -13,15 +13,14 @@ class Costume : Role {
     public static let FLAG_ENRAGED = 4
     public static let FLAG_CONFUSE = 8
     public static let FLAG_CONVERT = 16
-    public static let FLAG_REFLECT = 32
-    public static let FLAG_SHAPE_SHIFT = 64
-    public static let FLAG_INVINCIBLE = 128
-    public static let FLAG_STUN = 256
-    public static let FLAG_KO = 512
+    public static let FLAG_SHAPE_SHIFT = 32
+    public static let FLAG_INVINCIBLE = 64
+    public static let FLAG_STUN = 128
+    public static let FLAG_KO = 256
     
     public static var CausesTxt = ", %@ is affected by %@"
     
-    internal var _atk: Int, _def: Int, _spi: Int, _wis: Int, _agi: Int, _mActions: Int,
+    internal var _atk: Int, _def: Int, _spi: Int, _wis: Int, _agi: Int, _mActions: Int, _rflType: Int,
                  _aSkills: [Ability]?, _counters: [Ability]?, _stRes: [State: Int]?, _res: [Int: Int]?
     
     open var enraged: Bool {
@@ -34,10 +33,6 @@ class Costume : Role {
     
     open var converted: Bool {
         return (self._flags & Costume.FLAG_CONVERT) == Costume.FLAG_CONVERT
-    }
-    
-    open var reflects: Bool {
-        return (self._flags & Costume.FLAG_REFLECT) == Costume.FLAG_REFLECT
     }
     
     open var invincible: Bool {
@@ -56,6 +51,10 @@ class Costume : Role {
         return (self._flags & Costume.FLAG_KO) == Costume.FLAG_KO
     }
     
+    open var reflects: Bool {
+        return self._rflType != 0
+    }
+    
     open var counters: [Ability]? {
         return self._counters
     }
@@ -70,6 +69,10 @@ class Costume : Role {
     
     open var res: [Int: Int]? {
         return self._res
+    }
+    
+    open var rflType: Int {
+        return self._rflType
     }
     
     open var atk: Int {
@@ -115,6 +118,11 @@ class Costume : Role {
             if self.shapeShifted, self.sprite != nil {
                 actor.sprite = actor.job.sprite
             }
+            let roleRfl = self.rflType
+            let actorRfl = actor.rflType
+            if (actorRfl & roleRfl) == roleRfl {
+                actor.rflType = actorRfl & rflType
+            }
             if self.hp == 0 && self.mp == 0 && self.sp == 0 {
                 let roleElm = self.dmgType
                 let actorElm = self.dmgType
@@ -130,6 +138,7 @@ class Costume : Role {
             if self.hp == 0 && self.mp == 0 && self.sp == 0 {
                 actor.dmgType |= self.dmgType
             }
+            actor.rflType |= self.rflType
             if self.shapeShifted, let spr = self.sprite {
                 actor.sprite = spr
             }
@@ -172,11 +181,10 @@ class Costume : Role {
         self.adopt(actor: actor, updStates: delStates, remove: true)
     }
     
-    init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, elm: Int, hpDmg: Int,
-         mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int, wis: Int,
-         agi: Int, stun: Bool, range: Bool, enrage: Bool, confuse: Bool, reflect: Bool, invincible: Bool,
-         ko: Bool, revive: Bool, skills: [Ability]?, counters: [Ability]?, states: [State: Int]?,
-         stRes: [State: Int]?, res: [Int: Int]?) {
+    init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, dmgType: Int, rflType: Int,
+         hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int, wis: Int,
+         agi: Int, stun: Bool, range: Bool, enrage: Bool, confuse: Bool, invincible: Bool, ko: Bool, revive: Bool,
+         skills: [Ability]?, counters: [Ability]?, states: [State: Int]?, stRes: [State: Int]?, res: [Int: Int]?) {
         self._counters = counters
         self._aSkills = skills
         self._stRes = stRes
@@ -186,9 +194,10 @@ class Costume : Role {
         self._spi = spi
         self._wis = wis
         self._agi = agi
+        self._rflType = rflType
         self._mActions = mActions
         super.init(id: id, name: name, sprite: sprite, hp: hpDmg, mp: mpDmg, sp: spDmg, mHp: mHp,
-                   mMp: mMp, mSp: mSp, dmgType: elm, range: range, revive: revive, stateDur: states)
+                   mMp: mMp, mSp: mSp, dmgType: dmgType, range: range, revive: revive, stateDur: states)
         var flags = self._flags
         if shapeShift {
             flags |= Costume.FLAG_SHAPE_SHIFT
@@ -201,9 +210,6 @@ class Costume : Role {
         }
         if confuse {
             flags |= Costume.FLAG_CONFUSE
-        }
-        if reflect {
-            flags |= Costume.FLAG_REFLECT
         }
         if stun {
             flags |= Costume.FLAG_STUN

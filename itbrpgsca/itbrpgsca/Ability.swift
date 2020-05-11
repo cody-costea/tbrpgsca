@@ -32,12 +32,20 @@ class Ability : Role {
         return (self._flags & Ability.FLAG_STEAL) == Ability.FLAG_STEAL
     }
     
+    open var melee: Bool {
+        return (self._flags & Ability.FLAG_MELEE) == Ability.FLAG_MELEE
+    }
+    
     open var absorbs: Bool {
         return (self._flags & Ability.FLAG_ABSORB) == Ability.FLAG_ABSORB
     }
     
-    open var melee: Bool {
-        return (self._flags & Ability.FLAG_MELEE) == Ability.FLAG_MELEE
+    open var canMiss: Bool {
+        return (self._flags & Ability.FLAG_MISSABLE) == Ability.FLAG_MISSABLE
+    }
+    
+    open var doesCritical: Bool {
+        return (self._flags & Ability.FLAG_CRITICAL) == Ability.FLAG_CRITICAL
     }
     
     open var targetsSide: Bool {
@@ -90,7 +98,52 @@ class Ability : Role {
     }
     
     open func execute(ret: inout String, user: Actor, target: Actor, applyCosts: Bool) {
-        return
+        var trg: Actor
+        let dmgType = self.dmgType | user.dmgType, trgRflType = target.rflType
+        if dmgType & trgRflType == trgRflType {
+            ret.append(String(format: Ability.ReflectTxt, target.name))
+            trg = user
+        } else {
+            trg = target
+        }
+        var canMiss = self.canMiss ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
+                      trgAgi = trg.agi, trgSpi = trg.spi, usrWis = user.wis
+        if (dmgType & Role.DMG_TYPE_ATK) == Role.DMG_TYPE_ATK {
+            def += trg.def
+            dmg += user.atk
+            i += 1
+        }
+        if (dmgType & Role.DMG_TYPE_DEF) == Role.DMG_TYPE_DEF {
+            def += trg.def
+            dmg += user.def
+            i += 1
+        }
+        if (dmgType & Role.DMG_TYPE_SPI) == Role.DMG_TYPE_SPI {
+            def += trg.wis
+            dmg += user.spi
+            i += 1
+        }
+        if (dmgType & Role.DMG_TYPE_WIS) == Role.DMG_TYPE_WIS {
+            def += trg.spi
+            dmg += user.wis
+            i += 1
+        }
+        if (dmgType & Role.DMG_TYPE_AGI) == Role.DMG_TYPE_AGI {
+            def += trg.agi
+            dmg += user.agi
+            if canMiss > 0 {
+                canMiss = 3
+            }
+            i += 1
+        }
+        usrAgi = (usrAgi + usrWis) / 2
+        trgAgi = ((trgAgi + trgSpi) / 2) / 3
+        if canMiss == 0 {
+            canMiss = Int.random(in: 0...(usrAgi / 2)) + (usrAgi / canMiss)
+            if canMiss > trgAgi - (Int.random(in: 0...trgAgi)) {
+                
+            }
+        }
     }
     
     init(id: Int, name: String, sprite: String?, steal: Bool, range: Bool, melee: Bool, canMiss: Bool,

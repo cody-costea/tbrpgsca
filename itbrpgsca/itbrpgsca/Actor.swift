@@ -10,8 +10,8 @@ import Foundation
 
 class Actor : Costume {
     
+    public static let FLAG_RANDOM_AI = 512
     public static let FLAG_AI_PLAYER = 1024
-    public static let FLAG_RANDOM_AI = 2048
     
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"
@@ -25,8 +25,8 @@ class Actor : Costume {
     }
     
     enum EventType {
-        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, cover, drawn,
-             race, job, exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
+        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, rflType, cover,
+             drawn, race, job, exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
     }
     
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
@@ -266,18 +266,6 @@ class Actor : Costume {
         }
     }
     
-    override open var reflects: Bool {
-        get {
-            return super.reflects
-        }
-        set (val) {
-            let flags = self._flags
-            if val != ((flags & Costume.FLAG_REFLECT) == Costume.FLAG_REFLECT) {
-                self.flags = flags ^ Costume.FLAG_REFLECT
-            }
-        }
-    }
-    
     override open var stunned: Bool {
         get {
             return super.stunned
@@ -443,6 +431,17 @@ class Actor : Costume {
         set (val) {
             if self.runEvent(eventType: EventType.dmgType, newValue: val) {
                 self._dmgType = val
+            }
+        }
+    }
+    
+    override open var rflType: Int {
+        get {
+            return self._rflType
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.rflType, newValue: val) {
+                self._rflType = val
             }
         }
     }
@@ -750,6 +749,7 @@ class Actor : Costume {
          mActions: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int,wis: Int, agi: Int,
          res: [Int: Int]?, stRes: [State: Int]?, items: [Ability: Int]?) {
         self._actions = mActions
+        self._delayAct = nil
         self._dmgChain = 0
         self._oldSide = 0
         self._cover = nil
@@ -764,16 +764,14 @@ class Actor : Costume {
         self._delayTrn = 0
         self._events = nil
         self._items = items
-        self._delayAct = nil
         self._dmgRoles = nil
         self._skillsCrQty = nil
         self._skillsRgTurn = nil
         self._equipment = [EquipPos:Costume]()
-        super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions,
-                   elm: 0, hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp,
-                   atk: atk, def: def, spi: spi, wis: wis, agi: agi, stun: false, range: false,
-                   enrage: false, confuse: false, reflect: false, invincible: false, ko: false,
-                   revive: false, skills: nil, counters: nil, states: nil, stRes: stRes, res: res)
+        super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions, dmgType: 0, rflType: 0,
+                   hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp, atk: atk, def: def, spi: spi,
+                   wis: wis, agi: agi, stun: false, range: false, enrage: false, confuse: false, invincible: false,
+                   ko: false, revive: false, skills: nil, counters: nil, states: nil, stRes: stRes, res: res)
         self.race = race
         self.job = job
     }
