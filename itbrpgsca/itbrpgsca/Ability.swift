@@ -141,7 +141,40 @@ class Ability : Role {
         if canMiss == 0 {
             canMiss = Int.random(in: 0...(usrAgi / 2)) + (usrAgi / canMiss)
             if canMiss > trgAgi - (Int.random(in: 0...trgAgi)) {
-                
+                if canMiss > (trgAgi * 2) + (Int.random(in: 0...trgAgi)) {
+                    dmg = (dmg * 2) + (dmg / 2)
+                }
+                if i != 0 {
+                    def += Int.random(in: 0...(def /  2))
+                    dmg += Int.random(in: 0...(dmg /  2))
+                    dmg = (self.attrInc + (dmg / i)) - ((def / i) / 2)
+                    if dmg < 0 {
+                        dmg = 0
+                    }
+                }
+                self.damage(ret: &ret, absorber: self.absorbs ? user : nil, actor: target, dmg: dmg, percent: false)
+                if let aStates = self.stateDur {
+                    for (state, dur) in aStates {
+                        state.inflict(user: user, target: target, dur: dur, always: user.side == target.side)
+                    }
+                }
+                if let trgStates = target.stateDur, let rStates = self.rStates {
+                    for (rState, rDur) in rStates {
+                        if rDur > State.STATE_END_DUR {
+                            for (trgState, trgDur) in trgStates {
+                                if trgState == rState {
+                                    if trgDur > State.STATE_END_DUR {
+                                        rState.disable(actor: target, dur: rDur, remove: false)
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+                if self.steals, let trgItems = target.items {
+                    
+                }
             }
         }
     }

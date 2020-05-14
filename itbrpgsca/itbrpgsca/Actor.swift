@@ -25,7 +25,7 @@ class Actor : Costume {
     }
     
     enum EventType {
-        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, rflType, cover,
+        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, rflType, items, cover,
              drawn, race, job, exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
     }
     
@@ -190,6 +190,17 @@ class Actor : Costume {
             if self.runEvent(eventType: EventType.actions, newValue: val) {
                 let mActions = self._mActions
                 self._actions = val > mActions ? mActions : (val < 1 ? 0 : val)
+            }
+        }
+    }
+    
+    open var items: [Ability: Int]? {
+        get {
+            return self._items
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.items, newValue: val) {
+                self._items = val
             }
         }
     }
