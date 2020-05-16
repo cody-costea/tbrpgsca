@@ -146,12 +146,12 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             }
         }
         {
-            int const dmgType = role.dmgType;
             QMap<int, int>* trgResMap = actor.res;
             if (trgResMap != nullptr)
             {
                 int res = DEFAULT_RES;
                 {
+                    int const dmgType = role.dmgType;
                     auto const last = trgResMap->cend();
                     for (auto it = trgResMap->cbegin(); it != last; ++it)
                     {

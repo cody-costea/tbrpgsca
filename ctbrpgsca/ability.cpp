@@ -250,8 +250,8 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                             && (((std::rand() % 12) + user.agi / 4) > 4 + target->agi / 3))
                     {
                         int const itemId = std::rand() % trgItemsSize;
-                        if (itemId < trgItemsSize)
-                        {
+                        //if (itemId < trgItemsSize)
+                        //{
                             int trgItemQty = 0;
                             Ability* stolen = nullptr;
                             //Ability* stolen = trgItems->keys().at(itemId);
@@ -277,17 +277,17 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                                     user.items = usrItems;
                                 }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
-                                if ((--trgItemQty) == 0)
+                                if (trgItemQty < 2)
                                 {
                                     trgItems->remove(stolen);
                                 }
                                 else
                                 {
-                                    trgItems->operator[](stolen) = trgItemQty;
+                                    trgItems->operator[](stolen) = trgItemQty - 1;
                                 }
                                 ret = ret % Ability::StolenTxt.arg(stolen->name, target->name);
                             }
-                        }
+                        //}
                     }
                 }
             }
