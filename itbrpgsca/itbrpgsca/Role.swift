@@ -144,6 +144,40 @@ class Role : Hashable {
                     dmgSp += dmgSp < 0 ? (-1 * dmg) : dmg
                 }
             }
+            if let trgResMap = actor.res {
+                var res = Role.DEFAULT_RES
+                let dmgType = self.dmgType
+                for (elm, val) in trgResMap {
+                    if (dmgType & elm) == elm {
+                        res += val
+                    }
+                }
+                if res > 0 {
+                    if res > 7 {
+                        res = -7 + (res - 7)
+                        if res > -1 {
+                            dmgHp *= -1 * (res + 2)
+                            dmgMp *= -1 * (res + 2)
+                            dmgSp *= -1 * (res + 2)
+                        }
+                    } else if res == 7 {
+                        ret.append(String(format: Ability.ResistTxt, actor.name))
+                        return
+                    } else {
+                        dmgHp /= res
+                        dmgMp /= res
+                        dmgSp /= res
+                    }
+                } else {
+                    dmgHp *= -1 * (res - 2)
+                    dmgMp *= -1 * (res - 2)
+                    dmgSp *= -1 * (res - 2)
+                }
+            } else {
+                dmgHp /= Role.DEFAULT_RES
+                dmgMp /= Role.DEFAULT_RES
+                dmgSp /= Role.DEFAULT_RES
+            }
             var c: Bool = false
             if (dmgSp != 0)
             {

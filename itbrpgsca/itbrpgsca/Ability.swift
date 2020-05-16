@@ -139,14 +139,14 @@ class Ability : Role {
         usrAgi = (usrAgi + usrWis) / 2
         trgAgi = ((trgAgi + trgSpi) / 2) / 3
         if canMiss == 0 {
-            canMiss = Int.random(in: 0...(usrAgi / 2)) + (usrAgi / canMiss)
-            if canMiss > trgAgi - (Int.random(in: 0...trgAgi)) {
-                if canMiss > (trgAgi * 2) + (Int.random(in: 0...trgAgi)) {
+            canMiss = Int.random(in: 0..<(usrAgi / 2)) + (usrAgi / canMiss)
+            if canMiss > trgAgi - (Int.random(in: 0..<trgAgi)) {
+                if canMiss > (trgAgi * 2) + (Int.random(in: 0..<trgAgi)) {
                     dmg = (dmg * 2) + (dmg / 2)
                 }
                 if i != 0 {
-                    def += Int.random(in: 0...(def /  2))
-                    dmg += Int.random(in: 0...(dmg /  2))
+                    def += Int.random(in: 0..<(def /  2))
+                    dmg += Int.random(in: 0..<(dmg /  2))
                     dmg = (self.attrInc + (dmg / i)) - ((def / i) / 2)
                     if dmg < 0 {
                         dmg = 0
@@ -172,9 +172,46 @@ class Ability : Role {
                         }
                     }
                 }
-                if self.steals, let trgItems = target.items {
-                    
+                if self.steals {
+                    var usrItems: [Ability : Int]! = user.items
+                    if var trgItems = target.items, trgItems != usrItems {
+                        let trgItemsSize = trgItems.count
+                        if trgItemsSize > 0 && (Int.random(in: 0..<12) + user.agi / 4 > target.agi / 3) {
+                            let trgItemIdx = trgItems.index(trgItems.startIndex, offsetBy: Int.random(in: 0..<trgItemsSize))
+                            let stolen = trgItems.keys[trgItemIdx]
+                            let trgItemQty = trgItems[stolen] ?? 0
+                            if trgItemQty > 0 {
+                                if usrItems == nil {
+                                    usrItems = [Ability : Int]()
+                                    user.items = usrItems
+                                }
+                                usrItems[stolen] = (usrItems[stolen] ?? 0) + 1
+                                if trgItemQty < 2 {
+                                    trgItems.remove(at: trgItemIdx)
+                                } else {
+                                    trgItems[stolen] = trgItemQty - 1
+                                }
+                                ret.append(String(format: Ability.StolenTxt, target.name))
+                            }
+                        }
+                    }
                 }
+            } else {
+                ret.append(String(format: Ability.MissesTxt, target.name))
+            }
+        }
+        if applyCosts {
+            user.hp -= self.mHp
+            user.mp -= self.mMp
+            user.sp -= self.mSp
+            let mQty = self.mQty
+            if mQty > 0 {
+                var usrSkillsQty: [Ability : Int]! = user._skillsCrQty
+                if usrSkillsQty == nil {
+                    usrSkillsQty = [Ability : Int]()
+                    user._skillsCrQty = usrSkillsQty
+                }
+                usrSkillsQty[self] = (usrSkillsQty[self] ?? mQty) - 1
             }
         }
     }
