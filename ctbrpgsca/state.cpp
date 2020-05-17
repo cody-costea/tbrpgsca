@@ -60,10 +60,11 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
         }
     }
     if (stateDur > STATE_END_DUR)
-     {
-        int const stateRes = state.sRes;
-        QMap<State*, int>* const stRes = target.stRes;
-        if (always || stateRes < 0 || ((std::rand() % 10) > ((stRes == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
+    {
+        int stateRes;
+        QMap<State*, int>* stRes;
+        if (always || (stateRes = state.sRes) < 0 || ((std::rand() % 10) > (((stRes = target.stRes)
+                == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
             QMap<State*, int>* trgStates = target.stateDur;
             if (trgStates == nullptr)
@@ -165,11 +166,11 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
         }
         else
         {
-            int crDur = sDur->value(this, STATE_END_DUR);
+            int const crDur = sDur->value(this, STATE_END_DUR);
             //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
-            if (crDur > -1 || (dur <= crDur))
+            if (crDur > -1 || dur <= crDur)
             {
-                if (dur > 0 && crDur > 0 && crDur > dur)
+                if (dur > 0 /*&& crDur > 0*/ && crDur > dur)
                 {
                     sDur->operator[](this) = crDur - dur;
                     return false;
