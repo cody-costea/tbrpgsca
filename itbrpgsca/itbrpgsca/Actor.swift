@@ -10,8 +10,8 @@ import Foundation
 
 class Actor : Costume {
     
-    public static let FLAG_RANDOM_AI = 512
-    public static let FLAG_AI_PLAYER = 1024
+    public static let FLAG_RANDOM_AI = 2048
+    public static let FLAG_AI_PLAYER = 4096
     
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"

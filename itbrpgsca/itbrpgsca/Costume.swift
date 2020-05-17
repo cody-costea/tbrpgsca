@@ -15,8 +15,10 @@ class Costume : Role {
     public static let FLAG_CONVERT = 16
     public static let FLAG_SHAPE_SHIFT = 32
     public static let FLAG_INVINCIBLE = 64
-    public static let FLAG_STUN = 128
-    public static let FLAG_KO = 256
+    public static let FLAG_COVER = 128
+    public static let FLAG_DRAW = 256
+    public static let FLAG_STUN = 512
+    public static let FLAG_KO = 1024
     
     public static var CausesTxt = ", %@ is affected by %@"
     
@@ -41,6 +43,14 @@ class Costume : Role {
     
     open var shapeShifted: Bool {
         return (self._flags & Costume.FLAG_SHAPE_SHIFT) == Costume.FLAG_SHAPE_SHIFT
+    }
+    
+    open var covers: Bool {
+        return (self._flags & Costume.FLAG_COVER) == Costume.FLAG_COVER
+    }
+    
+    open var draws: Bool {
+        return (self._flags & Costume.FLAG_DRAW) == Costume.FLAG_DRAW
     }
     
     open var stunned: Bool {
