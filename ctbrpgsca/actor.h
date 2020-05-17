@@ -107,10 +107,12 @@ namespace tbrpgsca
         Actor& checkRegSkill(Ability& skill);
         Actor& recover(QString* const ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
+        Actor& removeStates(QString* const ret, Scene* const scene, bool const remove);
         Actor& applyStates(QString* const ret, Scene* const scene, bool const consume);
+        Actor& updateStates(bool const remove, QString* const ret, Scene* const scene,
+                            QMap<State*, int>& states, bool const includeWithDur);
         Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
         Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
-        Actor& updateStates(bool const remove, QString* const ret, Scene* const scene, QMap<State*, int>& states);
         Actor& updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
         Actor& switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
         Actor& setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
@@ -122,7 +124,6 @@ namespace tbrpgsca
         char unequipItem(Scene* const scene, Costume& item);
         Costume* unequipPos(Scene* const scene, char const pos);
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
-        Actor& refreshCostume(QString* const ret, Scene* const scene, Costume& costume);
         Actor& refreshCostumes(QString* const ret, Scene* const scene);
 
     private:

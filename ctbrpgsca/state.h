@@ -52,6 +52,7 @@ namespace tbrpgsca
 
         friend class Actor;
         friend class Ability;
+        friend class Costume;
         friend class Scene;
     };
 
