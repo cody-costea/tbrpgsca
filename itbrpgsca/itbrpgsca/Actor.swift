@@ -45,7 +45,7 @@ class Actor : Costume {
         }
     }
     
-    open var cover: Actor? {
+    open var coveredBy: Actor? {
         get {
             return self._drawn
         }
@@ -56,7 +56,7 @@ class Actor : Costume {
         }
     }
     
-    open var drawn: Actor? {
+    open var drawnBy: Actor? {
         get {
             return self._drawn
         }
@@ -199,7 +199,7 @@ class Actor : Costume {
             return self._items
         }
         set (val) {
-            if self.runEvent(eventType: EventType.items, newValue: val) {
+            if self.runEvent(eventType: EventType.items, newValue: val as Any) {
                 self._items = val
             }
         }

@@ -32,11 +32,11 @@ class State : Costume {
         if self.converted && !actor.converted {
             actor.side = actor._oldSide
         }
-        if self.covers && !actor.covers {
-            actor.cover = nil
+        if self.covered && !actor.covered {
+            actor.coveredBy = nil
         }
-        if self.draws && !actor.draws {
-            actor.drawn = nil
+        if self.drawn && !actor.drawn {
+            actor.drawnBy = nil
         }
     }
     
@@ -169,11 +169,11 @@ class State : Costume {
                 if self.converted && target.side != user.side {
                     target.side = user.side
                 }
-                if self.covers {
-                    target.cover = user
+                if self.covered {
+                    target.coveredBy = user
                 }
-                if self.draws {
-                    target.drawn = user
+                if self.drawn {
+                    target.drawnBy = user
                 }
             }
         }

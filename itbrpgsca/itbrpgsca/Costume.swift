@@ -45,11 +45,11 @@ class Costume : Role {
         return (self._flags & Costume.FLAG_SHAPE_SHIFT) == Costume.FLAG_SHAPE_SHIFT
     }
     
-    open var covers: Bool {
+    open var covered: Bool {
         return (self._flags & Costume.FLAG_COVER) == Costume.FLAG_COVER
     }
     
-    open var draws: Bool {
+    open var drawn: Bool {
         return (self._flags & Costume.FLAG_DRAW) == Costume.FLAG_DRAW
     }
     
