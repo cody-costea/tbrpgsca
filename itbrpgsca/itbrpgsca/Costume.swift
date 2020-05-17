@@ -21,7 +21,7 @@ class Costume : Role {
     public static var CausesTxt = ", %@ is affected by %@"
     
     internal var _atk: Int, _def: Int, _spi: Int, _wis: Int, _agi: Int, _mActions: Int, _rflType: Int,
-                 _aSkills: [Ability]?, _counters: [Ability]?, _stRes: [State: Int]?, _res: [Int: Int]?
+                 _aSkills: [Ability]?, _counters: [Ability]?, _stRes: [State?: Int]?, _res: [Int: Int]?
     
     open var enraged: Bool {
         return (self._flags & Costume.FLAG_ENRAGED) == Costume.FLAG_ENRAGED
@@ -59,7 +59,7 @@ class Costume : Role {
         return self._counters
     }
     
-    open var stRes: [State: Int]? {
+    open var stRes: [State?: Int]? {
         return self._stRes
     }
     

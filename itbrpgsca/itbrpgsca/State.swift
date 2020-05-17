@@ -27,23 +27,142 @@ class State : Costume {
     }
     
     open func remove(actor: Actor) {
-        return
+        self.blockSkills(actor: actor, remove: true)
+        self.adopt(actor: actor, updStates: false, remove: true)
+        if self.converted && !actor.converted {
+            actor.side = actor._oldSide
+        }
     }
     
     open func blockSkills(actor: Actor, remove: Bool) {
-        return
+        if let rSkills = self.rSkills {
+            var iSkills: [Ability : Int]! = actor._skillsCrQty
+            if remove {
+                if iSkills != nil {
+                    for skill in rSkills {
+                        if skill.mQty > 0 {
+                            iSkills[skill] = -1 * (iSkills[skill] ?? 0)
+                        } else {
+                            iSkills.removeValue(forKey: skill)
+                        }
+                    }
+                }
+            } else {
+                if iSkills == nil {
+                    iSkills = [Ability : Int]()
+                    actor._skillsCrQty = iSkills
+                }
+                for skill in rSkills {
+                    iSkills[skill] = skill.mQty > 0 ? -1 * (iSkills[skill] ?? 0) : 0
+                }
+            }
+        }
     }
     
     open func alter(ret: inout String?, actor: Actor, consume: Bool) {
-        return
+        if var sDur = actor.stateDur {
+            let d = sDur[self] ?? State.STATE_END_DUR
+            if consume {
+                if d > 0 {
+                    sDur[self] = d - 1
+                }
+            } else if dur == 0 {
+                sDur[self] = State.STATE_END_DUR
+                self.remove(actor: actor)
+            }
+        }
     }
     
     open func disable(actor: Actor, dur: Int, remove: Bool) -> Bool {
-        return true
+        let d = dur == 0 ? self.dur : dur
+        if d > State.STATE_END_DUR {
+            if var sDur = actor.stateDur {
+                let crDur = sDur[self] ?? State.STATE_END_DUR
+                if crDur > -1 || d <= crDur {
+                    if d > 0 && crDur > d {
+                        sDur[self] = crDur - d
+                        return false
+                    } else {
+                        if remove {
+                            sDur.removeValue(forKey: self)
+                        } else {
+                            sDur[self] = State.STATE_END_DUR
+                        }
+                        if crDur > State.STATE_END_DUR {
+                            self.remove(actor: actor)
+                        }
+                        return true
+                    }
+                }
+                return crDur <= State.STATE_END_DUR
+            } else {
+                return true
+            }
+        } else {
+            return false
+        }
     }
     
-    open func inflict(user: Actor?, target: Actor, dur: Int, always: Bool) {
-        return
+    open func inflict(user: Actor!, target: Actor, dur: Int, always: Bool) {
+        var d: Int
+        if dur == 0 {
+            d = self.dur
+            if d == 0 {
+                return
+            }
+        } else {
+            d = dur
+        }
+        if d > State.STATE_END_DUR {
+            if !always {
+                var stateRes = self.sRes
+                if stateRes > -1 {
+                    let stRes: [State? : Int]! = target.stRes
+                    stateRes = stRes == nil ? 0 : (stRes[self] ?? 0) + (stRes[nil] ?? 0) + stateRes
+                    if Int.random(in: 0..<10) < stateRes {
+                        return
+                    }
+                }
+            }
+            var trgStates: [State : Int]! = target.stateDur
+            if trgStates == nil {
+                trgStates = [State : Int]()
+                target.stateDur = trgStates
+            } else if let rStates = self.stateDur {
+                for (rState, var rDur) in rStates {
+                    if rDur == 0 || rDur <= State.STATE_END_DUR {
+                        rDur = rState.dur
+                    }
+                    for (aState, aDur) in trgStates {
+                        if aState == rState {
+                            if aDur > State.STATE_END_DUR {
+                                if aDur < 0 && rDur > aDur {
+                                    return
+                                }
+                                rState.disable(actor: target, dur: rDur, remove: false)
+                                if rDur > 0 && aDur > 0 {
+                                    d -= aDur < rDur ? aDur : rDur
+                                    if d < 1 {
+                                        return
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            self.blockSkills(actor: target, remove: false)
+            let crDur = trgStates[self] ?? State.STATE_END_DUR
+            if crDur == State.STATE_END_DUR {
+                self.adopt(actor: target, updStates: false, remove: false)
+                trgStates[self] = d
+            } else if (crDur > -1 && crDur < d) || (d < 0 && d < crDur) {
+                trgStates[self] = d
+            }
+            if user != nil && self.converted && target.side != user.side {
+                target.side = user.side
+            }
+        }
     }
     
     init(id: Int, name: String, sprite: String?, shapeShift: Bool, dur: Int, sRes: Int, mActions: Int, dmgType: Int,

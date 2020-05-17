@@ -495,7 +495,7 @@ class Actor : Costume {
         }
     }
     
-    override open var stRes: [State: Int]? {
+    override open var stRes: [State?: Int]? {
         get {
             return self._stRes
         }
@@ -641,7 +641,7 @@ class Actor : Costume {
         }
     }
     
-    open func updateResistance(remove: Bool, elmRes: [Int: Int]?, stRes: [State: Int]?) {
+    open func updateResistance(remove: Bool, elmRes: [Int: Int]?, stRes: [State?: Int]?) {
         if let elmRes = elmRes {
             var aElmRes: [Int: Int]! = self.res
             if remove {
@@ -661,7 +661,7 @@ class Actor : Costume {
             }
         }
         if let stRes = stRes {
-            var aStRes: [State: Int]! = self.stRes
+            var aStRes: [State?: Int]! = self.stRes
             if remove {
                 if aStRes != nil {
                     for (key, val) in stRes {
