@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
 
-class Costume : Role {
+open class Costume : Role {
     
     public static let FLAG_ENRAGED = 4
     public static let FLAG_CONFUSE = 8

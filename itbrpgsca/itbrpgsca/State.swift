@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
 
-class State : Costume {
+open class State : Costume {
     
     public static let STATE_END_DUR = -3
     

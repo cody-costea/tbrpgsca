@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
 
-class Role : Hashable {
+open class Role : Hashable {
     
     public static let FLAG_REVIVE: Int = 1
     public static let FLAG_RANGE: Int = 2

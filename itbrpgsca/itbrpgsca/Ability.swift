@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
 
-class Ability : Role {
+open class Ability : Role {
     
     public static let FLAG_MELEE = 4
     public static let FLAG_STEAL = 8

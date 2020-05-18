@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
 
-class Actor : Costume {
+open class Actor : Costume {
     
     public static let FLAG_RANDOM_AI = 2048
     public static let FLAG_AI_PLAYER = 4096
@@ -16,17 +16,17 @@ class Actor : Costume {
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"
     
-    typealias ActorRun = (Actor, Any) -> Bool
+    public typealias ActorRun = (Actor, Any) -> Bool
     
-    enum EquipPos: Character {
+    public enum EquipPos: Character {
         case race = "\u{0}", job = "\u{1}", arms = "a", chest = "c", weapon = "w", shield = "s", head = "h",
              legs = "l", feet = "f", belt = "b", ring1 = "1", ring2 = "2", ring3 = "3", ring4 = "4", ring5 = "5",
              ring6 = "6", ring7 = "7", ring8 = "8", ring9 = "9", ring10 = "0", necklace = "n", mantle = "m"
     }
     
-    enum EventType {
+    public enum EventType {
         case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, rflType, items, cover,
-             drawn, race, job, exp, maxExp, level, maxLv, side, sprite, name, flags, delayTrn, dmgChain, chainNr
+             drawn, race, job, exp, maxExp, level, maxLv, side, cInit, sprite, name, flags, delayTrn, dmgChain, chainNr
     }
     
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
@@ -149,6 +149,17 @@ class Actor : Costume {
         }
     }
     
+    open var cInit: Int {
+        get {
+            return self._init
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.cInit, newValue: val) {
+                self._side = val
+            }
+        }
+    }
+    
     open var delayTrn: Int {
         get {
             return self._delayTrn
@@ -201,6 +212,30 @@ class Actor : Costume {
         set (val) {
             if self.runEvent(eventType: EventType.items, newValue: val as Any) {
                 self._items = val
+            }
+        }
+    }
+    
+    open var randomAi: Bool {
+        get {
+            return (self._flags & Actor.FLAG_RANDOM_AI) == Actor.FLAG_RANDOM_AI
+        }
+        set (val) {
+            let flags = self._flags
+            if val != ((flags & Actor.FLAG_RANDOM_AI) == Actor.FLAG_RANDOM_AI) {
+                self.flags = flags ^ Actor.FLAG_RANDOM_AI
+            }
+        }
+    }
+    
+    open var aiControl: Bool {
+        get {
+            return (self._flags & Actor.FLAG_AI_PLAYER) == Actor.FLAG_AI_PLAYER
+        }
+        set (val) {
+            let flags = self._flags
+            if val != ((flags & Actor.FLAG_AI_PLAYER) == Actor.FLAG_AI_PLAYER) {
+                self.flags = flags ^ Actor.FLAG_AI_PLAYER
             }
         }
     }
