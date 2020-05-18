@@ -198,7 +198,7 @@ public extension Scene where Self: AnyObject {
             players?.append(contentsOf: party)
         }
         self.crActor = crActor
-        //agiCalc
+        self.agiCalc()
         if useInit {
             crActor.cInit = mInit
         } else {
