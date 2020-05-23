@@ -115,7 +115,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
         Actor** guardPos = &fGuard;
         QVector<Actor*>& party = *(this->parties[side]);
         int const pSize = party.size();
-        for (int i = 0; i < pSize; i++)
+        for (int i = 0; i < pSize; ++i)
         {
             Actor* const guardian = party[i];
             if (guardian == &target)
