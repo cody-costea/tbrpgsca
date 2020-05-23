@@ -10,6 +10,12 @@ import Foundation
 
 public let MIN_ROUND = Int.min
 
+public let PerformsTxt = "%@ performs %@"
+public let VictoryTxt = "The party has won!"
+public let FallenTxt = "The party has fallen!"
+public let EscapeTxt = "The party has escaped!"
+public let FailTxt = "The party attempted to escape, but failed."
+
 public enum SceneEvent {
     case begin, beforeAct, afterAct, newTurn, end
 }
@@ -24,7 +30,7 @@ public protocol Scene : class {
     
     typealias SpriteRun = (Scene, Actor?, Ability?, Bool, Actor?, Ability?) -> Bool
     
-    var status: Int {
+    var status: SceneStatus {
         get
         set
     }
@@ -132,6 +138,34 @@ public extension Scene where Self: AnyObject {
     }
     
     func getGuardian(user: Actor, target: Actor, skill: Ability) -> Actor {
+        let side = target._oldSide
+        if user._oldSide != side && ((!skill.ranged) && ((!user.ranged) || skill.melee)) {
+            var pos = -1
+            var first = true
+            var fGuard: Actor! = nil, lGuard: Actor! = nil
+            let party = self.parties[side], pSize = party.count
+            for i in 0..<pSize {
+                let guardian = party[i]
+                if guardian == target {
+                    if fGuard == nil || i == pSize - 1 {
+                        return target
+                    } else {
+                        pos = i
+                        first = false
+                        continue
+                    }
+                } else if (fGuard == nil || pos != -1) && guardian.hp > 0 && !(guardian.stunned || guardian.confused) {
+                    if first {
+                        fGuard = guardian
+                    } else {
+                        lGuard = guardian
+                    }
+                }
+            }
+            if fGuard != nil && lGuard != nil {
+                return pos < (pSize / 2) ? fGuard : lGuard
+            }
+        }
         return target
     }
     
@@ -139,12 +173,95 @@ public extension Scene where Self: AnyObject {
         return 0
     }
     
-    func execute(ret: inout String, user: Actor, target: Actor?, ability: Ability, applyCosts: Bool) {
-        
+    func execute(ret: inout String, user: Actor, target: Actor, ability: Ability, applyCosts: Bool) {
+        let healing = ability.hp < 0
+        let ko = target.hp < 1
+        if (healing && ability.revives) || !ko {
+            var cntSkill: Ability! = nil
+            ability.execute(ret: &ret, user: user, target: target, applyCosts: applyCosts)
+            if !healing {
+                if let counters = target.counters, (counters.count > 0 && (!target.stunned)
+                    && (target.side != user.side || target.confused)) {
+                    let usrDmgType = ability.dmgType
+                    for counter in counters {
+                        let cntDmgType = counter.dmgType
+                        if (usrDmgType & cntDmgType) == cntDmgType && (cntSkill == nil || counter.hp > cntSkill.hp) {
+                            cntSkill = counter
+                        }
+                    }
+                    if cntSkill != nil {
+                        cntSkill.execute(ret: &ret, user: target, target: user, applyCosts: false)
+                    }
+                }
+            }
+            let actorEvent: SpriteRun! = self.spriteRun
+            if actorEvent == nil || actorEvent(self, applyCosts ? user : nil, ability, ko && target.hp > 0,
+                                               target, target == user ? ability : cntSkill) {
+                var targets: [Actor]! = self.targets
+                if targets == nil {
+                    targets = [Actor]()
+                    self.targets = targets
+                }
+                targets.append(target)
+            }
+        }
     }
     
     func perform(ret: inout String, user: Actor, target: Actor, ability: Ability, item: Bool) {
         
+    }
+    
+    func checkStatus(ret: inout String) {
+        if self.status == SceneStatus.ongoing {
+            let parties = self.parties
+            var party = parties[0]
+            for actor in party {
+                if !actor.knockedOut {
+                    let pSize = parties.count
+                    for i in 1..<pSize {
+                        party = parties[i]
+                        for player in party {
+                            if !player.knockedOut {
+                                return
+                            }
+                        }
+                    }
+                    ret.append(VictoryTxt)
+                    self.status = SceneStatus.victory
+                    return
+                }
+            }
+            ret.append(FallenTxt)
+            self.status = SceneStatus.defeat
+        }
+    }
+    
+    func escape(ret: inout String) {
+        
+    }
+    
+    func resetTurn(actor: Actor) {
+        let mInit = self.mInit + 1
+        if mInit < 2 {
+            if actor.cInit > mInit {
+                actor.cInit = mInit
+            } else if mInit == 1 && actor.cInit < -1 {
+                actor.cInit = 0
+            }
+            self.previous = -1
+        }
+    }
+    
+    func agiCalc() {
+        if self.mInit < 1 {
+            self.players?.sort(by: { $0.agi > $1.agi })
+            self.previous = -1
+        }
+    }
+    
+    func canTarget(user: Actor, ability: Ability, target: Actor) -> Bool {
+        return (ability.canPerform(user: user) && (ability.targetsSelf || ((user.drawnBy == nil
+            || user.drawnBy == target) && (target.hp > 0 || ability.revives))))
     }
     
     func initialize(ret: inout String, parties: [[Actor]], spriteRun: SpriteRun?,
@@ -216,29 +333,6 @@ public extension Scene where Self: AnyObject {
             if defAction {
                 self.endTurn(ret: &ret, actor: crActor)
             }
-        }
-    }
-    
-    func canTarget(user: Actor, ability: Ability, target: Actor) -> Bool {
-        return false
-    }
-    
-    func checkStatus(ret: inout String) {
-        
-    }
-    
-    func escape(ret: inout String) {
-        
-    }
-    
-    func resetTurn(actor: Actor) {
-        
-    }
-    
-    func agiCalc() {
-        if self.mInit < 1 {
-            self.players?.sort(by: { $0.agi > $1.agi })
-            self.previous = -1
         }
     }
     
