@@ -107,14 +107,14 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 
 Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
-    if (user.oldSide != target.oldSide && (!skill.isRanged() && (!user.isRanged() || skill.isOnlyMelee())))
+    int const side = target.oldSide;
+    if (user.oldSide != side && ((!skill.isRanged()) && ((!user.isRanged()) || skill.isOnlyMelee())))
     {
         int pos = -1;
-        int side = target.oldSide;
         Actor* fGuard = nullptr,* lGuard = nullptr;
         Actor** guardPos = &fGuard;
         QVector<Actor*>& party = *(this->parties[side]);
-        int pSize = party.size();
+        int const pSize = party.size();
         for (int i = 0; i < pSize; i++)
         {
             Actor* const guardian = party[i];
@@ -716,7 +716,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
     scene.players = players;
     scene.targets = nullptr;
     scene.actorEvent = actorEvent;
-    scene.current = scene.oldCurrent = 0;
+    //scene.current = scene.oldCurrent = 0;
     scene.surprise = surprise;
     Actor* crActor = nullptr;
     for (int i = 0; i < partiesSize; ++i)
