@@ -186,33 +186,37 @@ Scene& Scene::checkStatus(QString& ret)
     return scene;
 }
 
-Scene& Scene::execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts)
+Scene& Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
 {
     Scene& scene = *this;
-    bool const healing = ability.hp < 0;
-    if ((healing && ability.isReviving()) || target->hp > 0)
+    bool const ko = target->hp < 1;
+    //bool const healing = ability.hp < 0;
+    if ((/*healing &&*/ ability.isReviving()) || !ko)
     {
-        int cntSize;
         Ability* counter = nullptr;
-        QVector<Ability*>* counters;
-        bool const ko = target->hp < 1;
         ability.execute(ret, this, user, target, applyCosts);
-        if ((!healing) && ((counters = target->counters) != nullptr) && (cntSize = counters->size()) > 0
-                && (!target->isStunned()) && (target->side != user.side || target->isConfused()))
+        if (ability.hp > -1)
+        //if (!healing)
         {
-            int const usrDmgType = ability.dmgType;
-            for (int i = 0; i < cntSize; ++i)
+            int cntSize;
+            QVector<Ability*>* const counters = target->counters;
+            if (counters != nullptr && (cntSize = counters->size()) > 0 && (!target->isStunned())
+                    && (target->side != user.side || target->isConfused()))
             {
-                Ability* cntSkill = counters->at(i);
-                int cntDmgType = cntSkill->dmgType;
-                if (((usrDmgType & cntDmgType) == cntDmgType) && cntSkill->hp > counter->hp)
+                int const usrDmgType = ability.dmgType;
+                for (int i = 0; i < cntSize; ++i)
                 {
-                    counter = cntSkill;
+                    Ability* const cntSkill = counters->at(i);
+                    int cntDmgType = cntSkill->dmgType;
+                    if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == nullptr || (cntSkill->hp > counter->hp)))
+                    {
+                        counter = cntSkill;
+                    }
                 }
-            }
-            if (counter != nullptr)
-            {
-                counter->execute(ret, *target, user, false);
+                if (counter != nullptr)
+                {
+                    counter->execute(ret, *target, user, false);
+                }
             }
         }
         ActorAct* const actorEvent = scene.actorEvent;
