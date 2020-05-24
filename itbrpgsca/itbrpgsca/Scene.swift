@@ -111,7 +111,7 @@ public protocol Scene : class {
     
     func getGuardian(user: Actor, target: Actor, skill: Ability) -> Actor
     
-    func getAiSkill(user: Actor, skills: [Ability], index: Int, nRestore: Bool) -> Int
+    func getAiSkill(user: Actor, skills: [Ability], defSkill: Int, restore: Bool) -> Int
     
     func execute(ret: inout String, user: Actor, target: Actor?, ability: Ability, applyCosts: Bool)
     
@@ -135,7 +135,105 @@ public protocol Scene : class {
 public extension Scene where Self: AnyObject {
     
     func playAi(ret: inout String, player: Actor) {
-        
+        let parties = self.parties, skills: [Ability]! = player.aSkills
+        var side: Int, sSize: Int = 0, skillIndex = 0, heal = -1, pSize = parties.count
+        var party: [Actor]!
+        if player.confused {
+            party = nil
+            side = -1
+        } else {
+            side = player.side
+            party = parties[side]
+            sSize = party.count
+            if !player.enraged {
+                for i in 0..<sSize {
+                    let iPlayer = party[i], iHp = iPlayer.hp
+                    if iHp < 1 {
+                        heal = 1
+                    } else if iHp < iPlayer.hp / 3 {
+                        heal = 0
+                    }
+                }
+            }
+            if heal > -1 {
+                for (i, s) in skills.enumerated() {
+                    if s.canPerform(user: player) && (s.hp < 0 && (heal == 0 || s.revives)) {
+                        skillIndex = i
+                        break
+                    }
+                }
+            }
+        }
+        var target: Actor! = nil
+        var (_, ability) = self.getAiSkill(user: player, skills: skills, defSkill: skillIndex, restore: heal == 1)
+        if ability.hp > -1 {
+            if party == nil || player.randomAi {
+                var trgSide: Int
+                if side > -1 && pSize == 2 {
+                    trgSide = side == 0 ? 1 : 0
+                } else {
+                    trgSide = Int.random(in: 0..<pSize)
+                    if side == trgSide {
+                        trgSide += 1
+                        if trgSide == pSize {
+                            trgSide = 0
+                        }
+                    }
+                }
+                party = parties[trgSide]
+                sSize = party.count
+                var trg = Int.random(in: 0..<sSize)
+                target = party[trg]
+                while target.knockedOut {
+                    trg += 1
+                    if trg == sSize {
+                        trg = 0
+                    }
+                    target = party[trg]
+                }
+            } else {
+                for j in 0..<pSize {
+                    if j == side {
+                        continue
+                    }
+                    var trg = 0
+                    let players = parties[j]
+                    sSize = players.count
+                    if target === nil {
+                        repeat {
+                            target = players[trg]
+                            trg += 1
+                        } while (trg < sSize) && (target.knockedOut || target.side == side)
+                    }
+                    for i in trg + 1..<sSize {
+                        let iPlayer = players[i]
+                        if iPlayer.side != side && (!iPlayer.knockedOut) && iPlayer.hp < target.hp {
+                            target = iPlayer
+                        }
+                    }
+                }
+            }
+        } else {
+            if party == nil {
+                party = parties[Int.random(in: 0..<pSize)]
+                sSize = party.count
+            }
+            target = party[0]
+            let restore = ability.revives
+            for i in 1..<sSize {
+                let iPlayer = party[i], iHp = iPlayer.hp
+                if iHp < target.hp && (restore || iHp > 0) {
+                    target = iPlayer
+                }
+            }
+        }
+        if target === nil {
+            target = player
+            if heal < 0 {
+                (_, ability) = self.getAiSkill(user: player, skills: skills, defSkill: 1, restore: false)
+            }
+        }
+        self.perform(ret: &ret, user: player, target: target, ability: ability, item: false)
     }
     
     func endTurn(ret: inout String, actor: Actor) {
@@ -179,7 +277,7 @@ public extension Scene where Self: AnyObject {
         }
     }
     
-    func getAiSkill(user: Actor, skills: [Ability], defSkill: Int, restore: Bool) -> Int {
+    func getAiSkill(user: Actor, skills: [Ability], defSkill: Int, restore: Bool) -> (Int, Ability) {
         var ret = defSkill, sSize = skills.count, s = skills[defSkill]
         for i in (defSkill + 1)..<sSize {
             let a = skills[i]
@@ -189,7 +287,7 @@ public extension Scene where Self: AnyObject {
                 s = a
             }
         }
-        return ret
+        return (ret, s)
     }
     
     func execute(ret: inout String, user: Actor, target: Actor, ability: Ability, applyCosts: Bool) {
