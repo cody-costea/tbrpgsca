@@ -791,6 +791,19 @@ open class Actor : Costume {
         }
     }
     
+    open func addEvent(eventType: EventType, actorRun: @escaping ActorRun) {
+        var events: [EventType : [ActorRun]]! = self._events
+        if events == nil {
+            events = [EventType : [ActorRun]]()
+        }
+        var eventList: [ActorRun]! = events[eventType]
+        if eventList == nil {
+            eventList = [ActorRun]()
+            events[eventType] = eventList
+        }
+        eventList.append(actorRun)
+    }
+    
     init(id: Int, name: String, sprite: String?, race: Costume, job: Costume, level: Int, maxLv: Int,
          mActions: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int,wis: Int, agi: Int,
          res: [Int: Int]?, stRes: [State: Int]?, items: [Ability: Int]?) {
