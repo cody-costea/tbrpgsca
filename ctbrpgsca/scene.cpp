@@ -265,25 +265,18 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
         int const pSize = parties.size();
         for (int j = 0; j < pSize; ++j)
         {
-            QVector<Actor*>* players = parties[j];
-            int sSize = players->size();
             if (sideTarget && noSelfTarget && j == usrSide)
             {
                 continue;
             }
+            QVector<Actor*>* const players = parties[j];
+            int const sSize = players->size();
             for (int i = 0; i < sSize; ++i)
             {
                 Actor* const trg = players->at(i);
-                if (trg == &user)
+                if (noSelfTarget && trg == &user)
                 {
-                    if (noSelfTarget)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        scene.execute(ret, user, &user, ability, applyCosts);
-                    }
+                    continue;
                 }
                 else
                 {
@@ -295,34 +288,29 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
     }
     else if (ability.targetsSide())
     {
-        int side = ability.targetsSelf() ? user.side : target.oldSide;
+        //QVector<Actor*>* const targets = scene.targets;
+        int const side = ability.targetsSelf() ? user.side : target.oldSide;
         QVector<Actor*>& party = *(scene.parties[side]);
-        QVector<Actor*>* targets = scene.targets;
-        int pSize = party.size();
+        int const pSize = party.size();
         for (int i = 0; i < pSize; ++i)
         {
-            Actor* const trg = party[i];
+            /*Actor* const trg = party[i];
+            if (targets != nullptr);
             if (targets != nullptr)
             {
                 targets->append(trg);
-            }
-            scene.execute(ret, user, trg, ability, i == 0);
+            }*/
+            scene.execute(ret, user, party[i], ability, i == 0);
         }
     }
     else
     {
-        if (&user == &target || ability.targetsSelf())
-        {
-            scene.execute(ret, user, &user, ability, true);
-        }
-        else
-        {
-            scene.execute(ret, user, &(scene.getGuardian(user, target, ability)), ability, true);
-        }
+        scene.execute(ret, user, &user == &target || ability.targetsSelf() ? &user
+                     : &(scene.getGuardian(user, target, ability)), ability, true);
     }
     if (item)
     {
-        QMap<Ability*, int>* items = user.items;
+        QMap<Ability*, int>* const items = user.items;
         if (items != nullptr)
         {
             items->operator[](&ability) = items->value(&ability, 1) - 1;
@@ -343,8 +331,8 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
 
 int Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const defSkill, bool const restore) const
 {
-    int ret = defSkill, sSize = skills.size();
     Ability* s = skills[defSkill];
+    int ret = defSkill, sSize = skills.size();
     for (int i = defSkill + 1; i < sSize; ++i)
     {
         Ability* a = skills[i];
@@ -393,7 +381,7 @@ Scene& Scene::playAi(QString& ret, Actor& player)
         }
         if (heal > -1)
         {
-            int skillsSize = skills.size();
+            int const skillsSize = skills.size();
             for (int i = 0; i < skillsSize; ++i)
             {
                 Ability& s = *(skills[i]);
@@ -422,12 +410,9 @@ Scene& Scene::playAi(QString& ret, Actor& player)
                     else
                     {
                         trgSide = rand() % pSize;
-                        if (side == trgSide)
+                        if (side == trgSide && (++trgSide == pSize))
                         {
-                            if (++trgSide == pSize)
-                            {
-                                trgSide = 0;
-                            }
+                            trgSide = 0;
                         }
                     }
                     party = parties[trgSide];
@@ -452,17 +437,17 @@ Scene& Scene::playAi(QString& ret, Actor& player)
                     {
                         continue;
                     }
-                    QVector<Actor*>* players = parties[j];
+                    int trg = 0;
+                    QVector<Actor*>* const players = parties[j];
                     sSize = players->size();
                     if (target == nullptr)
                     {
-                        int trg = 0;
                         do
                         {
                             target = players->at(trg);
                         } while (((++trg) < sSize) && (target->isKnockedOut() || target->side == side));
                     }
-                    for (int i = 1; i < sSize; ++i)
+                    for (int i = trg + 1; i < sSize; ++i)
                     {
                         Actor* const iPlayer = players->at(i);
                         if (iPlayer->side != side && (!iPlayer->isKnockedOut()) && iPlayer->hp < target->hp)
