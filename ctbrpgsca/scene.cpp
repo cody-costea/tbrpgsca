@@ -479,8 +479,8 @@ Scene& Scene::playAi(QString& ret, Actor& player)
         }
         if (target == nullptr)
         {
-            scene.perform(ret, player, player, *(skills[heal < 0 ? scene.getAiSkill
-                          (player, skills, skillIndex, false) : 1]), false);
+            scene.perform(ret, player, player, heal < 0 ? *(skills[scene.getAiSkill
+                          (player, skills, 1, false)]) : ability, false);
         }
         else
         {
