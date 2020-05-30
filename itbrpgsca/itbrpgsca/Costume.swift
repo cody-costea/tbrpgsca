@@ -191,10 +191,10 @@ open class Costume : Role {
         self.adopt(actor: actor, updStates: delStates, remove: true)
     }
     
-    init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, dmgType: Int, rflType: Int,
-         hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int, wis: Int,
-         agi: Int, stun: Bool, range: Bool, enrage: Bool, confuse: Bool, invincible: Bool, ko: Bool, revive: Bool,
-         skills: [Ability]?, counters: [Ability]?, states: [State: Int]?, stRes: [State: Int]?, res: [Int: Int]?) {
+    init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, mDelayTrn: Int, dmgType: Int, rflType: Int,
+         hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int, wis: Int, agi: Int,
+         stun: Bool, range: Bool, enrage: Bool, confuse: Bool, invincible: Bool, ko: Bool, revive: Bool, skills: [Ability]?,
+         counters: [Ability]?, states: [State: Int]?, stRes: [State: Int]?, res: [Int: Int]?) {
         self._counters = counters
         self._aSkills = skills
         self._stRes = stRes
@@ -206,8 +206,8 @@ open class Costume : Role {
         self._agi = agi
         self._rflType = rflType
         self._mActions = mActions
-        super.init(id: id, name: name, sprite: sprite, hp: hpDmg, mp: mpDmg, sp: spDmg, mHp: mHp,
-                   mMp: mMp, mSp: mSp, dmgType: dmgType, range: range, revive: revive, stateDur: states)
+        super.init(id: id, name: name, sprite: sprite, hp: hpDmg, mp: mpDmg, sp: spDmg, mHp: mHp, mMp: mMp, mSp: mSp,
+                   mDelayTrn: mDelayTrn, dmgType: dmgType, range: range, revive: revive, stateDur: states)
         var flags = self._flags
         if shapeShift {
             flags |= Costume.FLAG_SHAPE_SHIFT

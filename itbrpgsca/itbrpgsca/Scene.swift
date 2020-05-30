@@ -400,35 +400,54 @@ public extension Scene where Self: AnyObject {
     }
     
     func execute(ret: inout String, user: Actor, target: Actor, ability: Ability, applyCosts: Bool) {
-        let healing = ability.hp < 0
-        let ko = target.hp < 1
-        if (healing && ability.revives) || !ko {
-            var cntSkill: Ability! = nil
-            ability.execute(ret: &ret, user: user, target: target, applyCosts: applyCosts)
-            if !healing {
-                if let counters = target.counters, (counters.count > 0 && (!target.stunned)
-                    && (target.side != user.side || target.confused)) {
-                    let usrDmgType = ability.dmgType
-                    for counter in counters {
-                        let cntDmgType = counter.dmgType
-                        if (usrDmgType & cntDmgType) == cntDmgType && (cntSkill == nil || counter.hp > cntSkill.hp) {
-                            cntSkill = counter
+        self.message = ret
+        let performance = { () -> Void in
+            var ret: String! = self.message
+            let healing = ability.hp < 0
+            let ko = target.hp < 1
+            if ret == nil {
+                ret = ""
+            }
+            if (healing && ability.revives) || !ko {
+                var cntSkill: Ability! = nil
+                ability.execute(ret: &ret, user: user, target: target, applyCosts: applyCosts)
+                if !healing {
+                    if let counters = target.counters, (counters.count > 0 && (!target.stunned)
+                        && (target.side != user.side || target.confused)) {
+                        let usrDmgType = ability.dmgType
+                        for counter in counters {
+                            let cntDmgType = counter.dmgType
+                            if (usrDmgType & cntDmgType) == cntDmgType && (cntSkill === nil || counter.hp > cntSkill.hp) {
+                                cntSkill = counter
+                            }
+                        }
+                        if cntSkill !== nil {
+                            cntSkill.execute(ret: &ret, user: target, target: user, applyCosts: false)
                         }
                     }
-                    if cntSkill !== nil {
-                        cntSkill.execute(ret: &ret, user: target, target: user, applyCosts: false)
+                }
+                let actorEvent: SpriteRun! = self.spriteRun
+                if actorEvent == nil || actorEvent(self, applyCosts ? user : nil, ability, ko && target.hp > 0,
+                                                   target, target === user ? ability : cntSkill) {
+                    var targets: [Actor]! = self.targets
+                    if targets == nil {
+                        targets = [Actor]()
+                        self.targets = targets
                     }
+                    targets.append(target)
                 }
             }
-            let actorEvent: SpriteRun! = self.spriteRun
-            if actorEvent == nil || actorEvent(self, applyCosts ? user : nil, ability, ko && target.hp > 0,
-                                               target, target === user ? ability : cntSkill) {
-                var targets: [Actor]! = self.targets
-                if targets == nil {
-                    targets = [Actor]()
-                    self.targets = targets
-                }
-                targets.append(target)
+        }
+        let aDelayTrn = ability.mDelayTrn
+        if aDelayTrn < 0 {
+            performance()
+        } else {
+            let delayTrn = aDelayTrn - user.mDelayTrn
+            if delayTrn > 0 {
+                user.delayTrn = delayTrn
+                user._delayAct = performance
+            } else {
+                performance()
             }
         }
     }

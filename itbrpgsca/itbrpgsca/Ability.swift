@@ -216,17 +216,16 @@ open class Ability : Role {
         }
     }
     
-    init(id: Int, name: String, sprite: String?, steal: Bool, range: Bool, melee: Bool, canMiss: Bool,
-        doesCritical: Bool, canChain: Bool, lvRq: Int, hp: Int, mp: Int, sp: Int, attrInc: Int, dmgType: Int,
-        mHp: Int, mMp: Int, mSp: Int, trg: Int, elm: Int, rQty: Int, mQty: Int, absorb: Bool, revive: Bool,
-        aStates: [State : Int]?, rStates: [State : Int]?) {
+    init(id: Int, name: String, sprite: String?, steal: Bool, range: Bool, melee: Bool, canMiss: Bool, doesCritical: Bool, canChain: Bool,
+         lvRq: Int, hp: Int, mp: Int, sp: Int, attrInc: Int, dmgType: Int, mDelayTrn: Int, mHp: Int, mMp: Int, mSp: Int, trg: Int, elm: Int,
+         rQty: Int, mQty: Int, absorb: Bool, revive: Bool, aStates: [State : Int]?, rStates: [State : Int]?) {
         self._attrInc = attrInc
         self._mQty = mQty
         self._rQty = rQty
         self._lvRq = lvRq
         self._rStates = rStates
-        super.init(id: id, name: name, sprite: sprite, hp: hp, mp: mp, sp: sp, mHp: mHp, mMp: mMp,
-                   mSp: mSp, dmgType: dmgType, range: range, revive: revive, stateDur: aStates)
+        super.init(id: id, name: name, sprite: sprite, hp: hp, mp: mp, sp: sp, mHp: mHp, mMp: mMp, mSp: mSp,
+                   mDelayTrn: mDelayTrn, dmgType: dmgType, range: range, revive: revive, stateDur: aStates)
         var flags = self._flags
         if doesCritical {
             flags |= Ability.FLAG_CRITICAL

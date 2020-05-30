@@ -30,7 +30,7 @@ open class Role : Hashable, Equatable {
     public static var SpTxt: String = "RP"
     
     internal var _id: Int, _name: String, _sprite: String?, _hp: Int, _mp: Int,_sp: Int, _mHp: Int,
-                 _mMp: Int, _mSp: Int, _dmgType: Int, _flags: Int, _stateDur: [State: Int]?
+                 _mMp: Int, _mSp: Int, _dmgType: Int, _mDelayTrn: Int, _flags: Int, _stateDur: [State: Int]?
     
     public static func == (lhs: Role, rhs: Role) -> Bool {
         return lhs._id == rhs._id
@@ -66,6 +66,10 @@ open class Role : Hashable, Equatable {
     
     open var id: Int {
         return self._id
+    }
+    
+    open var mDelayTrn: Int {
+        return self._mDelayTrn
     }
     
     open var revives: Bool {
@@ -256,11 +260,12 @@ open class Role : Hashable, Equatable {
         }
     }
     
-    internal init(id: Int, name: String, sprite: String?, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int,
-         mSp: Int, dmgType: Int, range: Bool, revive: Bool, stateDur: Dictionary<State, Int>?) {
+    internal init(id: Int, name: String, sprite: String?, hp: Int, mp: Int, sp: Int, mHp: Int, mMp: Int, mSp: Int,
+                  mDelayTrn: Int, dmgType: Int, range: Bool, revive: Bool, stateDur: Dictionary<State, Int>?) {
         self._id = id
         self._name = name
         self._dmgType = dmgType
+        self._mDelayTrn = mDelayTrn
         self._stateDur = stateDur
         self._sprite = sprite
         self._mHp = mHp

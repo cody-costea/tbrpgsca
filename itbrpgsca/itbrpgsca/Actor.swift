@@ -25,12 +25,12 @@ open class Actor : Costume {
     }
     
     public enum EventType {
-        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, dmgType, rflType, items, cover,
+        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, mDelayTrn, dmgType, rflType, items, cover,
              drawn, race, job, exp, maxExp, level, maxLv, side, cInit, sprite, name, flags, delayTrn, dmgChain, chainNr
     }
     
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
-                 _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: (() -> Bool)?, _dmgRoles: [Costume]?,
+                 _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: (() -> Void)?, _dmgRoles: [Costume]?,
                  _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _drawn: Actor?, _cover: Actor?,
                  _items: [Ability: Int]?, _equipment: [EquipPos: Costume], _events: [EventType: [ActorRun]]?
     
@@ -342,6 +342,17 @@ open class Actor : Costume {
         set (val) {
             if self.runEvent(eventType: EventType.sprite, newValue: val as Any) {
                 self._sprite = val
+            }
+        }
+    }
+    
+    override open var mDelayTrn: Int {
+        get {
+            return self._mDelayTrn
+        }
+        set(val) {
+            if self.runEvent(eventType: EventType.mDelayTrn, newValue: val) {
+                self._mDelayTrn = val
             }
         }
     }
@@ -720,6 +731,7 @@ open class Actor : Costume {
         self.mHp = self.mHp + (i * costume.mHp)
         self.mMp = self.mMp + (i * costume.mMp)
         self.mSp = self.mSp + (i * costume.mSp)
+        self.mDelayTrn = self.mDelayTrn + (i * costume.mDelayTrn)
         self.mActions = self.mActions + (i * costume.mActions)
         self.atk += costume.atk
         self.def += costume.def
@@ -827,10 +839,10 @@ open class Actor : Costume {
         self._skillsCrQty = nil
         self._skillsRgTurn = nil
         self._equipment = [EquipPos:Costume]()
-        super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions, dmgType: 0, rflType: 0,
-                   hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp, atk: atk, def: def, spi: spi,
-                   wis: wis, agi: agi, stun: false, range: false, enrage: false, confuse: false, invincible: false,
-                   ko: false, revive: false, skills: nil, counters: nil, states: nil, stRes: stRes, res: res)
+        super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions, mDelayTrn: 0, dmgType: 0, rflType: 0,
+                   hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp, atk: atk, def: def, spi: spi, wis: wis, agi: agi,
+                   stun: false, range: false, enrage: false, confuse: false, invincible: false, ko: false, revive: false, skills: nil,
+                   counters: nil, states: nil, stRes: stRes, res: res)
         self.race = race
         self.job = job
     }
