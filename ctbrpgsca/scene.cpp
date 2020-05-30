@@ -587,7 +587,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
             }
             while (crActor->init < mInit || crActor->hp < 1);
         }
-        crActor->actions = cActions = crActor->mActions;
+        //crActor->actions = cActions = crActor->mActions;
         QMap<Ability*, int>* const regSkills = crActor->skillsRgTurn;
         if (regSkills != nullptr)
         {
@@ -604,7 +604,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                 int const skillMaxQty = skill->mQty, skillCrQty = skillsQty->value(skill, skillMaxQty);
                 if (skillCrQty < skillMaxQty)
                 {
-                    int skillRgTurn = it.value();//regSkills->value(skill, 0);
+                    int const skillRgTurn = it.value();//regSkills->value(skill, 0);
                     if (skillRgTurn == skill->rQty)
                     {
                         skillsQty->operator[](skill) = skillCrQty + 1;
@@ -617,6 +617,10 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                 }
             }
         }
+        /*if (crActor->isStunned())
+        {
+            crActor->actions = cActions = 0;
+        }*/
         {
             bool const shapeShifted = crActor->isShapeShifted();
             crActor->applyStates(&ret, this, false);
@@ -629,10 +633,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                 }
             }
         }
-        if (crActor->isStunned())
-        {
-            crActor->actions = cActions = 0;
-        }
+        crActor->actions = cActions = crActor ->isStunned() ? 0 : crActor->mActions;
     }
     scene.crActor = crActor;
     scene.current = current;
