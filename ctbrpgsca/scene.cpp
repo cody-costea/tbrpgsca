@@ -498,8 +498,8 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     {
         crActor = scene.crActor;
     }
-    --(crActor->actions);
-    while (crActor->actions < 1)
+    int crActions = --(crActor->actions);
+    while (crActions < 1)
     {
         if (crActor->hp > 0 && !(crActor->isInvincible() && crActor->isKnockedOut() && crActor->isStunned()))
         {
@@ -591,8 +591,8 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
             }
             while (crActor->init < mInit || crActor->hp < 1);
         }
-        crActor->actions = crActor->mActions;
-        QMap<Ability*, int>* regSkills = crActor->skillsRgTurn;
+        crActor->actions = crActions = crActor->mActions;
+        QMap<Ability*, int>* const regSkills = crActor->skillsRgTurn;
         if (regSkills != nullptr)
         {
             QMap<Ability*, int>* skillsQty = crActor->skillsCrQty;
@@ -636,7 +636,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
         }
         if (crActor->isStunned())
         {
-            crActor->actions = 0;
+            crActor->actions = crActions = 0;
         }
     }
     scene.crActor = crActor;
