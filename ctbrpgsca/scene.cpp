@@ -498,8 +498,8 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
     {
         crActor = scene.crActor;
     }
-    int crActions = --(crActor->actions);
-    while (crActions < 1)
+    int cActions = --(crActor->actions);
+    while (cActions < 1)
     {
         if (crActor->hp > 0 && !(crActor->isInvincible() && crActor->isKnockedOut() && crActor->isStunned()))
         {
@@ -508,14 +508,12 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
         int mInit = scene.mInit;
         if (mInit > 0)
         {
-            //int next = current;
-            //Actor* nxActor = crActor;
             int cInit = crActor->init - mInit;
             crActor->init = cInit;
             do
             {
-                QVector<Actor*>* ordered = scene.players;
-                if (ordered == nullptr)
+                //QVector<Actor*>* const ordered = scene.players;
+                //if (ordered == nullptr)
                 {
                     QVector<QVector<Actor*>*>& parties = scene.parties;
                     int const pSize = parties.size();
@@ -528,7 +526,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                             Actor* const iPlayer = players[i];
                             if (iPlayer->hp > 0)
                             {
-                                int iInit = iPlayer->init + iPlayer->agi;
+                                int const iInit = iPlayer->init + iPlayer->agi;
                                 iPlayer->init = iInit;
                                 if (iInit > cInit)
                                 {
@@ -540,12 +538,12 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                         }
                     }
                 }
-                else
+                /*else
                 {
                     int const oSize = ordered->size();
                     for (int i = 0; i < oSize; ++i)
                     {
-                        Actor* iPlayer = ordered->at(i);
+                        Actor* const iPlayer = ordered->at(i);
                         if (iPlayer->hp > 0)
                         {
                             int iInit = iPlayer->init + iPlayer->agi;
@@ -558,11 +556,9 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                             }
                         }
                     }
-                }
+                }*/
             }
-            while (crActor->init < mInit);
-            //crActor = nxActor;
-            //current = next;
+            while (cInit < mInit);
         }
         else
         {
@@ -591,7 +587,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
             }
             while (crActor->init < mInit || crActor->hp < 1);
         }
-        crActor->actions = crActions = crActor->mActions;
+        crActor->actions = cActions = crActor->mActions;
         QMap<Ability*, int>* const regSkills = crActor->skillsRgTurn;
         if (regSkills != nullptr)
         {
@@ -605,8 +601,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
             for (auto it = regSkills->cbegin(); it != last; ++it)
             {
                 Ability* const skill = it.key();
-                int skillMaxQty = skill->mQty;
-                int skillCrQty = skillsQty->value(skill, skillMaxQty);
+                int const skillMaxQty = skill->mQty, skillCrQty = skillsQty->value(skill, skillMaxQty);
                 if (skillCrQty < skillMaxQty)
                 {
                     int skillRgTurn = it.value();//regSkills->value(skill, 0);
@@ -636,7 +631,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
         }
         if (crActor->isStunned())
         {
-            crActor->actions = crActions = 0;
+            crActor->actions = cActions = 0;
         }
     }
     scene.crActor = crActor;
