@@ -236,8 +236,110 @@ public extension Scene where Self: AnyObject {
         self.perform(ret: &ret, user: player, target: target, ability: ability, item: false)
     }
     
-    func endTurn(ret: inout String, actor: Actor) {
-        
+    func endTurn(ret: inout String) {
+        if var crActor = self.crActor {
+            var current = self.current
+            var cActions = crActor.actions - 1
+            crActor.actions = cActions
+            var retOption: String? = ret
+            while cActions < 1 {
+                if crActor.hp > 0 && !(crActor.invincible && crActor.knockedOut && crActor.stunned) {
+                    crActor.applyStates(ret: &retOption, consume: true)
+                }
+                var mInit = self.mInit
+                if mInit > 0 {
+                    var cInit = crActor.cInit - mInit
+                    crActor.cInit = cInit
+                    repeat {
+                        /*if let ordered = self.players {
+                            for (i, iPlayer) in ordered.enumerated() {
+                                if iPlayer.hp > 0 {
+                                    let iInit = iPlayer.cInit + iPlayer.agi
+                                    if iInit > cInit {
+                                        cInit = iInit
+                                        crActor = iPlayer
+                                        current = i
+                                    }
+                                }
+                            }
+                        } else {*/
+                            let parties = self.parties
+                            for party in parties {
+                                for (i, iPlayer) in party.enumerated() {
+                                    if iPlayer.hp > 0 {
+                                        let iInit = iPlayer.cInit + iPlayer.agi
+                                        if iInit > cInit {
+                                            cInit = iInit
+                                            crActor = iPlayer
+                                            current = i
+                                        }
+                                    }
+                                }
+                            }
+                        //}
+                    } while cInit < mInit
+                } else {
+                    current = self.previous
+                    let players: [Actor]! = self.players, pSize = players.count
+                    var nInit = mInit - 1
+                    if nInit == MIN_ROUND {
+                        mInit = 0
+                        self.mInit = 0
+                        for i in 0..<pSize {
+                            players[i].cInit = 0
+                        }
+                        nInit = -1
+                    }
+                    crActor.cInit = nInit
+                    repeat {
+                        current += 1
+                        if current == pSize {
+                            self.mInit = nInit
+                            mInit = nInit
+                        }
+                        crActor = players[current]
+                    } while crActor.cInit < mInit || crActor.hp < 1
+                }
+                cActions = crActor.mActions
+                crActor.actions = cActions
+                if var regSkills = crActor._skillsRgTurn {
+                    var skillsQty: [Ability : Int]! = crActor._skillsCrQty
+                    if skillsQty == nil {
+                        skillsQty = [Ability : Int]()
+                        crActor._skillsCrQty = skillsQty
+                    }
+                    for (skill, rgTurn) in regSkills {
+                        let skillMaxQty = skill.mQty, skillCrQty = skillsQty[skill] ?? skillMaxQty
+                        if skillCrQty < skillMaxQty {
+                            if rgTurn == skill.rQty {
+                                skillsQty[skill] = skillCrQty + 1
+                                regSkills[skill] = 0
+                            } else {
+                                regSkills[skill] = rgTurn + 1
+                            }
+                        }
+                    }
+                }
+                let shapeShifted = crActor.shapeShifted
+                crActor.applyStates(ret: &retOption, consume: false)
+                if shapeShifted && (!crActor.shapeShifted), let actorEvent = self.spriteRun {
+                    actorEvent(self, crActor, nil, true, nil, nil)
+                }
+                ret = retOption!
+            }
+            if crActor.stunned {
+                crActor.actions = 0
+                cActions = 0
+            }
+            self.crActor = crActor
+            self.current = current
+            self.previous = current
+            if let events = self.events, let event = events[SceneEvent.newTurn],
+                event(self, &ret) && (crActor.aiControl || crActor.enraged || crActor.confused) {
+                self.playAi(ret: &ret, player: crActor)
+            }
+            ret.append(".")
+        }
     }
     
     func getGuardian(user: Actor, target: Actor, skill: Ability) -> Actor {
