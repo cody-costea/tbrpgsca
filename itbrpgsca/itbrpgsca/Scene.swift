@@ -267,6 +267,17 @@ public extension Scene where Self: AnyObject {
                             for party in parties {
                                 for (i, iPlayer) in party.enumerated() {
                                     if iPlayer.hp > 0 {
+                                        let delayTrn = iPlayer.delayTrn
+                                        if delayTrn > -1 {
+                                            if delayTrn == 0 {
+                                                if let delayAct = iPlayer._delayAct {
+                                                    delayAct()
+                                                }
+                                                iPlayer.delayTrn = -1
+                                            } else {
+                                                iPlayer.delayTrn = delayTrn - 1
+                                            }
+                                        }
                                         let iInit = iPlayer.cInit + iPlayer.agi
                                         if iInit > cInit {
                                             cInit = iInit
@@ -300,8 +311,6 @@ public extension Scene where Self: AnyObject {
                         crActor = players[current]
                     } while crActor.cInit < mInit || crActor.hp < 1
                 }
-                cActions = crActor.mActions
-                crActor.actions = cActions
                 if var regSkills = crActor._skillsRgTurn {
                     var skillsQty: [Ability : Int]! = crActor._skillsCrQty
                     if skillsQty == nil {
@@ -325,11 +334,9 @@ public extension Scene where Self: AnyObject {
                 if shapeShifted && (!crActor.shapeShifted), let actorEvent = self.spriteRun {
                     actorEvent(self, crActor, nil, true, nil, nil)
                 }
+                cActions = crActor.stunned || crActor.delayTrn > -1 ? 0 : crActor.mActions
+                crActor.actions = cActions
                 ret = retOption!
-            }
-            if crActor.stunned {
-                crActor.actions = 0
-                cActions = 0
             }
             self.crActor = crActor
             self.current = current
@@ -581,6 +588,7 @@ public extension Scene where Self: AnyObject {
                         return true
                     })
                 }
+                player._delayTrn = -1
                 player._oldSide = i
                 player.side = i
             }
