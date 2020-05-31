@@ -254,7 +254,6 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
             }
             else
             {
-                actor.hp = 0;
                 actor.sp = 0;
                 if (ret != nullptr)
                 {
@@ -284,6 +283,7 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                 }
                 else
                 {
+                    actor.hp = 0;
                     actor.removeStates(ret, scene, false);
                     actor.setStunned(true);
                     actor.setKnockedOut(true);
