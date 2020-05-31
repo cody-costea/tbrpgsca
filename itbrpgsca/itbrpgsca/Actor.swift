@@ -30,7 +30,7 @@ open class Actor : Costume {
     }
     
     internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
-                 _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: (() -> Void)?, _dmgRoles: [Costume]?,
+                 _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: ((Bool) -> Void)?, _dmgRoles: [Costume]?,
                  _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _drawn: Actor?, _cover: Actor?,
                  _items: [Ability: Int]?, _equipment: [EquipPos: Costume], _events: [EventType: [ActorRun]]?
     

@@ -10,11 +10,12 @@ import Foundation
 
 public let MIN_ROUND = Int.min
 
-public let PerformsTxt = "%@ performs %@"
-public let VictoryTxt = "The party has won!"
-public let FallenTxt = "The party has fallen!"
-public let EscapeTxt = "The party has escaped!"
-public let FailTxt = "The party attempted to escape, but failed."
+public var PreparesTxt = "%@ prepares %@"
+public var PerformsTxt = "%@ performs %@"
+public var VictoryTxt = "The party has won!"
+public var FallenTxt = "The party has fallen!"
+public var EscapeTxt = "The party has escaped!"
+public var FailTxt = "The party attempted to escape, but failed."
 
 public enum SceneEvent {
     case begin, beforeAct, afterAct, newTurn, end
@@ -271,7 +272,7 @@ public extension Scene where Self: AnyObject {
                                         if delayTrn > -1 {
                                             if delayTrn == 0 {
                                                 if let delayAct = iPlayer._delayAct {
-                                                    delayAct()
+                                                    delayAct(false)
                                                 }
                                                 iPlayer.delayTrn = -1
                                             } else {
@@ -400,100 +401,105 @@ public extension Scene where Self: AnyObject {
     }
     
     func execute(ret: inout String, user: Actor, target: Actor, ability: Ability, applyCosts: Bool) {
-        self.message = ret
-        let performance = { () -> Void in
-            var ret: String! = self.message
-            let healing = ability.hp < 0
-            let ko = target.hp < 1
-            if ret == nil {
-                ret = ""
-            }
-            if (healing && ability.revives) || !ko {
-                var cntSkill: Ability! = nil
-                ability.execute(ret: &ret, user: user, target: target, applyCosts: applyCosts)
-                if !healing {
-                    if let counters = target.counters, (counters.count > 0 && (!target.stunned)
-                        && (target.side != user.side || target.confused)) {
-                        let usrDmgType = ability.dmgType
-                        for counter in counters {
-                            let cntDmgType = counter.dmgType
-                            if (usrDmgType & cntDmgType) == cntDmgType && (cntSkill === nil || counter.hp > cntSkill.hp) {
-                                cntSkill = counter
-                            }
-                        }
-                        if cntSkill !== nil {
-                            cntSkill.execute(ret: &ret, user: target, target: user, applyCosts: false)
+        let healing = ability.hp < 0
+        let ko = target.hp < 1
+        if (healing && ability.revives) || !ko {
+            var cntSkill: Ability! = nil
+            ability.execute(ret: &ret, user: user, target: target, applyCosts: applyCosts)
+            if !healing {
+                if let counters = target.counters, (counters.count > 0 && (!target.stunned)
+                    && (target.side != user.side || target.confused)) {
+                    let usrDmgType = ability.dmgType
+                    for counter in counters {
+                        let cntDmgType = counter.dmgType
+                        if (usrDmgType & cntDmgType) == cntDmgType && (cntSkill === nil || counter.hp > cntSkill.hp) {
+                            cntSkill = counter
                         }
                     }
-                }
-                let actorEvent: SpriteRun! = self.spriteRun
-                if actorEvent == nil || actorEvent(self, applyCosts ? user : nil, ability, ko && target.hp > 0,
-                                                   target, target === user ? ability : cntSkill) {
-                    var targets: [Actor]! = self.targets
-                    if targets == nil {
-                        targets = [Actor]()
-                        self.targets = targets
+                    if cntSkill !== nil {
+                        cntSkill.execute(ret: &ret, user: target, target: user, applyCosts: false)
                     }
-                    targets.append(target)
                 }
             }
-        }
-        let aDelayTrn = ability.mDelayTrn
-        if aDelayTrn < 0 {
-            performance()
-        } else {
-            let delayTrn = aDelayTrn - user.mDelayTrn
-            if delayTrn > 0 {
-                user.delayTrn = delayTrn
-                user._delayAct = performance
-            } else {
-                performance()
+            let actorEvent: SpriteRun! = self.spriteRun
+            if actorEvent == nil || actorEvent(self, applyCosts ? user : nil, ability, ko && target.hp > 0,
+                                               target, target === user ? ability : cntSkill) {
+                var targets: [Actor]! = self.targets
+                if targets == nil {
+                    targets = [Actor]()
+                    self.targets = targets
+                }
+                targets.append(target)
             }
         }
     }
     
     func perform(ret: inout String, user: Actor, target: Actor, ability: Ability, item: Bool) {
-        ret.append(String(format: PerformsTxt, user.name, ability.name))
-        if var targets = self.targets {
-            targets.removeAll(keepingCapacity: true)
-        }
-        if let event = self.events?[SceneEvent.beforeAct], !event(self, &ret) {
-            return
-        }
-        if ability.ranged && ability.targetsAll {
-            let noSelfTarget = !ability.targetsSelf
-            let sideTarget = ability.targetsSide
-            let usrSide = user.side
-            var applyCosts = true
-            for (j, party) in self.parties.enumerated() {
-                if sideTarget && noSelfTarget && j == usrSide {
-                    continue
+        self.message = ret
+        let performance = { (endTurn: Bool) -> Void in
+            if var ret = self.message {
+                ret.append(String(format: PerformsTxt, user.name, ability.name))
+                if var targets = self.targets {
+                    targets.removeAll(keepingCapacity: true)
                 }
-                for trg in party {
-                    if noSelfTarget && trg === user {
-                        continue
-                    } else {
-                        self.execute(ret: &ret, user: user, target: target, ability: ability, applyCosts: applyCosts)
+                if let event = self.events?[SceneEvent.beforeAct], !event(self, &ret) {
+                    return
+                }
+                if ability.ranged && ability.targetsAll {
+                    let noSelfTarget = !ability.targetsSelf
+                    let sideTarget = ability.targetsSide
+                    let usrSide = user.side
+                    var applyCosts = true
+                    for (j, party) in self.parties.enumerated() {
+                        if sideTarget && noSelfTarget && j == usrSide {
+                            continue
+                        }
+                        for trg in party {
+                            if noSelfTarget && trg === user {
+                                continue
+                            } else {
+                                self.execute(ret: &ret, user: user, target: target, ability: ability, applyCosts: applyCosts)
+                            }
+                            applyCosts = false
+                        }
                     }
-                    applyCosts = false
+                } else if ability.targetsSide {
+                    let side = ability.targetsSelf ? user.side : target._oldSide
+                    for (i, trg) in self.parties[side].enumerated() {
+                        self.execute(ret: &ret, user: user, target: trg, ability: ability, applyCosts: i == 0)
+                    }
+                } else {
+                    self.execute(ret: &ret, user: user, target: user === target || ability.targetsSelf ? user
+                        : self.getGuardian(user: user, target: target, skill: ability), ability: ability, applyCosts: true)
+                }
+                if item, var items = user.items {
+                    items[ability] = (items[ability] ?? 1) - 1
+                }
+                self.lastAbility = ability
+                user.exp += 1
+                    if endTurn {
+                    if let event = self.events?[SceneEvent.afterAct], event(self, &ret) {
+                        self.endTurn(ret: &ret, actor: user)
+                    }
                 }
             }
-        } else if ability.targetsSide {
-            let side = ability.targetsSelf ? user.side : target._oldSide
-            for (i, trg) in parties[side].enumerated() {
-                self.execute(ret: &ret, user: user, target: trg, ability: ability, applyCosts: i == 0)
-            }
+        }
+        let aDelayTrn = ability.mDelayTrn
+        if aDelayTrn < 0 {
+            performance(true)
         } else {
-            self.execute(ret: &ret, user: user, target: user === target || ability.targetsSelf ? user
-                : self.getGuardian(user: user, target: target, skill: ability), ability: ability, applyCosts: true)
-        }
-        if item, var items = user.items {
-            items[ability] = (items[ability] ?? 1) - 1
-        }
-        self.lastAbility = ability
-        user.exp += 1
-        if let event = self.events?[SceneEvent.afterAct], event(self, &ret) {
-            self.endTurn(ret: &ret, actor: user)
+            let delayTrn = aDelayTrn - user.mDelayTrn
+            if delayTrn > 0 {
+                self.lastAbility = nil
+                user.delayTrn = delayTrn
+                user._delayAct = performance
+                ret.append(String(format: PreparesTxt, user.name, ability.name))
+                if let event = self.events?[SceneEvent.afterAct], event(self, &ret) {
+                    self.endTurn(ret: &ret, actor: user)
+                }
+            } else {
+                performance(true)
+            }
         }
     }
     
