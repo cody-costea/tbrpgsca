@@ -242,20 +242,6 @@ public extension Scene where Self: AnyObject {
         self.perform(ret: &ret, user: player, target: target, ability: ability, item: false)
     }
     
-    func doDelayedAct(iPlayer: Actor) {
-        let delayTrn = iPlayer.delayTrn
-        if delayTrn > -1 {
-            if delayTrn == 0 {
-                if let delayAct = iPlayer._delayAct {
-                    delayAct(false)
-                }
-                iPlayer.delayTrn = -1
-            } else {
-                iPlayer.delayTrn = delayTrn - 1
-            }
-        }
-    }
-    
     func endTurn(ret: inout String) {
         if var crActor = self.crActor {
             var current = self.current
@@ -287,7 +273,7 @@ public extension Scene where Self: AnyObject {
                             for party in parties {
                                 for (i, iPlayer) in party.enumerated() {
                                     if iPlayer.hp > 0 {
-                                        self.doDelayedAct(iPlayer: iPlayer)
+                                        iPlayer.doDelayedAct()
                                         let iInit = iPlayer.cInit + iPlayer.agi
                                         if iInit > cInit {
                                             cInit = iInit
@@ -298,7 +284,7 @@ public extension Scene where Self: AnyObject {
                                 }
                             }
                         //}
-                    } while cInit < mInit || crActor.delayTrn > -1 || crActor.hp < 1
+                    } while cInit < mInit || crActor.delayTrn > -1
                 } else {
                     current = self.previous
                     let players: [Actor]! = self.players, pSize = players.count
@@ -307,7 +293,7 @@ public extension Scene where Self: AnyObject {
                             for i in 0..<pSize {
                                 let iPlayer = players[i]
                                 if iPlayer.hp > 0 {
-                                    self.doDelayedAct(iPlayer: iPlayer)
+                                    iPlayer.doDelayedAct()
                                 }
                             }
                         }

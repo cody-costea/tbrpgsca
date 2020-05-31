@@ -584,6 +584,21 @@ open class Actor : Costume {
         }
     }
     
+    open func doDelayedAct() {
+        if let delayAct = self._delayAct {
+            let delayTrn = self.delayTrn
+            if delayTrn > -1 {
+                if delayTrn == 0 {
+                    delayAct(false)
+                    self._delayAct = nil
+                    self.delayTrn = -1
+                } else {
+                    self.delayTrn = delayTrn - 1
+                }
+            }
+        }
+    }
+    
     open func runEvent(eventType: EventType, newValue: Any) -> Bool {
         if let eventsMap = self._events {
             if let eventList = eventsMap[eventType] {
