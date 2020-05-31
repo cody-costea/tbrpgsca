@@ -594,6 +594,8 @@ open class Actor : Costume {
             self.updateStates(remove: true, states: stateDur, withDur: true)
             self.stateDur = nil
         }
+        //self.delayTrn = -1
+        //self._delayAct = nil
         self.refreshCostumes()
         self.actions = self.mActions
         self.hp = self.mHp
@@ -832,7 +834,7 @@ open class Actor : Costume {
         self._xp = 0
         self._side = 0
         self._chainNr = 0
-        self._delayTrn = 0
+        self._delayTrn = -1
         self._events = nil
         self._items = items
         self._dmgRoles = nil

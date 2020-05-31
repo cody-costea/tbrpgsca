@@ -36,12 +36,17 @@ public protocol Scene : class {
         set
     }
     
+    var previous: Int { //oldCurrent
+        get
+        set
+    }
+    
     var current: Int {
         get
         set
     }
     
-    var previous: Int { //oldCurrent
+    var actions: Int {
         get
         set
     }
@@ -237,6 +242,20 @@ public extension Scene where Self: AnyObject {
         self.perform(ret: &ret, user: player, target: target, ability: ability, item: false)
     }
     
+    func doDelayedAct(iPlayer: Actor) {
+        let delayTrn = iPlayer.delayTrn
+        if delayTrn > -1 {
+            if delayTrn == 0 {
+                if let delayAct = iPlayer._delayAct {
+                    delayAct(false)
+                }
+                iPlayer.delayTrn = -1
+            } else {
+                iPlayer.delayTrn = delayTrn - 1
+            }
+        }
+    }
+    
     func endTurn(ret: inout String) {
         if var crActor = self.crActor {
             var current = self.current
@@ -268,17 +287,7 @@ public extension Scene where Self: AnyObject {
                             for party in parties {
                                 for (i, iPlayer) in party.enumerated() {
                                     if iPlayer.hp > 0 {
-                                        let delayTrn = iPlayer.delayTrn
-                                        if delayTrn > -1 {
-                                            if delayTrn == 0 {
-                                                if let delayAct = iPlayer._delayAct {
-                                                    delayAct(false)
-                                                }
-                                                iPlayer.delayTrn = -1
-                                            } else {
-                                                iPlayer.delayTrn = delayTrn - 1
-                                            }
-                                        }
+                                        self.doDelayedAct(iPlayer: iPlayer)
                                         let iInit = iPlayer.cInit + iPlayer.agi
                                         if iInit > cInit {
                                             cInit = iInit
@@ -289,28 +298,38 @@ public extension Scene where Self: AnyObject {
                                 }
                             }
                         //}
-                    } while cInit < mInit
+                    } while cInit < mInit || crActor.delayTrn > -1 || crActor.hp < 1
                 } else {
                     current = self.previous
                     let players: [Actor]! = self.players, pSize = players.count
-                    var nInit = mInit - 1
-                    if nInit == MIN_ROUND {
-                        mInit = 0
-                        self.mInit = 0
-                        for i in 0..<pSize {
-                            players[i].cInit = 0
-                        }
-                        nInit = -1
-                    }
-                    crActor.cInit = nInit
                     repeat {
-                        current += 1
-                        if current == pSize {
-                            self.mInit = nInit
-                            mInit = nInit
+                        if self.actions > 0 {
+                            for i in 0..<pSize {
+                                let iPlayer = players[i]
+                                if iPlayer.hp > 0 {
+                                    self.doDelayedAct(iPlayer: iPlayer)
+                                }
+                            }
                         }
-                        crActor = players[current]
-                    } while crActor.cInit < mInit || crActor.hp < 1
+                        var nInit = mInit - 1
+                        if nInit == MIN_ROUND {
+                            mInit = 0
+                            self.mInit = 0
+                            for i in 0..<pSize {
+                                players[i].cInit = 0
+                            }
+                            nInit = -1
+                        }
+                        crActor.cInit = nInit
+                        repeat {
+                            current += 1
+                            if current == pSize {
+                                self.mInit = nInit
+                                mInit = nInit
+                            }
+                            crActor = players[current]
+                        } while crActor.hp < 1 || crActor.cInit < mInit
+                    } while crActor.delayTrn > -1
                 }
                 if var regSkills = crActor._skillsRgTurn {
                     var skillsQty: [Ability : Int]! = crActor._skillsCrQty
@@ -335,7 +354,7 @@ public extension Scene where Self: AnyObject {
                 if shapeShifted && (!crActor.shapeShifted), let actorEvent = self.spriteRun {
                     actorEvent(self, crActor, nil, true, nil, nil)
                 }
-                cActions = crActor.stunned || crActor.delayTrn > -1 ? 0 : crActor.mActions
+                cActions = crActor.stunned ? 0 : crActor.mActions
                 crActor.actions = cActions
                 ret = retOption!
             }
@@ -477,10 +496,12 @@ public extension Scene where Self: AnyObject {
                 }
                 self.lastAbility = ability
                 user.exp += 1
-                    if endTurn {
+                if endTurn {
                     if let event = self.events?[SceneEvent.afterAct], event(self, &ret) {
                         self.endTurn(ret: &ret, actor: user)
                     }
+                } else if self.mInit < 0 {
+                    self.actions -= 1
                 }
             }
         }
@@ -490,6 +511,9 @@ public extension Scene where Self: AnyObject {
         } else {
             let delayTrn = aDelayTrn - user.mDelayTrn
             if delayTrn > 0 {
+                if self.mInit < 0 {
+                    self.actions += 1
+                }
                 self.lastAbility = nil
                 user.delayTrn = delayTrn
                 user._delayAct = performance
