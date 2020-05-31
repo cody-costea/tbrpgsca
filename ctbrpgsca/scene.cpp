@@ -585,7 +585,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
                 }
                 crActor = players[current];
             }
-            while (crActor->init < mInit || crActor->hp < 1);
+            while (crActor->hp < 1 || crActor->init < mInit);
         }
         //crActor->actions = cActions = crActor->mActions;
         QMap<Ability*, int>* const regSkills = crActor->skillsRgTurn;
