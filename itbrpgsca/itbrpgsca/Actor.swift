@@ -10,8 +10,9 @@ import Foundation
 
 open class Actor : Costume {
     
-    public static let FLAG_RANDOM_AI = 2048
-    public static let FLAG_AI_PLAYER = 4096
+    public static let FLAG_SURVIVES = 2048
+    public static let FLAG_RANDOM_AI = 4096
+    public static let FLAG_AI_PLAYER = 8192
     
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"
@@ -240,6 +241,18 @@ open class Actor : Costume {
         }
     }
     
+    open var survives: Bool {
+        get {
+            return (self._flags & Actor.FLAG_SURVIVES) == Actor.FLAG_SURVIVES
+        }
+        set (val) {
+            let flags = self._flags
+            if val != ((flags & Actor.FLAG_SURVIVES) == Actor.FLAG_SURVIVES) {
+                self.flags = flags ^ Actor.FLAG_SURVIVES
+            }
+        }
+    }
+    
     override open var revives: Bool {
         get {
             return super.revives
@@ -296,6 +309,18 @@ open class Actor : Costume {
             let flags = self._flags
             if val != ((flags & Costume.FLAG_CONVERT) == Costume.FLAG_CONVERT) {
                 self.flags = flags ^ Costume.FLAG_CONVERT
+            }
+        }
+    }
+    
+    override open var knockedOut: Bool {
+        get {
+            return super.knockedOut
+        }
+        set (val) {
+            let flags = self._flags
+            if val != ((flags & Costume.FLAG_KO) == Costume.FLAG_KO) {
+                self.flags = flags ^ Costume.FLAG_KO
             }
         }
     }

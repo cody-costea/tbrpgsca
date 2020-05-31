@@ -631,10 +631,59 @@ public extension Scene where Self: AnyObject {
                         return true
                     })
                     player.addEvent(eventType: Actor.EventType.hp, actorRun: { (actor: Actor, val: Any) -> Bool in
-                        if var ret = self.message, (val as! Int) < 1 {
-                            self.checkStatus(ret: &ret)
+                        let hp = val as! Int
+                        var ret: String! = self.message
+                        if ret != nil {
+                            ret = ""
                         }
-                        return true
+                        if hp < 1 {
+                            if actor.hp != 0 {
+                                if actor.survives || actor.invincible {
+                                    actor._hp = 1
+                                } else {
+                                    actor.sp = 0
+                                    ret.append(String.init(format: Actor.KoTxt, actor.name))
+                                    if actor.cInit > 0 {
+                                        actor.cInit = 0
+                                    }
+                                    actor.drawnBy = nil
+                                    actor.coveredBy = nil
+                                    actor._delayAct = nil
+                                    actor.delayTrn = -1
+                                    let revives = actor.revives
+                                    if revives {
+                                        if ret != nil {
+                                            ret.append(Actor.RiseTxt)
+                                        }
+                                        actor._hp = actor.mHp
+                                        if actor.shapeShifted, let actorEvent = self.spriteRun {
+                                            actorEvent(self, crActor, nil, true, nil, nil)
+                                        }
+                                        if let stateDur = actor.stateDur {
+                                            actor.updateStates(remove: true, states: stateDur, withDur: true)
+                                        }
+                                    } else {
+                                        actor._hp = 0
+                                        if let stateDur = actor.stateDur {
+                                            actor.updateStates(remove: true, states: stateDur, withDur: true)
+                                        }
+                                        actor.stunned = true
+                                        actor.knockedOut = true
+                                        self.checkStatus(ret: &ret)
+                                    }
+                                }
+                            }
+                        } else {
+                            let oHp = actor._hp, mHp = actor.mHp
+                            actor._hp = hp > mHp ? mHp : hp
+                            if oHp < 1 {
+                                actor.stunned = false
+                                actor.knockedOut = false
+                                actor.refreshCostumes()
+                                self.resetTurn(actor: actor)
+                            }
+                        }
+                        return false
                     })
                 }
                 player._delayTrn = -1
