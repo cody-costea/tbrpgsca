@@ -10,6 +10,8 @@ import Foundation
 
 public let MIN_ROUND = Int.min
 
+public let FLAG_USE_GUARDIANS = 1
+
 public var PreparesTxt = "%@ prepares %@"
 public var PerformsTxt = "%@ performs %@"
 public var VictoryTxt = "The party has won!"
@@ -91,12 +93,22 @@ public protocol Scene : class {
         set
     }
     
+    var flags: Int {
+        get
+        set
+    }
+    
     var mInit: Int {
         get
         set
     }
     
     var message: String? {
+        get
+        set
+    }
+    
+    var useGuardians: Bool {
         get
         set
     }
@@ -123,7 +135,7 @@ public protocol Scene : class {
     
     func perform(ret: inout String, user: Actor, target: Actor, ability: Ability, item: Bool)
     
-    func initialize(ret: inout String, parties: [[Actor]], spriteRun: SpriteRun?,
+    func initialize(ret: inout String, parties: [[Actor]], useGuards: Bool, spriteRun: SpriteRun?,
                     events: [SceneEvent : [SceneRun]]?, surprise: Int, mInit: Int)
     
     func canTarget(user: Actor, ability: Ability, target: Actor) -> Bool
@@ -139,6 +151,18 @@ public protocol Scene : class {
 }
 
 public extension Scene where Self: AnyObject {
+    
+    var useGuardians: Bool {
+        get {
+            return (self.flags & FLAG_USE_GUARDIANS) == FLAG_USE_GUARDIANS
+        }
+        set (val) {
+            let flags = self.flags
+            if val != ((flags & FLAG_USE_GUARDIANS) == FLAG_USE_GUARDIANS) {
+                self.flags = flags ^ FLAG_USE_GUARDIANS
+            }
+        }
+    }
     
     func playAi(ret: inout String, player: Actor) {
         let parties = self.parties, skills: [Ability]! = player.aSkills
@@ -357,38 +381,42 @@ public extension Scene where Self: AnyObject {
     
     func getGuardian(user: Actor, target: Actor, skill: Ability) -> Actor {
         let side = target._oldSide
-        var covered: Actor = target
-        if user._oldSide != side && ((!skill.ranged) && ((!user.ranged) || skill.melee)) {
-            var pos = -1
-            var first = true
-            var fGuard: Actor! = nil, lGuard: Actor! = nil
-            let party = self.parties[side], pSize = party.count
-            for i in 0..<pSize {
-                let guardian = party[i]
-                if guardian === target {
-                    if fGuard === nil || i == pSize - 1 {
-                        break
-                    } else {
-                        pos = i
-                        first = false
-                        continue
-                    }
-                } else if (fGuard === nil || pos != -1) && guardian.hp > 0 && !(guardian.stunned || guardian.confused) {
-                    if first {
-                        fGuard = guardian
-                    } else {
-                        lGuard = guardian
+        if user._oldSide == side {
+            return target
+        } else {
+            var covered: Actor = target
+            if self.useGuardians && ((!skill.ranged) && ((!user.ranged) || skill.melee)) {
+                let party = self.parties[side], pSize = party.count
+                var fGuard: Actor! = nil, lGuard: Actor! = nil
+                var first = true
+                var pos = -1
+                for i in 0..<pSize {
+                    let guardian = party[i]
+                    if guardian === target {
+                        if fGuard === nil || i == pSize - 1 {
+                            break
+                        } else {
+                            pos = i
+                            first = false
+                            continue
+                        }
+                    } else if (fGuard === nil || pos != -1) && guardian.hp > 0 && !(guardian.stunned || guardian.confused) {
+                        if first {
+                            fGuard = guardian
+                        } else {
+                            lGuard = guardian
+                        }
                     }
                 }
+                if fGuard !== nil && lGuard !== nil {
+                    covered = pos < (pSize / 2) ? fGuard : lGuard
+                }
             }
-            if fGuard !== nil && lGuard !== nil {
-                covered = pos < (pSize / 2) ? fGuard : lGuard
+            if let covering = covered.coveredBy {
+                return covering
+            } else {
+                return covered
             }
-        }
-        if let covering = covered.coveredBy {
-            return covering
-        } else {
-            return covered
         }
     }
     
@@ -566,9 +594,10 @@ public extension Scene where Self: AnyObject {
             || user.drawnBy === target) && (target.hp > 0 || ability.revives))))
     }
     
-    func initialize(ret: inout String, parties: [[Actor]], spriteRun: SpriteRun?,
+    func initialize(ret: inout String, parties: [[Actor]], useGuards: Bool, spriteRun: SpriteRun?,
                     events: [SceneEvent : SceneRun]?, surprise: Int, mInit: Int) {
         assert(parties.count > 1)
+        self.useGuardians = useGuards
         var players: [Actor]?
         let useInit: Bool
         if mInit > 0 {
@@ -632,10 +661,10 @@ public extension Scene where Self: AnyObject {
                                     if actor.cInit > 0 {
                                         actor.cInit = 0
                                     }
+                                    actor.delayTrn = -1
                                     actor.drawnBy = nil
                                     actor.coveredBy = nil
                                     actor._delayAct = nil
-                                    actor.delayTrn = -1
                                     let revives = actor.revives
                                     if revives {
                                         if ret != nil {
@@ -660,7 +689,7 @@ public extension Scene where Self: AnyObject {
                                 }
                             }
                         } else {
-                            let oHp = actor._hp, mHp = actor.mHp
+                            let oHp = actor.hp, mHp = actor.mHp
                             actor._hp = hp > mHp ? mHp : hp
                             if oHp < 1 {
                                 actor.stunned = false
