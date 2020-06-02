@@ -32,9 +32,6 @@ open class State : Costume {
         if self.converted && !actor.converted {
             actor.side = actor._oldSide
         }
-        if self.covered && !actor.covered {
-            actor.coveredBy = nil
-        }
         if self.drawn && !actor.drawn {
             actor.drawnBy = nil
         }
@@ -169,9 +166,6 @@ open class State : Costume {
                 if self.converted && target.side != user.side {
                     target.side = user.side
                 }
-                if self.covered {
-                    target.coveredBy = user
-                }
                 if self.drawn {
                     target.drawnBy = user
                 }
@@ -179,25 +173,21 @@ open class State : Costume {
         }
     }
     
-    init(id: Int, name: String, sprite: String?, shapeShift: Bool, dur: Int, sRes: Int, mActions: Int, mDelayTrn: Int,
-         dmgType: Int, rflType: Int, hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int,
-         spi: Int, wis: Int, agi: Int, stun: Bool, range: Bool, enrage: Bool, confuse: Bool, convert: Bool, reflect: Bool,
-         invincible: Bool, cover: Bool, draw: Bool, ko: Bool, revive: Bool, aSkills: [Ability]?, rSkills: [Ability]?,
-         counters: [Ability]?, states: [State: Int]?, stRes: [State: Int]?, res: [Int: Int]?) {
+    init(id: Int, name: String, sprite: String?, shapeShift: Bool, dur: Int, sRes: Int, mActions: Int, mDelayTrn: Int, dmgType: Int,
+         rflType: Int, cvrType: Int, hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int,
+         wis: Int, agi: Int, stun: Bool, range: Bool, enrage: Bool, confuse: Bool, convert: Bool, reflect: Bool, invincible: Bool,
+         draw: Bool, ko: Bool, revive: Bool, aSkills: [Ability]?, rSkills: [Ability]?, counters: [Ability]?, states: [State: Int]?,
+         stRes: [State: Int]?, res: [Int: Int]?) {
         self._dur = dur
         self._sRes = sRes
         self._rSkills = rSkills
-        super.init(id: id, name: name, sprite: sprite, shapeShift: shapeShift, mActions: mActions, mDelayTrn: mDelayTrn,
-                   dmgType: dmgType, rflType: rflType, hpDmg: hpDmg, mpDmg: mpDmg, spDmg: spDmg, mHp: mHp, mMp: mMp, mSp: mSp,
-                   atk: atk, def: def, spi: spi, wis: wis, agi: agi, stun: stun, range: range, enrage: enrage, confuse: confuse,
-                   invincible: invincible, ko: ko, revive: revive, skills: aSkills, counters: counters, states: states, stRes: stRes,
-                   res: res)
+        super.init(id: id, name: name, sprite: sprite, shapeShift: shapeShift, mActions: mActions, mDelayTrn: mDelayTrn, dmgType: dmgType,
+                   rflType: rflType, cvrType: cvrType, hpDmg: hpDmg, mpDmg: mpDmg, spDmg: spDmg, mHp: mHp, mMp: mMp, mSp: mSp, atk: atk,
+                   def: def, spi: spi, wis: wis, agi: agi, stun: stun, range: range, enrage: enrage, confuse: confuse, invincible: invincible,
+                   ko: ko, revive: revive, skills: aSkills, counters: counters, states: states, stRes: stRes, res: res)
         var flags = self._flags
         if convert {
             flags |= State.FLAG_CONVERT
-        }
-        if cover {
-            flags |= State.FLAG_COVER
         }
         if draw {
             flags |= State.FLAG_DRAW

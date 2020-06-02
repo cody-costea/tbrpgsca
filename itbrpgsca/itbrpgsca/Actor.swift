@@ -9,10 +9,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 import Foundation
 
 open class Actor : Costume {
-    
-    public static let FLAG_SURVIVES = 2048
-    public static let FLAG_RANDOM_AI = 4096
-    public static let FLAG_AI_PLAYER = 8192
+
+    public static let FLAG_SURVIVES = 1024
+    public static let FLAG_RANDOM_AI = 2048
+    public static let FLAG_AI_PLAYER = 4096
     
     public static var KoTxt = ", %@ falls unconscious"
     public static var RiseTxt = ", but rises again"
@@ -26,14 +26,13 @@ open class Actor : Costume {
     }
     
     public enum EventType {
-        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, mDelayTrn, dmgType, rflType, items, cover,
+        case hp, mp, sp, mHp, mMp, mSp, atk, def, spi, wis, agi, actions, mActions, mDelayTrn, dmgType, rflType, items, cvrType,
              drawn, race, job, exp, maxExp, level, maxLv, side, cInit, sprite, name, flags, delayTrn, dmgChain, chainNr
     }
     
-    internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int,
-                 _dmgChain: Int, _chainNr: Int, _delayTrn: Int, _delayAct: ((Bool) -> Void)?, _dmgRoles: [Costume]?,
-                 _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?, _drawn: Actor?, _cover: Actor?,
-                 _items: [Ability: Int]?, _equipment: [EquipPos: Costume], _events: [EventType: [ActorRun]]?
+    internal var _lv: Int, _mLv: Int, _xp: Int, _maXp: Int, _init: Int, _side: Int, _oldSide: Int, _actions: Int, _dmgChain: Int, _chainNr: Int,
+                 _delayTrn: Int, _delayAct: ((Bool) -> Void)?, _dmgRoles: [Costume]?, _skillsCrQty: [Ability : Int]?, _skillsRgTurn: [Ability: Int]?,
+                 _drawn: Actor?, _items: [Ability: Int]?, _equipment: [EquipPos: Costume], _events: [EventType: [ActorRun]]?
     
     internal var flags: Int {
         get {
@@ -42,17 +41,6 @@ open class Actor : Costume {
         set (val) {
             if self.runEvent(eventType: EventType.flags, newValue: val) {
                 self._flags = val
-            }
-        }
-    }
-    
-    open var coveredBy: Actor? {
-        get {
-            return self._drawn
-        }
-        set (val) {
-            if self.runEvent(eventType: EventType.cover, newValue: val as Any) {
-                self._cover = val
             }
         }
     }
@@ -517,6 +505,17 @@ open class Actor : Costume {
         }
     }
     
+    override open var cvrType: Int {
+        get {
+            return self._cvrType
+        }
+        set (val) {
+            if self.runEvent(eventType: EventType.cvrType, newValue: val) {
+                self._cvrType = val
+            }
+        }
+    }
+    
     override open var rflType: Int {
         get {
             return self._rflType
@@ -865,7 +864,6 @@ open class Actor : Costume {
         self._delayAct = nil
         self._dmgChain = 0
         self._oldSide = 0
-        self._cover = nil
         self._drawn = nil
         self._mLv = maxLv
         self._maXp = 15
@@ -881,10 +879,10 @@ open class Actor : Costume {
         self._skillsCrQty = nil
         self._skillsRgTurn = nil
         self._equipment = [EquipPos:Costume]()
-        super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions, mDelayTrn: 0, dmgType: 0, rflType: 0,
-                   hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp, atk: atk, def: def, spi: spi, wis: wis, agi: agi,
-                   stun: false, range: false, enrage: false, confuse: false, invincible: false, ko: false, revive: false, skills: nil,
-                   counters: nil, states: nil, stRes: stRes, res: res)
+        super.init(id: id, name: name, sprite: sprite, shapeShift: false, mActions: mActions, mDelayTrn: 0, dmgType: 0, rflType: 0, cvrType: 0,
+                   hpDmg: mHp, mpDmg: mMp, spDmg: mSp, mHp: mHp, mMp: mMp, mSp: mSp, atk: atk, def: def, spi: spi, wis: wis, agi: agi, stun: false,
+                   range: false, enrage: false, confuse: false, invincible: false, ko: false, revive: false, skills: nil, counters: nil, states: nil,
+                   stRes: stRes, res: res)
         self.race = race
         self.job = job
     }

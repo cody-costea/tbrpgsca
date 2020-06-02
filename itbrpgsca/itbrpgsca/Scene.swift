@@ -384,6 +384,7 @@ public extension Scene where Self: AnyObject {
         if user._oldSide == side {
             return target
         } else {
+            let parties = self.parties
             var covered: Actor = target
             if self.useGuardians && ((!skill.ranged) && ((!user.ranged) || skill.melee)) {
                 let party = self.parties[side], pSize = party.count
@@ -412,11 +413,16 @@ public extension Scene where Self: AnyObject {
                     covered = pos < (pSize / 2) ? fGuard : lGuard
                 }
             }
-            if let covering = covered.coveredBy {
-                return covering
-            } else {
-                return covered
+            if covered.hp < covered.mHp / 3 {
+                let skillDmgType = skill.dmgType
+                for actor in parties[covered.side] {
+                    if (actor.cvrType & skillDmgType) != 0 {
+                        covered = actor
+                        break
+                    }
+                }
             }
+            return covered
         }
     }
     
@@ -663,7 +669,6 @@ public extension Scene where Self: AnyObject {
                                     }
                                     actor.delayTrn = -1
                                     actor.drawnBy = nil
-                                    actor.coveredBy = nil
                                     actor._delayAct = nil
                                     let revives = actor.revives
                                     if revives {

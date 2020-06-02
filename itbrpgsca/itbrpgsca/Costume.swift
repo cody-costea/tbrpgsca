@@ -15,14 +15,13 @@ open class Costume : Role {
     public static let FLAG_CONVERT = 16
     public static let FLAG_SHAPE_SHIFT = 32
     public static let FLAG_INVINCIBLE = 64
-    public static let FLAG_COVER = 128
-    public static let FLAG_DRAW = 256
-    public static let FLAG_STUN = 512
-    public static let FLAG_KO = 1024
+    public static let FLAG_DRAW = 128
+    public static let FLAG_STUN = 256
+    public static let FLAG_KO = 512
     
     public static var CausesTxt = ", %@ is affected by %@"
     
-    internal var _atk: Int, _def: Int, _spi: Int, _wis: Int, _agi: Int, _mActions: Int, _rflType: Int,
+    internal var _atk: Int, _def: Int, _spi: Int, _wis: Int, _agi: Int, _mActions: Int, _rflType: Int, _cvrType: Int,
                  _aSkills: [Ability]?, _counters: [Ability]?, _stRes: [State?: Int]?, _res: [Int: Int]?
     
     open var enraged: Bool {
@@ -45,10 +44,6 @@ open class Costume : Role {
         return (self._flags & Costume.FLAG_SHAPE_SHIFT) == Costume.FLAG_SHAPE_SHIFT
     }
     
-    open var covered: Bool {
-        return (self._flags & Costume.FLAG_COVER) == Costume.FLAG_COVER
-    }
-    
     open var drawn: Bool {
         return (self._flags & Costume.FLAG_DRAW) == Costume.FLAG_DRAW
     }
@@ -65,6 +60,10 @@ open class Costume : Role {
         return self._rflType != 0
     }
     
+    open var covered: Bool {
+        return self._cvrType != 0
+    }
+    
     open var counters: [Ability]? {
         return self._counters
     }
@@ -79,6 +78,10 @@ open class Costume : Role {
     
     open var res: [Int: Int]? {
         return self._res
+    }
+    
+    open var cvrType: Int {
+        return self._cvrType
     }
     
     open var rflType: Int {
@@ -131,7 +134,12 @@ open class Costume : Role {
             let roleRfl = self.rflType
             let actorRfl = actor.rflType
             if (actorRfl & roleRfl) == roleRfl {
-                actor.rflType = actorRfl & rflType
+                actor.rflType = actorRfl ^ roleRfl
+            }
+            let roleCvr = self.cvrType
+            let actorCvr = actor.cvrType
+            if (actorCvr & roleCvr) == roleCvr {
+                actor.cvrType = actorCvr ^ roleCvr
             }
             if self.hp == 0 && self.mp == 0 && self.sp == 0 {
                 let roleElm = self.dmgType
@@ -148,6 +156,7 @@ open class Costume : Role {
             if self.hp == 0 && self.mp == 0 && self.sp == 0 {
                 actor.dmgType |= self.dmgType
             }
+            actor.cvrType |= self.cvrType
             actor.rflType |= self.rflType
             if self.shapeShifted, let spr = self.sprite {
                 actor.sprite = spr
@@ -191,10 +200,10 @@ open class Costume : Role {
         self.adopt(actor: actor, updStates: delStates, remove: true)
     }
     
-    init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, mDelayTrn: Int, dmgType: Int, rflType: Int,
-         hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int, wis: Int, agi: Int,
-         stun: Bool, range: Bool, enrage: Bool, confuse: Bool, invincible: Bool, ko: Bool, revive: Bool, skills: [Ability]?,
-         counters: [Ability]?, states: [State: Int]?, stRes: [State: Int]?, res: [Int: Int]?) {
+    init(id: Int, name: String, sprite: String?, shapeShift: Bool, mActions: Int, mDelayTrn: Int, dmgType: Int, rflType: Int, cvrType: Int,
+         hpDmg: Int, mpDmg: Int, spDmg: Int, mHp: Int, mMp: Int, mSp: Int, atk: Int, def: Int, spi: Int, wis: Int, agi: Int, stun: Bool,
+         range: Bool, enrage: Bool, confuse: Bool, invincible: Bool, ko: Bool, revive: Bool, skills: [Ability]?, counters: [Ability]?,
+         states: [State: Int]?, stRes: [State: Int]?, res: [Int: Int]?) {
         self._counters = counters
         self._aSkills = skills
         self._stRes = stRes
@@ -204,6 +213,7 @@ open class Costume : Role {
         self._spi = spi
         self._wis = wis
         self._agi = agi
+        self._cvrType = cvrType
         self._rflType = rflType
         self._mActions = mActions
         super.init(id: id, name: name, sprite: sprite, hp: hpDmg, mp: mpDmg, sp: spDmg, mHp: mHp, mMp: mMp, mSp: mSp,
