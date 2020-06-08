@@ -14,9 +14,9 @@ use std::collections::HashMap;
 
 pub struct Costume<'a> {
     pub(crate) role: Box<Role<'a>>,
-    pub(crate) a_skills: Option<&'a Vec<Ability<'a>>>,
-    pub(crate) counters: Option<&'a Vec<Ability<'a>>>,
-    pub(crate) st_res: Option<&'a HashMap<State<'a>, i32>>,
+    pub(crate) a_skills: Option<&'a Vec<&'a Ability<'a>>>,
+    pub(crate) counters: Option<&'a Vec<&'a Ability<'a>>>,
+    pub(crate) st_res: Option<&'a HashMap<&'a State<'a>, i32>>,
     pub(crate) res: Option<&'a HashMap<i32, i32>>,
     pub(crate) m_actions: i32,
     pub(crate) cvr_type: i32,
@@ -73,11 +73,11 @@ impl<'a> Costume<'a> {
         self.m_actions
     }
 
-    pub fn a_skills(&self) -> &Option<&'a Vec<Ability>> {
+    pub fn a_skills(&self) -> &Option<&'a Vec<&'a Ability>> {
         &self.a_skills
     }
 
-    pub fn counters(&self) -> &Option<&'a Vec<Ability>> {
+    pub fn counters(&self) -> &Option<&'a Vec<&'a Ability>> {
         &self.counters
     }
 
@@ -85,7 +85,7 @@ impl<'a> Costume<'a> {
         &self.res
     }
 
-    pub fn st_res(&self) -> &Option<&'a HashMap<State<'a>, i32>> {
+    pub fn st_res(&self) -> &Option<&'a HashMap<&'a State<'a>, i32>> {
         &self.st_res
     }
 

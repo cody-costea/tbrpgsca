@@ -16,7 +16,7 @@ pub struct Role<'a> {
     pub(crate) flags: i32,
     pub(crate) name: &'static str,
     pub(crate) sprite: Option<&'static str>,
-    pub(crate) state_dur: Option<&'a HashMap<State<'a>, i32>>,
+    pub(crate) state_dur: Option<&'a HashMap<&'a State<'a>, i32>>,
     pub(crate) dmg_type: i32,
     pub(crate) m_hp: i32,
     pub(crate) m_mp: i32,
@@ -62,7 +62,7 @@ impl<'a> Role<'a> {
         self.sprite
     }
 
-    pub fn state_dur(&self) -> &Option<&'_ HashMap<State, i32>> {
+    pub fn state_dur(&self) -> &Option<&'_ HashMap<&'a State, i32>> {
         &(self.state_dur)
     }
 
@@ -106,8 +106,8 @@ impl<'a> Role<'a> {
         self
     }
 
-    pub fn new(id: i32, name: &'static str, sprite: Option<&'static str>, m_hp: i32, m_mp: i32, m_sp: i32, hp: i32,
-           mp: i32, sp: i32, element: i32, ranged: bool, revives: bool, state_dur: Option<&'a HashMap<State<'a>, i32>>) -> Role<'a> {
+    pub fn new(id: i32, name: &'static str, sprite: Option<&'static str>, m_hp: i32, m_mp: i32, m_sp: i32, hp: i32, mp: i32,
+    sp: i32, element: i32, ranged: bool, revives: bool, state_dur: Option<&'a HashMap<&'a State<'a>, i32>>) -> Role<'a> {
         let mut flags = 0;
         if revives {
             flags |= Role::FLAG_REVIVE;

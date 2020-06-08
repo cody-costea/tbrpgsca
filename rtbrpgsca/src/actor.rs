@@ -16,15 +16,19 @@ pub enum EquipPos {
 
 }
 
+pub enum EventType {
+
+}
+
 pub struct Actor<'a> {
     pub(crate) costume: Box<Costume<'a>>,
-    pub(crate) equipment: HashMap<EquipPos, Costume<'a>>,
-    pub(crate) skills_cr_qty: Option<HashMap<Ability<'a>, i32>>,
-    pub(crate) skills_rg_trn: Option<HashMap<Ability<'a>, i32>>,
-    pub(crate) items: Option<Rc<HashMap<Ability<'a>, i32>>>,
+    pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
+    pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
+    pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
+    pub(crate) items: Option<Rc<HashMap<&'a Ability<'a>, i32>>>,
     pub(crate) delay_act: Option<Box<&'a dyn FnMut(bool)>>,
-    pub(crate) dmg_roles: Option<Vec<Costume<'a>>>,
-    pub(crate) drawn_by: Option<Box<Actor<'a>>>,
+    pub(crate) dmg_roles: Option<Vec<&'a Costume<'a>>>,
+    pub(crate) drawn_by: Option<Box<&'a Actor<'a>>>,
     pub(crate) delay_trn: i32,
     pub(crate) dmg_chain: i32,
     pub(crate) chain_nr: i32,

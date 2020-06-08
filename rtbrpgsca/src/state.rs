@@ -11,7 +11,7 @@ use crate::costume::*;
 
 pub struct State<'a> {
     pub(crate) costume: Box<Costume<'a>>,
-    pub(crate) r_skills: Option<Vec<Ability<'a>>>,
+    pub(crate) r_skills: Option<&'a Vec<&'a Ability<'a>>>,
     pub(crate) s_res: i32,
     pub(crate) dur: i32,
 }
@@ -26,7 +26,7 @@ impl<'a> State<'a> {
         &mut (*self.costume)
     }
 
-    pub fn r_skills(&self) -> &Option<Vec<Ability>> {
+    pub fn r_skills(&self) -> &Option<&'a Vec<&'a Ability>> {
         &self.r_skills
     }
 
@@ -38,7 +38,7 @@ impl<'a> State<'a> {
         self.dur
     }
 
-    pub fn remove(&self, actor: Actor) {
+    pub fn remove(&self, actor: &Actor) {
 
     }
 
