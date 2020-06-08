@@ -12,6 +12,7 @@ use crate::state::*;
 
 use std::collections::HashMap;
 
+//#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Costume<'a> {
     pub(crate) role: Box<Role<'a>>,
     pub(crate) a_skills: Option<&'a Vec<&'a Ability<'a>>>,

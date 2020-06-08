@@ -11,6 +11,7 @@ use crate::actor::*;
 
 use std::collections::HashMap;
 
+//#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Ability<'a> {
     pub(crate) role: Box<Role<'a>>,
     pub(crate) r_states: Option<&'a HashMap<&'a State<'a>, i32>>,

@@ -9,6 +9,7 @@ use crate::actor::*;
 use crate::ability::*;
 use crate::costume::*;
 
+//#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct State<'a> {
     pub(crate) costume: Box<Costume<'a>>,
     pub(crate) r_skills: Option<&'a Vec<&'a Ability<'a>>>,

@@ -11,6 +11,7 @@ use crate::actor::*;
 use std::collections::HashMap;
 use std::str;
 
+//#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Role<'a> {
     pub(crate) id: i32,
     pub(crate) flags: i32,
@@ -58,8 +59,8 @@ impl<'a> Role<'a> {
         self.name
     }
 
-    pub fn sprite(&self) -> Option<&'static str> {
-        self.sprite
+    pub fn sprite(&self) -> &Option<&'static str> {
+        &self.sprite
     }
 
     pub fn state_dur(&self) -> &Option<&'_ HashMap<&'a State, i32>> {
