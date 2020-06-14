@@ -144,6 +144,54 @@ impl<'a> Actor<'a> {
         self.costume_mut().role_mut().flags = val;
     }
 
+    pub fn set_random_ai(&mut self, val: bool) {
+
+    }
+
+    pub fn set_ai_player(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_survives(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_stunned(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_reflects(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_shapeshifted(&mut self, val: bool) {
+        
+    }
+    
+    pub fn set_knocked_out(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_invincible(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_confused(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_enraged(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_ranged(&mut self, val: bool) {
+        
+    }
+
+    pub fn set_revives(&mut self, val: bool) {
+        
+    }
+
     pub fn set_atk(&mut self, val: i32) {
         self.costume_mut().atk = val;
     }
@@ -164,8 +212,21 @@ impl<'a> Actor<'a> {
         self.costume_mut().agi = val;
     }
 
+    pub fn set_agi_scene(&mut self, val: i32, scene: &'a dyn Scene) {
+        self.set_agi(val);
+        //scene.agi_calc();
+    }
+
     pub fn set_side(&mut self, val: i32) {
         self.side = val;
+    }
+
+    pub(crate) fn set_race_scene(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, val: &'a Costume) {
+
+    }
+
+    pub(crate) fn set_job_scene(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, val: &'a Costume) {
+        
     }
 
     pub fn set_race(&mut self, val: &'a Costume) {
@@ -282,28 +343,93 @@ impl<'a> Actor<'a> {
         self.max_lv = val;
     }
 
-    pub(crate) fn set_level_scene(&mut self, val: i32, scene: &Option<&'a mut dyn Scene>) {
+    pub(crate) fn set_exp_scene(&mut self, val: i32, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>) {
+
+    }
+
+    pub(crate) fn set_level_scene(&mut self, val: i32, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>) {
         while val > self.level() {
             self.xp = self.maxp;
-            self.level_up(&scene)
+            self.level_up(&ret, &scene)
         }
         self.cr_lv = val;
     }
 
     pub fn set_level(&mut self, val: i32) {
-        self.set_level_scene(val, &None);
+        self.set_level_scene(val, &None, &None);
     }
 
     pub fn set_max_exp(&mut self, val: i32) {
         
-    }    
+    }
 
     pub fn set_exp(&mut self, val: i32) {
         
     }
 
-    pub fn level_up(&mut self, scene: &Option<&'a mut dyn Scene>) {
+    pub fn check_reg_skill(&mut self, ability: &'a Ability) {
+        
+    }
 
+    pub fn level_up(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>) {
+
+    }
+
+    pub fn unequip_pos(&mut self, pos: EquipPos) -> Option<&'a Costume> {
+        self.equip_item(pos, &None)
+    }
+
+    pub fn equip_item(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>) -> Option<&'a Costume> {
+        self.equip_item_scene(pos, item, &None)
+    }
+
+    pub(crate) fn equip_item_scene(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>, scene: &'a Option<&'a dyn Scene>) -> Option<&'a Costume> {
+        None
+    }
+
+    pub(crate) fn apply_states(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, consume: bool) {
+
+    }
+
+    pub(crate) fn apply_dmg_roles(&mut self, ret: &'a mut String, scene: &Option<&'a mut dyn Scene>) {
+
+    }
+
+    pub(crate) fn update_attributes(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
+                                    costume: &'a Costume, remove: bool) {
+        
+    }
+
+    pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a HashMap<i32, i32>>,
+                                    st_res: &Option<&'a HashMap<&'a State, i32>>, remove: bool) {
+        
+    }
+
+    pub(crate) fn update_skills(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
+                                skills: &'a Vec<&'a Ability>, counters: bool, remove: bool) {
+        
+    }
+
+    pub(crate) fn update_states(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
+                                states: &'a HashMap<&'a State, i32>, with_dur: bool, remove: bool) {
+        
+    }
+
+    pub(crate) fn refresh_costumes(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>) {
+
+    }
+
+    pub(crate) fn switch_costume(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>,
+                                 old_cost: &Option<&'a Costume>, new_cost: &Option<&'a Costume>) {
+
+    }
+
+    pub(crate) fn recover_scene(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>) {
+        
+    }
+
+    pub fn recover(&mut self, ret:&'a mut String) {
+        self.recover_scene(&Some(ret), &None);
     }
     
 }
