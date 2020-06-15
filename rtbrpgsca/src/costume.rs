@@ -50,6 +50,34 @@ impl<'a> Costume<'a> {
         &(*self.role)
     }
 
+    pub fn enraged(&self) -> bool {
+        (self.flags & Costume::FLAG_ENRAGED) == Costume::FLAG_ENRAGED
+    }
+
+    pub fn confused(&self) -> bool {
+        (self.flags & Costume::FLAG_CONFUSE) == Costume::FLAG_CONFUSE
+    }
+
+    pub fn shape_shifted(&self) -> bool {
+        (self.flags & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT
+    }
+
+    pub fn invincible(&self) -> bool {
+        (self.flags & Costume::FLAG_INVINCIBLE) == Costume::FLAG_INVINCIBLE
+    }
+
+    pub fn stunned(&self) -> bool {
+        (self.flags & Costume::FLAG_STUN) == Costume::FLAG_STUN
+    }
+
+    pub fn drawn(&self) -> bool {
+        (self.flags & Costume::FLAG_DRAW) == Costume::FLAG_DRAW
+    }
+
+    pub fn knocked_out(&self) -> bool {
+        (self.flags & Costume::FLAG_KO) == Costume::FLAG_KO
+    }
+
     pub fn atk(&self) -> i32 {
         self.atk
     }

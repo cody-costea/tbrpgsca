@@ -9,6 +9,7 @@ use crate::scene::*;
 use crate::ability::*;
 use crate::costume::*;
 use crate::state::*;
+use crate::role::*;
 
 use std::rc::Rc;
 use std::any::Any;
@@ -133,7 +134,7 @@ impl<'a> Actor<'a> {
     }
 
     pub fn job(&self) -> &Costume {
-        self.equipment.get(&EquipPos::Race).unwrap()
+        self.equipment.get(&EquipPos::Job).unwrap()
     }
 
     pub fn race(&self) -> &Costume {
@@ -145,7 +146,11 @@ impl<'a> Actor<'a> {
     }
 
     pub fn set_random_ai(&mut self, val: bool) {
-
+        let role = self.costume_mut().role_mut();
+        let flags = role.flags();
+        if val != ((flags & Actor::FLAG_RANDOM_AI) == Actor::FLAG_RANDOM_AI) {
+            role.flags = flags ^ Role::FLAG_RANGE;
+        }
     }
 
     pub fn set_ai_player(&mut self, val: bool) {
@@ -164,7 +169,7 @@ impl<'a> Actor<'a> {
         
     }
 
-    pub fn set_shapeshifted(&mut self, val: bool) {
+    pub fn set_shape_shifted(&mut self, val: bool) {
         
     }
     
@@ -185,7 +190,11 @@ impl<'a> Actor<'a> {
     }
 
     pub fn set_ranged(&mut self, val: bool) {
-        
+        let role = self.costume_mut().role_mut();
+        let flags = role.flags();
+        if val != ((flags & Role::FLAG_RANGE) == Role::FLAG_RANGE) {
+            role.flags = flags ^ Role::FLAG_RANGE;
+        }
     }
 
     pub fn set_revives(&mut self, val: bool) {
