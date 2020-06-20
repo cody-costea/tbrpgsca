@@ -149,44 +149,88 @@ impl<'a> Actor<'a> {
         let role = self.costume_mut().role_mut();
         let flags = role.flags();
         if val != ((flags & Actor::FLAG_RANDOM_AI) == Actor::FLAG_RANDOM_AI) {
-            role.flags = flags ^ Role::FLAG_RANGE;
+            role.flags = flags ^ Actor::FLAG_RANDOM_AI;
         }
     }
 
     pub fn set_ai_player(&mut self, val: bool) {
-        
+        let role = self.costume_mut().role_mut();
+        let flags = role.flags();
+        if val != ((flags & Actor::FLAG_AI_PLAYER) == Actor::FLAG_AI_PLAYER) {
+            role.flags = flags ^ Actor::FLAG_AI_PLAYER;
+        }
     }
 
     pub fn set_survives(&mut self, val: bool) {
-        
+        let role = self.costume_mut().role_mut();
+        let flags = role.flags();
+        if val != ((flags & Actor::FLAG_SURVIVES) == Actor::FLAG_SURVIVES) {
+            role.flags = flags ^ Actor::FLAG_SURVIVES;
+        }
     }
 
     pub fn set_stunned(&mut self, val: bool) {
-        
-    }
-
-    pub fn set_reflects(&mut self, val: bool) {
-        
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_STUN) == Costume::FLAG_STUN) {
+            costume.flags = flags ^ Costume::FLAG_STUN;
+        }
     }
 
     pub fn set_shape_shifted(&mut self, val: bool) {
-        
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT) {
+            costume.flags = flags ^ Costume::FLAG_SHAPE_SHIFT;
+        }
     }
     
     pub fn set_knocked_out(&mut self, val: bool) {
-        
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_KO) == Costume::FLAG_KO) {
+            costume.flags = flags ^ Costume::FLAG_KO;
+        }
     }
 
     pub fn set_invincible(&mut self, val: bool) {
-        
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT) {
+            costume.flags = flags ^ Costume::FLAG_SHAPE_SHIFT;
+        }
     }
 
     pub fn set_confused(&mut self, val: bool) {
-        
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_CONFUSE) == Costume::FLAG_CONFUSE) {
+            costume.flags = flags ^ Costume::FLAG_CONFUSE;
+        }
     }
 
     pub fn set_enraged(&mut self, val: bool) {
-        
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_ENRAGED) == Costume::FLAG_ENRAGED) {
+            costume.flags = flags ^ Costume::FLAG_ENRAGED;
+        }
+    }
+
+    pub fn set_convertede(&mut self, val: bool) {
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_CONVERT) == Costume::FLAG_CONVERT) {
+            costume.flags = flags ^ Costume::FLAG_CONVERT;
+        }
+    }
+
+    pub fn set_drawn(&mut self, val: bool) {
+        let costume = self.costume_mut();
+        let flags = costume.flags();
+        if val != ((flags & Costume::FLAG_DRAW) == Costume::FLAG_DRAW) {
+            costume.flags = flags ^ Costume::FLAG_DRAW;
+        }
     }
 
     pub fn set_ranged(&mut self, val: bool) {
@@ -198,7 +242,11 @@ impl<'a> Actor<'a> {
     }
 
     pub fn set_revives(&mut self, val: bool) {
-        
+        let role = self.costume_mut().role_mut();
+        let flags = role.flags();
+        if val != ((flags & Role::FLAG_REVIVE) == Role::FLAG_REVIVE) {
+            role.flags = flags ^ Role::FLAG_REVIVE;
+        }
     }
 
     pub fn set_atk(&mut self, val: i32) {
@@ -221,20 +269,22 @@ impl<'a> Actor<'a> {
         self.costume_mut().agi = val;
     }
 
-    pub fn set_agi_scene(&mut self, val: i32, scene: &'a dyn Scene) {
+    pub fn set_agi_scene(&mut self, val: i32, scene: &mut Option<&'a mut dyn Scene>) {
         self.set_agi(val);
-        //scene.agi_calc();
+        if let Some(s) = scene {
+            s.agi_calc();
+        }
     }
 
     pub fn set_side(&mut self, val: i32) {
         self.side = val;
     }
 
-    pub(crate) fn set_race_scene(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, val: &'a Costume) {
+    pub(crate) fn set_race_scene(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>, val: &'a Costume) {
 
     }
 
-    pub(crate) fn set_job_scene(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, val: &'a Costume) {
+    pub(crate) fn set_job_scene(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>, val: &'a Costume) {
         
     }
 
@@ -352,36 +402,37 @@ impl<'a> Actor<'a> {
         self.max_lv = val;
     }
 
-    pub(crate) fn set_exp_scene(&mut self, val: i32, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>) {
+    pub(crate) fn set_exp_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
 
     }
 
-    pub(crate) fn set_level_scene(&mut self, val: i32, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>) {
+    pub(crate) fn set_level_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
         while val > self.level() {
             self.xp = self.maxp;
-            self.level_up(&ret, &scene)
+            self.level_up(ret, scene);
         }
         self.cr_lv = val;
     }
 
     pub fn set_level(&mut self, val: i32) {
-        self.set_level_scene(val, &None, &None);
+        self.set_level_scene(val, &mut None, &mut None);
     }
 
     pub fn set_max_exp(&mut self, val: i32) {
-        
+        self.maxp = if val < 1 {
+            1
+        } else {
+            val
+        };
     }
 
     pub fn set_exp(&mut self, val: i32) {
-        
+        self.xp = val;
+        self.level_up(&mut None, &mut None);
     }
 
     pub fn check_reg_skill(&mut self, ability: &'a Ability) {
         
-    }
-
-    pub fn level_up(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>) {
-
     }
 
     pub fn unequip_pos(&mut self, pos: EquipPos) -> Option<&'a Costume> {
@@ -394,6 +445,26 @@ impl<'a> Actor<'a> {
 
     pub(crate) fn equip_item_scene(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>, scene: &'a Option<&'a dyn Scene>) -> Option<&'a Costume> {
         None
+    }
+
+    pub(crate) fn level_up(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
+        let maxp = self.max_exp();
+        let max_lv = self.max_level();
+        let mut lv = self.level();
+        let xp = self.exp();
+        while maxp <= xp && lv < max_lv {
+            self.max_lv = maxp * 2;
+            self.m_hp += 3;
+            self.m_mp += 2;
+            self.m_sp += 2;
+            self.atk += 1;
+            self.def += 1;
+            self.spi += 1;
+            self.wis += 1;
+            self.set_agi_scene(self.agi + 1, scene);
+            lv += 1;
+        }
+        self.cr_lv = lv;
     }
 
     pub(crate) fn apply_states(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, consume: bool) {
