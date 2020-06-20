@@ -648,7 +648,7 @@ Actor& Actor::applyStates(QString* const ret, Scene* const scene, const bool con
     return actor;
 }
 
-Actor& Actor::checkRegSkill(Ability& skill)
+inline Actor& Actor::checkRegSkill(Ability& skill)
 {
     Actor& actor = *this;
     if (skill.rQty > 0)
@@ -739,20 +739,21 @@ Actor& Actor::levelUp(Scene* const scene)
 {
     Actor& actor = *this;
     //int const i = remove ? -1 : 1;
-    while (actor.maxp <= actor.xp && actor.lv < actor.maxLv)
+    int maxp = actor.maxp, xp = actor.xp, maxLv = actor.maxLv, lv;
+    while (maxp <= xp && (lv = actor.lv) < maxLv)
     {
-        actor.maxp *= 2;
-        ++(actor.lv);
+        actor.maxp = maxp * 2;
+        actor.lv = lv + 1;
         actor.mHp += 3;
         actor.mMp += 2;
         actor.mSp += 2;
-        ++(actor.atk);
-        ++(actor.def);
-        ++(actor.wis);
-        ++(actor.spi);
+        actor.atk += 1;
+        actor.def += 1;
+        actor.wis += 1;
+        actor.spi += 1;
         if (scene == nullptr)
         {
-            ++(actor.agi);
+            actor.agi += 1;
         }
         else
         {

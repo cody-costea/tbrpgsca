@@ -104,7 +104,7 @@ namespace tbrpgsca
         void* extra;
 
         Actor& levelUp(Scene* const scene);
-        Actor& checkRegSkill(Ability& skill);
+        inline Actor& checkRegSkill(Ability& skill);
         Actor& recover(QString* const ret, Scene* const scene);
         Actor& applyDmgRoles(QString& ret, Scene* const scene);
         Actor& removeStates(QString* const ret, Scene* const scene, bool const remove);
