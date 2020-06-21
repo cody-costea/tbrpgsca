@@ -13,7 +13,7 @@ use std::collections::HashMap;
 
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Ability<'a> {
-    pub(crate) role: Box<Role<'a>>,
+    pub(crate) base: Box<Role<'a>>,
     pub(crate) r_states: Option<&'a HashMap<&'a State<'a>, i32>>,
     pub(crate) sound: Option<&'static str>,
     pub(crate) attr_inc: i32,
@@ -42,14 +42,6 @@ impl<'a> Ability<'a> {
     pub const FLAG_TRG_ALL: i32 = 4;
     pub const FLAG_TRG_ONE: i32 = 0;
     pub const DEFAULT_RES: i32 = 3;
-
-    pub fn base_mut(&mut self) -> &mut Role<'a> {
-        &mut (*self.role)
-    }
-    
-    pub fn base(&self) -> &Role<'a> {
-        &(*self.role)
-    }
 
     pub fn lv_rq(&self) -> i32 {
         self.lv_rq
@@ -129,7 +121,7 @@ impl<'a> Ability<'a> {
         }
         (*role).flags = flags;
         Ability {
-            role: role,
+            base: role,
             lv_rq: lv_rq,
             attr_inc: attr_inc,
             r_states: r_states,

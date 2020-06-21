@@ -14,7 +14,7 @@ use std::collections::HashMap;
 
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Costume<'a> {
-    pub(crate) role: Box<Role<'a>>,
+    pub(crate) base: Box<Role<'a>>,
     pub(crate) a_skills: Option<&'a Vec<&'a Ability<'a>>>,
     pub(crate) counters: Option<&'a Vec<&'a Ability<'a>>>,
     pub(crate) st_res: Option<&'a HashMap<&'a State<'a>, i32>>,
@@ -43,14 +43,6 @@ impl<'a> Costume<'a> {
     pub const FLAG_DRAW: i32 = 128;
     pub const FLAG_STUN: i32 = 256;
     pub const FLAG_KO: i32 = 512;
-
-    pub fn base_mut(&mut self) -> &mut Role<'a> {
-        &mut (*self.role)
-    }
-
-    pub fn base(&self) -> &Role<'a> {
-        &(*self.role)
-    }
 
     pub fn enraged(&self) -> bool {
         (self.base().flags() & Costume::FLAG_ENRAGED) == Costume::FLAG_ENRAGED
@@ -120,15 +112,15 @@ impl<'a> Costume<'a> {
         &self.st_res
     }
 
-    pub fn refresh(&self, actor: Actor, upd_states: bool, remove: bool) {
+    pub fn refresh<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
 
     }
 
-    pub fn adopt(&self, actor: Actor, upd_states: bool, remove: bool) {
+    pub fn adopt<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
 
     }
 
-    pub fn apply(&self, ret: Option<&mut String>, actor: Actor) {
+    pub fn apply<'b>(&self, ret: &'b mut Option<&'a mut String>, actor: &'b mut Actor) {
         
     }
     

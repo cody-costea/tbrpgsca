@@ -138,6 +138,18 @@ macro_rules! extend_struct {
 
     ($sub: tt, $base: tt) => {
 
+        impl<'a> $sub<'a> {
+
+            pub fn base(&self) -> &$base<'a> {
+                &(*self.base)
+            }
+
+            pub fn base_mut(&mut self) -> &mut $base<'a> {
+                &mut (*self.base)
+            }
+
+        }
+
         impl<'a> std::ops::Deref for $sub<'a> {
 
             type Target = $base<'a>;

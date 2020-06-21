@@ -10,7 +10,7 @@ use crate::ability::*;
 use crate::costume::*;
 use crate::state::*;
 
-pub type SpriteAct<'a> = dyn FnMut(&mut dyn Scene, &Option<&'a Actor>, &Option<&'a Ability>, bool, &Option<&'a Actor>, &Option<&'a Ability>);
+pub type SpriteRun<'a> = dyn FnMut(&'a mut dyn Scene, &'a Option<&'a Actor>, &Option<&'a Ability>, bool, &'a Option<&'a Actor>, &Option<&'a Ability>);
 
 pub trait Scene<'a> {
     
@@ -24,23 +24,29 @@ pub trait Scene<'a> {
 
     fn last_ability(&self) -> &'a Ability<'a>;
 
-    fn play_ai(&mut self,ret: &'a String, actor: &'a Actor) {
+    fn sprite_run(&self) -> &'a Option<&'a SpriteRun<'a>>;
+
+    fn targets(&self) -> &'a Option<&'a Vec<&'a Actor>>;
+
+    fn set_targets(&mut self, targets: &'a Option<&'a Vec<&'a Actor>>);
+
+    fn play_ai(&mut self,ret: &'a mut String, actor: &'a mut Actor) {
 
     }
 
-    fn end_turn(&mut self, ret: &'a String, actor: &'a Actor) {
+    fn end_turn(&mut self, ret: &'a mut String, actor: &'a mut Actor) {
         
     }
 
-    fn perform(&mut self, ret: &'a String, user: &'a Actor, ability: &'a Ability, target: &'a Actor, item: bool) {
+    fn perform(&mut self, ret: &'a mut String, user: &'a mut Actor, ability: &'a Ability, target: &'a mut Actor, item: bool) {
 
     }
 
-    fn execute(&mut self, ret: &'a String, user: &'a Actor, ability: &'a Ability, target: &Option<&'a Actor>, apply_costs: bool) {
+    fn execute(&mut self, ret: &'a String, user: &'a mut Actor, ability: &'a Ability, target: &Option<&'a mut Actor>, apply_costs: bool) {
 
     }
 
-    fn initialize(&mut self, ret: &'a String, parties: Vec<&'a Vec<&'a Actor>>, surprise: i32, m_init: i32) {
+    fn initialize(&mut self, ret: &'a mut String, parties: Vec<&'a Vec<&'a mut Actor>>, surprise: i32, m_init: i32) {
 
     }
 
@@ -56,15 +62,15 @@ pub trait Scene<'a> {
         false
     }
 
-    fn check_status(&mut self, ret: &'a String) {
+    fn check_status(&mut self, ret: &'a mut String) {
         
     }
 
-    fn reset_turn(&mut self, actor: &'a Actor) {
+    fn reset_turn(&mut self, actor: &'a mut Actor) {
         
     }
 
-    fn escape(&mut self, ret: &'a String) {
+    fn escape(&mut self, ret: &'a mut String) {
         
     }
 

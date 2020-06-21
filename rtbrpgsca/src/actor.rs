@@ -25,12 +25,12 @@ pub enum EquipPos {
 
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Actor<'a> {
-    pub(crate) costume: Box<Costume<'a>>,
+    pub(crate) base: Box<Costume<'a>>,
     pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
     pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
     pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
     pub(crate) items: Option<Rc<&'a HashMap<&'a Ability<'a>, i32>>>,
-    pub(crate) dmg_roles: Option<Vec<&'a Costume<'a>>>,
+    pub(crate) dmg_roles: Option<&'a Vec<&'a Costume<'a>>>,
     pub(crate) delay_act: Option<&'a DelayAct>,
     pub(crate) drawn_by: Option<&'a Actor<'a>>,
     pub(crate) m_delay_trn: i32,
@@ -55,14 +55,6 @@ impl<'a> Actor<'a> {
     pub const FLAG_RANDOM_AI: i32 = 2048;
     pub const FLAG_AI_PLAYER: i32 = 4096;
 
-    pub fn base(&self) -> &Costume<'a> {
-        &(*self.costume)
-    }
-
-    pub fn base_mut(&mut self) -> &mut Costume<'a> {
-        &mut (*self.costume)
-    }
-
     pub fn survives(&self) -> bool {
         (self.base().base().flags() & Actor::FLAG_SURVIVES) == Actor::FLAG_SURVIVES
     }
@@ -83,7 +75,7 @@ impl<'a> Actor<'a> {
         &self.delay_act
     }
 
-    pub fn dmg_roles(&self) -> &Option<Vec<&'a Costume<'a>>> {
+    pub fn dmg_roles(&self) -> &Option<&'a Vec<&'a Costume<'a>>> {
         &self.dmg_roles
     }
 
@@ -300,7 +292,7 @@ impl<'a> Actor<'a> {
 
     pub fn set_m_actions(&mut self, val: i32) {
         if val > 0 {
-            let costume = &mut self.base_mut();            
+            let costume = self.base_mut();            
             costume.m_actions = val;
             if val < self.actions() {
                 self.actions = val;
@@ -310,7 +302,7 @@ impl<'a> Actor<'a> {
 
     pub fn set_m_hp(&mut self, val: i32) {
         if val > 0 {
-            let role = &mut self.base_mut().base_mut();
+            let role = self.base_mut().base_mut();
             role.m_hp = val;
             if val < role.hp() {
                 role.hp = val;
@@ -320,7 +312,7 @@ impl<'a> Actor<'a> {
 
     pub fn set_m_mp(&mut self, val: i32) {
         if val > 0 {
-            let role = &mut self.base_mut().base_mut();
+            let role = self.base_mut().base_mut();
             role.m_mp = val;
             if val < role.mp() {
                 role.mp = val;
@@ -330,7 +322,7 @@ impl<'a> Actor<'a> {
 
     pub fn set_m_sp(&mut self, val: i32) {
         if val > 0 {
-            let role = &mut self.base_mut().base_mut();
+            let role = self.base_mut().base_mut();
             role.m_sp = val;
             if val < role.sp() {
                 role.sp = val;
@@ -351,13 +343,13 @@ impl<'a> Actor<'a> {
     }
 
     pub fn set_hp(&mut self, val: i32) {
-        let role = &mut self.base_mut().base_mut();
+        let role = self.base_mut().base_mut();
         let m_hp = role.m_hp();
         role.hp = if val > m_hp { m_hp } else { val };
     }
 
     pub fn set_mp(&mut self, val: i32) {
-        let role = &mut self.base_mut().base_mut();
+        let role = self.base_mut().base_mut();
         let m_mp = role.m_mp();
         role.mp = if val > m_mp { m_mp } else { val };
     }
@@ -381,8 +373,8 @@ impl<'a> Actor<'a> {
     }
 
     pub fn set_delay_act(&mut self, val: &Option<&'a DelayAct>) {
-        self.delay_act = if let v = val.unwrap() {
-            Some(v)
+        self.delay_act = if let Some(v) = val {
+            Some(*v)
         } else {
             None
         };
@@ -476,14 +468,25 @@ impl<'a> Actor<'a> {
         if let Some(states) = self.base().base().state_dur {
             for (state, dur) in states.iter() {
                 if (*dur) > State::END_DUR {
-                    state.alter(ret, scene, self, consume);
+                    //state.alter(ret, scene, self, consume);
                 }
             }
         }
     }
 
-    pub(crate) fn apply_dmg_roles(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
+    pub(crate) fn apply_dmg_roles(&mut self, ret: &mut Option<&'a mut String>, scene: &'a mut Option<&'a mut dyn Scene>) {
+        if let Some(dmg_roles) = self.dmg_roles {
+            for costume in dmg_roles {
+                costume.apply(ret, self);
+            }
+            if let Some(scene) = scene {
+                if let Some(actorRun) = scene.sprite_run() {
+                    /*if actorRun(scene, &mut self, &None, false, &None, &None) {
 
+                    }*/
+                }
+            }
+        }
     }
 
     pub(crate) fn update_attributes(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>,

@@ -12,7 +12,7 @@ use crate::scene::*;
 
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct State<'a> {
-    pub(crate) costume: Box<Costume<'a>>,
+    pub(crate) base: Box<Costume<'a>>,
     pub(crate) r_skills: Option<&'a Vec<&'a Ability<'a>>>,
     pub(crate) s_res: i32,
     pub(crate) dur: i32,
@@ -23,14 +23,6 @@ extend_struct!(State, Costume);
 impl<'a> State<'a> {
 
     pub const END_DUR: i32 = 3;
-
-    pub fn base(&self) -> &Costume<'a> {
-        &(*self.costume)
-    }
-
-    pub fn base_mut(&mut self) -> &mut Costume<'a> {
-        &mut (*self.costume)
-    }
 
     pub fn r_skills(&self) -> &Option<&'a Vec<&'a Ability>> {
         &self.r_skills
@@ -44,23 +36,23 @@ impl<'a> State<'a> {
         self.dur
     }
 
-    pub fn remove(&self, actor: &Actor) {
+    pub fn remove<'b>(&self, actor: &'b mut Actor) {
 
     }
 
-    pub fn block_skills(&self, actor: &Actor, remove: bool) {
+    pub fn block_skills<'b>(&self, actor: &'b mut Actor, remove: bool) {
 
     }
 
-    pub fn alter<'b>(&self, ret: &'b mut Option<&'a mut String>, scene: &'b mut Option<&'a mut dyn Scene>, actor: &'b mut Actor, consume: bool) {
+    pub fn alter<'b>(&self, ret: &'b mut Option<&'b mut String>, scene: &'a mut Option<&'a mut dyn Scene>, actor: &'b mut Actor, consume: bool) {
 
     }
 
-    pub fn disable(&self, actor: &Actor, dur: i32, remove: bool) {
+    pub fn disable<'b>(&self, actor: &'b mut Actor, dur: i32, remove: bool) {
 
     }
 
-    pub fn inflict(&self, user: &Actor, dur: i32, always: bool) {
+    pub fn inflict<'b>(&self, user: &'b mut Actor, dur: i32, always: bool) {
 
     }
 
