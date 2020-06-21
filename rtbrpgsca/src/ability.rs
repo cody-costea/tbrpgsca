@@ -22,6 +22,8 @@ pub struct Ability<'a> {
     pub(crate) r_qty: i32,
 }
 
+extend_struct!(Ability, Role);
+
 impl<'a> Ability<'a> {
 
     pub const MISSES_TXT: &'static str = ", but misses {}";
@@ -41,11 +43,11 @@ impl<'a> Ability<'a> {
     pub const FLAG_TRG_ONE: i32 = 0;
     pub const DEFAULT_RES: i32 = 3;
 
-    pub fn role_mut(&mut self) -> &mut Role<'a> {
+    pub fn base_mut(&mut self) -> &mut Role<'a> {
         &mut (*self.role)
     }
     
-    pub fn role(&self) -> &Role<'a> {
+    pub fn base(&self) -> &Role<'a> {
         &(*self.role)
     }
 
@@ -58,23 +60,23 @@ impl<'a> Ability<'a> {
     }
 
     pub fn only_melee(&mut self) -> bool {
-        (self.role().flags() & Ability::FLAG_MELEE) == Ability::FLAG_MELEE
+        (self.base().flags() & Ability::FLAG_MELEE) == Ability::FLAG_MELEE
     }
 
     pub fn steals(&self) -> bool {
-        (self.role().flags() & Ability::FLAG_STEAL) == Ability::FLAG_STEAL
+        (self.base().flags() & Ability::FLAG_STEAL) == Ability::FLAG_STEAL
     }
 
     pub fn absorbs(&self) -> bool {
-        (self.role().flags() & Ability::FLAG_ABSORB) == Ability::FLAG_ABSORB
+        (self.base().flags() & Ability::FLAG_ABSORB) == Ability::FLAG_ABSORB
     }
 
     pub fn can_miss(&self) -> bool {
-        (self.role().flags() & Ability::FLAG_MISSABLE) == Ability::FLAG_MISSABLE
+        (self.base().flags() & Ability::FLAG_MISSABLE) == Ability::FLAG_MISSABLE
     }
 
     pub fn does_critical(&self) -> bool {
-        (self.role().flags() & Ability::FLAG_CRITICAL) == Ability::FLAG_CRITICAL
+        (self.base().flags() & Ability::FLAG_CRITICAL) == Ability::FLAG_CRITICAL
     }
 
     pub fn r_states(&self) -> &Option<&'a HashMap<&'a State<'a>, i32>> {
@@ -135,23 +137,6 @@ impl<'a> Ability<'a> {
             m_qty: m_qty,
             r_qty: r_qty
         }
-    }
-
-}
-
-impl<'a> std::ops::Deref for Ability<'a> {
-
-    type Target = Role<'a>;
-    fn deref(&self) -> &Role<'a> {
-        self.role()
-    }
-
-}
-
-impl<'a> std::ops::DerefMut for Ability<'a> {
-
-    fn deref_mut(&mut self) -> &mut Role<'a> {
-        self.role_mut()
     }
 
 }

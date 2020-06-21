@@ -63,7 +63,7 @@ impl<'a> Role<'a> {
         &self.sprite
     }
 
-    pub fn state_dur(&self) -> &Option<&'_ HashMap<&'a State, i32>> {
+    pub fn state_dur(&self) -> &Option<&'a HashMap<&'a State, i32>> {
         &(self.state_dur)
     }
 
@@ -130,6 +130,31 @@ impl<'a> Role<'a> {
             mp: mp,
             sp: sp
         }
+    }
+
+}
+
+macro_rules! extend_struct {
+
+    ($sub: tt, $base: tt) => {
+
+        impl<'a> std::ops::Deref for $sub<'a> {
+
+            type Target = $base<'a>;
+            fn deref(&self) -> &$base<'a> {
+                self.base()
+            }
+
+        }
+
+        impl<'a> std::ops::DerefMut for $sub<'a> {
+
+            fn deref_mut(&mut self) -> &mut $base<'a> {
+                self.base_mut()
+            }
+
+        }
+
     }
 
 }

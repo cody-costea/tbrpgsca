@@ -8,6 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 use crate::actor::*;
 use crate::ability::*;
 use crate::costume::*;
+use crate::scene::*;
 
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct State<'a> {
@@ -17,13 +18,17 @@ pub struct State<'a> {
     pub(crate) dur: i32,
 }
 
+extend_struct!(State, Costume);
+
 impl<'a> State<'a> {
 
-    pub fn costume(&self) -> &Costume<'a> {
+    pub const END_DUR: i32 = 3;
+
+    pub fn base(&self) -> &Costume<'a> {
         &(*self.costume)
     }
 
-    pub fn costume_mut(&mut self) -> &mut Costume<'a> {
+    pub fn base_mut(&mut self) -> &mut Costume<'a> {
         &mut (*self.costume)
     }
 
@@ -32,7 +37,7 @@ impl<'a> State<'a> {
     }
 
     pub fn s_res(&self) -> i32 {
-        self.s_res()
+        self.s_res
     }
 
     pub fn dur(&self) -> i32 {
@@ -47,7 +52,7 @@ impl<'a> State<'a> {
 
     }
 
-    pub fn alter(&self, ret: &String, actor: &Actor, consume: bool) {
+    pub fn alter<'b>(&self, ret: &'b mut Option<&'a mut String>, scene: &'b mut Option<&'a mut dyn Scene>, actor: &'b mut Actor, consume: bool) {
 
     }
 
@@ -57,23 +62,6 @@ impl<'a> State<'a> {
 
     pub fn inflict(&self, user: &Actor, dur: i32, always: bool) {
 
-    }
-
-}
-
-impl<'a> std::ops::Deref for State<'a> {
-
-    type Target = Costume<'a>;
-    fn deref(&self) -> &Costume<'a> {
-        self.costume()
-    }
-
-}
-
-impl<'a> std::ops::DerefMut for State<'a> {
-
-    fn deref_mut(&mut self) -> &mut Costume<'a> {
-        self.costume_mut()
     }
 
 }

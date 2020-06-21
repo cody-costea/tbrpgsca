@@ -1,4 +1,5 @@
 
+#[macro_use]
 mod role;
 mod actor;
 mod ability;

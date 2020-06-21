@@ -29,6 +29,8 @@ pub struct Costume<'a> {
     pub(crate) agi: i32,
 }
 
+extend_struct!(Costume, Role);
+
 impl<'a> Costume<'a> {
     
     pub const CAUSES_TXT: &'static str = ", {0} is affected by {1}";
@@ -42,40 +44,40 @@ impl<'a> Costume<'a> {
     pub const FLAG_STUN: i32 = 256;
     pub const FLAG_KO: i32 = 512;
 
-    pub fn role_mut(&mut self) -> &mut Role<'a> {
+    pub fn base_mut(&mut self) -> &mut Role<'a> {
         &mut (*self.role)
     }
 
-    pub fn role(&self) -> &Role<'a> {
+    pub fn base(&self) -> &Role<'a> {
         &(*self.role)
     }
 
     pub fn enraged(&self) -> bool {
-        (self.flags & Costume::FLAG_ENRAGED) == Costume::FLAG_ENRAGED
+        (self.base().flags() & Costume::FLAG_ENRAGED) == Costume::FLAG_ENRAGED
     }
 
     pub fn confused(&self) -> bool {
-        (self.flags & Costume::FLAG_CONFUSE) == Costume::FLAG_CONFUSE
+        (self.base().flags() & Costume::FLAG_CONFUSE) == Costume::FLAG_CONFUSE
     }
 
     pub fn shape_shifted(&self) -> bool {
-        (self.flags & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT
+        (self.base().flags() & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT
     }
 
     pub fn invincible(&self) -> bool {
-        (self.flags & Costume::FLAG_INVINCIBLE) == Costume::FLAG_INVINCIBLE
+        (self.base().flags() & Costume::FLAG_INVINCIBLE) == Costume::FLAG_INVINCIBLE
     }
 
     pub fn stunned(&self) -> bool {
-        (self.flags & Costume::FLAG_STUN) == Costume::FLAG_STUN
+        (self.base().flags() & Costume::FLAG_STUN) == Costume::FLAG_STUN
     }
 
     pub fn drawn(&self) -> bool {
-        (self.flags & Costume::FLAG_DRAW) == Costume::FLAG_DRAW
+        (self.base().flags() & Costume::FLAG_DRAW) == Costume::FLAG_DRAW
     }
 
     pub fn knocked_out(&self) -> bool {
-        (self.flags & Costume::FLAG_KO) == Costume::FLAG_KO
+        (self.base().flags() & Costume::FLAG_KO) == Costume::FLAG_KO
     }
 
     pub fn atk(&self) -> i32 {
@@ -130,21 +132,4 @@ impl<'a> Costume<'a> {
         
     }
     
-}
-
-impl<'a> std::ops::Deref for Costume<'a> {
-
-    type Target = Role<'a>;
-    fn deref(&self) -> &Role<'a> {
-        self.role()
-    }
-
-}
-
-impl<'a> std::ops::DerefMut for Costume<'a> {
-
-    fn deref_mut(&mut self) -> &mut Role<'a> {
-        self.role_mut()
-    }
-
 }
