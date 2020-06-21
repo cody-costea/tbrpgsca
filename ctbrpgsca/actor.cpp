@@ -153,23 +153,23 @@ Actor& Actor::removeStates(QString* const ret, Scene* const scene, bool const re
     return actor;
 }
 
-Actor& Actor::setExtra(void* const extra)
+inline Actor& Actor::setExtra(void* const extra)
 {
     this->extra = extra;
     return *this;
 }
 
-Actor& Actor::setRace(Costume& race)
+inline Actor& Actor::setRace(Costume& race)
 {
     return this->setRace(nullptr, race);
 }
 
-Actor& Actor::setJob(Costume& job)
+inline Actor& Actor::setJob(Costume& job)
 {
     return this->setJob(nullptr, job);
 }
 
-Actor& Actor::setRace(Scene* const scene, Costume& race)
+inline Actor& Actor::setRace(Scene* const scene, Costume& race)
 {
     Actor& actor = *this;
     actor.equipItem(scene, CHAR_RACE, &race);
@@ -199,31 +199,31 @@ Actor& Actor::setJob(Scene* const scene, Costume& job)
     return actor;
 }
 
-Actor& Actor::setAttack(const int atk)
+inline Actor& Actor::setAttack(const int atk)
 {
     this->atk = atk;
     return *this;
 }
 
-Actor& Actor::setDefense(const int def)
+inline Actor& Actor::setDefense(const int def)
 {
     this->def = def;
     return *this;
 }
 
-Actor& Actor::setSpirit(const int spi)
+inline Actor& Actor::setSpirit(const int spi)
 {
     this->spi = spi;
     return *this;
 }
 
-Actor& Actor::setWisdom(const int wis)
+inline Actor& Actor::setWisdom(const int wis)
 {
     this->wis = wis;
     return *this;
 }
 
-Actor& Actor::setAgility(const int agi)
+inline Actor& Actor::setAgility(const int agi)
 {
     this->agi = agi;
     return *this;
@@ -254,7 +254,6 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
             }
             else
             {
-                actor.hp = 0;
                 actor.sp = 0;
                 if (ret != nullptr)
                 {
@@ -284,6 +283,7 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                 }
                 else
                 {
+                    actor.hp = 0;
                     actor.removeStates(ret, scene, false);
                     actor.setStunned(true);
                     actor.setKnockedOut(true);
@@ -379,13 +379,13 @@ Actor& Actor::setMaximumRp(const int mRp)
     return actor;
 }
 
-Actor& Actor::setName(QString value)
+inline Actor& Actor::setName(QString value)
 {
     this->name = value;
     return *this;
 }
 
-Actor& Actor::setSprite(QString& value)
+inline Actor& Actor::setSprite(QString& value)
 {
     Actor& actor = *this;
     QString* sprite = actor.sprite;
@@ -532,13 +532,13 @@ Actor& Actor::setItems(QMap<Ability*, int>* const items)
     return *this;
 }
 
-Actor& Actor::setMaximumLevel(const int maxLv)
+inline Actor& Actor::setMaximumLevel(const int maxLv)
 {
     this->maxLv = maxLv;
     return *this;
 }
 
-Actor& Actor::setLevel(const int level)
+inline Actor& Actor::setLevel(const int level)
 {
     return this->setLevel(nullptr, level);
 }
@@ -555,7 +555,7 @@ Actor& Actor::setLevel(Scene* const scene, const int level)
     return actor;
 }
 
-Actor& Actor::setExperience(const int xp)
+inline Actor& Actor::setExperience(const int xp)
 {
     return this->setExperience(nullptr, xp);
 }
@@ -564,7 +564,10 @@ Actor& Actor::setExperience(Scene* const scene, const int xp)
 {
     Actor& actor = *this;
     actor.xp = xp;
-    actor.levelUp(scene);
+    if (xp >= actor.maxp)
+    {
+        actor.levelUp(scene);
+    }
     return actor;
 }
 
@@ -648,7 +651,7 @@ Actor& Actor::applyStates(QString* const ret, Scene* const scene, const bool con
     return actor;
 }
 
-Actor& Actor::checkRegSkill(Ability& skill)
+inline Actor& Actor::checkRegSkill(Ability& skill)
 {
     Actor& actor = *this;
     if (skill.rQty > 0)
@@ -738,27 +741,29 @@ Actor& Actor::recover(QString* ret, Scene* const scene)
 Actor& Actor::levelUp(Scene* const scene)
 {
     Actor& actor = *this;
-    //int const i = remove ? -1 : 1;
-    while (actor.maxp <= actor.xp && actor.lv < actor.maxLv)
+    int lv = actor.lv;
+    int const maxp = actor.maxp, xp = actor.xp, maxLv = actor.maxLv;
+    while (maxp <= xp && lv < maxLv)
     {
-        actor.maxp *= 2;
-        ++(actor.lv);
+        actor.maxp = maxp * 2;
         actor.mHp += 3;
         actor.mMp += 2;
         actor.mSp += 2;
-        ++(actor.atk);
-        ++(actor.def);
-        ++(actor.wis);
-        ++(actor.spi);
+        actor.atk += 1;
+        actor.def += 1;
+        actor.wis += 1;
+        actor.spi += 1;
         if (scene == nullptr)
         {
-            ++(actor.agi);
+            actor.agi += 1;
         }
         else
         {
             actor.setAgility(actor.agi + 1, *scene);
         }
+        lv += 1;
     }
+    actor.lv = lv;
     return actor;
 }
 
