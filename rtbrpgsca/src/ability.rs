@@ -26,63 +26,74 @@ extend_struct!(Ability, Role);
 
 impl<'a> Ability<'a> {
 
-    pub const MISSES_TXT: &'static str = ", but misses {}";
-    pub const SUFFERS_TXT: &'static str = ", {} suffers";
-    pub const REFLECT_TXT: &'static str = ", reflected by {}";
-    pub const RESIST_TXT: &'static str = ", resisted by {}";
-    pub const STOLEN_TXT: &'static str = ", obtaining {0} from {1}";
+    #[inline(always)] pub const MISSES_TXT: &'static str = ", but misses {}";
+    #[inline(always)] pub const SUFFERS_TXT: &'static str = ", {} suffers";
+    #[inline(always)] pub const REFLECT_TXT: &'static str = ", reflected by {}";
+    #[inline(always)] pub const RESIST_TXT: &'static str = ", resisted by {}";
+    #[inline(always)] pub const STOLEN_TXT: &'static str = ", obtaining {0} from {1}";
 
-    pub const FLAG_MELEE: i32 = 4;
-    pub const FLAG_STEAL: i32 = 8;
-    pub const FLAG_ABSORB: i32 = 16;
-    pub const FLAG_MISSABLE: i32 = 32;
-    pub const FLAG_CRITICAL: i32 = 64;
-    pub const FLAG_TRG_SIDE: i32 = 128;
-    pub const FLAG_TRG_SELF: i32 = 256;
-    pub const FLAG_TRG_ALL: i32 = 4;
-    pub const FLAG_TRG_ONE: i32 = 0;
-    pub const DEFAULT_RES: i32 = 3;
+    #[inline(always)] pub const FLAG_MELEE: i32 = 4;
+    #[inline(always)] pub const FLAG_STEAL: i32 = 8;
+    #[inline(always)] pub const FLAG_ABSORB: i32 = 16;
+    #[inline(always)] pub const FLAG_MISSABLE: i32 = 32;
+    #[inline(always)] pub const FLAG_CRITICAL: i32 = 64;
+    #[inline(always)] pub const FLAG_TRG_SIDE: i32 = 128;
+    #[inline(always)] pub const FLAG_TRG_SELF: i32 = 256;
+    #[inline(always)] pub const FLAG_TRG_ALL: i32 = 4;
+    #[inline(always)] pub const FLAG_TRG_ONE: i32 = 0;
+    #[inline(always)] pub const DEFAULT_RES: i32 = 3;
 
+    #[inline(always)]
     pub fn lv_rq(&self) -> i32 {
         self.lv_rq
     }
 
+    #[inline(always)]
     pub fn attr_inc(&self) -> i32 {
         self.attr_inc
     }
 
+    #[inline(always)]
     pub fn only_melee(&mut self) -> bool {
         (self.base().flags() & Ability::FLAG_MELEE) == Ability::FLAG_MELEE
     }
 
+    #[inline(always)]
     pub fn steals(&self) -> bool {
         (self.base().flags() & Ability::FLAG_STEAL) == Ability::FLAG_STEAL
     }
 
+    #[inline(always)]
     pub fn absorbs(&self) -> bool {
         (self.base().flags() & Ability::FLAG_ABSORB) == Ability::FLAG_ABSORB
     }
 
+    #[inline(always)]
     pub fn can_miss(&self) -> bool {
         (self.base().flags() & Ability::FLAG_MISSABLE) == Ability::FLAG_MISSABLE
     }
 
+    #[inline(always)]
     pub fn does_critical(&self) -> bool {
         (self.base().flags() & Ability::FLAG_CRITICAL) == Ability::FLAG_CRITICAL
     }
 
+    #[inline(always)]
     pub fn r_states(&self) -> &Option<&'a HashMap<&'a State<'a>, i32>> {
         &self.r_states
     }
 
+    #[inline(always)]
     pub fn sound(&self) -> Option<&'static str> {
         self.sound
     }
 
+    #[inline(always)]
     pub fn m_qty(&self) -> i32 {
         self.m_qty
     }
 
+    #[inline(always)]
     pub fn r_qty(&self) -> i32 {
         self.r_qty
     }

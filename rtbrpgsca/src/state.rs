@@ -22,16 +22,19 @@ extend_struct!(State, Costume);
 
 impl<'a> State<'a> {
 
-    pub const END_DUR: i32 = 3;
+    #[inline(always)] pub const END_DUR: i32 = 3;
 
+    #[inline(always)]
     pub fn r_skills(&self) -> &Option<&'a Vec<&'a Ability>> {
         &self.r_skills
     }
 
+    #[inline(always)]
     pub fn s_res(&self) -> i32 {
         self.s_res
     }
 
+    #[inline(always)]
     pub fn dur(&self) -> i32 {
         self.dur
     }
@@ -44,7 +47,7 @@ impl<'a> State<'a> {
 
     }
 
-    pub fn alter<'b>(&self, ret: &'b mut Option<&'b mut String>, scene: &'a mut Option<&'a mut dyn Scene>, actor: &'b mut Actor, consume: bool) {
+    pub fn alter(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: &mut Actor, consume: bool) {
 
     }
 

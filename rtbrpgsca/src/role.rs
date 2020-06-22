@@ -29,76 +29,90 @@ pub struct Role<'a> {
 
 impl<'a> Role<'a> {
 
-    pub const HP_TXT: &'static str = "HP";
-    pub const MP_TXT: &'static str = "MP";
-    pub const RP_TXT: &'static str = "RP";
+    #[inline(always)] pub const HP_TXT: &'static str = "HP";
+    #[inline(always)] pub const MP_TXT: &'static str = "MP";
+    #[inline(always)] pub const RP_TXT: &'static str = "RP";
 
-    pub const FLAG_RANGE: i32 = 2;
-    pub const FLAG_REVIVE: i32 = 1;
-    pub const DMG_TYPE_ATK: i32 = 1;
-    pub const DMG_TYPE_DEF: i32 = 2;
-    pub const DMG_TYPE_SPI: i32 = 4;
-    pub const DMG_TYPE_WIS: i32 = 8;
-    pub const DMG_TYPE_AGI: i32 = 16;
-    pub const ELEMENT_FIRE: i32 = 32;
-    pub const ELEMENT_WATER: i32 = 64;
-    pub const ELEMENT_THUNDER: i32 = 128;
-    pub const ELEMENT_EARTH: i32 = 256;
-    pub const ELEMENT_PSYCHIC: i32 = 512;
-    pub const ELEMENT_LIGHT: i32 = 1024;
+    #[inline(always)] pub const FLAG_RANGE: i32 = 2;
+    #[inline(always)] pub const FLAG_REVIVE: i32 = 1;
+    #[inline(always)] pub const DMG_TYPE_ATK: i32 = 1;
+    #[inline(always)] pub const DMG_TYPE_DEF: i32 = 2;
+    #[inline(always)] pub const DMG_TYPE_SPI: i32 = 4;
+    #[inline(always)] pub const DMG_TYPE_WIS: i32 = 8;
+    #[inline(always)] pub const DMG_TYPE_AGI: i32 = 16;
+    #[inline(always)] pub const ELEMENT_FIRE: i32 = 32;
+    #[inline(always)] pub const ELEMENT_WATER: i32 = 64;
+    #[inline(always)] pub const ELEMENT_THUNDER: i32 = 128;
+    #[inline(always)] pub const ELEMENT_EARTH: i32 = 256;
+    #[inline(always)] pub const ELEMENT_PSYCHIC: i32 = 512;
+    #[inline(always)] pub const ELEMENT_LIGHT: i32 = 1024;
 
+    #[inline(always)]
     pub fn id(&self) -> i32 {
         self.id
     }
-
+    
+    #[inline(always)]
     pub fn flags(&self) -> i32 {
         self.flags
     }
 
+    #[inline(always)]
     pub fn name(&self) -> &'static str {
         self.name
     }
 
+    #[inline(always)]
     pub fn sprite(&self) -> &Option<&'static str> {
         &self.sprite
     }
 
+    #[inline(always)]
     pub fn state_dur(&self) -> &Option<&'a HashMap<&'a State, i32>> {
         &(self.state_dur)
     }
 
+    #[inline(always)]
     pub fn revives(&self) -> bool {
         (self.flags & Role::FLAG_REVIVE) == Role::FLAG_REVIVE
     }
 
+    #[inline(always)]
     pub fn ranged(&self) -> bool {
         (self.flags & Role::FLAG_RANGE) == Role::FLAG_RANGE
     }
     
+    #[inline(always)]
     pub fn dmg_type(&self) -> i32 {
         self.dmg_type
     }
 
+    #[inline(always)]
     pub fn m_hp(&self) -> i32 {
         self.m_hp
     }
 
+    #[inline(always)]
     pub fn m_mp(&self) -> i32 {
         self.m_mp
     }
 
+    #[inline(always)]
     pub fn m_sp(&self) -> i32 {
         self.m_sp
     }
 
+    #[inline(always)]
     pub fn hp(&self) -> i32 {
         self.hp
     }
 
+    #[inline(always)]
     pub fn mp(&self) -> i32 {
         self.mp
     }
     
+    #[inline(always)]
     pub fn sp(&self) -> i32 {
         self.sp
     }
@@ -140,10 +154,12 @@ macro_rules! extend_struct {
 
         impl<'a> $sub<'a> {
 
+            #[inline(always)]
             pub fn base(&self) -> &$base<'a> {
                 &(*self.base)
             }
 
+            #[inline(always)]
             pub fn base_mut(&mut self) -> &mut $base<'a> {
                 &mut (*self.base)
             }
@@ -153,6 +169,7 @@ macro_rules! extend_struct {
         impl<'a> std::ops::Deref for $sub<'a> {
 
             type Target = $base<'a>;
+            #[inline(always)]
             fn deref(&self) -> &$base<'a> {
                 self.base()
             }
@@ -160,7 +177,8 @@ macro_rules! extend_struct {
         }
 
         impl<'a> std::ops::DerefMut for $sub<'a> {
-
+            
+            #[inline(always)]
             fn deref_mut(&mut self) -> &mut $base<'a> {
                 self.base_mut()
             }

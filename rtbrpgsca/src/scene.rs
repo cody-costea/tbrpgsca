@@ -10,7 +10,8 @@ use crate::ability::*;
 use crate::costume::*;
 use crate::state::*;
 
-pub type SpriteRun<'a> = dyn FnMut(&'a mut dyn Scene, &'a Option<&'a Actor>, &Option<&'a Ability>, bool, &'a Option<&'a Actor>, &Option<&'a Ability>);
+pub type SpriteRun = dyn FnMut(&mut dyn Scene, &mut Option<&mut Actor>, &Option<&Ability>,
+                         bool, &mut Option<&mut Actor>, &Option<&Ability>) -> bool;
 
 pub trait Scene<'a> {
     
@@ -24,7 +25,7 @@ pub trait Scene<'a> {
 
     fn last_ability(&self) -> &'a Ability<'a>;
 
-    fn sprite_run(&self) -> &'a Option<&'a SpriteRun<'a>>;
+    fn sprite_run(&self) -> &Option<&SpriteRun>;
 
     fn targets(&self) -> &'a Option<&'a Vec<&'a Actor>>;
 

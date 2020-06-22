@@ -51,94 +51,116 @@ extend_struct!(Actor, Costume);
 
 impl<'a> Actor<'a> {
 
-    pub const FLAG_SURVIVES: i32 = 1024;
-    pub const FLAG_RANDOM_AI: i32 = 2048;
-    pub const FLAG_AI_PLAYER: i32 = 4096;
+    #[inline(always)] pub const FLAG_SURVIVES: i32 = 1024;
+    #[inline(always)] pub const FLAG_RANDOM_AI: i32 = 2048;
+    #[inline(always)] pub const FLAG_AI_PLAYER: i32 = 4096;
 
+    #[inline(always)]
     pub fn survives(&self) -> bool {
         (self.base().base().flags() & Actor::FLAG_SURVIVES) == Actor::FLAG_SURVIVES
     }
 
+    #[inline(always)]
     pub fn random_ai(&self) -> bool {
         (self.base().base().flags() & Actor::FLAG_RANDOM_AI) == Actor::FLAG_RANDOM_AI
     }
 
+    #[inline(always)]
     pub fn ai_player(&self) -> bool {
         (self.base().base().flags() & Actor::FLAG_AI_PLAYER) == Actor::FLAG_AI_PLAYER
     }
 
+    #[inline(always)]
     pub fn items(&self) -> &Option<Rc<&'a HashMap<&'a Ability<'a>, i32>>> {
         &self.items
     }
 
+    #[inline(always)]
     pub fn delay_act(&self) -> &Option<&'a DelayAct> {
         &self.delay_act
     }
 
+    #[inline(always)]
     pub fn dmg_roles(&self) -> &Option<&'a Vec<&'a Costume<'a>>> {
         &self.dmg_roles
     }
 
+    #[inline(always)]
     pub fn drawn_by(&self) -> &Option<&'a Actor<'a>> {
         &self.drawn_by
     }
 
+    #[inline(always)]
     pub(crate) fn old_side(&self) -> i32 {
         self.old_side
     }
 
+    #[inline(always)]
     pub fn delay_trn(&self) -> i32 {
         self.delay_trn()
     }
 
+    #[inline(always)]
     pub fn dmg_chain(&self) -> i32 {
         self.dmg_chain
     }
 
+    #[inline(always)]
     pub fn chain_nr(&self) -> i32 {
         self.chain_nr
     }
 
+    #[inline(always)]
     pub fn actions(&self) -> i32 {
         self.actions
     }
 
+    #[inline(always)]
     pub fn max_exp(&self) -> i32 {
         self.maxp
     }
 
+    #[inline(always)]
     pub fn max_level(&self) -> i32 {
         self.max_lv
     }
 
+    #[inline(always)]
     pub fn level(&self) -> i32 {
         self.cr_lv
     }
 
+    #[inline(always)]
     pub fn init(&self) -> i32 {
         self.init
     }
 
+    #[inline(always)]
     pub fn side(&self) -> i32 {
         self.side
     }
 
+    #[inline(always)]
     pub fn exp(&self) -> i32 {
         self.xp
     }
 
+    #[inline(always)]
     pub fn job(&self) -> &Costume {
         self.equipment.get(&EquipPos::Job).unwrap()
     }
 
+    #[inline(always)]
     pub fn race(&self) -> &Costume {
         self.equipment.get(&EquipPos::Race).unwrap()
     }
 
+    #[inline]
     pub(crate) fn set_flags(&mut self, val: i32) {
         self.base_mut().base_mut().flags = val;
     }
 
+    #[inline]
     pub fn set_random_ai(&mut self, val: bool) {
         let role = self.base_mut().base_mut();
         let flags = role.flags();
@@ -147,6 +169,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_ai_player(&mut self, val: bool) {
         let role = self.base_mut().base_mut();
         let flags = role.flags();
@@ -155,6 +178,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_survives(&mut self, val: bool) {
         let role = self.base_mut().base_mut();
         let flags = role.flags();
@@ -163,6 +187,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_stunned(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -171,6 +196,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_shape_shifted(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -179,6 +205,7 @@ impl<'a> Actor<'a> {
         }
     }
     
+    #[inline]
     pub fn set_knocked_out(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -187,6 +214,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_invincible(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -195,6 +223,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_confused(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -203,6 +232,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_enraged(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -211,6 +241,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_converted(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -219,6 +250,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_drawn(&mut self, val: bool) {
         let costume = self.base_mut();
         let flags = costume.flags();
@@ -227,6 +259,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_ranged(&mut self, val: bool) {
         let role = self.base_mut().base_mut();
         let flags = role.flags();
@@ -235,6 +268,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_revives(&mut self, val: bool) {
         let role = self.base_mut().base_mut();
         let flags = role.flags();
@@ -243,26 +277,32 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline(always)]
     pub fn set_atk(&mut self, val: i32) {
         self.base_mut().atk = val;
     }
 
+    #[inline(always)]
     pub fn set_def(&mut self, val: i32) {
         self.base_mut().def = val;
     }
 
+    #[inline(always)]
     pub fn set_spi(&mut self, val: i32) {
         self.base_mut().spi = val;
     }
 
+    #[inline(always)]
     pub fn set_wis(&mut self, val: i32) {
         self.base_mut().wis = val;
     }
 
+    #[inline(always)]
     pub fn set_agi(&mut self, val: i32) {
         self.base_mut().agi = val;
     }
 
+    #[inline]
     pub fn set_agi_scene(&mut self, val: i32, scene: &mut Option<&'a mut dyn Scene>) {
         self.set_agi(val);
         if let Some(s) = scene {
@@ -270,6 +310,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline(always)]
     pub fn set_side(&mut self, val: i32) {
         self.side = val;
     }
@@ -282,14 +323,17 @@ impl<'a> Actor<'a> {
         
     }
 
+    #[inline]
     pub fn set_race(&mut self, val: &'a Costume) {
 
     }
 
+    #[inline]
     pub fn set_job(&mut self, val: &'a Costume) {
         
     }
 
+    #[inline]
     pub fn set_m_actions(&mut self, val: i32) {
         if val > 0 {
             let costume = self.base_mut();            
@@ -300,6 +344,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_m_hp(&mut self, val: i32) {
         if val > 0 {
             let role = self.base_mut().base_mut();
@@ -310,6 +355,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_m_mp(&mut self, val: i32) {
         if val > 0 {
             let role = self.base_mut().base_mut();
@@ -320,6 +366,7 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_m_sp(&mut self, val: i32) {
         if val > 0 {
             let role = self.base_mut().base_mut();
@@ -342,28 +389,33 @@ impl<'a> Actor<'a> {
         }
     }
 
+    #[inline]
     pub fn set_hp(&mut self, val: i32) {
         let role = self.base_mut().base_mut();
         let m_hp = role.m_hp();
         role.hp = if val > m_hp { m_hp } else { val };
     }
 
+    #[inline]
     pub fn set_mp(&mut self, val: i32) {
         let role = self.base_mut().base_mut();
         let m_mp = role.m_mp();
         role.mp = if val > m_mp { m_mp } else { val };
     }
 
+    #[inline]
     pub fn set_sp(&mut self, val: i32) {
         let role = &mut self.base_mut().base_mut();
         let m_sp = role.m_sp();
         role.mp = if val > m_sp { m_sp } else { val };
     }
 
+    #[inline(always)]
     pub fn set_name(&mut self, val: &'static str) {
         self.base_mut().base_mut().name = val;
     }
 
+    #[inline(always)]
     pub fn set_sprite(&mut self, val: &Option<&'static str>) {
         self.base_mut().base_mut().sprite = if let Some(v) = val {
             Some(v)
@@ -372,6 +424,7 @@ impl<'a> Actor<'a> {
         };
     }
 
+    #[inline(always)]
     pub fn set_delay_act(&mut self, val: &Option<&'a DelayAct>) {
         self.delay_act = if let Some(v) = val {
             Some(*v)
@@ -380,26 +433,32 @@ impl<'a> Actor<'a> {
         };
     }
 
+    #[inline(always)]
     pub fn set_delay_trn(&mut self, val: i32) {
         self.delay_trn = val;
     }
 
+    #[inline(always)]
     pub fn set_dmg_chain(&mut self, val: i32) {
         self.dmg_chain = val;
     }
 
+    #[inline(always)]
     pub fn set_chain_nr(&mut self, val: i32) {
         self.chain_nr = val;
     }
 
+    #[inline(always)]
     pub fn set_max_level(&mut self, val: i32) {
         self.max_lv = val;
     }
 
+    #[inline]
     pub(crate) fn set_exp_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
 
     }
 
+    #[inline]
     pub(crate) fn set_level_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
         while val > self.level() {
             self.xp = self.maxp;
@@ -408,10 +467,12 @@ impl<'a> Actor<'a> {
         self.cr_lv = val;
     }
 
+    #[inline(always)]
     pub fn set_level(&mut self, val: i32) {
         self.set_level_scene(val, &mut None, &mut None);
     }
 
+    #[inline(always)]
     pub fn set_max_exp(&mut self, val: i32) {
         self.maxp = if val < 1 {
             1
@@ -420,19 +481,23 @@ impl<'a> Actor<'a> {
         };
     }
 
+    #[inline(always)]
     pub fn set_exp(&mut self, val: i32) {
         self.xp = val;
         self.level_up(&mut None, &mut None);
     }
 
+    #[inline]
     pub fn check_reg_skill(&mut self, ability: &'a Ability) {
         
     }
 
+    #[inline(always)]
     pub fn unequip_pos(&mut self, pos: EquipPos) -> Option<&'a Costume> {
         self.equip_item(pos, &None)
     }
 
+    #[inline(always)]
     pub fn equip_item(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>) -> Option<&'a Costume> {
         self.equip_item_scene(pos, item, &None)
     }
@@ -461,37 +526,47 @@ impl<'a> Actor<'a> {
         self.cr_lv = lv;
     }
 
-    pub(crate) fn apply_states(&mut self, ret: &'a mut Option<&'a mut String>, scene: &'a mut Option<&'a mut dyn Scene>, consume: bool) {
+    pub(crate) fn apply_states(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, consume: bool) {
         if consume {
             self.apply_dmg_roles(ret, scene);
         }
         if let Some(states) = self.base().base().state_dur {
             for (state, dur) in states.iter() {
                 if (*dur) > State::END_DUR {
-                    //state.alter(ret, scene, self, consume);
+                    state.alter(ret, scene, self, consume);
                 }
             }
         }
     }
 
-    pub(crate) fn apply_dmg_roles(&mut self, ret: &mut Option<&'a mut String>, scene: &'a mut Option<&'a mut dyn Scene>) {
+    pub(crate) fn apply_dmg_roles(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>) {
         if let Some(dmg_roles) = self.dmg_roles {
             for costume in dmg_roles {
                 costume.apply(ret, self);
             }
-            if let Some(scene) = scene {
-                if let Some(actorRun) = scene.sprite_run() {
-                    /*if actorRun(scene, &mut self, &None, false, &None, &None) {
+            /*if let Some(scene) = scene {
+                if let Some(actor_run) = scene.sprite_run() {
+                    if actor_run(scene, &mut Some(self), &None, false, &mut None, &None) {
 
-                    }*/
+                    }
                 }
-            }
+            }*/
         }
     }
 
     pub(crate) fn update_attributes(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>,
                                     costume: &'a Costume, remove: bool) {
-        
+        let c_role = costume.base();
+        let i = if remove { -1 } else { 1 };
+        self.set_m_hp(self.m_hp() + (i * c_role.m_hp()));
+        self.set_m_mp(self.m_mp() + (i * c_role.m_mp()));
+        self.set_m_sp(self.m_sp() + (i * c_role.m_sp()));
+        self.set_m_actions(self.m_actions() + (i * costume.m_actions()));
+        self.set_agi_scene(i * costume.agi(), scene);
+        self.set_atk(i * costume.atk());
+        self.set_def(i * costume.def());
+        self.set_wis(i * costume.wis());
+        self.set_spi(i * costume.spi());
     }
 
     pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a HashMap<i32, i32>>,
