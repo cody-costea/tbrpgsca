@@ -15,10 +15,10 @@ use std::collections::HashMap;
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Costume<'a> {
     pub(crate) base: Box<Role<'a>>,
-    pub(crate) a_skills: Option<&'a Vec<&'a Ability<'a>>>,
-    pub(crate) counters: Option<&'a Vec<&'a Ability<'a>>>,
-    pub(crate) st_res: Option<&'a HashMap<&'a State<'a>, i32>>,
-    pub(crate) res: Option<&'a HashMap<i32, i32>>,
+    pub(crate) a_skills: Option<&'a mut Vec<&'a Ability<'a>>>,
+    pub(crate) counters: Option<&'a mut Vec<&'a Ability<'a>>>,
+    pub(crate) st_res: Option<&'a mut HashMap<&'a State<'a>, i32>>,
+    pub(crate) res: Option<&'a mut HashMap<i32, i32>>,
     pub(crate) m_actions: i32,
     pub(crate) cvr_type: i32,
     pub(crate) rfl_type: i32,
@@ -110,23 +110,23 @@ impl<'a> Costume<'a> {
     }
 
     #[inline(always)]
-    pub fn a_skills(&self) -> &Option<&'a Vec<&'a Ability>> {
-        &self.a_skills
+    pub fn a_skills(&mut self) -> &mut Option<&'a mut Vec<&'a Ability>> {
+        &mut self.a_skills
     }
 
     #[inline(always)]
-    pub fn counters(&self) -> &Option<&'a Vec<&'a Ability>> {
-        &self.counters
+    pub fn counters(&mut self) -> &mut Option<&'a mut Vec<&'a Ability>> {
+        &mut self.counters
     }
 
     #[inline(always)]
-    pub fn res(&self) -> &Option<&'a HashMap<i32, i32>> {
-        &self.res
+    pub fn res(&mut self) -> &mut Option<&'a mut HashMap<i32, i32>> {
+        &mut self.res
     }
 
     #[inline(always)]
-    pub fn st_res(&self) -> &Option<&'a HashMap<&'a State<'a>, i32>> {
-        &self.st_res
+    pub fn st_res(&mut self) -> &mut Option<&'a mut HashMap<&'a State<'a>, i32>> {
+        &mut self.st_res
     }
 
     pub fn refresh<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {

@@ -117,7 +117,7 @@ impl<'a> Role<'a> {
         self.sp
     }
 
-    pub fn damage(&self, ret: Option<&mut String>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) -> &Role {
+    pub fn damage(&self, ret: Option<&mut String>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) -> &Role<'a> {
         self
     }
 

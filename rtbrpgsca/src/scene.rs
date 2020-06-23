@@ -55,7 +55,7 @@ pub trait Scene<'a> {
         0
     }
 
-    fn guardian(&mut self, user: &'a Actor, ability: &'a Ability, target: &'a Actor) -> &'a Actor<'a> {
+    fn guardian(&mut self, user: &'a Actor, ability: &'a Ability, target: &'a Actor<'a>) -> &'a Actor<'a> {
         target
     }
 

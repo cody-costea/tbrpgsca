@@ -146,12 +146,12 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub fn job(&self) -> &Costume {
+    pub fn job(&self) -> &'a Costume {
         self.equipment.get(&EquipPos::Job).unwrap()
     }
 
     #[inline(always)]
-    pub fn race(&self) -> &Costume {
+    pub fn race(&self) -> &'a Costume {
         self.equipment.get(&EquipPos::Race).unwrap()
     }
 
@@ -571,7 +571,26 @@ impl<'a> Actor<'a> {
 
     pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a HashMap<i32, i32>>,
                                     st_res: &Option<&'a HashMap<&'a State, i32>>, remove: bool) {
-        
+        if let Some(elm_res) = elm_res {
+            if remove {
+                if let Some(a_elm_res) = self.res() {
+                    for (elm, res) in elm_res.iter() {
+                        a_elm_res.insert(*elm, (if a_elm_res.contains_key(elm) { a_elm_res[elm] } else { 0 }) + res);
+                    }
+                }
+            } else {
+                if self.res().is_none() {
+                    //self.res = Some(&'a mut HashMap<i32, i32>::new());
+                }
+            }
+        }
+        if let Some(st_res) = st_res {
+            if remove {
+
+            } else {
+
+            }
+        }
     }
 
     pub(crate) fn update_skills(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
