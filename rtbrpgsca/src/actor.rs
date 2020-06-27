@@ -533,13 +533,12 @@ impl<'a> Actor<'a> {
         if consume {
             self.apply_dmg_roles(ret, scene);
         }
-        unsafe
-        {
+        unsafe {
             let actor = self as *mut Actor;
             if let Some(states) = self.base().base().state_dur() {
                 for (state, dur) in states.iter() {
                     if (*dur) > State::END_DUR {
-                        state.alter(ret, scene, actor, consume);
+                        state.alter(ret, scene, &mut (*actor), consume);
                     }
                 }
             }
@@ -600,7 +599,7 @@ impl<'a> Actor<'a> {
             if remove {
                 if let Some(a_st_res) = self.st_res_mut() {
                     for (state, res) in st_res.iter() {
-                        a_st_res.insert(state, (if a_st_res.contains_key(state) { a_st_res[state] } else { res }) - res);
+                        a_st_res.insert(state, (if a_st_res.contains_key(state) { a_st_res[state] } else { *res }) - res);
                     }
                 }
             } else {

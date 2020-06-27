@@ -48,10 +48,8 @@ impl<'a> State<'a> {
 
     }
 
-    pub(crate) fn alter<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: *mut Actor, consume: bool) {
-        unsafe {
-
-        }
+    pub(crate) fn alter<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: &mut Actor, consume: bool) {
+        
     }
 
     pub(crate) fn disable<'b>(&self, actor: &'b mut Actor, dur: i32, remove: bool) {

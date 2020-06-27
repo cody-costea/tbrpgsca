@@ -125,7 +125,7 @@ impl<'a> Ability<'a> {
 
     fn new(id: i32, name: &'static str, sprite: Option<&'static str>, sound: Option<&'static str>, steal: bool, range: bool, melee: bool, can_miss: bool,
            critical: bool, lv_rq: i32, m_hp: i32, m_mp: i32, m_sp: i32, dmg_type: i32, attr_inc: i32, hp: i32, mp: i32, sp: i32, trg: i32, elm: i32, m_qty: i32,
-           r_qty: i32, absorb: bool, revive: bool, a_states: Option<&'a HashMap<&'a State<'a>, i32>>, r_states: Option<&'a HashMap<&'a State<'a>, i32>>) -> Ability<'a> {
+           r_qty: i32, absorb: bool, revive: bool, a_states: Option<HashMap<&'a State<'a>, i32>>, r_states: Option<HashMap<&'a State<'a>, i32>>) -> Ability<'a> {
         let mut role = Box::new(Role::new(id, name, sprite, m_hp, m_mp, m_sp, hp, mp, sp, dmg_type | elm, range, revive, a_states));
         let mut flags = role.flags();
         if steal {
@@ -148,11 +148,7 @@ impl<'a> Ability<'a> {
             base: role,
             lv_rq: lv_rq,
             attr_inc: attr_inc,
-            r_states: if let Some(v) = r_states {
-                Some(v.clone())
-            } else {
-                None
-            },
+            r_states: r_states,
             sound: sound,
             m_qty: m_qty,
             r_qty: r_qty

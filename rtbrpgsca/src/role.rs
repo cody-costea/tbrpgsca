@@ -135,7 +135,7 @@ impl<'a> Role<'a> {
     }
 
     pub fn new(id: i32, name: &'static str, sprite: Option<&'static str>, m_hp: i32, m_mp: i32, m_sp: i32, hp: i32, mp: i32,
-    sp: i32, element: i32, ranged: bool, revives: bool, state_dur: Option<&'a HashMap<&'a State<'a>, i32>>) -> Role<'a> {
+    sp: i32, element: i32, ranged: bool, revives: bool, state_dur: Option<HashMap<&'a State<'a>, i32>>) -> Role<'a> {
         let mut flags = 0;
         if revives {
             flags |= Role::FLAG_REVIVE;
@@ -148,11 +148,7 @@ impl<'a> Role<'a> {
             flags: flags,
             name: name,
             sprite: sprite,
-            state_dur: if let Some(v) = state_dur {
-                Some(v.clone())
-            } else {
-                None
-            },
+            state_dur: state_dur,
             dmg_type: element,
             m_hp: m_hp,
             m_mp: m_mp,
