@@ -14,7 +14,7 @@ use std::collections::HashMap;
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Ability<'a> {
     pub(crate) base: Box<Role<'a>>,
-    pub(crate) r_states: Option<&'a HashMap<&'a State<'a>, i32>>,
+    pub(crate) r_states: Option<HashMap<&'a State<'a>, i32>>,
     pub(crate) sound: Option<&'static str>,
     pub(crate) attr_inc: i32,
     pub(crate) lv_rq: i32,
@@ -79,8 +79,21 @@ impl<'a> Ability<'a> {
     }
 
     #[inline(always)]
-    pub fn r_states(&self) -> &Option<&'a HashMap<&'a State<'a>, i32>> {
-        &self.r_states
+    pub fn r_states(&self) -> Option<&HashMap<&'a State<'a>, i32>> {
+        if let Some(v) = self.r_states.as_ref() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn r_states_mut(&mut self) -> Option<&mut HashMap<&'a State<'a>, i32>> {
+        if let Some(v) = self.r_states.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
     #[inline(always)]
@@ -135,7 +148,11 @@ impl<'a> Ability<'a> {
             base: role,
             lv_rq: lv_rq,
             attr_inc: attr_inc,
-            r_states: r_states,
+            r_states: if let Some(v) = r_states {
+                Some(v.clone())
+            } else {
+                None
+            },
             sound: sound,
             m_qty: m_qty,
             r_qty: r_qty

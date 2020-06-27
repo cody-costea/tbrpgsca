@@ -9,6 +9,7 @@ use crate::actor::*;
 use crate::ability::*;
 use crate::costume::*;
 use crate::scene::*;
+use std::cell::*;
 
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct State<'a> {
@@ -39,19 +40,21 @@ impl<'a> State<'a> {
         self.dur
     }
 
-    pub fn remove<'b>(&self, actor: &'b mut Actor) {
+    pub(crate) fn remove<'b>(&self, actor: &'b mut Actor) {
 
     }
 
-    pub fn block_skills<'b>(&self, actor: &'b mut Actor, remove: bool) {
+    pub(crate) fn block_skills<'b>(&self, actor: &'b mut Actor, remove: bool) {
 
     }
 
-    pub fn alter(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: &mut Actor, consume: bool) {
+    pub(crate) fn alter<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: *mut Actor, consume: bool) {
+        unsafe {
 
+        }
     }
 
-    pub fn disable<'b>(&self, actor: &'b mut Actor, dur: i32, remove: bool) {
+    pub(crate) fn disable<'b>(&self, actor: &'b mut Actor, dur: i32, remove: bool) {
 
     }
 

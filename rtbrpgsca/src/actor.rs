@@ -5,6 +5,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+#![feature(nll)]
 use crate::scene::*;
 use crate::ability::*;
 use crate::costume::*;
@@ -14,6 +15,7 @@ use crate::role::*;
 use std::rc::Rc;
 use std::any::Any;
 use std::collections::HashMap;
+use std::cell::*;
 
 pub type DelayAct = dyn FnMut(&mut Actor, bool);
 
@@ -26,6 +28,7 @@ pub enum EquipPos {
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Actor<'a> {
     pub(crate) base: Box<Costume<'a>>,
+    pub(crate) res_box: Option<HashMap<i32, i32>>,
     pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
     pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
     pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
@@ -526,14 +529,18 @@ impl<'a> Actor<'a> {
         self.cr_lv = lv;
     }
 
-    pub(crate) fn apply_states(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, consume: bool) {
+    pub(crate) fn apply_states(&'a mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, consume: bool) {
         if consume {
             self.apply_dmg_roles(ret, scene);
         }
-        if let Some(states) = self.base().base().state_dur {
-            for (state, dur) in states.iter() {
-                if (*dur) > State::END_DUR {
-                    state.alter(ret, scene, self, consume);
+        unsafe
+        {
+            let actor = self as *mut Actor;
+            if let Some(states) = self.base().base().state_dur() {
+                for (state, dur) in states.iter() {
+                    if (*dur) > State::END_DUR {
+                        state.alter(ret, scene, actor, consume);
+                    }
                 }
             }
         }
@@ -573,24 +580,40 @@ impl<'a> Actor<'a> {
                                     st_res: &Option<&'a HashMap<&'a State, i32>>, remove: bool) {
         if let Some(elm_res) = elm_res {
             if remove {
-                if let Some(a_elm_res) = self.res() {
+                if let Some(a_elm_res) = self.base_mut().res_mut() {
                     for (elm, res) in elm_res.iter() {
-                        a_elm_res.insert(*elm, (if a_elm_res.contains_key(elm) { a_elm_res[elm] } else { 0 }) + res);
+                        a_elm_res.insert(*elm, (if a_elm_res.contains_key(elm) { a_elm_res[elm] } else { *res }) - res);
                     }
                 }
             } else {
                 if self.res().is_none() {
-                    //self.res = Some(&'a mut HashMap<i32, i32>::new());
+                    self.res = Some(HashMap::new());
+                }
+                if let Some(a_elm_res) = self.base_mut().res_mut() {
+                    for (elm, res) in elm_res.iter() {
+                        a_elm_res.insert(*elm, (if a_elm_res.contains_key(elm) { a_elm_res[elm] } else { 0 }) + res);
+                    }
                 }
             }
         }
-        if let Some(st_res) = st_res {
+        /*if let Some(st_res) = st_res {
             if remove {
-
+                if let Some(a_st_res) = self.st_res_mut() {
+                    for (state, res) in st_res.iter() {
+                        a_st_res.insert(state, (if a_st_res.contains_key(state) { a_st_res[state] } else { res }) - res);
+                    }
+                }
             } else {
-
+                if self.base().st_res().is_none() {
+                    self.st_res = Some(HashMap::new());
+                }
+                if let Some(a_st_res) = self.st_res_mut() {
+                    for (state, res) in st_res.iter() {
+                        a_st_res.insert(state, (if a_st_res.contains_key(state) { a_st_res[state] } else { 0 }) + res);
+                    }
+                }
             }
-        }
+        }*/
     }
 
     pub(crate) fn update_skills(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,

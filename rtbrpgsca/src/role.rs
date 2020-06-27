@@ -17,7 +17,7 @@ pub struct Role<'a> {
     pub(crate) flags: i32,
     pub(crate) name: &'static str,
     pub(crate) sprite: Option<&'static str>,
-    pub(crate) state_dur: Option<&'a HashMap<&'a State<'a>, i32>>,
+    pub(crate) state_dur: Option<HashMap<&'a State<'a>, i32>>,
     pub(crate) dmg_type: i32,
     pub(crate) m_hp: i32,
     pub(crate) m_mp: i32,
@@ -68,8 +68,21 @@ impl<'a> Role<'a> {
     }
 
     #[inline(always)]
-    pub fn state_dur(&self) -> &Option<&'a HashMap<&'a State, i32>> {
-        &(self.state_dur)
+    pub fn state_dur(&self) -> Option<&HashMap<&'a State, i32>> {
+        if let Some(v) = self.state_dur.as_ref() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn state_dur_mut(&mut self) -> Option<&mut HashMap<&'a State, i32>> {
+        if let Some(v) = self.state_dur.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
     #[inline(always)]
@@ -117,7 +130,7 @@ impl<'a> Role<'a> {
         self.sp
     }
 
-    pub fn damage(&self, ret: Option<&mut String>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) -> &Role<'a> {
+    pub(crate) fn damage(&self, ret: Option<&mut String>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) -> &Role<'a> {
         self
     }
 
@@ -135,7 +148,11 @@ impl<'a> Role<'a> {
             flags: flags,
             name: name,
             sprite: sprite,
-            state_dur: state_dur,
+            state_dur: if let Some(v) = state_dur {
+                Some(v.clone())
+            } else {
+                None
+            },
             dmg_type: element,
             m_hp: m_hp,
             m_mp: m_mp,

@@ -15,10 +15,10 @@ use std::collections::HashMap;
 //#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Costume<'a> {
     pub(crate) base: Box<Role<'a>>,
-    pub(crate) a_skills: Option<&'a mut Vec<&'a Ability<'a>>>,
-    pub(crate) counters: Option<&'a mut Vec<&'a Ability<'a>>>,
-    pub(crate) st_res: Option<&'a mut HashMap<&'a State<'a>, i32>>,
-    pub(crate) res: Option<&'a mut HashMap<i32, i32>>,
+    pub(crate) a_skills: Option<Vec<&'a Ability<'a>>>,
+    pub(crate) counters: Option<Vec<&'a Ability<'a>>>,
+    pub(crate) st_res: Option<HashMap<&'a State<'a>, i32>>,
+    pub(crate) res: Option<HashMap<i32, i32>>,
     pub(crate) m_actions: i32,
     pub(crate) cvr_type: i32,
     pub(crate) rfl_type: i32,
@@ -110,34 +110,86 @@ impl<'a> Costume<'a> {
     }
 
     #[inline(always)]
-    pub fn a_skills(&mut self) -> &mut Option<&'a mut Vec<&'a Ability>> {
-        &mut self.a_skills
+    pub fn a_skills(&self) -> Option<&'a Vec<&'a Ability>> {
+        if let Some(v) = self.a_skills.as_ref() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
     #[inline(always)]
-    pub fn counters(&mut self) -> &mut Option<&'a mut Vec<&'a Ability>> {
-        &mut self.counters
+    pub fn a_skills_mut(&mut self) -> Option<&'a mut Vec<&'a Ability>> {
+        if let Some(v) = self.a_skills.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
     #[inline(always)]
-    pub fn res(&mut self) -> &mut Option<&'a mut HashMap<i32, i32>> {
-        &mut self.res
+    pub fn counters(&self) -> Option<&'a Vec<&'a Ability>> {
+        if let Some(v) = self.counters.as_ref() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
     #[inline(always)]
-    pub fn st_res(&mut self) -> &mut Option<&'a mut HashMap<&'a State<'a>, i32>> {
-        &mut self.st_res
+    pub fn counters_mut(&mut self) -> Option<&'a mut Vec<&'a Ability>> {
+        if let Some(v) = self.counters.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
-    pub fn refresh<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
+    #[inline(always)]
+    pub fn res(&self) -> Option<&HashMap<i32, i32>> {
+        if let Some(v) = self.res.as_ref() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn res_mut(&mut self) -> Option<&mut HashMap<i32, i32>> {
+        if let Some(v) = self.res.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn st_res(&self) -> Option<&HashMap<&'a State<'a>, i32>> {
+        if let Some(v) = self.st_res.as_ref() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn st_res_mut(&mut self) -> Option<&mut HashMap<&'a State<'a>, i32>> {
+        if let Some(v) = self.st_res.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn refresh<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
 
     }
 
-    pub fn adopt<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
+    pub(crate) fn adopt<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
 
     }
 
-    pub fn apply(&self, ret: &mut Option<&mut String>, actor: &mut Actor) {
+    pub(crate) fn apply(&self, ret: &mut Option<&mut String>, actor: &mut Actor) {
         
     }
     
