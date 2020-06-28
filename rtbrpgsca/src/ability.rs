@@ -9,12 +9,12 @@ use crate::role::*;
 use crate::state::*;
 use crate::actor::*;
 
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct Ability<'a> {
     pub(crate) base: Box<Role<'a>>,
-    pub(crate) r_states: Option<BTreeMap<&'a State<'a>, i32>>,
+    pub(crate) r_states: Option<HashMap<&'a State<'a>, i32>>,
     pub(crate) sound: Option<&'static str>,
     pub(crate) attr_inc: i32,
     pub(crate) lv_rq: i32,
@@ -80,7 +80,7 @@ impl<'a> Ability<'a> {
     }
 
     #[inline(always)]
-    pub fn r_states(&self) -> Option<&BTreeMap<&'a State<'a>, i32>> {
+    pub fn r_states(&self) -> Option<&HashMap<&'a State<'a>, i32>> {
         if let Some(v) = self.r_states.as_ref() {
             Some(v)
         } else {
@@ -89,7 +89,7 @@ impl<'a> Ability<'a> {
     }
 
     #[inline(always)]
-    pub fn r_states_mut(&mut self) -> Option<&mut BTreeMap<&'a State<'a>, i32>> {
+    pub fn r_states_mut(&mut self) -> Option<&mut HashMap<&'a State<'a>, i32>> {
         if let Some(v) = self.r_states.as_mut() {
             Some(v)
         } else {
@@ -126,7 +126,7 @@ impl<'a> Ability<'a> {
 
     fn new(id: i32, name: &'static str, sprite: Option<&'static str>, sound: Option<&'static str>, steal: bool, range: bool, melee: bool, can_miss: bool,
            critical: bool, lv_rq: i32, m_hp: i32, m_mp: i32, m_sp: i32, dmg_type: i32, attr_inc: i32, hp: i32, mp: i32, sp: i32, trg: i32, elm: i32, m_qty: i32,
-           r_qty: i32, absorb: bool, revive: bool, a_states: Option<BTreeMap<&'a State<'a>, i32>>, r_states: Option<BTreeMap<&'a State<'a>, i32>>) -> Ability<'a> {
+           r_qty: i32, absorb: bool, revive: bool, a_states: Option<HashMap<&'a State<'a>, i32>>, r_states: Option<HashMap<&'a State<'a>, i32>>) -> Ability<'a> {
         let mut role = Box::new(Role::new(id, name, sprite, m_hp, m_mp, m_sp, hp, mp, sp, dmg_type | elm, range, revive, a_states));
         let mut flags = role.flags();
         if steal {

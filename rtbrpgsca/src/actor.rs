@@ -12,7 +12,7 @@ use crate::state::*;
 use crate::role::*;
 
 use std::rc::Rc;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 pub type DelayAct = dyn FnMut(&mut Actor, bool);
 
@@ -25,11 +25,11 @@ pub enum EquipPos {
 #[derive(Clone)]
 pub struct Actor<'a> {
     pub(crate) base: Box<Costume<'a>>,
-    pub(crate) res_box: Option<BTreeMap<i32, i32>>,
-    pub(crate) equipment: BTreeMap<EquipPos, &'a Costume<'a>>,
-    pub(crate) skills_cr_qty: Option<BTreeMap<&'a Ability<'a>, i32>>,
-    pub(crate) skills_rg_trn: Option<BTreeMap<&'a Ability<'a>, i32>>,
-    pub(crate) items: Option<Rc<&'a BTreeMap<&'a Ability<'a>, i32>>>,
+    pub(crate) res_box: Option<HashMap<i32, i32>>,
+    pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
+    pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
+    pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
+    pub(crate) items: Option<Rc<&'a mut BTreeMap<&'a Ability<'a>, i32>>>,
     pub(crate) dmg_roles: Option<&'a Vec<&'a Costume<'a>>>,
     pub(crate) delay_act: Option<&'a DelayAct>,
     pub(crate) drawn_by: Option<&'a Actor<'a>>,
@@ -72,8 +72,17 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub fn items(&self) -> &Option<Rc<&'a BTreeMap<&'a Ability<'a>, i32>>> {
-        &self.items
+    pub fn items_mut(&mut self) -> Option<&mut Rc<&'a mut BTreeMap<&'a Ability<'a>, i32>>> {
+        if let Some(v) = self.items.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn items(&self) -> Option<&Rc<&'a mut BTreeMap<&'a Ability<'a>, i32>>> {
+        self.items.as_ref().clone()
     }
 
     #[inline(always)]
@@ -154,6 +163,34 @@ impl<'a> Actor<'a> {
     #[inline(always)]
     pub fn race(&self) -> &'a Costume {
         self.equipment.get(&EquipPos::Race).unwrap()
+    }
+
+    #[inline(always)]
+    pub fn skills_rg_trn(&self) -> Option<&HashMap<&'a Ability<'a>, i32>> {
+        self.skills_rg_trn.as_ref().clone()
+    }
+
+    #[inline(always)]
+    pub fn skills_rg_trn_mut(&mut self) -> Option<&mut HashMap<&'a Ability<'a>, i32>> {
+        if let Some(v) = self.skills_rg_trn.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    #[inline(always)]
+    pub fn skills_cr_qty(&self) -> Option<&HashMap<&'a Ability<'a>, i32>> {
+        self.skills_cr_qty.as_ref().clone()
+    }
+
+    #[inline(always)]
+    pub fn skills_cr_qty_mut(&mut self) -> Option<&mut HashMap<&'a Ability<'a>, i32>> {
+        if let Some(v) = self.skills_cr_qty.as_mut() {
+            Some(v)
+        } else {
+            None
+        }
     }
 
     #[inline]
@@ -573,8 +610,8 @@ impl<'a> Actor<'a> {
         self.set_spi(i * costume.spi());
     }
 
-    pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a BTreeMap<i32, i32>>,
-                                    st_res: &Option<&'a BTreeMap<&'a State, i32>>, remove: bool) {
+    pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a HashMap<i32, i32>>,
+                                    st_res: &Option<&'a HashMap<&'a State, i32>>, remove: bool) {
         if let Some(elm_res) = elm_res {
             if remove {
                 if let Some(a_elm_res) = self.base_mut().res_mut() {
@@ -584,7 +621,7 @@ impl<'a> Actor<'a> {
                 }
             } else {
                 if self.res().is_none() {
-                    self.res = Some(BTreeMap::new());
+                    self.res = Some(HashMap::new());
                 }
                 if let Some(a_elm_res) = self.base_mut().res_mut() {
                     for (elm, res) in elm_res.iter() {
@@ -602,7 +639,7 @@ impl<'a> Actor<'a> {
                 }
             } else {
                 if self.base().st_res().is_none() {
-                    self.st_res = Some(BTreeMap::new());
+                    self.st_res = Some(HashMap::new());
                 }
                 if let Some(a_st_res) = self.st_res_mut() {
                     for (state, res) in st_res.iter() {
@@ -613,13 +650,58 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn update_skills(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
+    pub(crate) fn update_skills(&'a mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
                                 skills: &'a Vec<&'a Ability>, counters: bool, remove: bool) {
-        
+        unsafe {
+            let actor = self as *mut Actor;
+            let mut a_skills = if counters { (*actor).base_mut().a_skills_mut() } else { (*actor).base_mut().counters_mut() };
+            if remove {
+                if let Some(a_skills) = a_skills {
+                    for ability in skills {
+                        a_skills.retain(|&s| !(s.eq(ability)));
+                        if ability.r_qty() > 0 {
+                            if let Some(reg_turn) = self.skills_rg_trn_mut() {
+                                reg_turn.remove(ability);
+                            }
+                        }
+                        if ability.m_qty() > 0 {
+                            if let Some(cr_qty) = self.skills_cr_qty_mut() {
+                                cr_qty.remove(ability);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if a_skills.is_none() {
+                    if counters {
+                        self.counters = Some(Vec::new());
+                        a_skills = (*actor).counters_mut();
+                    } else {
+                        self.a_skills = Some(Vec::new());
+                        a_skills = (*actor).a_skills_mut();
+                    }
+                }
+                if let Some(a_skills) = a_skills {
+                    for ability in skills {
+                        if !a_skills.contains(ability) {
+                            a_skills.push(ability);
+                            let m_qty = ability.m_qty();
+                            if self.skills_cr_qty.is_none() {
+                                self.skills_cr_qty = Some(HashMap::new());
+                            }
+                            if let Some(cr_qty) = self.skills_cr_qty_mut() {
+                                cr_qty.insert(ability, m_qty);
+                                self.check_reg_skill(ability);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     pub(crate) fn update_states(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
-                                states: &'a BTreeMap<&'a State, i32>, with_dur: bool, remove: bool) {
+                                states: &'a HashMap<&'a State, i32>, with_dur: bool, remove: bool) {
         
     }
 
