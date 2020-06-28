@@ -5,7 +5,6 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#![feature(nll)]
 use crate::scene::*;
 use crate::ability::*;
 use crate::costume::*;
@@ -13,9 +12,7 @@ use crate::state::*;
 use crate::role::*;
 
 use std::rc::Rc;
-use std::any::Any;
 use std::collections::BTreeMap;
-use std::cell::*;
 
 pub type DelayAct = dyn FnMut(&mut Actor, bool);
 

@@ -9,9 +9,8 @@ use crate::actor::*;
 use crate::ability::*;
 use crate::costume::*;
 use crate::scene::*;
-use std::cell::*;
 
-#[derive(Clone, Hash)]
+#[derive(Clone)]
 pub struct State<'a> {
     pub(crate) base: Box<Costume<'a>>,
     pub(crate) r_skills: Option<&'a Vec<&'a Ability<'a>>>,

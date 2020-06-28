@@ -12,7 +12,7 @@ use crate::state::*;
 
 use std::collections::BTreeMap;
 
-#[derive(Clone, Hash)]
+#[derive(Clone)]
 pub struct Costume<'a> {
     pub(crate) base: Box<Role<'a>>,
     pub(crate) a_skills: Option<Vec<&'a Ability<'a>>>,

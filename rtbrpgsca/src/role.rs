@@ -11,7 +11,7 @@ use crate::actor::*;
 use std::collections::BTreeMap;
 use std::str;
 
-#[derive(Clone, Hash)]
+#[derive(Clone)]
 pub struct Role<'a> {
     pub(crate) id: i32,
     pub(crate) flags: i32,
@@ -182,6 +182,7 @@ macro_rules! extend_struct {
         impl<'a> std::ops::Deref for $sub<'a> {
 
             type Target = $base<'a>;
+            
             #[inline(always)]
             fn deref(&self) -> &$base<'a> {
                 self.base()
@@ -214,6 +215,12 @@ macro_rules! implement_comparison {
             }
         }
 
+        impl<'a> std::hash::Hash for $sub<'a> {
+            fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                self.id().hash(state);
+           } 
+        }
+
         impl<'a> PartialOrd for $sub<'a> {
             fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
                 self.id().partial_cmp(&other.id())
@@ -221,7 +228,7 @@ macro_rules! implement_comparison {
         }
 
         impl<'a> Ord for  $sub<'a> {
-            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
+            fn cmp(&self, other: &Self) -> std::cmp::Ordering {
                 self.id().cmp(&other.id())
             }
         }

@@ -11,7 +11,7 @@ use crate::actor::*;
 
 use std::collections::BTreeMap;
 
-#[derive(Clone, Hash)]
+#[derive(Clone)]
 pub struct Ability<'a> {
     pub(crate) base: Box<Role<'a>>,
     pub(crate) r_states: Option<BTreeMap<&'a State<'a>, i32>>,
