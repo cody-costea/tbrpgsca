@@ -11,7 +11,7 @@ use crate::costume::*;
 use crate::scene::*;
 use std::cell::*;
 
-//#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Hash)]
 pub struct State<'a> {
     pub(crate) base: Box<Costume<'a>>,
     pub(crate) r_skills: Option<&'a Vec<&'a Ability<'a>>>,
@@ -20,6 +20,7 @@ pub struct State<'a> {
 }
 
 extend_struct!(State, Costume);
+implement_comparison!(State);
 
 impl<'a> State<'a> {
 

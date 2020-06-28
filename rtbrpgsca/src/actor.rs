@@ -14,25 +14,25 @@ use crate::role::*;
 
 use std::rc::Rc;
 use std::any::Any;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::cell::*;
 
 pub type DelayAct = dyn FnMut(&mut Actor, bool);
 
-#[derive(Hash, Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum EquipPos {
     Race, Job, Arms, Chest, Weapon, Shield, Head, Legs, Feet, Belt, Ring1,
     Ring2, Ring3, Ring4, Ring5, Ring6, Ring7, Ring8, Necklace, Mantle
 }
 
-//#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone)]
 pub struct Actor<'a> {
     pub(crate) base: Box<Costume<'a>>,
-    pub(crate) res_box: Option<HashMap<i32, i32>>,
-    pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
-    pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
-    pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
-    pub(crate) items: Option<Rc<&'a HashMap<&'a Ability<'a>, i32>>>,
+    pub(crate) res_box: Option<BTreeMap<i32, i32>>,
+    pub(crate) equipment: BTreeMap<EquipPos, &'a Costume<'a>>,
+    pub(crate) skills_cr_qty: Option<BTreeMap<&'a Ability<'a>, i32>>,
+    pub(crate) skills_rg_trn: Option<BTreeMap<&'a Ability<'a>, i32>>,
+    pub(crate) items: Option<Rc<&'a BTreeMap<&'a Ability<'a>, i32>>>,
     pub(crate) dmg_roles: Option<&'a Vec<&'a Costume<'a>>>,
     pub(crate) delay_act: Option<&'a DelayAct>,
     pub(crate) drawn_by: Option<&'a Actor<'a>>,
@@ -51,6 +51,7 @@ pub struct Actor<'a> {
 }
 
 extend_struct!(Actor, Costume);
+implement_comparison!(Actor);
 
 impl<'a> Actor<'a> {
 
@@ -74,7 +75,7 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub fn items(&self) -> &Option<Rc<&'a HashMap<&'a Ability<'a>, i32>>> {
+    pub fn items(&self) -> &Option<Rc<&'a BTreeMap<&'a Ability<'a>, i32>>> {
         &self.items
     }
 
@@ -575,8 +576,8 @@ impl<'a> Actor<'a> {
         self.set_spi(i * costume.spi());
     }
 
-    pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a HashMap<i32, i32>>,
-                                    st_res: &Option<&'a HashMap<&'a State, i32>>, remove: bool) {
+    pub(crate) fn update_resistance(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>, elm_res: &Option<&'a BTreeMap<i32, i32>>,
+                                    st_res: &Option<&'a BTreeMap<&'a State, i32>>, remove: bool) {
         if let Some(elm_res) = elm_res {
             if remove {
                 if let Some(a_elm_res) = self.base_mut().res_mut() {
@@ -586,7 +587,7 @@ impl<'a> Actor<'a> {
                 }
             } else {
                 if self.res().is_none() {
-                    self.res = Some(HashMap::new());
+                    self.res = Some(BTreeMap::new());
                 }
                 if let Some(a_elm_res) = self.base_mut().res_mut() {
                     for (elm, res) in elm_res.iter() {
@@ -595,7 +596,7 @@ impl<'a> Actor<'a> {
                 }
             }
         }
-        /*if let Some(st_res) = st_res {
+        if let Some(st_res) = st_res {
             if remove {
                 if let Some(a_st_res) = self.st_res_mut() {
                     for (state, res) in st_res.iter() {
@@ -604,7 +605,7 @@ impl<'a> Actor<'a> {
                 }
             } else {
                 if self.base().st_res().is_none() {
-                    self.st_res = Some(HashMap::new());
+                    self.st_res = Some(BTreeMap::new());
                 }
                 if let Some(a_st_res) = self.st_res_mut() {
                     for (state, res) in st_res.iter() {
@@ -612,7 +613,7 @@ impl<'a> Actor<'a> {
                     }
                 }
             }
-        }*/
+        }
     }
 
     pub(crate) fn update_skills(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
@@ -621,7 +622,7 @@ impl<'a> Actor<'a> {
     }
 
     pub(crate) fn update_states(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
-                                states: &'a HashMap<&'a State, i32>, with_dur: bool, remove: bool) {
+                                states: &'a BTreeMap<&'a State, i32>, with_dur: bool, remove: bool) {
         
     }
 
