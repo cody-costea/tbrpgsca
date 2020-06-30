@@ -19,7 +19,6 @@ pub struct State<'a> {
 }
 
 extend_struct!(State, Costume);
-implement_comparison!(State);
 
 impl<'a> State<'a> {
 

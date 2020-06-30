@@ -69,11 +69,7 @@ impl<'a> Role<'a> {
 
     #[inline(always)]
     pub fn state_dur(&self) -> Option<&HashMap<&'a State, i32>> {
-        if let Some(v) = self.state_dur.as_ref() {
-            Some(v)
-        } else {
-            None
-        }
+        self.state_dur.as_ref().clone()
     }
 
     #[inline(always)]
@@ -161,6 +157,40 @@ impl<'a> Role<'a> {
 
 }
 
+macro_rules! implement_comparison {
+
+    ($sub: tt) => {
+
+        impl<'a> Eq for  $sub<'a> {}
+
+        impl<'a> PartialEq for  $sub<'a> {
+            fn eq(&self, other: &Self) -> bool {
+                self.id() == other.id()
+            }
+        }
+
+        impl<'a> std::hash::Hash for $sub<'a> {
+            fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                self.id().hash(state);
+           } 
+        }
+
+        impl<'a> PartialOrd for $sub<'a> {
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                self.id().partial_cmp(&other.id())
+            }
+        }
+
+        impl<'a> Ord for  $sub<'a> {
+            fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                self.id().cmp(&other.id())
+            }
+        }
+
+    }
+
+}
+
 macro_rules! extend_struct {
 
     ($sub: tt, $base: tt) => {
@@ -199,39 +229,7 @@ macro_rules! extend_struct {
 
         }
 
-    }
-
-}
-
-macro_rules! implement_comparison {
-
-    ($sub: tt) => {
-
-        impl<'a> Eq for  $sub<'a> {}
-
-        impl<'a> PartialEq for  $sub<'a> {
-            fn eq(&self, other: &Self) -> bool {
-                self.id().eq(&other.id())
-            }
-        }
-
-        impl<'a> std::hash::Hash for $sub<'a> {
-            fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-                self.id().hash(state);
-           } 
-        }
-
-        impl<'a> PartialOrd for $sub<'a> {
-            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
-                self.id().partial_cmp(&other.id())
-            }
-        }
-
-        impl<'a> Ord for  $sub<'a> {
-            fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-                self.id().cmp(&other.id())
-            }
-        }
+        implement_comparison!($sub);
 
     }
 

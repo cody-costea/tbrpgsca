@@ -23,7 +23,6 @@ pub struct Ability<'a> {
 }
 
 extend_struct!(Ability, Role);
-implement_comparison!(Ability);
 
 impl<'a> Ability<'a> {
 

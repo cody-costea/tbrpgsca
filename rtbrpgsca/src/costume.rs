@@ -30,7 +30,6 @@ pub struct Costume<'a> {
 }
 
 extend_struct!(Costume, Role);
-implement_comparison!(Costume);
 
 impl<'a> Costume<'a> {
     

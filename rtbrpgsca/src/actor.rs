@@ -25,7 +25,6 @@ pub enum EquipPos {
 #[derive(Clone)]
 pub struct Actor<'a> {
     pub(crate) base: Box<Costume<'a>>,
-    pub(crate) res_box: Option<HashMap<i32, i32>>,
     pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
     pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
     pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
@@ -48,7 +47,6 @@ pub struct Actor<'a> {
 }
 
 extend_struct!(Actor, Costume);
-implement_comparison!(Actor);
 
 impl<'a> Actor<'a> {
 
