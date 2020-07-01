@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.12.0, 2020-06-20T22:04:18. -->
+<!-- Written by QtCreator 4.12.3, 2020-06-29T21:00:42. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -84,7 +84,7 @@
     <value type="bool">true</value>
     <value type="int" key="EnableQmlDebugging">0</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\codyc\Documents\Projects\tbrpgsca\qtcppjs\build-ctbrpgsca-Desktop_Qt_5_12_7_MinGW_64_bit-Debug</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:\Users\codyc\Documents\Projects\tbrpgsca\qtcppjs\build-ctbrpgsca-Desktop_Qt_5_12_7_MinGW_64_bit-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/Users/codyc/Documents/Projects/tbrpgsca/qtcppjs/build-ctbrpgsca-Desktop_Qt_5_12_7_MinGW_64_bit-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -338,7 +338,7 @@
     <value type="bool">true</value>
     <value type="int" key="EnableQmlDebugging">0</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\codyc\Documents\Projects\tbrpgsca\qtcppjs\build-ctbrpgsca-Android_for_arm64_v8a_Clang_Qt_5_12_7_for_Android_ARM64_v8a-Debug</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:\Users\codyc\Documents\Projects\tbrpgsca\qtcppjs\build-ctbrpgsca-Android_for_arm64_v8a_Clang_Qt_5_12_7_for_Android_ARM64_v8a-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/Users/codyc/Documents/Projects/tbrpgsca/qtcppjs/build-ctbrpgsca-Android_for_arm64_v8a_Clang_Qt_5_12_7_for_Android_ARM64_v8a-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>

@@ -954,7 +954,7 @@ Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const s
                 int const rDur = it.value();
                 if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
                 {
-                    it.key()->disable(ret, scene, actor, it.value(), includeWithDur);
+                    it.key()->disable(ret, scene, actor, rDur, includeWithDur);
                 }
             }
         }
