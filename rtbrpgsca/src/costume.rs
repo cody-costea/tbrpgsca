@@ -9,6 +9,7 @@ use crate::role::*;
 use crate::actor::*;
 use crate::ability::*;
 use crate::state::*;
+use crate::scene::*;
 
 use std::collections::HashMap;
 
@@ -165,15 +166,15 @@ impl<'a> Costume<'a> {
         }
     }
 
-    pub(crate) fn refresh<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
+    pub(crate) fn refresh<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: &'b mut Actor, upd_states: bool, remove: bool) {
 
     }
 
-    pub(crate) fn adopt<'b>(&self, actor: &'b mut Actor, upd_states: bool, remove: bool) {
+    pub(crate) fn adopt<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: &'b mut Actor, upd_states: bool, remove: bool) {
 
     }
 
-    pub(crate) fn apply(&self, ret: &mut Option<&mut String>, actor: &mut Actor) {
+    pub(crate) fn apply(&self, ret: &mut Option<&mut String>, scene: &Option<&mut dyn Scene>, actor: &mut Actor) {
         
     }
     

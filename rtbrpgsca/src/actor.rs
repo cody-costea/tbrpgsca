@@ -698,18 +698,49 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn update_states(&mut self, ret: &Option<&'a mut String>, scene: &Option<&'a mut dyn Scene>,
+    pub(crate) fn update_states(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>,
                                 states: &'a HashMap<&'a State, i32>, with_dur: bool, remove: bool) {
-        
+        if remove {
+            if self.base_mut().base_mut().state_dur().is_some() {
+                for (&state, &dur) in states.iter() {
+                    if with_dur || (dur < 0 && dur > State::END_DUR) {
+                        state.disable(ret, scene, self, dur, with_dur);
+                    }
+                }
+            }
+        } else {
+            for (state, &dur) in states.iter() {
+                if with_dur || (dur < 0 && dur > State::END_DUR) {
+                    state.inflict(ret, scene, self, dur, true);
+                }
+            }
+        }
     }
 
-    pub(crate) fn refresh_costumes(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>) {
-
+    pub(crate) fn refresh_costumes(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
+        unsafe {
+            let actor = self as *mut Actor;            
+            for (_, costume) in &(*actor).equipment {
+                costume.refresh(ret, scene, self, true, false);
+            }
+            if let Some(a_state_dur) = (*actor).base_mut().base_mut().state_dur() {
+                for (state, &dur) in a_state_dur {
+                    if dur > State::END_DUR {
+                        state.base().refresh(ret, scene, self, false, false);
+                    }
+                }
+            }
+        }
     }
 
-    pub(crate) fn switch_costume(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>,
+    pub(crate) fn switch_costume(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>,
                                  old_cost: &Option<&'a Costume>, new_cost: &Option<&'a Costume>) {
-
+        if let Some(old_cost) = old_cost {
+            old_cost.adopt(ret, scene, self, true, true);
+        }
+        if let Some(new_cost) = old_cost {
+            new_cost.adopt(ret, scene, self, true, false);
+        }
     }
 
     pub(crate) fn recover_scene(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>) {

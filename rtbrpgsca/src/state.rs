@@ -51,11 +51,11 @@ impl<'a> State<'a> {
         
     }
 
-    pub(crate) fn disable<'b>(&self, actor: &'b mut Actor, dur: i32, remove: bool) {
+    pub(crate) fn disable<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, actor: &'b mut Actor, dur: i32, remove: bool) {
 
     }
 
-    pub fn inflict<'b>(&self, user: &'b mut Actor, dur: i32, always: bool) {
+    pub fn inflict<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, user: &'b mut Actor, dur: i32, always: bool) {
 
     }
 
