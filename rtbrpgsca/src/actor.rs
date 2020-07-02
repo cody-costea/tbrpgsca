@@ -524,8 +524,15 @@ impl<'a> Actor<'a> {
     }
 
     #[inline]
-    pub fn check_reg_skill(&mut self, ability: &'a Ability) {
-        
+    pub fn check_reg_skill(&mut self, skill: &'a Ability) {
+        if skill.r_qty() > 0 {
+            if self.skills_rg_trn().is_none() {
+                self.skills_rg_trn = Some(HashMap::new());
+            }
+            if let Some(reg_skills) = self.skills_rg_trn_mut() {
+                reg_skills.insert(skill, 0);
+            }
+        }
     }
 
     #[inline(always)]
@@ -534,12 +541,21 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub fn equip_item(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>) -> Option<&'a Costume> {
-        self.equip_item_scene(pos, item, &None)
+    pub fn equip_item(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>) -> Option<&Costume> {
+        self.equip_item_scene(pos, item, &mut None)
     }
 
-    pub(crate) fn equip_item_scene(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>, scene: &'a Option<&'a dyn Scene>) -> Option<&'a Costume> {
-        None
+    pub(crate) fn equip_item_scene(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>, scene: &mut Option<&mut dyn Scene>) -> Option<&Costume> {
+        unsafe {
+            let actor = self as *mut Actor;
+            let equipment = &mut self.equipment;
+            let mut old: Option<&'a Costume<'a>> = if let Some(i) = equipment.get(&pos) { Some(i) } else { None };
+            (*actor).switch_costume(&mut None, scene, &old, item);
+            if let Some(item) = item {
+                equipment.insert(pos, item);
+            }
+            old
+        }
     }
 
     pub(crate) fn level_up(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
@@ -568,10 +584,10 @@ impl<'a> Actor<'a> {
         }
         unsafe {
             let actor = self as *mut Actor;
-            if let Some(states) = self.base().base().state_dur() {
+            if let Some(states) = (*actor).base().base().state_dur() {
                 for (state, dur) in states.iter() {
                     if (*dur) > State::END_DUR {
-                        state.alter(ret, scene, &mut (*actor), consume);
+                        state.alter(ret, scene, self, consume);
                     }
                 }
             }
@@ -581,7 +597,7 @@ impl<'a> Actor<'a> {
     pub(crate) fn apply_dmg_roles(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>) {
         if let Some(dmg_roles) = self.dmg_roles {
             for costume in dmg_roles {
-                costume.apply(ret, self);
+                costume.apply(ret, scene, self);
             }
             /*if let Some(scene) = scene {
                 if let Some(actor_run) = scene.sprite_run() {
@@ -733,7 +749,7 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn switch_costume(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>,
+    pub(crate) fn switch_costume(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&mut dyn Scene>,
                                  old_cost: &Option<&'a Costume>, new_cost: &Option<&'a Costume>) {
         if let Some(old_cost) = old_cost {
             old_cost.adopt(ret, scene, self, true, true);
