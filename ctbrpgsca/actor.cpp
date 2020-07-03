@@ -115,7 +115,7 @@ Costume* Actor::unequipPos(const char pos)
     return this->equipItem(nullptr, pos, nullptr);
 }
 
-Costume* Actor::unequipPos(Scene* scene, const char pos)
+Costume* Actor::unequipPos(Scene* const scene, const char pos)
 {
     return this->equipItem(scene, pos, nullptr);
 }
@@ -672,7 +672,7 @@ Actor& Actor::recover(QString& ret)
     return this->recover(&ret, nullptr);
 }
 
-Actor& Actor::recover(QString* ret, Scene* const scene)
+Actor& Actor::recover(QString* const ret, Scene* const scene)
 {
     Actor& actor = *this;
     actor.removeStates(ret, scene, true);
@@ -767,7 +767,7 @@ Actor& Actor::levelUp(Scene* const scene)
     return actor;
 }
 
-Actor& Actor::switchCostume(QString* ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
+Actor& Actor::switchCostume(QString* const ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
 {
     Actor& actor = *this;
     if (oldCost != nullptr)
