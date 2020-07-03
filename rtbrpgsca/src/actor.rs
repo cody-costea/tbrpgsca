@@ -191,7 +191,12 @@ impl<'a> Actor<'a> {
         }
     }
 
-    #[inline]
+    #[inline(always)]
+    pub(crate) fn set_actions(&mut self, val: i32) {
+        self.actions = val;
+    }
+
+    #[inline(always)]
     pub(crate) fn set_flags(&mut self, val: i32) {
         self.base_mut().base_mut().flags = val;
     }
@@ -714,8 +719,8 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn update_states(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>,
-                                states: &'a HashMap<&'a State, i32>, with_dur: bool, remove: bool) {
+    pub(crate) fn update_states(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>,
+                                states: &HashMap<&State, i32>, with_dur: bool, remove: bool) {
         if remove {
             if self.base_mut().base_mut().state_dur().is_some() {
                 for (&state, &dur) in states.iter() {
@@ -733,9 +738,9 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn refresh_costumes(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
+    pub(crate) fn refresh_costumes(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>) {
         unsafe {
-            let actor = self as *mut Actor;            
+            let actor = self as *mut Actor;
             for (_, costume) in &(*actor).equipment {
                 costume.refresh(ret, scene, self, true, false);
             }
@@ -759,12 +764,46 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn recover_scene(&mut self, ret: &Option<&'a String>, scene: &Option<&'a mut dyn Scene>) {
-        
+    pub(crate) fn remove_states(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, delete: bool) {
+        unsafe {
+            let actor = self as *mut Actor;            
+            if let Some(state_dur) = (*actor).base_mut().base_mut().state_dur() {
+                self.update_states(ret, scene, state_dur, true, true);
+                if delete && state_dur.is_empty() {
+                    self.base_mut().base_mut().state_dur = None;
+                }
+            }
+        }
     }
 
-    pub fn recover(&mut self, ret:&'a mut String) {
-        self.recover_scene(&Some(ret), &None);
+    pub(crate) fn recover_scene(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>) {
+        self.remove_states(ret, scene, true);
+        self.refresh_costumes(ret, scene);
+        self.set_actions(self.m_actions());
+        self.set_hp(self.base().base().m_hp());
+        self.set_mp(self.base().base().m_mp());
+        self.set_sp(0);
+        if let Some(res_map) = &mut self.base_mut().res {
+            res_map.retain(|&elm, &mut res| res != 0);
+            if res_map.is_empty() {
+                self.base_mut().res = None;
+            }
+        }
+        if let Some(res_map) = &mut self.base_mut().st_res {
+            res_map.retain(|&elm, &mut res| res != 0);
+            if res_map.is_empty() {
+                self.base_mut().st_res = None;
+            }
+        }
+        if let Some(skills_cr_qty) = self.skills_cr_qty_mut() {
+            for (skill, qty) in skills_cr_qty.iter_mut() {
+                (*qty) = skill.m_qty();
+            }
+        }
+    }
+
+    pub fn recover(&mut self, ret: &mut String) {
+        self.recover_scene(&mut Some(ret), &mut None);
     }
     
 }
