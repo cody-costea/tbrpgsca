@@ -119,7 +119,7 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 
 Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
-    //if (this->usesGuards())
+    if (this->usesGuards())
     {
         int const side = target._old_side;
         if (user._old_side != side && ((!skill.isRanged()) && ((!user.isRanged()) || skill.isOnlyMelee())))
@@ -164,7 +164,7 @@ Scene& Scene::checkStatus(QString& ret)
     Scene& scene = *this;
     if (scene._status == 0)
     {
-        auto parties = scene._parties;
+        auto& parties = scene._parties;
         auto party = parties[0];
         int partySize = party->size();
         {

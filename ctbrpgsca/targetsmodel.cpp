@@ -29,7 +29,7 @@ int TargetsModel::rowCount(const QModelIndex& parent) const
             count += party->size();
         }
     }*/
-    return this->_scene->trgCount;//count;
+    return this->_scene->_trg_count;//count;
 }
 
 QVariant TargetsModel::data(const QModelIndex& index, int role) const

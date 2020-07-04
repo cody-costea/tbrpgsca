@@ -69,7 +69,7 @@ namespace tbrpgsca
         struct ActorSprite : QObject
         {
         public:
-            ActorSprite& playActor(int const spr);
+            ActorSprite& playActor(int const _spr);
             ActorSprite& playSkill(QString& sprPath);
 
             ActorSprite& relocate(QRect& location);
@@ -78,13 +78,13 @@ namespace tbrpgsca
 
             ~ActorSprite();
         protected:
-            Actor* actor;
-            ArenaWidget* arena;
-            QMovie* actorMovie,* skillMovie;
-            ClickableLabel* skillLabel;
-            QLabel* actorLabel;
-            QString pos;
-            int spr;
+            Actor* _actor;
+            ArenaWidget* _arena;
+            QMovie* _actor_mov,* _skill_mov;
+            ClickableLabel* _skill_lbl;
+            QLabel* _actor_lbl;
+            QString _pos;
+            int _spr;
 
             friend class ArenaWidget;
         };
@@ -102,18 +102,18 @@ namespace tbrpgsca
         ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
 
-        QString* returnTxt;
-        int sprRuns, trgCount;
-        QLayout* ctrLayout,* mainLayout;
-        QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
-        QComboBox* skillsBox,* itemsBox,* targetBox;
-        QWidget* ctrWidget,* actWidget;
-        TargetsModel* targetsModel;
-        QLabel* infoTxt,* backImg;
-        QMediaPlayer* abilitySnd;
-        QVBoxLayout* actLayout;
-        QTextEdit* actionsTxt;
-        Actor* trgActor;
+        QString* _ret_str;
+        int _spr_runs, _trg_count;
+        QLayout* _ctr_lyt,* _main_lyt;
+        QPushButton* _act_btn,* _use_btn,* _flee_btn,* _auto_btn;
+        QComboBox* _skills_box,* _items_box,* _target_box;
+        QWidget* _ctr_wdt,* _act_wdt;
+        TargetsModel* _targets_mdl;
+        QLabel* _info_txt,* _back_img;
+        QMediaPlayer* _ability_snd;
+        QVBoxLayout* _act_lyt;
+        QTextEdit* _acts_txt;
+        Actor* _trg_actor;
 
     signals:
 
