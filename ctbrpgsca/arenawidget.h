@@ -42,9 +42,9 @@ namespace tbrpgsca
         #define POS_LEFT "l"
         #define POS_RIGHT "r"
         #define SPR_EXT "gif"
-        #define FLAG_AUTOMATIC 1
-        #define FLAG_AI_TURN 2
-        #define FLAG_END_TURN 4
+        #define FLAG_AI_TURN 4
+        #define FLAG_AUTOMATIC 2
+        #define FLAG_END_TURN 8
     public:
         inline bool isAiTurn() const;
         inline bool isAutomatic() const;
@@ -103,7 +103,7 @@ namespace tbrpgsca
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
 
         QString* returnTxt;
-        int sprRuns, flags, trgCount;
+        int sprRuns, trgCount;
         QLayout* ctrLayout,* mainLayout;
         QPushButton* actBtn,* useBtn,* fleeBtn,* autoBtn;
         QComboBox* skillsBox,* itemsBox,* targetBox;

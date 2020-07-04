@@ -652,7 +652,6 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
         //arena.song = songPlayer;
     }
     arena.abilitySnd = nullptr;
-    arena.flags = 0;
     {
         QPalette palette = arena.palette();
         QLabel* arenaImg = new QLabel(this);
@@ -834,7 +833,7 @@ ArenaWidget& ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<
     arena.returnTxt = returnTxt;
     if (doScene)
     {
-        arena.Scene::operator()(*returnTxt, parties, actorRun, events, surprise, mInit);
+        arena.Scene::operator()(*returnTxt, parties, actorRun, events, true, surprise, mInit);
     }
     else
     {
@@ -859,7 +858,7 @@ ArenaWidget::ArenaWidget(QWidget* parent) : QWidget(parent), Scene()
 
 ArenaWidget::ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
                          QString backImage, QString songName, int const surprise, int const mInit)
-    : QWidget(parent), Scene(ret, parties, nullptr, events, surprise, mInit)
+    : QWidget(parent), Scene(ret, parties, nullptr, events, true, surprise, mInit)
 {
     this->operator()(size, ret, parties, events, backImage, songName, surprise, mInit, false);
 }

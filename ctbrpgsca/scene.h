@@ -27,6 +27,7 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
+        #define FLAG_USE_GUARDS 1
         #define MIN_ROUND INT_MIN
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneAct;
@@ -71,9 +72,9 @@ namespace tbrpgsca
         int getCurrent() const;
         int getStatus() const;
 
-        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, bool const useGuards, int const surprise, int const mInit);
 
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, bool const useGuards, int const surprise, int const mInit);
 
         Scene();
 
@@ -81,7 +82,7 @@ namespace tbrpgsca
     protected:
         Ability* lastAbility;
         QVector<SceneAct*>* events;
-        int current, oldCurrent, surprise, fTarget, lTarget, status, mInit;
+        int flags, current, oldCurrent, surprise, fTarget, lTarget, status, mInit;
         QVector<Actor*>* players,* targets;
         QVector<QVector<Actor*>*> parties;
         ActorAct* actorEvent;
@@ -90,6 +91,9 @@ namespace tbrpgsca
         void agiCalc();
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
+
+        bool usesGuards() const;
+        Scene& setUseGuards(bool const useGuards);
 
         friend class Actor;
         friend class Ability;

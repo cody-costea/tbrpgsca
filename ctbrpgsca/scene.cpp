@@ -25,6 +25,22 @@ bool Scene::actorAgiComp(Actor* const a, Actor* const b)
     return (a->agi > b->agi);
 }
 
+bool Scene::usesGuards() const
+{
+    return (this->flags & FLAG_USE_GUARDS) == FLAG_USE_GUARDS;
+}
+
+Scene& Scene::setUseGuards(const bool useGuards)
+{
+    Scene& scene = *this;
+    int const flags = scene.flags;
+    if (useGuards != ((flags & FLAG_USE_GUARDS) == FLAG_USE_GUARDS))
+    {
+        scene.flags = flags ^ FLAG_USE_GUARDS;
+    }
+    return scene;
+}
+
 int Scene::getCurrent() const
 {
     return this->current;
@@ -107,38 +123,41 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 
 Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
-    int const side = target.oldSide;
-    if (user.oldSide != side && ((!skill.isRanged()) && ((!user.isRanged()) || skill.isOnlyMelee())))
+    if (this->usesGuards())
     {
-        int pos = -1;
-        Actor* fGuard = nullptr,* lGuard = nullptr;
-        Actor** guardPos = &fGuard;
-        QVector<Actor*>& party = *(this->parties[side]);
-        int const pSize = party.size();
-        for (int i = 0; i < pSize; ++i)
+        int const side = target.oldSide;
+        if (user.oldSide != side && ((!skill.isRanged()) && ((!user.isRanged()) || skill.isOnlyMelee())))
         {
-            Actor* const guardian = party[i];
-            if (guardian == &target)
+            int pos = -1;
+            Actor* fGuard = nullptr,* lGuard = nullptr;
+            Actor** guardPos = &fGuard;
+            QVector<Actor*>& party = *(this->parties[side]);
+            int const pSize = party.size();
+            for (int i = 0; i < pSize; ++i)
             {
-                if (fGuard == nullptr || i == pSize - 1)
+                Actor* const guardian = party[i];
+                if (guardian == &target)
                 {
-                    return target;//break;
+                    if (fGuard == nullptr || i == pSize - 1)
+                    {
+                        return target;//break;
+                    }
+                    else
+                    {
+                        pos = i;
+                        guardPos = &lGuard;
+                        continue;
+                    }
                 }
-                else
+                else if ((fGuard == nullptr || pos != -1) && guardian->hp > 0 && (!guardian->isStunned()) && (!guardian->isConfused()))
                 {
-                    pos = i;
-                    guardPos = &lGuard;
-                    continue;
+                    (*guardPos) = guardian;
                 }
             }
-            else if ((fGuard == nullptr || pos != -1) && guardian->hp > 0 && (!guardian->isStunned()) && (!guardian->isConfused()))
+            if (fGuard != nullptr && lGuard != nullptr)
             {
-                (*guardPos) = guardian;
+                return *((pos < (pSize / 2)) ? fGuard : lGuard);
             }
-        }
-        if (fGuard != nullptr && lGuard != nullptr)
-        {
-            return *((pos < (pSize / 2)) ? fGuard : lGuard);
         }
     }
     return target;
@@ -684,7 +703,8 @@ void Scene::resetTurn(Actor& actor)
     }
 }
 
-Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events,
+                         bool const useGuards, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
     assert(partiesSize > 1);
@@ -755,6 +775,8 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Actor
             players->append(party);
         }
     }
+    scene.flags = 0;
+    scene.setUseGuards(useGuards);
     scene.crActor = crActor;
     scene.agiCalc();
     if (useInit)
@@ -780,9 +802,10 @@ Scene::Scene()
 
 }
 
-Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit)
+Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events,
+             bool const useGuards, int const surprise, int const mInit)
 {
-    this->operator()(ret, parties, actorEvent, events, surprise, mInit);
+    this->operator()(ret, parties, actorEvent, events, useGuards, surprise, mInit);
 }
 
 Scene::~Scene()
