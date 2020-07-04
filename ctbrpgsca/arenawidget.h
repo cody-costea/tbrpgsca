@@ -58,12 +58,12 @@ namespace tbrpgsca
 
         explicit ArenaWidget(QWidget* const parent = nullptr);
 
-        ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+        ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                     QString backImage, QString songName, int const surprise, int const mInit);
 
         ~ArenaWidget();
 
-        ArenaWidget& operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+        ArenaWidget& operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString backImage, QString songName, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
@@ -99,7 +99,7 @@ namespace tbrpgsca
         inline ArenaWidget& setAiTurn(bool const aiTurn);
         Actor* getPlayerFromTargetBox(int const index);
 
-        ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneAct*>* const events,
+        ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
 
         QString* returnTxt;

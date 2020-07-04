@@ -57,18 +57,18 @@ namespace tbrpgsca
         Ability& replenish(Actor& user);
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
-                int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
+                int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
                 int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 
         Ability(Ability& ability);
 
         ~Ability();
     protected:
-        int lvRq, attrInc, mQty, rQty;
-        QMap<State*, int>* rStates;
-        QString* sound;
+        int _lv_rq, _attr_inc, _m_qty, _r_qty;
+        QMap<State*, int>* _r_states;
+        QString* _sound;
 
-        Ability& execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts);
+        Ability& execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
 
         friend class Actor;
         friend class Costume;

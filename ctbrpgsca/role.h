@@ -8,6 +8,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef ROLE_H
 #define ROLE_H
 
+#include <play.h>
+
 #include <QString>
 #include <QVector>
 
@@ -18,7 +20,7 @@ namespace tbrpgsca
     class State;
     class Scene;
 
-    class Role
+    class Role : Play
     {
         #define FLAG_REVIVE 1
         #define FLAG_RANGE 2
@@ -60,13 +62,13 @@ namespace tbrpgsca
 
         bool operator==(Role& role) const;
     protected:
-        QString name,* sprite;
-        int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
-        QMap<State*, int>* stateDur;
+        QString _name,* _sprite;
+        int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
+        QMap<State*, int>* _state_dur;
 
         Role& damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
 
-        Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+        Role(int const id, QString& _name, QString& _sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);
 
         Role(Role& role);

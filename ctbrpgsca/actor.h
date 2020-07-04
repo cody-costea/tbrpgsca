@@ -52,31 +52,31 @@ namespace tbrpgsca
         Actor& recover(QString& ret);
         //Actor& applyRoles(QString& ret);
         Actor& applyStates(QString& ret, bool const consume);
-        Actor& setElementResistance(int const element, int const res);
-        Actor& setStateResistance(State* const state, int const res);
-        Actor& setItems(QMap<Ability*, int>* items);
-        inline Actor& setExtra(void* const extra);
+        Actor& setElementResistance(int const element, int const _res);
+        Actor& setStateResistance(State* const state, int const _res);
+        Actor& setItems(QMap<Ability*, int>* _items);
+        inline Actor& setExtra(void* const _extra);
         inline Actor& setLevel(int const level);
-        inline Actor& setExperience(int const xp);
+        inline Actor& setExperience(int const _xp);
         inline Actor& setSprite(QString& value);
         inline Actor& setName(QString value);
         inline Actor& setJob(Costume& job);
         inline Actor& setRace(Costume& race);
-        Actor& setMaximumActions(int const mActions);
-        inline Actor& setMaximumLevel(int const maxLv);
-        Actor& setMaximumHp(int const mHp);
-        Actor& setMaximumMp(int const mMp);
-        Actor& setMaximumRp(int const mSp);
-        Actor& setCurrentHp(int const hp, QString& ret, bool const survive);
-        Actor& setCurrentHp(int const hp);
-        Actor& setCurrentMp(int const mp);
-        Actor& setCurrentRp(int const sp);
-        inline Actor& setAttack(int const atk);
-        inline Actor& setDefense(int const def);
-        inline Actor& setSpirit(int const spi);
-        inline Actor& setWisdom(int const wis);
-        inline Actor& setAgility(int const agi);
-        Actor& setInitiative(int const init);
+        Actor& setMaximumActions(int const _m_actions);
+        inline Actor& setMaximumLevel(int const _max_lv);
+        Actor& setMaximumHp(int const _m_hp);
+        Actor& setMaximumMp(int const _m_mp);
+        Actor& setMaximumRp(int const _m_sp);
+        Actor& setCurrentHp(int const _hp, QString& ret, bool const survive);
+        Actor& setCurrentHp(int const _hp);
+        Actor& setCurrentMp(int const _mp);
+        Actor& setCurrentRp(int const _sp);
+        inline Actor& setAttack(int const _atk);
+        inline Actor& setDefense(int const _def);
+        inline Actor& setSpirit(int const _spi);
+        inline Actor& setWisdom(int const _wis);
+        inline Actor& setAgility(int const _agi);
+        Actor& setInitiative(int const _init);
         Actor& setRanged(bool const range);
         Actor& setStunned(bool const stun);
         Actor& setReflecting(bool const reflects);
@@ -97,11 +97,11 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        int lv, maxLv, xp, maxp, init, side, actions;
-        QMap<Ability*, int>* skillsCrQty,* skillsRgTurn,* items;
-        QMap<char, Costume*> equipment;
-        QVector<Costume*>* dmgRoles;
-        void* extra;
+        int _lv, _max_lv, _xp, _maxp, _init, _side, _actions;
+        QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
+        QMap<char, Costume*> _equipment;
+        QVector<Costume*>* _dmg_roles;
+        void* _extra;
 
         Actor& levelUp(Scene* const scene);
         inline Actor& checkRegSkill(Ability& skill);
@@ -127,7 +127,7 @@ namespace tbrpgsca
         Actor& refreshCostumes(QString* const ret, Scene* const scene);
 
     private:
-        int oldSide;
+        int _old_side;
 
         Actor& setNewItems(bool const newItems);
 

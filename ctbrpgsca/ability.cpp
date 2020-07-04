@@ -24,94 +24,94 @@ QString Ability::StolenTxt = ", obtaining %1 from %2";
 
 int Ability::getUsesRegen() const
 {
-    return this->rQty;
+    return this->_r_qty;
 }
 
 int Ability::getMaximumUses() const
 {
-    return this->mQty;
+    return this->_m_qty;
 }
 
 int Ability::getAttributeIncrement() const
 {
-    return this->attrInc;
+    return this->_attr_inc;
 }
 
 int Ability::getRequiredLevel() const
 {
-    return this->lvRq;
+    return this->_lv_rq;
 }
 
 int Ability::getRemovedStateDuration(State& state) const
 {
-    QMap<State*, int>* aStates = this->rStates;
+    QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
 QList<State*> Ability::getRemovedStatesList() const
 {
-    QMap<State*, int>* aStates = this->rStates;
+    QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
 bool Ability::hasRemovedState(State& state) const
 {
-    QMap<State*, int>* aStates = this->rStates;
+    QMap<State*, int>* aStates = this->_r_states;
     return aStates != nullptr && aStates->contains(&state);
 }
 
 int Ability::getRemovedStatesSize() const
 {
-    QMap<State*, int>* aStates = this->rStates;
+    QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
 bool Ability::canMiss() const
 {
-    return (this->flags & FLAG_MISSABLE) == FLAG_MISSABLE;
+    return (this->_flags & FLAG_MISSABLE) == FLAG_MISSABLE;
 }
 
 bool Ability::isStealing() const
 {
-    return (this->flags & FLAG_STEAL) == FLAG_STEAL;
+    return (this->_flags & FLAG_STEAL) == FLAG_STEAL;
 }
 
 bool Ability::isAbsorbing() const
 {
-    return (this->flags & FLAG_ABSORB) == FLAG_ABSORB;
+    return (this->_flags & FLAG_ABSORB) == FLAG_ABSORB;
 }
 
 bool Ability::isOnlyMelee() const
 {
-    return (this->flags & FLAG_MELEE) == FLAG_MELEE;
+    return (this->_flags & FLAG_MELEE) == FLAG_MELEE;
 }
 
 bool Ability::targetsSide() const
 {
-    return (this->flags & FLAG_TRG_SIDE) == FLAG_TRG_SIDE;
+    return (this->_flags & FLAG_TRG_SIDE) == FLAG_TRG_SIDE;
 }
 
 bool Ability::targetsSelf() const
 {
-    return (this->flags & FLAG_TRG_SELF) == FLAG_TRG_SELF;
+    return (this->_flags & FLAG_TRG_SELF) == FLAG_TRG_SELF;
 }
 
 bool Ability::targetsAll() const
 {
-    return (this->flags & FLAG_TRG_ALL) == FLAG_TRG_ALL;
+    return (this->_flags & FLAG_TRG_ALL) == FLAG_TRG_ALL;
 }
 
 Ability& Ability::replenish(Actor& user)
 {
     Ability& ability = *this;
-    int const mQty = ability.mQty;
+    int const mQty = ability._m_qty;
     if (mQty > 0)
     {
-        QMap<Ability*, int>* usrSkills = user.skillsCrQty;
+        QMap<Ability*, int>* usrSkills = user._skills_cr_qty;
         if (usrSkills == nullptr)
         {
             usrSkills = new QMap<Ability*, int>();
-            user.skillsCrQty = usrSkills;
+            user._skills_cr_qty = usrSkills;
         }
         usrSkills->operator[](this) = mQty;
     }
@@ -120,8 +120,8 @@ Ability& Ability::replenish(Actor& user)
 
 bool Ability::canPerform(Actor& actor)
 {
-    QMap<Ability*, int>* skillsQty = actor.skillsCrQty;
-    return this->mMp <= actor.mp && this->mHp < actor.hp && this->mSp <= actor.sp && actor.lv >= this->lvRq
+    QMap<Ability*, int>* skillsQty = actor._skills_cr_qty;
+    return this->_m_mp <= actor._mp && this->_m_hp < actor._hp && this->_m_sp <= actor._sp && actor._lv >= this->_lv_rq
                     && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
 
@@ -134,31 +134,31 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
 {
     assert(target != nullptr);
     Ability& ability = *this;
-    int const dmgType = ability.dmgType | user.dmgType;
+    int const dmgType = ability._dmg_type | user._dmg_type;
     if (dmgType == DMG_TYPE_WIS && target != &user && target->isReflecting())
     {
-        ret = ret % Ability::ReflectTxt.arg(target->name);
+        ret = ret % Ability::ReflectTxt.arg(target->_name);
         target = &user;
     }
     {
-        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
-                trgAgi = target->agi, trgSpi = target->spi, usrWis = user.wis;
+        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user._agi,
+                trgAgi = target->_agi, trgSpi = target->_spi, usrWis = user._wis;
         if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
         {
-            dmg += user.atk;
-            def += target->def;
+            dmg += user._atk;
+            def += target->_def;
             ++i;
         }
         if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
         {
-            dmg += user.def;
-            def += target->def;
+            dmg += user._def;
+            def += target->_def;
             ++i;
         }
         if ((dmgType & DMG_TYPE_SPI) == DMG_TYPE_SPI)
         {
-            dmg += user.spi;
-            def += target->wis;
+            dmg += user._spi;
+            def += target->_wis;
             ++i;
         }
         if ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)
@@ -189,7 +189,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             {
                 def += std::rand() % (def / 2);
                 dmg += std::rand() % (dmg / 2);
-                dmg = (ability.attrInc + (dmg / i)) - ((def / i) / 2);
+                dmg = (ability._attr_inc + (dmg / i)) - ((def / i) / 2);
                 if (dmg < 0)
                 {
                     dmg = 0;
@@ -197,21 +197,21 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             }
             ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
             {
-                QMap<State*, int>* aStates = ability.stateDur;
+                QMap<State*, int>* aStates = ability._state_dur;
                 if (aStates != nullptr)
                 {
                     auto const last = aStates->cend();
                     for (auto it = aStates->cbegin(); it != last; ++it)
                     {
-                        it.key()->inflict(&ret, scene, &user, *target, it.value(), user.side == target->side);
+                        it.key()->inflict(&ret, scene, &user, *target, it.value(), user._side == target->_side);
                     }
                 }
             }
             {
-                QMap<State*, int>* stateDur = target->stateDur;
+                QMap<State*, int>* stateDur = target->_state_dur;
                 if (stateDur != nullptr)
                 {
-                    QMap<State*, int>* rStates = ability.rStates;
+                    QMap<State*, int>* rStates = ability._r_states;
                     if (rStates != nullptr)
                     {
                         auto const rLast = rStates->cend();
@@ -241,13 +241,13 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             }
             if (ability.isStealing())
             {
-                QMap<Ability*, int>* usrItems = user.items;
+                QMap<Ability*, int>* usrItems = user._items;
                 //if (usrItems != nullptr)
                 {
                     int trgItemsSize;
-                    QMap<Ability*, int>* trgItems = target->items;
+                    QMap<Ability*, int>* trgItems = target->_items;
                     if (trgItems != nullptr && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
-                            && (((std::rand() % 12) + user.agi / 4) > 4 + target->agi / 3))
+                            && (((std::rand() % 12) + user._agi / 4) > 4 + target->_agi / 3))
                     {
                         int const itemId = std::rand() % trgItemsSize;
                         //if (itemId < trgItemsSize)
@@ -274,7 +274,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                                 {
                                     usrItems = new QMap<Ability*, int>();
                                     user.setNewItems(true);
-                                    user.items = usrItems;
+                                    user._items = usrItems;
                                 }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
                                 if (trgItemQty < 2)
@@ -285,7 +285,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                                 {
                                     trgItems->operator[](stolen) = trgItemQty - 1;
                                 }
-                                ret = ret % Ability::StolenTxt.arg(stolen->name, target->name);
+                                ret = ret % Ability::StolenTxt.arg(stolen->_name, target->_name);
                             }
                         //}
                     }
@@ -294,22 +294,22 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
         }
         else
         {
-            ret = ret % Ability::MissesTxt.arg(target->name);
+            ret = ret % Ability::MissesTxt.arg(target->_name);
         }
     }
     if (applyCosts)
     {
-        user.setCurrentRp(user.sp - ability.mSp);
-        user.setCurrentMp(user.mp - ability.mMp);
-        user.setCurrentHp(user.hp - ability.mHp, &ret, scene, false);
-        int mQty = ability.mQty;
+        user.setCurrentRp(user._sp - ability._m_sp);
+        user.setCurrentMp(user._mp - ability._m_mp);
+        user.setCurrentHp(user._hp - ability._m_hp, &ret, scene, false);
+        int mQty = ability._m_qty;
         if (mQty > 0)
         {
-            QMap<Ability*, int>* usrSkillsQty = user.skillsCrQty;
+            QMap<Ability*, int>* usrSkillsQty = user._skills_cr_qty;
             if (usrSkillsQty == nullptr)
             {
                 usrSkillsQty = new QMap<Ability*, int>();
-                user.skillsCrQty = usrSkillsQty;
+                user._skills_cr_qty = usrSkillsQty;
             }
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
@@ -322,14 +322,14 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
                  int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
-    this->lvRq = lvRq;
-    this->mQty = mQty;
-    this->rQty = rQty;
-    this->dmgType = dmgType;
-    this->attrInc = attrInc;
-    this->sound = sound.length() > 0 ? new QString(sound) : nullptr;
-    this->rStates = rStates;
-    int flags = this->flags;
+    this->_lv_rq = lvRq;
+    this->_m_qty = mQty;
+    this->_r_qty = rQty;
+    this->_dmg_type = dmgType;
+    this->_attr_inc = attrInc;
+    this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
+    this->_r_states = rStates;
+    int flags = this->_flags;
     if (canMiss)
     {
         flags |= FLAG_MISSABLE;
@@ -347,24 +347,24 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
         flags |= FLAG_ABSORB;
     }
     flags |= trg;
-    this->flags = flags;
+    this->_flags = flags;
 }
 
 Ability::Ability(Ability& ability) : Role(ability)
 {
-    this->dmgType = ability.dmgType;
-    this->lvRq = ability.lvRq;
-    this->mQty = ability.mQty;
-    this->rQty = ability.rQty;
-    this->dmgType = ability.dmgType;
-    this->attrInc = ability.attrInc;
-    this->stateDur = ability.stateDur;
-    this->rStates = ability.rStates;
+    this->_dmg_type = ability._dmg_type;
+    this->_lv_rq = ability._lv_rq;
+    this->_m_qty = ability._m_qty;
+    this->_r_qty = ability._r_qty;
+    this->_dmg_type = ability._dmg_type;
+    this->_attr_inc = ability._attr_inc;
+    this->_state_dur = ability._state_dur;
+    this->_r_states = ability._r_states;
 }
 
 Ability::~Ability()
 {
-    QString* const sound = this->sound;
+    QString* const sound = this->_sound;
     if (sound != nullptr)
     {
         delete sound;

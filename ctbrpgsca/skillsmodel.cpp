@@ -11,7 +11,7 @@ using namespace tbrpgsca;
 
 SkillsModel::SkillsModel(Actor& actor, QObject* const parent) : QAbstractListModel(parent)
 {
-    this->actor = &actor;
+    this->_actor = &actor;
 }
 
 SkillsModel::~SkillsModel()
@@ -21,7 +21,7 @@ SkillsModel::~SkillsModel()
 
 int SkillsModel::rowCount(const QModelIndex& parent) const
 {
-    return this->actor->aSkills->size();
+    return this->_actor->_a_skills->size();
 }
 
 QVariant SkillsModel::data(const QModelIndex& index, int role) const
@@ -31,8 +31,8 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
        return QVariant();
    }
 
-   Actor& actor = *(this->actor);
-   Ability& ability = *(actor.aSkills->at(index.row()));
+   Actor& actor = *(this->_actor);
+   Ability& ability = *(actor._a_skills->at(index.row()));
 
    switch (role)
    {
@@ -41,9 +41,9 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
    case Qt::DisplayRole:
    {
        int usesQty;
-       QMap<Ability*, int>* skillsQty = actor.skillsCrQty;
-       return QString(tr("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability.name, QString::number(ability.lvRq),
-            QString::number(ability.mHp), QString::number(ability.mMp), QString::number(ability.mSp), (skillsQty == nullptr
+       QMap<Ability*, int>* skillsQty = actor._skills_cr_qty;
+       return QString(tr("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability._name, QString::number(ability._lv_rq),
+            QString::number(ability._m_hp), QString::number(ability._m_mp), QString::number(ability._m_sp), (skillsQty == nullptr
             || (usesQty = skillsQty->value(&ability, -1)) < 0 ? "∞" : QString::number(usesQty)));
    }
    default:

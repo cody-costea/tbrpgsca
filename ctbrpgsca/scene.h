@@ -9,6 +9,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define SCENE_H
 
 #include "actor.h"
+#include "play.h"
 
 #include <QVector>
 #include <QStringBuilder>
@@ -16,7 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
-    class Scene
+    class Scene : Play
     {
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1
@@ -30,9 +31,9 @@ namespace tbrpgsca
         #define FLAG_USE_GUARDS 1
         #define MIN_ROUND INT_MIN
     public:
-        typedef std::function<bool(Scene& scene, QString* const ret)> SceneAct;
+        typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                   Actor* const target, Ability* const counter)> ActorAct;
+                                   Actor* const target, Ability* const counter)> SpriteRun;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -72,28 +73,30 @@ namespace tbrpgsca
         int getCurrent() const;
         int getStatus() const;
 
-        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, bool const useGuards, int const surprise, int const mInit);
+        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+                          bool const useGuards, int const surprise, int const mInit);
 
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, bool const useGuards, int const surprise, int const mInit);
+        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+              bool const useGuards, int const surprise, int const mInit);
 
         Scene();
 
         ~Scene();
     protected:
-        Ability* lastAbility;
-        QVector<SceneAct*>* events;
-        int flags, current, oldCurrent, surprise, fTarget, lTarget, status, mInit;
-        QVector<Actor*>* players,* targets;
-        QVector<QVector<Actor*>*> parties;
-        ActorAct* actorEvent;
-        Actor* crActor;
+        Ability* _last_ability;
+        QVector<SceneRun*>* _events;
+        int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
+        QVector<Actor*>* _players,* _targets;
+        QVector<QVector<Actor*>*> _parties;
+        SpriteRun* _actor_run;
+        Actor* _cr_actor;
 
         void agiCalc();
         Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
 
+        Scene& setUseGuards(bool const useGuards);        
         bool usesGuards() const;
-        Scene& setUseGuards(bool const useGuards);
 
         friend class Actor;
         friend class Ability;
