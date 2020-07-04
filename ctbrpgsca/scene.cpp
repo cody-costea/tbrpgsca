@@ -336,7 +336,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
         }
     }
     this->lastAbility = &ability;
-    user.setExperience(user.xp + 1);
+    user.setExperience(this, user.xp + 1);
     if (events != nullptr && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);
