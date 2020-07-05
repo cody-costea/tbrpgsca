@@ -49,15 +49,6 @@ pub struct Actor<'a> {
 
 extend_struct!(Actor, Costume);
 
-impl<'a> Play for Actor<'a> {
-    
-    #[inline(always)]
-    fn flags(&self) -> i32 {
-        self.base().base().flags()
-    }
-
-}
-
 impl<'a> PlayMut for Actor<'a> {
 
     #[inline(always)]

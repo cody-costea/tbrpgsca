@@ -28,15 +28,6 @@ pub struct Role<'a> {
     pub(crate) sp: i32,
 }
 
-impl<'a> Play for Role<'a> {
-    
-    #[inline(always)]
-    fn flags(&self) -> i32 {
-        self.flags
-    }
-    
-}
-
 impl<'a> Role<'a> {
 
     pub const HP_TXT: &'static str = "HP";
@@ -192,6 +183,14 @@ macro_rules! implement_comparison {
             }
         }
 
+        impl<'a> Play for $sub<'a> {
+            
+            #[inline(always)]
+            fn flags(&self) -> i32 {
+                self.flags
+            }
+            
+        }
     }
 
 }
