@@ -28,11 +28,11 @@ namespace tbrpgsca
     public:
         static QString CausesTxt;
 
-        int getAttack() const;
-        int getDefense() const;
-        int getSpirit() const;
-        int getWisdom() const;
-        int getAgility() const;
+        int offense() const;
+        int defense() const;
+        int spirit() const;
+        int wisdom() const;
+        int agility() const;
 
         bool isEnraged() const;
         bool isConfused() const;
@@ -44,17 +44,17 @@ namespace tbrpgsca
         bool isReflecting() const;
         bool isStunned() const;
 
-        int getMaximumActions() const;
-        int getElementResistance(int const element) const;
-        int getStateResistance(State* const state) const;
+        int maximumActions() const;
+        int elementResistance(int const element) const;
+        int stateResistance(State* const state) const;
 
-        Ability& getAddedSkill(int const n) const;
+        Ability& addedSkill(int const n) const;
         bool hasAddedSkill(Ability& skill) const;
-        int getAddedSkillsSize() const;
+        int addedSkillsSize() const;
 
-        Ability& getCounterSkill(int const n) const;
+        Ability& counterSkill(int const n) const;
         bool hasCounterSkill(Ability& skill) const;
-        int getCounterSkillsSize() const;
+        int counterSkillsSize() const;
 
         Costume& adopt(QString& ret, Actor& actor);
         Costume& abandon(QString& ret, Actor& actor);

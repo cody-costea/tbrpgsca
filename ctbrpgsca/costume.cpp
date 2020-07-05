@@ -18,37 +18,37 @@ using namespace tbrpgsca;
 
 QString Costume::CausesTxt = ", %1 is affected by %2";
 
-int Costume::getAttack() const
+int Costume::offense() const
 {
     return this->_atk;
 }
 
-int Costume::getDefense() const
+int Costume::defense() const
 {
     return this->_def;
 }
 
-int Costume::getSpirit() const
+int Costume::spirit() const
 {
     return this->_spi;
 }
 
-int Costume::getWisdom() const
+int Costume::wisdom() const
 {
     return this->_wis;
 }
 
-int Costume::getAgility() const
+int Costume::agility() const
 {
     return this->_agi;
 }
 
-int Costume::getMaximumActions() const
+int Costume::maximumActions() const
 {
     return this->_m_actions;
 }
 
-Ability& Costume::getAddedSkill(int const n) const
+Ability& Costume::addedSkill(int const n) const
 {
     return *(this->_a_skills->at(n));
 }
@@ -59,13 +59,13 @@ bool Costume::hasAddedSkill(Ability& skill) const
     return aSkills != nullptr && aSkills->contains(&skill);
 }
 
-int Costume::getAddedSkillsSize() const
+int Costume::addedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->_a_skills;
     return aSkills == nullptr ? 0 : aSkills->size();
 }
 
-Ability& Costume::getCounterSkill(int const n) const
+Ability& Costume::counterSkill(int const n) const
 {
     return *(this->_counters->at(n));
 }
@@ -76,19 +76,19 @@ bool Costume::hasCounterSkill(Ability& skill) const
     return counters != nullptr && counters->contains(&skill);
 }
 
-int Costume::getCounterSkillsSize() const
+int Costume::counterSkillsSize() const
 {
     QVector<Ability*>* counters = this->_counters;
     return counters == nullptr ? 0 : counters->size();
 }
 
-int Costume::getElementResistance(const int element) const
+int Costume::elementResistance(const int element) const
 {
     QMap<int, int>* res = this->_res;
     return res == nullptr ? 0 : res->value(element, 0);
 }
 
-int Costume::getStateResistance(State* const state) const
+int Costume::stateResistance(State* const state) const
 {
     QMap<State*, int>* stRes = this->_st_res;
     return stRes == nullptr ? 0 : stRes->value(state, 0);
@@ -170,7 +170,7 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
         }
         if (costume.isShapeShifted() && costume._sprite != nullptr)
         {
-            (*actor._sprite) = *(actor.getJob()._sprite);
+            (*actor._sprite) = *(actor.job()._sprite);
         }
         if (costume._hp == 0 && costume._mp == 0 && costume._sp == 0)
         {

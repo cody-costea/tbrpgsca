@@ -20,53 +20,53 @@ QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
 
-int Role::getId() const
+int Role::id() const
 {
     return this->_id;
 }
 
-QString Role::getName() const
+QString Role::name() const
 {
     return this->_name;
 }
 
-QString Role::getSprite() const
+QString Role::sprite() const
 {
     QString* const spr = this->_sprite;
     return spr == nullptr ? QString() : *(this->_sprite);
 }
 
-int Role::getDamageElement() const
+int Role::damageElement() const
 {
     return this->_dmg_type;
 }
 
-int Role::getMaximumHp() const
+int Role::maximumHp() const
 {
     return this->_m_hp;
 }
 
-int Role::getMaximumMp() const
+int Role::maximumMp() const
 {
     return this->_m_mp;
 }
 
-int Role::getMaximumRp() const
+int Role::maximumRp() const
 {
     return this->_m_sp;
 }
 
-int Role::getCurrentHp() const
+int Role::currentHp() const
 {
     return this->_hp;
 }
 
-int Role::getCurrentMp() const
+int Role::currentMp() const
 {
     return this->_mp;
 }
 
-int Role::getCurrentRp() const
+int Role::currentRp() const
 {
     return this->_sp;
 }
@@ -81,13 +81,13 @@ bool Role::isReviving() const
     return this->hasFlag(FLAG_REVIVE);
 }
 
-int Role::getStateDuration(State& state) const
+int Role::stateDuration(State& state) const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-QList<State*> Role::getStatesList() const
+QList<State*> Role::statesList() const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
@@ -99,7 +99,7 @@ bool Role::hasState(State& state) const
     return aStates != nullptr && aStates->contains(&state);
 }
 
-int Role::getStatesSize() const
+int Role::statesSize() const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
     return aStates == nullptr ? 0 : aStates->size();

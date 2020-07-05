@@ -14,6 +14,29 @@ int Play::flags() const
     return this->_flags;
 }
 
+int Play::flags(const int flags)
+{
+    return this->flags(flags, true);
+}
+
+void Play::setFlags(const int flags)
+{
+    this->_flags = flags;
+}
+
+Play& Play::withFlags(const int flags)
+{
+    this->_flags = flags;
+    return *this;
+}
+
+int Play::flags(const int flags, const bool returnOld)
+{
+    int const old = returnOld ? this->_flags : flags;
+    this->_flags = flags;
+    return old;
+}
+
 bool Play::hasFlag(int const flag) const
 {
     return (this->_flags & flag) == flag;

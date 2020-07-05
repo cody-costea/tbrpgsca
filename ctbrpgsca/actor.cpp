@@ -20,65 +20,65 @@ using namespace tbrpgsca;
 QString Actor::KoTxt = ", %1 falls unconscious";
 QString Actor::RiseTxt = ", but rises again";
 
-int Actor::getLevel() const
+int Actor::level() const
 {
     return this->_lv;
 }
 
-int Actor::getExperience() const
+int Actor::experience() const
 {
     return this->_xp;
 }
 
-int Actor::getMaximumLevel() const
+int Actor::maximumLevel() const
 {
     return this->_max_lv;
 }
 
-int Actor::getMaximumExperience() const
+int Actor::maximumExperience() const
 {
     return this->_maxp;
 }
 
-int Actor::getCurrentActions() const
+int Actor::currentActions() const
 {
     return this->_actions;
 }
 
-int Actor::getInitiative() const
+int Actor::initiative() const
 {
     return this->_init;
 }
 
-int Actor::getRemainingSkillUses(Ability& skill) const
+int Actor::remainingSkillUses(Ability& skill) const
 {
     QMap<Ability*, int>* crQty = this->_skills_cr_qty;
     return crQty == nullptr ? 0 : crQty->value(&skill, 0);
 }
 
-int Actor::getRegeneratingSkillTurn(Ability& skill) const
+int Actor::regeneratingSkillTurn(Ability& skill) const
 {
     QMap<Ability*, int>* regTurn = this->_skills_rg_turn;
     return regTurn == nullptr ? 0 : regTurn->value(&skill, 0);
 }
 
-QMap<Ability*, int> Actor::getItems() const
+QMap<Ability*, int> Actor::items() const
 {
     QMap<Ability*, int>* items = this->_items;
     return items == nullptr? QMap<Ability*, int>() : *items;
 }
 
-Costume& Actor::getRace() const
+Costume& Actor::race() const
 {
     return *(this->_equipment[CHAR_RACE]);
 }
 
-Costume& Actor::getJob() const
+Costume& Actor::job() const
 {
     return *(this->_equipment[CHAR_JOB]);
 }
 
-void* Actor::getExtra() const
+void* Actor::extra() const
 {
     return this->_extra;
 }
@@ -199,7 +199,7 @@ Actor& Actor::setJob(Scene* const scene, Costume& job)
     return actor;
 }
 
-inline Actor& Actor::setAttack(const int atk)
+inline Actor& Actor::setOffense(const int atk)
 {
     this->_atk = atk;
     return *this;

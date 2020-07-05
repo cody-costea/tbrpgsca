@@ -40,23 +40,23 @@ namespace tbrpgsca
         static QString MpTxt;
         static QString RpTxt;
 
-        int getId() const;
-        QString getName() const;
-        QString getSprite() const;
-        int getDamageElement() const;
-        int getMaximumHp() const;
-        int getMaximumMp() const;
-        int getMaximumRp() const;
-        int getCurrentHp() const;
-        int getCurrentMp() const;
-        int getCurrentRp() const;
+        int id() const;
+        QString name() const;
+        QString sprite() const;
+        int damageElement() const;
+        int maximumHp() const;
+        int maximumMp() const;
+        int maximumRp() const;
+        int currentHp() const;
+        int currentMp() const;
+        int currentRp() const;
         bool isReviving() const;
         bool isRanged() const;
 
-        QList<State*> getStatesList() const;
-        int getStateDuration(State& state) const;
+        QList<State*> statesList() const;
+        int stateDuration(State& state) const;
         bool hasState(State& state) const;
-        int getStatesSize() const;
+        int statesSize() const;
 
         Role& damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
 

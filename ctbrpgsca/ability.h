@@ -34,10 +34,10 @@ namespace tbrpgsca
         static QString ResistTxt;
         static QString StolenTxt;
 
-        int getRequiredLevel() const;
-        int getAttributeIncrement() const;
-        int getMaximumUses() const;
-        int getUsesRegen() const;
+        int requiredLevel() const;
+        int attributeIncrement() const;
+        int maximumUses() const;
+        int usesRegen() const;
 
         bool canMiss() const;
         bool isStealing() const;
@@ -47,10 +47,10 @@ namespace tbrpgsca
         bool targetsSelf() const;
         bool targetsAll() const;
 
-        QList<State*> getRemovedStatesList() const;
-        int getRemovedStateDuration(State& state) const;
-        bool hasRemovedState(State& state) const;
-        int getRemovedStatesSize() const;
+        QList<State*> removedStatesList() const;
+        int removedStateDuration(State& state) const;
+        bool removedState(State& state) const;
+        int removedStatesSize() const;
 
         bool canPerform(Actor& user);
         Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);

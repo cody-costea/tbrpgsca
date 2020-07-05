@@ -22,45 +22,45 @@ QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::ResistTxt = ", resisted by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
 
-int Ability::getUsesRegen() const
+int Ability::usesRegen() const
 {
     return this->_r_qty;
 }
 
-int Ability::getMaximumUses() const
+int Ability::maximumUses() const
 {
     return this->_m_qty;
 }
 
-int Ability::getAttributeIncrement() const
+int Ability::attributeIncrement() const
 {
     return this->_attr_inc;
 }
 
-int Ability::getRequiredLevel() const
+int Ability::requiredLevel() const
 {
     return this->_lv_rq;
 }
 
-int Ability::getRemovedStateDuration(State& state) const
+int Ability::removedStateDuration(State& state) const
 {
     QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-QList<State*> Ability::getRemovedStatesList() const
+QList<State*> Ability::removedStatesList() const
 {
     QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
-bool Ability::hasRemovedState(State& state) const
+bool Ability::removedState(State& state) const
 {
     QMap<State*, int>* aStates = this->_r_states;
     return aStates != nullptr && aStates->contains(&state);
 }
 
-int Ability::getRemovedStatesSize() const
+int Ability::removedStatesSize() const
 {
     QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->size();

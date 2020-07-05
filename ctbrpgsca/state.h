@@ -19,12 +19,12 @@ namespace tbrpgsca
     {
         #define STATE_END_DUR -3
     public:
-        int getDuration() const;
-        int getResistance() const;
+        int duration() const;
+        int resistance() const;
 
-        int getRemovedSkillsSize() const;
+        int removedSkillsSize() const;
         bool hasRemovedSkill(Ability& skill) const;
-        Ability& getRemovedSkill(int const n) const;
+        Ability& removedSkill(int const n) const;
 
         State& alter(QString& ret, Actor& actor, bool const consume);
         State& inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);

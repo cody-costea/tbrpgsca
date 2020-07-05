@@ -16,17 +16,17 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-int State::getDuration() const
+int State::duration() const
 {
     return this->_dur;
 }
 
-int State::getResistance() const
+int State::resistance() const
 {
     return this->_s_res;
 }
 
-Ability& State::getRemovedSkill(int const n) const
+Ability& State::removedSkill(int const n) const
 {
     return *(this->_r_skills->at(n));
 }
@@ -37,7 +37,7 @@ bool State::hasRemovedSkill(Ability& skill) const
     return aSkills != nullptr && aSkills->contains(&skill);
 }
 
-int State::getRemovedSkillsSize() const
+int State::removedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->_r_skills;
     return aSkills == nullptr ? 0 : aSkills->size();

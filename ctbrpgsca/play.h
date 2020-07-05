@@ -19,8 +19,13 @@ namespace tbrpgsca
     protected:
         int _flags;
 
-        void setFlag(int const flag, bool const value);
+        int flags(int const flags);
+        void setFlags(int const flags);
+        Play& withFlags(int const flags);
+        int flags(int const flags, bool const returnOld);
+
         Play& withFlag(int const flag, bool const value);
+        void setFlag(int const flag, bool const value);
 
         Play(int const flags);
 
