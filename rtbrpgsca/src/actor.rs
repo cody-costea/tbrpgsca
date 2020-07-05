@@ -5,14 +5,15 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+use crate::play::*;
 use crate::scene::*;
 use crate::ability::*;
 use crate::costume::*;
 use crate::state::*;
 use crate::role::*;
 
-use std::rc::Rc;
 use std::collections::{BTreeMap, HashMap};
+use std::rc::Rc;
 
 pub type DelayAct = dyn FnMut(&mut Actor, bool);
 
@@ -48,25 +49,48 @@ pub struct Actor<'a> {
 
 extend_struct!(Actor, Costume);
 
+impl<'a> Play for Actor<'a> {
+    
+    #[inline(always)]
+    fn flags(&self) -> i32 {
+        self.base().base().flags()
+    }
+
+}
+
+impl<'a> PlayMut for Actor<'a> {
+
+    #[inline(always)]
+    fn flags_mut(&mut self) -> &mut i32 {
+        &mut self.base_mut().base_mut().flags
+    }
+
+    #[inline(always)]
+    fn set_flags(&mut self, val: i32) {
+        self.base_mut().base_mut().flags = val;
+    }
+
+}
+
 impl<'a> Actor<'a> {
 
-    #[inline(always)] pub const FLAG_SURVIVES: i32 = 1024;
-    #[inline(always)] pub const FLAG_RANDOM_AI: i32 = 2048;
-    #[inline(always)] pub const FLAG_AI_PLAYER: i32 = 4096;
+    pub const FLAG_SURVIVES: i32 = 1024;
+    pub const FLAG_RANDOM_AI: i32 = 2048;
+    pub const FLAG_AI_PLAYER: i32 = 4096;
 
     #[inline(always)]
     pub fn survives(&self) -> bool {
-        (self.base().base().flags() & Actor::FLAG_SURVIVES) == Actor::FLAG_SURVIVES
+        self.has_flag(Actor::FLAG_SURVIVES)
     }
 
     #[inline(always)]
     pub fn random_ai(&self) -> bool {
-        (self.base().base().flags() & Actor::FLAG_RANDOM_AI) == Actor::FLAG_RANDOM_AI
+        self.has_flag(Actor::FLAG_RANDOM_AI)
     }
 
     #[inline(always)]
     pub fn ai_player(&self) -> bool {
-        (self.base().base().flags() & Actor::FLAG_AI_PLAYER) == Actor::FLAG_AI_PLAYER
+        self.has_flag(Actor::FLAG_AI_PLAYER)
     }
 
     #[inline(always)]
@@ -197,125 +221,68 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub(crate) fn set_flags(&mut self, val: i32) {
-        self.base_mut().base_mut().flags = val;
-    }
-
-    #[inline]
     pub fn set_random_ai(&mut self, val: bool) {
-        let role = self.base_mut().base_mut();
-        let flags = role.flags();
-        if val != ((flags & Actor::FLAG_RANDOM_AI) == Actor::FLAG_RANDOM_AI) {
-            role.flags = flags ^ Actor::FLAG_RANDOM_AI;
-        }
+        self.set_flag(Actor::FLAG_RANDOM_AI, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_ai_player(&mut self, val: bool) {
-        let role = self.base_mut().base_mut();
-        let flags = role.flags();
-        if val != ((flags & Actor::FLAG_AI_PLAYER) == Actor::FLAG_AI_PLAYER) {
-            role.flags = flags ^ Actor::FLAG_AI_PLAYER;
-        }
+        self.set_flag(Actor::FLAG_AI_PLAYER, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_survives(&mut self, val: bool) {
-        let role = self.base_mut().base_mut();
-        let flags = role.flags();
-        if val != ((flags & Actor::FLAG_SURVIVES) == Actor::FLAG_SURVIVES) {
-            role.flags = flags ^ Actor::FLAG_SURVIVES;
-        }
+        self.set_flag(Actor::FLAG_SURVIVES, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_stunned(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_STUN) == Costume::FLAG_STUN) {
-            costume.flags = flags ^ Costume::FLAG_STUN;
-        }
+        self.set_flag(Costume::FLAG_STUN, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_shape_shifted(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT) {
-            costume.flags = flags ^ Costume::FLAG_SHAPE_SHIFT;
-        }
+        self.set_flag(Costume::FLAG_SHAPE_SHIFT, val);
     }
     
-    #[inline]
+    #[inline(always)]
     pub fn set_knocked_out(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_KO) == Costume::FLAG_KO) {
-            costume.flags = flags ^ Costume::FLAG_KO;
-        }
+        self.set_flag(Costume::FLAG_KO, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_invincible(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_SHAPE_SHIFT) == Costume::FLAG_SHAPE_SHIFT) {
-            costume.flags = flags ^ Costume::FLAG_SHAPE_SHIFT;
-        }
+        self.set_flag(Costume::FLAG_SHAPE_SHIFT, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_confused(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_CONFUSE) == Costume::FLAG_CONFUSE) {
-            costume.flags = flags ^ Costume::FLAG_CONFUSE;
-        }
+        self.set_flag(Costume::FLAG_CONFUSE, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_enraged(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_ENRAGED) == Costume::FLAG_ENRAGED) {
-            costume.flags = flags ^ Costume::FLAG_ENRAGED;
-        }
+        self.set_flag(Costume::FLAG_ENRAGED, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_converted(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_CONVERT) == Costume::FLAG_CONVERT) {
-            costume.flags = flags ^ Costume::FLAG_CONVERT;
-        }
+        self.set_flag(Costume::FLAG_CONVERT, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_drawn(&mut self, val: bool) {
-        let costume = self.base_mut();
-        let flags = costume.flags();
-        if val != ((flags & Costume::FLAG_DRAW) == Costume::FLAG_DRAW) {
-            costume.flags = flags ^ Costume::FLAG_DRAW;
-        }
+        self.set_flag(Costume::FLAG_DRAW, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_ranged(&mut self, val: bool) {
-        let role = self.base_mut().base_mut();
-        let flags = role.flags();
-        if val != ((flags & Role::FLAG_RANGE) == Role::FLAG_RANGE) {
-            role.flags = flags ^ Role::FLAG_RANGE;
-        }
+        self.set_flag(Role::FLAG_RANGE, val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn set_revives(&mut self, val: bool) {
-        let role = self.base_mut().base_mut();
-        let flags = role.flags();
-        if val != ((flags & Role::FLAG_REVIVE) == Role::FLAG_REVIVE) {
-            role.flags = flags ^ Role::FLAG_REVIVE;
-        }
+        self.set_flag(Role::FLAG_REVIVE, val);
     }
 
     #[inline(always)]

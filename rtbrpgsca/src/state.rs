@@ -22,7 +22,7 @@ extend_struct!(State, Costume);
 
 impl<'a> State<'a> {
 
-    #[inline(always)] pub const END_DUR: i32 = 3;
+    pub const END_DUR: i32 = 3;
 
     #[inline(always)]
     pub fn r_skills(&self) -> &Option<&'a Vec<&'a Ability>> {

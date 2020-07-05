@@ -5,6 +5,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+use crate::play::*;
 use crate::state::*;
 use crate::actor::*;
 
@@ -27,34 +28,38 @@ pub struct Role<'a> {
     pub(crate) sp: i32,
 }
 
+impl<'a> Play for Role<'a> {
+    
+    #[inline(always)]
+    fn flags(&self) -> i32 {
+        self.flags
+    }
+    
+}
+
 impl<'a> Role<'a> {
 
-    #[inline(always)] pub const HP_TXT: &'static str = "HP";
-    #[inline(always)] pub const MP_TXT: &'static str = "MP";
-    #[inline(always)] pub const RP_TXT: &'static str = "RP";
+    pub const HP_TXT: &'static str = "HP";
+    pub const MP_TXT: &'static str = "MP";
+    pub const RP_TXT: &'static str = "RP";
 
-    #[inline(always)] pub const FLAG_RANGE: i32 = 2;
-    #[inline(always)] pub const FLAG_REVIVE: i32 = 1;
-    #[inline(always)] pub const DMG_TYPE_ATK: i32 = 1;
-    #[inline(always)] pub const DMG_TYPE_DEF: i32 = 2;
-    #[inline(always)] pub const DMG_TYPE_SPI: i32 = 4;
-    #[inline(always)] pub const DMG_TYPE_WIS: i32 = 8;
-    #[inline(always)] pub const DMG_TYPE_AGI: i32 = 16;
-    #[inline(always)] pub const ELEMENT_FIRE: i32 = 32;
-    #[inline(always)] pub const ELEMENT_WATER: i32 = 64;
-    #[inline(always)] pub const ELEMENT_THUNDER: i32 = 128;
-    #[inline(always)] pub const ELEMENT_EARTH: i32 = 256;
-    #[inline(always)] pub const ELEMENT_PSYCHIC: i32 = 512;
-    #[inline(always)] pub const ELEMENT_LIGHT: i32 = 1024;
+    pub const FLAG_RANGE: i32 = 2;
+    pub const FLAG_REVIVE: i32 = 1;
+    pub const DMG_TYPE_ATK: i32 = 1;
+    pub const DMG_TYPE_DEF: i32 = 2;
+    pub const DMG_TYPE_SPI: i32 = 4;
+    pub const DMG_TYPE_WIS: i32 = 8;
+    pub const DMG_TYPE_AGI: i32 = 16;
+    pub const ELEMENT_FIRE: i32 = 32;
+    pub const ELEMENT_WATER: i32 = 64;
+    pub const ELEMENT_THUNDER: i32 = 128;
+    pub const ELEMENT_EARTH: i32 = 256;
+    pub const ELEMENT_PSYCHIC: i32 = 512;
+    pub const ELEMENT_LIGHT: i32 = 1024;
 
     #[inline(always)]
     pub fn id(&self) -> i32 {
         self.id
-    }
-    
-    #[inline(always)]
-    pub fn flags(&self) -> i32 {
-        self.flags
     }
 
     #[inline(always)]
@@ -83,12 +88,12 @@ impl<'a> Role<'a> {
 
     #[inline(always)]
     pub fn revives(&self) -> bool {
-        (self.flags & Role::FLAG_REVIVE) == Role::FLAG_REVIVE
+        self.has_flag(Role::FLAG_REVIVE)
     }
 
     #[inline(always)]
     pub fn ranged(&self) -> bool {
-        (self.flags & Role::FLAG_RANGE) == Role::FLAG_RANGE
+        self.has_flag(Role::FLAG_RANGE)
     }
     
     #[inline(always)]

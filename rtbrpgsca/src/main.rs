@@ -7,6 +7,7 @@ mod costume;
 mod library;
 mod state;
 mod scene;
+mod play;
 
 extern crate sciter;
 

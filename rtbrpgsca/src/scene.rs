@@ -5,6 +5,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+use crate::play::*;
 use crate::actor::*;
 use crate::ability::*;
 use crate::costume::*;
@@ -13,7 +14,7 @@ use crate::state::*;
 pub type SpriteRun = dyn FnMut(&mut dyn Scene, &mut Option<&mut Actor>, &Option<&Ability>,
                          bool, &mut Option<&mut Actor>, &Option<&Ability>) -> bool;
 
-pub trait Scene<'a> {
+pub trait Scene<'a>: PlayMut {
     
     fn status(&self) -> i32;
     
@@ -31,7 +32,7 @@ pub trait Scene<'a> {
 
     fn set_targets(&mut self, targets: &'a Option<&'a Vec<&'a Actor>>);
 
-    fn play_ai(&mut self,ret: &'a mut String, actor: &'a mut Actor) {
+    fn play_ai(&mut self, ret: &'a mut String, actor: &'a mut Actor) {
 
     }
 
