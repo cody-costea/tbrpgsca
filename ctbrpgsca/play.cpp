@@ -9,6 +9,11 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
+int Play::flags() const
+{
+    return this->_flags;
+}
+
 bool Play::hasFlag(int const flag) const
 {
     return (this->_flags & flag) == flag;
@@ -21,6 +26,12 @@ void Play::setFlag(const int flag, const bool value)
     {
         this->_flags = flags ^ flag;
     }
+}
+
+Play& Play::withFlag(const int flag, const bool value)
+{
+    this->setFlag(flag, value);
+    return *this;
 }
 
 Play::Play(int const flags)

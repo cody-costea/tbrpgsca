@@ -14,11 +14,13 @@ namespace tbrpgsca
     class Play
     {
     public:
+        int flags() const;
         bool hasFlag(int const flag) const;
     protected:
         int _flags;
 
         void setFlag(int const flag, bool const value);
+        Play& withFlag(int const flag, bool const value);
 
         Play(int const flags);
 

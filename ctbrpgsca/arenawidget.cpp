@@ -15,49 +15,37 @@ using namespace tbrpgsca;
 
 inline bool ArenaWidget::isAiTurn() const
 {
-    return (this->_flags & FLAG_AI_TURN) == FLAG_AI_TURN;
+    return this->hasFlag(FLAG_AI_TURN);
 }
 
 inline bool ArenaWidget::isAutomatic() const
 {
-    return (this->_flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC;
+    return this->hasFlag(FLAG_AUTOMATIC);
 }
 
 inline bool ArenaWidget::isEndTurn() const
 {
-    return (this->_flags & FLAG_END_TURN) == FLAG_END_TURN;
+    return this->hasFlag(FLAG_END_TURN);
 }
 
 inline ArenaWidget& ArenaWidget::setAiTurn(const bool aiTurn)
 {
     ArenaWidget& arena = *this;
-    int const _flags = arena._flags;
-    if (aiTurn != ((_flags & FLAG_AI_TURN) == FLAG_AI_TURN))
-    {
-        arena._flags = _flags ^ FLAG_AI_TURN;
-    }
+    arena.setFlag(FLAG_AI_TURN, aiTurn);
     return arena;
 }
 
 inline ArenaWidget& ArenaWidget::setEndTurn(const bool endTurn)
 {
     ArenaWidget& arena = *this;
-    int const _flags = arena._flags;
-    if (endTurn != ((_flags & FLAG_END_TURN) == FLAG_END_TURN))
-    {
-        arena._flags = _flags ^ FLAG_END_TURN;
-    }
+    arena.setFlag(FLAG_END_TURN, endTurn);
     return arena;
 }
 
 inline ArenaWidget& ArenaWidget::setAutomatic(const bool automatic)
 {
     ArenaWidget& arena = *this;
-    int const _flags = arena._flags;
-    if (automatic != ((_flags & FLAG_AUTOMATIC) == FLAG_AUTOMATIC))
-    {
-        arena._flags = _flags ^ FLAG_AUTOMATIC;
-    }
+    arena.setFlag(FLAG_AUTOMATIC, automatic);
     return arena;
 }
 
