@@ -376,15 +376,55 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn set_hp_scene(&mut self, val: i32, ret: &'a mut String, scene: &'a mut dyn Scene) {
+    pub(crate) fn set_hp_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
         if val < 1 {
             if self.hp != 0 {
-                /*if self.survives() || self.invincible() {
-
-                }*/
+                if self.survives() || self.invincible() {
+                    self.hp = 1;
+                } else {
+                    self.sp = 0;
+                }
+                if let Some(ret) = ret {
+                    ret.push_str(&*format!(", {} falls unconscious", self.name()));
+                }
+                if self.init > 0 {
+                    self.init = 0;
+                }
+                if self.revives() {
+                    if let Some(ret) = ret {
+                        ret.push_str(", but rises again");
+                    }
+                    self.hp = self.m_hp;
+                    if let Some(scene) = scene {
+                        if self.shape_shifted() {
+                            //TODO: reset sprite
+                        }
+                    }
+                    self.remove_states(ret, scene, false);
+                } else {
+                    self.hp = 0;
+                    self.remove_states(ret, scene, true);
+                    self.set_knocked_out(true);
+                    self.set_stunned(true);
+                    if let Some(scene) = scene {
+                        if let Some(ret) = ret {
+                            scene.check_status(ret);
+                        }
+                    }
+                }
             }
         } else {
-
+            let o_hp = self.hp;
+            let m_hp = self.m_hp;
+            self.hp = if val > m_hp { m_hp } else { val };
+            if o_hp < 1 {
+                self.set_stunned(false);
+                self.set_knocked_out(false);
+                self.refresh_costumes(ret, scene);
+                if let Some(scene) = scene {
+                    scene.reset_turn(self);
+                }
+            }
         }
     }
 

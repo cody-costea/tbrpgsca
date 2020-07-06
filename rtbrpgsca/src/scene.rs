@@ -64,11 +64,11 @@ pub trait Scene<'a>: PlayMut {
         false
     }
 
-    fn check_status(&mut self, ret: &'a mut String) {
+    fn check_status(&mut self, ret: &mut String) {
         
     }
 
-    fn reset_turn(&mut self, actor: &'a mut Actor) {
+    fn reset_turn(&mut self, actor: &mut Actor) {
         
     }
 
