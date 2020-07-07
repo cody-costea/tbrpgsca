@@ -263,8 +263,7 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
                 {
                     actor._init = 0;
                 }
-                bool const revives = actor.isReviving();
-                if (revives)
+                if (actor.isReviving())
                 {
                     if (ret != nullptr)
                     {
