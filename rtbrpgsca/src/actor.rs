@@ -302,7 +302,7 @@ impl<'a> Actor<'a> {
     }
 
     #[inline]
-    pub fn set_agi_scene(&mut self, val: i32, scene: &mut Option<&'a mut dyn Scene>) {
+    pub fn set_agi_scene(&mut self, val: i32, scene: &mut Option<&mut dyn Scene>) {
         self.set_agi(val);
         if let Some(s) = scene {
             s.agi_calc();
@@ -314,22 +314,27 @@ impl<'a> Actor<'a> {
         self.side = val;
     }
 
-    pub(crate) fn set_race_scene(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>, val: &'a Costume) {
-
+    pub(crate) fn set_race_scene(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, val: &'a Costume) {
+        self.equip_item_scene(EquipPos::Race, &Some(val), ret, scene);
     }
 
-    pub(crate) fn set_job_scene(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>, val: &'a Costume) {
-        
+    pub(crate) fn set_job_scene(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, val: &'a Costume) {
+        self.equip_item_scene(EquipPos::Job, &Some(val), ret, scene);
+        if !self.shape_shifted() {
+            if let Some(spr) = val.sprite() {
+                self.set_sprite(&Some(spr));
+            }
+        }
     }
 
     #[inline]
     pub fn set_race(&mut self, val: &'a Costume) {
-
+        self.set_race_scene(&mut None, &mut None, val);
     }
 
     #[inline]
     pub fn set_job(&mut self, val: &'a Costume) {
-        
+        self.set_job_scene(&mut None, &mut None, val);
     }
 
     #[inline]
@@ -494,13 +499,16 @@ impl<'a> Actor<'a> {
 
     #[inline]
     pub(crate) fn set_exp_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
-
+        self.xp = val;
+        if val >= self.max_exp() {
+            self.level_up(ret, scene);
+        }
     }
 
     #[inline]
     pub(crate) fn set_level_scene(&mut self, val: i32, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
         while val > self.level() {
-            self.xp = self.maxp;
+            self.xp = self.max_exp();
             self.level_up(ret, scene);
         }
         self.cr_lv = val;
@@ -539,16 +547,17 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub fn unequip_pos(&mut self, pos: EquipPos) -> Option<&'a Costume> {
+    pub fn unequip_pos(&mut self, pos: EquipPos) -> Option<&Costume> {
         self.equip_item(pos, &None)
     }
 
     #[inline(always)]
     pub fn equip_item(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>) -> Option<&Costume> {
-        self.equip_item_scene(pos, item, &mut None)
+        self.equip_item_scene(pos, item, &mut None, &mut None)
     }
 
-    pub(crate) fn equip_item_scene(&mut self, pos: EquipPos, item: &'a Option<&'a Costume>, scene: &mut Option<&mut dyn Scene>) -> Option<&Costume> {
+    pub(crate) fn equip_item_scene(&mut self, pos: EquipPos, item: &Option<&'a Costume>,
+        ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>) -> Option<&Costume> {
         unsafe {
             let actor = self as *mut Actor;
             let equipment = &mut self.equipment;
@@ -561,7 +570,7 @@ impl<'a> Actor<'a> {
         }
     }
 
-    pub(crate) fn level_up(&mut self, ret: &mut Option<&'a mut String>, scene: &mut Option<&'a mut dyn Scene>) {
+    pub(crate) fn level_up(&mut self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>) {
         let maxp = self.max_exp();
         let max_lv = self.max_level();
         let mut lv = self.level();
