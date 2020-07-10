@@ -128,7 +128,7 @@ impl<'a> Ability<'a> {
         true
     }
 
-    pub fn replenish(&'a self, user: &'a mut Actor) {
+    pub fn replenish(&'a self, user: &'a mut Actor<'a>) {
         let m_qty = self.m_qty();
         if m_qty > 0 {
             if user.skills_cr_qty().is_none() {
