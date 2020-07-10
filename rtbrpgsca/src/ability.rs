@@ -113,15 +113,31 @@ impl<'a> Ability<'a> {
     }
 
     pub fn can_perform(&self, user: &Actor) -> bool {
-        true
+        let mut has_qty = true;
+        if let Some(skills_qty) = user.skills_cr_qty() {
+            if let Some(&qty) = skills_qty.get(self) {
+                if qty < 1 {
+                    has_qty = false;
+                }
+            }
+        }
+        has_qty && self.m_mp() <= user.mp() && self.m_hp < user.hp() && self.m_sp() <= user.sp() && user.level() >= self.lv_rq()
     }
 
     pub fn execute(&self, ret: &mut String, user: &mut Actor, target: &mut Actor, apply_costs: bool) -> bool {
         true
     }
 
-    pub fn replenish(&self, user: &mut Actor) -> bool {
-        true
+    pub fn replenish(&'a self, user: &'a mut Actor) {
+        let m_qty = self.m_qty();
+        if m_qty > 0 {
+            if user.skills_cr_qty().is_none() {
+                user.skills_cr_qty = Some(HashMap::new());
+            }
+            if let Some(skills_cr_qty) = user.skills_cr_qty_mut() {
+                skills_cr_qty.insert(self, m_qty);
+            }
+        }
     }
 
     fn new(id: i32, name: &'static str, sprite: Option<&'static str>, sound: Option<&'static str>, steal: bool, range: bool, melee: bool, can_miss: bool,
