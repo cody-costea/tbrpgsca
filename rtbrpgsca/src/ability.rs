@@ -10,7 +10,10 @@ use crate::state::*;
 use crate::actor::*;
 use crate::play::*;
 
+extern crate rand;
+
 use std::collections::HashMap;
+use rand::Rng;
 
 #[derive(Clone)]
 pub struct Ability<'a> {
@@ -124,8 +127,61 @@ impl<'a> Ability<'a> {
         has_qty && self.m_mp() <= user.mp() && self.m_hp < user.hp() && self.m_sp() <= user.sp() && user.level() >= self.lv_rq()
     }
 
-    pub fn execute(&self, ret: &mut String, user: &mut Actor, target: &mut Actor, apply_costs: bool) -> bool {
-        true
+    pub fn execute<'b>(&self, ret: &mut String, user: &'b mut Actor<'b>, target: &'b mut Actor<'b>, apply_costs: bool) {
+        let dmg_type = self.dmg_type() | user.dmg_type();
+        unsafe {
+            let usr = user as *mut Actor;
+            let trg = if (dmg_type & target.rfl_type()) == 0 {
+                ret.push_str(&*format!(", reflected by {}", target.name()));
+                &mut (*usr)
+            } else { target }; //as *mut Actor;
+            let mut can_miss = if self.can_miss() { 4 } else { 0 };
+            let mut trg_agi = trg.agi();
+            let mut trg_spi = trg.spi();
+            let mut usr_agi = user.agi();
+            let mut usr_wis = user.wis();
+            let mut dmg = 0;
+            let mut def = 0;
+            let mut i = 0;
+            if (dmg_type & Role::DMG_TYPE_ATK) == Role::DMG_TYPE_ATK {
+                dmg += user.atk();
+                def += trg.def();
+                i += 1;
+            }
+            if (dmg_type & Role::DMG_TYPE_DEF) == Role::DMG_TYPE_DEF {
+                dmg += user.def();
+                def += trg.def();
+                i += 1;
+            }
+            if (dmg_type & Role::DMG_TYPE_SPI) == Role::DMG_TYPE_SPI {
+                dmg += user.spi();
+                def += trg.wis();
+                i += 1;
+            }
+            if (dmg_type & Role::DMG_TYPE_WIS) == Role::DMG_TYPE_WIS {
+                dmg += usr_wis;
+                def += trg_spi;
+                i += 1;
+            }
+            if (dmg_type & Role::DMG_TYPE_AGI) == Role::DMG_TYPE_AGI {
+                dmg += usr_agi;
+                def += trg_agi;
+                if can_miss > 0 {
+                    can_miss = 3;
+                }
+                i += 1;
+            }
+            trg_agi = ((trg_agi + trg_spi) / 2) / 3;
+            usr_agi = (usr_agi + usr_wis) / 2;
+            let mut rng = rand::thread_rng();
+            let miss_factor = rng.gen_range(0, usr_agi / 2);
+            if can_miss == 0 || usr == (trg as *mut Actor) || (miss_factor + (usr_agi / miss_factor)) > trg_agi - (rng.gen_range(0, trg_agi)) {
+                if self.does_critical() && miss_factor > (trg_agi * 2) + rng.gen_range(0, trg_agi) {
+                    dmg = (dmg * 2) + (dmg / 2);
+                }
+                
+            }
+        }
     }
 
     pub fn replenish(&'a self, user: &'a mut Actor<'a>) {

@@ -82,6 +82,16 @@ impl<'a> Costume<'a> {
     }
 
     #[inline(always)]
+    pub fn rfl_type(&self) -> i32 {
+        self.rfl_type
+    }
+
+    #[inline(always)]
+    pub fn cvr_type(&self) -> i32 {
+        self.cvr_type
+    }
+
+    #[inline(always)]
     pub fn atk(&self) -> i32 {
         self.atk
     }

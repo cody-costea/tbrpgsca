@@ -10,6 +10,7 @@ mod scene;
 mod play;
 
 extern crate sciter;
+extern crate rand;
 
 fn main() {
     println!("Hello, world!!!");
