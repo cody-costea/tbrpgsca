@@ -56,7 +56,7 @@ impl<'a> State<'a> {
 
     }
 
-    pub fn inflict<'b>(&self, ret: &mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, user: &'b mut Actor, dur: i32, always: bool) {
+    pub fn inflict<'b>(&self, ret: &'b mut Option<&mut String>, scene: &mut Option<&mut dyn Scene>, user: &'b mut Actor, dur: i32, always: bool) {
 
     }
 

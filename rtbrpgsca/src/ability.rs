@@ -7,12 +7,14 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 use crate::role::*;
 use crate::state::*;
+use crate::scene::*;
 use crate::actor::*;
 use crate::play::*;
 
 extern crate rand;
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
+use std::rc::Rc;
 use rand::Rng;
 
 #[derive(Clone)]
@@ -127,10 +129,10 @@ impl<'a> Ability<'a> {
         has_qty && self.m_mp() <= user.mp() && self.m_hp < user.hp() && self.m_sp() <= user.sp() && user.level() >= self.lv_rq()
     }
 
-    pub fn execute<'b>(&self, ret: &mut String, user: &'b mut Actor<'b>, target: &'b mut Actor<'b>, apply_costs: bool) {
+    pub fn execute<'b>(&'b self, ret: &mut String, scene: &mut Option<&mut dyn Scene>, user: &'b mut Actor<'b>, target: &'b mut Actor<'b>, apply_costs: bool) {
         let dmg_type = self.dmg_type() | user.dmg_type();
         unsafe {
-            let usr = user as *mut Actor;
+            let usr = user as *mut Actor<'b>;
             let trg = if (dmg_type & target.rfl_type()) == 0 {
                 ret.push_str(&*format!(", reflected by {}", target.name()));
                 &mut (*usr)
@@ -175,11 +177,82 @@ impl<'a> Ability<'a> {
             usr_agi = (usr_agi + usr_wis) / 2;
             let mut rng = rand::thread_rng();
             let miss_factor = rng.gen_range(0, usr_agi / 2);
-            if can_miss == 0 || usr == (trg as *mut Actor) || (miss_factor + (usr_agi / miss_factor)) > trg_agi - (rng.gen_range(0, trg_agi)) {
+            if can_miss == 0 || usr == trg || (miss_factor + (usr_agi / miss_factor)) > trg_agi - (rng.gen_range(0, trg_agi)) {
                 if self.does_critical() && miss_factor > (trg_agi * 2) + rng.gen_range(0, trg_agi) {
                     dmg = (dmg * 2) + (dmg / 2);
                 }
-                
+                if i != 0 {
+                    def += rng.gen_range(0, def / 2);
+                    dmg += rng.gen_range(0, dmg / 2);
+                    dmg = (self.attr_inc() + (dmg / i)) - ((def / i) / 2);
+                    if dmg < 0 {
+                        dmg = 0;
+                    }
+                }
+                self.damage(ret, scene, if self.absorbs() { Some(user) } else { None }, trg, dmg, false);
+                let ret_option = &mut Some(ret);
+                if let Some(a_state_dur) = self.state_dur() {
+                    for (state, &dur) in a_state_dur.iter() {
+                        state.inflict(ret_option, scene, trg, dur, user.side() == trg.side());
+                    }
+                }
+                let trg_ptr = trg as *mut Actor;
+                if let Some(t_state_dur) = (*trg_ptr).state_dur() {
+                    if let Some(r_states) = self.r_states() {
+                        for (r_state, &r_dur) in r_states.iter() {
+                            if r_dur > State::END_DUR {
+                                for (t_state, &t_dur) in t_state_dur {
+                                    if t_state == r_state {
+                                        if t_dur > State::END_DUR {
+                                            r_state.disable(ret_option, scene, trg, r_dur, false);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if self.steals() {
+                    if let Some(trg_items) = (*trg_ptr).items_mut() {
+                        let trg_items_len = trg_items.len();
+                        if trg_items_len > 0 && ((rng.gen_range(0, 12) + user.agi()) > 4 + trg.agi() / 3) {
+                            if let Some(stolen) = trg_items.iter().nth(rng.gen_range(0, trg_items_len)) {
+                                let trg_item_qty = *(stolen.1);
+                                if trg_item_qty > 0 {
+                                    if user.items.is_none() {
+                                        user.items = Some(Rc::new(BTreeMap::new()));
+                                    }
+                                    if let Some(usr_items_map) = user.items_mut() {
+                                        if let Some(usr_items) = Rc::get_mut(usr_items_map) {
+                                            if let Some(&usr_item_qty) = usr_items.get(self) {
+                                                usr_items.insert(self, usr_item_qty + 1);
+                                            }
+                                        }
+                                        //usr_items.insert(self, *(usr_items.get(self).unwrap_or(&1)));
+                                    }
+                                    ret_option.as_mut().unwrap().push_str(&*format!(", obtaining {0} from {1}", self.name(), (*trg).name()))
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                ret.push_str(&*format!(", but misses {}", trg.name()));
+            }
+            if apply_costs {
+                user.set_sp(user.sp() - self.m_sp());
+                user.set_mp(user.mp() - self.m_mp());
+                user.set_hp(user.hp() - self.m_hp());
+                let m_qty = self.m_qty();
+                if m_qty > 0 {
+                    if user.skills_cr_qty().is_none() {
+                        user.skills_cr_qty = Some(HashMap::new());
+                    }
+                    if let Some(skills_cr_qty) = (*usr).skills_cr_qty_mut() {
+                        skills_cr_qty.insert(self, *skills_cr_qty.get(self).unwrap_or(&(m_qty - 1)));
+                    }
+                }
             }
         }
     }

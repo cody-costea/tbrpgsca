@@ -8,6 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 use crate::play::*;
 use crate::state::*;
 use crate::actor::*;
+use crate::scene::*;
 
 use std::collections::HashMap;
 use std::str;
@@ -122,8 +123,8 @@ impl<'a> Role<'a> {
         self.sp
     }
 
-    pub(crate) fn damage(&self, ret: Option<&mut String>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) -> &Role<'a> {
-        self
+    pub(crate) fn damage(&self, ret: &mut String, scene: &mut Option<&mut dyn Scene>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) {
+        
     }
 
     pub fn new(id: i32, name: &'static str, sprite: Option<&'static str>, m_hp: i32, m_mp: i32, m_sp: i32, hp: i32, mp: i32,
