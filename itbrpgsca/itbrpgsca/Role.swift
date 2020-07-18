@@ -1,10 +1,10 @@
 /*
-Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
-
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*/
+ Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
+ 
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 
 import Foundation
 
@@ -30,7 +30,7 @@ open class Role : Hashable, Equatable {
     public static var SpTxt: String = "RP"
     
     internal var _id: Int, _name: String, _sprite: String?, _hp: Int, _mp: Int,_sp: Int, _mHp: Int,
-                 _mMp: Int, _mSp: Int, _dmgType: Int, _mDelayTrn: Int, _flags: Int, _stateDur: [State: Int]?
+    _mMp: Int, _mSp: Int, _dmgType: Int, _mDelayTrn: Int, _flags: Int, _stateDur: [State: Int]?
     
     public static func == (lhs: Role, rhs: Role) -> Bool {
         return lhs._id == rhs._id
@@ -59,7 +59,7 @@ open class Role : Hashable, Equatable {
     open func hash(into hasher: inout Hasher) {
         hasher.combine(self._id)
     }
-                
+    
     open var hashValue: Int {
         return self._id
     }
@@ -121,7 +121,6 @@ open class Role : Hashable, Equatable {
     }
     
     open func damage(ret: inout String, absorber: Actor?, actor: Actor, dmg: Int, percent: Bool) {
-        var dmg: Int = dmg
         if !actor.invincible {
             var dmgHp: Int, dmgMp: Int, dmgSp: Int
             if (percent)
@@ -135,16 +134,13 @@ open class Role : Hashable, Equatable {
                 dmgHp = self.hp
                 dmgMp = self.mp
                 dmgSp = self.sp
-                if (dmgHp != 0)
-                {
+                if dmgHp != 0 {
                     dmgHp += dmgHp < 0 ? (-1 * dmg) : dmg
                 }
-                if (dmgMp != 0)
-                {
+                if dmgMp != 0 {
                     dmgMp += dmgMp < 0 ? (-1 * dmg) : dmg
                 }
-                if (dmgSp != 0)
-                {
+                if dmgSp != 0 {
                     dmgSp += dmgSp < 0 ? (-1 * dmg) : dmg
                 }
             }
@@ -185,72 +181,41 @@ open class Role : Hashable, Equatable {
                 dmgSp /= Role.DEFAULT_RES
             }
             var c: Bool = false
-            if (dmgSp != 0)
-            {
+            if dmgSp != 0 {
                 c = true
                 ret += String(format: Ability.SuffersTxt, actor.name)
-                ret += " "
-                if (dmgSp < 0)
-                {
-                    dmg =  -1 * dmg + dmgSp
+                if dmgSp < 0 {
                     ret += "+"
-                }
-                else
-                {
-                    dmg += dmgSp
                 }
                 actor.sp = (actor._sp - dmgSp)
                 ret += String(format: "%d %@", -dmgSp, Role.SpTxt)
             }
-            if (dmgMp != 0)
-            {
-                if (c)
-                {
+            if dmgMp != 0 {
+                if c {
                     ret += ", "
-                }
-                else
-                {
+                } else {
                     ret += String(format: Ability.SuffersTxt, actor.name)
-                    ret += " "
                     c = true
                 }
-                if (dmgMp < 0)
-                {
-                    dmg =  -1 * dmg + dmgMp
+                if dmgMp < 0 {
                     ret += "+"
-                }
-                else
-                {
-                    dmg += dmgMp
                 }
                 actor.mp = (actor._mp - dmgMp)
                 ret += String(format: "%d %@", -dmgMp, Role.MpTxt)
             }
-            if (dmgHp != 0)
-            {
-                if (c)
-                {
+            if dmgHp != 0 {
+                if c {
                     ret += ", "
-                }
-                else
-                {
+                } else {
                     ret += String(format: Ability.SuffersTxt, actor.name)
-                    ret += " "
                     c = true
                 }
-                if (dmgHp < 0)
-                {
-                    dmg =  -1 * dmg + dmgSp
+                if dmgHp < 0 {
                     ret += "+"
-                }
-                else
-                {
-                    dmg += dmgHp
                 }
                 actor.hp = (actor._hp - dmgHp)
                 ret += String(format: "%d %@", -dmgHp, Role.HpTxt)
-                if (actor.hp < 1)
-                {
+                if actor.hp < 1 {
                     ret += String(format: Actor.KoTxt, actor.name)
                 }
             }

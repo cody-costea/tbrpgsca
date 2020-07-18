@@ -21,7 +21,7 @@ open class Ability : Role {
     public static let FLAG_TRG_ALL = 4
     
     public static var MissesTxt = ", but misses %@"
-    public static var SuffersTxt = ", %@ suffers"
+    public static var SuffersTxt = ", %@ suffers "
     public static var ReflectTxt = ", reflected by %@"
     public static var ResistTxt = ", resisted by %@"
     public static var StolenTxt = ", obtaining %@ from %@"
