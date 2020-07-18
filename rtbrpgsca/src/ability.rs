@@ -13,6 +13,7 @@ use crate::play::*;
 
 extern crate rand;
 
+use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
 use std::rc::Rc;
 use rand::Rng;
@@ -176,9 +177,11 @@ impl<'a> Ability<'a> {
             trg_agi = ((trg_agi + trg_spi) / 2) / 3;
             usr_agi = (usr_agi + usr_wis) / 2;
             let mut rng = rand::thread_rng();
-            let miss_factor = rng.gen_range(0, usr_agi / 2);
-            if can_miss == 0 || usr == trg || (miss_factor + (usr_agi / miss_factor)) > trg_agi - (rng.gen_range(0, trg_agi)) {
-                if self.does_critical() && miss_factor > (trg_agi * 2) + rng.gen_range(0, trg_agi) {
+            if can_miss != 0 {
+                can_miss = rng.gen_range(0, usr_agi / 2) + (usr_agi / can_miss);
+            }
+            if can_miss == 0 || usr == trg || can_miss > trg_agi - (rng.gen_range(0, trg_agi)) {
+                if self.does_critical() && can_miss > (trg_agi * 2) + rng.gen_range(0, trg_agi) {
                     dmg = (dmg * 2) + (dmg / 2);
                 }
                 if i != 0 {
@@ -214,20 +217,20 @@ impl<'a> Ability<'a> {
                     }
                 }
                 if self.steals() {
-                    if let Some(trg_items) = (*trg_ptr).items_mut() {
+                    if let Some(trg_items_ref) = (*trg_ptr).items_mut() {
+                        let trg_items = trg_items_ref.borrow_mut();
                         let trg_items_len = trg_items.len();
                         if trg_items_len > 0 && ((rng.gen_range(0, 12) + user.agi()) > 4 + trg.agi() / 3) {
                             if let Some(stolen) = trg_items.iter().nth(rng.gen_range(0, trg_items_len)) {
                                 let trg_item_qty = *(stolen.1);
                                 if trg_item_qty > 0 {
                                     if user.items.is_none() {
-                                        user.items = Some(Rc::new(BTreeMap::new()));
+                                        user.items = Some(Rc::new(RefCell::new(BTreeMap::new())));
                                     }
-                                    if let Some(usr_items_map) = user.items_mut() {
-                                        if let Some(usr_items) = Rc::get_mut(usr_items_map) {
-                                            if let Some(&usr_item_qty) = usr_items.get(self) {
-                                                usr_items.insert(self, usr_item_qty + 1);
-                                            }
+                                    if let Some(usr_items_ref) = user.items_mut() {
+                                        let mut usr_items = usr_items_ref.borrow_mut();
+                                        if let Some(&usr_item_qty) = usr_items.get(self) {
+                                            usr_items.insert(self, usr_item_qty + 1);
                                         }
                                         //usr_items.insert(self, *(usr_items.get(self).unwrap_or(&1)));
                                     }

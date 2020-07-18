@@ -13,6 +13,7 @@ use crate::state::*;
 use crate::role::*;
 
 use std::collections::{BTreeMap, HashMap};
+use std::cell::RefCell;
 use std::rc::Rc;
 
 pub type DelayAct = dyn FnMut(&mut Actor, bool);
@@ -29,7 +30,7 @@ pub struct Actor<'a> {
     pub(crate) equipment: HashMap<EquipPos, &'a Costume<'a>>,
     pub(crate) skills_cr_qty: Option<HashMap<&'a Ability<'a>, i32>>,
     pub(crate) skills_rg_trn: Option<HashMap<&'a Ability<'a>, i32>>,
-    pub(crate) items: Option<Rc<BTreeMap<&'a Ability<'a>, i32>>>,
+    pub(crate) items: Option<Rc<RefCell<BTreeMap<&'a Ability<'a>, i32>>>>,
     pub(crate) dmg_roles: Option<&'a Vec<&'a Costume<'a>>>,
     pub(crate) delay_act: Option<&'a DelayAct>,
     pub(crate) drawn_by: Option<&'a Actor<'a>>,
@@ -85,17 +86,21 @@ impl<'a> Actor<'a> {
     }
 
     #[inline(always)]
-    pub fn items_mut(&mut self) -> Option<&mut Rc<BTreeMap<&'a Ability<'a>, i32>>> {
-        if let Some(v) = self.items.as_mut() {
-            Some(v)
+    pub fn items_mut(&mut self) -> Option<&RefCell<BTreeMap<&'a Ability<'a>, i32>>> {
+        if let Some(items) = &mut self.items {
+            Some(items)
         } else {
             None
         }
     }
 
     #[inline(always)]
-    pub fn items(&self) -> Option<&BTreeMap<&'a Ability<'a>, i32>> {
-        self.items.as_deref()
+    pub fn items(&self) -> Option<&RefCell<BTreeMap<&'a Ability<'a>, i32>>> {
+        if let Some(items) = &self.items {
+            Some(items)
+        } else {
+            None
+        }
     }
 
     #[inline(always)]
