@@ -100,7 +100,7 @@ open class Ability : Role {
     open func execute(ret: inout String, user: Actor, target: Actor, applyCosts: Bool) {
         var trg: Actor
         let dmgType = self.dmgType | user.dmgType, trgRflType = target.rflType
-        if dmgType & trgRflType != 0 {
+        if (dmgType & trgRflType) != 0 {
             ret.append(String(format: Ability.ReflectTxt, target.name))
             trg = user
         } else {
