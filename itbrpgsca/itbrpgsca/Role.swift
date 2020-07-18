@@ -160,9 +160,10 @@ open class Role : Hashable, Equatable {
                     if res > 7 {
                         res = -7 + (res - 7)
                         if res > -1 {
-                            dmgHp *= -1 * (res + 2)
-                            dmgMp *= -1 * (res + 2)
-                            dmgSp *= -1 * (res + 2)
+                            res = -1 * res + 2
+                            dmgHp *= res
+                            dmgMp *= res
+                            dmgSp *= res
                         }
                     } else if res == 7 {
                         ret.append(String(format: Ability.ResistTxt, actor.name))
@@ -173,9 +174,10 @@ open class Role : Hashable, Equatable {
                         dmgSp /= res
                     }
                 } else {
-                    dmgHp *= -1 * (res - 2)
-                    dmgMp *= -1 * (res - 2)
-                    dmgSp *= -1 * (res - 2)
+                    res = -1 * res - 2;
+                    dmgHp *= res
+                    dmgMp *= res
+                    dmgSp *= res
                 }
             } else {
                 dmgHp /= Role.DEFAULT_RES
