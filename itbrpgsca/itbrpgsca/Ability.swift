@@ -1,10 +1,10 @@
 /*
-Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
-
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-*/
+ Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
+ 
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 
 import Foundation
 
@@ -94,7 +94,7 @@ open class Ability : Role {
     open func canPerform(user: Actor) -> Bool {
         let skillsQty: [Ability : Int]! = user._skillsCrQty
         return (self.mMp <= user.mp && self.mSp <= user.sp && self.mHp < user.hp && user.level >= self._lvRq
-                && (skillsQty == nil || skillsQty[self] ?? 1 > 0))
+            && (skillsQty == nil || skillsQty[self] ?? 1 > 0))
     }
     
     open func execute(ret: inout String, user: Actor, target: Actor, applyCosts: Bool) {
@@ -107,7 +107,7 @@ open class Ability : Role {
             trg = target
         }
         var canMiss = self.canMiss ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user.agi,
-                      trgAgi = trg.agi, trgSpi = trg.spi, usrWis = user.wis
+        trgAgi = trg.agi, trgSpi = trg.spi, usrWis = user.wis
         if (dmgType & Role.DMG_TYPE_ATK) == Role.DMG_TYPE_ATK {
             def += trg.def
             dmg += user.atk
@@ -138,67 +138,67 @@ open class Ability : Role {
         }
         usrAgi = (usrAgi + usrWis) / 2
         trgAgi = ((trgAgi + trgSpi) / 2) / 3
-        if canMiss == 0 {
+        if canMiss != 0 {
             canMiss = Int.random(in: 0..<(usrAgi / 2)) + (usrAgi / canMiss)
-            if canMiss > trgAgi - (Int.random(in: 0..<trgAgi)) {
-                if canMiss > (trgAgi * 2) + (Int.random(in: 0..<trgAgi)) {
-                    dmg = (dmg * 2) + (dmg / 2)
-                }
-                if i != 0 {
-                    def += Int.random(in: 0..<(def /  2))
-                    dmg += Int.random(in: 0..<(dmg /  2))
-                    dmg = (self.attrInc + (dmg / i)) - ((def / i) / 2)
-                    if dmg < 0 {
-                        dmg = 0
-                    }
-                }
-                self.damage(ret: &ret, absorber: self.absorbs ? user : nil, actor: target, dmg: dmg, percent: false)
-                if let aStates = self.stateDur {
-                    for (state, dur) in aStates {
-                        state.inflict(user: user, target: target, dur: dur, always: user.side == target.side)
-                    }
-                }
-                if let trgStates = target.stateDur, let rStates = self.rStates {
-                    for (rState, rDur) in rStates {
-                        if rDur > State.STATE_END_DUR {
-                            for (trgState, trgDur) in trgStates {
-                                if trgState == rState {
-                                    if trgDur > State.STATE_END_DUR {
-                                        rState.disable(actor: target, dur: rDur, remove: false)
-                                    }
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
-                if self.steals {
-                    var usrItems: [Ability : Int]! = user.items
-                    if var trgItems = target.items, trgItems != usrItems {
-                        let trgItemsSize = trgItems.count
-                        if trgItemsSize > 0 && (Int.random(in: 0..<12) + user.agi / 4 > target.agi / 3) {
-                            let trgItemIdx = trgItems.index(trgItems.startIndex, offsetBy: Int.random(in: 0..<trgItemsSize))
-                            let stolen = trgItems.keys[trgItemIdx]
-                            let trgItemQty = trgItems[stolen] ?? 0
-                            if trgItemQty > 0 {
-                                if usrItems == nil {
-                                    usrItems = [Ability : Int]()
-                                    user.items = usrItems
-                                }
-                                usrItems[stolen] = (usrItems[stolen] ?? 0) + 1
-                                if trgItemQty < 2 {
-                                    trgItems.remove(at: trgItemIdx)
-                                } else {
-                                    trgItems[stolen] = trgItemQty - 1
-                                }
-                                ret.append(String(format: Ability.StolenTxt, target.name))
-                            }
-                        }
-                    }
-                }
-            } else {
-                ret.append(String(format: Ability.MissesTxt, target.name))
+        }
+        if canMiss == 0 || user === trg || canMiss > trgAgi - (Int.random(in: 0..<trgAgi)) {
+            if self.doesCritical && canMiss > (trgAgi * 2) + (Int.random(in: 0..<trgAgi)) {
+                dmg = (dmg * 2) + (dmg / 2)
             }
+            if i != 0 {
+                def += Int.random(in: 0..<(def /  2))
+                dmg += Int.random(in: 0..<(dmg /  2))
+                dmg = (self.attrInc + (dmg / i)) - ((def / i) / 2)
+                if dmg < 0 {
+                    dmg = 0
+                }
+            }
+            self.damage(ret: &ret, absorber: self.absorbs ? user : nil, actor: target, dmg: dmg, percent: false)
+            if let aStates = self.stateDur {
+                for (state, dur) in aStates {
+                    state.inflict(user: user, target: target, dur: dur, always: user.side == target.side)
+                }
+            }
+            if let trgStates = target.stateDur, let rStates = self.rStates {
+                for (rState, rDur) in rStates {
+                    if rDur > State.STATE_END_DUR {
+                        for (trgState, trgDur) in trgStates {
+                            if trgState == rState {
+                                if trgDur > State.STATE_END_DUR {
+                                    rState.disable(actor: target, dur: rDur, remove: false)
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            if self.steals {
+                var usrItems: [Ability : Int]! = user.items
+                if var trgItems = target.items, trgItems != usrItems {
+                    let trgItemsSize = trgItems.count
+                    if trgItemsSize > 0 && (Int.random(in: 0..<12) + user.agi / 4 > target.agi / 3) {
+                        let trgItemIdx = trgItems.index(trgItems.startIndex, offsetBy: Int.random(in: 0..<trgItemsSize))
+                        let stolen = trgItems.keys[trgItemIdx]
+                        let trgItemQty = trgItems[stolen] ?? 0
+                        if trgItemQty > 0 {
+                            if usrItems == nil {
+                                usrItems = [Ability : Int]()
+                                user.items = usrItems
+                            }
+                            usrItems[stolen] = (usrItems[stolen] ?? 0) + 1
+                            if trgItemQty < 2 {
+                                trgItems.remove(at: trgItemIdx)
+                            } else {
+                                trgItems[stolen] = trgItemQty - 1
+                            }
+                            ret.append(String(format: Ability.StolenTxt, target.name))
+                        }
+                    }
+                }
+            }
+        } else {
+            ret.append(String(format: Ability.MissesTxt, target.name))
         }
         if applyCosts {
             user.hp -= self.mHp
