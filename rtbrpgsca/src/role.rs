@@ -48,6 +48,7 @@ impl<'a> Role<'a> {
     pub const ELEMENT_EARTH: i32 = 256;
     pub const ELEMENT_PSYCHIC: i32 = 512;
     pub const ELEMENT_LIGHT: i32 = 1024;
+    pub const DEFAULT_RES: i32 = 3;
 
     #[inline(always)]
     pub fn id(&self) -> i32 {
@@ -124,7 +125,111 @@ impl<'a> Role<'a> {
     }
 
     pub(crate) fn damage(&self, ret: &mut String, scene: &mut Option<&mut dyn Scene>, absorber: Option<&mut Actor>, target: &mut Actor, dmg: i32, percent: bool) {
-        
+        if !target.invincible() {
+            let mut dmg_hp;
+            let mut dmg_mp;
+            let mut dmg_sp;
+            if percent {
+                dmg_hp = (target.m_hp() + dmg) * self.hp() / 100;
+                dmg_mp = (target.m_mp() + dmg) * self.mp() / 100;
+                dmg_sp = (target.m_sp() + dmg) * self.sp() / 100;
+            } else {
+                dmg_hp = self.hp();
+                dmg_mp = self.mp();
+                dmg_sp = self.sp();
+                if dmg_hp != 0 {
+                    dmg_hp += if dmg_hp < 0 { -1 * dmg } else { dmg };
+                }
+                if dmg_mp != 0 {
+                    dmg_mp += if dmg_mp < 0 { -1 * dmg } else { dmg };
+                }
+                if dmg_sp != 0 {
+                    dmg_sp += if dmg_sp < 0 { -1 * dmg } else { dmg };
+                }
+            }
+            if let Some(trg_res_map) = target.res() {
+                let mut res = Role::DEFAULT_RES;
+                let dmg_type = self.dmg_type();
+                for (&elm, val) in trg_res_map.iter() {
+                    if (dmg_type & elm) == elm {
+                        res += val;
+                    }
+                }
+                if res > 0 {
+                    if res > 7 {
+                        res = -7 + (res - 7);
+                        if res > -1 {
+                            res = -1 * res + 2;
+                            dmg_hp *= res;
+                            dmg_mp *= res;
+                            dmg_sp *= res;
+                        }
+                    } else if res == 7 {
+                        ret.push_str(&*format!(", resisted by {}", target.name()));
+                        return
+                    } else {
+                        dmg_hp /= res;
+                        dmg_mp /= res;
+                        dmg_sp /= res;
+                    }
+                } else {
+                    res = -1 * res - 2;
+                    dmg_hp *= res;
+                    dmg_mp *= res;
+                    dmg_sp *= res;
+                }
+            } else {
+                dmg_hp /= Role::DEFAULT_RES;
+                dmg_mp /= Role::DEFAULT_RES;
+                dmg_sp /= Role::DEFAULT_RES;                
+            }
+            let mut c = false;
+            if dmg_sp != 0 {
+                c = true;
+                ret.push_str(&*format!(", {} suffers ", target.name()));
+                if dmg_sp < 0 {
+                    ret.push_str("+");
+                }
+                target.set_sp(target.sp() - dmg_sp);
+                ret.push_str(&*format!(" {0} {1} suffers ", -dmg_sp, "RP"));
+            }
+            if dmg_mp != 0 {
+                if c {
+                    ret.push_str(", ");
+                } else {
+                    ret.push_str(&*format!(", {} suffers ", target.name()));
+                    c = true;
+                }
+                if dmg_mp < 0 {
+                    ret.push_str("+");
+                }
+                target.set_mp(target.mp() - dmg_mp);
+                ret.push_str(&*format!(" {0} {1} suffers ", -dmg_mp, "MP"));
+            }
+            if dmg_hp != 0 {
+                if c {
+                    ret.push_str(", ");
+                } else {
+                    ret.push_str(&*format!(", {} suffers ", target.name()));
+                    c = true;
+                }
+                if dmg_hp < 0 {
+                    ret.push_str("+");
+                }
+                target.set_hp(target.hp() - dmg_hp);
+                ret.push_str(&*format!(" {0} {1} suffers ", -dmg_hp, "HP"));
+                if target.hp() < 1 {
+                    ret.push_str(&*format!(", {} falls unconscious", target.name()));
+                }
+                if c {
+                    if let Some(absorber) = absorber {
+                        absorber.set_sp(absorber.sp() + dmg_sp / 2);
+                        absorber.set_mp(absorber.mp() + dmg_mp / 2);
+                        absorber.set_hp(absorber.hp() + dmg_hp / 2);
+                    }
+                }
+            }
+        }
     }
 
     pub fn new(id: i32, name: &'static str, sprite: Option<&'static str>, m_hp: i32, m_mp: i32, m_sp: i32, hp: i32, mp: i32,

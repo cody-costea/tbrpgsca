@@ -48,7 +48,6 @@ impl<'a> Ability<'a> {
     pub const FLAG_TRG_SELF: i32 = 256;
     pub const FLAG_TRG_ALL: i32 = 4;
     pub const FLAG_TRG_ONE: i32 = 0;
-    pub const DEFAULT_RES: i32 = 3;
 
     #[inline(always)]
     pub fn lv_rq(&self) -> i32 {
