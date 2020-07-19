@@ -99,7 +99,7 @@ bool Ability::targetsAll() const
     return (this->_flags & FLAG_TRG_ALL) == FLAG_TRG_ALL;
 }
 
-Ability& Ability::replenish(Actor& user)
+void Ability::replenish(Actor& user)
 {
     Ability& ability = *this;
     int const mQty = ability._m_qty;
@@ -113,7 +113,7 @@ Ability& Ability::replenish(Actor& user)
         }
         usrSkills->operator[](this) = mQty;
     }
-    return ability;
+
 }
 
 bool Ability::canPerform(Actor& actor)
@@ -123,12 +123,12 @@ bool Ability::canPerform(Actor& actor)
                     && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
 
-Ability& Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
+void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
     return this->execute(ret, nullptr, user, &target, applyCosts);
 }
 
-Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
+void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
     assert(target != nullptr);
     Ability& ability = *this;
@@ -312,7 +312,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
     }
-    return ability;
+
 }
 
 Ability::Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,

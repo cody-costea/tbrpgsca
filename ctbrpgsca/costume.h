@@ -56,9 +56,9 @@ namespace tbrpgsca
         bool hasCounterSkill(Ability& skill) const;
         int counterSkillsSize() const;
 
-        Costume& adopt(QString& ret, Actor& actor);
-        Costume& abandon(QString& ret, Actor& actor);
-        Costume& apply(QString& ret, Actor& actor);
+        void adopt(QString& ret, Actor& actor);
+        void abandon(QString& ret, Actor& actor);
+        void apply(QString& ret, Actor& actor);
 
         Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
@@ -74,9 +74,9 @@ namespace tbrpgsca
         QMap<State*, int>* _st_res;
         QMap<int, int>* _res;
 
-        Costume& apply(QString& ret, Scene* const scene, Actor& actor);
-        Costume& refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove);
-        Costume& adopt(QString* const ret, Scene* const scene, Actor& actor, bool const upeStates, bool const rmeove);
+        void apply(QString& ret, Scene* const scene, Actor& actor);
+        void refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove);
+        void adopt(QString* const ret, Scene* const scene, Actor& actor, bool const upeStates, bool const rmeove);
 
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,

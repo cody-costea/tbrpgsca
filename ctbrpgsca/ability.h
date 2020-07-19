@@ -51,8 +51,8 @@ namespace tbrpgsca
         int removedStatesSize() const;
 
         bool canPerform(Actor& user);
-        Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
-        Ability& replenish(Actor& user);
+        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
+        void replenish(Actor& user);
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                 int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
@@ -66,7 +66,7 @@ namespace tbrpgsca
         QMap<State*, int>* _r_states;
         QString* _sound;
 
-        Ability& execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
+        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
 
         friend class Actor;
         friend class Costume;

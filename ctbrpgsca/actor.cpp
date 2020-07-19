@@ -137,7 +137,7 @@ Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const ite
     return old;
 }
 
-Actor& Actor::removeStates(QString* const ret, Scene* const scene, bool const remove)
+void Actor::removeStates(QString* const ret, Scene* const scene, bool const remove)
 {
     Actor& actor = *this;
     QMap<State*, int>* const stateDur = actor._state_dur;
@@ -150,33 +150,30 @@ Actor& Actor::removeStates(QString* const ret, Scene* const scene, bool const re
             delete stateDur;
         }
     }
-    return actor;
 }
 
-inline Actor& Actor::setExtra(void* const extra)
+inline void Actor::setExtra(void* const extra)
 {
     this->_extra = extra;
-    return *this;
 }
 
-inline Actor& Actor::setRace(Costume& race)
+inline void Actor::setRace(Costume& race)
 {
     return this->setRace(nullptr, race);
 }
 
-inline Actor& Actor::setJob(Costume& job)
+inline void Actor::setJob(Costume& job)
 {
     return this->setJob(nullptr, job);
 }
 
-inline Actor& Actor::setRace(Scene* const scene, Costume& race)
+inline void Actor::setRace(Scene* const scene, Costume& race)
 {
     Actor& actor = *this;
     actor.equipItem(scene, CHAR_RACE, &race);
-    return actor;
 }
 
-Actor& Actor::setJob(Scene* const scene, Costume& job)
+void Actor::setJob(Scene* const scene, Costume& job)
 {
     Actor& actor = *this;
     actor.equipItem(scene, CHAR_JOB, &job);
@@ -196,52 +193,45 @@ Actor& Actor::setJob(Scene* const scene, Costume& job)
             }
         }
     }
-    return actor;
 }
 
-inline Actor& Actor::setOffense(const int atk)
+inline void Actor::setOffense(const int atk)
 {
     this->_atk = atk;
-    return *this;
 }
 
-inline Actor& Actor::setDefense(const int def)
+inline void Actor::setDefense(const int def)
 {
     this->_def = def;
-    return *this;
 }
 
-inline Actor& Actor::setSpirit(const int spi)
+inline void Actor::setSpirit(const int spi)
 {
     this->_spi = spi;
-    return *this;
 }
 
-inline Actor& Actor::setWisdom(const int wis)
+inline void Actor::setWisdom(const int wis)
 {
     this->_wis = wis;
-    return *this;
 }
 
-inline Actor& Actor::setAgility(const int agi)
+inline void Actor::setAgility(const int agi)
 {
     this->_agi = agi;
-    return *this;
 }
 
-Actor& Actor::setAgility(const int agi, Scene& scene)
+void Actor::setAgility(const int agi, Scene& scene)
 {
-    Actor& actor = this->setAgility(agi);
+    this->setAgility(agi);
     scene.agiCalc();
-    return actor;
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
+void Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
 {
     return this->setCurrentHp(hp, &ret, nullptr, survive);
 }
 
-Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive)
+void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive)
 {
     Actor& actor = *this;
     if (hp < 1)
@@ -310,31 +300,27 @@ Actor& Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene,
             }
         }
     }
-    return actor;
 }
 
-Actor& Actor::setCurrentHp(const int hp)
+void Actor::setCurrentHp(const int hp)
 {
     int mHp = this->_m_hp;
     this->_hp = hp > mHp ? mHp : (hp < 1 ? 0 : hp);
-    return *this;
 }
 
-Actor& Actor::setCurrentMp(const int mp)
+void Actor::setCurrentMp(const int mp)
 {
     int mMp = this->_m_mp;
     this->_mp = mp > mMp ? mMp : (mp < 1 ? 0 : mp);
-    return *this;
 }
 
-Actor& Actor::setCurrentRp(const int sp)
+void Actor::setCurrentRp(const int sp)
 {
     int mSp = this->_m_sp;
     this->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
-    return *this;
 }
 
-Actor& Actor::setMaximumActions(const int mActions)
+void Actor::setMaximumActions(const int mActions)
 {
     Actor& actor = *this;
     actor._m_actions = mActions;
@@ -342,10 +328,9 @@ Actor& Actor::setMaximumActions(const int mActions)
     {
         actor._actions = mActions;
     }
-    return actor;
 }
 
-Actor& Actor::setMaximumHp(const int mHp)
+void Actor::setMaximumHp(const int mHp)
 {
     Actor& actor = *this;
     actor._m_hp = mHp;
@@ -353,10 +338,9 @@ Actor& Actor::setMaximumHp(const int mHp)
     {
         actor._hp = mHp;
     }
-    return actor;
 }
 
-Actor& Actor::setMaximumMp(const int mMp)
+void Actor::setMaximumMp(const int mMp)
 {
     Actor& actor = *this;
     actor._m_mp = mMp;
@@ -364,10 +348,9 @@ Actor& Actor::setMaximumMp(const int mMp)
     {
         actor._mp = mMp;
     }
-    return actor;
 }
 
-Actor& Actor::setMaximumRp(const int mRp)
+void Actor::setMaximumRp(const int mRp)
 {
     Actor& actor = *this;
     actor._m_sp = mRp;
@@ -375,16 +358,14 @@ Actor& Actor::setMaximumRp(const int mRp)
     {
         actor._sp = mRp;
     }
-    return actor;
 }
 
-inline Actor& Actor::setName(QString value)
+inline void Actor::setName(QString value)
 {
     this->_name = value;
-    return *this;
 }
 
-inline Actor& Actor::setSprite(QString& value)
+inline void Actor::setSprite(QString& value)
 {
     Actor& actor = *this;
     QString* sprite = actor._sprite;
@@ -393,86 +374,75 @@ inline Actor& Actor::setSprite(QString& value)
         delete sprite;
     }
     actor._sprite = new QString(value);
-    return *this;
 }
 
-Actor& Actor::setRanged(const bool range)
+void Actor::setRanged(const bool range)
 {
     this->setFlag(FLAG_RANGE, range);
-    return *this;
 }
 
-Actor& Actor::setReviving(const bool revive)
+void Actor::setReviving(const bool revive)
 {
     this->setFlag(FLAG_REVIVE, revive);
-    return *this;
 }
 
-Actor& Actor::setEnraged(const bool automate)
+void Actor::setEnraged(const bool automate)
 {
     this->setFlag(FLAG_ENRAGED, automate);
-    return *this;
 }
 
-Actor& Actor::setConfused(const bool confuse)
+void Actor::setConfused(const bool confuse)
 {
     this->setFlag(FLAG_CONFUSE, confuse);
-    return *this;
 }
 
-Actor& Actor::setAiPlayer(const bool aiPlayer)
+void Actor::setAiPlayer(const bool aiPlayer)
 {
     this->setFlag(FLAG_AI_PLAYER, aiPlayer);
-    return *this;
+
 }
 
-Actor& Actor::setRandomAi(const bool randomAi)
+void Actor::setRandomAi(const bool randomAi)
 {
     this->setFlag(FLAG_RANDOM_AI, randomAi);
-    return *this;
 }
 
-Actor& Actor::setNewItems(const bool newItems)
+void Actor::setNewItems(const bool newItems)
 {
     this->setFlag(FLAG_NEW_ITEMS, newItems);
-    return *this;
 }
 
-Actor& Actor::setReflecting(const bool reflect)
+void Actor::setReflecting(const bool reflect)
 {
     this->setFlag(FLAG_REFLECT, reflect);
-    return *this;
 }
 
-Actor& Actor::setShapeShifted(const bool shapeshift)
+void Actor::setShapeShifted(const bool shapeshift)
 {
     this->setFlag(FLAG_SHAPE_SHIFT, shapeshift);
-    return *this;
 }
 
-Actor& Actor::setKnockedOut(const bool ko)
+void Actor::setKnockedOut(const bool ko)
 {
     this->setFlag(FLAG_KO, ko);
-    return *this;
+
 }
 
-Actor& Actor::setInvincible(const bool invincible)
+void Actor::setInvincible(const bool invincible)
 {
     this->setFlag(FLAG_INVINCIBLE, invincible);
-    return *this;
 }
 
-Actor& Actor::setStunned(const bool stun)
+void Actor::setStunned(const bool stun)
 {
     int const flags = this->_flags;
     if (stun != ((flags & FLAG_STUN) == FLAG_STUN))
     {
         this->_flags = flags ^ FLAG_STUN;
     }
-    return *this;
 }
 
-Actor& Actor::setItems(QMap<Ability*, int>* const items)
+void Actor::setItems(QMap<Ability*, int>* const items)
 {
     if (this->hasNewItems())
     {
@@ -484,21 +454,19 @@ Actor& Actor::setItems(QMap<Ability*, int>* const items)
         }
     }
     this->_items = items;
-    return *this;
 }
 
-inline Actor& Actor::setMaximumLevel(const int maxLv)
+inline void Actor::setMaximumLevel(const int maxLv)
 {
     this->_max_lv = maxLv;
-    return *this;
 }
 
-inline Actor& Actor::setLevel(const int level)
+inline void Actor::setLevel(const int level)
 {
     return this->setLevel(nullptr, level);
 }
 
-Actor& Actor::setLevel(Scene* const scene, const int level)
+void Actor::setLevel(Scene* const scene, const int level)
 {
     Actor& actor = *this;
     while (level > actor._lv)
@@ -507,15 +475,15 @@ Actor& Actor::setLevel(Scene* const scene, const int level)
         actor.levelUp(scene);
     }
     actor._lv = level;
-    return actor;
+
 }
 
-inline Actor& Actor::setExperience(const int xp)
+inline void Actor::setExperience(const int xp)
 {
     return this->setExperience(nullptr, xp);
 }
 
-Actor& Actor::setExperience(Scene* const scene, const int xp)
+void Actor::setExperience(Scene* const scene, const int xp)
 {
     Actor& actor = *this;
     actor._xp = xp;
@@ -523,10 +491,9 @@ Actor& Actor::setExperience(Scene* const scene, const int xp)
     {
         actor.levelUp(scene);
     }
-    return actor;
 }
 
-Actor& Actor::setElementResistance(const int element, const int res)
+void Actor::setElementResistance(const int element, const int res)
 {
     Actor& actor = *this;
     QMap<int, int>* rMap = actor._res;
@@ -536,10 +503,9 @@ Actor& Actor::setElementResistance(const int element, const int res)
         actor._res = rMap;
     }
     rMap->operator[](element) = res;
-    return actor;
 }
 
-Actor& Actor::setStateResistance(State* const state, const int res)
+void Actor::setStateResistance(State* const state, const int res)
 {
     Actor& actor = *this;
     QMap<State*, int>* stRes = actor._st_res;
@@ -549,10 +515,9 @@ Actor& Actor::setStateResistance(State* const state, const int res)
         actor._st_res = stRes;
     }
     stRes->operator[](state) = res;
-    return actor;
 }
 
-Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
+void Actor::applyDmgRoles(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
     QVector<Costume*>* const dmgRoles = actor._dmg_roles;
@@ -581,10 +546,9 @@ Actor& Actor::applyDmgRoles(QString& ret, Scene* const scene)
             }
         }
     }
-    return actor;
 }
 
-Actor& Actor::applyStates(QString* const ret, Scene* const scene, const bool consume)
+void Actor::applyStates(QString* const ret, Scene* const scene, const bool consume)
 {
     Actor& actor = *this;
     if (consume && ret != nullptr)
@@ -603,10 +567,9 @@ Actor& Actor::applyStates(QString* const ret, Scene* const scene, const bool con
             }
         }
     }
-    return actor;
 }
 
-inline Actor& Actor::checkRegSkill(Ability& skill)
+inline void Actor::checkRegSkill(Ability& skill)
 {
     Actor& actor = *this;
     if (skill._r_qty > 0)
@@ -619,15 +582,14 @@ inline Actor& Actor::checkRegSkill(Ability& skill)
         }
         regSkills->operator[](&skill) = 0;
     }
-    return actor;
 }
 
-Actor& Actor::recover(QString& ret)
+void Actor::recover(QString& ret)
 {
-    return this->recover(&ret, nullptr);
+    this->recover(&ret, nullptr);
 }
 
-Actor& Actor::recover(QString* const ret, Scene* const scene)
+void Actor::recover(QString* const ret, Scene* const scene)
 {
     Actor& actor = *this;
     actor.removeStates(ret, scene, true);
@@ -690,10 +652,9 @@ Actor& Actor::recover(QString* const ret, Scene* const scene)
             }
         }
     }
-    return actor;
 }
 
-Actor& Actor::levelUp(Scene* const scene)
+void Actor::levelUp(Scene* const scene)
 {
     Actor& actor = *this;
     int lv = actor._lv;
@@ -719,10 +680,9 @@ Actor& Actor::levelUp(Scene* const scene)
         lv += 1;
     }
     actor._lv = lv;
-    return actor;
 }
 
-Actor& Actor::switchCostume(QString* const ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
+void Actor::switchCostume(QString* const ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
 {
     Actor& actor = *this;
     if (oldCost != nullptr)
@@ -733,10 +693,9 @@ Actor& Actor::switchCostume(QString* const ret, Scene* const scene, Costume* con
     {
         newCost->adopt(ret, scene, actor, true, false);
     }
-    return actor;
 }
 
-Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& costume)
+void Actor::updateAttributes(const bool remove, Scene* const scene, Costume& costume)
 {
     Actor& actor = *this;
     int const i = remove ? -1 : 1;
@@ -756,10 +715,9 @@ Actor& Actor::updateAttributes(const bool remove, Scene* const scene, Costume& c
     {
         actor.setAgility(actor._agi + (i * costume._agi), *scene);
     }
-    return actor;
 }
 
-Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QMap<State *, int>* const stRes)
+void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QMap<State *, int>* const stRes)
 {
     Actor& actor = *this;
     if (elmRes != nullptr)
@@ -824,10 +782,9 @@ Actor& Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, 
             }
         }
     }
-    return actor;
 }
 
-Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)
+void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)
 {
     Actor& actor = *this;
     QVector<Ability*>* aSkills = counters ? actor._counters : actor._a_skills;
@@ -891,10 +848,9 @@ Actor& Actor::updateSkills(const bool remove, const bool counters, QVector<Abili
             }
         }
     }
-    return actor;
 }
 
-Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const scene,
+void Actor::updateStates(bool const remove, QString* const ret, Scene* const scene,
                            QMap<State*, int>& states, bool const includeWithDur)
 {
     Actor& actor = *this;
@@ -926,10 +882,9 @@ Actor& Actor::updateStates(bool const remove, QString* const ret, Scene* const s
             }
         }
     }
-    return actor;
 }
 
-Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
+void Actor::refreshCostumes(QString* const ret, Scene* const scene)
 {
     Actor& actor = *this;
     {
@@ -952,7 +907,6 @@ Actor& Actor::refreshCostumes(QString* const ret, Scene* const scene)
             }
         }
     }
-    return actor;
 }
 
 Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,

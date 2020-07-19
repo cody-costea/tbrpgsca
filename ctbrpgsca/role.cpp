@@ -112,12 +112,12 @@ bool Role::operator==(Role& role) const
     return this->_id == role._id;
 }
 
-Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
+void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
 {
     return this->damage(ret, nullptr, absorber, target, dmg, percent);
 }
 
-Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
+void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
 {
     Role& role = *this;
     if (!actor.isInvincible())
@@ -177,7 +177,7 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                     else if (res == 7)
                     {
                         ret = ret % Ability::ResistTxt.arg(actor._name);
-                        return role;
+                        return;
                     }
                     else
                     {
@@ -230,7 +230,6 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             {
                 ret = ret % "+";
             }
-            else
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgMp), Role::MpTxt));
             actor.setCurrentMp(actor._mp - dmgMp);
         }
@@ -263,7 +262,6 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             absorber->setCurrentHp(absorber->_hp + dmgHp / 2, &ret, scene, true);
         }
     }
-    return role;
 }
 
 Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,

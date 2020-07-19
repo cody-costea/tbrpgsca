@@ -30,11 +30,11 @@ bool Scene::usesGuards() const
     return this->hasFlag(FLAG_USE_GUARDS);
 }
 
-Scene& Scene::setUseGuards(const bool useGuards)
+void Scene::setUseGuards(const bool useGuards)
 {
     Scene& scene = *this;
     scene.setFlag(FLAG_USE_GUARDS, useGuards);
-    return scene;
+
 }
 
 int Scene::getCurrent() const
@@ -161,7 +161,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
     return target;
 }
 
-Scene& Scene::checkStatus(QString& ret)
+void Scene::checkStatus(QString& ret)
 {
     Scene& scene = *this;
     if (scene._status == 0)
@@ -179,7 +179,7 @@ Scene& Scene::checkStatus(QString& ret)
             }
             scene._status = -2;
             ret = ret % Scene::FallenTxt;
-            return scene;
+            return;
         }
         enemyCheck:
         {
@@ -192,7 +192,7 @@ Scene& Scene::checkStatus(QString& ret)
                 {
                     if (!(party->at(j)->isKnockedOut()))
                     {
-                        return scene;
+                        return;
                     }
                 }
             }
@@ -200,10 +200,10 @@ Scene& Scene::checkStatus(QString& ret)
             scene._status = 1;
         }
     }
-    return scene;
+
 }
 
-Scene& Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
+void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
 {
     Scene& scene = *this;
     bool const ko = target->_hp < 1;
@@ -249,10 +249,10 @@ Scene& Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& a
             targets->append(target);
         }
     }
-    return scene;
+
 }
 
-Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item)
+void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item)
 {
     Scene& scene = *this;
     ret = ret % Scene::PerformsTxt.arg(user._name, ability._name);
@@ -269,7 +269,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
         auto event = events->at(EVENT_BEFORE_ACT);
         if (event != nullptr && !((*event)(scene, &ret)))
         {
-            return scene;
+            return;
         }
     }
     if (ability.isRanged() && ability.targetsAll())
@@ -343,7 +343,7 @@ Scene& Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability
             scene.endTurn(ret, &user);
         }
     }
-    return scene;
+
 }
 
 int Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const defSkill, bool const restore) const
@@ -363,7 +363,7 @@ int Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const defSkill
     return ret;
 }
 
-Scene& Scene::playAi(QString& ret, Actor& player)
+void Scene::playAi(QString& ret, Actor& player)
 {
     Scene& scene = *this;
     QVector<Actor*>* party;
@@ -504,10 +504,10 @@ Scene& Scene::playAi(QString& ret, Actor& player)
             scene.perform(ret, player, *target, ability, false);
         }
     }
-    return scene;
+
 }
 
-Scene& Scene::endTurn(QString& ret, Actor* crActor)
+void Scene::endTurn(QString& ret, Actor* crActor)
 {
     Scene& scene = *this;
     int current = scene._current;
@@ -665,7 +665,7 @@ Scene& Scene::endTurn(QString& ret, Actor* crActor)
         }
     }
     ret = ret % ".";
-    return scene;
+
 }
 
 bool Scene::canTarget(Actor& user, Ability& ability, Actor& target)
@@ -701,7 +701,7 @@ void Scene::resetTurn(Actor& actor)
     }
 }
 
-Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorEvent, QVector<SceneRun*>* const events,
+void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorEvent, QVector<SceneRun*>* const events,
                          bool const useGuards, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
@@ -793,7 +793,7 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Sprit
     {
         scene.endTurn(ret, crActor);
     }
-    return scene;
+
 }
 
 Scene::Scene() : Play(0)

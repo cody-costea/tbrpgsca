@@ -17,7 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
-    class Scene : Play
+    class Scene : public Play
     {
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1
@@ -29,7 +29,9 @@ namespace tbrpgsca
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
-        #define ALLOW_NO_GUARDS 0
+        #define FLAG_HAS_COVERS 2
+        #define DISABLE_COVERING 0
+        #define ALLOW_NO_GUARDS 1
         #define MIN_ROUND INT_MIN
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
@@ -44,11 +46,11 @@ namespace tbrpgsca
 
         static bool actorAgiComp(Actor* const a, Actor* const b);
 
-        Scene& playAi(QString& ret, Actor& player);
-        Scene& endTurn(QString& ret, Actor* const actor);
-        Scene& perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
-        Scene& checkStatus(QString& ret);
-        Scene& escape(QString& ret);
+        void playAi(QString& ret, Actor& player);
+        void endTurn(QString& ret, Actor* const actor);
+        void perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
+        void checkStatus(QString& ret);
+        void escape(QString& ret);
 
         bool canTarget(Actor& user, Ability& ability, Actor& target);
 
@@ -74,7 +76,10 @@ namespace tbrpgsca
         int getCurrent() const;
         int getStatus() const;
 
-        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        bool hasCovers() const;
+        bool usesGuards() const;
+
+        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
                           bool const useGuards, int const surprise, int const mInit);
 
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
@@ -93,11 +98,11 @@ namespace tbrpgsca
         Actor* _cr_actor;
 
         void agiCalc();
-        Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
 
-        Scene& setUseGuards(bool const useGuards);        
-        bool usesGuards() const;
+        void setUseGuards(bool const useGuards);
+        void setHasCovers(bool const hasCovers);
 
         friend class Actor;
         friend class Ability;

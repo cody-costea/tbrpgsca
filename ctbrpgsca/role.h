@@ -20,7 +20,7 @@ namespace tbrpgsca
     class State;
     class Scene;
 
-    class Role : Play
+    class Role : public Play
     {
         #define FLAG_REVIVE 1
         #define FLAG_RANGE 2
@@ -60,7 +60,7 @@ namespace tbrpgsca
         bool hasState(State& state) const;
         int statesSize() const;
 
-        Role& damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
+        void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
 
         bool operator==(Role& role) const;
     protected:
@@ -68,7 +68,7 @@ namespace tbrpgsca
         int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
         QMap<State*, int>* _state_dur;
 
-        Role& damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
+        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);

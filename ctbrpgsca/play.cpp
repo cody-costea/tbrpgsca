@@ -9,7 +9,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-int Play::flags() const
+/*int Play::flags() const
 {
     return this->_flags;
 }
@@ -35,7 +35,7 @@ int Play::flags(const int flags, const bool returnOld)
     int const old = returnOld ? this->_flags : flags;
     this->_flags = flags;
     return old;
-}
+}*/
 
 bool Play::hasFlag(int const flag) const
 {

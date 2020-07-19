@@ -50,11 +50,11 @@ namespace tbrpgsca
         inline bool isAutomatic() const;
         inline bool isEndTurn() const;
 
-        ArenaWidget& enableControls(bool const enable);
+        void enableControls(bool const enable);
 
         void resizeEvent(QResizeEvent* const event) override;
 
-        ArenaWidget& resizeScene(const QSize& newSize, const QSize* const oldSize);
+        void resizeScene(const QSize& newSize, const QSize* const oldSize);
 
         explicit ArenaWidget(QWidget* const parent = nullptr);
 
@@ -63,16 +63,16 @@ namespace tbrpgsca
 
         ~ArenaWidget();
 
-        ArenaWidget& operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
+        void operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString backImage, QString songName, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
         {
         public:
-            ActorSprite& playActor(int const _spr);
-            ActorSprite& playSkill(QString& sprPath);
+            void playActor(int const _spr);
+            void playSkill(QString& sprPath);
 
-            ActorSprite& relocate(QRect& location);
+            void relocate(QRect& location);
 
             ActorSprite(int const index, Actor& actor, QWidget* const widget, QRect& size, ArenaWidget& arena, QString& pos);
 
@@ -88,18 +88,18 @@ namespace tbrpgsca
 
             friend class ArenaWidget;
         };
-        ArenaWidget& afterAct();
-        ArenaWidget& afterPlay();
-        ArenaWidget& prepareItemsBox(Actor& actor);
-        ArenaWidget& prepareTargetBox(bool const freeMemory);
-        ArenaWidget& prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
-        ArenaWidget& recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
-        inline ArenaWidget& setAutomatic(bool const automatic);
-        inline ArenaWidget& setEndTurn(bool const endTurn);
-        inline ArenaWidget& setAiTurn(bool const aiTurn);
+        void afterAct();
+        void afterPlay();
+        void prepareItemsBox(Actor& actor);
+        void prepareTargetBox(bool const freeMemory);
+        void prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
+        void recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
+        inline void setAutomatic(bool const automatic);
+        inline void setEndTurn(bool const endTurn);
+        inline void setAiTurn(bool const aiTurn);
         Actor* getPlayerFromTargetBox(int const index);
 
-        ArenaWidget& operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
+        void operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
 
         QString* _ret_str;

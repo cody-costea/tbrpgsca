@@ -140,22 +140,22 @@ bool Costume::isKnockedOut() const
     return this->hasFlag(FLAG_KO);
 }
 
-Costume& Costume::adopt(QString& ret, Actor& actor)
+void Costume::adopt(QString& ret, Actor& actor)
 {
-    return this->adopt(&ret, nullptr, actor, true, false);
+    this->adopt(&ret, nullptr, actor, true, false);
 }
 
-Costume& Costume::abandon(QString& ret, Actor& actor)
+void Costume::abandon(QString& ret, Actor& actor)
 {
-    return this->adopt(&ret, nullptr, actor, true, true);
+    this->adopt(&ret, nullptr, actor, true, true);
 }
 
-Costume& Costume::apply(QString& ret, Actor& actor)
+void Costume::apply(QString& ret, Actor& actor)
 {
-    return this->apply(ret, nullptr, actor);
+    this->apply(ret, nullptr, actor);
 }
 
-Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)
+void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)
 {
     Costume& costume = *this;
     actor.updateAttributes(remove, scene, costume);
@@ -214,18 +214,16 @@ Costume& Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bo
         }
         costume.refresh(ret, scene, actor, false, false);
     }
-    return costume;
 }
 
-Costume& Costume::apply(QString& ret, Scene* scene, Actor& actor)
+void Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
     ret = ret % QString(Costume::CausesTxt).arg(actor._name, role._name);
     role.damage(ret, scene, nullptr, actor, std::rand() % 4, true);
-    return role;
 }
 
-Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)
+void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)
 {
     Costume& costume = *this;
     {
@@ -269,7 +267,6 @@ Costume& Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, 
             }
         }
     }
-    return actor;
 }
 
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
