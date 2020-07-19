@@ -17,7 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using namespace tbrpgsca;
 
 QString Ability::MissesTxt = ", but misses %1";
-QString Ability::SuffersTxt = ", %1 suffers";
+QString Ability::SuffersTxt = ", %1 suffers ";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::ResistTxt = ", resisted by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
@@ -256,7 +256,7 @@ Ability& Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* 
                             Ability* stolen = nullptr;
                             //Ability* stolen = trgItems->keys().at(itemId);
                             {
-                                int i = 0;
+                                i = 0;
                                 auto const last = trgItems->cend();
                                 for (auto it = trgItems->cbegin(); it != last; ++it, ++i)
                                 {

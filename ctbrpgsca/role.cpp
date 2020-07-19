@@ -115,7 +115,7 @@ Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const
     return this->damage(ret, nullptr, absorber, target, dmg, percent);
 }
 
-Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int dmg, bool const percent)
+Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
 {
     Role& role = *this;
     if (!actor.isInvincible())
@@ -169,9 +169,10 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                         res = -7 + (res - 7);
                         if (res > -1)
                         {
-                            dmgHp *= -1 * (res + 2);
-                            dmgMp *= -1 * (res + 2);
-                            dmgSp *= -1 * (res + 2);
+                            res = -1 * (res + 2);
+                            /*dmgHp *= res;
+                            dmgMp *= res;
+                            dmgSp *= res;*/
                         }
                     }
                     else if (res == 7)
@@ -184,14 +185,16 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                         dmgHp /= res;
                         dmgMp /= res;
                         dmgSp /= res;
+                        goto applyChanges;
                     }
                 }
                 else
                 {
-                    dmgHp *= -1 * (res - 2);
-                    dmgMp *= -1 * (res - 2);
-                    dmgSp *= -1 * (res - 2);
-                }
+                    res = -1 * (res - 2);
+                }                
+                dmgHp *= -1 * (res - 2);
+                dmgMp *= -1 * (res - 2);
+                dmgSp *= -1 * (res - 2);
             }
             else
             {
@@ -200,19 +203,15 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                 dmgSp /= DEFAULT_RES;
             }
         }
+        applyChanges:
         bool c = false;
         if (dmgSp != 0)
         {
             c = true;
-            ret = ret % Ability::SuffersTxt.arg(actor._name) % " ";
+            ret = ret % Ability::SuffersTxt.arg(actor._name);
             if (dmgSp < 0)
             {
-                dmg = -1 * dmg + dmgSp;
                 ret = ret % "+";
-            }
-            else
-            {
-                dmg += dmgSp;
             }
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgSp), Role::RpTxt));
             actor.setCurrentRp(actor._sp - dmgSp);
@@ -225,18 +224,14 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             }
             else
             {
-                ret = ret % Ability::SuffersTxt.arg(actor._name) % " ";
+                ret = ret % Ability::SuffersTxt.arg(actor._name);
                 c = true;
             }
             if (dmgMp < 0)
             {
-                dmg =  -1 * dmg + dmgMp;
                 ret = ret % "+";
             }
             else
-            {
-                dmg += dmgMp;
-            }
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgMp), Role::MpTxt));
             actor.setCurrentMp(actor._mp - dmgMp);
         }
@@ -248,17 +243,12 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             }
             else
             {
-                ret = ret % Ability::SuffersTxt.arg(actor._name) % " ";
+                ret = ret % Ability::SuffersTxt.arg(actor._name);
                 c = true;
             }
             if (dmgHp < 0)
             {
-                dmg =  -1 * dmg + dmgSp;
                 ret = ret % "+";
-            }
-            else
-            {
-                dmg += dmgHp;
             }
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
             actor.setCurrentHp(actor._hp - dmgHp, &ret, scene, percent);
