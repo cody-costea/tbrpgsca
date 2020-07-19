@@ -19,6 +19,8 @@ using namespace tbrpgsca;
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
+QString Role::ResistTxt = ", resisted by %1";
+QString Role::SuffersTxt = ", %1 suffers ";
 
 int Role::id() const
 {
@@ -170,9 +172,6 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                         if (res > -1)
                         {
                             res = -1 * (res + 2);
-                            /*dmgHp *= res;
-                            dmgMp *= res;
-                            dmgSp *= res;*/
                         }
                     }
                     else if (res == 7)
@@ -192,9 +191,9 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                 {
                     res = -1 * (res - 2);
                 }                
-                dmgHp *= -1 * (res - 2);
-                dmgMp *= -1 * (res - 2);
-                dmgSp *= -1 * (res - 2);
+                dmgHp *= res;
+                dmgMp *= res;
+                dmgSp *= res;
             }
             else
             {

@@ -119,7 +119,9 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 
 Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 {
+#if ALLOW_NO_GUARDS
     if (this->usesGuards())
+#endif
     {
         int const side = target._old_side;
         if (user._old_side != side && ((!skill.isRanged()) && ((!user.isRanged()) || skill.isOnlyMelee())))
@@ -771,7 +773,9 @@ Scene& Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Sprit
             players->append(party);
         }
     }
+#if ALLOW_NO_GUARDS
     scene.setUseGuards(useGuards);
+#endif
     scene._cr_actor = crActor;
     scene.agiCalc();
     if (useInit)

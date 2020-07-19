@@ -17,9 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using namespace tbrpgsca;
 
 QString Ability::MissesTxt = ", but misses %1";
-QString Ability::SuffersTxt = ", %1 suffers ";
 QString Ability::ReflectTxt = ", reflected by %1";
-QString Ability::ResistTxt = ", resisted by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
 
 int Ability::usesRegen() const

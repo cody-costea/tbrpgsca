@@ -29,9 +29,7 @@ namespace tbrpgsca
         #define DEFAULT_RES 3
     public:
         static QString MissesTxt;
-        static QString SuffersTxt;
         static QString ReflectTxt;
-        static QString ResistTxt;
         static QString StolenTxt;
 
         int requiredLevel() const;

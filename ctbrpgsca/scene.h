@@ -29,6 +29,7 @@ namespace tbrpgsca
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
+        #define ALLOW_NO_GUARDS 0
         #define MIN_ROUND INT_MIN
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;

@@ -39,6 +39,8 @@ namespace tbrpgsca
         static QString HpTxt;
         static QString MpTxt;
         static QString RpTxt;
+        static QString SuffersTxt;
+        static QString ResistTxt;
 
         int id() const;
         QString name() const;
