@@ -11,82 +11,121 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
-#define PROP_FIELD_GET(Name, Type, Field, Level) \
-    Level: Type Name() const \
+#define PROP_FIELD_GET(Name, Type, GetLevel, Field) \
+    GetLevel: inline Type Name() const \
     { \
         return this->Field; \
     }
 
-#define PROP_FIELD_SET(Name, Type, Field, Level) \
-    inline void set##Name(Type const value) \
+#define PROP_FIELD_GET_NEW(Name, Type, GetLevel, Field, FieldLevel) \
+    FieldLevel: Type Field; \
+    PROP_FIELD_GET(Name, Type, GetLevel, Field)
+
+#define PROP_REF_GET(Name, Type, Level, Field) \
+    Level: inline Type& Name() const \
+    { \
+        return *this->Field; \
+    }
+
+#define PROP_REF_GET_NEW(Name, Type, Level, Field, FieldLevel) \
+    FieldLevel: Type* Field; \
+    PROP_REF_GET(Name, Type, GetLevel, Field)
+
+#define PROP_FIELD_SET(Name, Type, Level, Field) \
+    Level: inline void Name(Type const value) \
     { \
         this->Field = value; \
     } \
 
-#define PROP_FIELD_SETGET(Name, Type, Field, Level) \
-    Level: Type Field(Type const value) \
+#define PROP_FIELD_SETGET(SetName, Type, Level, GetName) \
+    Level: inline Type GetName(Type const value) \
     { \
-        Type old = this->Field(); \
-        this->set##Name(value); \
+        Type old = this->GetName(); \
+        this->SetName(value); \
         return old; \
-    } \
+    }
 
-#define PROP_FIELD_WITH(Class, Name, Type, Level) \
-    Level: Class& with##Name(Type const value) \
+#define PROP_FIELD_WITH(Class, WithName, Type, Level, SetName) \
+    Level: inline Class& WithName(Type const value) \
     { \
-        this->set##Name(value); \
+        this->SetName(value); \
         return *this; \
     }
 
-#define PROP_FIELD_WITH_SETGET(Class, Name, Type, Field, Level) \
-    PROP_FIELD_SETGET(Name, Type, Field, Level) \
-    PROP_FIELD_WITH(Class, Name, Type, Level)
+#define PROP_FIELD_WITH_SETGET(Class, SetName, WithName, Type, Level, GetName) \
+    PROP_FIELD_SETGET(SetName, Type, Level, GetName) \
+    PROP_FIELD_WITH(Class, WithName, Type, Level, SetName)
 
-#define PROP_FIELD_SET_ALL(Class, Name, Type, Field, Level) \
-    PROP_FIELD_SET(Name, Type, _##Field, Level) \
-    PROP_FIELD_WITH_SETGET(Class, Name, Type, Field, Level)
+#define PROP_FIELD_SET_ALL(Class, SetName, WithName, Type, Level, GetName, Field) \
+    PROP_FIELD_SET(SetName, Type, Level, Field) \
+    PROP_FIELD_WITH_SETGET(Class, SetName, WithName, Type, Level, GetName)
 
-#define PROP_FIELD_NEW(Class, Name, Type, GetLevel, SetLevel, Field, FieldLevel) \
-    FieldLevel: Type _##Field; \
-    PROP_FIELD(Class, Name, Type, GetLevel, SetLevel, Field)
+#define PROP_CUSTOM_FIELD(Class, GetName, SetName, WithName, Type, GetLevel, SetLevel, Field) \
+    PROP_FIELD_GET_NEW(GetName, Type, GetLevel, Field, protected) \
+    PROP_FIELD_SET_ALL(Class, SetName, WithName, Type, SetLevel, GetName, Field)
 
-#define PROP_FIELD(Class, Name, Type, GetLevel, SetLevel, Field) \
-    PROP_FIELD_GET(Field, Type, _##Field, GetLevel) \
-    PROP_FIELD_SET_ALL(Class, Name, Type, Field, SetLevel)
+#define PROP_FIELD(Class, GetName, SetName, Type, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, GetName, set##SetName, with##SetName, Type, GetLevel, SetLevel, _##GetName)
 
-#define PROP_FLAG_SET(Name, Flag, Level, Field) \
-    Level: void set##Name(bool const value) const \
+#define PROP_CAMEL_FIELD(Class, Name, Type, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, get##Name, set##Name, with##Name, Type, GetLevel, SetLevel, _##Name)
+
+#define PROP_SNAKE_FIELD(Class, Name, Type, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, Name, set_##Name, with_##Name, Type, GetLevel, SetLevel, _##Name)
+
+#define PROP_PASCAL_FIELD(Class, Name, Type, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, Name, Set##Name, With##Name, Type, GetLevel, SetLevel, _##Name)
+
+#define PROP_CUSTOM_REF(Class, GetName, SetName, WithName, Type, GetLevel, SetLevel, Field) \
+    PROP_REF_GET_NEW(GetName, Type, GetLevel, Field, protected) \
+    PROP_FIELD_SET_ALL(Class, SetName, WithName, Type*, SetLevel, GetName, Field)
+
+#define PROP_REF(Class, GetName, SetName, Type, GetLevel, SetLevel) \
+    PROP_CUSTOM_REF(Class, GetName, set##SetName, with##SetName, Type, GetLevel, SetLevel, _##GetName)
+
+#define PROP_FLAG_SET(Name, Flag, Level) \
+    Level: inline void set##Name(bool const value) const \
     { \
         this->setFlag(flag, value); \
     }
 
-#define PROP_FLAG_GET(Name, Flag, Level, Field) \
-    Level: bool is##Name() const \
+#define PROP_FLAG_SET_ALL(Class, Name, Flag, Level) \
+    PROP_FLAG_SET(Name, Flag, Level) \
+    PROP_FIELD_WITH_SETGET(Class, Name, bool, Level, is##Name)
+
+#define PROP_FLAG_GET(Name, Flag, Level) \
+    Level: inline bool is##Name() const \
     { \
         return this->hasFlag(Flag); \
     }
 
-#define PROP_FLAG(Class, Name, Flag, Level, Field) \
-    PROP_FLAG_GET(Name, Flag, Level, Field) \
-    PROP_FLAG_SET(Name, Flag, Level, Field) \
-    PROP_FIELD_WITH_SETGET(Class, Name, bool, is##Name, Level)
+#define PROP_FLAG(Class, Name, Flag, Level) \
+    PROP_FLAG_GET(Name, Flag, Level) \
+    PROP_FLAG_SET_ALL(Class, Name, Flag, Level)
 
     class Play
     {
-PROP_FIELD_NEW(Play, Flags, int, public, protected, flags, protected);
+        PROP_FIELD(Play, flags, Flags, int, public, protected)
     public:
-        //int flags() const;
-        bool hasFlag(int const flag) const;
+        inline bool hasFlag(int const flag) const
+        {
+            return (this->_flags & flag) == flag;
+        }
     protected:
-        /*int _flags;
+        inline void setFlag(int const flag, bool const value)
+        {
+            int const flags = this->_flags;
+            if (value != ((flags & flag) == flag))
+            {
+                this->_flags = flags ^ flag;
+            }
+        }
 
-        int flags(int const flags);
-        void setFlags(int const flags);
-        Play& withFlags(int const flags);
-        int flags(int const flags, bool const returnOld);*/
-
-        Play& withFlag(int const flag, bool const value);
-        void setFlag(int const flag, bool const value);
+        inline Play& withFlag(int const flag, bool const value)
+        {
+            this->setFlag(flag, value);
+            return *this;
+        }
 
         Play(int const flags);
 

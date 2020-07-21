@@ -22,65 +22,10 @@ QString Role::RpTxt = "RP";
 QString Role::ResistTxt = ", resisted by %1";
 QString Role::SuffersTxt = ", %1 suffers ";
 
-int Role::id() const
-{
-    return this->_id;
-}
-
-QString Role::name() const
-{
-    return this->_name;
-}
-
 QString Role::sprite() const
 {
     QString* const spr = this->_sprite;
     return spr == nullptr ? QString() : *(this->_sprite);
-}
-
-int Role::damageElement() const
-{
-    return this->_dmg_type;
-}
-
-int Role::maximumHp() const
-{
-    return this->_m_hp;
-}
-
-int Role::maximumMp() const
-{
-    return this->_m_mp;
-}
-
-int Role::maximumRp() const
-{
-    return this->_m_sp;
-}
-
-int Role::currentHp() const
-{
-    return this->_hp;
-}
-
-int Role::currentMp() const
-{
-    return this->_mp;
-}
-
-int Role::currentRp() const
-{
-    return this->_sp;
-}
-
-bool Role::isRanged() const
-{
-    return this->hasFlag(FLAG_RANGE);
-}
-
-bool Role::isReviving() const
-{
-    return this->hasFlag(FLAG_REVIVE);
 }
 
 int Role::stateDuration(State& state) const

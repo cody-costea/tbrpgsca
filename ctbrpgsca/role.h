@@ -35,6 +35,18 @@ namespace tbrpgsca
         #define ELEMENT_EARTH 256
         #define ELEMENT_PSYCHIC 512
         #define ELEMENT_LIGHT 1024
+
+        PROP_FIELD_GET(id, int, public, _id)
+        PROP_FIELD_GET(currentHp, int, public, _hp)
+        PROP_FIELD_GET(currentMp, int, public, _mp)
+        PROP_FIELD_GET(currentRp, int, public, _sp)
+        PROP_FIELD_GET(maximumHp, int, public, _m_hp)
+        PROP_FIELD_GET(maximumMp, int, public, _m_mp)
+        PROP_FIELD_GET(maximumRp, int, public, _m_sp)
+        PROP_FIELD_GET(dmgElement, int, public, _dmg_type)
+        PROP_FIELD_GET(name, QString, public, _name)
+        PROP_FLAG_GET(Reviving, FLAG_REVIVE, public)
+        PROP_FLAG_GET(Ranged, FLAG_RANGE, public)
     public:
         static QString HpTxt;
         static QString MpTxt;
@@ -42,19 +54,7 @@ namespace tbrpgsca
         static QString SuffersTxt;
         static QString ResistTxt;
 
-        int id() const;
-        QString name() const;
         QString sprite() const;
-        int damageElement() const;
-        int maximumHp() const;
-        int maximumMp() const;
-        int maximumRp() const;
-        int currentHp() const;
-        int currentMp() const;
-        int currentRp() const;
-        bool isReviving() const;
-        bool isRanged() const;
-
         QList<State*> statesList() const;
         int stateDuration(State& state) const;
         bool hasState(State& state) const;
