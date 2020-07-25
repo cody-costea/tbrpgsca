@@ -20,36 +20,6 @@ using namespace tbrpgsca;
 QString Actor::KoTxt = ", %1 falls unconscious";
 QString Actor::RiseTxt = ", but rises again";
 
-int Actor::level() const
-{
-    return this->_lv;
-}
-
-int Actor::experience() const
-{
-    return this->_xp;
-}
-
-int Actor::maximumLevel() const
-{
-    return this->_max_lv;
-}
-
-int Actor::maximumExperience() const
-{
-    return this->_maxp;
-}
-
-int Actor::currentActions() const
-{
-    return this->_actions;
-}
-
-int Actor::initiative() const
-{
-    return this->_init;
-}
-
 int Actor::remainingSkillUses(Ability& skill) const
 {
     QMap<Ability*, int>* crQty = this->_skills_cr_qty;
@@ -76,26 +46,6 @@ Costume& Actor::race() const
 Costume& Actor::job() const
 {
     return *(this->_equipment[CHAR_JOB]);
-}
-
-void* Actor::extra() const
-{
-    return this->_extra;
-}
-
-bool Actor::hasNewItems() const
-{
-    return this->hasFlag(FLAG_NEW_ITEMS);
-}
-
-bool Actor::isAiPlayer() const
-{
-    return this->hasFlag(FLAG_AI_PLAYER);
-}
-
-bool Actor::isRandomAi() const
-{
-    return this->hasFlag(FLAG_RANDOM_AI);
 }
 
 Costume* Actor::equipItem(const char pos, Costume* const item)
@@ -150,11 +100,6 @@ void Actor::removeStates(QString* const ret, Scene* const scene, bool const remo
             delete stateDur;
         }
     }
-}
-
-inline void Actor::setExtra(void* const extra)
-{
-    this->_extra = extra;
 }
 
 inline void Actor::setRace(Costume& race)
@@ -320,7 +265,7 @@ void Actor::setCurrentRp(const int sp)
     this->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
 }
 
-void Actor::setMaximumActions(const int mActions)
+void Actor::setMaxActions(const int mActions)
 {
     Actor& actor = *this;
     actor._m_actions = mActions;
@@ -358,11 +303,6 @@ void Actor::setMaximumRp(const int mRp)
     {
         actor._sp = mRp;
     }
-}
-
-inline void Actor::setName(QString value)
-{
-    this->_name = value;
 }
 
 inline void Actor::setSprite(QString& value)
@@ -456,7 +396,7 @@ void Actor::setItems(QMap<Ability*, int>* const items)
     this->_items = items;
 }
 
-inline void Actor::setMaximumLevel(const int maxLv)
+inline void Actor::setMaxLevel(const int maxLv)
 {
     this->_max_lv = maxLv;
 }
@@ -702,7 +642,7 @@ void Actor::updateAttributes(const bool remove, Scene* const scene, Costume& cos
     actor.setMaximumHp(actor._m_hp + (i * costume._m_hp));
     actor.setMaximumMp(actor._m_mp + (i * costume._m_mp));
     actor.setMaximumRp(actor._m_sp + (i * costume._m_sp));
-    actor.setMaximumActions(actor._m_actions + (i * costume._m_actions));
+    actor.setMaxActions(actor._m_actions + (i * costume._m_actions));
     actor._atk += i * costume._atk;
     actor._def += i * costume._def;
     actor._spi += i * costume._spi;

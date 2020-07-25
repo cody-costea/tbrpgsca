@@ -20,26 +20,6 @@ QString Ability::MissesTxt = ", but misses %1";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
 
-int Ability::usesRegen() const
-{
-    return this->_r_qty;
-}
-
-int Ability::maximumUses() const
-{
-    return this->_m_qty;
-}
-
-int Ability::attributeIncrement() const
-{
-    return this->_attr_inc;
-}
-
-int Ability::requiredLevel() const
-{
-    return this->_lv_rq;
-}
-
 int Ability::removedStateDuration(State& state) const
 {
     QMap<State*, int>* aStates = this->_r_states;
@@ -62,41 +42,6 @@ int Ability::removedStatesSize() const
 {
     QMap<State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->size();
-}
-
-bool Ability::canMiss() const
-{
-    return (this->_flags & FLAG_MISSABLE) == FLAG_MISSABLE;
-}
-
-bool Ability::isStealing() const
-{
-    return (this->_flags & FLAG_STEAL) == FLAG_STEAL;
-}
-
-bool Ability::isAbsorbing() const
-{
-    return (this->_flags & FLAG_ABSORB) == FLAG_ABSORB;
-}
-
-bool Ability::isOnlyMelee() const
-{
-    return (this->_flags & FLAG_MELEE) == FLAG_MELEE;
-}
-
-bool Ability::targetsSide() const
-{
-    return (this->_flags & FLAG_TRG_SIDE) == FLAG_TRG_SIDE;
-}
-
-bool Ability::targetsSelf() const
-{
-    return (this->_flags & FLAG_TRG_SELF) == FLAG_TRG_SELF;
-}
-
-bool Ability::targetsAll() const
-{
-    return (this->_flags & FLAG_TRG_ALL) == FLAG_TRG_ALL;
 }
 
 void Ability::replenish(Actor& user)

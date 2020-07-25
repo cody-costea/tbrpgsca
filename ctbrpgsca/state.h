@@ -18,10 +18,10 @@ namespace tbrpgsca
     class State : public Costume
     {
         #define STATE_END_DUR -3
-    public:
-        int duration() const;
-        int resistance() const;
 
+        PROP_FIELD_GET_CUSTOM(duration, int, public, _dur)
+        PROP_FIELD_GET_CUSTOM(resistance, int, public, _s_res)
+    public:
         int removedSkillsSize() const;
         bool hasRemovedSkill(Ability& skill) const;
         Ability& removedSkill(int const n) const;

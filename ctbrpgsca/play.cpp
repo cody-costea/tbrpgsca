@@ -14,7 +14,6 @@ Play::Play(int const flags)
     this->_flags = flags;
 }
 
-Play::~Play()
-{
+Play::Play() : Play(0) {}
 
-}
+Play::~Play() {}

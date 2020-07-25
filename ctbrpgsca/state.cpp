@@ -16,16 +16,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-int State::duration() const
-{
-    return this->_dur;
-}
-
-int State::resistance() const
-{
-    return this->_s_res;
-}
-
 Ability& State::removedSkill(int const n) const
 {
     return *(this->_r_skills->at(n));

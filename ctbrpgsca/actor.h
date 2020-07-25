@@ -24,25 +24,27 @@ namespace tbrpgsca
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
+
+        PROP_FLAG_GET(isAiPlayer, FLAG_AI_PLAYER, public)
+        PROP_FLAG_GET(isRandomAi, FLAG_RANDOM_AI, public)
+        PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
+        PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
+        PROP_FIELD(Actor, Extra, extra, void*, public, protected)
+        PROP_FIELD_SET_ALL(Actor, setName, name, withName, QString, public, Role::name, _name)
+        PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
+        PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
+        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
+        PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
+        PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
+        PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
     public:
         static QString KoTxt;
         static QString RiseTxt;
 
-        int level() const;
-        int maximumLevel() const;
-        int maximumExperience() const;
         QMap<Ability*, int> items() const;
-        int currentActions() const;
-        int experience() const;
-        int initiative() const;
         //int getPartySide() const;
         Costume& race() const;
         Costume& job() const;
-        bool hasNewItems() const;
-        bool isAiPlayer() const;
-        bool isRandomAi() const;
-        bool isCovering() const;
-        void* extra() const;
 
         int remainingSkillUses(Ability& skill) const;
         int regeneratingSkillTurn(Ability& skill) const;
@@ -57,15 +59,13 @@ namespace tbrpgsca
         void setElementResistance(int const element, int const res);
         void setStateResistance(State* const state, int const res);
         void setItems(QMap<Ability*, int>* items);
-        inline void setExtra(void* const extra);
         inline void setLevel(int const level);
         inline void setExperience(int const xp);
         inline void setSprite(QString& value);
-        inline void setName(QString value);
         inline void setJob(Costume& job);
         inline void setRace(Costume& race);
-        void setMaximumActions(int const mActions);
-        inline void setMaximumLevel(int const maxLv);
+        void setMaxActions(int const mActions);
+        inline void setMaxLevel(int const maxLv);
         void setMaximumHp(int const mHp);
         void setMaximumMp(int const mMp);
         void setMaximumRp(int const mSp);
@@ -104,7 +104,6 @@ namespace tbrpgsca
         QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         QMap<char, Costume*> _equipment;
         QVector<Costume*>* _dmg_roles;
-        void* _extra;
 
         void levelUp(Scene* const scene);
         inline void checkRegSkill(Ability& skill);

@@ -27,23 +27,22 @@ namespace tbrpgsca
         #define FLAG_TRG_SELF 64
         #define FLAG_TRG_ONE 0
         #define DEFAULT_RES 3
+
+        PROP_FLAG_GET(canMiss, FLAG_MISSABLE, public)
+        PROP_FLAG_GET(isStealing, FLAG_STEAL, public)
+        PROP_FLAG_GET(isOnlyMelee, FLAG_MELEE, public)
+        PROP_FLAG_GET(targetsAll, FLAG_TRG_ALL, public)
+        PROP_FLAG_GET(isAbsorbing, FLAG_ABSORB, public)
+        PROP_FLAG_GET(targetsSide, FLAG_TRG_SIDE, public)
+        PROP_FLAG_GET(targetsSelf, FLAG_TRG_SELF, public)
+        PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
+        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
+        PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
+        PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
     public:
         static QString MissesTxt;
         static QString ReflectTxt;
         static QString StolenTxt;
-
-        int requiredLevel() const;
-        int attributeIncrement() const;
-        int maximumUses() const;
-        int usesRegen() const;
-
-        bool canMiss() const;
-        bool isStealing() const;
-        bool isAbsorbing() const;
-        bool isOnlyMelee() const;
-        bool targetsSide() const;
-        bool targetsSelf() const;
-        bool targetsAll() const;
 
         QList<State*> removedStatesList() const;
         int removedStateDuration(State& state) const;

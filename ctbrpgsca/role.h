@@ -36,17 +36,17 @@ namespace tbrpgsca
         #define ELEMENT_PSYCHIC 512
         #define ELEMENT_LIGHT 1024
 
-        PROP_FIELD_GET(id, int, public, _id)
-        PROP_FIELD_GET(currentHp, int, public, _hp)
-        PROP_FIELD_GET(currentMp, int, public, _mp)
-        PROP_FIELD_GET(currentRp, int, public, _sp)
-        PROP_FIELD_GET(maximumHp, int, public, _m_hp)
-        PROP_FIELD_GET(maximumMp, int, public, _m_mp)
-        PROP_FIELD_GET(maximumRp, int, public, _m_sp)
-        PROP_FIELD_GET(dmgElement, int, public, _dmg_type)
-        PROP_FIELD_GET(name, QString, public, _name)
-        PROP_FLAG_GET(Reviving, FLAG_REVIVE, public)
-        PROP_FLAG_GET(Ranged, FLAG_RANGE, public)
+        PROP_FLAG_GET(isRanged, FLAG_RANGE, public)
+        PROP_FLAG_GET(isReviving, FLAG_REVIVE, public)
+        PROP_FIELD_GET_CUSTOM(currentHp, int, public, _hp)
+        PROP_FIELD_GET_CUSTOM(currentMp, int, public, _mp)
+        PROP_FIELD_GET_CUSTOM(currentRp, int, public, _sp)
+        PROP_FIELD_GET_CUSTOM(maximumHp, int, public, _m_hp)
+        PROP_FIELD_GET_CUSTOM(maximumMp, int, public, _m_mp)
+        PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _m_sp)
+        PROP_FIELD_GET_CUSTOM(dmgElement, int, public, _dmg_type)
+        PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
+        PROP_FIELD_GET_CUSTOM(id, int, public, _id)
     public:
         static QString HpTxt;
         static QString MpTxt;

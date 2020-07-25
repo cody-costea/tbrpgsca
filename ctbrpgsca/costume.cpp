@@ -18,36 +18,6 @@ using namespace tbrpgsca;
 
 QString Costume::CausesTxt = ", %1 is affected by %2";
 
-int Costume::offense() const
-{
-    return this->_atk;
-}
-
-int Costume::defense() const
-{
-    return this->_def;
-}
-
-int Costume::spirit() const
-{
-    return this->_spi;
-}
-
-int Costume::wisdom() const
-{
-    return this->_wis;
-}
-
-int Costume::agility() const
-{
-    return this->_agi;
-}
-
-int Costume::maximumActions() const
-{
-    return this->_m_actions;
-}
-
 Ability& Costume::addedSkill(int const n) const
 {
     return *(this->_a_skills->at(n));
@@ -94,50 +64,10 @@ int Costume::stateResistance(State* const state) const
     return stRes == nullptr ? 0 : stRes->value(state, 0);
 }
 
-bool Costume::isReflecting() const
-{
-    return this->hasFlag(FLAG_REFLECT);
-}
-
 bool Costume::isCountering() const
 {
     QVector<Ability*>* counters = this->_counters;
     return counters != nullptr && counters->size() > 0;
-}
-
-bool Costume::isShapeShifted() const
-{
-    return this->hasFlag(FLAG_SHAPE_SHIFT);
-}
-
-bool Costume::isEnraged() const
-{
-    return this->hasFlag(FLAG_ENRAGED);
-}
-
-bool Costume::isConfused() const
-{
-    return this->hasFlag(FLAG_CONFUSE);
-}
-
-bool Costume::isConverted() const
-{
-    return this->hasFlag(FLAG_CONVERT);
-}
-
-bool Costume::isInvincible() const
-{
-    return this->hasFlag(FLAG_INVINCIBLE);
-}
-
-bool Costume::isStunned() const
-{
-    return this->hasFlag(FLAG_STUN);
-}
-
-bool Costume::isKnockedOut() const
-{
-    return this->hasFlag(FLAG_KO);
 }
 
 void Costume::adopt(QString& ret, Actor& actor)

@@ -25,26 +25,26 @@ namespace tbrpgsca
         #define FLAG_INVINCIBLE 128
         #define FLAG_STUN 256
         #define FLAG_KO 512
+
+        PROP_FLAG_GET(isStunned, FLAG_STUN, public)
+        PROP_FLAG_GET(isKnockedOut, FLAG_KO, public)
+        PROP_FLAG_GET(isEnraged, FLAG_CONFUSE, public)
+        PROP_FLAG_GET(isConfused, FLAG_CONFUSE, public)
+        PROP_FLAG_GET(isConverted, FLAG_CONVERT, public)
+        PROP_FLAG_GET(isReflecting, FLAG_REFLECT, public)
+        PROP_FLAG_GET(isInvincible, FLAG_INVINCIBLE, public)
+        PROP_FLAG_GET(isShapeShifted, FLAG_SHAPE_SHIFT, public)
+        PROP_FIELD_GET_CUSTOM(maxActions, int, public, _m_actions)
+        PROP_FIELD_GET_CUSTOM(offense, int, public, _atk)
+        PROP_FIELD_GET_CUSTOM(defense, int, public, _def)
+        PROP_FIELD_GET_CUSTOM(spirit, int, public, _spi)
+        PROP_FIELD_GET_CUSTOM(wisdom, int, public, _wis)
+        PROP_FIELD_GET_CUSTOM(agility, int, public, _agi)
     public:
         static QString CausesTxt;
 
-        int offense() const;
-        int defense() const;
-        int spirit() const;
-        int wisdom() const;
-        int agility() const;
-
-        bool isEnraged() const;
-        bool isConfused() const;
-        bool isConverted() const;
         bool isCountering() const;
-        bool isShapeShifted() const;
-        bool isKnockedOut() const;
-        bool isInvincible() const;
-        bool isReflecting() const;
-        bool isStunned() const;
 
-        int maximumActions() const;
         int elementResistance(int const element) const;
         int stateResistance(State* const state) const;
 
