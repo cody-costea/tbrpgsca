@@ -65,6 +65,7 @@ FORMS +=
 CONFIG += mobility
 MOBILITY = 
 
+QMAKE_CXXFLAGS += -O2 #-fdeclspec
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
