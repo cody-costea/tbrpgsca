@@ -124,7 +124,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
 #endif
     {
         int const side = target._old_side;
-        if (user._old_side != side && ((!skill.isRanged()) && ((!user.isRanged()) || skill.isOnlyMelee())))
+        if (user._old_side != side && ((!skill.isRanged()) && ((!user.Role::isRanged()) || skill.isOnlyMelee())))
         {
             int pos = -1;
             Actor* fGuard = nullptr,* lGuard = nullptr;
@@ -147,7 +147,7 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
                         continue;
                     }
                 }
-                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->isStunned()) && (!guardian->isConfused()))
+                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused()))
                 {
                     (*guardPos) = guardian;
                 }
@@ -172,7 +172,7 @@ void Scene::checkStatus(QString& ret)
         {
             for (int k = 0; k < partySize; ++k)
             {
-                if (!(party->at(k)->isKnockedOut()))
+                if (!(party->at(k)->Costume::isKnockedOut()))
                 {
                     goto enemyCheck;
                 }
@@ -190,7 +190,7 @@ void Scene::checkStatus(QString& ret)
                 partySize = party->size();
                 for (int j = 0; j < partySize; ++j)
                 {
-                    if (!(party->at(j)->isKnockedOut()))
+                    if (!(party->at(j)->Costume::isKnockedOut()))
                     {
                         return;
                     }
@@ -217,8 +217,8 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         {
             int cntSize;
             QVector<Ability*>* const counters = target->_counters;
-            if (counters != nullptr && (cntSize = counters->size()) > 0 && (!target->isStunned())
-                    && (target->_side != user._side || target->isConfused()))
+            if (counters != nullptr && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
+                    && (target->_side != user._side || target->Costume::isConfused()))
             {
                 int const usrDmgType = ability._dmg_type;
                 for (int i = 0; i < cntSize; ++i)
@@ -370,7 +370,7 @@ void Scene::playAi(QString& ret, Actor& player)
     QVector<Ability*>& skills = *(player._a_skills);
     QVector<QVector<Actor*>*>& parties = scene._parties;
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
-    if (player.isConfused())
+    if (player.Costume::isConfused())
     {
         party = nullptr;
         side = -1;
@@ -380,7 +380,7 @@ void Scene::playAi(QString& ret, Actor& player)
         side = player._side;
         party = parties[side];
         sSize = party->size();
-        if (!(player.isEnraged()))
+        if (!(player.Costume::isEnraged()))
         {
             for (int i = 0; i < sSize; ++i)
             {
@@ -437,7 +437,7 @@ void Scene::playAi(QString& ret, Actor& player)
                 }
                 int trg = rand() % sSize;
                 target = party->at(trg);
-                while (target->isKnockedOut())
+                while (target->Costume::isKnockedOut())
                 {
                     if (++trg == sSize)
                     {
@@ -462,12 +462,12 @@ void Scene::playAi(QString& ret, Actor& player)
                         do
                         {
                             target = players->at(trg);
-                        } while (((++trg) < sSize) && (target->isKnockedOut() || target->_side == side));
+                        } while (((++trg) < sSize) && (target->Costume::isKnockedOut() || target->_side == side));
                     }
                     for (int i = trg + 1; i < sSize; ++i)
                     {
                         Actor* const iPlayer = players->at(i);
-                        if (iPlayer->_side != side && (!iPlayer->isKnockedOut()) && iPlayer->_hp < target->_hp)
+                        if (iPlayer->_side != side && (!iPlayer->Costume::isKnockedOut()) && iPlayer->_hp < target->_hp)
                         {
                             target = iPlayer;
                         }
@@ -518,7 +518,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->isInvincible() && crActor->isKnockedOut() && crActor->isStunned()))
+        if (crActor->_hp > 0 && !(crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()))
         {
             crActor->applyStates(&ret, this, true);
         }
@@ -639,9 +639,9 @@ void Scene::endTurn(QString& ret, Actor* crActor)
             crActor->actions = cActions = 0;
         }*/
         {
-            bool const shapeShifted = crActor->isShapeShifted();
+            bool const shapeShifted = crActor->Costume::isShapeShifted();
             crActor->applyStates(&ret, this, false);
-            if (shapeShifted && (!crActor->isShapeShifted()))
+            if (shapeShifted && (!crActor->Costume::isShapeShifted()))
             {
                 SpriteRun* const actorEvent = scene._actor_run;
                 if (actorEvent != nullptr)
@@ -650,7 +650,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
                 }
             }
         }
-        crActor->_actions = cActions = crActor ->isStunned() ? 0 : crActor->_m_actions;
+        crActor->_actions = cActions = crActor->Costume::isStunned() ? 0 : crActor->_m_actions;
     }
     scene._cr_actor = crActor;
     scene._current = current;
@@ -659,7 +659,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && (*event)(scene, &ret) && (crActor->isAiPlayer() || crActor->isEnraged() || crActor->isConfused()))
+        if (event != nullptr && (*event)(scene, &ret) && (crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused()))
         {
             scene.playAi(ret, (*crActor));
         }

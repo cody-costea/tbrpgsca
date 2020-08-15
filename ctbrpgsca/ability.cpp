@@ -78,7 +78,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     assert(target != nullptr);
     Ability& ability = *this;
     int const dmgType = ability._dmg_type | user._dmg_type;
-    if (dmgType == DMG_TYPE_WIS && target != &user && target->isReflecting())
+    if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
     {
         ret = ret % Ability::ReflectTxt.arg(target->_name);
         target = &user;

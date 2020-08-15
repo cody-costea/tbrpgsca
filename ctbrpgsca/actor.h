@@ -25,16 +25,49 @@ namespace tbrpgsca
         #define CHAR_RACE 1
         #define CHAR_JOB 2
 
-        PROP_FLAG_GET(isAiPlayer, FLAG_AI_PLAYER, public)
-        PROP_FLAG_GET(isRandomAi, FLAG_RANDOM_AI, public)
         PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
-        PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
-        PROP_FIELD(Actor, Extra, extra, void*, public, protected)
+        //PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
+        PROP_FLAG(Actor, Covering, FLAG_COVERING, public, public)
+        PROP_FLAG(Actor, AiPlayer, FLAG_AI_PLAYER, public, public)
+        PROP_FLAG(Actor, RandomAi, FLAG_RANDOM_AI, public, public)
+        PROP_FLAG_SET_ALL(Actor, Ranged, FLAG_RANGE, public, Role::isRanged)
+        PROP_FLAG_SET_ALL(Actor, NewItems, FLAG_NEW_ITEMS, public, hasNewItems)
+        PROP_FLAG_SET_ALL(Actor, Stunned, FLAG_STUN, public, Costume::isStunned)
+        PROP_FLAG_SET_ALL(Actor, Reviving, FLAG_REVIVE, public, Role::isReviving)
+        PROP_FLAG_SET_ALL(Actor, Enraged, FLAG_ENRAGED, public, Costume::isEnraged)
+        PROP_FLAG_SET_ALL(Actor, KnockedOut, FLAG_KO, public, Costume::isKnockedOut)
+        PROP_FLAG_SET_ALL(Actor, Confused, FLAG_CONFUSE, public, Costume::isConfused)
+        PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Costume::isReflecting)
+        PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Costume::isInvincible)
+        PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Costume::isShapeShifted)
+        PROP_CUSTOM_FIELD(Actor, initiative, setInitiative, withInitive, int, public, public, _init)
+        PROP_CUSTOM_FIELD(Actor, partySide, setPartySide, withPartySide, int, public, public, _side)
+        PROP_FIELD_WITH_SETGET(Actor, setExperience, experience, withExperience, int, public, experience)
+        PROP_FIELD_WITH_SETGET(Actor, setMaximumHp, maximumHp, withMaximumHp, int, public, Role::maximumHp)
+        PROP_FIELD_WITH_SETGET(Actor, setMaximumMp, maximumMp, withMaximumMp, int, public, Role::maximumMp)
+        PROP_FIELD_WITH_SETGET(Actor, setMaximumRp, maximumRp, withMaximumRp, int, public, Role::maximumRp)
+        PROP_FIELD_WITH_SETGET(Actor, setMaxActions, maxActions, withMaxActions, int, public, Costume::maxActions)
+        PROP_FIELD_WITH_SETGET(Actor, setCurrentHp, currentHp, withCurrentHp, int, public, Role::currentHp)
+        PROP_FIELD_WITH_SETGET(Actor, setCurrentMp, currentMp, withCurrentMp, int, public, Role::currentMp)
+        PROP_FIELD_WITH_SETGET(Actor, setCurrentRp, currentRp, withCurrentRp, int, public, Role::currentRp)
+        PROP_FIELD_WITH_SETGET(Actor, setOffense, offense, withOffense, int, public, Costume::offense)
+        PROP_FIELD_WITH_SETGET(Actor, setDefense, defense, withDefense, int, public, Costume::defense)
+        PROP_FIELD_WITH_SETGET(Actor, setAgility, agility, withAgility, int, public, Costume::agility)
+        PROP_FIELD_WITH_SETGET(Actor, setWisdom, wisdom, withWisdom, int, public, Costume::wisdom)
+        PROP_FIELD_WITH_SETGET(Actor, setSpirit, spirit, withSpirit, int, public, Costume::spirit)
+        PROP_FIELD_WITH_SETGET(Actor, setMaxLevel, maxLevel, withMaxLevel, int, public, maxLevel)
         PROP_FIELD_SET_ALL(Actor, setName, name, withName, QString, public, Role::name, _name)
+        PROP_FIELD_WITH_SETGET(Actor, setRace, race, withRace, Costume&, public, race)
+        PROP_FIELD_WITH_SETGET(Actor, setLevel, level, withLevel, int, public, level)
+        //PROP_FIELD_WITH_SETGET(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
+        PROP_FIELD_SETGET(sprite, setSprite, QString, QString&, public, Role::sprite)
+        PROP_FIELD_WITH_SETGET(Actor, setJob, job, withJob, Costume&, public, job)
+        PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
+        PROP_FIELD(Actor, Extra, extra, void*, public, protected)
+        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
+        //PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
         PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
         PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
-        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
-        PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
         PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
         PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
     public:
@@ -66,6 +99,11 @@ namespace tbrpgsca
         inline void setRace(Costume& race);
         void setMaxActions(int const mActions);
         inline void setMaxLevel(int const maxLv);
+        inline void setAgility(int const agi);
+        inline void setOffense(int const atk);
+        inline void setDefense(int const def);
+        inline void setWisdom(int const wis);
+        inline void setSpirit(int const spi);
         void setMaximumHp(int const mHp);
         void setMaximumMp(int const mMp);
         void setMaximumRp(int const mSp);
@@ -73,24 +111,6 @@ namespace tbrpgsca
         void setCurrentHp(int const hp);
         void setCurrentMp(int const mp);
         void setCurrentRp(int const sp);
-        inline void setOffense(int const atk);
-        inline void setDefense(int const def);
-        inline void setSpirit(int const spi);
-        inline void setWisdom(int const wis);
-        inline void setAgility(int const agi);
-        void setInitiative(int const init);
-        void setRanged(bool const range);
-        void setStunned(bool const stun);
-        void setCovering(bool const covers);
-        void setReflecting(bool const reflects);
-        void setShapeShifted(bool const shapeshift);
-        void setKnockedOut(bool const knockOut);
-        void setInvincible(bool const invincible);
-        void setEnraged(bool const automate);
-        void setConfused(bool const confuse);
-        void setRandomAi(bool const randomAi);
-        void setAiPlayer(bool const aiPlayer);
-        void setReviving(bool const revive);
 
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
@@ -100,7 +120,7 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        int _lv, _max_lv, _xp, _maxp, _init, _side, _actions;
+        int _lv, _max_lv, _xp, _maxp, _actions;
         QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         QMap<char, Costume*> _equipment;
         QVector<Costume*>* _dmg_roles;
@@ -130,8 +150,6 @@ namespace tbrpgsca
 
     private:
         int _old_side;
-
-        void setNewItems(bool const newItems);
 
         friend class Scene;
         friend class Ability;

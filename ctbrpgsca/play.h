@@ -40,16 +40,16 @@ namespace tbrpgsca
         this->Field = value; \
     }
 
-#define PROP_FIELD_SETGET(SetGetName, SetName, Type, Level, GetName) \
-    Level: inline Type SetGetName(Type const value) \
+#define PROP_FIELD_SETGET(SetGetName, SetName, GetType, SetType, Level, GetName) \
+    Level: inline GetType SetGetName(SetType value) \
     { \
-        Type old = this->GetName(); \
+        GetType old = this->GetName(); \
         this->SetName(value); \
         return old; \
     }
 
 #define PROP_FIELD_WITH(Class, WithName, Type, Level, SetName) \
-    Level: inline Class& WithName(Type const value) \
+    Level: inline Class& WithName(Type value) \
     { \
         this->SetName(value); \
         return *this; \
@@ -57,7 +57,7 @@ namespace tbrpgsca
 
 #define PROP_FIELD_WITH_SETGET(Class, SetName, SetGetName, WithName, Type, Level, GetName) \
     PROP_FIELD_WITH(Class, WithName, Type, Level, SetName) \
-    PROP_FIELD_SETGET(SetGetName, SetName, Type, Level, GetName)
+    PROP_FIELD_SETGET(SetGetName, SetName, Type, Type, Level, GetName)
 
 #define PROP_FIELD_SET_ALL(Class, SetName, SetGetName, WithName, Type, Level, GetName, Field) \
     PROP_FIELD_SET(SetName, Type, Level, Field) \
@@ -93,14 +93,14 @@ namespace tbrpgsca
     PROP_CUSTOM_REF(Class, GetName, set##SetName, with##SetName, Type, GetLevel, SetLevel, _##GetName)
 
 #define PROP_FLAG_SET(Name, Flag, Level) \
-    Level: inline void set##Name(bool const value) const \
+    Level: inline void Name(bool const value) \
     { \
-        this->setFlag(flag, value); \
+        this->setFlag(Flag, value); \
     }
 
-#define PROP_FLAG_SET_ALL(Class, Name, Flag, Level) \
-    PROP_FLAG_SET(Name, Flag, Level) \
-    PROP_FIELD_WITH_SETGET(Class, is##Name, Name, bool, Level, is##Name)
+#define PROP_FLAG_SET_ALL(Class, PropName, Flag, Level, GetName) \
+    PROP_FLAG_SET(set##PropName, Flag, Level) \
+    PROP_FIELD_WITH_SETGET(Class, set##PropName, is##PropName, with##PropName, bool, Level, GetName)
 
 #define PROP_FLAG_GET(Name, Flag, Level) \
     Level: inline bool Name() const \
@@ -108,9 +108,9 @@ namespace tbrpgsca
         return this->hasFlag(Flag); \
     }
 
-#define PROP_FLAG(Class, Name, Flag, Level) \
-    PROP_FLAG_GET(is##Name, Flag, Level) \
-    PROP_FLAG_SET_ALL(Class, Name, Flag, Level)
+#define PROP_FLAG(Class, Name, Flag, GetLevel, SetLevel) \
+    PROP_FLAG_GET(is##Name, Flag, GetLevel) \
+    PROP_FLAG_SET_ALL(Class, Name, Flag, SetLevel, is##Name)
 
     class Play
     {

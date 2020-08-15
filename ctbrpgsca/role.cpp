@@ -65,7 +65,7 @@ void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const 
 void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
 {
     Role& role = *this;
-    if (!actor.isInvincible())
+    if (!actor.Costume::isInvincible())
     {
         int dmgHp, dmgMp, dmgSp;
         if (percent)

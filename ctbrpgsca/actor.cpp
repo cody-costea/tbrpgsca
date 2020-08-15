@@ -122,7 +122,7 @@ void Actor::setJob(Scene* const scene, Costume& job)
 {
     Actor& actor = *this;
     actor.equipItem(scene, CHAR_JOB, &job);
-    if (!actor.isShapeShifted())
+    if (!actor.Costume::isShapeShifted())
     {
         QString* spr = job._sprite;
         if (spr != nullptr)
@@ -183,7 +183,7 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
     {
         if (actor._hp != 0)
         {
-            if (survive || actor.isInvincible())
+            if (survive || actor.Costume::isInvincible())
             {
                 actor._hp = 1;
             }
@@ -198,14 +198,14 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
                 {
                     actor._init = 0;
                 }
-                if (actor.isReviving())
+                if (actor.Role::isReviving())
                 {
                     if (ret != nullptr)
                     {
                         *ret = *ret % Actor::RiseTxt;
                     }
                     actor._hp = actor._m_hp;
-                    if (scene != nullptr && actor.isShapeShifted())
+                    if (scene != nullptr && actor.Costume::isShapeShifted())
                     {
                         Scene::SpriteRun* const actorEvent = scene->_actor_run;
                         if (actorEvent != nullptr)
@@ -314,72 +314,6 @@ inline void Actor::setSprite(QString& value)
         delete sprite;
     }
     actor._sprite = new QString(value);
-}
-
-void Actor::setRanged(const bool range)
-{
-    this->setFlag(FLAG_RANGE, range);
-}
-
-void Actor::setReviving(const bool revive)
-{
-    this->setFlag(FLAG_REVIVE, revive);
-}
-
-void Actor::setEnraged(const bool automate)
-{
-    this->setFlag(FLAG_ENRAGED, automate);
-}
-
-void Actor::setConfused(const bool confuse)
-{
-    this->setFlag(FLAG_CONFUSE, confuse);
-}
-
-void Actor::setAiPlayer(const bool aiPlayer)
-{
-    this->setFlag(FLAG_AI_PLAYER, aiPlayer);
-
-}
-
-void Actor::setRandomAi(const bool randomAi)
-{
-    this->setFlag(FLAG_RANDOM_AI, randomAi);
-}
-
-void Actor::setNewItems(const bool newItems)
-{
-    this->setFlag(FLAG_NEW_ITEMS, newItems);
-}
-
-void Actor::setReflecting(const bool reflect)
-{
-    this->setFlag(FLAG_REFLECT, reflect);
-}
-
-void Actor::setShapeShifted(const bool shapeshift)
-{
-    this->setFlag(FLAG_SHAPE_SHIFT, shapeshift);
-}
-
-void Actor::setKnockedOut(const bool ko)
-{
-    this->setFlag(FLAG_KO, ko);
-
-}
-
-void Actor::setInvincible(const bool invincible)
-{
-    this->setFlag(FLAG_INVINCIBLE, invincible);
-}
-
-void Actor::setStunned(const bool stun)
-{
-    int const flags = this->_flags;
-    if (stun != ((flags & FLAG_STUN) == FLAG_STUN))
-    {
-        this->_flags = flags ^ FLAG_STUN;
-    }
 }
 
 void Actor::setItems(QMap<Ability*, int>* const items)
