@@ -30,9 +30,14 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
         #define FLAG_HAS_COVERS 2
-        #define DISABLE_COVERING 0
         #define ALLOW_NO_GUARDS 1
+        #define ALLOW_COVERING 1
         #define MIN_ROUND INT_MIN
+
+        PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)
+        PROP_FLAG_GET(usesGuards, FLAG_USE_GUARDS, public)
+        PROP_FLAG_SET_ALL(Scene, UseGuards, FLAG_USE_GUARDS, protected, usesGuards)
+        PROP_FLAG_SET_ALL(Scene, HasCovers, FLAG_HAS_COVERS, protected, hasCovers)
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
@@ -55,7 +60,7 @@ namespace tbrpgsca
         bool canTarget(Actor& user, Ability& ability, Actor& target);
 
         int getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
-        Actor& getGuardian(Actor& user, Actor& target, Ability& skill) const;
+        Actor* getGuardian(Actor& user, Actor* target, Ability& skill) const;
 
         Actor& getPartyPlayer(int const party, int const player) const;
         bool hasPartyPlayer(int const party, Actor& player) const;
@@ -75,9 +80,6 @@ namespace tbrpgsca
         int getCurrentParty() const;
         int getCurrent() const;
         int getStatus() const;
-
-        bool hasCovers() const;
-        bool usesGuards() const;
 
         void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
                           bool const useGuards, int const surprise, int const mInit);
@@ -100,9 +102,6 @@ namespace tbrpgsca
         void agiCalc();
         void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
-
-        void setUseGuards(bool const useGuards);
-        void setHasCovers(bool const hasCovers);
 
         friend class Actor;
         friend class Ability;

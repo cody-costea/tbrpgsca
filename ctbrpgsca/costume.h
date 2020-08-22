@@ -23,6 +23,7 @@ namespace tbrpgsca
         #define FLAG_REFLECT 32
         #define FLAG_SHAPE_SHIFT 64
         #define FLAG_INVINCIBLE 128
+        #define FLAG_COVERING 1024
         #define FLAG_STUN 256
         #define FLAG_KO 512
 
@@ -30,6 +31,7 @@ namespace tbrpgsca
         PROP_FLAG_GET(isKnockedOut, FLAG_KO, public)
         PROP_FLAG_GET(isEnraged, FLAG_CONFUSE, public)
         PROP_FLAG_GET(isConfused, FLAG_CONFUSE, public)
+        PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
         PROP_FLAG_GET(isConverted, FLAG_CONVERT, public)
         PROP_FLAG_GET(isReflecting, FLAG_REFLECT, public)
         PROP_FLAG_GET(isInvincible, FLAG_INVINCIBLE, public)

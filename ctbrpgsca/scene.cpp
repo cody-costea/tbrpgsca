@@ -25,18 +25,6 @@ bool Scene::actorAgiComp(Actor* const a, Actor* const b)
     return (a->_agi > b->_agi);
 }
 
-bool Scene::usesGuards() const
-{
-    return this->hasFlag(FLAG_USE_GUARDS);
-}
-
-void Scene::setUseGuards(const bool useGuards)
-{
-    Scene& scene = *this;
-    scene.setFlag(FLAG_USE_GUARDS, useGuards);
-
-}
-
 int Scene::getCurrent() const
 {
     return this->_current;
@@ -117,13 +105,13 @@ bool Scene::hasTargetedPlayer(Actor& player) const
     return players != nullptr && players->contains(&player);
 }
 
-Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
+Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
 {
+    int const side = target->_old_side;
 #if ALLOW_NO_GUARDS
     if (this->usesGuards())
 #endif
     {
-        int const side = target._old_side;
         if (user._old_side != side && ((!skill.isRanged()) && ((!user.Role::isRanged()) || skill.isOnlyMelee())))
         {
             int pos = -1;
@@ -134,11 +122,15 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
             for (int i = 0; i < pSize; ++i)
             {
                 Actor* const guardian = party[i];
-                if (guardian == &target)
+                if (guardian == target)
                 {
                     if (fGuard == nullptr || i == pSize - 1)
                     {
-                        return target;//break;
+#if ALLOW_COVERING
+                        goto coverCheck;
+#else
+                        return target;
+#endif
                     }
                     else
                     {
@@ -154,10 +146,33 @@ Actor& Scene::getGuardian(Actor& user, Actor& target, Ability& skill) const
             }
             if (fGuard != nullptr && lGuard != nullptr)
             {
-                return *((pos < (pSize / 2)) ? fGuard : lGuard);
+#if ALLOW_COVERING
+                target = ((pos < (pSize / 2)) ? fGuard : lGuard);
+#else
+                return ((pos < (pSize / 2)) ? fGuard : lGuard);
+#endif
             }
         }
     }
+    coverCheck:
+#if ALLOW_COVERING
+    if (this->hasCovers() && (skill._dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK && target->_hp < target->_m_hp / 3)
+    {
+        Actor* coverer = nullptr;
+        QVector<Actor*>& party = *(this->_parties[side]);
+        for (Actor* const actor : party)
+        {
+            if (actor != target && actor->Costume::isCovering() && (coverer == nullptr || (actor->_hp > coverer->_hp)))
+            {
+                coverer = actor;
+            }
+        }
+        if (coverer != nullptr)
+        {
+            return coverer;
+        }
+    }
+#endif
     return target;
 }
 
@@ -323,7 +338,7 @@ void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, 
     else
     {
         scene.execute(ret, user, &user == &target || ability.targetsSelf() ? &user
-                     : &(scene.getGuardian(user, target, ability)), ability, true);
+                     : (scene.getGuardian(user, &target, ability)), ability, true);
     }
     if (item)
     {
@@ -671,7 +686,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
 bool Scene::canTarget(Actor& user, Ability& ability, Actor& target)
 {
     return ability.canPerform(user) && (ability.targetsSelf() || ((target._hp > 0 || ability.isReviving())
-            && (&(this->getGuardian(user, target, ability))) == &target));
+            && ((this->getGuardian(user, &target, ability))) == &target));
 }
 
 void Scene::agiCalc()
@@ -767,6 +782,12 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteR
             }
             player._old_side = i;
             player._side = i;
+#if ALLOW_COVERING
+            if (player.Costume::isCovering())
+            {
+                scene.setHasCovers(true);
+            }
+#endif
         }
         if (players != nullptr)
         {

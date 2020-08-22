@@ -184,9 +184,18 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
             actor._dmg_type |= costume._dmg_type;
         }
         actor._flags |= cFlags;
-        if (scene != nullptr && ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
+        if (scene != nullptr)
         {
-            scene->checkStatus(*ret);
+#if ALLOW_COVERING
+            if ((cFlags & FLAG_COVERING) == FLAG_COVERING)
+            {
+                scene->setHasCovers(true);
+            }
+#endif
+            if (ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
+            {
+                scene->checkStatus(*ret);
+            }
         }
         if (costume.isShapeShifted())
         {

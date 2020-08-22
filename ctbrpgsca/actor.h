@@ -17,17 +17,14 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_AI_PLAYER 1024
+        #define FLAG_AI_PLAYER 8192
         #define FLAG_RANDOM_AI 2048
         #define FLAG_NEW_ITEMS 4096
-        #define FLAG_COVERING 8192
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
 
         PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
-        //PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
-        PROP_FLAG(Actor, Covering, FLAG_COVERING, public, public)
         PROP_FLAG(Actor, AiPlayer, FLAG_AI_PLAYER, public, public)
         PROP_FLAG(Actor, RandomAi, FLAG_RANDOM_AI, public, public)
         PROP_FLAG_SET_ALL(Actor, Ranged, FLAG_RANGE, public, Role::isRanged)
@@ -37,6 +34,7 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, Enraged, FLAG_ENRAGED, public, Costume::isEnraged)
         PROP_FLAG_SET_ALL(Actor, KnockedOut, FLAG_KO, public, Costume::isKnockedOut)
         PROP_FLAG_SET_ALL(Actor, Confused, FLAG_CONFUSE, public, Costume::isConfused)
+        PROP_FLAG_SET_ALL(Actor, Covering, FLAG_COVERING, public, Costume::isCovering)
         PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Costume::isReflecting)
         PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Costume::isInvincible)
         PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Costume::isShapeShifted)
