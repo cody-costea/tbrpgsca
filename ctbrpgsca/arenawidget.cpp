@@ -13,42 +13,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-inline bool ArenaWidget::isAiTurn() const
-{
-    return this->hasFlag(FLAG_AI_TURN);
-}
-
-inline bool ArenaWidget::isAutomatic() const
-{
-    return this->hasFlag(FLAG_AUTOMATIC);
-}
-
-inline bool ArenaWidget::isEndTurn() const
-{
-    return this->hasFlag(FLAG_END_TURN);
-}
-
-inline void ArenaWidget::setAiTurn(const bool aiTurn)
-{
-    ArenaWidget& arena = *this;
-    arena.setFlag(FLAG_AI_TURN, aiTurn);
-    return;
-}
-
-inline void ArenaWidget::setEndTurn(const bool endTurn)
-{
-    ArenaWidget& arena = *this;
-    arena.setFlag(FLAG_END_TURN, endTurn);
-    return;
-}
-
-inline void ArenaWidget::setAutomatic(const bool automatic)
-{
-    ArenaWidget& arena = *this;
-    arena.setFlag(FLAG_AUTOMATIC, automatic);
-    return;
-}
-
 void ArenaWidget::afterPlay()
 {
     ArenaWidget& arena = *this;

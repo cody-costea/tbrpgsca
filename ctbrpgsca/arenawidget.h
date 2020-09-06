@@ -42,14 +42,14 @@ namespace tbrpgsca
         #define POS_LEFT "l"
         #define POS_RIGHT "r"
         #define SPR_EXT "gif"
-        #define FLAG_AI_TURN 4
-        #define FLAG_AUTOMATIC 2
-        #define FLAG_END_TURN 8
-    public:
-        inline bool isAiTurn() const;
-        inline bool isAutomatic() const;
-        inline bool isEndTurn() const;
+        #define FLAG_AI_TURN 8
+        #define FLAG_AUTOMATIC 4
+        #define FLAG_END_TURN 16
 
+        PROP_FLAG(ArenaWidget, AiTurn, FLAG_AI_TURN, public, public)
+        PROP_FLAG(ArenaWidget, Automatic, FLAG_AUTOMATIC, public, public)
+        PROP_FLAG(ArenaWidget, EndTurn, FLAG_END_TURN, public, public)
+    public:
         void enableControls(bool const enable);
 
         void resizeEvent(QResizeEvent* const event) override;
@@ -94,9 +94,6 @@ namespace tbrpgsca
         void prepareTargetBox(bool const freeMemory);
         void prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         void recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
-        inline void setAutomatic(bool const automatic);
-        inline void setEndTurn(bool const endTurn);
-        inline void setAiTurn(bool const aiTurn);
         Actor* getPlayerFromTargetBox(int const index);
 
         void operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
