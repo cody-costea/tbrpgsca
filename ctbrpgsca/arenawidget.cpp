@@ -100,7 +100,7 @@ void ArenaWidget::ActorSprite::playActor(int const spr)
             break;
         case SPR_HIT:
             s = "hit";
-        break;
+            break;
         case SPR_FALL:
             s = "fallen";
             break;
@@ -578,7 +578,7 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
 {
     const QSize& newSize = event->size();
     const QSize& oldSize = (event->oldSize());
-    int width = newSize.width(), height = newSize.height();
+    int const width = newSize.width(), height = newSize.height();
     bool const landscape = (width > height);
     if (landscape != (oldSize.width() > oldSize.height()))
     {

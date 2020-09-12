@@ -273,7 +273,7 @@ void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, 
     Scene& scene = *this;
     ret = ret % Scene::PerformsTxt.arg(user._name, ability._name);
     {
-        QVector<Actor*>* targets = scene._targets;
+        QVector<Actor*>* const targets = scene._targets;
         if (targets)
         {
             targets->clear();
@@ -534,7 +534,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->hasOneFlag(FLAG_INVINCIBLE | FLAG_KO)
+        if (crActor->_hp > 0 && !(crActor->hasOneFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
             /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
         {
             crActor->applyStates(&ret, this, true);
