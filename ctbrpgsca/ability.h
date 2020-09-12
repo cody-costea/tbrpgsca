@@ -27,48 +27,45 @@ namespace tbrpgsca
         #define FLAG_TRG_SELF 64
         #define FLAG_TRG_ONE 0
         #define DEFAULT_RES 3
+
+        PROP_FLAG_GET(canMiss, FLAG_MISSABLE, public)
+        PROP_FLAG_GET(isStealing, FLAG_STEAL, public)
+        PROP_FLAG_GET(isOnlyMelee, FLAG_MELEE, public)
+        PROP_FLAG_GET(targetsAll, FLAG_TRG_ALL, public)
+        PROP_FLAG_GET(isAbsorbing, FLAG_ABSORB, public)
+        PROP_FLAG_GET(targetsSide, FLAG_TRG_SIDE, public)
+        PROP_FLAG_GET(targetsSelf, FLAG_TRG_SELF, public)
+        PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
+        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
+        PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
+        PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
     public:
         static QString MissesTxt;
-        static QString SuffersTxt;
         static QString ReflectTxt;
-        static QString ResistTxt;
         static QString StolenTxt;
 
-        int getRequiredLevel() const;
-        int getAttributeIncrement() const;
-        int getMaximumUses() const;
-        int getUsesRegen() const;
-
-        bool canMiss() const;
-        bool isStealing() const;
-        bool isAbsorbing() const;
-        bool isOnlyMelee() const;
-        bool targetsSide() const;
-        bool targetsSelf() const;
-        bool targetsAll() const;
-
-        QList<State*> getRemovedStatesList() const;
-        int getRemovedStateDuration(State& state) const;
-        bool hasRemovedState(State& state) const;
-        int getRemovedStatesSize() const;
+        QList<State*> removedStatesList() const;
+        int removedStateDuration(State& state) const;
+        bool removedState(State& state) const;
+        int removedStatesSize() const;
 
         bool canPerform(Actor& user);
-        Ability& execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
-        Ability& replenish(Actor& user);
+        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
+        void replenish(Actor& user);
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
-                int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
+                int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
                 int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 
         Ability(Ability& ability);
 
         ~Ability();
     protected:
-        int lvRq, attrInc, mQty, rQty;
-        QMap<State*, int>* rStates;
-        QString* sound;
+        int _lv_rq, _attr_inc, _m_qty, _r_qty;
+        QMap<State*, int>* _r_states;
+        QString* _sound;
 
-        Ability& execute(QString& ret, Scene* scene, Actor& user, Actor* target, bool const applyCosts);
+        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
 
         friend class Actor;
         friend class Costume;

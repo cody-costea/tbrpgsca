@@ -17,77 +17,98 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_AI_PLAYER 1024
+        #define FLAG_AI_PLAYER 8192
         #define FLAG_RANDOM_AI 2048
         #define FLAG_NEW_ITEMS 4096
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
+
+        PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
+        PROP_FLAG(Actor, AiPlayer, FLAG_AI_PLAYER, public, public)
+        PROP_FLAG(Actor, RandomAi, FLAG_RANDOM_AI, public, public)
+        PROP_FLAG_SET_ALL(Actor, Ranged, FLAG_RANGE, public, Role::isRanged)
+        PROP_FLAG_SET_ALL(Actor, NewItems, FLAG_NEW_ITEMS, public, hasNewItems)
+        PROP_FLAG_SET_ALL(Actor, Stunned, FLAG_STUN, public, Costume::isStunned)
+        PROP_FLAG_SET_ALL(Actor, Reviving, FLAG_REVIVE, public, Role::isReviving)
+        PROP_FLAG_SET_ALL(Actor, Enraged, FLAG_ENRAGED, public, Costume::isEnraged)
+        PROP_FLAG_SET_ALL(Actor, KnockedOut, FLAG_KO, public, Costume::isKnockedOut)
+        PROP_FLAG_SET_ALL(Actor, Confused, FLAG_CONFUSE, public, Costume::isConfused)
+        PROP_FLAG_SET_ALL(Actor, Covering, FLAG_COVERING, public, Costume::isCovering)
+        PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Costume::isReflecting)
+        PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Costume::isInvincible)
+        PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Costume::isShapeShifted)
+        PROP_CUSTOM_FIELD(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
+        PROP_CUSTOM_FIELD(Actor, partySide, setPartySide, swapPartySide, withPartySide, int, public, public, _side)
+        PROP_FIELD_WITH_SWAP(Actor, setExperience, swapExperience, withExperience, int, public, experience)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, Role::maximumHp)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, Role::maximumMp)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumRp, swapMaximumRp, withMaximumRp, int, public, Role::maximumRp)
+        PROP_FIELD_WITH_SWAP(Actor, setMaxActions, swapMaxActions, withMaxActions, int, public, Costume::maxActions)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentHp, swapCurrentHp, withCurrentHp, int, public, Role::currentHp)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentMp, swapCurrentMp, withCurrentMp, int, public, Role::currentMp)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentRp, swapCurrentRp, withCurrentRp, int, public, Role::currentRp)
+        PROP_FIELD_WITH_SWAP(Actor, setOffense, swapOffense, withOffense, int, public, Costume::offense)
+        PROP_FIELD_WITH_SWAP(Actor, setDefense, swapDefense, withDefense, int, public, Costume::defense)
+        PROP_FIELD_WITH_SWAP(Actor, setAgility, swapAgility, withAgility, int, public, Costume::agility)
+        PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, Costume::wisdom)
+        PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, Costume::spirit)
+        PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
+        PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, Role::name, _name)
+        PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, public, race)
+        PROP_FIELD_WITH_SWAP(Actor, setLevel, swapLevel, withLevel, int, public, level)
+        //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
+        PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, Role::sprite)
+        PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, public, job)
+        PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
+        PROP_FIELD(Actor, Extra, extra, void*, public, protected)
+        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
+        //PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
+        PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
+        PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
+        PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
+        PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
     public:
         static QString KoTxt;
         static QString RiseTxt;
 
-        int getLevel() const;
-        int getMaximumLevel() const;
-        int getMaximumExperience() const;
-        QMap<Ability*, int> getItems() const;
-        int getCurrentActions() const;
-        int getExperience() const;
-        int getInitiative() const;
+        QMap<Ability*, int> items() const;
         //int getPartySide() const;
-        Costume& getRace() const;
-        Costume& getJob() const;
-        bool hasNewItems() const;
-        bool isAiPlayer() const;
-        bool isRandomAi() const;
-        void* getExtra() const;
+        Costume& race() const;
+        Costume& job() const;
 
-        int getRemainingSkillUses(Ability& skill) const;
-        int getRegeneratingSkillTurn(Ability& skill) const;
+        int remainingSkillUses(Ability& skill) const;
+        int regeneratingSkillTurn(Ability& skill) const;
 
         Costume* unequipPos(char const pos);
         Costume* equipItem(char const pos, Costume* const item);
         char unequipItem(Costume& item);
 
-        Actor& recover(QString& ret);
+        void recover(QString& ret);
         //Actor& applyRoles(QString& ret);
-        Actor& applyStates(QString& ret, bool const consume);
-        Actor& setElementResistance(int const element, int const res);
-        Actor& setStateResistance(State* const state, int const res);
-        Actor& setItems(QMap<Ability*, int>* items);
-        inline Actor& setExtra(void* const extra);
-        inline Actor& setLevel(int const level);
-        inline Actor& setExperience(int const xp);
-        inline Actor& setSprite(QString& value);
-        inline Actor& setName(QString value);
-        inline Actor& setJob(Costume& job);
-        inline Actor& setRace(Costume& race);
-        Actor& setMaximumActions(int const mActions);
-        inline Actor& setMaximumLevel(int const maxLv);
-        Actor& setMaximumHp(int const mHp);
-        Actor& setMaximumMp(int const mMp);
-        Actor& setMaximumRp(int const mSp);
-        Actor& setCurrentHp(int const hp, QString& ret, bool const survive);
-        Actor& setCurrentHp(int const hp);
-        Actor& setCurrentMp(int const mp);
-        Actor& setCurrentRp(int const sp);
-        inline Actor& setAttack(int const atk);
-        inline Actor& setDefense(int const def);
-        inline Actor& setSpirit(int const spi);
-        inline Actor& setWisdom(int const wis);
-        inline Actor& setAgility(int const agi);
-        Actor& setInitiative(int const init);
-        Actor& setRanged(bool const range);
-        Actor& setStunned(bool const stun);
-        Actor& setReflecting(bool const reflects);
-        Actor& setShapeShifted(bool const shapeshift);
-        Actor& setKnockedOut(bool const knockOut);
-        Actor& setInvincible(bool const invincible);
-        Actor& setEnraged(bool const automate);
-        Actor& setConfused(bool const confuse);
-        Actor& setRandomAi(bool const randomAi);
-        Actor& setAiPlayer(bool const aiPlayer);
-        Actor& setReviving(bool const revive);
+        void applyStates(QString& ret, bool const consume);
+        void setElementResistance(int const element, int const res);
+        void setStateResistance(State* const state, int const res);
+        void setItems(QMap<Ability*, int>* items);
+        void setLevel(int const level);
+        void setExperience(int const xp);
+        void setSprite(QString& value);
+        void setJob(Costume& job);
+        void setRace(Costume& race);
+        void setMaxActions(int const mActions);
+        void setMaxLevel(int const maxLv);
+        void setAgility(int const agi);
+        void setOffense(int const atk);
+        void setDefense(int const def);
+        void setWisdom(int const wis);
+        void setSpirit(int const spi);
+        void setMaximumHp(int const mHp);
+        void setMaximumMp(int const mMp);
+        void setMaximumRp(int const mSp);
+        void setCurrentHp(int const hp, QString& ret, bool const survive);
+        void setCurrentHp(int const hp);
+        void setCurrentMp(int const mp);
+        void setCurrentRp(int const sp);
 
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
@@ -97,39 +118,36 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        int lv, maxLv, xp, maxp, init, side, actions;
-        QMap<Ability*, int>* skillsCrQty,* skillsRgTurn,* items;
-        QMap<char, Costume*> equipment;
-        QVector<Costume*>* dmgRoles;
-        void* extra;
+        int _lv, _max_lv, _xp, _maxp, _actions;
+        QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
+        QMap<char, Costume*> _equipment;
+        QVector<Costume*>* _dmg_roles;
 
-        Actor& levelUp(Scene* const scene);
-        inline Actor& checkRegSkill(Ability& skill);
-        Actor& recover(QString* const ret, Scene* const scene);
-        Actor& applyDmgRoles(QString& ret, Scene* const scene);
-        Actor& removeStates(QString* const ret, Scene* const scene, bool const remove);
-        Actor& applyStates(QString* const ret, Scene* const scene, bool const consume);
-        Actor& updateStates(bool const remove, QString* const ret, Scene* const scene,
+        void levelUp(Scene* const scene);
+        inline void checkRegSkill(Ability& skill);
+        void recover(QString* const ret, Scene* const scene);
+        void applyDmgRoles(QString& ret, Scene* const scene);
+        void removeStates(QString* const ret, Scene* const scene, bool const remove);
+        void applyStates(QString* const ret, Scene* const scene, bool const consume);
+        void updateStates(bool const remove, QString* const ret, Scene* const scene,
                             QMap<State*, int>& states, bool const includeWithDur);
-        Actor& updateAttributes(bool const remove, Scene* const scene, Costume& costume);
-        Actor& updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
-        Actor& updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
-        Actor& switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
-        Actor& setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
-        Actor& setExperience(Scene* const scene, int const xp);
-        Actor& setLevel(Scene* const scene, int const level);
-        Actor& setRace(Scene* const scene, Costume& race);
-        Actor& setAgility(int const agi, Scene& scene);
-        Actor& setJob(Scene* const scene, Costume& job);
+        void updateAttributes(bool const remove, Scene* const scene, Costume& costume);
+        void updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
+        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
+        void switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
+        void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
+        void setExperience(Scene* const scene, int const xp);
+        void setLevel(Scene* const scene, int const level);
+        void setRace(Scene* const scene, Costume& race);
+        void setAgility(int const agi, Scene& scene);
+        void setJob(Scene* const scene, Costume& job);
         char unequipItem(Scene* const scene, Costume& item);
         Costume* unequipPos(Scene* const scene, char const pos);
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
-        Actor& refreshCostumes(QString* const ret, Scene* const scene);
+        void refreshCostumes(QString* const ret, Scene* const scene);
 
     private:
-        int oldSide;
-
-        Actor& setNewItems(bool const newItems);
+        int _old_side;
 
         friend class Scene;
         friend class Ability;

@@ -18,37 +18,36 @@ namespace tbrpgsca
     class State : public Costume
     {
         #define STATE_END_DUR -3
+
+        PROP_FIELD_GET_CUSTOM(duration, int, public, _dur)
+        PROP_FIELD_GET_CUSTOM(resistance, int, public, _s_res)
     public:
-        int getDuration() const;
-        int getResistance() const;
-
-        int getRemovedSkillsSize() const;
+        int removedSkillsSize() const;
         bool hasRemovedSkill(Ability& skill) const;
-        Ability& getRemovedSkill(int const n) const;
+        Ability& removedSkill(int const n) const;
 
-        State& alter(QString& ret, Actor& actor, bool const consume);
-        State& inflict(QString& ret, Actor* user, Actor& target, int dur, bool const always);
+        void alter(QString& ret, Actor& actor, bool const consume);
+        void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
         bool disable(Actor& actor, int const dur, bool const remove);
-        State& blockSkills(Actor& actor, bool const remove);
+        void blockSkills(Actor& actor, bool const remove);
 
-        State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions,
-              int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk,
-              int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-              bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const aSkills,
-              QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states, QMap<State*, int>* const stRes,
-              QMap<int, int>* const res);
+        State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
+              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
+              bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
+              QMap<State*, int>* const stRes, QMap<int, int>* const res);
 
         State(State& state);
 
         ~State();
     protected:
-        int dur, sRes;
-        QVector<Ability*>* rSkills;
+        int _dur, _s_res;
+        QVector<Ability*>* _r_skills;
 
-        State& alter(QString* const ret, Scene* const scene, Actor& actor, bool const consume);
-        State& inflict(QString* const ret, Scene* const scene, Actor* user, Actor& target, int dur, bool const always);
+        void alter(QString* const ret, Scene* const scene, Actor& actor, bool const consume);
+        void inflict(QString* const ret, Scene* const scene, Actor* user, Actor& target, int dur, bool const always);
         bool disable(QString* const ret, Scene* const scene, Actor& actor, int dur, bool const remove);
-        State& remove(QString* const ret, Scene* const scene, Actor& actor);
+        void remove(QString* const ret, Scene* const scene, Actor& actor);
 
         friend class Actor;
         friend class Ability;

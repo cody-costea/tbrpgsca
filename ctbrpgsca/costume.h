@@ -23,44 +23,46 @@ namespace tbrpgsca
         #define FLAG_REFLECT 32
         #define FLAG_SHAPE_SHIFT 64
         #define FLAG_INVINCIBLE 128
+        #define FLAG_COVERING 1024
         #define FLAG_STUN 256
         #define FLAG_KO 512
+
+        PROP_FLAG_GET(isStunned, FLAG_STUN, public)
+        PROP_FLAG_GET(isKnockedOut, FLAG_KO, public)
+        PROP_FLAG_GET(isEnraged, FLAG_CONFUSE, public)
+        PROP_FLAG_GET(isConfused, FLAG_CONFUSE, public)
+        PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
+        PROP_FLAG_GET(isConverted, FLAG_CONVERT, public)
+        PROP_FLAG_GET(isReflecting, FLAG_REFLECT, public)
+        PROP_FLAG_GET(isInvincible, FLAG_INVINCIBLE, public)
+        PROP_FLAG_GET(isShapeShifted, FLAG_SHAPE_SHIFT, public)
+        PROP_FIELD_GET_CUSTOM(maxActions, int, public, _m_actions)
+        PROP_FIELD_GET_CUSTOM(offense, int, public, _atk)
+        PROP_FIELD_GET_CUSTOM(defense, int, public, _def)
+        PROP_FIELD_GET_CUSTOM(spirit, int, public, _spi)
+        PROP_FIELD_GET_CUSTOM(wisdom, int, public, _wis)
+        PROP_FIELD_GET_CUSTOM(agility, int, public, _agi)
     public:
         static QString CausesTxt;
 
-        int getAttack() const;
-        int getDefense() const;
-        int getSpirit() const;
-        int getWisdom() const;
-        int getAgility() const;
-
-        bool isEnraged() const;
-        bool isConfused() const;
-        bool isConverted() const;
         bool isCountering() const;
-        bool isShapeShifted() const;
-        bool isKnockedOut() const;
-        bool isInvincible() const;
-        bool isReflecting() const;
-        bool isStunned() const;
 
-        int getMaximumActions() const;
-        int getElementResistance(int const element) const;
-        int getStateResistance(State* const state) const;
+        int elementResistance(int const element) const;
+        int stateResistance(State* const state) const;
 
-        Ability& getAddedSkill(int const n) const;
+        Ability& addedSkill(int const n) const;
         bool hasAddedSkill(Ability& skill) const;
-        int getAddedSkillsSize() const;
+        int addedSkillsSize() const;
 
-        Ability& getCounterSkill(int const n) const;
+        Ability& counterSkill(int const n) const;
         bool hasCounterSkill(Ability& skill) const;
-        int getCounterSkillsSize() const;
+        int counterSkillsSize() const;
 
-        Costume& adopt(QString& ret, Actor& actor);
-        Costume& abandon(QString& ret, Actor& actor);
-        Costume& apply(QString& ret, Actor& actor);
+        void adopt(QString& ret, Actor& actor);
+        void abandon(QString& ret, Actor& actor);
+        void apply(QString& ret, Actor& actor);
 
-        Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+        Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
                 QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res);
@@ -69,16 +71,16 @@ namespace tbrpgsca
 
         ~Costume();
     protected:
-        int atk, def, spi, wis, agi, mActions;
-        QVector<Ability*>* aSkills,* counters;
-        QMap<State*, int>* stRes;
-        QMap<int, int>* res;
+        int _atk, _def, _spi, _wis, _agi, _m_actions;
+        QVector<Ability*>* _a_skills,* _counters;
+        QMap<State*, int>* _st_res;
+        QMap<int, int>* _res;
 
-        Costume& apply(QString& ret, Scene* const scene, Actor& actor);
-        Costume& refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove);
-        Costume& adopt(QString* const ret, Scene* const scene, Actor& actor, bool const upeStates, bool const rmeove);
+        void apply(QString& ret, Scene* const scene, Actor& actor);
+        void refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove);
+        void adopt(QString* const ret, Scene* const scene, Actor& actor, bool const upeStates, bool const rmeove);
 
-        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
                 bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const skills,
                 QVector<Ability*>* const counters, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res);

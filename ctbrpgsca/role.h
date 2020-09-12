@@ -8,6 +8,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef ROLE_H
 #define ROLE_H
 
+#include <play.h>
+
 #include <QString>
 #include <QVector>
 
@@ -18,7 +20,7 @@ namespace tbrpgsca
     class State;
     class Scene;
 
-    class Role
+    class Role : public Play
     {
         #define FLAG_REVIVE 1
         #define FLAG_RANGE 2
@@ -33,38 +35,40 @@ namespace tbrpgsca
         #define ELEMENT_EARTH 256
         #define ELEMENT_PSYCHIC 512
         #define ELEMENT_LIGHT 1024
+
+        PROP_FLAG_GET(isRanged, FLAG_RANGE, public)
+        PROP_FLAG_GET(isReviving, FLAG_REVIVE, public)
+        PROP_FIELD_GET_CUSTOM(currentHp, int, public, _hp)
+        PROP_FIELD_GET_CUSTOM(currentMp, int, public, _mp)
+        PROP_FIELD_GET_CUSTOM(currentRp, int, public, _sp)
+        PROP_FIELD_GET_CUSTOM(maximumHp, int, public, _m_hp)
+        PROP_FIELD_GET_CUSTOM(maximumMp, int, public, _m_mp)
+        PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _m_sp)
+        PROP_FIELD_GET_CUSTOM(dmgElement, int, public, _dmg_type)
+        PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
+        PROP_FIELD_GET_CUSTOM(id, int, public, _id)
     public:
         static QString HpTxt;
         static QString MpTxt;
         static QString RpTxt;
+        static QString SuffersTxt;
+        static QString ResistTxt;
 
-        int getId() const;
-        QString getName() const;
-        QString getSprite() const;
-        int getDamageElement() const;
-        int getMaximumHp() const;
-        int getMaximumMp() const;
-        int getMaximumRp() const;
-        int getCurrentHp() const;
-        int getCurrentMp() const;
-        int getCurrentRp() const;
-        bool isReviving() const;
-        bool isRanged() const;
-
-        QList<State*> getStatesList() const;
-        int getStateDuration(State& state) const;
+        QString sprite() const;
+        QList<State*> statesList() const;
+        int stateDuration(State& state) const;
         bool hasState(State& state) const;
-        int getStatesSize() const;
+        int statesSize() const;
 
-        Role& damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
+        void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
 
         bool operator==(Role& role) const;
     protected:
-        QString name,* sprite;
-        int id, hp, mp, sp, mHp, mMp, mSp, dmgType, flags;
-        QMap<State*, int>* stateDur;
+        QString _name,* _sprite;
+        int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
+        QMap<State*, int>* _state_dur;
 
-        Role& damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
+        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);

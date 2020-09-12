@@ -16,65 +16,55 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-int State::getDuration() const
+Ability& State::removedSkill(int const n) const
 {
-    return this->dur;
-}
-
-int State::getResistance() const
-{
-    return this->sRes;
-}
-
-Ability& State::getRemovedSkill(int const n) const
-{
-    return *(this->rSkills->at(n));
+    return *(this->_r_skills->at(n));
 }
 
 bool State::hasRemovedSkill(Ability& skill) const
 {
-    QVector<Ability*>* aSkills = this->rSkills;
+    QVector<Ability*>* aSkills = this->_r_skills;
     return aSkills != nullptr && aSkills->contains(&skill);
 }
 
-int State::getRemovedSkillsSize() const
+int State::removedSkillsSize() const
 {
-    QVector<Ability*>* aSkills = this->rSkills;
+    QVector<Ability*>* aSkills = this->_r_skills;
     return aSkills == nullptr ? 0 : aSkills->size();
 }
 
-State& State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
+void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
 {
     return this->inflict(&ret, nullptr, user, target, dur, always);
 }
 
-State& State::inflict(QString* const ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always)
+void State::inflict(QString* const ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always)
 {
     State& state = *this;
     if (stateDur == 0)
     {
-        stateDur = state.dur;
+        stateDur = state._dur;
         if (stateDur == 0)
         {
-            return state;
+            return;
         }
     }
     if (stateDur > STATE_END_DUR)
     {
         int stateRes;
         QMap<State*, int>* stRes;
-        if (always || (stateRes = state.sRes) < 0 || ((std::rand() % 10) > (((stRes = target.stRes)
+        if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._st_res)
                 == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
-            QMap<State*, int>* trgStates = target.stateDur;
+            QMap<State*, int>* trgStates = target._state_dur;
             if (trgStates == nullptr)
             {
                 trgStates = new QMap<State*, int>();
-                target.stateDur = trgStates;
+                target._state_dur = trgStates;
             }
             else
             {
-                QMap<State*, int>* const rStates = state.stateDur;
+                QMap<State*, int>* const rStates = state._state_dur;
                 if (rStates != nullptr)
                 {
                     auto const rLast = rStates->cend();
@@ -84,7 +74,7 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
                         State* const rState = rIt.key();
                         if (rDur == 0 || rDur <= STATE_END_DUR)
                         {
-                            rDur = rState->dur;
+                            rDur = rState->_dur;
                         }
                         auto const last = trgStates->cend();
                         for (auto it = trgStates->cbegin(); it != last; ++it)
@@ -97,7 +87,7 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
                                 {
                                     if (aDur < 0 && rDur > aDur)
                                     {
-                                        return state;
+                                        return;
                                     }
                                     rState->disable(ret, scene, target, rDur, false);
                                     if (rDur > 0 && aDur > 0)
@@ -105,7 +95,7 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
                                         stateDur -= aDur < rDur ? aDur : rDur;
                                         if (stateDur < 1)
                                         {
-                                            return state;
+                                            return;
                                         }
                                     }
                                 }
@@ -125,25 +115,25 @@ State& State::inflict(QString* const ret, Scene* const scene, Actor* const user,
             {
                 trgStates->operator[](this) = stateDur;
             }
-            if (user != nullptr && this->isConverted() && target.side != user->side)
+            if (user != nullptr && this->isConverted() && target._side != user->_side)
             {
-                target.side = user->side;
+                target._side = user->_side;
             }
         }
     }
-    return state;
+
 }
 
-State& State::remove(QString* const ret, Scene* const scene, Actor& actor)
+void State::remove(QString* const ret, Scene* const scene, Actor& actor)
 {
     State& state = *this;
     state.blockSkills(actor, true);
     state.adopt(ret, scene, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
     {
-        actor.side = static_cast<int>(actor.oldSide);
+        actor._side = static_cast<int>(actor._old_side);
     }
-    return state;
+
 }
 
 bool State::disable(Actor& actor, int const dur, const bool remove)
@@ -155,11 +145,11 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
 {
     if (dur == 0)
     {
-        dur = this->dur;
+        dur = this->_dur;
     }
     if (dur > STATE_END_DUR)
     {
-        QMap<State*, int>* sDur = actor.stateDur;
+        QMap<State*, int>* sDur = actor._state_dur;
         if (sDur == nullptr)
         {
             return true;
@@ -201,15 +191,15 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
     }
 }
 
-State& State::alter(QString& ret, Actor& actor, const bool consume)
+void State::alter(QString& ret, Actor& actor, const bool consume)
 {
     return this->alter(&ret, nullptr, actor, consume);
 }
 
-State& State::alter(QString* const ret, Scene* const scene, Actor& actor, const bool consume)
+void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bool consume)
 {
     State& state = *this;
-    QMap<State*, int>* sDur = actor.stateDur;
+    QMap<State*, int>* sDur = actor._state_dur;
     if (sDur != nullptr /*&& actor.hp > 0*/)
     {
         int const d = sDur->value(this, STATE_END_DUR);
@@ -226,23 +216,23 @@ State& State::alter(QString* const ret, Scene* const scene, Actor& actor, const 
             state.remove(ret, scene, actor);
         }
     }
-    return state;
+
 }
 
-State& State::blockSkills(Actor& actor, const bool remove)
+void State::blockSkills(Actor& actor, const bool remove)
 {
     State& state = *this;
-    QVector<Ability*>* rSkills = state.rSkills;
+    QVector<Ability*>* rSkills = state._r_skills;
     if (rSkills != nullptr)
     {
-        QMap<Ability*, int>* iSkills = actor.skillsCrQty;
+        QMap<Ability*, int>* iSkills = actor._skills_cr_qty;
         if (remove)
         {
             if (iSkills != nullptr)
             {
                 for (Ability* const skill : *rSkills)
                 {
-                    if (skill->mQty > 0)
+                    if (skill->_m_qty > 0)
                     {
                         iSkills->operator[](skill) = -1 * iSkills->value(skill, 0);
                     }
@@ -258,15 +248,15 @@ State& State::blockSkills(Actor& actor, const bool remove)
             if (iSkills == nullptr)
             {
                 iSkills = new QMap<Ability*, int>();
-                actor.skillsCrQty = iSkills;
+                actor._skills_cr_qty = iSkills;
             }
             for (Ability* const skill : *rSkills)
             {
-                iSkills->operator[](skill) = skill->mQty > 0 ? -1 * iSkills->value(skill, 0) : 0;
+                iSkills->operator[](skill) = skill->_m_qty > 0 ? -1 * iSkills->value(skill, 0) : 0;
             }
         }
     }
-    return state;
+
 }
 
 State::State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
@@ -279,18 +269,18 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
 {
     if (convert)
     {
-        this->flags |= FLAG_CONVERT;
+        this->_flags |= FLAG_CONVERT;
     }
-    this->dur = dur;
-    this->sRes = sRes;
-    this->rSkills = rSkills;
+    this->_dur = dur;
+    this->_s_res = sRes;
+    this->_r_skills = rSkills;
 }
 
 State::State(State& state) : Costume(state)
 {
-    this->dur = state.dur;
-    this->sRes = state.sRes;
-    this->rSkills = state.rSkills;
+    this->_dur = state._dur;
+    this->_s_res = state._s_res;
+    this->_r_skills = state._r_skills;
 }
 
 State::~State()

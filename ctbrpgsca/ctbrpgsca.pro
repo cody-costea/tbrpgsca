@@ -38,6 +38,7 @@ SOURCES += \
         demolib.cpp \
         itemsmodel.cpp \
         main.cpp \
+        play.cpp \
         role.cpp \
         scene.cpp \
         skillsmodel.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
         costume.h \
         demolib.h \
         itemsmodel.h \
+        play.h \
         role.h \
         scene.h \
         skillsmodel.h \
@@ -63,6 +65,7 @@ FORMS +=
 CONFIG += mobility
 MOBILITY = 
 
+QMAKE_CXXFLAGS += -O2 #-fdeclspec
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

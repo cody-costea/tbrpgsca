@@ -19,119 +19,66 @@ using namespace tbrpgsca;
 QString Role::HpTxt = "HP";
 QString Role::MpTxt = "MP";
 QString Role::RpTxt = "RP";
+QString Role::ResistTxt = ", resisted by %1";
+QString Role::SuffersTxt = ", %1 suffers ";
 
-int Role::getId() const
+QString Role::sprite() const
 {
-    return this->id;
+    QString* const spr = this->_sprite;
+    return spr == nullptr ? QString() : *(this->_sprite);
 }
 
-QString Role::getName() const
+int Role::stateDuration(State& state) const
 {
-    return this->name;
-}
-
-QString Role::getSprite() const
-{
-    QString* const spr = this->sprite;
-    return spr == nullptr ? QString() : *(this->sprite);
-}
-
-int Role::getDamageElement() const
-{
-    return this->dmgType;
-}
-
-int Role::getMaximumHp() const
-{
-    return this->mHp;
-}
-
-int Role::getMaximumMp() const
-{
-    return this->mMp;
-}
-
-int Role::getMaximumRp() const
-{
-    return this->mSp;
-}
-
-int Role::getCurrentHp() const
-{
-    return this->hp;
-}
-
-int Role::getCurrentMp() const
-{
-    return this->mp;
-}
-
-int Role::getCurrentRp() const
-{
-    return this->sp;
-}
-
-bool Role::isRanged() const
-{
-    return (this->flags & FLAG_RANGE) == FLAG_RANGE;
-}
-
-bool Role::isReviving() const
-{
-    return (this->flags & FLAG_REVIVE) == FLAG_REVIVE;
-}
-
-int Role::getStateDuration(State& state) const
-{
-    QMap<State*, int>* const aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->_state_dur;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-QList<State*> Role::getStatesList() const
+QList<State*> Role::statesList() const
 {
-    QMap<State*, int>* const aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->_state_dur;
     return aStates == nullptr ? QList<State*>() : aStates->keys();
 }
 
 bool Role::hasState(State& state) const
 {
-    QMap<State*, int>* const aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->_state_dur;
     return aStates != nullptr && aStates->contains(&state);
 }
 
-int Role::getStatesSize() const
+int Role::statesSize() const
 {
-    QMap<State*, int>* const aStates = this->stateDur;
+    QMap<State*, int>* const aStates = this->_state_dur;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
 bool Role::operator==(Role& role) const
 {
-    return this->id == role.id;
+    return this->_id == role._id;
 }
 
-Role& Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
+void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
 {
     return this->damage(ret, nullptr, absorber, target, dmg, percent);
 }
 
-Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int dmg, bool const percent)
+void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
 {
     Role& role = *this;
-    if (!actor.isInvincible())
+    if (!actor.Costume::isInvincible())
     {
         int dmgHp, dmgMp, dmgSp;
         if (percent)
         {
-            dmgHp = (actor.mHp + dmg) * role.hp / 100;
-            dmgMp = (actor.mMp + dmg) * role.mp / 100;
-            dmgSp = (actor.mSp + dmg) * role.sp / 100;
+            dmgHp = (actor._m_hp + dmg) * role._hp / 100;
+            dmgMp = (actor._m_mp + dmg) * role._mp / 100;
+            dmgSp = (actor._m_sp + dmg) * role._sp / 100;
         }
         else
         {
-            dmgHp = role.hp;
-            dmgMp = role.mp;
-            dmgSp = role.sp;
+            dmgHp = role._hp;
+            dmgMp = role._mp;
+            dmgSp = role._sp;
             if (dmgHp != 0)
             {
                 dmgHp += dmgHp < 0 ? (-1 * dmg) : dmg;
@@ -146,12 +93,12 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             }
         }
         {
-            QMap<int, int>* trgResMap = actor.res;
+            QMap<int, int>* trgResMap = actor._res;
             if (trgResMap != nullptr)
             {
                 int res = DEFAULT_RES;
                 {
-                    int const dmgType = role.dmgType;
+                    int const dmgType = role._dmg_type;
                     auto const last = trgResMap->cend();
                     for (auto it = trgResMap->cbegin(); it != last; ++it)
                     {
@@ -169,29 +116,29 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                         res = -7 + (res - 7);
                         if (res > -1)
                         {
-                            dmgHp *= -1 * (res + 2);
-                            dmgMp *= -1 * (res + 2);
-                            dmgSp *= -1 * (res + 2);
+                            res = -1 * (res + 2);
                         }
                     }
                     else if (res == 7)
                     {
-                        ret = ret % Ability::ResistTxt.arg(actor.name);
-                        return role;
+                        ret = ret % Ability::ResistTxt.arg(actor._name);
+                        return;
                     }
                     else
                     {
                         dmgHp /= res;
                         dmgMp /= res;
                         dmgSp /= res;
+                        goto applyChanges;
                     }
                 }
                 else
                 {
-                    dmgHp *= -1 * (res - 2);
-                    dmgMp *= -1 * (res - 2);
-                    dmgSp *= -1 * (res - 2);
-                }
+                    res = -1 * (res - 2);
+                }                
+                dmgHp *= res;
+                dmgMp *= res;
+                dmgSp *= res;
             }
             else
             {
@@ -200,22 +147,18 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
                 dmgSp /= DEFAULT_RES;
             }
         }
+        applyChanges:
         bool c = false;
         if (dmgSp != 0)
         {
             c = true;
-            ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+            ret = ret % Ability::SuffersTxt.arg(actor._name);
             if (dmgSp < 0)
             {
-                dmg = -1 * dmg + dmgSp;
                 ret = ret % "+";
             }
-            else
-            {
-                dmg += dmgSp;
-            }
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgSp), Role::RpTxt));
-            actor.setCurrentRp(actor.sp - dmgSp);
+            actor.setCurrentRp(actor._sp - dmgSp);
         }
         if (dmgMp != 0)
         {
@@ -225,20 +168,15 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             }
             else
             {
-                ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+                ret = ret % Ability::SuffersTxt.arg(actor._name);
                 c = true;
             }
             if (dmgMp < 0)
             {
-                dmg =  -1 * dmg + dmgMp;
                 ret = ret % "+";
             }
-            else
-            {
-                dmg += dmgMp;
-            }
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgMp), Role::MpTxt));
-            actor.setCurrentMp(actor.mp - dmgMp);
+            actor.setCurrentMp(actor._mp - dmgMp);
         }
         if (dmgHp != 0)
         {
@@ -248,20 +186,15 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
             }
             else
             {
-                ret = ret % Ability::SuffersTxt.arg(actor.name) % " ";
+                ret = ret % Ability::SuffersTxt.arg(actor._name);
                 c = true;
             }
             if (dmgHp < 0)
             {
-                dmg =  -1 * dmg + dmgSp;
                 ret = ret % "+";
             }
-            else
-            {
-                dmg += dmgHp;
-            }
             ret = ret % (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
-            actor.setCurrentHp(actor.hp - dmgHp, &ret, scene, percent);
+            actor.setCurrentHp(actor._hp - dmgHp, &ret, scene, percent);
             /*if (actor.hp < 1)
             {
                 ret = ret % Actor::KoTxt.arg(actor.name);
@@ -269,58 +202,51 @@ Role& Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Acto
         }
         if (c && absorber != nullptr)
         {
-            absorber->setCurrentRp(absorber->sp + dmgSp / 2);
-            absorber->setCurrentMp(absorber->mp + dmgMp / 2);
-            absorber->setCurrentHp(absorber->hp + dmgHp / 2, &ret, scene, true);
+            absorber->setCurrentRp(absorber->_sp + dmgSp / 2);
+            absorber->setCurrentMp(absorber->_mp + dmgMp / 2);
+            absorber->setCurrentHp(absorber->_hp + dmgHp / 2, &ret, scene, true);
         }
     }
-    return role;
 }
 
 Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
            int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates)
+    : Play(((revive ? FLAG_REVIVE : 0) | (range ? FLAG_RANGE : 0)))
 {
-    this->id = id;
-    this->name = name;
-    this->sprite = sprite.length() == 0 ? nullptr : new QString(sprite);
-    this->mHp = mHp;
-    this->mMp = mMp;
-    this->mSp = mSp;
-    this->hp = hpDmg;
-    this->mp = mpDmg;
-    this->sp = spDmg;
-    this->dmgType = element;
-    int flags = revive ? FLAG_REVIVE : 0;
-    if (range)
-    {
-        flags |= FLAG_RANGE;
-    }
-    this->stateDur = aStates;
-    this->flags = flags;
+    this->_id = id;
+    this->_name = name;
+    this->_sprite = sprite.length() == 0 ? nullptr : new QString(sprite);
+    this->_m_hp = mHp;
+    this->_m_mp = mMp;
+    this->_m_sp = mSp;
+    this->_hp = hpDmg;
+    this->_mp = mpDmg;
+    this->_sp = spDmg;
+    this->_dmg_type = element;
+    this->_state_dur = aStates;
 }
 
-Role::Role(Role& role)
+Role::Role(Role& role) : Play(role._flags)
 {
-    this->id = role.id;
-    this->name = role.name;
-    this->sprite = role.sprite;
-    this->flags = role.flags;
-    this->stateDur = role.stateDur;
-    this->dmgType = role.dmgType;
-    this->mHp = role.mHp;
-    this->mMp = role.mMp;
-    this->mSp = role.mSp;
-    this->hp = role.hp;
-    this->mp = role.mp;
-    this->sp = role.sp;
+    this->_id = role._id;
+    this->_name = role._name;
+    this->_sprite = role._sprite;
+    this->_state_dur = role._state_dur;
+    this->_dmg_type = role._dmg_type;
+    this->_m_hp = role._m_hp;
+    this->_m_mp = role._m_mp;
+    this->_m_sp = role._m_sp;
+    this->_hp = role._hp;
+    this->_mp = role._mp;
+    this->_sp = role._sp;
 }
 
 Role::~Role()
 {
-    QString* sprite = this->sprite;
+    QString* sprite = this->_sprite;
     if (sprite != nullptr)
     {
-        this->sprite = nullptr;
+        this->_sprite = nullptr;
         delete sprite;
     }
 }

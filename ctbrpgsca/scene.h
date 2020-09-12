@@ -9,6 +9,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define SCENE_H
 
 #include "actor.h"
+#include "play.h"
 
 #include <QVector>
 #include <QStringBuilder>
@@ -16,7 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
-    class Scene
+    class Scene : public Play
     {
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1
@@ -27,11 +28,20 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
+        #define FLAG_USE_GUARDS 1
+        #define FLAG_HAS_COVERS 2
+        #define ALLOW_NO_GUARDS 1
+        #define ALLOW_COVERING 1
         #define MIN_ROUND INT_MIN
+
+        PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)
+        PROP_FLAG_GET(usesGuards, FLAG_USE_GUARDS, public)
+        PROP_FLAG_SET_ALL(Scene, UseGuards, FLAG_USE_GUARDS, protected, usesGuards)
+        PROP_FLAG_SET_ALL(Scene, HasCovers, FLAG_HAS_COVERS, protected, hasCovers)
     public:
-        typedef std::function<bool(Scene& scene, QString* const ret)> SceneAct;
+        typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                   Actor* const target, Ability* const counter)> ActorAct;
+                                   Actor* const target, Ability* const counter)> SpriteRun;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -41,16 +51,16 @@ namespace tbrpgsca
 
         static bool actorAgiComp(Actor* const a, Actor* const b);
 
-        Scene& playAi(QString& ret, Actor& player);
-        Scene& endTurn(QString& ret, Actor* const actor);
-        Scene& perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
-        Scene& checkStatus(QString& ret);
-        Scene& escape(QString& ret);
+        void playAi(QString& ret, Actor& player);
+        void endTurn(QString& ret, Actor* const actor);
+        void perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
+        void checkStatus(QString& ret);
+        void escape(QString& ret);
 
         bool canTarget(Actor& user, Ability& ability, Actor& target);
 
         int getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
-        Actor& getGuardian(Actor& user, Actor& target, Ability& skill) const;
+        Actor* getGuardian(Actor& user, Actor* target, Ability& skill) const;
 
         Actor& getPartyPlayer(int const party, int const player) const;
         bool hasPartyPlayer(int const party, Actor& player) const;
@@ -71,24 +81,26 @@ namespace tbrpgsca
         int getCurrent() const;
         int getStatus() const;
 
-        Scene& operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+                          bool const useGuards, int const surprise, int const mInit);
 
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ActorAct* const actorEvent, QVector<SceneAct*>* const events, int const surprise, int const mInit);
+        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+              bool const useGuards, int const surprise, int const mInit);
 
         Scene();
 
         ~Scene();
     protected:
-        Ability* lastAbility;
-        QVector<SceneAct*>* events;
-        int current, oldCurrent, surprise, fTarget, lTarget, status, mInit;
-        QVector<Actor*>* players,* targets;
-        QVector<QVector<Actor*>*> parties;
-        ActorAct* actorEvent;
-        Actor* crActor;
+        Ability* _last_ability;
+        QVector<SceneRun*>* _events;
+        int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
+        QVector<Actor*>* _players,* _targets;
+        QVector<QVector<Actor*>*> _parties;
+        SpriteRun* _actor_run;
+        Actor* _cr_actor;
 
         void agiCalc();
-        Scene& execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
 
         friend class Actor;

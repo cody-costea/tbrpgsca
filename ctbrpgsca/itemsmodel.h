@@ -29,7 +29,7 @@ namespace tbrpgsca
        QVariant data(const QModelIndex& index, int role) const;
 
     private:
-       Actor* actor;
+       Actor* _actor;
     };
 
 }
