@@ -40,8 +40,8 @@ namespace tbrpgsca
         this->Field = value; \
     }
 
-#define PROP_FIELD_SETGET(SetGetName, SetName, GetType, SetType, Level, GetName) \
-    Level: inline GetType SetGetName(SetType value) \
+#define PROP_FIELD_SWAP(SwapName, SetName, GetType, SetType, Level, GetName) \
+    Level: inline GetType SwapName(SetType value) \
     { \
         GetType old = this->GetName(); \
         this->SetName(value); \
@@ -55,20 +55,20 @@ namespace tbrpgsca
         return *this; \
     }
 
-#define PROP_FIELD_WITH_SETGET(Class, SetName, SetGetName, WithName, Type, Level, GetName) \
+#define PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Level, GetName) \
     PROP_FIELD_WITH(Class, WithName, Type, Level, SetName) \
-    PROP_FIELD_SETGET(SetGetName, SetName, Type, Type, Level, GetName)
+    PROP_FIELD_SWAP(SwapName, SetName, Type, Type, Level, GetName)
 
-#define PROP_FIELD_SET_ALL(Class, SetName, SetGetName, WithName, Type, Level, GetName, Field) \
+#define PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, Level, GetName, Field) \
     PROP_FIELD_SET(SetName, Type, Level, Field) \
-    PROP_FIELD_WITH_SETGET(Class, SetName, SetGetName, WithName, Type, Level, GetName)
+    PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Level, GetName)
 
-#define PROP_CUSTOM_FIELD(Class, GetName, SetName, WithName, Type, GetLevel, SetLevel, Field) \
+#define PROP_CUSTOM_FIELD(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
     PROP_FIELD_GET_NEW(GetName, Type, GetLevel, Field, protected) \
-    PROP_FIELD_SET_ALL(Class, SetName, GetName, WithName, Type, SetLevel, GetName, Field)
+    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, SetLevel, GetName, Field)
 
 #define PROP_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, GetName, set##PropName, with##PropName, Type, GetLevel, SetLevel, _##GetName) \
+    PROP_CUSTOM_FIELD(Class, GetName, set##PropName, swap##PropName, with##PropName, Type, GetLevel, SetLevel, _##GetName) \
 
 #if (defined(__clang__) || defined(_MSC_VER))
 #define PROP_DECL_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
@@ -77,20 +77,20 @@ namespace tbrpgsca
 #endif
 
 #define PROP_CAMEL_FIELD(Class, Name, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, get##Name, set##Name, with##Name, Type, GetLevel, SetLevel, _##Name)
+    PROP_CUSTOM_FIELD(Class, get##Name, set##Name swap##Name, with##Name, Type, GetLevel, SetLevel, _##Name)
 
 #define PROP_SNAKE_FIELD(Class, Name, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, Name, set_##Name, with_##Name, Type, GetLevel, SetLevel, _##Name)
+    PROP_CUSTOM_FIELD(Class, Name, set_##Name swap_##Name, with_##Name, Type, GetLevel, SetLevel, _##Name)
 
 #define PROP_PASCAL_FIELD(Class, Name, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, Get##Name, Set##Name, With##Name, Type, GetLevel, SetLevel, _##Name)
+    PROP_CUSTOM_FIELD(Class, Get##Name, Set##Name, Swap##Name, With##Name, Type, GetLevel, SetLevel, _##Name)
 
-#define PROP_CUSTOM_REF(Class, GetName, SetName, WithName, Type, GetLevel, SetLevel, Field) \
+#define PROP_CUSTOM_REF(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
     PROP_REF_GET_NEW(GetName, Type, GetLevel, Field, protected) \
-    PROP_FIELD_SET_ALL(Class, SetName, WithName, Type*, SetLevel, GetName, Field)
+    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type*, SetLevel, GetName, Field)
 
 #define PROP_REF(Class, GetName, SetName, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_REF(Class, GetName, set##SetName, with##SetName, Type, GetLevel, SetLevel, _##GetName)
+    PROP_CUSTOM_REF(Class, GetName, set##SetName, swap##SetName, with##SetName, Type, GetLevel, SetLevel, _##GetName)
 
 #define PROP_FLAG_SET(Name, Flag, Level) \
     Level: inline void Name(bool const value) \
@@ -100,12 +100,12 @@ namespace tbrpgsca
 
 #define PROP_FLAG_SET_ALL(Class, PropName, Flag, Level, GetName) \
     PROP_FLAG_SET(set##PropName, Flag, Level) \
-    PROP_FIELD_WITH_SETGET(Class, set##PropName, is##PropName, with##PropName, bool, Level, GetName)
+    PROP_FIELD_WITH_SWAP(Class, set##PropName, swap##PropName, with##PropName, bool, Level, GetName)
 
 #define PROP_FLAG_GET(Name, Flag, Level) \
     Level: inline bool Name() const \
     { \
-        return this->hasFlag(Flag); \
+        return this->hasAllFlags(Flag); \
     }
 
 #define PROP_FLAG(Class, Name, Flag, GetLevel, SetLevel) \
@@ -116,9 +116,13 @@ namespace tbrpgsca
     {
         PROP_FIELD(Play, Flags, flags, int, public, protected)
     public:
-        inline bool hasFlag(int const flag) const
+        inline bool hasAllFlags(int const flag) const
         {
             return (this->_flags & flag) == flag;
+        }
+        inline bool hasOneFlag(int const flag) const
+        {
+            return (this->_flags & flag) != 0;
         }
     protected:
         inline void setFlag(int const flag, bool const value)

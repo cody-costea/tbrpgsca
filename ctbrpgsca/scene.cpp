@@ -139,7 +139,8 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
                         continue;
                     }
                 }
-                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused()))
+                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasOneFlag(FLAG_STUN | FLAG_CONFUSE))
+                         /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
                     (*guardPos) = guardian;
                 }
@@ -533,7 +534,8 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()))
+        if (crActor->_hp > 0 && !(crActor->hasAllFlags(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
+            /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
         {
             crActor->applyStates(&ret, this, true);
         }
@@ -674,7 +676,8 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     if (events != nullptr && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && (*event)(scene, &ret) && (crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused()))
+        if (event != nullptr && (*event)(scene, &ret) && crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
+                /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
         {
             scene.playAi(ret, (*crActor));
         }

@@ -29,6 +29,7 @@ int TargetsModel::rowCount(const QModelIndex& parent) const
             count += party->size();
         }
     }*/
+    Q_UNUSED(parent)
     return this->_scene->_trg_count;//count;
 }
 

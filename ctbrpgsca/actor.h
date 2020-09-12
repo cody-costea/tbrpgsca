@@ -38,28 +38,28 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Costume::isReflecting)
         PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Costume::isInvincible)
         PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Costume::isShapeShifted)
-        PROP_CUSTOM_FIELD(Actor, initiative, setInitiative, withInitive, int, public, public, _init)
-        PROP_CUSTOM_FIELD(Actor, partySide, setPartySide, withPartySide, int, public, public, _side)
-        PROP_FIELD_WITH_SETGET(Actor, setExperience, experience, withExperience, int, public, experience)
-        PROP_FIELD_WITH_SETGET(Actor, setMaximumHp, maximumHp, withMaximumHp, int, public, Role::maximumHp)
-        PROP_FIELD_WITH_SETGET(Actor, setMaximumMp, maximumMp, withMaximumMp, int, public, Role::maximumMp)
-        PROP_FIELD_WITH_SETGET(Actor, setMaximumRp, maximumRp, withMaximumRp, int, public, Role::maximumRp)
-        PROP_FIELD_WITH_SETGET(Actor, setMaxActions, maxActions, withMaxActions, int, public, Costume::maxActions)
-        PROP_FIELD_WITH_SETGET(Actor, setCurrentHp, currentHp, withCurrentHp, int, public, Role::currentHp)
-        PROP_FIELD_WITH_SETGET(Actor, setCurrentMp, currentMp, withCurrentMp, int, public, Role::currentMp)
-        PROP_FIELD_WITH_SETGET(Actor, setCurrentRp, currentRp, withCurrentRp, int, public, Role::currentRp)
-        PROP_FIELD_WITH_SETGET(Actor, setOffense, offense, withOffense, int, public, Costume::offense)
-        PROP_FIELD_WITH_SETGET(Actor, setDefense, defense, withDefense, int, public, Costume::defense)
-        PROP_FIELD_WITH_SETGET(Actor, setAgility, agility, withAgility, int, public, Costume::agility)
-        PROP_FIELD_WITH_SETGET(Actor, setWisdom, wisdom, withWisdom, int, public, Costume::wisdom)
-        PROP_FIELD_WITH_SETGET(Actor, setSpirit, spirit, withSpirit, int, public, Costume::spirit)
-        PROP_FIELD_WITH_SETGET(Actor, setMaxLevel, maxLevel, withMaxLevel, int, public, maxLevel)
-        PROP_FIELD_SET_ALL(Actor, setName, name, withName, QString, public, Role::name, _name)
-        PROP_FIELD_WITH_SETGET(Actor, setRace, race, withRace, Costume&, public, race)
-        PROP_FIELD_WITH_SETGET(Actor, setLevel, level, withLevel, int, public, level)
-        //PROP_FIELD_WITH_SETGET(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
-        PROP_FIELD_SETGET(sprite, setSprite, QString, QString&, public, Role::sprite)
-        PROP_FIELD_WITH_SETGET(Actor, setJob, job, withJob, Costume&, public, job)
+        PROP_CUSTOM_FIELD(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
+        PROP_CUSTOM_FIELD(Actor, partySide, setPartySide, swapPartySide, withPartySide, int, public, public, _side)
+        PROP_FIELD_WITH_SWAP(Actor, setExperience, swapExperience, withExperience, int, public, experience)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, Role::maximumHp)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, Role::maximumMp)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumRp, swapMaximumRp, withMaximumRp, int, public, Role::maximumRp)
+        PROP_FIELD_WITH_SWAP(Actor, setMaxActions, swapMaxActions, withMaxActions, int, public, Costume::maxActions)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentHp, swapCurrentHp, withCurrentHp, int, public, Role::currentHp)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentMp, swapCurrentMp, withCurrentMp, int, public, Role::currentMp)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentRp, swapCurrentRp, withCurrentRp, int, public, Role::currentRp)
+        PROP_FIELD_WITH_SWAP(Actor, setOffense, swapOffense, withOffense, int, public, Costume::offense)
+        PROP_FIELD_WITH_SWAP(Actor, setDefense, swapDefense, withDefense, int, public, Costume::defense)
+        PROP_FIELD_WITH_SWAP(Actor, setAgility, swapAgility, withAgility, int, public, Costume::agility)
+        PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, Costume::wisdom)
+        PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, Costume::spirit)
+        PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
+        PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, Role::name, _name)
+        PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, public, race)
+        PROP_FIELD_WITH_SWAP(Actor, setLevel, swapLevel, withLevel, int, public, level)
+        //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
+        PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, Role::sprite)
+        PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, public, job)
         PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
         PROP_FIELD(Actor, Extra, extra, void*, public, protected)
         PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
@@ -90,18 +90,18 @@ namespace tbrpgsca
         void setElementResistance(int const element, int const res);
         void setStateResistance(State* const state, int const res);
         void setItems(QMap<Ability*, int>* items);
-        inline void setLevel(int const level);
-        inline void setExperience(int const xp);
-        inline void setSprite(QString& value);
-        inline void setJob(Costume& job);
-        inline void setRace(Costume& race);
+        void setLevel(int const level);
+        void setExperience(int const xp);
+        void setSprite(QString& value);
+        void setJob(Costume& job);
+        void setRace(Costume& race);
         void setMaxActions(int const mActions);
-        inline void setMaxLevel(int const maxLv);
-        inline void setAgility(int const agi);
-        inline void setOffense(int const atk);
-        inline void setDefense(int const def);
-        inline void setWisdom(int const wis);
-        inline void setSpirit(int const spi);
+        void setMaxLevel(int const maxLv);
+        void setAgility(int const agi);
+        void setOffense(int const atk);
+        void setDefense(int const def);
+        void setWisdom(int const wis);
+        void setSpirit(int const spi);
         void setMaximumHp(int const mHp);
         void setMaximumMp(int const mMp);
         void setMaximumRp(int const mSp);

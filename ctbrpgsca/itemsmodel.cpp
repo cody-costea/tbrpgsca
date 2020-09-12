@@ -21,6 +21,7 @@ ItemsModel::~ItemsModel()
 
 int ItemsModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent)
     QMap<Ability*, int>* const items = this->_actor->_items;
     return items == nullptr ? 0 : items->size();
 }

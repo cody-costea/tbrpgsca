@@ -21,6 +21,7 @@ SkillsModel::~SkillsModel()
 
 int SkillsModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent)
     return this->_actor->_a_skills->size();
 }
 

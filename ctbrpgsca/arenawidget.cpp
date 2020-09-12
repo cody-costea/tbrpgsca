@@ -46,7 +46,8 @@ void ArenaWidget::afterPlay()
                }
                crActor = arena._cr_actor;
                arena._acts_txt->append(ret); ret.clear();
-               if (arena.isAutomatic() || crActor->_side != 0 || crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged())
+               if (arena.isAutomatic() || crActor->_side != 0 || crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
+                       /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
                {
                    arena._info_txt->setText("");
                    arena.setAiTurn(true);
@@ -698,7 +699,8 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
                 QString& ret = *(arena._ret_str); ret.clear();
                 arena.setAutomatic(true);
                 arena._auto_btn->setText(tr("Manual"));
-                if (crActor->_side == 0 || !(crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()))
+                if (crActor->_side == 0 || !(crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
+                    /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/))
                 {
                     arena.playAi(ret, *crActor);
                     arena.enableControls(false);
@@ -798,7 +800,8 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         arena._actor_run = actorRun;
     }
     Actor* const crActor = arena._cr_actor;
-    if (crActor->_side != 0 || crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged())
+    if (crActor->_side != 0 || crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
+            /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
     {
         arena.playAi(*returnTxt, *crActor);
         arena.enableControls(false);
