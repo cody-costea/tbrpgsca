@@ -24,7 +24,7 @@ Ability& State::removedSkill(int const n) const
 bool State::hasRemovedSkill(Ability& skill) const
 {
     QVector<Ability*>* aSkills = this->_r_skills;
-    return aSkills != nullptr && aSkills->contains(&skill);
+    return aSkills && aSkills->contains(&skill);
 }
 
 int State::removedSkillsSize() const
@@ -65,7 +65,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
             else
             {
                 QMap<State*, int>* const rStates = state._state_dur;
-                if (rStates != nullptr)
+                if (rStates)
                 {
                     auto const rLast = rStates->cend();
                     for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
@@ -115,7 +115,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
             {
                 trgStates->operator[](this) = stateDur;
             }
-            if (user != nullptr && this->isConverted() && target._side != user->_side)
+            if (user && this->isConverted() && target._side != user->_side)
             {
                 target._side = user->_side;
             }
@@ -200,7 +200,7 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
 {
     State& state = *this;
     QMap<State*, int>* sDur = actor._state_dur;
-    if (sDur != nullptr /*&& actor.hp > 0*/)
+    if (sDur /*&& actor.hp > 0*/)
     {
         int const d = sDur->value(this, STATE_END_DUR);
         if (consume)
@@ -223,12 +223,12 @@ void State::blockSkills(Actor& actor, const bool remove)
 {
     State& state = *this;
     QVector<Ability*>* rSkills = state._r_skills;
-    if (rSkills != nullptr)
+    if (rSkills)
     {
         QMap<Ability*, int>* iSkills = actor._skills_cr_qty;
         if (remove)
         {
-            if (iSkills != nullptr)
+            if (iSkills)
             {
                 for (Ability* const skill : *rSkills)
                 {

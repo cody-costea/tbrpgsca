@@ -79,7 +79,7 @@ Actor& Scene::getOrderedPlayer(int const n) const
 bool Scene::hasOrderedPlayer(Actor& player) const
 {
     QVector<Actor*>* players = this->_players;
-    return players != nullptr && players->contains(&player);
+    return players && players->contains(&player);
 }
 
 int Scene::getOrderedPlayersSize() const
@@ -102,7 +102,7 @@ Actor& Scene::getTargetedPlayer(int const n) const
 bool Scene::hasTargetedPlayer(Actor& player) const
 {
     QVector<Actor*>* players = this->_targets;
-    return players != nullptr && players->contains(&player);
+    return players && players->contains(&player);
 }
 
 Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
@@ -145,7 +145,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
                     (*guardPos) = guardian;
                 }
             }
-            if (fGuard != nullptr && lGuard != nullptr)
+            if (fGuard && lGuard)
             {
 #if ALLOW_COVERING
                 target = ((pos < (pSize / 2)) ? fGuard : lGuard);
@@ -168,7 +168,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
                 coverer = actor;
             }
         }
-        if (coverer != nullptr)
+        if (coverer)
         {
             return coverer;
         }
@@ -233,7 +233,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         {
             int cntSize;
             QVector<Ability*>* const counters = target->_counters;
-            if (counters != nullptr && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
+            if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
                     && (target->_side != user._side || target->Costume::isConfused()))
             {
                 int const usrDmgType = ability._dmg_type;
@@ -246,7 +246,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
                         counter = cntSkill;
                     }
                 }
-                if (counter != nullptr)
+                if (counter)
                 {
                     counter->execute(ret, *target, user, false);
                 }
@@ -274,16 +274,16 @@ void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, 
     ret = ret % Scene::PerformsTxt.arg(user._name, ability._name);
     {
         QVector<Actor*>* targets = scene._targets;
-        if (targets != nullptr)
+        if (targets)
         {
             targets->clear();
         }
     }
     QVector<SceneRun*>* events = scene._events;
-    if (events != nullptr && events->size() > EVENT_BEFORE_ACT)
+    if (events && events->size() > EVENT_BEFORE_ACT)
     {
         auto event = events->at(EVENT_BEFORE_ACT);
-        if (event != nullptr && !((*event)(scene, &ret)))
+        if (event && !((*event)(scene, &ret)))
         {
             return;
         }
@@ -328,8 +328,8 @@ void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, 
         for (int i = 0; i < pSize; ++i)
         {
             /*Actor* const trg = party[i];
-            if (targets != nullptr);
-            if (targets != nullptr)
+            if (targets);
+            if (targets)
             {
                 targets->append(trg);
             }*/
@@ -344,17 +344,17 @@ void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, 
     if (item)
     {
         QMap<Ability*, int>* const items = user._items;
-        if (items != nullptr)
+        if (items)
         {
             items->operator[](&ability) = items->value(&ability, 1) - 1;
         }
     }
     this->_last_ability = &ability;
     user.setExperience(this, user._xp + 1);
-    if (events != nullptr && events->size() > EVENT_AFTER_ACT)
+    if (events && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);
-        if (event != nullptr && ((*event)(scene, &ret)))
+        if (event && ((*event)(scene, &ret)))
         {
             scene.endTurn(ret, &user);
         }
@@ -534,7 +534,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->hasAllFlags(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
+        if (crActor->_hp > 0 && !(crActor->hasOneFlag(FLAG_INVINCIBLE | FLAG_KO)
             /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
         {
             crActor->applyStates(&ret, this, true);
@@ -623,7 +623,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
         }
         //crActor->actions = cActions = crActor->mActions;
         QMap<Ability*, int>* const regSkills = crActor->_skills_rg_turn;
-        if (regSkills != nullptr)
+        if (regSkills)
         {
             QMap<Ability*, int>* skillsQty = crActor->_skills_cr_qty;
             if (skillsQty == nullptr)
@@ -661,7 +661,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
             if (shapeShifted && (!crActor->Costume::isShapeShifted()))
             {
                 SpriteRun* const actorEvent = scene._actor_run;
-                if (actorEvent != nullptr)
+                if (actorEvent)
                 {
                     ((*actorEvent)(scene, crActor, nullptr, true, nullptr, nullptr));
                 }
@@ -673,10 +673,10 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     scene._current = current;
     scene._original = current;
     QVector<SceneRun*>* const events = scene._events;
-    if (events != nullptr && events->size() > EVENT_NEW_TURN)
+    if (events && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event != nullptr && (*event)(scene, &ret) && crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
+        if (event && (*event)(scene, &ret) && crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
                 /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
         {
             scene.playAi(ret, (*crActor));
@@ -792,7 +792,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteR
             }
 #endif
         }
-        if (players != nullptr)
+        if (players)
         {
             players->append(party);
         }
@@ -813,7 +813,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteR
     SceneRun* event;
     scene._current = current;
     scene._original = current;
-    if (events != nullptr && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE)) != nullptr) && (*event)(scene, &ret))
+    if (events && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE))) && (*event)(scene, &ret))
     {
         scene.endTurn(ret, crActor);
     }
@@ -834,7 +834,7 @@ Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const 
 Scene::~Scene()
 {
     auto players = this->_players;
-    if (players != nullptr)
+    if (players)
     {
         this->_players = nullptr;
         delete players;

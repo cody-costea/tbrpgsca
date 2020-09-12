@@ -35,7 +35,7 @@ QList<State*> Ability::removedStatesList() const
 bool Ability::removedState(State& state) const
 {
     QMap<State*, int>* aStates = this->_r_states;
-    return aStates != nullptr && aStates->contains(&state);
+    return aStates && aStates->contains(&state);
 }
 
 int Ability::removedStatesSize() const
@@ -75,7 +75,7 @@ void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 
 void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
 {
-    assert(target != nullptr);
+    assert(target);
     Ability& ability = *this;
     int const dmgType = ability._dmg_type | user._dmg_type;
     if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
@@ -141,7 +141,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
             {
                 QMap<State*, int>* aStates = ability._state_dur;
-                if (aStates != nullptr)
+                if (aStates)
                 {
                     auto const last = aStates->cend();
                     for (auto it = aStates->cbegin(); it != last; ++it)
@@ -152,10 +152,10 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             }
             {
                 QMap<State*, int>* stateDur = target->_state_dur;
-                if (stateDur != nullptr)
+                if (stateDur)
                 {
                     QMap<State*, int>* rStates = ability._r_states;
-                    if (rStates != nullptr)
+                    if (rStates)
                     {
                         auto const rLast = rStates->cend();
                         for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
@@ -185,11 +185,11 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             if (ability.isStealing())
             {
                 QMap<Ability*, int>* usrItems = user._items;
-                //if (usrItems != nullptr)
+                //if (usrItems)
                 {
                     int trgItemsSize;
                     QMap<Ability*, int>* trgItems = target->_items;
-                    if (trgItems != nullptr && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
+                    if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
                             && (((std::rand() % 12) + user._agi / 4) > 4 + target->_agi / 3))
                     {
                         int const itemId = std::rand() % trgItemsSize;
@@ -308,7 +308,7 @@ Ability::Ability(Ability& ability) : Role(ability)
 Ability::~Ability()
 {
     QString* const sound = this->_sound;
-    if (sound != nullptr)
+    if (sound)
     {
         delete sound;
     }
