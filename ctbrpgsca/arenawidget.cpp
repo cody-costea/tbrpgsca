@@ -33,7 +33,7 @@ void ArenaWidget::afterPlay()
                {
                    crActor = arena._cr_actor;
                    QVector<Costume*>* usrRoles;
-                   if (((usrRoles = crActor->_dmg_roles) != nullptr) && usrRoles->size() > 0)
+                   if (((usrRoles = crActor->_dmg_roles)) && usrRoles->size() > 0)
                    {
                        arena.setEndTurn(true);
                        arena.endTurn(ret, crActor);
@@ -100,7 +100,7 @@ void ArenaWidget::ActorSprite::playActor(int const spr)
             break;
         case SPR_HIT:
             s = "hit";
-        break;
+            break;
         case SPR_FALL:
             s = "fallen";
             break;
@@ -232,7 +232,7 @@ void ArenaWidget::prepareTargetBox(bool const freeMemory)
     if (freeMemory)
     {
         targetsModel = arena._targets_mdl;
-        if (targetsModel != nullptr)
+        if (targetsModel)
         {
             delete targetsModel;
         }
@@ -355,11 +355,11 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
             bool const portrait = height > width, deleted = (oldSize == nullptr || (portrait != (oldSize->height() > oldSize->width())));
             if (deleted)
             {
-                if (layout != nullptr)
+                if (layout)
                 {
                     delete layout;
                 }
-                if (ctrLayout != nullptr)
+                if (ctrLayout)
                 {
                     delete ctrLayout;
                 }
@@ -560,7 +560,7 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                             {
                                 extras[1] = new SkillsModel(actor);
                             }
-                            if (extras[2] == nullptr && actor._items != nullptr)
+                            if (extras[2] == nullptr && actor._items)
                             {
                                 extras[2] = new ItemsModel(actor);
                             }
@@ -578,7 +578,7 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
 {
     const QSize& newSize = event->size();
     const QSize& oldSize = (event->oldSize());
-    int width = newSize.width(), height = newSize.height();
+    int const width = newSize.width(), height = newSize.height();
     bool const landscape = (width > height);
     if (landscape != (oldSize.width() > oldSize.height()))
     {
@@ -740,20 +740,20 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
                                  Actor* const target, Ability* const counter) -> bool
     {
         ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
-        if (target != nullptr)
+        if (target)
         {
             ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target->_extra)[0]));
             targetSpr.playActor(target->_hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
                 : (((counter->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
-            if (ability != nullptr)
+            if (ability)
             {
                 QString* const spr = ability->_sprite;
-                if (spr != nullptr && spr->length() > 0)
+                if (spr && spr->length() > 0)
                 {
                     targetSpr.playSkill(*spr);
                 }
                 QString* const sndName = ability->_sound;
-                if (sndName != nullptr)
+                if (sndName)
                 {
                     QMediaPlayer* sound = arena._ability_snd;
                     if (sound == nullptr)
@@ -779,7 +779,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             }
         }
         usrSprPlay:
-        if (user != nullptr && user != target)
+        if (user && user != target)
         {
             (*(static_cast<ActorSprite*>(static_cast<void**>(user->_extra)[0]))).playActor(
                 user->_hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
@@ -801,7 +801,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
     }
     Actor* const crActor = arena._cr_actor;
     if (crActor->_side != 0 || crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
-            /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
+        /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
     {
         arena.playAi(*returnTxt, *crActor);
         arena.enableControls(false);
@@ -838,13 +838,13 @@ ArenaWidget::~ArenaWidget()
             void** const extra = static_cast<void**>(player->_extra);
             player->_extra = nullptr;
             ActorSprite* const spr = static_cast<ActorSprite*>(extra[0]);
-            if (spr != nullptr)
+            if (spr)
             {
                 delete spr;
             }
             delete (static_cast<SkillsModel*>(extra[1]));
             void* const itemsExtra = extra[2];
-            if (itemsExtra != nullptr)
+            if (itemsExtra)
             {
                 delete (static_cast<ItemsModel*>(itemsExtra));
             }
@@ -852,12 +852,12 @@ ArenaWidget::~ArenaWidget()
         }
     }
     /*auto song = this->song;
-    if (song != nullptr)
+    if (song)
     {
         delete song;
     }
     auto abilitySnd = this->abilitySnd;
-    if (abilitySnd != nullptr)
+    if (abilitySnd)
     {
         delete abilitySnd;
     }*/

@@ -43,7 +43,7 @@ QList<State*> Role::statesList() const
 bool Role::hasState(State& state) const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates != nullptr && aStates->contains(&state);
+    return aStates && aStates->contains(&state);
 }
 
 int Role::statesSize() const
@@ -94,7 +94,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
         }
         {
             QMap<int, int>* trgResMap = actor._res;
-            if (trgResMap != nullptr)
+            if (trgResMap)
             {
                 int res = DEFAULT_RES;
                 {
@@ -200,7 +200,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
                 ret = ret % Actor::KoTxt.arg(actor.name);
             }*/
         }
-        if (c && absorber != nullptr)
+        if (c && absorber)
         {
             absorber->setCurrentRp(absorber->_sp + dmgSp / 2);
             absorber->setCurrentMp(absorber->_mp + dmgMp / 2);
@@ -244,7 +244,7 @@ Role::Role(Role& role) : Play(role._flags)
 Role::~Role()
 {
     QString* sprite = this->_sprite;
-    if (sprite != nullptr)
+    if (sprite)
     {
         this->_sprite = nullptr;
         delete sprite;

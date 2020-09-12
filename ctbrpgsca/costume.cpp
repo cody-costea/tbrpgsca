@@ -26,7 +26,7 @@ Ability& Costume::addedSkill(int const n) const
 bool Costume::hasAddedSkill(Ability& skill) const
 {
     QVector<Ability*>* aSkills = this->_a_skills;
-    return aSkills != nullptr && aSkills->contains(&skill);
+    return aSkills && aSkills->contains(&skill);
 }
 
 int Costume::addedSkillsSize() const
@@ -43,7 +43,7 @@ Ability& Costume::counterSkill(int const n) const
 bool Costume::hasCounterSkill(Ability& skill) const
 {
     QVector<Ability*>* counters = this->_counters;
-    return counters != nullptr && counters->contains(&skill);
+    return counters && counters->contains(&skill);
 }
 
 int Costume::counterSkillsSize() const
@@ -67,7 +67,7 @@ int Costume::stateResistance(State* const state) const
 bool Costume::isCountering() const
 {
     QVector<Ability*>* counters = this->_counters;
-    return counters != nullptr && counters->size() > 0;
+    return counters && counters->size() > 0;
 }
 
 void Costume::adopt(QString& ret, Actor& actor)
@@ -98,7 +98,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         {
             actor._flags = actorFlags ^ roleFlags;
         }
-        if (costume.isShapeShifted() && costume._sprite != nullptr)
+        if (costume.isShapeShifted() && costume._sprite)
         {
             (*actor._sprite) = *(actor.job()._sprite);
         }
@@ -114,7 +114,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         else
         {
             QVector<Costume*>* const dmgRoles = actor._dmg_roles;
-            if (dmgRoles != nullptr)
+            if (dmgRoles)
             {
                 dmgRoles->removeOne(&costume);
             }
@@ -127,7 +127,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         if (updStates)
         {
             QMap<State*, int>* const cStates = costume._state_dur;
-            if (cStates != nullptr)
+            if (cStates)
             {
                 actor.updateStates(false, ret, scene, *cStates, true);
             }
@@ -158,12 +158,12 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     Costume& costume = *this;
     {
         QVector<Ability*>* skills = costume._a_skills;
-        if (skills != nullptr)
+        if (skills)
         {
             actor.updateSkills(remove, false, *skills);
         }
         skills = costume._counters;
-        if (skills != nullptr)
+        if (skills)
         {
             actor.updateSkills(remove, true, *skills);
         }
@@ -171,7 +171,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     if (updStates)
     {
         QMap<State*, int>* cStates = costume._state_dur;
-        if (cStates != nullptr)
+        if (cStates)
         {
             actor.updateStates(remove, ret, scene, *cStates, false);
         }
@@ -184,7 +184,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
             actor._dmg_type |= costume._dmg_type;
         }
         actor._flags |= cFlags;
-        if (scene != nullptr)
+        if (scene)
         {
 #if ALLOW_COVERING
             if ((cFlags & FLAG_COVERING) == FLAG_COVERING)
@@ -192,7 +192,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
                 scene->setHasCovers(true);
             }
 #endif
-            if (ret != nullptr && (cFlags & FLAG_KO) == FLAG_KO)
+            if (ret && (cFlags & FLAG_KO) == FLAG_KO)
             {
                 scene->checkStatus(*ret);
             }
@@ -200,7 +200,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         if (costume.isShapeShifted())
         {
             QString* const spr = costume._sprite;
-            if (spr != nullptr)
+            if (spr)
             {
                 (*actor._sprite) = *spr;
             }
@@ -232,7 +232,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     if (shapeShift)
     {
         QString* spr = this->_sprite;
-        if (spr != nullptr && spr->length() > 0)
+        if (spr && spr->length() > 0)
         {
             flags |= FLAG_SHAPE_SHIFT;
         }
