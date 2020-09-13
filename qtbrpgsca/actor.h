@@ -61,10 +61,11 @@ namespace tbrpgsca
         PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, sprite)
         PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, public, job)
         PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
+        PROP_FIELD(Actor, Actions, actions, int, public, protected)
         PROP_FIELD(Actor, Extra, extra, void*, public, protected)
         PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
         //PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
-        PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
+        //PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
         PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
         PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
         PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
@@ -118,7 +119,7 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        int _lv, _max_lv, _xp, _maxp, _actions;
+        int _lv, _max_lv, _xp, _maxp;
         QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         QMap<char, Costume*> _equipment;
         QVector<Costume*>* _dmg_roles;

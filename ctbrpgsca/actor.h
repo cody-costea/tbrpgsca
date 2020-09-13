@@ -17,6 +17,7 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
+        #define FLAG_ACTIVE 32768
         #define FLAG_AI_PLAYER 8192
         #define FLAG_RANDOM_AI 16384
         #define FLAG_NEW_ITEMS 4096
@@ -25,6 +26,7 @@ namespace tbrpgsca
         #define CHAR_JOB 2
 
         PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
+        PROP_FLAG(Actor, Active, FLAG_ACTIVE, public, public)
         PROP_FLAG(Actor, AiPlayer, FLAG_AI_PLAYER, public, public)
         PROP_FLAG(Actor, RandomAi, FLAG_RANDOM_AI, public, public)
         PROP_FLAG_SET_ALL(Actor, Ranged, FLAG_RANGE, public, Role::isRanged)
@@ -44,7 +46,7 @@ namespace tbrpgsca
         PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, Role::maximumHp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, Role::maximumMp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumRp, swapMaximumRp, withMaximumRp, int, public, Role::maximumRp)
-        PROP_FIELD_WITH_SWAP(Actor, setMaxActions, swapMaxActions, withMaxActions, int, public, Costume::maxActions)
+        //PROP_FIELD_WITH_SWAP(Actor, setMaxActions, swapMaxActions, withMaxActions, int, public, Costume::maxActions)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentHp, swapCurrentHp, withCurrentHp, int, public, Role::currentHp)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentMp, swapCurrentMp, withCurrentMp, int, public, Role::currentMp)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentRp, swapCurrentRp, withCurrentRp, int, public, Role::currentRp)
@@ -64,7 +66,7 @@ namespace tbrpgsca
         PROP_FIELD(Actor, Extra, extra, void*, public, protected)
         PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
         //PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
-        PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
+        //PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
         PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
         PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
         PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
@@ -95,7 +97,7 @@ namespace tbrpgsca
         void setSprite(QString& value);
         void setJob(Costume& job);
         void setRace(Costume& race);
-        void setMaxActions(int const mActions);
+        //void setMaxActions(int const mActions);
         void setMaxLevel(int const maxLv);
         void setAgility(int const agi);
         void setOffense(int const atk);
@@ -118,7 +120,7 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        int _lv, _max_lv, _xp, _maxp, _actions;
+        int _lv, _max_lv, _xp, _maxp;
         QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         QMap<char, Costume*> _equipment;
         QVector<Costume*>* _dmg_roles;

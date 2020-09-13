@@ -197,7 +197,6 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     this->_wis = wis;
     this->_agi = agi;
     this->_res = res;
-    this->_m_actions = mActions;
     this->_st_res = stRes;
     this->_a_skills = skills;
     int flags = this->_flags;
@@ -259,7 +258,6 @@ Costume::Costume(Costume& costume) : Role(costume)
     this->_agi = costume._agi;
     this->_res = costume._res;
     this->_a_skills = costume._a_skills;
-    this->_m_actions = costume._m_actions;
     this->_st_res = costume._st_res;
 }
 

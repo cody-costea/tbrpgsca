@@ -155,8 +155,8 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
             }
         }
     }
-    coverCheck:
 #if ALLOW_COVERING
+    coverCheck:
     if (this->hasCovers() && (skill._dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK && target->_hp < target->_m_hp / 3)
     {
         Actor* coverer = nullptr;
@@ -521,8 +521,9 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     {
         crActor = scene._cr_actor;
     }
-    int cActions = --(crActor->_actions);
-    while (cActions < 1)
+    bool inactive;
+    crActor->setActive(false);
+    do
     {
         if (crActor->_hp > 0 && !(crActor->hasAnyFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
             /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
@@ -657,8 +658,8 @@ void Scene::endTurn(QString& ret, Actor* crActor)
                 }
             }
         }
-        crActor->_actions = cActions = crActor->Costume::isStunned() ? 0 : crActor->_m_actions;
-    }
+        crActor->setActive(!(inactive = crActor->Costume::isStunned()));
+    } while (inactive);
     scene._cr_actor = crActor;
     scene._current = current;
     scene._original = current;
@@ -751,7 +752,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteR
         for (int j = 0; j < pSize; ++j)
         {
             Actor& player = *(party[j]);
-            player._actions = 0;
+            player.setActive(false);
             if (surprised)
             {
                 player._init = useInit ? -(mInit + 1) : -1;

@@ -265,16 +265,6 @@ void Actor::setCurrentRp(const int sp)
     this->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
 }
 
-void Actor::setMaxActions(const int mActions)
-{
-    Actor& actor = *this;
-    actor._m_actions = mActions;
-    if (mActions < actor._actions)
-    {
-        actor._actions = mActions;
-    }
-}
-
 void Actor::setMaximumHp(const int mHp)
 {
     Actor& actor = *this;
@@ -468,7 +458,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
     Actor& actor = *this;
     actor.removeStates(ret, scene, true);
     actor.refreshCostumes(ret, scene);
-    actor._actions = actor._m_actions;
+    actor.setActive(true);
     actor._hp = actor._m_hp;
     actor._mp = actor._m_mp;
     actor._sp = 0;
@@ -576,7 +566,7 @@ void Actor::updateAttributes(const bool remove, Scene* const scene, Costume& cos
     actor.setMaximumHp(actor._m_hp + (i * costume._m_hp));
     actor.setMaximumMp(actor._m_mp + (i * costume._m_mp));
     actor.setMaximumRp(actor._m_sp + (i * costume._m_sp));
-    actor.setMaxActions(actor._m_actions + (i * costume._m_actions));
+    //actor.setMaxActions(actor._m_actions + (i * costume._m_actions));
     actor._atk += i * costume._atk;
     actor._def += i * costume._def;
     actor._spi += i * costume._spi;
@@ -780,7 +770,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items)
     : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QVector<Ability*>(),
-              nullptr, nullptr, stRes, res)
+              false, nullptr, stRes, res)
 {
     this->_lv = 1;
     this->_xp = 0;
@@ -792,7 +782,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->_skills_rg_turn = nullptr;
     this->_skills_cr_qty = nullptr;
     this->_state_dur = nullptr;
-    this->_actions = mActions;
+    this->setActive(true);
     this->_max_lv = maxLv;
     this->setRace(race);
     this->setJob(job);
