@@ -35,23 +35,6 @@ int Costume::addedSkillsSize() const
     return aSkills == nullptr ? 0 : aSkills->size();
 }
 
-Ability& Costume::counterSkill(int const n) const
-{
-    return *(this->_counters->at(n));
-}
-
-bool Costume::hasCounterSkill(Ability& skill) const
-{
-    QVector<Ability*>* counters = this->_counters;
-    return counters && counters->contains(&skill);
-}
-
-int Costume::counterSkillsSize() const
-{
-    QVector<Ability*>* counters = this->_counters;
-    return counters == nullptr ? 0 : counters->size();
-}
-
 int Costume::elementResistance(const int element) const
 {
     QMap<int, int>* res = this->_res;
@@ -62,12 +45,6 @@ int Costume::stateResistance(State* const state) const
 {
     QMap<State*, int>* stRes = this->_st_res;
     return stRes == nullptr ? 0 : stRes->value(state, 0);
-}
-
-bool Costume::isCountering() const
-{
-    QVector<Ability*>* counters = this->_counters;
-    return counters && counters->size() > 0;
 }
 
 void Costume::adopt(QString& ret, Actor& actor)
@@ -162,11 +139,11 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         {
             actor.updateSkills(remove, false, *skills);
         }
-        skills = costume._counters;
+        /*skills = costume._counters;
         if (skills)
         {
             actor.updateSkills(remove, true, *skills);
-        }
+        }*/
     }
     if (updStates)
     {
@@ -211,7 +188,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
                  bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const skills,
-                 QVector<Ability*>* const counters, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res)
+                 bool const counters, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, elm, range, revive, states)
 {
     this->_atk = atk;
@@ -223,11 +200,14 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     this->_m_actions = mActions;
     this->_st_res = stRes;
     this->_a_skills = skills;
-    this->_counters = counters;
     int flags = this->_flags;
     if (stun)
     {
         flags |= FLAG_STUN;
+    }
+    if (counters)
+    {
+        flags |= FLAG_COUNTER;
     }
     if (shapeShift)
     {
@@ -262,7 +242,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
 
 Costume::Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, bool const counters,
                  QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
               revive, skills, counters, states, stRes, res)

@@ -129,11 +129,6 @@ void State::remove(QString* const ret, Scene* const scene, Actor& actor)
     State& state = *this;
     state.blockSkills(actor, true);
     state.adopt(ret, scene, actor, false, true);
-    if (this->isConverted() && (!actor.isConverted()))
-    {
-        actor._side = static_cast<int>(actor._old_side);
-    }
-
 }
 
 bool State::disable(Actor& actor, int const dur, const bool remove)

@@ -62,7 +62,7 @@ namespace tbrpgsca
         bool hasState(State& state) const;
         int statesSize() const;
 
-        void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
+        Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
 
         bool operator==(Role& role) const;
     protected:

@@ -20,6 +20,7 @@ namespace tbrpgsca
         #define FLAG_ENRAGED 4
         #define FLAG_CONFUSE 8
         #define FLAG_CONVERT 16
+        #define FLAG_COUNTER 2048
         #define FLAG_REFLECT 32
         #define FLAG_SHAPE_SHIFT 64
         #define FLAG_INVINCIBLE 128
@@ -33,6 +34,7 @@ namespace tbrpgsca
         PROP_FLAG_GET(isConfused, FLAG_CONFUSE, public)
         PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
         PROP_FLAG_GET(isConverted, FLAG_CONVERT, public)
+        PROP_FLAG_GET(isCountering, FLAG_COUNTER, public)
         PROP_FLAG_GET(isReflecting, FLAG_REFLECT, public)
         PROP_FLAG_GET(isInvincible, FLAG_INVINCIBLE, public)
         PROP_FLAG_GET(isShapeShifted, FLAG_SHAPE_SHIFT, public)
@@ -45,8 +47,6 @@ namespace tbrpgsca
     public:
         static QString CausesTxt;
 
-        bool isCountering() const;
-
         int elementResistance(int const element) const;
         int stateResistance(State* const state) const;
 
@@ -54,17 +54,13 @@ namespace tbrpgsca
         bool hasAddedSkill(Ability& skill) const;
         int addedSkillsSize() const;
 
-        Ability& counterSkill(int const n) const;
-        bool hasCounterSkill(Ability& skill) const;
-        int counterSkillsSize() const;
-
         void adopt(QString& ret, Actor& actor);
         void abandon(QString& ret, Actor& actor);
         void apply(QString& ret, Actor& actor);
 
         Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, bool const counters,
                 QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res);
 
         Costume(Costume& costume);
@@ -72,7 +68,7 @@ namespace tbrpgsca
         ~Costume();
     protected:
         int _atk, _def, _spi, _wis, _agi, _m_actions;
-        QVector<Ability*>* _a_skills,* _counters;
+        QVector<Ability*>* _a_skills;
         QMap<State*, int>* _st_res;
         QMap<int, int>* _res;
 
@@ -83,7 +79,7 @@ namespace tbrpgsca
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
                 bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const skills,
-                QVector<Ability*>* const counters, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res);
+                bool const counters, QMap<State*, int>* const states, QMap<State*, int>* const stRes, QMap<int, int>* const res);
 
         friend class Actor;
         friend class Ability;

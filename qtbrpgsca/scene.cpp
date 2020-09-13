@@ -139,7 +139,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
                         continue;
                     }
                 }
-                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasOneFlag(FLAG_STUN | FLAG_CONFUSE))
+                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasAnyFlag(FLAG_STUN | FLAG_CONFUSE | FLAG_CONVERT))
                          /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
                     (*guardPos) = guardian;
@@ -155,8 +155,8 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
             }
         }
     }
-    coverCheck:
 #if ALLOW_COVERING
+    coverCheck:
     if (this->hasCovers() && (skill._dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK && target->_hp < target->_m_hp / 3)
     {
         Actor* coverer = nullptr;
@@ -534,7 +534,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->hasOneFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
+        if (crActor->_hp > 0 && !(crActor->hasAnyFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
             /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
         {
             crActor->applyStates(&ret, this, true);
@@ -676,7 +676,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     if (events && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event && (*event)(scene, &ret) && crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
+        if (event && (*event)(scene, &ret) && crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
                 /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
         {
             scene.playAi(ret, (*crActor));

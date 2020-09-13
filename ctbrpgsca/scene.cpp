@@ -107,12 +107,12 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 
 Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
 {
-    int const side = target->_old_side;
+    int const side = target->_side;
 #if ALLOW_NO_GUARDS
     if (this->usesGuards())
 #endif
     {
-        if (user._old_side != side && ((!skill.isRanged()) && ((!user.Role::isRanged()) || skill.isOnlyMelee())))
+        if (user._side != side && ((!skill.isRanged()) && ((!user.Role::isRanged()) || skill.isOnlyMelee())))
         {
             int pos = -1;
             Actor* fGuard = nullptr,* lGuard = nullptr;
@@ -139,7 +139,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
                         continue;
                     }
                 }
-                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasOneFlag(FLAG_STUN | FLAG_CONFUSE))
+                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasAnyFlag(FLAG_STUN | FLAG_CONVERT | FLAG_CONFUSE))
                          /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
                     (*guardPos) = guardian;
@@ -231,25 +231,11 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         if (ability._hp > -1)
         //if (!healing)
         {
-            int cntSize;
-            QVector<Ability*>* const counters = target->_counters;
-            if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
-                    && (target->_side != user._side || target->Costume::isConfused()))
+            if (target->isCountering() && (!target->Costume::isStunned())
+                    && (target->_side != user._side || target->hasAnyFlag(FLAG_CONFUSE | FLAG_ENRAGED | FLAG_CONVERT)))
             {
-                int const usrDmgType = ability._dmg_type;
-                for (int i = 0; i < cntSize; ++i)
-                {
-                    Ability* const cntSkill = counters->at(i);
-                    int cntDmgType = cntSkill->_dmg_type;
-                    if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == nullptr || (cntSkill->_hp > counter->_hp)))
-                    {
-                        counter = cntSkill;
-                    }
-                }
-                if (counter)
-                {
-                    counter->execute(ret, *target, user, false);
-                }
+                counter = target->_a_skills->operator[](0);
+                counter->execute(ret, *target, user, false);
             }
         }
         SpriteRun* const actorEvent = scene._actor_run;
@@ -259,7 +245,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
             QVector<Actor*>* targets = scene._targets;
             if (targets == nullptr)
             {
-                targets = new QVector<Actor*>(scene._parties[target->_old_side]->size());
+                targets = new QVector<Actor*>(scene._parties[target->_side]->size());
                 scene._targets = targets;
             }
             targets->append(target);
@@ -322,7 +308,7 @@ void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, 
     else if (ability.targetsSide())
     {
         //QVector<Actor*>* const targets = scene.targets;
-        int const side = ability.targetsSelf() ? user._side : target._old_side;
+        int const side = ability.targetsSelf() ? user._side : target._side;
         QVector<Actor*>& party = *(scene._parties[side]);
         int const pSize = party.size();
         for (int i = 0; i < pSize; ++i)
@@ -396,7 +382,7 @@ void Scene::playAi(QString& ret, Actor& player)
         side = player._side;
         party = parties[side];
         sSize = party->size();
-        if (!(player.Costume::isEnraged()))
+        if (!(player.hasAnyFlag(FLAG_ENRAGED | FLAG_CONFUSE | FLAG_CONVERT)))
         {
             for (int i = 0; i < sSize; ++i)
             {
@@ -436,7 +422,11 @@ void Scene::playAi(QString& ret, Actor& player)
             {
                 {
                     int trgSide;
-                    if (side > -1 && pSize == 2)
+                    if (player.isConverted())
+                    {
+                        trgSide = side;
+                    }
+                    else if (side > -1 && pSize == 2)
                     {
                         trgSide = side == 0 ? 1 : 0;
                     }
@@ -534,7 +524,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->hasOneFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
+        if (crActor->_hp > 0 && !(crActor->hasAnyFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
             /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
         {
             crActor->applyStates(&ret, this, true);
@@ -676,7 +666,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     if (events && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event && (*event)(scene, &ret) && crActor->hasOneFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
+        if (event && (*event)(scene, &ret) && crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONVERT | FLAG_ENRAGED | FLAG_CONFUSE)
                 /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
         {
             scene.playAi(ret, (*crActor));
@@ -783,7 +773,6 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteR
                 //player.setRandomAi(true);
                 player.setAiPlayer(true);
             }
-            player._old_side = i;
             player._side = i;
 #if ALLOW_COVERING
             if (player.Costume::isCovering())

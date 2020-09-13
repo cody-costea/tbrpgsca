@@ -18,7 +18,7 @@ namespace tbrpgsca
     class Actor : public Costume
     {
         #define FLAG_AI_PLAYER 8192
-        #define FLAG_RANDOM_AI 2048
+        #define FLAG_RANDOM_AI 16384
         #define FLAG_NEW_ITEMS 4096
         #define CHAR_NONE 0
         #define CHAR_RACE 1
@@ -147,7 +147,6 @@ namespace tbrpgsca
         void refreshCostumes(QString* const ret, Scene* const scene);
 
     private:
-        int _old_side;
 
         friend class Scene;
         friend class Ability;

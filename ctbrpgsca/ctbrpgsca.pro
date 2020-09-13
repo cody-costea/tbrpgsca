@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core gui
-QT += multimedia
-QT += opengl
+QT += core gui multimedia opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,9 +23,7 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++17
-CONFIG += resources_big
-CONFIG += qtquickcompiler
+CONFIG += c++17 resources_big qtquickcompiler
 
 SOURCES += \
         ability.cpp \

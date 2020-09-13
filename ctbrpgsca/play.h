@@ -120,7 +120,7 @@ namespace tbrpgsca
         {
             return (this->_flags & flag) == flag;
         }
-        inline bool hasOneFlag(int const flag) const
+        inline bool hasAnyFlag(int const flag) const
         {
             return (this->_flags & flag) != 0;
         }

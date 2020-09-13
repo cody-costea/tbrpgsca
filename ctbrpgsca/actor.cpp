@@ -661,7 +661,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
 void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)
 {
     Actor& actor = *this;
-    QVector<Ability*>* aSkills = counters ? actor._counters : actor._a_skills;
+    QVector<Ability*>* aSkills = actor._a_skills;
     if (remove)
     {
         if (aSkills)
@@ -693,14 +693,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
         if (aSkills == nullptr)
         {
             aSkills = new QVector<Ability*>();
-            if (counters)
-            {
-                this->_counters = aSkills;
-            }
-            else
-            {
-                this->_a_skills = aSkills;
-            }
+            this->_a_skills = aSkills;
         }
         for (Ability* const ability : skills)
         {
@@ -795,7 +788,6 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->_side = 0;
     this->_init = 0;
     this->_side = 0;
-    this->_old_side = 0;
     this->_dmg_roles = nullptr;
     this->_skills_rg_turn = nullptr;
     this->_skills_cr_qty = nullptr;
@@ -814,7 +806,6 @@ Actor::Actor(Actor& actor) : Costume(actor)
 {
     this->_init = 0;//actor.init;
     this->_side = 0;//actor.side;
-    this->_old_side = 0;
     /*this->setJob(actor.getJob());
     this->setRace(actor.getRace());
     this->setExperience(actor.xp);*/
@@ -893,7 +884,7 @@ Actor::Actor(Actor& actor) : Costume(actor)
             this->_a_skills = nSkillsRgTurn;
         }
     }
-    {
+    /*{
         QVector<Ability*>* skillsRgTurn = actor._counters;
         if (skillsRgTurn == nullptr)
         {
@@ -905,7 +896,7 @@ Actor::Actor(Actor& actor) : Costume(actor)
             (*nSkillsRgTurn) = (*skillsRgTurn);
             this->_counters = nSkillsRgTurn;
         }
-    }
+    }*/
     this->_extra = actor._extra;
 }
 
