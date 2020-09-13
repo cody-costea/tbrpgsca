@@ -1,52 +1,81 @@
 /*
-Copyright (C) AD 2018 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-
 #ifndef ABILITY_H
 #define ABILITY_H
 
-#include <QString>
-#include <state.h>
+#include "role.h"
 
-namespace qtbrpgsca
+namespace tbrpgsca
 {
-    struct State;
 
-    struct Ability
+    class Actor;
+    class Scene;
+
+    class Ability : public Role
     {
+        #define FLAG_MELEE 4
+        #define FLAG_STEAL 8
+        #define FLAG_ABSORB 16
+        #define FLAG_MISSABLE 32
+        #define FLAG_TRG_ALL 4
+        #define FLAG_TRG_SIDE 128
+        #define FLAG_TRG_SELF 64
+        #define FLAG_TRG_ONE 0
+        #define DEFAULT_RES 3
+
+        PROP_FLAG_GET(canMiss, FLAG_MISSABLE, public)
+        PROP_FLAG_GET(isStealing, FLAG_STEAL, public)
+        PROP_FLAG_GET(isOnlyMelee, FLAG_MELEE, public)
+        PROP_FLAG_GET(targetsAll, FLAG_TRG_ALL, public)
+        PROP_FLAG_GET(isAbsorbing, FLAG_ABSORB, public)
+        PROP_FLAG_GET(targetsSide, FLAG_TRG_SIDE, public)
+        PROP_FLAG_GET(targetsSelf, FLAG_TRG_SELF, public)
+        PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
+        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
+        PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
+        PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
     public:
-        QString name, anim, audio;
-        int id, trg, hpc, mpc, spc, lvrq, atki, hpdmg, mpdmg, spdmg,
-        dmgtype, element, qty, mqty, rqty, tqty, staten, rstaten;
-        bool steal, absorb, range, restore;
-        State** state,** rstate;
+        static QString MissesTxt;
+        static QString ReflectTxt;
+        static QString StolenTxt;
 
-        Ability(int id, QString name, QString anim, QString audio, bool steal,
-                bool range, int lvrq, int hpc, int mpc, int spc, int dmgtype,
-                int atkp, int hpdmg, int mpdmg, int spdmg, int trg, int element,
-                int mqty, int rqty, bool absorb, bool restore, State** state,
-                int staten, State** rstate, int rstaten);
+        QList<State*> removedStatesList() const;
+        int removedStateDuration(State& state) const;
+        bool removedState(State& state) const;
+        int removedStatesSize() const;
 
-        Ability(int id, QString name, QString anim, QString audio, int hpdmg,
-                int mpdmg, int spdmg, int trg, int element, bool restore,
-                State** state, int staten, State** rstate, int rstaten);
+        bool canPerform(Actor& user);
+        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
+        void replenish(Actor& user);
 
-        Ability();
+        Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
+                int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
+                int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
+
+        Ability(Ability& ability);
 
         ~Ability();
+    protected:
+        int _lv_rq, _attr_inc, _m_qty, _r_qty;
+        QMap<State*, int>* _r_states;
+        QString* _sound;
+
+        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
+
+        friend class Actor;
+        friend class Costume;
+        friend class ArenaWidget;
+        friend class SkillsModel;
+        friend class ItemsModel;
+        friend class State;
+        friend class Scene;
     };
 
 }
+
 #endif // ABILITY_H

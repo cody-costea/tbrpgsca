@@ -571,19 +571,5 @@
         <file>sprites/Santa/bt_r_ko.mng</file>
         <file>sprites/Santa/bt_r_restored.gif</file>
         <file>sprites/Santa/bt_r_restored.mng</file>
-        <file>ability.cpp</file>
-        <file>ability.h</file>
-        <file>actor.cpp</file>
-        <file>actor.h</file>
-        <file>demolib.h</file>
-        <file>job.cpp</file>
-        <file>job.h</file>
-        <file>main.cpp</file>
-        <file>race.cpp</file>
-        <file>race.h</file>
-        <file>sceneact.cpp</file>
-        <file>sceneact.h</file>
-        <file>state.cpp</file>
-        <file>state.h</file>
     </qresource>
 </RCC>
