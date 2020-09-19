@@ -54,6 +54,7 @@ namespace tbrpgsca
         PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, wisdom)
         PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, spirit)
         PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
+        PROP_FIELD_SET_ALL(Actor, setDmgType, sawpDmgType, withDmgType, int, public, dmgType, _dmg_type)
         PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, name, _name)
         PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, public, race)
         PROP_FIELD_WITH_SWAP(Actor, setLevel, swapLevel, withLevel, int, public, level)

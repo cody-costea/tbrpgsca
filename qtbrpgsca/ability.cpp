@@ -272,7 +272,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_attr_inc = attrInc;
     this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
     this->_r_states = rStates;
-    int flags = this->_flags;
+    int flags = this->flags();
     if (canMiss)
     {
         flags |= FLAG_MISSABLE;
@@ -290,7 +290,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
         flags |= FLAG_ABSORB;
     }
     flags |= trg;
-    this->_flags = flags;
+    this->setFlags(flags);
 }
 
 Ability::Ability(Ability& ability) : Role(ability)

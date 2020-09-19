@@ -46,7 +46,7 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(maximumHp, int, public, _m_hp)
         PROP_FIELD_GET_CUSTOM(maximumMp, int, public, _m_mp)
         PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _m_sp)
-        PROP_FIELD_GET_CUSTOM(dmgElement, int, public, _dmg_type)
+        PROP_FIELD_GET_CUSTOM(dmgType, int, public, _dmg_type)
         PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
         PROP_FIELD_GET_CUSTOM(id, int, public, _id)
     public:

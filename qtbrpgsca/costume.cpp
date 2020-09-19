@@ -92,11 +92,11 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
     actor.updateResistance(remove, costume._res, costume._st_res);
     if (remove)
     {
-        int const roleFlags = costume._flags;
-        int const actorFlags = actor._flags;
+        int const roleFlags = costume.flags();
+        int const actorFlags = actor.flags();
         if ((actorFlags & roleFlags) == roleFlags)
         {
-            actor._flags = actorFlags ^ roleFlags;
+            actor.setFlags(actorFlags ^ roleFlags);
         }
         if (costume.isShapeShifted() && costume._sprite)
         {
@@ -104,11 +104,11 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         }
         if (costume._hp == 0 && costume._mp == 0 && costume._sp == 0)
         {
-            int const roleElm = costume._dmg_type;
-            int const actorElm = actor._dmg_type;
+            int const roleElm = costume.dmgType();
+            int const actorElm = actor.dmgType();
             if ((actorElm & roleElm) == roleElm)
             {
-                actor._dmg_type = actorElm ^ roleElm;
+                actor.setDmgType(actorElm ^ roleElm);
             }
         }
         else
