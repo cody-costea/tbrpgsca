@@ -273,7 +273,7 @@ public extension Scene where Self: AnyObject {
             crActor.actions = cActions
             var retOption: String? = ret
             while cActions < 1 {
-                if crActor.hp > 0 && !(crActor.invincible && crActor.knockedOut && crActor.stunned) {
+                if crActor.hp > 0 && !(/*crActor.invincible || */crActor.knockedOut || crActor.stunned) {
                     crActor.applyStates(ret: &retOption, consume: true)
                 }
                 var mInit = self.mInit
