@@ -132,7 +132,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             {
                 def += std::rand() % (def / 2);
                 dmg += std::rand() % (dmg / 2);
-                dmg = (ability._attr_inc + (dmg / i)) - ((def / i) / 2);
+                dmg = (/*ability._attr_inc +*/ (dmg / i)) - ((def / i) / 2);
                 if (dmg < 0)
                 {
                     dmg = 0;
@@ -261,15 +261,15 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
 }
 
 Ability::Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
-                 int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
-                 int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
+                 int const hpC, int const mpC, int const spC, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
+                 int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
     this->_lv_rq = lvRq;
     this->_m_qty = mQty;
     this->_r_qty = rQty;
     this->_dmg_type = dmgType;
-    this->_attr_inc = attrInc;
+    //this->_attr_inc = attrInc;
     this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
     this->_r_states = rStates;
     int flags = this->_flags;
@@ -300,7 +300,7 @@ Ability::Ability(Ability& ability) : Role(ability)
     this->_m_qty = ability._m_qty;
     this->_r_qty = ability._r_qty;
     this->_dmg_type = ability._dmg_type;
-    this->_attr_inc = ability._attr_inc;
+    //this->_attr_inc = ability._attr_inc;
     this->_state_dur = ability._state_dur;
     this->_r_states = ability._r_states;
 }

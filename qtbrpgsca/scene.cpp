@@ -534,8 +534,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0 && !(crActor->hasAnyFlag(FLAG_INVINCIBLE | FLAG_KO | FLAG_STUN)
-            /*crActor->Costume::isInvincible() && crActor->Costume::isKnockedOut() && crActor->Costume::isStunned()*/))
+        if (crActor->_hp > 0)
         {
             crActor->applyStates(&ret, this, true);
         }

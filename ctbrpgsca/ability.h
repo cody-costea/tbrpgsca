@@ -36,7 +36,7 @@ namespace tbrpgsca
         PROP_FLAG_GET(targetsSide, FLAG_TRG_SIDE, public)
         PROP_FLAG_GET(targetsSelf, FLAG_TRG_SELF, public)
         PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
-        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
+        //PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
         PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
         PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
     public:
@@ -54,14 +54,14 @@ namespace tbrpgsca
         void replenish(Actor& user);
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
-                int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
-                int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
+                int const hpCost, int const mpCost, int const spCost, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
+                int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 
         Ability(Ability& ability);
 
         ~Ability();
     protected:
-        int _lv_rq, _attr_inc, _m_qty, _r_qty;
+        int _lv_rq, _m_qty, _r_qty;
         QMap<State*, int>* _r_states;
         QString* _sound;
 
