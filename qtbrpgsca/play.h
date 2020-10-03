@@ -157,9 +157,7 @@ namespace tbrpgsca
             return *this;
         }
 
-        Play();
-
-        Play(int const flags);
+        Play(QObject* const parent = nullptr, int const flags = 0);
 
         ~Play();
     };

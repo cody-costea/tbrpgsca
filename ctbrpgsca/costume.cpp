@@ -126,7 +126,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
 void Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
-    ret = ret % QString(Costume::CausesTxt).arg(actor._name, role._name);
+    ret += QString(Costume::CausesTxt).arg(actor._name, role._name);
     role.damage(ret, scene, nullptr, actor, std::rand() % 4, true);
 }
 

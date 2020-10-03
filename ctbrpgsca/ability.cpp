@@ -80,7 +80,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     int const dmgType = ability._dmg_type | user._dmg_type;
     if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
     {
-        ret = ret % Ability::ReflectTxt.arg(target->_name);
+        ret += Ability::ReflectTxt.arg(target->_name);
         target = &user;
     }
     {
@@ -228,7 +228,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                                 {
                                     trgItems->operator[](stolen) = trgItemQty - 1;
                                 }
-                                ret = ret % Ability::StolenTxt.arg(stolen->_name, target->_name);
+                                ret += Ability::StolenTxt.arg(stolen->_name, target->_name);
                             }
                         //}
                     }
@@ -237,7 +237,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         }
         else
         {
-            ret = ret % Ability::MissesTxt.arg(target->_name);
+            ret += Ability::MissesTxt.arg(target->_name);
         }
     }
     if (applyCosts)

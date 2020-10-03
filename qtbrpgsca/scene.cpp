@@ -194,7 +194,7 @@ void Scene::checkStatus(QString& ret)
                 }
             }
             scene._status = -2;
-            ret = ret % Scene::FallenTxt;
+            ret += Scene::FallenTxt;
             return;
         }
         enemyCheck:
@@ -212,7 +212,7 @@ void Scene::checkStatus(QString& ret)
                     }
                 }
             }
-            ret = ret % Scene::VictoryTxt;
+            ret += Scene::VictoryTxt;
             scene._status = 1;
         }
     }
@@ -271,7 +271,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
 void Scene::perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item)
 {
     Scene& scene = *this;
-    ret = ret % Scene::PerformsTxt.arg(user._name, ability._name);
+    ret += Scene::PerformsTxt.arg(user._name, ability._name);
     {
         QVector<Actor*>* const targets = scene._targets;
         if (targets)
@@ -681,7 +681,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
             scene.playAi(ret, (*crActor));
         }
     }
-    ret = ret % ".";
+    ret += ".";
 
 }
 

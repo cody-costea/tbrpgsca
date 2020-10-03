@@ -9,11 +9,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-Play::Play(int const flags)
+Play::Play(QObject* const parent, int const flags) : QObject(parent)
 {
     this->_flags = flags;
 }
-
-Play::Play() : Play(0) {}
 
 Play::~Play() {}
