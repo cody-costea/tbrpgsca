@@ -10,6 +10,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QGridLayout>
 #include <QComboBox>
 #include <QDebug>
+#include <QTimer>
 
 using namespace tbrpgsca;
 
@@ -740,8 +741,17 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
                                  Actor* const target, Ability* const counter) -> bool
     {
         ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
+#if TRG_SPR_DELAY < 0
         if (target)
         {
+#else
+        if (target && target != user)
+        {
+            ++(arena._spr_runs);
+            QTimer::singleShot(TRG_SPR_DELAY, &arena, [&arena, target, revive, counter, ability]()
+            {
+                --(arena._spr_runs);
+#endif
             ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target->_extra)[0]));
             targetSpr.playActor(target->_hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
                 : (((counter->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
@@ -751,7 +761,8 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
                 if (spr && spr->length() > 0)
                 {
                     targetSpr.playSkill(*spr);
-                }
+                }                
+#if TRG_SPR_DELAY < 0
                 QString* const sndName = ability->_sound;
                 if (sndName)
                 {
@@ -781,6 +792,40 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         usrSprPlay:
         if (user && user != target)
         {
+#else
+            }});
+        }
+        if (user)
+        {
+            if (ability)
+            {
+                QString* const sndName = ability->_sound;
+                if (sndName)
+                {
+                    QMediaPlayer* sound = arena._ability_snd;
+                    if (sound == nullptr)
+                    {
+                        sound = new QMediaPlayer(&arena);
+                        connect(sound, &QMediaPlayer::stateChanged, [&arena](QMediaPlayer::State state)
+                        {
+                            if (state == QMediaPlayer::StoppedState)
+                            {
+                                arena.afterPlay();
+                            }
+                        });
+                        arena._ability_snd = sound;
+                    }
+                    else if (sound->state() == QMediaPlayer::PlayingState)
+                    {
+                        goto usrSprPlay;
+                    }
+                    arena._spr_runs++;
+                    sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
+                    sound->play();
+                }
+            }
+            usrSprPlay:
+#endif
             (*(static_cast<ActorSprite*>(static_cast<void**>(user->_extra)[0]))).playActor(
                 user->_hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
             : ((ability->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));

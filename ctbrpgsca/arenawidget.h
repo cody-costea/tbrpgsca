@@ -46,6 +46,8 @@ namespace tbrpgsca
         #define FLAG_AUTOMATIC 4
         #define FLAG_END_TURN 16
 
+        #define TRG_SPR_DELAY -1
+
         PROP_FLAG(ArenaWidget, AiTurn, FLAG_AI_TURN, public, public)
         PROP_FLAG(ArenaWidget, Automatic, FLAG_AUTOMATIC, public, public)
         PROP_FLAG(ArenaWidget, EndTurn, FLAG_END_TURN, public, public)
