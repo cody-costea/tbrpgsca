@@ -68,7 +68,8 @@ namespace tbrpgsca
         int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
         QMap<State*, int>* _state_dur;
 
-        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
+        template <typename SpriteRun>
+        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent, SpriteRun* const spriteRun);
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);

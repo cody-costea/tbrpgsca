@@ -10,7 +10,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "costume.h"
 #include "actor.h"
 #include "state.h"
-#include "scene.h"
+#include "arenawidget.h"
 
 #include <QStringBuilder>
 
@@ -59,10 +59,12 @@ bool Role::operator==(Role& role) const
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
 {
-    return this->damage(ret, nullptr, absorber, target, dmg, percent);
+    Scene::SpriteCall* const spr = nullptr;
+    return this->damage(ret, nullptr, absorber, target, dmg, percent, spr);
 }
 
-void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
+template <typename SpriteRun>
+void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent, SpriteRun* const spriteRun)
 {
     Role& role = *this;
     if (!actor.Costume::isInvincible())
@@ -194,7 +196,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
                 ret += "+";
             }
             ret += (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
-            actor.setCurrentHp(actor._hp - dmgHp, &ret, scene, percent);
+            actor.setCurrentHp(actor._hp - dmgHp, &ret, scene, percent, spriteRun);
             /*if (actor.hp < 1)
             {
                 ret += Actor::KoTxt.arg(actor.name);
@@ -204,7 +206,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
         {
             absorber->setCurrentRp(absorber->_sp + dmgSp / 2);
             absorber->setCurrentMp(absorber->_mp + dmgMp / 2);
-            absorber->setCurrentHp(absorber->_hp + dmgHp / 2, &ret, scene, true);
+            absorber->setCurrentHp(absorber->_hp + dmgHp / 2, &ret, scene, true, spriteRun);
         }
     }
 }
@@ -250,3 +252,6 @@ Role::~Role()
         delete sprite;
     }
 }
+
+template void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent, ArenaWidget* const spriteRun);
+template void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent, Scene::SpriteCall* const spriteRun);

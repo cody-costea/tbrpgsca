@@ -46,7 +46,7 @@ namespace tbrpgsca
         #define FLAG_AUTOMATIC 4
         #define FLAG_END_TURN 16
 
-        #define TRG_SPR_DELAY -1
+        #define TRG_SPR_DELAY 400
 
         PROP_FLAG(ArenaWidget, AiTurn, FLAG_AI_TURN, public, public)
         PROP_FLAG(ArenaWidget, Automatic, FLAG_AUTOMATIC, public, public)
@@ -90,16 +90,20 @@ namespace tbrpgsca
 
             friend class ArenaWidget;
         };
+
         void afterAct();
         void afterPlay();
         void prepareItemsBox(Actor& actor);
         void prepareTargetBox(bool const freeMemory);
+        Actor* getPlayerFromTargetBox(int const index);
         void prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
         void recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
-        Actor* getPlayerFromTargetBox(int const index);
 
         void operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
+
+        bool operator()(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
+                       Actor* const target, Ability* const counter);
 
         QString* _ret_str;
         int _spr_runs, _trg_count;
@@ -117,6 +121,10 @@ namespace tbrpgsca
     signals:
 
         friend class TargetsModel;
+        friend class Ability;
+        friend class Actor;
+        friend class Scene;
+        friend class Role;
 
     };
 

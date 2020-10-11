@@ -7,6 +7,15 @@
 
 using namespace tbrpgsca;
 
+/*extern template void Scene::endTurn<ArenaWidget>(QString& ret, Actor* const actor, ArenaWidget* const spriteRun);
+extern template void Scene::playAi<ArenaWidget>(QString& ret, Actor& player, ArenaWidget* const spriteRun);
+extern template void Scene::perform<ArenaWidget>(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item, ArenaWidget* const spriteRun);
+extern template void Scene::operator()<ArenaWidget>(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
+                                                    bool const useGuards, int const surprise, int const mInit);
+extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
+                             bool const useGuards, int const surprise, int const mInit);*/
+
+
 int main(int argc, char* argv[])
 {
     srand(time(0));

@@ -41,7 +41,7 @@ namespace tbrpgsca
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                   Actor* const target, Ability* const counter)> SpriteRun;
+                                   Actor* const target, Ability* const counter)> SpriteCall;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -51,9 +51,15 @@ namespace tbrpgsca
 
         static bool actorAgiComp(Actor* const a, Actor* const b);
 
-        void playAi(QString& ret, Actor& player);
-        void endTurn(QString& ret, Actor* const actor);
-        void perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
+        template <typename SpriteRun>
+        void endTurn(QString& ret, Actor* const actor, SpriteRun* const spriteRun);
+
+        template <typename SpriteRun>
+        void perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item, SpriteRun* const spriteRun);
+
+        template <typename SpriteRun>
+        void playAi(QString& ret, Actor& player, SpriteRun* const spriteRun);
+
         void checkStatus(QString& ret);
         void escape(QString& ret);
 
@@ -81,9 +87,11 @@ namespace tbrpgsca
         int getCurrent() const;
         int getStatus() const;
 
+        template <typename SpriteRun>
         void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
                           bool const useGuards, int const surprise, int const mInit);
 
+        template <typename SpriteRun>
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
               bool const useGuards, int const surprise, int const mInit);
 
@@ -96,12 +104,14 @@ namespace tbrpgsca
         int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
         QVector<Actor*>* _players,* _targets;
         QVector<QVector<Actor*>*> _parties;
-        SpriteRun* _actor_run;
+        //SpriteRun* _actor_run;
         Actor* _cr_actor;
 
         void agiCalc();
-        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
+
+        template <typename SpriteRun>
+        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts, SpriteRun* const actorEvent);
 
         friend class Actor;
         friend class Ability;

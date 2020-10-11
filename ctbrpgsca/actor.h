@@ -128,16 +128,13 @@ namespace tbrpgsca
         void levelUp(Scene* const scene);
         inline void checkRegSkill(Ability& skill);
         void recover(QString* const ret, Scene* const scene);
-        void applyDmgRoles(QString& ret, Scene* const scene);
         void removeStates(QString* const ret, Scene* const scene, bool const remove);
-        void applyStates(QString* const ret, Scene* const scene, bool const consume);
         void updateStates(bool const remove, QString* const ret, Scene* const scene,
                             QMap<State*, int>& states, bool const includeWithDur);
         void updateAttributes(bool const remove, Scene* const scene, Costume& costume);
         void updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
         void switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
-        void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
         void setExperience(Scene* const scene, int const xp);
         void setLevel(Scene* const scene, int const level);
         void setRace(Scene* const scene, Costume& race);
@@ -147,6 +144,15 @@ namespace tbrpgsca
         Costume* unequipPos(Scene* const scene, char const pos);
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
         void refreshCostumes(QString* const ret, Scene* const scene);
+
+        template <typename SpriteRun>
+        void applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const actorEvent);
+
+        template <typename SpriteRun>
+        void applyStates(QString* const ret, Scene* const scene, bool const consume, SpriteRun* const spriteRun);
+
+        template <typename SpriteRun>
+        void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive, SpriteRun* const actorEvent);
 
     private:
 

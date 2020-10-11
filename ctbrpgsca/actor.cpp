@@ -11,6 +11,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "state.h"
 #include "scene.h"
 #include "role.h"
+#include "arenawidget.h"
 
 #include <QStringBuilder>
 #include <QString>
@@ -173,10 +174,12 @@ void Actor::setAgility(const int agi, Scene& scene)
 
 void Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
 {
-    return this->setCurrentHp(hp, &ret, nullptr, survive);
+    Scene::SpriteCall* const spr = nullptr;
+    return this->setCurrentHp(hp, &ret, nullptr, survive, spr);
 }
 
-void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive)
+template <typename SpriteRun>
+void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive, SpriteRun* const actorEvent)
 {
     Actor& actor = *this;
     if (hp < 1)
@@ -207,7 +210,7 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
                     actor._hp = actor._m_hp;
                     if (scene && actor.Costume::isShapeShifted())
                     {
-                        Scene::SpriteRun* const actorEvent = scene->_actor_run;
+                        //Scene::SpriteRun* const actorEvent = scene->_actor_run;
                         if (actorEvent)
                         {
                             ((*actorEvent)(*scene, &actor, nullptr, true, nullptr, nullptr));
@@ -381,7 +384,8 @@ void Actor::setStateResistance(State* const state, const int res)
     stRes->operator[](state) = res;
 }
 
-void Actor::applyDmgRoles(QString& ret, Scene* const scene)
+template <typename SpriteRun>
+void Actor::applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const actorEvent)
 {
     Actor& actor = *this;
     QVector<Costume*>* const dmgRoles = actor._dmg_roles;
@@ -393,7 +397,7 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene)
         }
         if (scene)
         {
-            Scene::SpriteRun* const actorEvent = scene->_actor_run;
+            //Scene::SpriteRun* const actorEvent = scene->_actor_run;
             if (actorEvent == nullptr || ((*actorEvent)(*scene, &actor, nullptr, false, nullptr, nullptr)))
             {
                 QVector<Actor*>* targets = scene->_targets;
@@ -412,12 +416,13 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene)
     }
 }
 
-void Actor::applyStates(QString* const ret, Scene* const scene, const bool consume)
+template <typename SpriteRun>
+void Actor::applyStates(QString* const ret, Scene* const scene, const bool consume, SpriteRun* const spriteRun)
 {
     Actor& actor = *this;
     if (consume && ret)
     {
-        actor.applyDmgRoles(*ret, scene);
+        actor.applyDmgRoles(*ret, scene, spriteRun);
     }
     QMap<State*, int>* const stateDur = actor._state_dur;
     if (stateDur)
@@ -769,8 +774,8 @@ void Actor::refreshCostumes(QString* const ret, Scene* const scene)
 Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items)
-    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QVector<Ability*>(),
-              false, nullptr, stRes, res)
+    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false,
+              false, false, false, new QVector<Ability*>(), false, nullptr, stRes, res)
 {
     this->_lv = 1;
     this->_xp = 0;
@@ -933,3 +938,10 @@ Actor::~Actor()
         }
     }
 }
+
+template void Actor::applyDmgRoles(QString& ret, Scene* const scene, ArenaWidget* const actorEvent);
+template void Actor::applyDmgRoles(QString& ret, Scene* const scene, Scene::SpriteCall* const actorEvent);
+template void Actor::applyStates(QString* const ret, Scene* const scene, bool const consume, ArenaWidget* const spriteRun);
+template void Actor::applyStates(QString* const ret, Scene* const scene, bool const consume, Scene::SpriteCall* const spriteRun);
+template void Actor::setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive, ArenaWidget* const actorEvent);
+template void Actor::setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive, Scene::SpriteCall* const actorEvent);

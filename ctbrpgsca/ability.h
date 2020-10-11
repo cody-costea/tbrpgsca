@@ -65,7 +65,8 @@ namespace tbrpgsca
         QMap<State*, int>* _r_states;
         QString* _sound;
 
-        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
+        template <typename SpriteRun>
+        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, SpriteRun* const spriteRun);
 
         friend class Actor;
         friend class Costume;

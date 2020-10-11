@@ -11,6 +11,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "state.h"
 #include "scene.h"
 #include "role.h"
+#include "arenawidget.h"
 
 #include <QStringBuilder>
 
@@ -70,10 +71,12 @@ bool Ability::canPerform(Actor& actor)
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
-    return this->execute(ret, nullptr, user, &target, applyCosts);
+    Scene::SpriteCall* const spr = nullptr;
+    return this->execute(ret, nullptr, user, &target, applyCosts, spr);
 }
 
-void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
+template <typename SpriteRun>
+void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, SpriteRun* const spriteRun)
 {
     assert(target);
     Ability& ability = *this;
@@ -138,7 +141,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     dmg = 0;
                 }
             }
-            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
+            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false, spriteRun);
             {
                 QMap<State*, int>* aStates = ability._state_dur;
                 if (aStates)
@@ -244,7 +247,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     {
         user.setCurrentRp(user._sp - ability._m_sp);
         user.setCurrentMp(user._mp - ability._m_mp);
-        user.setCurrentHp(user._hp - ability._m_hp, &ret, scene, false);
+        user.setCurrentHp(user._hp - ability._m_hp, &ret, scene, false, spriteRun);
         int mQty = ability._m_qty;
         if (mQty > 0)
         {
@@ -313,3 +316,6 @@ Ability::~Ability()
         delete sound;
     }
 }
+
+template void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, ArenaWidget* const spriteRun);
+template void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, Scene::SpriteCall* const spriteRun);
