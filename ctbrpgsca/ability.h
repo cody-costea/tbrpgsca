@@ -66,7 +66,7 @@ namespace tbrpgsca
         QString* _sound;
 
         template <typename SpriteRun>
-        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, SpriteRun* const spriteRun);
+        void execute(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts);
 
         friend class Actor;
         friend class Costume;

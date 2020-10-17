@@ -37,12 +37,12 @@ void ArenaWidget::afterPlay()
                    if (((usrRoles = crActor->_dmg_roles)) && usrRoles->size() > 0)
                    {
                        arena.setEndTurn(true);
-                       arena.endTurn(ret, crActor, this);
+                       arena.endTurn(ret, this, crActor);
                        return;
                    }
                    else
                    {
-                       arena.endTurn(ret, crActor, this);
+                       arena.endTurn(ret, this, crActor);
                    }
                }
                crActor = arena._cr_actor;
@@ -52,7 +52,7 @@ void ArenaWidget::afterPlay()
                {
                    arena._info_txt->setText("");
                    arena.setAiTurn(true);
-                   arena.playAi(ret, *crActor, this);
+                   arena.playAi(ret, this, *crActor);
                }
                else
                {
@@ -66,7 +66,7 @@ void ArenaWidget::afterPlay()
     else
     {
         arena.setEndTurn(false);
-        arena.endTurn(ret, arena._cr_actor, this);
+        arena.endTurn(ret, this, arena._cr_actor);
     }
     return;
 }
@@ -78,7 +78,7 @@ void ArenaWidget::ActorSprite::playSkill(QString& sprName)
     movie.stop();
     movie.setFileName(QString(":/sprites/%1/abilities/%2.%1").arg(SPR_EXT, sprName));
     movie.jumpToFrame(0);    
-    ++(actSprite._arena->_spr_runs);
+    actSprite._arena->_spr_runs += 1;
     movie.start();
     return;
 }
@@ -130,7 +130,7 @@ void ArenaWidget::ActorSprite::playActor(int const spr)
     }
     else
     {
-        ++(actSprite._arena->_spr_runs);
+        actSprite._arena->_spr_runs += 1;
         movie.start();
     }
     return;
@@ -598,10 +598,10 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, Ability* const abi
 #else
    if (target && target != user)
    {
-       ++(arena._spr_runs);
+       arena._spr_runs += 1;
        QTimer::singleShot(TRG_SPR_DELAY, &arena, [&arena, target, revive, counter, ability]()
        {
-           --(arena._spr_runs);
+           arena._spr_runs -= 1;
 #endif
        ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target->_extra)[0]));
        targetSpr.playActor(target->_hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
@@ -634,7 +634,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, Ability* const abi
                {
                    goto usrSprPlay;
                }
-               arena._spr_runs++;
+               arena._spr_runs += 1;
                sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
                sound->play();
            }
@@ -670,7 +670,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, Ability* const abi
                {
                    goto usrSprPlay;
                }
-               arena._spr_runs++;
+               arena._spr_runs += 1;
                sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
                sound->play();
            }
@@ -799,7 +799,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
                 if (crActor->_side == 0 || !(crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
                     /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/))
                 {
-                    arena.playAi(ret, *crActor, &arena);
+                    arena.playAi(ret, &arena, *crActor);
                     arena.enableControls(false);
                 }
             }
@@ -810,7 +810,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             Actor* const crActor = arena._cr_actor;
             Actor* const trgActor = arena._trg_actor;
             QString& ret = *(arena._ret_str); ret.clear();
-            arena.perform(ret, *crActor, *trgActor, *(crActor->_a_skills->at(arena._skills_box->currentIndex())), false, &arena);
+            arena.perform(ret, &arena, *crActor, *trgActor, *(crActor->_a_skills->at(arena._skills_box->currentIndex())), false);
         });        
         connect(useBtn, &QPushButton::clicked, [&arena]()
         {
@@ -821,7 +821,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             QMap<Ability*, int>* const items = crActor->_items;
             auto const it = items->cbegin() + arena._items_box->currentIndex();
             Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
-            arena.perform(ret, *crActor, *trgActor, *ability, false, &arena);
+            arena.perform(ret, &arena, *crActor, *trgActor, *ability, false);
         });
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
@@ -833,101 +833,6 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         });
     }
     arena._spr_runs = 0;
-    /*auto actorRun = new SpriteCall([](Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                 Actor* const target, Ability* const counter) -> bool
-    {
-        ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
-#if TRG_SPR_DELAY < 0
-        if (target)
-        {
-#else
-        if (target && target != user)
-        {
-            ++(arena._spr_runs);
-            QTimer::singleShot(TRG_SPR_DELAY, &arena, [&arena, target, revive, counter, ability]()
-            {
-                --(arena._spr_runs);
-#endif
-            ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target->_extra)[0]));
-            targetSpr.playActor(target->_hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
-                : (((counter->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
-            if (ability)
-            {
-                QString* const spr = ability->_sprite;
-                if (spr && spr->length() > 0)
-                {
-                    targetSpr.playSkill(*spr);
-                }                
-#if TRG_SPR_DELAY < 0
-                QString* const sndName = ability->_sound;
-                if (sndName)
-                {
-                    QMediaPlayer* sound = arena._ability_snd;
-                    if (sound == nullptr)
-                    {
-                        sound = new QMediaPlayer(&arena);
-                        connect(sound, &QMediaPlayer::stateChanged, [&arena](QMediaPlayer::State state)
-                        {
-                            if (state == QMediaPlayer::StoppedState)
-                            {
-                                arena.afterPlay();
-                            }
-                        });
-                        arena._ability_snd = sound;
-                    }
-                    else if (sound->state() == QMediaPlayer::PlayingState)
-                    {
-                        goto usrSprPlay;
-                    }
-                    arena._spr_runs++;
-                    sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
-                    sound->play();
-                }
-            }
-        }
-        usrSprPlay:
-        if (user && user != target)
-        {
-#else
-            }});
-        }
-        if (user)
-        {
-            if (ability)
-            {
-                QString* const sndName = ability->_sound;
-                if (sndName)
-                {
-                    QMediaPlayer* sound = arena._ability_snd;
-                    if (sound == nullptr)
-                    {
-                        sound = new QMediaPlayer(&arena);
-                        connect(sound, &QMediaPlayer::stateChanged, [&arena](QMediaPlayer::State state)
-                        {
-                            if (state == QMediaPlayer::StoppedState)
-                            {
-                                arena.afterPlay();
-                            }
-                        });
-                        arena._ability_snd = sound;
-                    }
-                    else if (sound->state() == QMediaPlayer::PlayingState)
-                    {
-                        goto usrSprPlay;
-                    }
-                    arena._spr_runs++;
-                    sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
-                    sound->play();
-                }
-            }
-            usrSprPlay:
-#endif
-            (*(static_cast<ActorSprite*>(static_cast<void**>(user->_extra)[0]))).playActor(
-                user->_hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
-            : ((ability->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
-        }
-        return false;
-    });*/
     QString* const returnTxt = new QString(ret);
     arena.resizeScene(size, nullptr);
     arena.prepareTargetBox(false);
@@ -944,7 +849,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
     if (crActor->_side != 0 || crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
         /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
     {
-        arena.playAi(*returnTxt, *crActor, this);
+        arena.playAi(*returnTxt, this, *crActor);
         arena.enableControls(false);
     }
     else

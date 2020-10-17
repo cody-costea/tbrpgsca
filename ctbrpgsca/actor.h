@@ -149,10 +149,10 @@ namespace tbrpgsca
         void applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const actorEvent);
 
         template <typename SpriteRun>
-        void applyStates(QString* const ret, Scene* const scene, bool const consume, SpriteRun* const spriteRun);
+        void applyStates(QString* const ret, Scene* const scene, SpriteRun* const spriteRun, bool const consume);
 
         template <typename SpriteRun>
-        void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive, SpriteRun* const actorEvent);
+        void setCurrentHp(QString* const ret, Scene* const scene, SpriteRun* const actorEvent, int const hp, bool const survive);
 
     private:
 

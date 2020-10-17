@@ -736,7 +736,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         });
     }
     arena._spr_runs = 0;
-    auto actorRun = new SpriteRun([](Scene& scene, Actor* const user, Ability* const ability, bool const revive,
+    auto actorRun = new SpriteCall([](Scene& scene, Actor* const user, Ability* const ability, bool const revive,
                                  Actor* const target, Ability* const counter) -> bool
     {
         ArenaWidget& arena = static_cast<ArenaWidget&>(scene);

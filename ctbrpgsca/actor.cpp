@@ -174,12 +174,12 @@ void Actor::setAgility(const int agi, Scene& scene)
 
 void Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
 {
-    Scene::SpriteCall* const spr = nullptr;
-    return this->setCurrentHp(hp, &ret, nullptr, survive, spr);
+    const Scene::SpriteAct* const spr = nullptr;
+    return this->setCurrentHp(&ret, nullptr, spr, hp, survive);
 }
 
 template <typename SpriteRun>
-void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive, SpriteRun* const actorEvent)
+void Actor::setCurrentHp(QString* const ret, Scene* const scene, SpriteRun* const actorEvent, const int hp, bool const survive)
 {
     Actor& actor = *this;
     if (hp < 1)
@@ -417,7 +417,7 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const act
 }
 
 template <typename SpriteRun>
-void Actor::applyStates(QString* const ret, Scene* const scene, const bool consume, SpriteRun* const spriteRun)
+void Actor::applyStates(QString* const ret, Scene* const scene, SpriteRun* const spriteRun, const bool consume)
 {
     Actor& actor = *this;
     if (consume && ret)
@@ -940,8 +940,8 @@ Actor::~Actor()
 }
 
 template void Actor::applyDmgRoles(QString& ret, Scene* const scene, ArenaWidget* const actorEvent);
-template void Actor::applyDmgRoles(QString& ret, Scene* const scene, Scene::SpriteCall* const actorEvent);
-template void Actor::applyStates(QString* const ret, Scene* const scene, bool const consume, ArenaWidget* const spriteRun);
-template void Actor::applyStates(QString* const ret, Scene* const scene, bool const consume, Scene::SpriteCall* const spriteRun);
-template void Actor::setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive, ArenaWidget* const actorEvent);
-template void Actor::setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive, Scene::SpriteCall* const actorEvent);
+template void Actor::applyDmgRoles(QString& ret, Scene* const scene, Scene::SpriteAct* const actorEvent);
+template void Actor::applyStates(QString* const ret, Scene* const scene, ArenaWidget* const spriteRun, bool const consume);
+template void Actor::applyStates(QString* const ret, Scene* const scene, Scene::SpriteAct* const spriteRun, bool const consume);
+template void Actor::setCurrentHp(QString* const ret, Scene* const scene, ArenaWidget* const actorEvent, int const hp, bool const survive);
+template void Actor::setCurrentHp(QString* const ret, Scene* const scene, Scene::SpriteAct* const actorEvent, int const hp, bool const survive);

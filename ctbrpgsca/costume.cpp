@@ -126,9 +126,9 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
 void Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
-    Scene::SpriteCall* const spr = nullptr;
+    Scene::SpriteAct* const spr = nullptr;
     ret += QString(Costume::CausesTxt).arg(actor._name, role._name);
-    role.damage(ret, scene, nullptr, actor, std::rand() % 4, true, spr);
+    role.damage(ret, scene, spr, nullptr, actor, std::rand() % 4, true);
 }
 
 void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove)

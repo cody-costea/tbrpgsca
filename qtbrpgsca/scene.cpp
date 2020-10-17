@@ -252,7 +252,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
                 }
             }
         }
-        SpriteRun* const actorEvent = scene._actor_run;
+        SpriteCall* const actorEvent = scene._actor_run;
         if (actorEvent == nullptr || ((*actorEvent)(scene, applyCosts ? &user : nullptr, &ability, (ko && target->_hp > 0),
                                                     target, &user == target ? &ability : counter)))
         {
@@ -659,7 +659,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
             crActor->applyStates(&ret, this, false);
             if (shapeShifted && (!crActor->Costume::isShapeShifted()))
             {
-                SpriteRun* const actorEvent = scene._actor_run;
+                SpriteCall* const actorEvent = scene._actor_run;
                 if (actorEvent)
                 {
                     ((*actorEvent)(scene, crActor, nullptr, true, nullptr, nullptr));
@@ -718,7 +718,7 @@ void Scene::resetTurn(Actor& actor)
     }
 }
 
-void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorEvent, QVector<SceneRun*>* const events,
+void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteCall* const actorEvent, QVector<SceneRun*>* const events,
                          bool const useGuards, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
@@ -824,7 +824,7 @@ Scene::Scene() : Play(0)
 
 }
 
-Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorEvent, QVector<SceneRun*>* const events,
+Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteCall* const actorEvent, QVector<SceneRun*>* const events,
              bool const useGuards, int const surprise, int const mInit) : Play(0)
 {
     this->operator()(ret, parties, actorEvent, events, useGuards, surprise, mInit);

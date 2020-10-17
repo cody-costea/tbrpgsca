@@ -41,7 +41,7 @@ namespace tbrpgsca
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                   Actor* const target, Ability* const counter)> SpriteCall;
+                                   Actor* const target, Ability* const counter)> SpriteAct;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -52,13 +52,13 @@ namespace tbrpgsca
         static bool actorAgiComp(Actor* const a, Actor* const b);
 
         template <typename SpriteRun>
-        void endTurn(QString& ret, Actor* const actor, SpriteRun* const spriteRun);
+        void endTurn(QString& ret, SpriteRun* const spriteRun, Actor* const actor);
 
         template <typename SpriteRun>
-        void perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item, SpriteRun* const spriteRun);
+        void perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
 
         template <typename SpriteRun>
-        void playAi(QString& ret, Actor& player, SpriteRun* const spriteRun);
+        void playAi(QString& ret, SpriteRun* const spriteRun, Actor& player);
 
         void checkStatus(QString& ret);
         void escape(QString& ret);
@@ -111,7 +111,7 @@ namespace tbrpgsca
         void resetTurn(Actor& actor);
 
         template <typename SpriteRun>
-        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts, SpriteRun* const actorEvent);
+        void execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
 
         friend class Actor;
         friend class Ability;

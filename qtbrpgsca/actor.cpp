@@ -207,7 +207,7 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
                     actor._hp = actor._m_hp;
                     if (scene && actor.Costume::isShapeShifted())
                     {
-                        Scene::SpriteRun* const actorEvent = scene->_actor_run;
+                        Scene::SpriteCall* const actorEvent = scene->_actor_run;
                         if (actorEvent)
                         {
                             ((*actorEvent)(*scene, &actor, nullptr, true, nullptr, nullptr));
@@ -403,7 +403,7 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene)
         }
         if (scene)
         {
-            Scene::SpriteRun* const actorEvent = scene->_actor_run;
+            Scene::SpriteCall* const actorEvent = scene->_actor_run;
             if (actorEvent == nullptr || ((*actorEvent)(*scene, &actor, nullptr, false, nullptr, nullptr)))
             {
                 QVector<Actor*>* targets = scene->_targets;

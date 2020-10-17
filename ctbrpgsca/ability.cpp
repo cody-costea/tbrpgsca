@@ -71,12 +71,12 @@ bool Ability::canPerform(Actor& actor)
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
-    Scene::SpriteCall* const spr = nullptr;
-    return this->execute(ret, nullptr, user, &target, applyCosts, spr);
+    Scene::SpriteAct* const spr = nullptr;
+    return this->execute(ret, nullptr, spr, user, &target, applyCosts);
 }
 
 template <typename SpriteRun>
-void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, SpriteRun* const spriteRun)
+void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts)
 {
     assert(target);
     Ability& ability = *this;
@@ -141,7 +141,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     dmg = 0;
                 }
             }
-            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false, spriteRun);
+            ability.damage(ret, scene, spriteRun, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
             {
                 QMap<State*, int>* aStates = ability._state_dur;
                 if (aStates)
@@ -247,7 +247,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     {
         user.setCurrentRp(user._sp - ability._m_sp);
         user.setCurrentMp(user._mp - ability._m_mp);
-        user.setCurrentHp(user._hp - ability._m_hp, &ret, scene, false, spriteRun);
+        user.setCurrentHp(&ret, scene, spriteRun, user._hp - ability._m_hp, false);
         int mQty = ability._m_qty;
         if (mQty > 0)
         {
@@ -317,5 +317,5 @@ Ability::~Ability()
     }
 }
 
-template void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, ArenaWidget* const spriteRun);
-template void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts, Scene::SpriteCall* const spriteRun);
+template void Ability::execute(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts);
+template void Ability::execute(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts);

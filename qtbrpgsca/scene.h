@@ -41,7 +41,7 @@ namespace tbrpgsca
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                   Actor* const target, Ability* const counter)> SpriteRun;
+                                   Actor* const target, Ability* const counter)> SpriteAct;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -81,10 +81,10 @@ namespace tbrpgsca
         int getCurrent() const;
         int getStatus() const;
 
-        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                           bool const useGuards, int const surprise, int const mInit);
 
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
               bool const useGuards, int const surprise, int const mInit);
 
         Scene();
@@ -96,7 +96,7 @@ namespace tbrpgsca
         int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
         QVector<Actor*>* _players,* _targets;
         QVector<QVector<Actor*>*> _parties;
-        SpriteRun* _actor_run;
+        SpriteAct* _actor_run;
         Actor* _cr_actor;
 
         void agiCalc();
