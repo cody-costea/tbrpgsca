@@ -939,9 +939,12 @@ Actor::~Actor()
     }
 }
 
+#if USE_TEMPLATE
 template void Actor::applyDmgRoles(QString& ret, Scene* const scene, ArenaWidget* const actorEvent);
-template void Actor::applyDmgRoles(QString& ret, Scene* const scene, Scene::SpriteAct* const actorEvent);
 template void Actor::applyStates(QString* const ret, Scene* const scene, ArenaWidget* const spriteRun, bool const consume);
-template void Actor::applyStates(QString* const ret, Scene* const scene, Scene::SpriteAct* const spriteRun, bool const consume);
 template void Actor::setCurrentHp(QString* const ret, Scene* const scene, ArenaWidget* const actorEvent, int const hp, bool const survive);
+#endif
+
+template void Actor::applyDmgRoles(QString& ret, Scene* const scene, Scene::SpriteAct* const actorEvent);
+template void Actor::applyStates(QString* const ret, Scene* const scene, Scene::SpriteAct* const spriteRun, bool const consume);
 template void Actor::setCurrentHp(QString* const ret, Scene* const scene, Scene::SpriteAct* const actorEvent, int const hp, bool const survive);

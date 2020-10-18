@@ -19,6 +19,9 @@ namespace tbrpgsca
 
     class Scene : public Play
     {
+#define ALLOW_NO_GUARDS 1
+#define ALLOW_COVERING 1
+
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1
         #define STATUS_ONGOING 0
@@ -30,8 +33,6 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
         #define FLAG_HAS_COVERS 2
-        #define ALLOW_NO_GUARDS 1
-        #define ALLOW_COVERING 1
         #define MIN_ROUND INT_MIN
 
         PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)

@@ -9,6 +9,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define PLAY_H
 
 #include <QObject>
+#include <QApplication>
+#include <QThread>
+#include <QTimer>
 
 namespace tbrpgsca
 {
@@ -133,6 +136,51 @@ namespace tbrpgsca
         Q_OBJECT
         PROP_FIELD(Play, Flags, flags, int, public, protected)
     public:
+        template  <typename PlayAct>
+        static void runOnMainThread(PlayAct fn, bool const newTimer)
+        {
+            QThread* const mainThr = qApp->thread();
+            if (mainThr == QThread::currentThread())
+            {
+                fn();
+                return;
+            }
+            QTimer* timer;
+            if (newTimer)
+            {
+                timer = new QTimer();
+                timer->moveToThread(mainThr);
+                timer->setSingleShot(true);
+                QObject::connect(timer, &QTimer::timeout, [fn, timer]()
+                {
+                    fn();
+                    timer->deleteLater();
+                });
+            }
+            else
+            {
+                timer = Play::_timer;
+                if (!timer)
+                {
+                    timer = new QTimer();
+                    Play::_timer = timer;
+                    timer->setSingleShot(true);
+                    timer->moveToThread(mainThr);
+                }
+                QMetaObject::Connection* conn = Play::_conn;
+                if (!conn)
+                {
+                    conn = new QMetaObject::Connection();
+                    Play::_conn = conn;
+                }
+                (*conn) = QObject::connect(timer, &QTimer::timeout, [fn, timer, conn]()
+                {
+                    fn();
+                    QObject::disconnect(*conn);
+                });
+            }
+            QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
+        }
         Q_INVOKABLE inline bool hasAllFlags(int const flag) const
         {
             return (this->_flags & flag) == flag;
@@ -160,6 +208,9 @@ namespace tbrpgsca
         Play(QObject* const parent = nullptr, int const flags = 0);
 
         ~Play();
+    private:
+        static inline QMetaObject::Connection* _conn = nullptr;
+        static inline QTimer* _timer = nullptr;
     };
 
 }

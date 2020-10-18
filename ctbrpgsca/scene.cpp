@@ -837,17 +837,22 @@ Scene::~Scene()
     }
 }
 
-template void Scene::playAi(QString& ret, ArenaWidget* const spriteRun, Actor& player);
-template void Scene::playAi(QString& ret, Scene::SpriteAct* const spriteRun, Actor& player);
-template void Scene::endTurn(QString& ret, ArenaWidget* const spriteRun, Actor* const actor);
-template void Scene::endTurn(QString& ret, Scene::SpriteAct* const spriteRun, Actor* const actor);
-template void Scene::perform(QString& ret, ArenaWidget* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
-template void Scene::perform(QString& ret, Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
-template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
+#if USE_TEMPLATE
+    template void Scene::playAi(QString& ret, ArenaWidget* const spriteRun, Actor& player);
+    template void Scene::endTurn(QString& ret, ArenaWidget* const spriteRun, Actor* const actor);
+    template void Scene::perform(QString& ret, ArenaWidget* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
+    template void Scene::execute(QString& ret, ArenaWidget* const actorEvent, Actor& user, Actor* const target, Ability& ability, bool const applyCosts);
+    template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                                 bool const useGuards, int const surprise, int const mInit);
+    template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
+                      bool const useGuards, int const surprise, int const mInit);
+#endif
+
+template void Scene::playAi(QString& ret, Scene::SpriteAct* const spriteRun, Actor& player);
+template void Scene::endTurn(QString& ret, Scene::SpriteAct* const spriteRun, Actor* const actor);
+template void Scene::perform(QString& ret, Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
+template void Scene::execute(QString& ret, Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, Ability& ability, bool const applyCosts);
 template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                                 bool const useGuards, int const surprise, int const mInit);
 template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
-                      bool const useGuards, int const surprise, int const mInit);
-template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                       bool const useGuards, int const surprise, int const mInit);

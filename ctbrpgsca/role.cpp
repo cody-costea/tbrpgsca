@@ -59,8 +59,7 @@ bool Role::operator==(Role& role) const
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
 {
-    Scene::SpriteAct* const spr = nullptr;
-    return this->damage(ret, nullptr, spr, absorber, target, dmg, percent);
+    return this->damage(ret, nullptr, static_cast<Scene::SpriteAct*>(nullptr), absorber, target, dmg, percent);
 }
 
 template <typename SpriteRun>
@@ -253,5 +252,8 @@ Role::~Role()
     }
 }
 
+#if USE_TEMPLATE
 template void Role::damage(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent);
+#endif
+
 template void Role::damage(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent);

@@ -37,6 +37,8 @@ namespace tbrpgsca
         PROP_FLAG_GET(isInvincible, FLAG_INVINCIBLE, public)
         PROP_FLAG_GET(isShapeShifted, FLAG_SHAPE_SHIFT, public)
         PROP_FIELD_GET_CUSTOM(maxActions, int, public, _m_actions)
+        PROP_FIELD_GET_CUSTOM(coverDmgType, int, public, _cvr_type)
+        PROP_FIELD_GET_CUSTOM(reflectDmgType, int, public, _rfl_type)
         PROP_FIELD_GET_CUSTOM(offense, int, public, _atk)
         PROP_FIELD_GET_CUSTOM(defense, int, public, _def)
         PROP_FIELD_GET_CUSTOM(spirit, int, public, _spi)
@@ -71,7 +73,7 @@ namespace tbrpgsca
 
         ~Costume();
     protected:
-        int _atk, _def, _spi, _wis, _agi, _m_actions;
+        int _atk, _def, _spi, _wis, _agi, _m_actions, _cvr_type, _rfl_type;
         QVector<Ability*>* _a_skills,* _counters;
         QMap<State*, int>* _st_res;
         QMap<int, int>* _res;

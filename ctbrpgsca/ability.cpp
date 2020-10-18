@@ -71,8 +71,7 @@ bool Ability::canPerform(Actor& actor)
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
-    Scene::SpriteAct* const spr = nullptr;
-    return this->execute(ret, nullptr, spr, user, &target, applyCosts);
+    return this->execute(ret, nullptr, static_cast<Scene::SpriteAct*>(nullptr), user, &target, applyCosts);
 }
 
 template <typename SpriteRun>
@@ -317,5 +316,7 @@ Ability::~Ability()
     }
 }
 
+#if USE_TEMPLATE
 template void Ability::execute(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts);
+#endif
 template void Ability::execute(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts);

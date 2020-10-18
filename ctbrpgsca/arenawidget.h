@@ -30,6 +30,8 @@ namespace tbrpgsca
 
     class ArenaWidget : public QWidget, public Scene
     {
+#define USE_TEMPLATE 1
+
         Q_OBJECT
         #define SPR_SIZE 8
         #define SPR_IDLE 0
@@ -46,7 +48,17 @@ namespace tbrpgsca
         #define FLAG_AUTOMATIC 4
         #define FLAG_END_TURN 16
 
-        #define TRG_SPR_DELAY 400
+        #define TRG_SPR_DELAY 371
+
+    #if USE_TEMPLATE
+        #define SPR_ACTION this
+        #define SPRITE_ACT &arena
+    #else
+    private:
+        SpriteAct* _spr_act = nullptr;
+        #define SPRITE_ACT static_cast<SpriteAct*>(arena._spr_act)
+        #define SPR_ACTION static_cast<SpriteAct*>(_spr_act)
+    #endif
 
         PROP_FLAG(ArenaWidget, AiTurn, FLAG_AI_TURN, public, public)
         PROP_FLAG(ArenaWidget, Automatic, FLAG_AUTOMATIC, public, public)
@@ -101,9 +113,10 @@ namespace tbrpgsca
 
         void operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
-
+    #if USE_TEMPLATE
         bool operator()(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
                        Actor* const target, Ability* const counter);
+    #endif
 
         QString* _ret_str;
         int _spr_runs, _trg_count;

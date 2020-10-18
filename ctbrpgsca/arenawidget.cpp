@@ -37,12 +37,12 @@ void ArenaWidget::afterPlay()
                    if (((usrRoles = crActor->_dmg_roles)) && usrRoles->size() > 0)
                    {
                        arena.setEndTurn(true);
-                       arena.endTurn(ret, this, crActor);
+                       arena.endTurn(ret, SPR_ACTION, crActor);
                        return;
                    }
                    else
                    {
-                       arena.endTurn(ret, this, crActor);
+                       arena.endTurn(ret, SPR_ACTION, crActor);
                    }
                }
                crActor = arena._cr_actor;
@@ -52,7 +52,7 @@ void ArenaWidget::afterPlay()
                {
                    arena._info_txt->setText("");
                    arena.setAiTurn(true);
-                   arena.playAi(ret, this, *crActor);
+                   arena.playAi(ret, SPR_ACTION, *crActor);
                }
                else
                {
@@ -66,7 +66,7 @@ void ArenaWidget::afterPlay()
     else
     {
         arena.setEndTurn(false);
-        arena.endTurn(ret, this, arena._cr_actor);
+        arena.endTurn(ret, SPR_ACTION, arena._cr_actor);
     }
     return;
 }
@@ -468,7 +468,7 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                 QVector<QVector<Actor*>*>& parties = arena._parties;
                 int const pSize = parties.size(), sprFactor = sprLength / 3 + sprLength / 10, sprWidth = (sprLength / 2) + sprFactor + sprFactor / 3, sprHeight = imgHeight / 10,
                         sprDistance = (sprHeight * 2) + (sprHeight), xCentre = imgWidth / 2 - (sprLength / 2 + sprLength / 7), yCentre = imgHeight / 2 - sprLength / 2;
-                for (int j = 0; j < pSize; ++j)
+                for (int j = 0; j < pSize; j += 1)
                 {
                     int x;
                     QString pos;
@@ -501,7 +501,7 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                     QVector<Actor*>& party = *(parties[j]);
                     int const sSize = party.size();
                     trgCount += sSize;
-                    for (int i = 0; i < sSize; ++i)
+                    for (int i = 0; i < sSize; i += 1)
                     {
                         void** extras;
                         Actor& actor = *(party[i]);
@@ -553,7 +553,7 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                                     static_cast<ActorSprite*>(sprExtra)->relocate(loc);
                                 }
                             }
-                            ++k;
+                            k += 1;
                         }
                         if (j == 0)
                         {
@@ -588,6 +588,7 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
     QWidget::resizeEvent(event);
 }
 
+#if USE_TEMPLATE
 bool ArenaWidget::operator()(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
                             Actor* const target, Ability* const counter)
 {
@@ -683,6 +684,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, Ability* const abi
    }
    return false;
 }
+#endif
 
 void ArenaWidget::operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                      QString backImage, QString songName, int const surprise, int const mInit)
@@ -786,9 +788,10 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             bool const automatic = arena.isAutomatic();
             if (automatic)
             {
+                auto autoBtn = arena._auto_btn;
                 arena.setAutomatic(false);
-                arena._auto_btn->setEnabled(false);
-                arena._auto_btn->setText(tr("Auto"));
+                autoBtn->setEnabled(false);
+                autoBtn->setText(tr("Auto"));
             }
             else if (arena._act_btn->isEnabled())
             {
@@ -799,7 +802,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
                 if (crActor->_side == 0 || !(crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
                     /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/))
                 {
-                    arena.playAi(ret, &arena, *crActor);
+                    arena.playAi(ret, SPRITE_ACT, *crActor);
                     arena.enableControls(false);
                 }
             }
@@ -810,7 +813,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             Actor* const crActor = arena._cr_actor;
             Actor* const trgActor = arena._trg_actor;
             QString& ret = *(arena._ret_str); ret.clear();
-            arena.perform(ret, &arena, *crActor, *trgActor, *(crActor->_a_skills->at(arena._skills_box->currentIndex())), false);
+            arena.perform(ret, SPRITE_ACT, *crActor, *trgActor, *(crActor->_a_skills->at(arena._skills_box->currentIndex())), false);
         });        
         connect(useBtn, &QPushButton::clicked, [&arena]()
         {
@@ -821,7 +824,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             QMap<Ability*, int>* const items = crActor->_items;
             auto const it = items->cbegin() + arena._items_box->currentIndex();
             Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
-            arena.perform(ret, &arena, *crActor, *trgActor, *ability, false);
+            arena.perform(ret, SPRITE_ACT, *crActor, *trgActor, *ability, false);
         });
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
         {
@@ -833,13 +836,111 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         });
     }
     arena._spr_runs = 0;
+#if !USE_TEMPLATE
+    SpriteAct* const _spr_act = new SpriteAct([](Scene& scene, Actor* const user, Ability* const ability, bool const revive,
+                                     Actor* const target, Ability* const counter) -> bool
+        {
+            ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
+    #if TRG_SPR_DELAY < 0
+            if (target)
+            {
+    #else
+            if (target && target != user)
+            {
+                arena._spr_runs += 1;
+                QTimer::singleShot(TRG_SPR_DELAY, &arena, [&arena, target, revive, counter, ability]()
+                {
+                    arena._spr_runs -= 1;
+    #endif
+                ActorSprite& targetSpr = *(static_cast<ActorSprite*>(static_cast<void**>(target->_extra)[0]));
+                targetSpr.playActor(target->_hp > 0 ? (revive ? SPR_RISE : (counter == nullptr ? SPR_HIT
+                    : (((counter->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK) ? SPR_ACT : SPR_CAST))) : SPR_FALL);
+                if (ability)
+                {
+                    QString* const spr = ability->_sprite;
+                    if (spr && spr->length() > 0)
+                    {
+                        targetSpr.playSkill(*spr);
+                    }
+    #if TRG_SPR_DELAY < 0
+                    QString* const sndName = ability->_sound;
+                    if (sndName)
+                    {
+                        QMediaPlayer* sound = arena._ability_snd;
+                        if (sound == nullptr)
+                        {
+                            sound = new QMediaPlayer(&arena);
+                            connect(sound, &QMediaPlayer::stateChanged, [&arena](QMediaPlayer::State state)
+                            {
+                                if (state == QMediaPlayer::StoppedState)
+                                {
+                                    arena.afterPlay();
+                                }
+                            });
+                            arena._ability_snd = sound;
+                        }
+                        else if (sound->state() == QMediaPlayer::PlayingState)
+                        {
+                            goto usrSprPlay;
+                        }
+                        arena._spr_runs += 1;
+                        sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
+                        sound->play();
+                    }
+                }
+            }
+            usrSprPlay:
+            if (user && user != target)
+            {
+    #else
+                }});
+            }
+            if (user)
+            {
+                if (ability)
+                {
+                    QString* const sndName = ability->_sound;
+                    if (sndName)
+                    {
+                        QMediaPlayer* sound = arena._ability_snd;
+                        if (sound == nullptr)
+                        {
+                            sound = new QMediaPlayer(&arena);
+                            connect(sound, &QMediaPlayer::stateChanged, [&arena](QMediaPlayer::State state)
+                            {
+                                if (state == QMediaPlayer::StoppedState)
+                                {
+                                    arena.afterPlay();
+                                }
+                            });
+                            arena._ability_snd = sound;
+                        }
+                        else if (sound->state() == QMediaPlayer::PlayingState)
+                        {
+                            goto usrSprPlay;
+                        }
+                        arena._spr_runs += 1;
+                        sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
+                        sound->play();
+                    }
+                }
+                usrSprPlay:
+    #endif
+                (*(static_cast<ActorSprite*>(static_cast<void**>(user->_extra)[0]))).playActor(
+                    user->_hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
+                : ((ability->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK ? SPR_ACT : SPR_CAST)));
+            }
+            return false;
+        });
+    this->_spr_act = _spr_act;
+#endif
     QString* const returnTxt = new QString(ret);
     arena.resizeScene(size, nullptr);
     arena.prepareTargetBox(false);
     arena._ret_str = returnTxt;
     if (doScene)
     {
-        arena.Scene::operator()(*returnTxt, parties, this, events, true, surprise, mInit);
+        arena.Scene::operator()(*returnTxt, parties, SPR_ACTION, events, true, surprise, mInit);
     }
     /*else
     {
@@ -849,7 +950,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
     if (crActor->_side != 0 || crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
         /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
     {
-        arena.playAi(*returnTxt, this, *crActor);
+        arena.playAi(*returnTxt, SPR_ACTION, *crActor);
         arena.enableControls(false);
     }
     else
@@ -866,7 +967,13 @@ ArenaWidget::ArenaWidget(QWidget* parent) : QWidget(parent), Scene()
 
 ArenaWidget::ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                          QString backImage, QString songName, int const surprise, int const mInit)
-    : QWidget(parent), Scene(ret, parties, this, events, true, surprise, mInit)
+    : QWidget(parent), Scene(ret, parties,
+                             #if USE_TEMPLATE
+                             this
+                             #else
+                             static_cast<SpriteAct*>(nullptr)
+                             #endif
+                             , events, true, surprise, mInit)
 {
     this->operator()(size, ret, parties, events, backImage, songName, surprise, mInit, false);
 }
@@ -897,6 +1004,14 @@ ArenaWidget::~ArenaWidget()
             delete[] extra;
         }
     }
+#if !USE_TEMPLATE
+    auto spriteAct = this->_spr_act;
+    if (spriteAct)
+    {
+        this->_spr_act = nullptr;
+        delete spriteAct;
+    }
+#endif
     /*auto song = this->song;
     if (song)
     {
