@@ -48,7 +48,7 @@ namespace tbrpgsca
         #define FLAG_AUTOMATIC 4
         #define FLAG_END_TURN 16
 
-        #define TRG_SPR_DELAY 371
+        #define TRG_SPR_DELAY -1//387
 
     #if USE_TEMPLATE
         #define SPR_ACTION this

@@ -111,7 +111,7 @@ namespace tbrpgsca
         bool const field = this->GetName(); \
         if (field != value) \
         { \
-            this->setFlag(Flag, value); \
+            this->setPlayFlag(Flag, value); \
             emit GetName##Changed(value); \
         } \
     }
@@ -123,7 +123,7 @@ namespace tbrpgsca
 #define PROP_FLAG_GET(Name, Flag, Level) \
     Level: inline bool Name() const \
     { \
-        return this->hasAllFlags(Flag); \
+        return this->hasAllPlayFlags(Flag); \
     }
 
 #define PROP_FLAG(Class, QmlName, PropName, Flag, GetLevel, SetLevel) \
@@ -134,7 +134,7 @@ namespace tbrpgsca
     class Play : public QObject
     {
         Q_OBJECT
-        PROP_FIELD(Play, Flags, flags, int, public, protected)
+        PROP_FIELD(Play, PlayFlags, playFlags, int, public, protected)
     public:
         template  <typename PlayAct>
         static void runOnMainThread(PlayAct fn, bool const newTimer)
@@ -181,27 +181,27 @@ namespace tbrpgsca
             }
             QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
         }
-        Q_INVOKABLE inline bool hasAllFlags(int const flag) const
+        Q_INVOKABLE inline bool hasAllPlayFlags(int const flag) const
         {
-            return (this->_flags & flag) == flag;
+            return (this->_playFlags & flag) == flag;
         }
-        Q_INVOKABLE inline bool hasAnyFlag(int const flag) const
+        Q_INVOKABLE inline bool hasAnyPlayFlag(int const flag) const
         {
-            return (this->_flags & flag) != 0;
+            return (this->_playFlags & flag) != 0;
         }
     protected:
-        Q_INVOKABLE inline void setFlag(int const flag, bool const value)
+        Q_INVOKABLE inline void setPlayFlag(int const flag, bool const value)
         {
-            int const flags = this->_flags;
+            int const flags = this->_playFlags;
             if (value != ((flags & flag) == flag))
             {
-                this->_flags = flags ^ flag;
+                this->_playFlags = flags ^ flag;
             }
         }
 
-        inline Play& withFlag(int const flag, bool const value)
+        inline Play& withPlayFlag(int const flag, bool const value)
         {
-            this->setFlag(flag, value);
+            this->setPlayFlag(flag, value);
             return *this;
         }
 
@@ -211,6 +211,8 @@ namespace tbrpgsca
     private:
         static inline QMetaObject::Connection* _conn = nullptr;
         static inline QTimer* _timer = nullptr;
+
+        friend class Role;
     };
 
 }

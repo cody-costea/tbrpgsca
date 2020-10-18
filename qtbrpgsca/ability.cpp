@@ -78,7 +78,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     assert(target);
     Ability& ability = *this;
     int const dmgType = ability._dmg_type | user._dmg_type;
-    if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
+    if (target != &user && ((dmgType & target->reflectDmgType()) != 0))
     {
         ret += Ability::ReflectTxt.arg(target->_name);
         target = &user;
@@ -272,7 +272,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_attr_inc = attrInc;
     this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
     this->_r_states = rStates;
-    int flags = this->flags();
+    int flags = this->playFlags();
     if (canMiss)
     {
         flags |= FLAG_MISSABLE;
@@ -290,7 +290,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
         flags |= FLAG_ABSORB;
     }
     flags |= trg;
-    this->setFlags(flags);
+    this->setPlayFlags(flags);
 }
 
 Ability::Ability(Ability& ability) : Role(ability)

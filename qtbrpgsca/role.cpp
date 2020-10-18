@@ -212,7 +212,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
 
 Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
            int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates)
-    : Play(((revive ? FLAG_REVIVE : 0) | (range ? FLAG_RANGE : 0)))
+    : Play(nullptr, ((revive ? FLAG_REVIVE : 0) | (range ? FLAG_RANGE : 0)))
 {
     this->_id = id;
     this->_name = name;
@@ -227,7 +227,7 @@ Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int co
     this->_state_dur = aStates;
 }
 
-Role::Role(Role& role) : Play(role._flags)
+Role::Role(Role& role) : Play(nullptr, role.playFlags())
 {
     this->_id = role._id;
     this->_name = role._name;

@@ -23,20 +23,16 @@ CONFIG += c++17 resources_big qtquickcompiler
 
 SOURCES += \
     ability.cpp \
-	actor.cpp \
-	arenawidget.cpp \
-	clickablelabel.cpp \
-	itemsmodel.cpp \
-	costume.cpp \
-	demolib.cpp \
-	main.cpp \
-	play.cpp \
-	role.cpp \
-	state.cpp \
-	scene.cpp \
-	skillsmodel.cpp \
-	targetsmodel.cpp \
-    sceneact.cpp
+        actor.cpp \
+        itemsmodel.cpp \
+        costume.cpp \
+        demolib.cpp \
+        main.cpp \
+        play.cpp \
+        role.cpp \
+        state.cpp \
+        scene.cpp \
+        skillsmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -48,26 +44,22 @@ include(deployment.pri)
 
 HEADERS += \
     ability.h \
-	actor.h \
-	arenawidget.h \
-	clickablelabel.h \
-	itemsmodel.h \
-	costume.h \
-	demolib.h \
-	play.h \
-	role.h \
-	state.h \
-	scene.h \
-	skillsmodel.h \
-	targetsmodel.h \
-    sceneact.h
+        actor.h \
+        itemsmodel.h \
+        costume.h \
+        demolib.h \
+        play.h \
+        role.h \
+        state.h \
+        scene.h \
+        skillsmodel.h
 
 DISTFILES +=
 
 CONFIG += mobility
-MOBILITY = 
+MOBILITY =
 
-QMAKE_CXXFLAGS += -O3 -fdeclspec
+QMAKE_CXXFLAGS += -O3 #-fdeclspec
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

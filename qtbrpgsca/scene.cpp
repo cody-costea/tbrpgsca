@@ -139,7 +139,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
                         continue;
                     }
                 }
-                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasAnyFlag(FLAG_STUN | FLAG_CONFUSE | FLAG_CONVERT))
+                else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasAnyPlayFlag(FLAG_STUN | FLAG_CONFUSE | FLAG_CONVERT))
                          /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
                     (*guardPos) = guardian;
@@ -252,7 +252,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
                 }
             }
         }
-        SpriteCall* const actorEvent = scene._actor_run;
+        SpriteAct* const actorEvent = scene._actor_run;
         if (actorEvent == nullptr || ((*actorEvent)(scene, applyCosts ? &user : nullptr, &ability, (ko && target->_hp > 0),
                                                     target, &user == target ? &ability : counter)))
         {
@@ -659,7 +659,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
             crActor->applyStates(&ret, this, false);
             if (shapeShifted && (!crActor->Costume::isShapeShifted()))
             {
-                SpriteCall* const actorEvent = scene._actor_run;
+                SpriteAct* const actorEvent = scene._actor_run;
                 if (actorEvent)
                 {
                     ((*actorEvent)(scene, crActor, nullptr, true, nullptr, nullptr));
@@ -675,7 +675,7 @@ void Scene::endTurn(QString& ret, Actor* crActor)
     if (events && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event && (*event)(scene, &ret) && crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
+        if (event && (*event)(scene, &ret) && crActor->hasAnyPlayFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
                 /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
         {
             scene.playAi(ret, (*crActor));
@@ -718,7 +718,7 @@ void Scene::resetTurn(Actor& actor)
     }
 }
 
-void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteCall* const actorEvent, QVector<SceneRun*>* const events,
+void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
                          bool const useGuards, int const surprise, int const mInit)
 {
     int partiesSize = parties.size();
@@ -824,7 +824,7 @@ Scene::Scene() : Play(0)
 
 }
 
-Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteCall* const actorEvent, QVector<SceneRun*>* const events,
+Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
              bool const useGuards, int const surprise, int const mInit) : Play(0)
 {
     this->operator()(ret, parties, actorEvent, events, useGuards, surprise, mInit);

@@ -92,11 +92,11 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
     actor.updateResistance(remove, costume._res, costume._st_res);
     if (remove)
     {
-        int const roleFlags = costume.flags();
-        int const actorFlags = actor.flags();
+        int const roleFlags = costume.playFlags();
+        int const actorFlags = actor.playFlags();
         if ((actorFlags & roleFlags) == roleFlags)
         {
-            actor.setFlags(actorFlags ^ roleFlags);
+            actor.setPlayFlags(actorFlags ^ roleFlags);
         }
         if (costume.isShapeShifted() && costume._sprite)
         {
@@ -178,12 +178,12 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     }
     if (!remove)
     {
-        int const cFlags = costume._flags;
+        int const cFlags = costume.playFlags();
         if (costume._hp == 0 && costume._mp == 0 && costume._sp == 0)
         {
             actor._dmg_type |= costume._dmg_type;
         }
-        actor._flags |= cFlags;
+        actor.setPlayFlags(actor.playFlags() | cFlags);
         if (scene)
         {
 #if ALLOW_COVERING
@@ -224,7 +224,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     this->_st_res = stRes;
     this->_a_skills = skills;
     this->_counters = counters;
-    int flags = this->_flags;
+    int flags = this->playFlags();
     if (stun)
     {
         flags |= FLAG_STUN;
@@ -257,7 +257,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     {
         flags |= FLAG_KO;
     }
-    this->_flags = flags;
+    this->setPlayFlags(flags);
 }
 
 Costume::Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
