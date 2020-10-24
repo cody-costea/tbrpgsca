@@ -398,6 +398,7 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const act
         if (scene)
         {
             //Scene::SpriteRun* const actorEvent = scene->_actor_run;
+#if USE_TARGET_LIST
             if (actorEvent == nullptr || ((*actorEvent)(*scene, &actor, nullptr, false, nullptr, nullptr)))
             {
                 QVector<Actor*>* targets = scene->_targets;
@@ -412,6 +413,12 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const act
                 }
                 targets->append(this);
             }
+#else
+            if (actorEvent)
+            {
+                (*actorEvent)(*scene, &actor, nullptr, false, nullptr, nullptr);
+            }
+#endif
         }
     }
 }

@@ -19,6 +19,7 @@ namespace tbrpgsca
 
     class Scene : public Play
     {
+#define USE_TARGET_LIST 0
 #define ALLOW_NO_GUARDS 0
 #define ALLOW_COVERING 0
 
@@ -103,8 +104,11 @@ namespace tbrpgsca
         Ability* _last_ability;
         QVector<SceneRun*>* _events;
         int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
-        QVector<Actor*>* _players,* _targets;
         QVector<QVector<Actor*>*> _parties;
+        QVector<Actor*>* _players;
+#if USE_TARGET_LIST
+        QVector<Actor*>* _targets;
+#endif
         //SpriteRun* _actor_run;
         Actor* _cr_actor;
 

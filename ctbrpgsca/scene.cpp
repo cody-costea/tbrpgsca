@@ -87,7 +87,7 @@ int Scene::getOrderedPlayersSize() const
     QVector<Actor*>* players = this->_players;
     return players == nullptr ? 0 : players->size();
 }
-
+#if USE_TARGET_LIST
 int Scene::getTargetedPlayersSize() const
 {
     QVector<Actor*>* players = this->_targets;
@@ -104,7 +104,7 @@ bool Scene::hasTargetedPlayer(Actor& player) const
     QVector<Actor*>* players = this->_targets;
     return players && players->contains(&player);
 }
-
+#endif
 Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
 {
     int const side = target->_side;
@@ -240,6 +240,7 @@ void Scene::execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Acto
             }
         }
         //SpriteRun* const actorEvent = scene._actor_run;
+#if USE_TARGET_LIST
         if (actorEvent == nullptr || (*actorEvent)(scene, applyCosts ? &user : nullptr, &ability, (ko && target->_hp > 0),
                                                     target, &user == target ? &ability : counter))
         {
@@ -251,6 +252,13 @@ void Scene::execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Acto
             }
             targets->append(target);
         }
+#else
+        if (actorEvent)
+        {
+            (*actorEvent)(scene, applyCosts ? &user : nullptr, &ability, (ko && target->_hp > 0),
+                                                    target, &user == target ? &ability : counter);
+        }
+#endif
     }
 
 }
@@ -260,6 +268,7 @@ void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor
 {
     Scene& scene = *this;
     ret += Scene::PerformsTxt.arg(user._name, ability._name);
+#if USE_TARGET_LIST
     {
         QVector<Actor*>* const targets = scene._targets;
         if (targets)
@@ -267,6 +276,7 @@ void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor
             targets->clear();
         }
     }
+#endif
     QVector<SceneRun*>* events = scene._events;
     if (events && events->size() > EVENT_BEFORE_ACT)
     {
@@ -739,7 +749,9 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteR
     scene._events = events;
     scene._parties = parties;
     scene._players = players;
+#if USE_TARGET_LIST
     scene._targets = nullptr;
+#endif
     //scene._actor_run = actorEvent;
     //scene.current = scene.oldCurrent = 0;
     scene._surprise = surprise;
