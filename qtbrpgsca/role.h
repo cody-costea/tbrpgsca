@@ -38,6 +38,7 @@ namespace tbrpgsca
 #define ELEMENT_PSYCHIC 512
 #define ELEMENT_LIGHT 1024
 
+        Q_OBJECT
         PROP_FLAG_GET(isRanged, FLAG_RANGE, public)
         PROP_FLAG_GET(isReviving, FLAG_REVIVE, public)
         PROP_FIELD_GET_CUSTOM(currentHp, int, public, _hp)

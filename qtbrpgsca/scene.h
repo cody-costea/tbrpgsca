@@ -19,6 +19,10 @@ namespace tbrpgsca
 
     class Scene : public Play
     {
+#define USE_TARGET_LIST 1
+#define ALLOW_NO_GUARDS 1
+#define ALLOW_COVERING 1
+
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1
         #define STATUS_ONGOING 0
@@ -30,17 +34,16 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
         #define FLAG_HAS_COVERS 2
-        #define ALLOW_NO_GUARDS 1
-        #define ALLOW_COVERING 1
         #define MIN_ROUND INT_MIN
 
+        Q_OBJECT
         PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)
         PROP_FLAG_GET(usesGuards, FLAG_USE_GUARDS, public)
         PROP_FLAG_SET_ALL(Scene, UseGuards, FLAG_USE_GUARDS, protected, usesGuards)
         PROP_FLAG_SET_ALL(Scene, HasCovers, FLAG_HAS_COVERS, protected, hasCovers)
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
-        typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
+        typedef std::function<void(Scene* const scene, Actor* const user, Ability* const ability, bool const revive,
                                    Actor* const target, Ability* const counter)> SpriteAct;
 
         static QString EscapeTxt;
@@ -51,16 +54,16 @@ namespace tbrpgsca
 
         static bool actorAgiComp(Actor* const a, Actor* const b);
 
-        void playAi(QString& ret, Actor& player);
-        void endTurn(QString& ret, Actor* const actor);
-        void perform(QString& ret, Actor& user, Actor& target, Ability& ability, bool const item);
-        void checkStatus(QString& ret);
-        void escape(QString& ret);
+        Q_INVOKABLE void playAi(QString* const ret, Actor* const player);
+        Q_INVOKABLE void perform(QString* const ret, Actor* const user, Actor* const target, Ability* const ability, bool const item);
+        Q_INVOKABLE void checkStatus(QString* const ret);
+        Q_INVOKABLE void endTurn(QString* const ret);
+        Q_INVOKABLE void escape(QString* const ret);
 
-        bool canTarget(Actor& user, Ability& ability, Actor& target);
+        Q_INVOKABLE bool canTarget(Actor* const user, Ability* const ability, Actor* const target);
 
-        int getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
-        Actor* getGuardian(Actor& user, Actor* target, Ability& skill) const;
+        Q_INVOKABLE int getAiSkill(Actor* const user, QVector<Ability*>* const skills, int const index, bool const nRestore) const;
+        Q_INVOKABLE Actor* getGuardian(Actor* const user, Actor* target, Ability* const skill) const;
 
         Actor& getPartyPlayer(int const party, int const player) const;
         bool hasPartyPlayer(int const party, Actor& player) const;
@@ -90,13 +93,21 @@ namespace tbrpgsca
         Scene();
 
         ~Scene();
+
+    signals:
+        void spriteAct(Scene* const scene, Actor* const user, Ability* const ability, bool const revive,
+                                           Actor* const target, Ability* const counter);
+
     protected:
         Ability* _last_ability;
         QVector<SceneRun*>* _events;
         int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
-        QVector<Actor*>* _players,* _targets;
         QVector<QVector<Actor*>*> _parties;
-        SpriteAct* _actor_run;
+        QVector<Actor*>* _players;
+#if USE_TARGET_LIST
+        QVector<Actor*>* _targets;
+#endif
+        //SpriteAct* _actor_run;
         Actor* _cr_actor;
 
         void agiCalc();

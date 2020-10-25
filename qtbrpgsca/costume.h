@@ -27,6 +27,7 @@ namespace tbrpgsca
         #define FLAG_STUN 256
         #define FLAG_KO 512
 
+        Q_OBJECT
         PROP_FLAG_GET(isStunned, FLAG_STUN, public)
         PROP_FLAG_GET(isKnockedOut, FLAG_KO, public)
         PROP_FLAG_GET(isEnraged, FLAG_CONFUSE, public)

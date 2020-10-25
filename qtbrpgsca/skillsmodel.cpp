@@ -32,8 +32,8 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
        return QVariant();
    }
 
-   Actor& actor = *(this->_actor);
-   Ability& ability = *(actor._a_skills->at(index.row()));
+   Actor* const actor = (this->_actor);
+   Ability& ability = *(actor->_a_skills->at(index.row()));
 
    switch (role)
    {
@@ -42,7 +42,7 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
    case Qt::DisplayRole:
    {
        int usesQty;
-       QMap<Ability*, int>* skillsQty = actor._skills_cr_qty;
+       QMap<Ability*, int>* skillsQty = actor->_skills_cr_qty;
        return QString(tr("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability._name, QString::number(ability._lv_rq),
             QString::number(ability._m_hp), QString::number(ability._m_mp), QString::number(ability._m_sp), (skillsQty == nullptr
             || (usesQty = skillsQty->value(&ability, -1)) < 0 ? "∞" : QString::number(usesQty)));

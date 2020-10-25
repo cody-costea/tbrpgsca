@@ -30,12 +30,12 @@ bool State::hasRemovedSkill(Ability& skill) const
 int State::removedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->_r_skills;
-    return aSkills == nullptr ? 0 : aSkills->size();
+    return aSkills == NIL ? 0 : aSkills->size();
 }
 
 void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
 {
-    return this->inflict(&ret, nullptr, user, target, dur, always);
+    return this->inflict(&ret, NIL, user, target, dur, always);
 }
 
 void State::inflict(QString* const ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always)
@@ -54,10 +54,10 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
         int stateRes;
         QMap<State*, int>* stRes;
         if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._st_res)
-                == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
+                == NIL ? 0 : stRes->value(this, 0) + stRes->value(NIL, 0)) + stateRes)))
         {
             QMap<State*, int>* trgStates = target._state_dur;
-            if (trgStates == nullptr)
+            if (trgStates == NIL)
             {
                 trgStates = new QMap<State*, int>();
                 target._state_dur = trgStates;
@@ -138,7 +138,7 @@ void State::remove(QString* const ret, Scene* const scene, Actor& actor)
 
 bool State::disable(Actor& actor, int const dur, const bool remove)
 {
-    return this->disable(nullptr, nullptr, actor, remove, dur);
+    return this->disable(NIL, NIL, actor, remove, dur);
 }
 
 bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int dur, const bool remove)
@@ -150,7 +150,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
     if (dur > STATE_END_DUR)
     {
         QMap<State*, int>* sDur = actor._state_dur;
-        if (sDur == nullptr)
+        if (sDur == NIL)
         {
             return true;
         }
@@ -193,7 +193,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
 
 void State::alter(QString& ret, Actor& actor, const bool consume)
 {
-    return this->alter(&ret, nullptr, actor, consume);
+    return this->alter(&ret, NIL, actor, consume);
 }
 
 void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bool consume)
@@ -245,7 +245,7 @@ void State::blockSkills(Actor& actor, const bool remove)
         }
         else
         {
-            if (iSkills == nullptr)
+            if (iSkills == NIL)
             {
                 iSkills = new QMap<Ability*, int>();
                 actor._skills_cr_qty = iSkills;

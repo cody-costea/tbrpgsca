@@ -25,19 +25,19 @@ QString Role::SuffersTxt = ", %1 suffers ";
 QString Role::sprite() const
 {
     QString* const spr = this->_sprite;
-    return spr == nullptr ? QString() : *(this->_sprite);
+    return spr == NIL ? QString() : *(this->_sprite);
 }
 
 int Role::stateDuration(State& state) const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates == nullptr ? 0 : aStates->value(&state, 0);
+    return aStates == NIL ? 0 : aStates->value(&state, 0);
 }
 
 QList<State*> Role::statesList() const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates == nullptr ? QList<State*>() : aStates->keys();
+    return aStates == NIL ? QList<State*>() : aStates->keys();
 }
 
 bool Role::hasState(State& state) const
@@ -49,7 +49,7 @@ bool Role::hasState(State& state) const
 int Role::statesSize() const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates == nullptr ? 0 : aStates->size();
+    return aStates == NIL ? 0 : aStates->size();
 }
 
 bool Role::operator==(Role& role) const
@@ -59,7 +59,7 @@ bool Role::operator==(Role& role) const
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
 {
-    return this->damage(ret, nullptr, absorber, target, dmg, percent);
+    return this->damage(ret, NIL, absorber, target, dmg, percent);
 }
 
 void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
@@ -212,11 +212,11 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
 
 Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
            int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates)
-    : Play(nullptr, ((revive ? FLAG_REVIVE : 0) | (range ? FLAG_RANGE : 0)))
+    : Play(NIL, ((revive ? FLAG_REVIVE : 0) | (range ? FLAG_RANGE : 0)))
 {
     this->_id = id;
     this->_name = name;
-    this->_sprite = sprite.length() == 0 ? nullptr : new QString(sprite);
+    this->_sprite = sprite.length() == 0 ? NIL : new QString(sprite);
     this->_m_hp = mHp;
     this->_m_mp = mMp;
     this->_m_sp = mSp;
@@ -227,7 +227,7 @@ Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int co
     this->_state_dur = aStates;
 }
 
-Role::Role(Role& role) : Play(nullptr, role.playFlags())
+Role::Role(Role& role) : Play(NIL, role.playFlags())
 {
     this->_id = role._id;
     this->_name = role._name;
@@ -247,7 +247,7 @@ Role::~Role()
     QString* sprite = this->_sprite;
     if (sprite)
     {
-        this->_sprite = nullptr;
+        this->_sprite = NIL;
         delete sprite;
     }
 }

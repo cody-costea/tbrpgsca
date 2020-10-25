@@ -129,7 +129,9 @@ namespace tbrpgsca
 #define PROP_FLAG(Class, QmlName, PropName, Flag, GetLevel, SetLevel) \
     PROP_FLAG_GET(is##PropName, Flag, GetLevel) \
     PROP_FLAG_SET_ALL(Class, PropName, Flag, SetLevel, is##PropName) \
-    Q_PROPERTY(bool QmlName READ is##PropName WRITE PropName NOTIFY is##PropName##Changed)
+    Q_PROPERTY(bool QmlName READ is##PropName WRITE set##PropName NOTIFY is##PropName##Changed)
+
+#define NIL nullptr
 
     class Play : public QObject
     {

@@ -16,10 +16,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
-    class DemoLib
+    class DemoLib : public QObject
     {
-         Q_DECLARE_TR_FUNCTIONS(DemoLib)
-
+        //Q_DECLARE_TR_FUNCTIONS(DemoLib)
+        Q_OBJECT
         public:
             QVector<State*>& getStates();
             QVector<Actor*>& getPlayers();

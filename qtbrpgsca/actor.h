@@ -24,6 +24,7 @@ namespace tbrpgsca
         #define CHAR_RACE 1
         #define CHAR_JOB 2
 
+        Q_OBJECT
         PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
         PROP_FLAG(Actor, aiPlayer, AiPlayer, FLAG_AI_PLAYER, public, public)
         PROP_FLAG(Actor, randomAi, RandomAi, FLAG_RANDOM_AI, public, public)

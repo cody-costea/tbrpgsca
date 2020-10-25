@@ -19,6 +19,7 @@ namespace tbrpgsca
     {
         #define STATE_END_DUR -3
 
+        Q_OBJECT
         PROP_FIELD_GET_CUSTOM(duration, int, public, _dur)
         PROP_FIELD_GET_CUSTOM(resistance, int, public, _s_res)
     public:

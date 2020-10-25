@@ -23,13 +23,13 @@ QString Ability::StolenTxt = ", obtaining %1 from %2";
 int Ability::removedStateDuration(State& state) const
 {
     QMap<State*, int>* aStates = this->_r_states;
-    return aStates == nullptr ? 0 : aStates->value(&state, 0);
+    return aStates == NIL ? 0 : aStates->value(&state, 0);
 }
 
 QList<State*> Ability::removedStatesList() const
 {
     QMap<State*, int>* aStates = this->_r_states;
-    return aStates == nullptr ? QList<State*>() : aStates->keys();
+    return aStates == NIL ? QList<State*>() : aStates->keys();
 }
 
 bool Ability::removedState(State& state) const
@@ -41,7 +41,7 @@ bool Ability::removedState(State& state) const
 int Ability::removedStatesSize() const
 {
     QMap<State*, int>* aStates = this->_r_states;
-    return aStates == nullptr ? 0 : aStates->size();
+    return aStates == NIL ? 0 : aStates->size();
 }
 
 void Ability::replenish(Actor& user)
@@ -51,7 +51,7 @@ void Ability::replenish(Actor& user)
     if (mQty > 0)
     {
         QMap<Ability*, int>* usrSkills = user._skills_cr_qty;
-        if (usrSkills == nullptr)
+        if (usrSkills == NIL)
         {
             usrSkills = new QMap<Ability*, int>();
             user._skills_cr_qty = usrSkills;
@@ -61,16 +61,17 @@ void Ability::replenish(Actor& user)
 
 }
 
-bool Ability::canPerform(Actor& actor)
+bool Ability::canPerform(Actor* const actor)
 {
-    QMap<Ability*, int>* skillsQty = actor._skills_cr_qty;
-    return this->_m_mp <= actor._mp && this->_m_hp < actor._hp && this->_m_sp <= actor._sp && actor._lv >= this->_lv_rq
-                    && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
+    assert(actor);
+    QMap<Ability*, int>* skillsQty = actor->_skills_cr_qty;
+    return this->_m_mp <= actor->_mp && this->_m_hp < actor->_hp && this->_m_sp <= actor->_sp && actor->_lv >= this->_lv_rq
+                    && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
 }
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
-    return this->execute(ret, nullptr, user, &target, applyCosts);
+    return this->execute(ret, NIL, user, &target, applyCosts);
 }
 
 void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
@@ -138,7 +139,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     dmg = 0;
                 }
             }
-            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
+            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : NIL), *target, dmg, false);
             {
                 QMap<State*, int>* aStates = ability._state_dur;
                 if (aStates)
@@ -196,7 +197,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                         //if (itemId < trgItemsSize)
                         //{
                             int trgItemQty = 0;
-                            Ability* stolen = nullptr;
+                            Ability* stolen = NIL;
                             //Ability* stolen = trgItems->keys().at(itemId);
                             {
                                 i = 0;
@@ -213,7 +214,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                             }
                             if (trgItemQty > 0)
                             {
-                                if (usrItems == nullptr)
+                                if (usrItems == NIL)
                                 {
                                     usrItems = new QMap<Ability*, int>();
                                     user.setNewItems(true);
@@ -249,7 +250,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         if (mQty > 0)
         {
             QMap<Ability*, int>* usrSkillsQty = user._skills_cr_qty;
-            if (usrSkillsQty == nullptr)
+            if (usrSkillsQty == NIL)
             {
                 usrSkillsQty = new QMap<Ability*, int>();
                 user._skills_cr_qty = usrSkillsQty;
@@ -270,7 +271,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_r_qty = rQty;
     this->_dmg_type = dmgType;
     this->_attr_inc = attrInc;
-    this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
+    this->_sound = sound.length() > 0 ? new QString(sound) : NIL;
     this->_r_states = rStates;
     int flags = this->playFlags();
     if (canMiss)

@@ -28,6 +28,7 @@ namespace tbrpgsca
         #define FLAG_TRG_ONE 0
         #define DEFAULT_RES 3
 
+        Q_OBJECT
         PROP_FLAG_GET(canMiss, FLAG_MISSABLE, public)
         PROP_FLAG_GET(isStealing, FLAG_STEAL, public)
         PROP_FLAG_GET(isOnlyMelee, FLAG_MELEE, public)
@@ -49,7 +50,7 @@ namespace tbrpgsca
         bool removedState(State& state) const;
         int removedStatesSize() const;
 
-        bool canPerform(Actor& user);
+        Q_INVOKABLE bool canPerform(Actor* const user);
         void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
         void replenish(Actor& user);
 
