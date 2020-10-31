@@ -17,8 +17,6 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_AI_PLAYER 8192
-        #define FLAG_RANDOM_AI 2048
         #define FLAG_NEW_ITEMS 4096
         #define CHAR_NONE 0
         #define CHAR_RACE 1
@@ -26,19 +24,19 @@ namespace tbrpgsca
 
         Q_OBJECT
         PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
-        PROP_FLAG(Actor, aiPlayer, AiPlayer, FLAG_AI_PLAYER, public, public)
-        PROP_FLAG(Actor, randomAi, RandomAi, FLAG_RANDOM_AI, public, public)
-        PROP_FLAG_SET_ALL(Actor, Ranged, FLAG_RANGE, public, isRanged)
+        PROP_FLAG(Actor, aiPlayer, AiPlayer, Attribute::AiPlayer, public, public)
+        PROP_FLAG(Actor, randomAi, RandomAi, Attribute::RandomAi, public, public)
+        PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
         PROP_FLAG_SET_ALL(Actor, NewItems, FLAG_NEW_ITEMS, public, hasNewItems)
-        PROP_FLAG_SET_ALL(Actor, Stunned, FLAG_STUN, public, isStunned)
-        PROP_FLAG_SET_ALL(Actor, Reviving, FLAG_REVIVE, public, isReviving)
-        PROP_FLAG_SET_ALL(Actor, Enraged, FLAG_ENRAGED, public, isEnraged)
-        PROP_FLAG_SET_ALL(Actor, KnockedOut, FLAG_KO, public, isKnockedOut)
-        PROP_FLAG_SET_ALL(Actor, Confused, FLAG_CONFUSE, public, isConfused)
-        PROP_FLAG_SET_ALL(Actor, Covering, FLAG_COVERING, public, isCovering)
-        PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, isReflecting)
-        PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, isInvincible)
-        PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, isShapeShifted)
+        PROP_FLAG_SET_ALL(Actor, Stunned, Costume::Attribute::Stun, public, isStunned)
+        PROP_FLAG_SET_ALL(Actor, Reviving, Role::Attribute::Revive, public, isReviving)
+        PROP_FLAG_SET_ALL(Actor, Enraged, Costume::Attribute::Enraged, public, isEnraged)
+        PROP_FLAG_SET_ALL(Actor, KnockedOut, Costume::Attribute::Ko, public, isKnockedOut)
+        PROP_FLAG_SET_ALL(Actor, Confused, Costume::Attribute::Confuse, public, isConfused)
+        PROP_FLAG_SET_ALL(Actor, Covering, Costume::Attribute::Covering, public, isCovering)
+        PROP_FLAG_SET_ALL(Actor, Reflecting, Costume::Attribute::Reflect, public, isReflecting)
+        PROP_FLAG_SET_ALL(Actor, Invincible, Costume::Attribute::Invincible, public, isInvincible)
+        PROP_FLAG_SET_ALL(Actor, ShapeShifted, Costume::Attribute::ShapeShift, public, isShapeShifted)
         PROP_CUSTOM_FIELD(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
         PROP_CUSTOM_FIELD(Actor, partySide, setPartySide, swapPartySide, withPartySide, int, public, public, _side)
         PROP_FIELD_WITH_SWAP(Actor, setExperience, swapExperience, withExperience, int, public, experience)
@@ -74,6 +72,14 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
         PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
     public:
+        enum Attribute {
+            //HasNewItems = 4096,
+            RandomAi = 2048,
+            AiPlayer = 8192
+        };
+        Q_DECLARE_FLAGS(Attributes, Attribute)
+        Q_FLAG(Attributes)
+
         static QString KoTxt;
         static QString RiseTxt;
 
@@ -166,5 +172,7 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Actor::Attributes)
 
 #endif // ACTOR_H

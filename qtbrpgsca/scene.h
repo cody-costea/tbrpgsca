@@ -32,16 +32,21 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
-        #define FLAG_USE_GUARDS 1
-        #define FLAG_HAS_COVERS 2
         #define MIN_ROUND INT_MIN
 
         Q_OBJECT
-        PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)
-        PROP_FLAG_GET(usesGuards, FLAG_USE_GUARDS, public)
-        PROP_FLAG_SET_ALL(Scene, UseGuards, FLAG_USE_GUARDS, protected, usesGuards)
-        PROP_FLAG_SET_ALL(Scene, HasCovers, FLAG_HAS_COVERS, protected, hasCovers)
+        PROP_FLAG_GET(hasCovers, Attribute::HasCovers, public)
+        PROP_FLAG_GET(usesGuards, Attribute::UseGuards, public)
+        PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::UseGuards, protected, usesGuards)
+        PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, protected, hasCovers)
     public:
+        enum Attribute {
+            UseGuards = 1,
+            HasCovers = 2
+        };
+        Q_DECLARE_FLAGS(Attributes, Attribute)
+        Q_FLAG(Attributes)
+
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
         typedef std::function<void(Scene* const scene, Actor* const user, Ability* const ability, bool const revive,
                                    Actor* const target, Ability* const counter)> SpriteAct;
@@ -124,5 +129,7 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Scene::Attributes)
 
 #endif // SCENE_H

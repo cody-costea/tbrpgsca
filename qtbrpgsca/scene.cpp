@@ -142,7 +142,8 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
                         continue;
                     }
                 }
-                else if ((fGuard == NIL || pos != -1) && guardian->_hp > 0 && (!guardian->hasAnyPlayFlag(FLAG_STUN | FLAG_CONFUSE | FLAG_CONVERT))
+                else if ((fGuard == NIL || pos != -1) && guardian->_hp > 0
+                         && (!guardian->hasAnyPlayFlag(Costume::Attribute::Stun | Costume::Attribute::Confuse | Costume::Attribute::Convert))
                          /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
                     (*guardPos) = guardian;
@@ -160,20 +161,24 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
     }
 #if ALLOW_COVERING
     coverCheck:
-    if (this->hasCovers() && (skill->_dmg_type & DMG_TYPE_ATK) == DMG_TYPE_ATK && target->_hp < target->_m_hp / 3)
+    if (this->hasCovers())
     {
-        Actor* coverer = NIL;
-        QVector<Actor*>& party = *(this->_parties[side]);
-        for (Actor* const actor : party)
+        int cvrType = target->_cvr_type;
+        if (this->hasCovers() && (skill->_dmg_type & cvrType) == cvrType && target->_hp < target->_m_hp / 3)
         {
-            if (actor != target && actor->Costume::isCovering() && (coverer == NIL || (actor->_hp > coverer->_hp)))
+            Actor* coverer = NIL;
+            QVector<Actor*>& party = *(this->_parties[side]);
+            for (Actor* const actor : party)
             {
-                coverer = actor;
+                if (actor != target && actor->Costume::isCovering() && (coverer == NIL || (actor->_hp > coverer->_hp)))
+                {
+                    coverer = actor;
+                }
             }
-        }
-        if (coverer)
-        {
-            return coverer;
+            if (coverer)
+            {
+                return coverer;
+            }
         }
     }
 #endif
@@ -677,7 +682,7 @@ void Scene::endTurn(QString* const ret)
     if (events && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event && (*event)(scene, ret) && crActor->hasAnyPlayFlag(FLAG_AI_PLAYER | FLAG_ENRAGED | FLAG_CONFUSE)
+        if (event && (*event)(scene, ret) && crActor->hasAnyPlayFlag(Actor::Attribute::AiPlayer | Costume::Attribute::Enraged | Costume::Attribute::Confuse)
                 /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
         {
             scene.playAi(ret, crActor);

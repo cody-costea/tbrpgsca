@@ -187,12 +187,12 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         if (scene)
         {
 #if ALLOW_COVERING
-            if ((cFlags & FLAG_COVERING) == FLAG_COVERING)
+            if ((cFlags & Attribute::Covering) == Attribute::Covering)
             {
                 scene->setHasCovers(true);
             }
 #endif
-            if (ret && (cFlags & FLAG_KO) == FLAG_KO)
+            if (ret && (cFlags & Attribute::Ko) == Attribute::Ko)
             {
                 scene->checkStatus(ret);
             }
@@ -227,35 +227,35 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     int flags = this->playFlags();
     if (stun)
     {
-        flags |= FLAG_STUN;
+        flags |= Attribute::Stun;
     }
     if (shapeShift)
     {
         QString* spr = this->_sprite;
         if (spr && spr->length() > 0)
         {
-            flags |= FLAG_SHAPE_SHIFT;
+            flags |= Attribute::ShapeShift;
         }
     }
     if (automate)
     {
-        flags |= FLAG_ENRAGED;
+        flags |= Attribute::Enraged;
     }
     if (confuse)
     {
-        flags |= FLAG_CONFUSE;
+        flags |= Attribute::Confuse;
     }
     if (reflect)
     {
-        flags |= FLAG_REFLECT;
+        flags |= Attribute::Reflect;
     }
     if (invincible)
     {
-        flags |= FLAG_INVINCIBLE;
+        flags |= Attribute::Invincible;
     }
     if (ko)
     {
-        flags |= FLAG_KO;
+        flags |= Attribute::Ko;
     }
     this->setPlayFlags(flags);
 }

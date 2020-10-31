@@ -17,26 +17,16 @@ namespace tbrpgsca
 {
     class Costume : public Role
     {
-        #define FLAG_ENRAGED 4
-        #define FLAG_CONFUSE 8
-        #define FLAG_CONVERT 16
-        #define FLAG_REFLECT 32
-        #define FLAG_SHAPE_SHIFT 64
-        #define FLAG_INVINCIBLE 128
-        #define FLAG_COVERING 1024
-        #define FLAG_STUN 256
-        #define FLAG_KO 512
-
         Q_OBJECT
-        PROP_FLAG_GET(isStunned, FLAG_STUN, public)
-        PROP_FLAG_GET(isKnockedOut, FLAG_KO, public)
-        PROP_FLAG_GET(isEnraged, FLAG_CONFUSE, public)
-        PROP_FLAG_GET(isConfused, FLAG_CONFUSE, public)
-        PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
-        PROP_FLAG_GET(isConverted, FLAG_CONVERT, public)
-        PROP_FLAG_GET(isReflecting, FLAG_REFLECT, public)
-        PROP_FLAG_GET(isInvincible, FLAG_INVINCIBLE, public)
-        PROP_FLAG_GET(isShapeShifted, FLAG_SHAPE_SHIFT, public)
+        PROP_FLAG_GET(isStunned, Attribute::Stun, public)
+        PROP_FLAG_GET(isKnockedOut, Attribute::Ko, public)
+        PROP_FLAG_GET(isEnraged, Attribute::Enraged, public)
+        PROP_FLAG_GET(isConfused, Attribute::Confuse, public)
+        PROP_FLAG_GET(isCovering, Attribute::Covering, public)
+        PROP_FLAG_GET(isConverted, Attribute::Convert, public)
+        PROP_FLAG_GET(isReflecting, Attribute::Reflect, public)
+        PROP_FLAG_GET(isInvincible, Attribute::Invincible, public)
+        PROP_FLAG_GET(isShapeShifted, Attribute::ShapeShift, public)
         PROP_FIELD_GET_CUSTOM(maxActions, int, public, _m_actions)
         PROP_FIELD_GET_CUSTOM(coverDmgType, int, public, _cvr_type)
         PROP_FIELD_GET_CUSTOM(reflectDmgType, int, public, _rfl_type)
@@ -46,6 +36,20 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(wisdom, int, public, _wis)
         PROP_FIELD_GET_CUSTOM(agility, int, public, _agi)
     public:
+        enum Attribute {
+            Enraged = 4,
+            Confuse = 8,
+            Convert = 16,
+            Reflect = 32,
+            ShapeShift = 64,
+            Invincible = 128,
+            Covering = 1024,
+            Stun = 256,
+            Ko = 512
+        };
+        Q_DECLARE_FLAGS(Attributes, Attribute)
+        Q_FLAG(Attributes)
+
         static QString CausesTxt;
 
         bool isCountering() const;
@@ -95,5 +99,7 @@ namespace tbrpgsca
         friend class Scene;
     };
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Costume::Attributes)
 
 #endif // COSTUME_H

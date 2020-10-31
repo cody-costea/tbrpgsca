@@ -30,7 +30,7 @@ namespace tbrpgsca
 
         PROP_FLAG_GET(isStunned, FLAG_STUN, public)
         PROP_FLAG_GET(isKnockedOut, FLAG_KO, public)
-        PROP_FLAG_GET(isEnraged, FLAG_CONFUSE, public)
+        PROP_FLAG_GET(isEnraged, FLAG_ENRAGED, public)
         PROP_FLAG_GET(isConfused, FLAG_CONFUSE, public)
         PROP_FLAG_GET(isCovering, FLAG_COVERING, public)
         PROP_FLAG_GET(isConverted, FLAG_CONVERT, public)

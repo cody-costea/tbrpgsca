@@ -24,23 +24,9 @@ namespace tbrpgsca
     {
 #define DMG_RND 3
 
-#define FLAG_REVIVE 1
-#define FLAG_RANGE 2
-#define DMG_TYPE_ATK 1
-#define DMG_TYPE_DEF 2
-#define DMG_TYPE_SPI 4
-#define DMG_TYPE_WIS 8
-#define DMG_TYPE_AGI 16
-#define ELEMENT_FIRE 32
-#define ELEMENT_WATER 64
-#define ELEMENT_THUNDER 128
-#define ELEMENT_EARTH 256
-#define ELEMENT_PSYCHIC 512
-#define ELEMENT_LIGHT 1024
-
         Q_OBJECT
-        PROP_FLAG_GET(isRanged, FLAG_RANGE, public)
-        PROP_FLAG_GET(isReviving, FLAG_REVIVE, public)
+        PROP_FLAG_GET(isRanged, Attribute::Range, public)
+        PROP_FLAG_GET(isReviving, Attribute::Revive, public)
         PROP_FIELD_GET_CUSTOM(currentHp, int, public, _hp)
         PROP_FIELD_GET_CUSTOM(currentMp, int, public, _mp)
         PROP_FIELD_GET_CUSTOM(currentRp, int, public, _sp)
@@ -51,6 +37,31 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
         PROP_FIELD_GET_CUSTOM(id, int, public, _id)
     public:
+        enum Attribute {
+            Revive = 1,
+            Range = 2
+        };
+        Q_DECLARE_FLAGS(Attributes, Attribute)
+        Q_FLAG(Attributes)
+
+        enum Element {
+            Attack = 1,
+            Defense = 2,
+            Spirit = 4,
+            Wisdom = 8,
+            Agility = 16,
+            Fire = 32,
+            Water = 64,
+            Wind = 128,
+            Earth = 256,
+            Psychic = 512,
+            Light = 1024,
+            Electric = 2048,
+            Ice = 4096,
+        };
+        Q_DECLARE_FLAGS(Elements, Element)
+        Q_FLAG(Elements)
+
         static QString HpTxt;
         static QString MpTxt;
         static QString RpTxt;
@@ -88,4 +99,7 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Role::Attributes)
+Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Role::Elements)
 #endif // ROLE_H

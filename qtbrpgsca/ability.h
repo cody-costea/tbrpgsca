@@ -18,29 +18,34 @@ namespace tbrpgsca
 
     class Ability : public Role
     {
-        #define FLAG_MELEE 4
-        #define FLAG_STEAL 8
-        #define FLAG_ABSORB 16
-        #define FLAG_MISSABLE 32
-        #define FLAG_TRG_ALL 4
-        #define FLAG_TRG_SIDE 128
-        #define FLAG_TRG_SELF 64
-        #define FLAG_TRG_ONE 0
         #define DEFAULT_RES 3
 
         Q_OBJECT
-        PROP_FLAG_GET(canMiss, FLAG_MISSABLE, public)
-        PROP_FLAG_GET(isStealing, FLAG_STEAL, public)
-        PROP_FLAG_GET(isOnlyMelee, FLAG_MELEE, public)
-        PROP_FLAG_GET(targetsAll, FLAG_TRG_ALL, public)
-        PROP_FLAG_GET(isAbsorbing, FLAG_ABSORB, public)
-        PROP_FLAG_GET(targetsSide, FLAG_TRG_SIDE, public)
-        PROP_FLAG_GET(targetsSelf, FLAG_TRG_SELF, public)
+        PROP_FLAG_GET(canMiss, Attribute::Missable, public)
+        PROP_FLAG_GET(isStealing, Attribute::Steal, public)
+        PROP_FLAG_GET(isOnlyMelee, Attribute::Melee, public)
+        PROP_FLAG_GET(isAbsorbing, Attribute::Absorb, public)
+        PROP_FLAG_GET(targetsAll, Attribute::TargetAll, public)
+        PROP_FLAG_GET(targetsSide, Attribute::TargetSide, public)
+        PROP_FLAG_GET(targetsSelf, Attribute::TargetSelf, public)
         PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
         PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
         PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
         PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
     public:
+        enum Attribute {
+            Melee = 4,
+            Steal = 8,
+            Absorb = 16,
+            Missable = 32,
+            TargetAll = 4,
+            TargetSide = 128,
+            TargetSelf = 64,
+            TargetOne = 0
+        };
+        Q_DECLARE_FLAGS(Attributes, Attribute)
+        Q_FLAG(Attributes)
+
         static QString MissesTxt;
         static QString ReflectTxt;
         static QString StolenTxt;
@@ -78,5 +83,7 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Ability::Attributes)
 
 #endif // ABILITY_H

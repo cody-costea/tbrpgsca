@@ -87,31 +87,31 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     {
         int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user._agi,
                 trgAgi = target->_agi, trgSpi = target->_spi, usrWis = user._wis;
-        if ((dmgType & DMG_TYPE_ATK) == DMG_TYPE_ATK)
+        if ((dmgType & Role::Element::Attack) == Role::Element::Attack)
         {
             dmg += user._atk;
             def += target->_def;
             ++i;
         }
-        if ((dmgType & DMG_TYPE_DEF) == DMG_TYPE_DEF)
+        if ((dmgType & Role::Element::Defense) == Role::Element::Defense)
         {
             dmg += user._def;
             def += target->_def;
             ++i;
         }
-        if ((dmgType & DMG_TYPE_SPI) == DMG_TYPE_SPI)
+        if ((dmgType & Role::Element::Spirit) == Role::Element::Spirit)
         {
             dmg += user._spi;
             def += target->_wis;
             ++i;
         }
-        if ((dmgType & DMG_TYPE_WIS) == DMG_TYPE_WIS)
+        if ((dmgType & Role::Element::Wisdom) == Role::Element::Wisdom)
         {
             dmg += usrWis;
             def += trgSpi;
             ++i;
         }
-        if ((dmgType & DMG_TYPE_AGI) == DMG_TYPE_AGI)
+        if ((dmgType & Role::Element::Agility) == Role::Element::Agility)
         {
             dmg += usrAgi;
             def += trgAgi;
@@ -276,19 +276,19 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     int flags = this->playFlags();
     if (canMiss)
     {
-        flags |= FLAG_MISSABLE;
+        flags |= Attribute::Missable;
     }
     if (melee)
     {
-        flags |= FLAG_MELEE;
+        flags |= Attribute::Melee;
     }
     if (steal)
     {
-        flags |= FLAG_STEAL;
+        flags |= Attribute::Steal;
     }
     if (absorb)
     {
-        flags |= FLAG_ABSORB;
+        flags |= Attribute::Absorb;
     }
     flags |= trg;
     this->setPlayFlags(flags);
