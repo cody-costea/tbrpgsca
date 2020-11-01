@@ -25,7 +25,7 @@ QString Role::SuffersTxt = ", %1 suffers ";
 QString Role::sprite() const
 {
     QString* const spr = this->_sprite;
-    return spr == nullptr ? QString() : *(this->_sprite);
+    return spr ? *spr : QString();
 }
 
 int Role::stateDuration(State& state) const

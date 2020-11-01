@@ -129,13 +129,13 @@ void Actor::setJob(Scene* const scene, Costume& job)
         if (spr)
         {
             QString* actorSpr = actor._sprite;
-            if (actorSpr == nullptr)
+            if (actorSpr)
             {
-                actor._sprite = new QString(*spr);
+                (*actorSpr) = *spr;
             }
             else
             {
-                (*actorSpr) = *spr;
+                actor._sprite = new QString(*spr);
             }
         }
     }
@@ -402,14 +402,14 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const act
             if (actorEvent == nullptr || ((*actorEvent)(*scene, &actor, nullptr, false, nullptr, nullptr)))
             {
                 QVector<Actor*>* targets = scene->_targets;
-                if (targets == nullptr)
+                if (targets)
                 {
-                    targets = new QVector<Actor*>(1);
-                    scene->_targets = targets;
+                    targets->clear();
                 }
                 else
                 {
-                    targets->clear();
+                    targets = new QVector<Actor*>(1);
+                    scene->_targets = targets;
                 }
                 targets->append(this);
             }
