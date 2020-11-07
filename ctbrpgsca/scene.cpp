@@ -43,7 +43,7 @@ Actor* Scene::getCurrentPlayer() const
 int Scene::getCurrentParty() const
 {
     Actor* const crActor = this->_cr_actor;
-    return crActor == nullptr ? -1 : crActor->_side;
+    return crActor ? crActor->_side : -1;
 }
 
 Ability* Scene::getLastAbility() const
@@ -78,20 +78,20 @@ Actor& Scene::getOrderedPlayer(int const n) const
 
 bool Scene::hasOrderedPlayer(Actor& player) const
 {
-    QVector<Actor*>* players = this->_players;
+    QVector<Actor*>* const players = this->_players;
     return players && players->contains(&player);
 }
 
 int Scene::getOrderedPlayersSize() const
 {
-    QVector<Actor*>* players = this->_players;
-    return players == nullptr ? 0 : players->size();
+    QVector<Actor*>* const players = this->_players;
+    return players ? players->size() : 0;
 }
 #if USE_TARGET_LIST
 int Scene::getTargetedPlayersSize() const
 {
-    QVector<Actor*>* players = this->_targets;
-    return players == nullptr ? 0 : players->size();
+    QVector<Actor*>* const players = this->_targets;
+    return players ? players->size() : 0;
 }
 
 Actor& Scene::getTargetedPlayer(int const n) const
@@ -101,7 +101,7 @@ Actor& Scene::getTargetedPlayer(int const n) const
 
 bool Scene::hasTargetedPlayer(Actor& player) const
 {
-    QVector<Actor*>* players = this->_targets;
+    QVector<Actor*>* const players = this->_targets;
     return players && players->contains(&player);
 }
 #endif

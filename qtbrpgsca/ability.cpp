@@ -65,8 +65,8 @@ bool Ability::canPerform(Actor* const actor)
 {
     assert(actor);
     QMap<Ability*, int>* skillsQty = actor->_skills_cr_qty;
-    return this->_m_mp <= actor->_mp && this->_m_hp < actor->_hp && this->_m_sp <= actor->_sp && actor->_lv >= this->_lv_rq
-                    && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
+    return this->maximumMp() <= actor->maximumMp() && this->maximumHp() < actor->maximumHp() && this->maximumRp() <= actor->maximumRp()
+            && actor->level() >= this->requiredLevel() && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
 }
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
@@ -78,10 +78,10 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
 {
     assert(target);
     Ability& ability = *this;
-    int const dmgType = ability._dmg_type | user._dmg_type;
+    int const dmgType = ability.dmgType() | user.dmgType();
     if (target != &user && ((dmgType & target->reflectDmgType()) != 0))
     {
-        ret += Ability::ReflectTxt.arg(target->_name);
+        ret += Ability::ReflectTxt.arg(target->name());
         target = &user;
     }
     {
@@ -141,7 +141,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             }
             ability.damage(ret, scene, (ability.isAbsorbing() ? &user : NIL), *target, dmg, false);
             {
-                QMap<State*, int>* aStates = ability._state_dur;
+                QMap<State*, int>* aStates = ability._role_data->_state_dur;
                 if (aStates)
                 {
                     auto const last = aStates->cend();
@@ -152,7 +152,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                 }
             }
             {
-                QMap<State*, int>* stateDur = target->_state_dur;
+                QMap<State*, int>* stateDur = target->_role_data->_state_dur;
                 if (stateDur)
                 {
                     QMap<State*, int>* rStates = ability._r_states;
@@ -229,7 +229,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                                 {
                                     trgItems->operator[](stolen) = trgItemQty - 1;
                                 }
-                                ret += Ability::StolenTxt.arg(stolen->_name, target->_name);
+                                ret += Ability::StolenTxt.arg(stolen->name(), target->name());
                             }
                         //}
                     }
@@ -238,14 +238,14 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         }
         else
         {
-            ret += Ability::MissesTxt.arg(target->_name);
+            ret += Ability::MissesTxt.arg(target->name());
         }
     }
     if (applyCosts)
     {
-        user.setCurrentRp(user._sp - ability._m_sp);
-        user.setCurrentMp(user._mp - ability._m_mp);
-        user.setCurrentHp(user._hp - ability._m_hp, &ret, scene, false);
+        user.setCurrentRp(user.currentRp() - ability.maximumRp());
+        user.setCurrentMp(user.currentMp() - ability.maximumMp());
+        user.setCurrentHp(user.currentHp() - ability.maximumHp(), &ret, scene, false);
         int mQty = ability._m_qty;
         if (mQty > 0)
         {
@@ -269,7 +269,6 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_lv_rq = lvRq;
     this->_m_qty = mQty;
     this->_r_qty = rQty;
-    this->_dmg_type = dmgType;
     this->_attr_inc = attrInc;
     this->_sound = sound.length() > 0 ? new QString(sound) : NIL;
     this->_r_states = rStates;
@@ -296,13 +295,10 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
 
 Ability::Ability(Ability& ability) : Role(ability)
 {
-    this->_dmg_type = ability._dmg_type;
     this->_lv_rq = ability._lv_rq;
     this->_m_qty = ability._m_qty;
     this->_r_qty = ability._r_qty;
-    this->_dmg_type = ability._dmg_type;
     this->_attr_inc = ability._attr_inc;
-    this->_state_dur = ability._state_dur;
     this->_r_states = ability._r_states;
 }
 

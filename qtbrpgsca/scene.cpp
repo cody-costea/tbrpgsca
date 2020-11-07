@@ -142,7 +142,7 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
                         continue;
                     }
                 }
-                else if ((fGuard == NIL || pos != -1) && guardian->_hp > 0
+                else if ((fGuard == NIL || pos != -1) && guardian->currentHp() > 0
                          && (!guardian->hasAnyPlayFlag(Costume::Attribute::Stun | Costume::Attribute::Confuse | Costume::Attribute::Convert))
                          /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
@@ -164,13 +164,13 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
     if (this->hasCovers())
     {
         int cvrType = target->_cvr_type;
-        if (this->hasCovers() && (skill->_dmg_type & cvrType) == cvrType && target->_hp < target->_m_hp / 3)
+        if (this->hasCovers() && (skill->dmgType() & cvrType) == cvrType && target->currentHp() < target->maximumHp() / 3)
         {
             Actor* coverer = NIL;
             QVector<Actor*>& party = *(this->_parties[side]);
             for (Actor* const actor : party)
             {
-                if (actor != target && actor->Costume::isCovering() && (coverer == NIL || (actor->_hp > coverer->_hp)))
+                if (actor != target && actor->Costume::isCovering() && (coverer == NIL || (actor->currentHp() > coverer->currentHp())))
                 {
                     coverer = actor;
                 }
@@ -231,13 +231,13 @@ void Scene::checkStatus(QString* const ret)
 void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
 {
     Scene& scene = *this;
-    bool const ko = target->_hp < 1;
+    bool const ko = target->currentHp() < 1;
     //bool const healing = ability.hp < 0;
     if ((/*healing &&*/ ability.isReviving()) || !ko)
     {
         Ability* counter = NIL;
         ability.execute(ret, this, user, target, applyCosts);
-        if (ability._hp > -1)
+        if (ability.currentHp() > -1)
         //if (!healing)
         {
             int cntSize;
@@ -245,12 +245,12 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
             if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
                     && (target->_side != user._side || target->Costume::isConfused()))
             {
-                int const usrDmgType = ability._dmg_type;
+                int const usrDmgType = ability.dmgType();
                 for (int i = 0; i < cntSize; ++i)
                 {
                     Ability* const cntSkill = counters->at(i);
-                    int cntDmgType = cntSkill->_dmg_type;
-                    if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == NIL || (cntSkill->_hp > counter->_hp)))
+                    int cntDmgType = cntSkill->dmgType();
+                    if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == NIL || (cntSkill->currentHp() > counter->currentHp())))
                     {
                         counter = cntSkill;
                     }
@@ -261,7 +261,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
                 }
             }
         }
-        emit this->spriteAct(this, applyCosts ? &user : NIL, &ability, (ko && target->_hp > 0),
+        emit this->spriteAct(this, applyCosts ? &user : NIL, &ability, (ko && target->currentHp() > 0),
                        target, &user == target ? &ability : counter);
 #if USE_TARGET_LIST
         QVector<Actor*>* targets = scene._targets;
@@ -381,8 +381,8 @@ int Scene::getAiSkill(Actor* const user, QVector<Ability*>* const skills, int co
     for (int i = defSkill + 1; i < sSize; ++i)
     {
         Ability* a = skills->operator[](i);
-        if (a->canPerform(user) && ((defSkill > 0 && (a->_hp < s->_hp)
-            && (a->isReviving() || !restore)) || (a->_hp > s->_hp)))
+        if (a->canPerform(user) && ((defSkill > 0 && (a->currentHp() < s->currentHp())
+            && (a->isReviving() || !restore)) || (a->currentHp() > s->currentHp())))
         {
             ret = i;
             s = a;
@@ -414,12 +414,12 @@ void Scene::playAi(QString* const ret, Actor* const player)
             for (int i = 0; i < sSize; ++i)
             {
                 Actor& iPlayer = *(party->at(i));
-                int iHp = iPlayer._hp;
+                int iHp = iPlayer.currentHp();
                 if (iHp < 1)
                 {
                     heal = 1;
                 }
-                else if (iHp < (iPlayer._m_hp / 3))
+                else if (iHp < (iPlayer.maximumHp() / 3))
                 {
                     heal = 0;
                 }
@@ -431,7 +431,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
             for (int i = 0; i < skillsSize; ++i)
             {
                 Ability& s = *(skills[i]);
-                if (s.canPerform(player) && (s._hp < 0 && ((heal == 0) || s.isReviving())))
+                if (s.canPerform(player) && (s.currentHp() < 0 && ((heal == 0) || s.isReviving())))
                 {
                     skillIndex = i;
                     break;
@@ -443,7 +443,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
         Actor* target = NIL;
         //Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
         Ability& ability = *(skills[scene.getAiSkill(player, &skills, skillIndex, heal == 1)]);
-        if (ability._hp > -1)
+        if (ability.currentHp() > -1)
         {
             if (party == NIL || player->isRandomAi())
             {
@@ -496,7 +496,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
                     for (int i = trg + 1; i < sSize; ++i)
                     {
                         Actor* const iPlayer = players->at(i);
-                        if (iPlayer->_side != side && (!iPlayer->Costume::isKnockedOut()) && iPlayer->_hp < target->_hp)
+                        if (iPlayer->_side != side && (!iPlayer->Costume::isKnockedOut()) && iPlayer->currentHp() < target->currentHp())
                         {
                             target = iPlayer;
                         }
@@ -516,8 +516,8 @@ void Scene::playAi(QString* const ret, Actor* const player)
             for (int i = 1; i < sSize; ++i)
             {
                 Actor* const iPlayer = party->at(i);
-                int const iHp = iPlayer->_hp;
-                if (iHp < target->_hp && (restore || iHp > 0))
+                int const iHp = iPlayer->currentHp();
+                if (iHp < target->currentHp() && (restore || iHp > 0))
                 {
                     target = iPlayer;
                 }
@@ -545,7 +545,7 @@ void Scene::endTurn(QString* const ret)
     int cActions = --(crActor->_actions);
     while (cActions < 1)
     {
-        if (crActor->_hp > 0)
+        if (crActor->currentHp() > 0)
         {
             crActor->applyStates(ret, this, true);
         }
@@ -568,7 +568,7 @@ void Scene::endTurn(QString* const ret)
                         for (int i = 0; i < sSize; ++i)
                         {
                             Actor* const iPlayer = players[i];
-                            if (iPlayer->_hp > 0)
+                            if (iPlayer->currentHp() > 0)
                             {
                                 int const iInit = iPlayer->_init + iPlayer->_agi;
                                 iPlayer->_init = iInit;
@@ -629,7 +629,7 @@ void Scene::endTurn(QString* const ret)
                 }
                 crActor = players[current];
             }
-            while (crActor->_hp < 1 || crActor->_init < mInit);
+            while (crActor->currentHp() < 1 || crActor->_init < mInit);
         }
         //crActor->actions = cActions = crActor->mActions;
         QMap<Ability*, int>* const regSkills = crActor->_skills_rg_turn;
@@ -694,7 +694,7 @@ void Scene::endTurn(QString* const ret)
 bool Scene::canTarget(Actor* const user, Ability* const ability, Actor* const target)
 {
     assert(user && ability && target);
-    return ability->canPerform(user) && (ability->targetsSelf() || ((target->_hp > 0 || ability->isReviving())
+    return ability->canPerform(user) && (ability->targetsSelf() || ((target->currentHp() > 0 || ability->isReviving())
             && ((this->getGuardian(user, target, ability))) == target));
 }
 

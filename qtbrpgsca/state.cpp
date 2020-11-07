@@ -56,15 +56,16 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
         if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._st_res)
                 == NIL ? 0 : stRes->value(this, 0) + stRes->value(NIL, 0)) + stateRes)))
         {
-            QMap<State*, int>* trgStates = target._state_dur;
+            QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
+            QMap<State*, int>* trgStates = trgRoleData->_state_dur;
             if (trgStates == NIL)
             {
                 trgStates = new QMap<State*, int>();
-                target._state_dur = trgStates;
+                trgRoleData->_state_dur = trgStates;
             }
             else
             {
-                QMap<State*, int>* const rStates = state._state_dur;
+                QMap<State*, int>* const rStates = state._role_data->_state_dur;
                 if (rStates)
                 {
                     auto const rLast = rStates->cend();
@@ -149,7 +150,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
     }
     if (dur > STATE_END_DUR)
     {
-        QMap<State*, int>* sDur = actor._state_dur;
+        QMap<State*, int>* sDur = actor._role_data->_state_dur;
         if (sDur == NIL)
         {
             return true;
@@ -199,7 +200,7 @@ void State::alter(QString& ret, Actor& actor, const bool consume)
 void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bool consume)
 {
     State& state = *this;
-    QMap<State*, int>* sDur = actor._state_dur;
+    QMap<State*, int>* sDur = actor._role_data->_state_dur;
     if (sDur /*&& actor.hp > 0*/)
     {
         int const d = sDur->value(this, STATE_END_DUR);

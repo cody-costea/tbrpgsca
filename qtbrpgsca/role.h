@@ -27,15 +27,15 @@ namespace tbrpgsca
         Q_OBJECT
         PROP_FLAG_GET(isRanged, Attribute::Range, public)
         PROP_FLAG_GET(isReviving, Attribute::Revive, public)
-        PROP_FIELD_GET_CUSTOM(currentHp, int, public, _hp)
-        PROP_FIELD_GET_CUSTOM(currentMp, int, public, _mp)
-        PROP_FIELD_GET_CUSTOM(currentRp, int, public, _sp)
-        PROP_FIELD_GET_CUSTOM(maximumHp, int, public, _m_hp)
-        PROP_FIELD_GET_CUSTOM(maximumMp, int, public, _m_mp)
-        PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _m_sp)
-        PROP_FIELD_GET_CUSTOM(dmgType, int, public, _dmg_type)
-        PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
-        PROP_FIELD_GET_CUSTOM(id, int, public, _id)
+        PROP_FIELD_GET_CUSTOM(currentHp, int, public, _role_data->_hp)
+        PROP_FIELD_GET_CUSTOM(currentMp, int, public, _role_data->_mp)
+        PROP_FIELD_GET_CUSTOM(currentRp, int, public, _role_data->_sp)
+        PROP_FIELD_GET_CUSTOM(maximumHp, int, public, _role_data->_m_hp)
+        PROP_FIELD_GET_CUSTOM(maximumMp, int, public, _role_data->_m_mp)
+        PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _role_data->_m_sp)
+        PROP_FIELD_GET_CUSTOM(dmgType, int, public, _role_data->_dmg_type)
+        PROP_FIELD_GET_CUSTOM(name, QString, public, _role_data->_name)
+        PROP_FIELD_GET_CUSTOM(id, int, public, _role_data->_id)
     public:
         enum Attribute {
             Revive = 1,
@@ -78,9 +78,22 @@ namespace tbrpgsca
 
         bool operator==(Role& role) const;
     protected:
-        QString _name,* _sprite;
-        int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
-        QMap<State*, int>* _state_dur;
+        class RoleData : public QSharedData
+        {
+        private:
+            QString _name,* _sprite;
+            int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
+            QMap<State*, int>* _state_dur;
+
+            friend class Ability;
+            friend class Costume;
+            friend class Actor;
+            friend class State;
+            friend class Scene;
+            friend class Role;
+        };
+
+        QSharedDataPointer<RoleData> _role_data;
 
         void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
 

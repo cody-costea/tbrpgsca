@@ -275,16 +275,16 @@ void ArenaWidget::prepareItemsBox(Actor& actor)
     ArenaWidget& arena = *this;
     QComboBox& itemsBox = *(arena._items_box);
     void* const extra = (static_cast<void**>(actor._extra))[2];
-    if (extra == nullptr)
-    {
-        arena._use_btn->setEnabled(false);
-        itemsBox.setEnabled(false);
-    }
-    else
+    if (extra)
     {
         arena._use_btn->setEnabled(true);
         itemsBox.setModel(static_cast<ItemsModel*>(extra));
         itemsBox.setEnabled(true);
+    }
+    else
+    {
+        arena._use_btn->setEnabled(false);
+        itemsBox.setEnabled(false);
     }
     return;
 }
@@ -507,14 +507,14 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                         Actor& actor = *(party[i]);
                         {
                             void* const extra = actor._extra;
-                            if (extra == nullptr)
+                            if (extra)
                             {
-                                extras = new void*[3] { nullptr, nullptr, nullptr };
-                                actor._extra = extras;
+                                extras = (static_cast<void**>(extra));
                             }
                             else
                             {
-                                extras = (static_cast<void**>(extra));
+                                extras = new void*[3] { nullptr, nullptr, nullptr };
+                                actor._extra = extras;
                             }
                         }
                         if (k < SPR_SIZE)
@@ -542,15 +542,15 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                                     break;
                                 }
                                 void* const sprExtra = extras[0];
-                                if (sprExtra == nullptr)
+                                if (sprExtra)
+                                {
+                                    static_cast<ActorSprite*>(sprExtra)->relocate(loc);
+                                }
+                                else
                                 {
                                     ActorSprite* const spr = new ActorSprite(k, actor, _back_img, loc, arena, pos);
                                     spr->playActor(actor._hp > 0 ? SPR_IDLE : SPR_KO);
                                     extras[0] = spr;
-                                }
-                                else
-                                {
-                                    static_cast<ActorSprite*>(sprExtra)->relocate(loc);
                                 }
                             }
                             k += 1;

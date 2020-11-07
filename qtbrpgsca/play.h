@@ -207,7 +207,7 @@ namespace tbrpgsca
             return *this;
         }
 
-        Play(QObject* const parent = nullptr, int const flags = 0);
+        explicit Play(QObject* const parent = nullptr, int const flags = 0);
 
         ~Play();
     private:

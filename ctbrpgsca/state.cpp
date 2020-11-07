@@ -30,7 +30,7 @@ bool State::hasRemovedSkill(Ability& skill) const
 int State::removedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->_r_skills;
-    return aSkills == nullptr ? 0 : aSkills->size();
+    return aSkills ? aSkills->size() : 0;
 }
 
 void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
@@ -57,12 +57,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                 == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
             QMap<State*, int>* trgStates = target._state_dur;
-            if (trgStates == nullptr)
-            {
-                trgStates = new QMap<State*, int>();
-                target._state_dur = trgStates;
-            }
-            else
+            if (trgStates)
             {
                 QMap<State*, int>* const rStates = state._state_dur;
                 if (rStates)
@@ -103,6 +98,11 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                         }
                     }
                 }
+            }
+            else
+            {
+                trgStates = new QMap<State*, int>();
+                target._state_dur = trgStates;
             }
             state.blockSkills(target, false);
             int const crDur = trgStates->value(this, STATE_END_DUR);
@@ -145,11 +145,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
     if (dur > STATE_END_DUR)
     {
         QMap<State*, int>* sDur = actor._state_dur;
-        if (sDur == nullptr)
-        {
-            return true;
-        }
-        else
+        if (sDur)
         {
             int const crDur = sDur->value(this, STATE_END_DUR);
             //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
@@ -178,6 +174,10 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
                 }
             }
             return crDur <= STATE_END_DUR;
+        }
+        else
+        {
+            return true;
         }
     }
     else

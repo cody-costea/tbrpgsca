@@ -31,13 +31,13 @@ QString Role::sprite() const
 int Role::stateDuration(State& state) const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates == nullptr ? 0 : aStates->value(&state, 0);
+    return aStates ? aStates->value(&state, 0) : 0;
 }
 
 QList<State*> Role::statesList() const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates == nullptr ? QList<State*>() : aStates->keys();
+    return aStates ? aStates->keys() : QList<State*>();
 }
 
 bool Role::hasState(State& state) const
@@ -49,7 +49,7 @@ bool Role::hasState(State& state) const
 int Role::statesSize() const
 {
     QMap<State*, int>* const aStates = this->_state_dur;
-    return aStates == nullptr ? 0 : aStates->size();
+    return aStates ? aStates->size() : 0;
 }
 
 bool Role::operator==(Role& role) const
@@ -136,7 +136,7 @@ void Role::damage(QString& ret, Scene* const scene, SpriteRun* const spriteRun, 
                 else
                 {
                     res = -1 * (res - 2);
-                }                
+                }
                 dmgHp *= res;
                 dmgMp *= res;
                 dmgSp *= res;

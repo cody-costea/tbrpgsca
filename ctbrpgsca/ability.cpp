@@ -270,7 +270,6 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_lv_rq = lvRq;
     this->_m_qty = mQty;
     this->_r_qty = rQty;
-    this->_dmg_type = dmgType;
     //this->_attr_inc = attrInc;
     this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
     this->_r_states = rStates;
@@ -297,11 +296,9 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
 
 Ability::Ability(Ability& ability) : Role(ability)
 {
-    this->_dmg_type = ability._dmg_type;
     this->_lv_rq = ability._lv_rq;
     this->_m_qty = ability._m_qty;
     this->_r_qty = ability._r_qty;
-    this->_dmg_type = ability._dmg_type;
     //this->_attr_inc = ability._attr_inc;
     this->_state_dur = ability._state_dur;
     this->_r_states = ability._r_states;

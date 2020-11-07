@@ -98,11 +98,11 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         {
             actor.setPlayFlags(actorFlags ^ roleFlags);
         }
-        if (costume.isShapeShifted() && costume._sprite)
+        if (costume.isShapeShifted() && costume._role_data->_sprite)
         {
-            (*actor._sprite) = *(actor.job()._sprite);
+            (*actor._role_data->_sprite) = *(actor.job()._role_data->_sprite);
         }
-        if (costume._hp == 0 && costume._mp == 0 && costume._sp == 0)
+        if (costume.currentHp() == 0 && costume.currentMp() == 0 && costume.currentRp() == 0)
         {
             int const roleElm = costume.dmgType();
             int const actorElm = actor.dmgType();
@@ -126,13 +126,13 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
     {
         if (updStates)
         {
-            QMap<State*, int>* const cStates = costume._state_dur;
+            QMap<State*, int>* const cStates = costume._role_data->_state_dur;
             if (cStates)
             {
                 actor.updateStates(false, ret, scene, *cStates, true);
             }
         }
-        if (costume._hp != 0 || costume._mp != 0 || costume._sp != 0)
+        if (costume.currentHp() != 0 || costume.currentMp() != 0 || costume.currentRp() != 0)
         {
             QVector<Costume*>* dmgRoles = actor._dmg_roles;
             if (dmgRoles == NIL)
@@ -149,7 +149,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
 void Costume::apply(QString& ret, Scene* scene, Actor& actor)
 {
     Costume& role = *this;
-    ret += QString(Costume::CausesTxt).arg(actor._name, role._name);
+    ret += QString(Costume::CausesTxt).arg(actor.name(), role.name());
     role.damage(ret, scene, NIL, actor, 0, true);
 }
 
@@ -170,7 +170,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     }
     if (updStates)
     {
-        QMap<State*, int>* cStates = costume._state_dur;
+        QMap<State*, int>* cStates = costume._role_data->_state_dur;
         if (cStates)
         {
             actor.updateStates(remove, ret, scene, *cStates, false);
@@ -179,9 +179,9 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     if (!remove)
     {
         int const cFlags = costume.playFlags();
-        if (costume._hp == 0 && costume._mp == 0 && costume._sp == 0)
+        if (costume.currentHp() == 0 && costume.currentMp() == 0 && costume.currentRp() == 0)
         {
-            actor._dmg_type |= costume._dmg_type;
+            actor.setDmgType(actor.dmgType() | costume.dmgType());
         }
         actor.setPlayFlags(actor.playFlags() | cFlags);
         if (scene)
@@ -199,10 +199,10 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         }
         if (costume.isShapeShifted())
         {
-            QString* const spr = costume._sprite;
+            QString* const spr = costume._role_data->_sprite;
             if (spr)
             {
-                (*actor._sprite) = *spr;
+                (*actor._role_data->_sprite) = *spr;
             }
         }
     }
@@ -231,7 +231,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     }
     if (shapeShift)
     {
-        QString* spr = this->_sprite;
+        QString* spr = this->_role_data->_sprite;
         if (spr && spr->length() > 0)
         {
             flags |= Attribute::ShapeShift;

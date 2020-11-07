@@ -90,13 +90,13 @@ Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const ite
 void Actor::removeStates(QString* const ret, Scene* const scene, bool const remove)
 {
     Actor& actor = *this;
-    QMap<State*, int>* const stateDur = actor._state_dur;
+    QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
     if (stateDur)
     {
         actor.updateStates(true, ret, scene, *stateDur, true);
         if (remove && stateDur->size() == 0)
         {
-            actor._state_dur = NIL;
+            actor._role_data->_state_dur = NIL;
             delete stateDur;
         }
     }
@@ -124,17 +124,17 @@ void Actor::setJob(Scene* const scene, Costume& job)
     actor.equipItem(scene, CHAR_JOB, &job);
     if (!actor.Costume::isShapeShifted())
     {
-        QString* spr = job._sprite;
+        QString* spr = job._role_data->_sprite;
         if (spr)
         {
-            QString* actorSpr = actor._sprite;
-            if (actorSpr == NIL)
+            QString* actorSpr = actor._role_data->_sprite;
+            if (actorSpr)
             {
-                actor._sprite = new QString(*spr);
+                (*actorSpr) = *spr;
             }
             else
             {
-                (*actorSpr) = *spr;
+                actor._role_data->_sprite = new QString(*spr);
             }
         }
     }
@@ -179,22 +179,23 @@ void Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
 void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, bool const survive)
 {
     Actor& actor = *this;
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
     if (hp < 1)
     {
-        if (actor._hp != 0)
+        if (actor.currentHp() != 0)
         {
             if (survive || actor.Costume::isInvincible())
             {
-                actor._hp = 1;
+                roleData->_hp = 1;
             }
             else
             {
-                actor._sp = 0;
+                roleData->_sp = 0;
                 if (ret)
                 {
-                    *ret = *ret % Actor::KoTxt.arg(actor._name);
+                    *ret = *ret % Actor::KoTxt.arg(actor.name());
                 }
-                if (actor._init > 0)
+                if (actor.initiative() > 0)
                 {
                     actor._init = 0;
                 }
@@ -204,7 +205,7 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
                     {
                         *ret = *ret % Actor::RiseTxt;
                     }
-                    actor._hp = actor._m_hp;
+                    roleData->_hp = actor.maximumHp();
                     if (scene && actor.Costume::isShapeShifted())
                     {
                         emit scene->spriteAct(scene, &actor, NIL, true, NIL, NIL);
@@ -213,7 +214,7 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
                 }
                 else
                 {
-                    actor._hp = 0;
+                    roleData->_hp = 0;
                     actor.removeStates(ret, scene, false);
                     actor.setStunned(true);
                     actor.setKnockedOut(true);
@@ -227,8 +228,8 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
     }
     else
     {
-        int const oHp = actor._hp, mHp = actor._m_hp;
-        actor._hp = hp > mHp ? mHp : hp;
+        int const oHp = actor.currentHp(), mHp = actor.maximumHp();
+        roleData->_hp = hp > mHp ? mHp : hp;
         if (oHp < 1)
         {
             actor.setStunned(false);
@@ -245,20 +246,20 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
 
 void Actor::setCurrentHp(const int hp)
 {
-    int mHp = this->_m_hp;
-    this->_hp = hp > mHp ? mHp : (hp < 1 ? 0 : hp);
+    int mHp = this->maximumHp();
+    this->_role_data->_hp = hp > mHp ? mHp : (hp < 1 ? 0 : hp);
 }
 
 void Actor::setCurrentMp(const int mp)
 {
-    int mMp = this->_m_mp;
-    this->_mp = mp > mMp ? mMp : (mp < 1 ? 0 : mp);
+    int mMp = this->maximumMp();
+    this->_role_data->_mp = mp > mMp ? mMp : (mp < 1 ? 0 : mp);
 }
 
 void Actor::setCurrentRp(const int sp)
 {
-    int mSp = this->_m_sp;
-    this->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
+    int mSp = this->maximumRp();
+    this->_role_data->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
 }
 
 void Actor::setMaxActions(const int mActions)
@@ -274,42 +275,46 @@ void Actor::setMaxActions(const int mActions)
 void Actor::setMaximumHp(const int mHp)
 {
     Actor& actor = *this;
-    actor._m_hp = mHp;
-    if (mHp < actor._hp)
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    roleData->_m_hp = mHp;
+    if (mHp < actor.currentHp())
     {
-        actor._hp = mHp;
+        roleData->_hp = mHp;
     }
 }
 
 void Actor::setMaximumMp(const int mMp)
 {
     Actor& actor = *this;
-    actor._m_mp = mMp;
-    if (mMp < actor._mp)
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    roleData->_m_mp = mMp;
+    if (mMp < actor.currentMp())
     {
-        actor._mp = mMp;
+        roleData->_mp = mMp;
     }
 }
 
 void Actor::setMaximumRp(const int mRp)
 {
     Actor& actor = *this;
-    actor._m_sp = mRp;
-    if (mRp < actor._sp)
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    roleData->_m_sp = mRp;
+    if (mRp < actor.currentRp())
     {
-        actor._sp = mRp;
+        roleData->_sp = mRp;
     }
 }
 
 inline void Actor::setSprite(QString& value)
 {
     Actor& actor = *this;
-    QString* sprite = actor._sprite;
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    QString* sprite = roleData->_sprite;
     if (sprite)
     {
         delete sprite;
     }
-    actor._sprite = new QString(value);
+    roleData->_sprite = new QString(value);
 }
 
 void Actor::setItems(QMap<Ability*, int>* const items)
@@ -426,7 +431,7 @@ void Actor::applyStates(QString* const ret, Scene* const scene, const bool consu
     {
         actor.applyDmgRoles(*ret, scene);
     }
-    QMap<State*, int>* const stateDur = actor._state_dur;
+    QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
     if (stateDur)
     {
         auto const last = stateDur->cend();
@@ -466,9 +471,10 @@ void Actor::recover(QString* const ret, Scene* const scene)
     actor.removeStates(ret, scene, true);
     actor.refreshCostumes(ret, scene);
     actor._actions = actor._m_actions;
-    actor._hp = actor._m_hp;
-    actor._mp = actor._m_mp;
-    actor._sp = 0;
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    roleData->_hp = actor.maximumHp();
+    roleData->_mp = actor.maximumMp();
+    roleData->_sp = 0;
     {
         QMap<int, int>* const res = actor._res;
         if (res)
@@ -530,12 +536,13 @@ void Actor::levelUp(Scene* const scene)
     Actor& actor = *this;
     int lv = actor._lv;
     int const maxp = actor._maxp, xp = actor._xp, maxLv = actor._max_lv;
+    QSharedDataPointer<RoleData>& roleData = actor._role_data;
     while (maxp <= xp && lv < maxLv)
     {
         actor._maxp = maxp * 2;
-        actor._m_hp += 3;
-        actor._m_mp += 2;
-        actor._m_sp += 2;
+        roleData->_m_hp += 3;
+        roleData->_m_mp += 2;
+        roleData->_m_sp += 2;
         actor._atk += 1;
         actor._def += 1;
         actor._wis += 1;
@@ -570,9 +577,9 @@ void Actor::updateAttributes(const bool remove, Scene* const scene, Costume& cos
 {
     Actor& actor = *this;
     int const i = remove ? -1 : 1;
-    actor.setMaximumHp(actor._m_hp + (i * costume._m_hp));
-    actor.setMaximumMp(actor._m_mp + (i * costume._m_mp));
-    actor.setMaximumRp(actor._m_sp + (i * costume._m_sp));
+    actor.setMaximumHp(actor.maximumHp() + (i * costume.maximumHp()));
+    actor.setMaximumMp(actor.maximumMp() + (i * costume.maximumMp()));
+    actor.setMaximumRp(actor.maximumRp() + (i * costume.maximumRp()));
     actor.setMaxActions(actor._m_actions + (i * costume._m_actions));
     actor._atk += i * costume._atk;
     actor._def += i * costume._def;
@@ -727,7 +734,7 @@ void Actor::updateStates(bool const remove, QString* const ret, Scene* const sce
     Actor& actor = *this;
     if (remove)
     {
-        QMap<State*, int>* const stateDur = actor._state_dur;
+        QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
         if (stateDur && stateDur->size() > 0)
         {
             auto const last = states.cend();
@@ -766,7 +773,7 @@ void Actor::refreshCostumes(QString* const ret, Scene* const scene)
             it.value()->refresh(ret, scene, actor, true, false);
         }
     }
-    QMap<State*, int>* const stateDur = actor._state_dur;
+    QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
     if (stateDur)
     {
         auto const last = stateDur->cend();
@@ -796,7 +803,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->_dmg_roles = NIL;
     this->_skills_rg_turn = NIL;
     this->_skills_cr_qty = NIL;
-    this->_state_dur = NIL;
+    this->_role_data->_state_dur = NIL;
     this->_actions = mActions;
     this->_max_lv = maxLv;
     this->setRace(race);
@@ -852,16 +859,16 @@ Actor::Actor(Actor& actor) : Costume(actor)
         }
     }
     {
-        QMap<State*, int>* crSkillsQty = actor._state_dur;
+        QMap<State*, int>* crSkillsQty = actor._role_data->_state_dur;
         if (crSkillsQty == NIL)
         {
-            this->_state_dur = NIL;
+            this->_role_data->_state_dur = NIL;
         }
         else
         {
             QMap<State*, int>* nSkillsQty = new QMap<State*, int>();
             (*nSkillsQty) = (*crSkillsQty);
-            this->_state_dur = nSkillsQty;
+            this->_role_data->_state_dur = nSkillsQty;
         }
     }
     {
@@ -920,10 +927,11 @@ Actor::~Actor()
         this->_res = NIL;
         delete res;
     }
-    auto states = this->_state_dur;
+    QSharedDataPointer<RoleData>& roleData = this->_role_data;
+    auto states = roleData->_state_dur;
     if (states)
     {
-        this->_state_dur = NIL;
+        roleData->_state_dur = NIL;
         delete states;
     }
     auto skills = this->_a_skills;

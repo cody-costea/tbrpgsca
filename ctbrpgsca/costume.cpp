@@ -32,19 +32,19 @@ bool Costume::hasAddedSkill(Ability& skill) const
 int Costume::addedSkillsSize() const
 {
     QVector<Ability*>* aSkills = this->_a_skills;
-    return aSkills == nullptr ? 0 : aSkills->size();
+    return aSkills ? aSkills->size() : 0;
 }
 
 int Costume::elementResistance(const int element) const
 {
     QMap<int, int>* res = this->_res;
-    return res == nullptr ? 0 : res->value(element, 0);
+    return res ? res->value(element, 0) : 0;
 }
 
 int Costume::stateResistance(State* const state) const
 {
     QMap<State*, int>* stRes = this->_st_res;
-    return stRes == nullptr ? 0 : stRes->value(state, 0);
+    return stRes ? stRes->value(state, 0) : 0;
 }
 
 void Costume::adopt(QString& ret, Actor& actor)
