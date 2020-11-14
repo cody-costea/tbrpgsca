@@ -233,7 +233,7 @@ void State::blockSkills(Actor& actor, const bool remove)
             {
                 for (Ability* const skill : *rSkills)
                 {
-                    if (skill->_m_qty > 0)
+                    if (skill->maximumUses() > 0)
                     {
                         iSkills->operator[](skill) = -1 * iSkills->value(skill, 0);
                     }
@@ -253,7 +253,7 @@ void State::blockSkills(Actor& actor, const bool remove)
             }
             for (Ability* const skill : *rSkills)
             {
-                iSkills->operator[](skill) = skill->_m_qty > 0 ? -1 * iSkills->value(skill, 0) : 0;
+                iSkills->operator[](skill) = skill->maximumUses() > 0 ? -1 * iSkills->value(skill, 0) : 0;
             }
         }
     }

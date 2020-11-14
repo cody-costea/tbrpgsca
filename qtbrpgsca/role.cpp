@@ -210,6 +210,16 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
     }
 }
 
+Role::RoleData::~RoleData()
+{
+    QString* sprite = this->_sprite;
+    if (sprite)
+    {
+        this->_sprite = NIL;
+        delete sprite;
+    }
+}
+
 Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
            int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates)
     : Play(NIL, ((revive ? Attribute::Revive : 0) | (range ? Attribute::Range : 0)))
@@ -236,11 +246,5 @@ Role::Role(Role& role) : Play(NIL, role.playFlags())
 
 Role::~Role()
 {
-    QSharedDataPointer<RoleData>& roleData = this->_role_data;
-    QString* sprite = roleData->_sprite;
-    if (sprite)
-    {
-        roleData->_sprite = NIL;
-        delete sprite;
-    }
+
 }

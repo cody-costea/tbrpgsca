@@ -448,7 +448,7 @@ void Actor::applyStates(QString* const ret, Scene* const scene, const bool consu
 inline void Actor::checkRegSkill(Ability& skill)
 {
     Actor& actor = *this;
-    if (skill._r_qty > 0)
+    if (skill.usesRegen() > 0)
     {
         QMap<Ability*, int>* regSkills = actor._skills_rg_turn;
         if (regSkills == NIL)
@@ -525,7 +525,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
             for (auto it = skillsQty->cbegin(); it != last; ++it)
             {
                 Ability* const ability = it.key();
-                skillsQty->operator[](ability) = ability->_m_qty;
+                skillsQty->operator[](ability) = ability->maximumUses();
             }
         }
     }
@@ -673,7 +673,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
             for (Ability* const ability : skills)
             {
                 aSkills->removeOne(ability);
-                if (ability->_r_qty > 0)
+                if (ability->usesRegen() > 0)
                 {
                     QMap<Ability*, int>* regTurn = actor._skills_rg_turn;
                     if (regTurn)
@@ -681,7 +681,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
                         regTurn->remove(ability);
                     }
                 }
-                if (ability->_m_qty > 0)
+                if (ability->maximumUses() > 0)
                 {
                     QMap<Ability*, int>* crQty = actor._skills_cr_qty;
                     if (crQty)
@@ -711,7 +711,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
             if (!aSkills->contains(ability))
             {
                 aSkills->append(ability);
-                int const mQty = ability->_m_qty;
+                int const mQty = ability->maximumUses();
                 if (mQty > 0)
                 {
                     QMap<Ability*, int>* crQty = actor._skills_cr_qty;

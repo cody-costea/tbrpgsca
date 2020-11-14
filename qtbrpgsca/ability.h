@@ -28,10 +28,10 @@ namespace tbrpgsca
         PROP_FLAG_GET(targetsAll, Attribute::TargetAll, public)
         PROP_FLAG_GET(targetsSide, Attribute::TargetSide, public)
         PROP_FLAG_GET(targetsSelf, Attribute::TargetSelf, public)
-        PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
-        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
-        PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
-        PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
+        PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _ability_data->_lv_rq)
+        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _ability_data->_attr_inc)
+        PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _ability_data->_m_qty)
+        PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _ability_data->_r_qty)
     public:
         enum Attribute {
             Melee = 4,
@@ -67,9 +67,27 @@ namespace tbrpgsca
 
         ~Ability();
     protected:
-        int _lv_rq, _attr_inc, _m_qty, _r_qty;
-        QMap<State*, int>* _r_states;
-        QString* _sound;
+        class AbilityData : public QSharedData
+        {
+        public:
+            ~AbilityData();
+
+        protected:
+            int _lv_rq, _attr_inc, _m_qty, _r_qty;
+            QMap<State*, int>* _r_states;
+            QString* _sound;
+
+            friend class Actor;
+            friend class Costume;
+            friend class Ability;
+            friend class ArenaWidget;
+            friend class SkillsModel;
+            friend class ItemsModel;
+            friend class State;
+            friend class Scene;
+        };
+
+        QSharedDataPointer<AbilityData> _ability_data;
 
         void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
 

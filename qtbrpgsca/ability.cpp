@@ -22,32 +22,32 @@ QString Ability::StolenTxt = ", obtaining %1 from %2";
 
 int Ability::removedStateDuration(State& state) const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<State*, int>* aStates = this->_ability_data->_r_states;
     return aStates == NIL ? 0 : aStates->value(&state, 0);
 }
 
 QList<State*> Ability::removedStatesList() const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<State*, int>* aStates = this->_ability_data->_r_states;
     return aStates == NIL ? QList<State*>() : aStates->keys();
 }
 
 bool Ability::removedState(State& state) const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<State*, int>* aStates = this->_ability_data->_r_states;
     return aStates && aStates->contains(&state);
 }
 
 int Ability::removedStatesSize() const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<State*, int>* aStates = this->_ability_data->_r_states;
     return aStates == NIL ? 0 : aStates->size();
 }
 
 void Ability::replenish(Actor& user)
 {
     Ability& ability = *this;
-    int const mQty = ability._m_qty;
+    int const mQty = ability.maximumUses();
     if (mQty > 0)
     {
         QMap<Ability*, int>* usrSkills = user._skills_cr_qty;
@@ -133,7 +133,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             {
                 //def += std::rand() % (def / 2);
                 //dmg += std::rand() % (dmg / 2);
-                dmg = (ability._attr_inc + (dmg / i)) - ((def / i) / 2);
+                dmg = (ability.attributeIncrement() + (dmg / i)) - ((def / i) / 2);
                 if (dmg < 0)
                 {
                     dmg = 0;
@@ -155,7 +155,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                 QMap<State*, int>* stateDur = target->_role_data->_state_dur;
                 if (stateDur)
                 {
-                    QMap<State*, int>* rStates = ability._r_states;
+                    QMap<State*, int>* rStates = ability._ability_data->_r_states;
                     if (rStates)
                     {
                         auto const rLast = rStates->cend();
@@ -246,7 +246,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         user.setCurrentRp(user.currentRp() - ability.maximumRp());
         user.setCurrentMp(user.currentMp() - ability.maximumMp());
         user.setCurrentHp(user.currentHp() - ability.maximumHp(), &ret, scene, false);
-        int mQty = ability._m_qty;
+        int mQty = ability.maximumUses();
         if (mQty > 0)
         {
             QMap<Ability*, int>* usrSkillsQty = user._skills_cr_qty;
@@ -261,17 +261,28 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
 
 }
 
+Ability::AbilityData::~AbilityData()
+{
+    QString* const sound = this->_sound;
+    if (sound)
+    {
+        this->_sound = NIL;
+        delete sound;
+    }
+}
+
 Ability::Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                  int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
                  int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
-    this->_lv_rq = lvRq;
-    this->_m_qty = mQty;
-    this->_r_qty = rQty;
-    this->_attr_inc = attrInc;
-    this->_sound = sound.length() > 0 ? new QString(sound) : NIL;
-    this->_r_states = rStates;
+    QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
+    dataPtr->_lv_rq = lvRq;
+    dataPtr->_m_qty = mQty;
+    dataPtr->_r_qty = rQty;
+    dataPtr->_attr_inc = attrInc;
+    dataPtr->_sound = sound.length() > 0 ? new QString(sound) : NIL;
+    this->_ability_data->_r_states = rStates;
     int flags = this->playFlags();
     if (canMiss)
     {
@@ -295,16 +306,12 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
 
 Ability::Ability(Ability& ability) : Role(ability)
 {
-    this->_lv_rq = ability._lv_rq;
-    this->_m_qty = ability._m_qty;
-    this->_r_qty = ability._r_qty;
-    this->_attr_inc = ability._attr_inc;
-    this->_r_states = ability._r_states;
+    this->_ability_data = ability._ability_data;
 }
 
 Ability::~Ability()
 {
-    QString* const sound = this->_sound;
+    QString* const sound = this->_ability_data->_sound;
     if (sound)
     {
         delete sound;

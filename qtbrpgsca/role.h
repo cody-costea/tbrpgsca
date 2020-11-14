@@ -80,7 +80,10 @@ namespace tbrpgsca
     protected:
         class RoleData : public QSharedData
         {
-        private:
+        public:
+            ~RoleData();
+
+        protected:
             QString _name,* _sprite;
             int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
             QMap<State*, int>* _state_dur;

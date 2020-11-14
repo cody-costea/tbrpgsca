@@ -645,11 +645,11 @@ void Scene::endTurn(QString* const ret)
             for (auto it = regSkills->cbegin(); it != last; ++it)
             {
                 Ability* const skill = it.key();
-                int const skillMaxQty = skill->_m_qty, skillCrQty = skillsQty->value(skill, skillMaxQty);
+                int const skillMaxQty = skill->maximumUses(), skillCrQty = skillsQty->value(skill, skillMaxQty);
                 if (skillCrQty < skillMaxQty)
                 {
                     int const skillRgTurn = it.value();//regSkills->value(skill, 0);
-                    if (skillRgTurn == skill->_r_qty)
+                    if (skillRgTurn == skill->usesRegen())
                     {
                         skillsQty->operator[](skill) = skillCrQty + 1;
                         regSkills->operator[](skill) = 0;
