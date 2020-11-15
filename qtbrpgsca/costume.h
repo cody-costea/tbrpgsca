@@ -27,14 +27,14 @@ namespace tbrpgsca
         PROP_FLAG_GET(isReflecting, Attribute::Reflect, public)
         PROP_FLAG_GET(isInvincible, Attribute::Invincible, public)
         PROP_FLAG_GET(isShapeShifted, Attribute::ShapeShift, public)
-        PROP_FIELD_GET_CUSTOM(maxActions, int, public, _m_actions)
-        PROP_FIELD_GET_CUSTOM(coverDmgType, int, public, _cvr_type)
-        PROP_FIELD_GET_CUSTOM(reflectDmgType, int, public, _rfl_type)
-        PROP_FIELD_GET_CUSTOM(offense, int, public, _atk)
-        PROP_FIELD_GET_CUSTOM(defense, int, public, _def)
-        PROP_FIELD_GET_CUSTOM(spirit, int, public, _spi)
-        PROP_FIELD_GET_CUSTOM(wisdom, int, public, _wis)
-        PROP_FIELD_GET_CUSTOM(agility, int, public, _agi)
+        PROP_FIELD_GET_CUSTOM(maxActions, int, public, _costume_data->_m_actions)
+        PROP_FIELD_GET_CUSTOM(coverDmgType, int, public, _costume_data->_cvr_type)
+        PROP_FIELD_GET_CUSTOM(reflectDmgType, int, public, _costume_data->_rfl_type)
+        PROP_FIELD_GET_CUSTOM(offense, int, public, _costume_data->_atk)
+        PROP_FIELD_GET_CUSTOM(defense, int, public, _costume_data->_def)
+        PROP_FIELD_GET_CUSTOM(spirit, int, public, _costume_data->_spi)
+        PROP_FIELD_GET_CUSTOM(wisdom, int, public, _costume_data->_wis)
+        PROP_FIELD_GET_CUSTOM(agility, int, public, _costume_data->_agi)
     public:
         enum Attribute {
             Enraged = 4,
@@ -78,10 +78,28 @@ namespace tbrpgsca
 
         ~Costume();
     protected:
-        int _atk, _def, _spi, _wis, _agi, _m_actions, _cvr_type, _rfl_type;
-        QVector<Ability*>* _a_skills,* _counters;
-        QMap<State*, int>* _st_res;
-        QMap<int, int>* _res;
+        class CostumeData : public QSharedData
+        {
+        public:
+            ~CostumeData();
+
+        protected:
+            int _atk, _def, _spi, _wis, _agi, _m_actions, _cvr_type, _rfl_type;
+            QVector<Ability*>* _a_skills,* _counters;
+            QMap<State*, int>* _st_res;
+            QMap<int, int>* _res;
+
+            friend class Costume;
+            friend class Ability;
+            friend class SkillsModel;
+            friend class DemoLib;
+            friend class Actor;
+            friend class State;
+            friend class Scene;
+            friend class Role;
+        };
+
+        QSharedDataPointer<CostumeData> _costume_data;
 
         void apply(QString& ret, Scene* const scene, Actor& actor);
         void refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove);

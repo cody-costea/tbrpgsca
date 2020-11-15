@@ -22,7 +22,7 @@ QString Scene::FailTxt = "The party attempted to escape, but failed.";
 
 bool Scene::actorAgiComp(Actor* const a, Actor* const b)
 {
-    return (a->_agi > b->_agi);
+    return (a->agility() > b->agility());
 }
 
 int Scene::getCurrent() const
@@ -163,7 +163,7 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
     coverCheck:
     if (this->hasCovers())
     {
-        int cvrType = target->_cvr_type;
+        int cvrType = target->coverDmgType();
         if (this->hasCovers() && (skill->dmgType() & cvrType) == cvrType && target->currentHp() < target->maximumHp() / 3)
         {
             Actor* coverer = NIL;
@@ -241,7 +241,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         //if (!healing)
         {
             int cntSize;
-            QVector<Ability*>* const counters = target->_counters;
+            QVector<Ability*>* const counters = target->_costume_data->_counters;
             if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
                     && (target->_side != user._side || target->Costume::isConfused()))
             {
@@ -396,8 +396,8 @@ void Scene::playAi(QString* const ret, Actor* const player)
     Scene& scene = *this;
     assert(ret && player);
     QVector<Actor*>* party;
-    QVector<Ability*>& skills = *(player->_a_skills);
     QVector<QVector<Actor*>*>& parties = scene._parties;
+    QVector<Ability*>& skills = *(player->_costume_data->_a_skills);
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
     if (player->Costume::isConfused())
     {
@@ -570,7 +570,7 @@ void Scene::endTurn(QString* const ret)
                             Actor* const iPlayer = players[i];
                             if (iPlayer->currentHp() > 0)
                             {
-                                int const iInit = iPlayer->_init + iPlayer->_agi;
+                                int const iInit = iPlayer->_init + iPlayer->agility();
                                 iPlayer->_init = iInit;
                                 if (iInit > cInit)
                                 {
@@ -673,7 +673,7 @@ void Scene::endTurn(QString* const ret)
                 emit this->spriteAct(this, crActor, NIL, true, NIL, NIL);
             }
         }
-        crActor->setActions((cActions = crActor->Costume::isStunned() ? 0 : crActor->_m_actions));
+        crActor->setActions((cActions = crActor->Costume::isStunned() ? 0 : crActor->maxActions()));
     }
     scene._current = current;
     scene._original = current;
@@ -786,7 +786,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
             else
             {
                 player._init = 0;
-                if (player._agi > crActor->_agi || crActor->_init < 0)
+                if (player.agility() > crActor->agility() || crActor->_init < 0)
                 {
                     crActor = &player;
                     if (useInit)

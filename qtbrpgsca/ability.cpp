@@ -85,24 +85,26 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         target = &user;
     }
     {
-        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = user._agi,
-                trgAgi = target->_agi, trgSpi = target->_spi, usrWis = user._wis;
+        auto& usrCostData = user._costume_data;
+        auto& trgCostData = target->_costume_data;
+        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = usrCostData->_agi,
+                trgAgi = trgCostData->_agi, trgSpi = trgCostData->_spi, usrWis = usrCostData->_wis;
         if ((dmgType & Role::Element::Attack) == Role::Element::Attack)
         {
-            dmg += user._atk;
-            def += target->_def;
+            dmg += usrCostData->_atk;
+            def += trgCostData->_def;
             ++i;
         }
         if ((dmgType & Role::Element::Defense) == Role::Element::Defense)
         {
-            dmg += user._def;
-            def += target->_def;
+            dmg += usrCostData->_def;
+            def += trgCostData->_def;
             ++i;
         }
         if ((dmgType & Role::Element::Spirit) == Role::Element::Spirit)
         {
-            dmg += user._spi;
-            def += target->_wis;
+            dmg += usrCostData->_spi;
+            def += trgCostData->_wis;
             ++i;
         }
         if ((dmgType & Role::Element::Wisdom) == Role::Element::Wisdom)
@@ -191,7 +193,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     int trgItemsSize;
                     QMap<Ability*, int>* trgItems = target->_items;
                     if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
-                            && (((std::rand() % 12) + user._agi / 4) > 4 + target->_agi / 3))
+                            && (((std::rand() % 12) + usrCostData->_agi / 4) > 4 + trgCostData->_agi / 3))
                     {
                         int const itemId = std::rand() % trgItemsSize;
                         //if (itemId < trgItemsSize)
@@ -277,12 +279,12 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
     QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
+    dataPtr->_sound = sound.length() > 0 ? new QString(sound) : NIL;
+    dataPtr->_attr_inc = attrInc;
     dataPtr->_lv_rq = lvRq;
     dataPtr->_m_qty = mQty;
     dataPtr->_r_qty = rQty;
-    dataPtr->_attr_inc = attrInc;
-    dataPtr->_sound = sound.length() > 0 ? new QString(sound) : NIL;
-    this->_ability_data->_r_states = rStates;
+    dataPtr->_r_states = rStates;
     int flags = this->playFlags();
     if (canMiss)
     {
@@ -302,6 +304,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     }
     flags |= trg;
     this->setPlayFlags(flags);
+    this->_ability_data = dataPtr;
 }
 
 Ability::Ability(Ability& ability) : Role(ability)

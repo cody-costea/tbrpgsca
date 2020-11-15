@@ -94,7 +94,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
             }
         }
         {
-            QMap<int, int>* trgResMap = actor._res;
+            QMap<int, int>* trgResMap = actor._costume_data->_res;
             if (trgResMap)
             {
                 int res = DEFAULT_RES;

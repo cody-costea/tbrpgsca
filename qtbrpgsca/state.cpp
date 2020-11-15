@@ -53,7 +53,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
     {
         int stateRes;
         QMap<State*, int>* stRes;
-        if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._st_res)
+        if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
                 == NIL ? 0 : stRes->value(this, 0) + stRes->value(NIL, 0)) + stateRes)))
         {
             QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
