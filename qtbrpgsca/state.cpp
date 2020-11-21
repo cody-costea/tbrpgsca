@@ -18,18 +18,18 @@ using namespace tbrpgsca;
 
 Ability& State::removedSkill(int const n) const
 {
-    return *(this->_r_skills->at(n));
+    return *(this->_state_data->_r_skills->at(n));
 }
 
 bool State::hasRemovedSkill(Ability& skill) const
 {
-    QVector<Ability*>* aSkills = this->_r_skills;
+    QVector<Ability*>* aSkills = this->_state_data->_r_skills;
     return aSkills && aSkills->contains(&skill);
 }
 
 int State::removedSkillsSize() const
 {
-    QVector<Ability*>* aSkills = this->_r_skills;
+    QVector<Ability*>* aSkills = this->_state_data->_r_skills;
     return aSkills == NIL ? 0 : aSkills->size();
 }
 
@@ -40,10 +40,9 @@ void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const boo
 
 void State::inflict(QString* const ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always)
 {
-    State& state = *this;
     if (stateDur == 0)
     {
-        stateDur = state._dur;
+        stateDur = this->duration();
         if (stateDur == 0)
         {
             return;
@@ -53,7 +52,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
     {
         int stateRes;
         QMap<State*, int>* stRes;
-        if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
+        if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
                 == NIL ? 0 : stRes->value(this, 0) + stRes->value(NIL, 0)) + stateRes)))
         {
             QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
@@ -65,7 +64,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
             }
             else
             {
-                QMap<State*, int>* const rStates = state._role_data->_state_dur;
+                QMap<State*, int>* const rStates = this->_role_data->_state_dur;
                 if (rStates)
                 {
                     auto const rLast = rStates->cend();
@@ -75,7 +74,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                         State* const rState = rIt.key();
                         if (rDur == 0 || rDur <= STATE_END_DUR)
                         {
-                            rDur = rState->_dur;
+                            rDur = rState->duration();
                         }
                         auto const last = trgStates->cend();
                         for (auto it = trgStates->cbegin(); it != last; ++it)
@@ -105,11 +104,11 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                     }
                 }
             }
-            state.blockSkills(target, false);
+            this->blockSkills(target, false);
             int const crDur = trgStates->value(this, STATE_END_DUR);
             if (crDur == STATE_END_DUR)
             {
-                state.adopt(ret, scene, target, false, false);
+                this->adopt(ret, scene, target, false, false);
                 trgStates->operator[](this) = stateDur;
             }
             else if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
@@ -146,7 +145,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
 {
     if (dur == 0)
     {
-        dur = this->_dur;
+        dur = this->duration();
     }
     if (dur > STATE_END_DUR)
     {
@@ -222,8 +221,7 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
 
 void State::blockSkills(Actor& actor, const bool remove)
 {
-    State& state = *this;
-    QVector<Ability*>* rSkills = state._r_skills;
+    QVector<Ability*>* rSkills = this->_state_data->_r_skills;
     if (rSkills)
     {
         QMap<Ability*, int>* iSkills = actor._skills_cr_qty;
@@ -268,20 +266,25 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res)
 {
+    QSharedDataPointer<StateData> stateData(new StateData);
+    stateData->_r_skills = rSkills;
+    stateData->_s_res = sRes;
+    stateData->_dur = dur;
     if (convert)
     {
         this->setPlayFlags(this->playFlags() | Costume::Attribute::Convert);
     }
-    this->_dur = dur;
-    this->_s_res = sRes;
-    this->_r_skills = rSkills;
+    this->_state_data = stateData;
 }
 
 State::State(State& state) : Costume(state)
 {
-    this->_dur = state._dur;
-    this->_s_res = state._s_res;
-    this->_r_skills = state._r_skills;
+    this->_state_data = state._state_data;
+}
+
+State::StateData::~StateData()
+{
+
 }
 
 State::~State()

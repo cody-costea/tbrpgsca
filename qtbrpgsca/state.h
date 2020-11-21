@@ -20,8 +20,8 @@ namespace tbrpgsca
         #define STATE_END_DUR -3
 
         Q_OBJECT
-        PROP_FIELD_GET_CUSTOM(duration, int, public, _dur)
-        PROP_FIELD_GET_CUSTOM(resistance, int, public, _s_res)
+        PROP_FIELD_GET_CUSTOM(duration, int, public, _state_data->_dur)
+        PROP_FIELD_GET_CUSTOM(resistance, int, public, _state_data->_s_res)
     public:
         int removedSkillsSize() const;
         bool hasRemovedSkill(Ability& skill) const;
@@ -42,8 +42,23 @@ namespace tbrpgsca
 
         ~State();
     protected:
-        int _dur, _s_res;
-        QVector<Ability*>* _r_skills;
+        class StateData : public QSharedData
+        {
+        public:
+            ~StateData();
+
+        protected:
+            int _dur, _s_res;
+            QVector<Ability*>* _r_skills;
+
+            friend class Actor;
+            friend class Ability;
+            friend class Costume;
+            friend class State;
+            friend class Scene;
+        };
+
+        QSharedDataPointer<StateData> _state_data;
 
         void alter(QString* const ret, Scene* const scene, Actor& actor, bool const consume);
         void inflict(QString* const ret, Scene* const scene, Actor* user, Actor& target, int dur, bool const always);
