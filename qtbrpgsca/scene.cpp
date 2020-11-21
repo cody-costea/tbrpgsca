@@ -43,7 +43,7 @@ Actor* Scene::getCurrentPlayer() const
 int Scene::getCurrentParty() const
 {
     Actor* const crActor = this->_cr_actor;
-    return crActor == NIL ? -1 : crActor->_side;
+    return crActor == NIL ? -1 : crActor->partySide();
 }
 
 Ability* Scene::getLastAbility() const
@@ -110,12 +110,12 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill) const
 {
     assert(user && skill);
-    int const side = target->_old_side;
+    int const side = target->_actor_data->_old_side;
 #if ALLOW_NO_GUARDS
     if (this->usesGuards())
 #endif
     {
-        if (user->_old_side != side && ((!skill->isRanged()) && ((!user->Role::isRanged()) || skill->isOnlyMelee())))
+        if (user->_actor_data->_old_side != side && ((!skill->isRanged()) && ((!user->Role::isRanged()) || skill->isOnlyMelee())))
         {
             int pos = -1;
             Actor* fGuard = NIL,* lGuard = NIL;
@@ -243,7 +243,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
             int cntSize;
             QVector<Ability*>* const counters = target->_costume_data->_counters;
             if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
-                    && (target->_side != user._side || target->Costume::isConfused()))
+                    && (target->partySide() != user.partySide() || target->Costume::isConfused()))
             {
                 int const usrDmgType = ability.dmgType();
                 for (int i = 0; i < cntSize; ++i)
@@ -267,7 +267,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         QVector<Actor*>* targets = scene._targets;
         if (targets == NIL)
         {
-            targets = new QVector<Actor*>(scene._parties[target->_old_side]->size());
+            targets = new QVector<Actor*>(scene._parties[target->_actor_data->_old_side]->size());
             scene._targets = targets;
         }
         targets->append(target);
@@ -333,7 +333,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     else if (ability->targetsSide())
     {
         //QVector<Actor*>* const targets = scene.targets;
-        int const side = ability->targetsSelf() ? user->partySide() : target->_old_side;
+        int const side = ability->targetsSelf() ? user->partySide() : target->_actor_data->_old_side;
         QVector<Actor*>& party = *(scene._parties[side]);
         int const pSize = party.size();
         for (int i = 0; i < pSize; ++i)
@@ -354,7 +354,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     }
     if (item)
     {
-        QMap<Ability*, int>* const items = user->_items;
+        QMap<Ability*, int>* const items = user->_actor_data->_items;
         if (items)
         {
             items->operator[](ability) = items->value(ability, 1) - 1;
@@ -406,7 +406,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
     }
     else
     {
-        side = player->_side;
+        side = player->partySide();
         party = parties[side];
         sSize = party->size();
         if (!(player->Costume::isEnraged()))
@@ -491,12 +491,12 @@ void Scene::playAi(QString* const ret, Actor* const player)
                         do
                         {
                             target = players->at(trg);
-                        } while (((++trg) < sSize) && (target->Costume::isKnockedOut() || target->_side == side));
+                        } while (((++trg) < sSize) && (target->Costume::isKnockedOut() || target->partySide() == side));
                     }
                     for (int i = trg + 1; i < sSize; ++i)
                     {
                         Actor* const iPlayer = players->at(i);
-                        if (iPlayer->_side != side && (!iPlayer->Costume::isKnockedOut()) && iPlayer->currentHp() < target->currentHp())
+                        if (iPlayer->partySide() != side && (!iPlayer->Costume::isKnockedOut()) && iPlayer->currentHp() < target->currentHp())
                         {
                             target = iPlayer;
                         }
@@ -542,7 +542,8 @@ void Scene::endTurn(QString* const ret)
     Scene& scene = *this;
     int current = scene._current;
     Actor* crActor = scene._cr_actor;
-    int cActions = --(crActor->_actions);
+    int cActions = (crActor->actions()) - 1;
+    crActor->setActions(cActions);
     while (cActions < 1)
     {
         if (crActor->currentHp() > 0)
@@ -552,8 +553,8 @@ void Scene::endTurn(QString* const ret)
         int mInit = scene._m_init;
         if (mInit > 0)
         {
-            int cInit = crActor->_init - mInit;
-            crActor->_init = cInit;
+            int cInit = crActor->initiative() - mInit;
+            crActor->setInitiative(cInit);
             do
             {
                 //QVector<Actor*>* const ordered = scene.players;
@@ -570,8 +571,8 @@ void Scene::endTurn(QString* const ret)
                             Actor* const iPlayer = players[i];
                             if (iPlayer->currentHp() > 0)
                             {
-                                int const iInit = iPlayer->_init + iPlayer->agility();
-                                iPlayer->_init = iInit;
+                                int const iInit = iPlayer->initiative() + iPlayer->agility();
+                                iPlayer->setInitiative(iInit);
                                 if (iInit > cInit)
                                 {
                                     cInit = iInit;
@@ -615,11 +616,11 @@ void Scene::endTurn(QString* const ret)
                 scene._m_init = mInit = 0;
                 for (int i = 0; i < playersSize; ++i)
                 {
-                    players[i]->_init = 0;
+                    players[i]->setInitiative(0);
                 }
                 nInit = -1;
             }
-            crActor->_init = nInit;
+            crActor->setInitiative(nInit);
             do
             {
                 if (++current == playersSize)
@@ -629,17 +630,18 @@ void Scene::endTurn(QString* const ret)
                 }
                 crActor = players[current];
             }
-            while (crActor->currentHp() < 1 || crActor->_init < mInit);
+            while (crActor->currentHp() < 1 || crActor->initiative() < mInit);
         }
         //crActor->actions = cActions = crActor->mActions;
-        QMap<Ability*, int>* const regSkills = crActor->_skills_rg_turn;
+        auto& crActorData = crActor->_actor_data;
+        QMap<Ability*, int>* const regSkills = crActorData->_skills_rg_turn;
         if (regSkills)
         {
-            QMap<Ability*, int>* skillsQty = crActor->_skills_cr_qty;
+            QMap<Ability*, int>* skillsQty = crActorData->_skills_cr_qty;
             if (skillsQty == NIL)
             {
                 skillsQty = new QMap<Ability*, int>();
-                crActor->_skills_cr_qty = skillsQty;
+                crActorData->_skills_cr_qty = skillsQty;
             }
             auto const last = regSkills->cend();
             for (auto it = regSkills->cbegin(); it != last; ++it)
@@ -713,13 +715,13 @@ void Scene::resetTurn(Actor& actor)
     int const mInit = this->_m_init + 1;
     if (mInit < 2)
     {
-        if (actor._init > mInit)
+        if (actor.initiative() > mInit)
         {
-            actor._init = mInit;
+            actor.setInitiative(mInit);
         }
-        else if (mInit == 1 && actor._init < -1)
+        else if (mInit == 1 && actor.initiative() < -1)
         {
-            actor._init = 0;
+            actor.setInitiative(0);
         }
         this->_original = -1;
     }
@@ -778,15 +780,15 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
         for (int j = 0; j < pSize; ++j)
         {
             Actor& player = *(party[j]);
-            player._actions = 0;
+            player.setActions(0);
             if (surprised)
             {
-                player._init = useInit ? -(mInit + 1) : -1;
+                player.setInitiative(useInit ? -(mInit + 1) : -1);
             }
             else
             {
-                player._init = 0;
-                if (player.agility() > crActor->agility() || crActor->_init < 0)
+                player.setInitiative(0);
+                if (player.agility() > crActor->agility() || crActor->initiative() < 0)
                 {
                     crActor = &player;
                     if (useInit)
@@ -800,8 +802,8 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
                 //player.setRandomAi(true);
                 player.setAiPlayer(true);
             }
-            player._old_side = i;
-            player._side = i;
+            player._actor_data->_old_side = i;
+            player.setPartySide(i);
 #if ALLOW_COVERING
             if (player.Costume::isCovering())
             {
@@ -821,7 +823,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
     scene.agiCalc();
     if (useInit)
     {
-        crActor->_init = mInit;
+        crActor->setInitiative(mInit);
     }
     else
     {

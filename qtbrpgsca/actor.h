@@ -17,7 +17,7 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_NEW_ITEMS 4096
+        #define FLAG_NEW_ITEMS 4096  //TODO: use shared pointer for "items", instead of this flag;
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -37,8 +37,6 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, Reflecting, Costume::Attribute::Reflect, public, isReflecting)
         PROP_FLAG_SET_ALL(Actor, Invincible, Costume::Attribute::Invincible, public, isInvincible)
         PROP_FLAG_SET_ALL(Actor, ShapeShifted, Costume::Attribute::ShapeShift, public, isShapeShifted)
-        PROP_CUSTOM_FIELD(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
-        PROP_CUSTOM_FIELD(Actor, partySide, setPartySide, swapPartySide, withPartySide, int, public, public, _side)
         PROP_FIELD_WITH_SWAP(Actor, setExperience, swapExperience, withExperience, int, public, experience)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, maximumHp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, maximumMp)
@@ -53,7 +51,12 @@ namespace tbrpgsca
         PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, wisdom)
         PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, spirit)
         PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
+        PROP_FIELD_SET_ALL(Actor, setExtra, sawpExtra, withExtra, void*, public, extra, _actor_data->_extra)
         PROP_FIELD_SET_ALL(Actor, setDmgType, sawpDmgType, withDmgType, int, public, dmgType, _role_data->_dmg_type)
+        PROP_FIELD_SET_ALL(Actor, setActions, sawpActions, withActions, int, public, actions, _actor_data->_actions)
+        PROP_FIELD_SET_ALL(Actor, setPartySide, sawpPartySide, withPartySide, int, public, partySide, _actor_data->_side)
+        PROP_FIELD_SET_ALL(Actor, setInitiative, sawpInitiative, withInitiative, int, public, initiative, _actor_data->_init)
+        PROP_FIELD_SET_ALL(Actor, setMaxExperience, sawpMaxExperience, withMaxExperience, int, public, maxExperience, _actor_data->_maxp)
         PROP_FIELD_SET_ALL(Actor, setReflectDmgType, sawpReflectDmgType, withReflectDmgType, int, public, reflectDmgType, _costume_data->_rfl_type)
         PROP_FIELD_SET_ALL(Actor, setCoverDmgType, sawpCoverDmgType, withCoverDmgType, int, public, coverDmgType, _costume_data->_cvr_type)
         PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, name, _role_data->_name)
@@ -63,14 +66,15 @@ namespace tbrpgsca
         PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, sprite)
         PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, public, job)
         PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
-        PROP_FIELD(Actor, Actions, actions, int, public, protected)
-        PROP_FIELD(Actor, Extra, extra, void*, public, protected)
-        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
-        //PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
-        //PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
-        PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
-        PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
-        PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
+        //PROP_FIELD(Actor, Extra, extra, void*, public, protected)
+        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _actor_data->_maxp)
+        PROP_FIELD_GET_CUSTOM(initiative, int, public, _actor_data->_init)
+        PROP_FIELD_GET_CUSTOM(actions, int, public, _actor_data->_actions)
+        PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _actor_data->_max_lv)
+        PROP_FIELD_GET_CUSTOM(partySide, int, public, _actor_data->_side)
+        PROP_FIELD_GET_CUSTOM(extra, void*, public, _actor_data->_extra)
+        PROP_FIELD_GET_CUSTOM(experience, int, public, _actor_data->_xp)
+        PROP_FIELD_GET_CUSTOM(level, int, public, _actor_data->_lv)
     public:
         enum Attribute {
             //HasNewItems = 4096,
@@ -129,10 +133,31 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        int _lv, _max_lv, _xp, _maxp;
-        QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
-        QMap<char, Costume*> _equipment;
-        QVector<Costume*>* _dmg_roles;
+        class ActorData : public QSharedData
+        {
+        public:
+            ~ActorData();
+
+        protected:
+            int _lv, _max_lv, _xp, _maxp, _old_side, _init, _side, _actions;
+            QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
+            QMap<char, Costume*> _equipment;
+            QVector<Costume*>* _dmg_roles;
+            void* _extra;
+
+            friend class Scene;
+            friend class Actor;
+            friend class Ability;
+            friend class ArenaWidget;
+            friend class TargetsModel;
+            friend class SkillsModel;
+            friend class ItemsModel;
+            friend class Costume;
+            friend class State;
+            friend class Role;
+        };
+
+        QSharedDataPointer<ActorData> _actor_data;
 
         void levelUp(Scene* const scene);
         inline void checkRegSkill(Ability& skill);
@@ -156,9 +181,6 @@ namespace tbrpgsca
         Costume* unequipPos(Scene* const scene, char const pos);
         Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
         void refreshCostumes(QString* const ret, Scene* const scene);
-
-    private:
-        int _old_side;
 
         friend class Scene;
         friend class Ability;

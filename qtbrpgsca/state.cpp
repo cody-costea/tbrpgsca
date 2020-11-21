@@ -115,9 +115,9 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
             {
                 trgStates->operator[](this) = stateDur;
             }
-            if (user && this->isConverted() && target._side != user->_side)
+            if (user && this->isConverted() && target.partySide() != user->partySide())
             {
-                target._side = user->_side;
+                target.setPartySide(user->partySide());
             }
         }
     }
@@ -131,7 +131,7 @@ void State::remove(QString* const ret, Scene* const scene, Actor& actor)
     state.adopt(ret, scene, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
     {
-        actor._side = static_cast<int>(actor._old_side);
+        actor.setPartySide(static_cast<int>(actor._actor_data->_old_side));
     }
 
 }
@@ -224,7 +224,8 @@ void State::blockSkills(Actor& actor, const bool remove)
     QVector<Ability*>* rSkills = this->_state_data->_r_skills;
     if (rSkills)
     {
-        QMap<Ability*, int>* iSkills = actor._skills_cr_qty;
+        auto& actorData = actor._actor_data;
+        QMap<Ability*, int>* iSkills = actorData->_skills_cr_qty;
         if (remove)
         {
             if (iSkills)
@@ -247,7 +248,7 @@ void State::blockSkills(Actor& actor, const bool remove)
             if (iSkills == NIL)
             {
                 iSkills = new QMap<Ability*, int>();
-                actor._skills_cr_qty = iSkills;
+                actorData->_skills_cr_qty = iSkills;
             }
             for (Ability* const skill : *rSkills)
             {

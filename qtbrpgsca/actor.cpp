@@ -22,30 +22,30 @@ QString Actor::RiseTxt = ", but rises again";
 
 int Actor::remainingSkillUses(Ability& skill) const
 {
-    QMap<Ability*, int>* crQty = this->_skills_cr_qty;
+    QMap<Ability*, int>* crQty = this->_actor_data->_skills_cr_qty;
     return crQty == NIL ? 0 : crQty->value(&skill, 0);
 }
 
 int Actor::regeneratingSkillTurn(Ability& skill) const
 {
-    QMap<Ability*, int>* regTurn = this->_skills_rg_turn;
+    QMap<Ability*, int>* regTurn = this->_actor_data->_skills_rg_turn;
     return regTurn == NIL ? 0 : regTurn->value(&skill, 0);
 }
 
 QMap<Ability*, int> Actor::items() const
 {
-    QMap<Ability*, int>* items = this->_items;
+    QMap<Ability*, int>* items = this->_actor_data->_items;
     return items == NIL? QMap<Ability*, int>() : *items;
 }
 
 Costume& Actor::race() const
 {
-    return *(this->_equipment[CHAR_RACE]);
+    return *(this->_actor_data->_equipment[CHAR_RACE]);
 }
 
 Costume& Actor::job() const
 {
-    return *(this->_equipment[CHAR_JOB]);
+    return *(this->_actor_data->_equipment[CHAR_JOB]);
 }
 
 Costume* Actor::equipItem(const char pos, Costume* const item)
@@ -72,7 +72,7 @@ Costume* Actor::unequipPos(Scene* const scene, const char pos)
 
 char Actor::unequipItem(Scene* const scene, Costume& item)
 {
-    QMap<char, Costume*>& equipment = this->_equipment;
+    QMap<char, Costume*>& equipment = this->_actor_data->_equipment;
     char const old = equipment.key(&item, CHAR_NONE);
     this->equipItem(scene, old, NIL);
     return old;
@@ -80,7 +80,7 @@ char Actor::unequipItem(Scene* const scene, Costume& item)
 
 Costume* Actor::equipItem(Scene* const scene, const char pos, Costume* const item)
 {
-    QMap<char, Costume*>& equipment = this->_equipment;
+    QMap<char, Costume*>& equipment = this->_actor_data->_equipment;
     Costume* old = equipment.value(pos, NIL);
     switchCostume(NIL, scene, old, item);
     equipment[pos] = item;
@@ -197,7 +197,7 @@ void Actor::setCurrentHp(const int hp, QString* const ret, Scene* const scene, b
                 }
                 if (actor.initiative() > 0)
                 {
-                    actor._init = 0;
+                    actor.setInitiative(0);
                 }
                 if (actor.Role::isReviving())
                 {
@@ -266,9 +266,9 @@ void Actor::setMaxActions(const int mActions)
 {
     Actor& actor = *this;
     actor._costume_data->_m_actions = mActions;
-    if (mActions < actor._actions)
+    if (mActions < actor.actions())
     {
-        actor._actions = mActions;
+        actor.setActions(mActions);
     }
 }
 
@@ -319,21 +319,22 @@ inline void Actor::setSprite(QString& value)
 
 void Actor::setItems(QMap<Ability*, int>* const items)
 {
+    auto& actorData = this->_actor_data;
     if (this->hasNewItems())
     {
         this->setNewItems(false);
-        QMap<Ability*, int>* oldItems = this->_items;
+        QMap<Ability*, int>* oldItems = actorData->_items;
         if (oldItems)
         {
             delete oldItems;
         }
     }
-    this->_items = items;
+    actorData->_items = items;
 }
 
 inline void Actor::setMaxLevel(const int maxLv)
 {
-    this->_max_lv = maxLv;
+    this->_actor_data->_max_lv = maxLv;
 }
 
 inline void Actor::setLevel(const int level)
@@ -343,13 +344,13 @@ inline void Actor::setLevel(const int level)
 
 void Actor::setLevel(Scene* const scene, const int level)
 {
-    Actor& actor = *this;
-    while (level > actor._lv)
+    auto& actorData = this->_actor_data;
+    while (level > actorData->_lv)
     {
-        actor._xp = actor._maxp;
-        actor.levelUp(scene);
+        actorData->_xp = actorData->_maxp;
+        this->levelUp(scene);
     }
-    actor._lv = level;
+    actorData->_lv = level;
 
 }
 
@@ -360,11 +361,11 @@ inline void Actor::setExperience(const int xp)
 
 void Actor::setExperience(Scene* const scene, const int xp)
 {
-    Actor& actor = *this;
-    actor._xp = xp;
-    if (xp >= actor._maxp)
+    auto& actorData = this->_actor_data;
+    actorData->_xp = xp;
+    if (xp >= actorData->_maxp)
     {
-        actor.levelUp(scene);
+        this->levelUp(scene);
     }
 }
 
@@ -395,7 +396,7 @@ void Actor::setStateResistance(State* const state, const int res)
 void Actor::applyDmgRoles(QString& ret, Scene* const scene)
 {
     Actor& actor = *this;
-    QVector<Costume*>* const dmgRoles = actor._dmg_roles;
+    QVector<Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
     if (dmgRoles && dmgRoles->size() > 0)
     {
         for (Costume* const role : *dmgRoles)
@@ -448,13 +449,14 @@ void Actor::applyStates(QString* const ret, Scene* const scene, const bool consu
 inline void Actor::checkRegSkill(Ability& skill)
 {
     Actor& actor = *this;
+    auto& actorData = actor._actor_data;
     if (skill.usesRegen() > 0)
     {
-        QMap<Ability*, int>* regSkills = actor._skills_rg_turn;
+        QMap<Ability*, int>* regSkills = actorData->_skills_rg_turn;
         if (regSkills == NIL)
         {
             regSkills = new QMap<Ability*, int>();
-            actor._skills_rg_turn = regSkills;
+            actorData->_skills_rg_turn = regSkills;
         }
         regSkills->operator[](&skill) = 0;
     }
@@ -470,7 +472,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
     Actor& actor = *this;
     actor.removeStates(ret, scene, true);
     actor.refreshCostumes(ret, scene);
-    actor._actions = actor.maxActions();
+    actor.setActions(actor.maxActions());
     auto& actorCostData = actor._costume_data;
     QSharedDataPointer<RoleData>& roleData = actor._role_data;
     roleData->_hp = actor.maximumHp();
@@ -519,7 +521,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
         }
     }
     {
-        QMap<Ability*, int>* skillsQty = actor._skills_cr_qty;
+        QMap<Ability*, int>* skillsQty = actor._actor_data->_skills_cr_qty;
         if (skillsQty)
         {
             auto const last = skillsQty->cend();
@@ -535,15 +537,15 @@ void Actor::recover(QString* const ret, Scene* const scene)
 void Actor::levelUp(Scene* const scene)
 {
     Actor& actor = *this;
-    int lv = actor._lv;
+    int lv = actor.level();
     int const maxp = actor.maxExperience(), xp = actor.experience(), maxLv = actor.maxLevel();
     QSharedDataPointer<RoleData>& roleData = actor._role_data;
     while (maxp <= xp && lv < maxLv)
     {
-        actor._maxp = maxp * 2;
         roleData->_m_hp += 3;
         roleData->_m_mp += 2;
         roleData->_m_sp += 2;
+        actor.setMaxExperience(maxp * 2);
         actor.setOffense(actor.offense() + 1);
         actor.setDefense(actor.defense() + 1);
         actor.setWisdom(actor.wisdom() + 1);
@@ -558,7 +560,7 @@ void Actor::levelUp(Scene* const scene)
         }
         lv += 1;
     }
-    actor._lv = lv;
+    actor._actor_data->_lv = lv;
 }
 
 void Actor::switchCostume(QString* const ret, Scene* const scene, Costume* const oldCost, Costume* const newCost)
@@ -666,6 +668,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
 void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)
 {
     Actor& actor = *this;
+    auto& actorData = actor._actor_data;
     auto& actorCostData = actor._costume_data;
     QVector<Ability*>* aSkills = counters ? actorCostData->_counters : actorCostData->_a_skills;
     if (remove)
@@ -677,7 +680,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
                 aSkills->removeOne(ability);
                 if (ability->usesRegen() > 0)
                 {
-                    QMap<Ability*, int>* regTurn = actor._skills_rg_turn;
+                    QMap<Ability*, int>* regTurn = actorData->_skills_rg_turn;
                     if (regTurn)
                     {
                         regTurn->remove(ability);
@@ -685,7 +688,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
                 }
                 if (ability->maximumUses() > 0)
                 {
-                    QMap<Ability*, int>* crQty = actor._skills_cr_qty;
+                    QMap<Ability*, int>* crQty = actorData->_skills_cr_qty;
                     if (crQty)
                     {
                         crQty->remove(ability);
@@ -716,11 +719,11 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
                 int const mQty = ability->maximumUses();
                 if (mQty > 0)
                 {
-                    QMap<Ability*, int>* crQty = actor._skills_cr_qty;
+                    QMap<Ability*, int>* crQty = actorData->_skills_cr_qty;
                     if (crQty == NIL)
                     {
                         crQty = new QMap<Ability*, int>();
-                        actor._skills_cr_qty = crQty;
+                        actorData->_skills_cr_qty = crQty;
                     }
                     crQty->operator[](ability) = mQty;
                     actor.checkRegSkill(*ability);
@@ -768,7 +771,7 @@ void Actor::refreshCostumes(QString* const ret, Scene* const scene)
 {
     Actor& actor = *this;
     {
-        QMap<char, Costume*>& equipment = actor._equipment;
+        QMap<char, Costume*>& equipment = actor._actor_data->_equipment;
         auto const last = equipment.cend();
         for (auto it = equipment.cbegin(); it != last; ++it)
         {
@@ -795,45 +798,37 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QVector<Ability*>(),
               NIL, NIL, stRes, res)
 {
-    this->_lv = 1;
-    this->_xp = 0;
-    this->_maxp = 15;
-    this->_side = 0;
-    this->_init = 0;
-    this->_side = 0;
-    this->_old_side = 0;
-    this->_dmg_roles = NIL;
-    this->_skills_rg_turn = NIL;
-    this->_skills_cr_qty = NIL;
+    QSharedDataPointer<ActorData> actorData(new ActorData);
+    actorData->_lv = 1;
+    actorData->_xp = 0;
+    actorData->_maxp = 15;
+    actorData->_side = 0;
+    actorData->_init = 0;
+    actorData->_side = 0;
+    actorData->_old_side = 0;
+    actorData->_dmg_roles = NIL;
+    actorData->_skills_rg_turn = NIL;
+    actorData->_skills_cr_qty = NIL;
     this->_role_data->_state_dur = NIL;
-    this->_actions = mActions;
-    this->_max_lv = maxLv;
+    actorData->_actions = mActions;
+    actorData->_max_lv = maxLv;
+    actorData->_items = items;
+    actorData->_extra = NIL;
     this->setRace(race);
     this->setJob(job);
-    this->_items = items;
     this->setLevel(level);
     this->recover(NIL, NIL);
-    this->_extra = NIL;
 }
 
 Actor::Actor(Actor& actor) : Costume(actor)
 {
-    this->_init = 0;//actor.init;
-    this->_side = 0;//actor.side;
-    this->_old_side = 0;
-    /*this->setJob(actor.getJob());
-    this->setRace(actor.getRace());
-    this->setExperience(actor.xp);*/
-    auto& copyCostData = actor._costume_data;
+    this->_actor_data = actor._actor_data;
+    /*auto& copyCostData = actor._costume_data;
     auto& actorCostData = this->_costume_data;
     QVector<Ability*>* aSkills = new QVector<Ability*>();
     this->_items = actor.hasNewItems() ? new QMap<Ability*, int>(*(actor._items)) : actor._items;
     *(aSkills) = *(copyCostData->_a_skills);
     actorCostData->_a_skills = aSkills;
-    this->_maxp = actor._maxp;
-    this->_xp = actor._xp;
-    this->_lv = actor._lv;
-    this->_max_lv = actor._lv;
     this->_equipment = actor._equipment;
     {
         QMap<Ability*, int>* crSkillsQty = actor._skills_cr_qty;
@@ -913,8 +908,28 @@ Actor::Actor(Actor& actor) : Costume(actor)
             (*nSkillsRgTurn) = (*skillsRgTurn);
             actorCostData->_counters = nSkillsRgTurn;
         }
+    }*/
+}
+
+Actor::ActorData::~ActorData()
+{
+    auto dmgRoles = this->_dmg_roles;
+    if (dmgRoles)
+    {
+        this->_dmg_roles = NIL;
+        delete dmgRoles;
     }
-    this->_extra = actor._extra;
+    //TODO: use shared pointer;
+    /*if (this->hasNewItems())
+    {
+        //this->setNewItems(false);
+        QMap<Ability*, int>* items = this->_items;
+        if (items)
+        {
+            this->_items = NIL;
+            delete items;
+        }
+    }*/
 }
 
 Actor::~Actor()
@@ -946,20 +961,4 @@ Actor::~Actor()
         actorCostData->_a_skills = NIL;
         delete skills;
     }*/
-    auto dmgRoles = this->_dmg_roles;
-    if (dmgRoles)
-    {
-        this->_dmg_roles = NIL;
-        delete dmgRoles;
-    }
-    if (this->hasNewItems())
-    {
-        //this->setNewItems(false);
-        QMap<Ability*, int>* items = this->_items;
-        if (items)
-        {
-            this->_items = NIL;
-            delete items;
-        }
-    }
 }

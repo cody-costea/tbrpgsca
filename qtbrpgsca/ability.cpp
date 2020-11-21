@@ -50,11 +50,12 @@ void Ability::replenish(Actor& user)
     int const mQty = ability.maximumUses();
     if (mQty > 0)
     {
-        QMap<Ability*, int>* usrSkills = user._skills_cr_qty;
+        auto& userData = user._actor_data;
+        QMap<Ability*, int>* usrSkills = userData->_skills_cr_qty;
         if (usrSkills == NIL)
         {
             usrSkills = new QMap<Ability*, int>();
-            user._skills_cr_qty = usrSkills;
+            userData->_skills_cr_qty = usrSkills;
         }
         usrSkills->operator[](this) = mQty;
     }
@@ -64,7 +65,7 @@ void Ability::replenish(Actor& user)
 bool Ability::canPerform(Actor* const actor)
 {
     assert(actor);
-    QMap<Ability*, int>* skillsQty = actor->_skills_cr_qty;
+    QMap<Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
     return this->maximumMp() <= actor->maximumMp() && this->maximumHp() < actor->maximumHp() && this->maximumRp() <= actor->maximumRp()
             && actor->level() >= this->requiredLevel() && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
 }
@@ -84,6 +85,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         ret += Ability::ReflectTxt.arg(target->name());
         target = &user;
     }
+    auto& userData = user._actor_data;
     {
         auto& usrCostData = user._costume_data;
         auto& trgCostData = target->_costume_data;
@@ -149,7 +151,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     auto const last = aStates->cend();
                     for (auto it = aStates->cbegin(); it != last; ++it)
                     {
-                        it.key()->inflict(&ret, scene, &user, *target, it.value(), user._side == target->_side);
+                        it.key()->inflict(&ret, scene, &user, *target, it.value(), user.partySide() == target->partySide());
                     }
                 }
             }
@@ -187,11 +189,11 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             }
             if (ability.isStealing())
             {
-                QMap<Ability*, int>* usrItems = user._items;
+                QMap<Ability*, int>* usrItems = userData->_items;
                 //if (usrItems)
                 {
                     int trgItemsSize;
-                    QMap<Ability*, int>* trgItems = target->_items;
+                    QMap<Ability*, int>* trgItems = target->_actor_data->_items;
                     if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
                             && (((std::rand() % 12) + usrCostData->_agi / 4) > 4 + trgCostData->_agi / 3))
                     {
@@ -220,7 +222,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                                 {
                                     usrItems = new QMap<Ability*, int>();
                                     user.setNewItems(true);
-                                    user._items = usrItems;
+                                    userData->_items = usrItems;
                                 }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
                                 if (trgItemQty < 2)
@@ -251,11 +253,11 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         int mQty = ability.maximumUses();
         if (mQty > 0)
         {
-            QMap<Ability*, int>* usrSkillsQty = user._skills_cr_qty;
+            QMap<Ability*, int>* usrSkillsQty = userData->_skills_cr_qty;
             if (usrSkillsQty == NIL)
             {
                 usrSkillsQty = new QMap<Ability*, int>();
-                user._skills_cr_qty = usrSkillsQty;
+                userData->_skills_cr_qty = usrSkillsQty;
             }
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
