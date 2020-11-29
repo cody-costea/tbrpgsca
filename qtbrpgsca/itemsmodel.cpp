@@ -22,7 +22,7 @@ ItemsModel::~ItemsModel()
 int ItemsModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
-    QMap<Ability*, int>* const items = this->_actor->_actor_data->_items;
+    auto& items = this->_actor->_actor_data->_items;
     return items == nullptr ? 0 : items->size();
 }
 
@@ -34,7 +34,7 @@ QVariant ItemsModel::data(const QModelIndex& index, int role) const
    }
 
    Actor* const actor = this->_actor;
-   QMap<Ability*, int>* const items = actor->_actor_data->_items;
+   auto& items = actor->_actor_data->_items;
    if (items == nullptr)
    {
        return QVariant();

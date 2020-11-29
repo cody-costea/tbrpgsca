@@ -354,7 +354,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     }
     if (item)
     {
-        QMap<Ability*, int>* const items = user->_actor_data->_items;
+        const auto& items = user->_actor_data->_items;
         if (items)
         {
             items->operator[](ability) = items->value(ability, 1) - 1;

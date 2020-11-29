@@ -10,6 +10,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "costume.h"
 
+#include <QSharedPointer>
+
 namespace tbrpgsca
 {
 
@@ -17,17 +19,14 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
-        #define FLAG_NEW_ITEMS 4096  //TODO: use shared pointer for "items", instead of this flag;
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
 
         Q_OBJECT
-        PROP_FLAG_GET(hasNewItems, FLAG_NEW_ITEMS, public)
         PROP_FLAG(Actor, aiPlayer, AiPlayer, Attribute::AiPlayer, public, public)
         PROP_FLAG(Actor, randomAi, RandomAi, Attribute::RandomAi, public, public)
         PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
-        PROP_FLAG_SET_ALL(Actor, NewItems, FLAG_NEW_ITEMS, public, hasNewItems)
         PROP_FLAG_SET_ALL(Actor, Stunned, Costume::Attribute::Stun, public, isStunned)
         PROP_FLAG_SET_ALL(Actor, Reviving, Role::Attribute::Revive, public, isReviving)
         PROP_FLAG_SET_ALL(Actor, Enraged, Costume::Attribute::Enraged, public, isEnraged)
@@ -77,9 +76,8 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(level, int, public, _actor_data->_lv)
     public:
         enum Attribute {
-            //HasNewItems = 4096,
             RandomAi = 2048,
-            AiPlayer = 8192
+            AiPlayer = 4096
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)
@@ -102,11 +100,11 @@ namespace tbrpgsca
         void recover(QString& ret);
         //Actor& applyRoles(QString& ret);
         void applyStates(QString& ret, bool const consume);
-        void setElementResistance(int const element, int const res);
         void setStateResistance(State* const state, int const res);
-        void setItems(QMap<Ability*, int>* items);
-        void setLevel(int const level);
+        void setElementResistance(int const element, int const res);
+        void setItems(const QSharedPointer<QMap<Ability*, int>>& items);
         void setExperience(int const xp);
+        void setLevel(int const level);
         void setSprite(QString& value);
         void setJob(Costume& job);
         void setRace(Costume& race);
@@ -127,7 +125,11 @@ namespace tbrpgsca
 
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items);
+              QMap<int, int>* const res, QMap<State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items);
+
+        Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
+              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+              QMap<int, int>* const res, QMap<State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>&& items);
 
         Actor(Actor& actor);
 
@@ -140,7 +142,8 @@ namespace tbrpgsca
 
         protected:
             int _lv, _max_lv, _xp, _maxp, _old_side, _init, _side, _actions;
-            QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
+            QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn;
+            QSharedPointer<QMap<Ability*, int>> _items;
             QMap<char, Costume*> _equipment;
             QVector<Costume*>* _dmg_roles;
             void* _extra;

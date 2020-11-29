@@ -12,6 +12,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "scene.h"
 #include "role.h"
 
+#include <QSharedPointer>
 #include <QStringBuilder>
 
 using namespace tbrpgsca;
@@ -189,11 +190,11 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
             }
             if (ability.isStealing())
             {
-                QMap<Ability*, int>* usrItems = userData->_items;
+                auto& usrItems = userData->_items;
                 //if (usrItems)
                 {
                     int trgItemsSize;
-                    QMap<Ability*, int>* trgItems = target->_actor_data->_items;
+                    auto& trgItems = target->_actor_data->_items;
                     if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
                             && (((std::rand() % 12) + usrCostData->_agi / 4) > 4 + trgCostData->_agi / 3))
                     {
@@ -220,8 +221,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                             {
                                 if (usrItems == NIL)
                                 {
-                                    usrItems = new QMap<Ability*, int>();
-                                    user.setNewItems(true);
+                                    usrItems = QSharedPointer<QMap<Ability*, int>>();
                                     userData->_items = usrItems;
                                 }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
