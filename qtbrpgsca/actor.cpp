@@ -398,11 +398,11 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene)
             emit scene->spriteAct(scene, &actor, NIL, false, NIL, NIL);
 #if USE_TARGET_LIST
             {
-                QVector<Actor*>* targets = scene->_targets;
+                QVector<Actor*>* targets = scene->_scene_data->_targets;
                 if (targets == NIL)
                 {
                     targets = new QVector<Actor*>(1);
-                    scene->_targets = targets;
+                    scene->_scene_data->_targets = targets;
                 }
                 else
                 {

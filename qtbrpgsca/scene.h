@@ -93,9 +93,11 @@ namespace tbrpgsca
                           bool const useGuards, int const surprise, int const mInit);
 
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
-              bool const useGuards, int const surprise, int const mInit);
+              bool const useGuards, int const surprise, int const mInit, QObject* const parent = NIL);
 
-        Scene();
+        Scene(QObject* const parent = NIL);
+
+        Scene(const Scene& scene);
 
         ~Scene();
 
@@ -104,16 +106,34 @@ namespace tbrpgsca
                                            Actor* const target, Ability* const counter);
 
     protected:
-        Ability* _last_ability;
-        QVector<SceneRun*>* _events;
-        int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
-        QVector<QVector<Actor*>*> _parties;
-        QVector<Actor*>* _players;
-#if USE_TARGET_LIST
-        QVector<Actor*>* _targets;
-#endif
-        //SpriteAct* _actor_run;
-        Actor* _cr_actor;
+        class SceneData : public QSharedData
+        {
+        public:
+            ~SceneData();
+
+        protected:
+            Ability* _last_ability;
+            QVector<SceneRun*>* _events;
+            int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
+            QVector<QVector<Actor*>*> _parties;
+            QVector<Actor*>* _players;
+    #if USE_TARGET_LIST
+            QVector<Actor*>* _targets;
+    #endif
+            //SpriteAct* _actor_run;
+            Actor* _cr_actor;
+
+            friend class Actor;
+            friend class Scene;
+            friend class Ability;
+            friend class ArenaWidget;
+            friend class TargetsModel;
+            friend class Costume;
+            friend class State;
+            friend class Role;
+        };
+
+        QSharedDataPointer<SceneData> _scene_data;
 
         void agiCalc();
         void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
