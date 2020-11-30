@@ -25,17 +25,17 @@ namespace tbrpgsca
 #define DMG_RND 3
 
         Q_OBJECT
-        PROP_FLAG_GET(isRanged, Attribute::Range, public)
-        PROP_FLAG_GET(isReviving, Attribute::Revive, public)
-        PROP_FIELD_GET_CUSTOM(currentHp, int, public, _role_data->_hp)
-        PROP_FIELD_GET_CUSTOM(currentMp, int, public, _role_data->_mp)
-        PROP_FIELD_GET_CUSTOM(currentRp, int, public, _role_data->_sp)
-        PROP_FIELD_GET_CUSTOM(maximumHp, int, public, _role_data->_m_hp)
-        PROP_FIELD_GET_CUSTOM(maximumMp, int, public, _role_data->_m_mp)
-        PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _role_data->_m_sp)
-        PROP_FIELD_GET_CUSTOM(dmgType, int, public, _role_data->_dmg_type)
-        PROP_FIELD_GET_CUSTOM(name, QString, public, _role_data->_name)
-        PROP_FIELD_GET_CUSTOM(id, int, public, _role_data->_id)
+        PROP_FLAG(Role, Ranged, ranged, Attribute::Range, inline, public, public)
+        PROP_FLAG(Role, Reviving, revives, Attribute::Revive, inline, public, public)
+        PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, _role_data->_hp)
+        PROP_FIELD(Role, CurrentMp, currentMp, int, virtual inline, public, public, _role_data->_mp)
+        PROP_FIELD(Role, CurrentRp, currentRp, int, virtual inline, public, public, _role_data->_sp)
+        PROP_FIELD(Role, MaximumHp, maximumHp, int, virtual inline, public, public, _role_data->_m_hp)
+        PROP_FIELD(Role, MaximumMp, maximumMp, int, virtual inline, public, public, _role_data->_m_mp)
+        PROP_FIELD(Role, MaximumRp, maximumRp, int, virtual inline, public, public, _role_data->_m_sp)
+        PROP_FIELD(Role, DamageType, damageType, int, inline, public, public, _role_data->_dmg_type)
+        PROP_FIELD(Role, DatabaseId, databaseId, int, inline, public, protected, _role_data->_id)
+        PROP_FIELD(Role, Name, name, QString, inline, public, public, _role_data->_name)
     public:
         enum Attribute {
             Revive = 1,

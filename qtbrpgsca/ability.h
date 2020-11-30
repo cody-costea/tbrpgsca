@@ -21,17 +21,17 @@ namespace tbrpgsca
         #define DEFAULT_RES 3
 
         Q_OBJECT
-        PROP_FLAG_GET(canMiss, Attribute::Missable, public)
-        PROP_FLAG_GET(isStealing, Attribute::Steal, public)
-        PROP_FLAG_GET(isOnlyMelee, Attribute::Melee, public)
-        PROP_FLAG_GET(isAbsorbing, Attribute::Absorb, public)
-        PROP_FLAG_GET(targetsAll, Attribute::TargetAll, public)
-        PROP_FLAG_GET(targetsSide, Attribute::TargetSide, public)
-        PROP_FLAG_GET(targetsSelf, Attribute::TargetSelf, public)
-        PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _ability_data->_lv_rq)
-        PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _ability_data->_attr_inc)
-        PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _ability_data->_m_qty)
-        PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _ability_data->_r_qty)
+        PROP_FLAG(Ability, Stealing, steals, Attribute::Steal, inline, public, public)
+        PROP_FLAG(Ability, OnlyMelee, melee, Attribute::Melee, inline, public, public)
+        PROP_FLAG(Ability, Missable, misses, Attribute::Missable, inline, public, public)
+        PROP_FLAG(Ability, Absorbing, absorbs, Attribute::Absorb, inline, public, public)
+        PROP_FLAG(Ability, TargetingAll, targetsAll, Attribute::TargetAll, inline, public, public)
+        PROP_FLAG(Ability, TargetingSide, targetsSide, Attribute::TargetSide, inline, public, public)
+        PROP_FLAG(Ability, TargetingSelf, targetsSelf, Attribute::TargetSelf, inline, public, public)
+        PROP_FIELD(Ability, RequiredLevel, requiredLevel, int, inline, public, public, _ability_data->_lv_rq)
+        PROP_FIELD(Ability, AttributeIncrement, attributeIncrement, int, inline, public, public, _ability_data->_attr_inc)
+        PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, _ability_data->_m_qty)
+        PROP_FIELD(Ability, UsesRegen, usesRegen, int, inline, public, public, _ability_data->_r_qty)
     public:
         enum Attribute {
             Melee = 4,

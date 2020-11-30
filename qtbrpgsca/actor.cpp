@@ -140,7 +140,7 @@ void Actor::setJob(Scene* const scene, Costume& job)
     }
 }
 
-inline void Actor::setOffense(const int atk)
+/*inline void Actor::setOffense(const int atk)
 {
     this->_costume_data->_atk = atk;
 }
@@ -163,11 +163,11 @@ inline void Actor::setWisdom(const int wis)
 inline void Actor::setAgility(const int agi)
 {
     this->_costume_data->_agi = agi;
-}
+}*/
 
 void Actor::setAgility(const int agi, Scene& scene)
 {
-    this->setAgility(agi);
+    this->Costume::setAgility(agi);
     scene.agiCalc();
 }
 
@@ -262,13 +262,13 @@ void Actor::setCurrentRp(const int sp)
     this->_role_data->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
 }
 
-void Actor::setMaxActions(const int mActions)
+void Actor::setMaximumActions(const int mActions)
 {
     Actor& actor = *this;
     actor._costume_data->_m_actions = mActions;
-    if (mActions < actor.actions())
+    if (mActions < actor.currentActions())
     {
-        actor.setActions(mActions);
+        actor.setCurrentActions(mActions);
     }
 }
 
@@ -322,17 +322,17 @@ void Actor::setItems(const QSharedPointer<QMap<Ability*, int>>& items)
     this->_actor_data->_items = items;
 }
 
-inline void Actor::setMaxLevel(const int maxLv)
+inline void Actor::setMaximumLevel(const int maxLv)
 {
     this->_actor_data->_max_lv = maxLv;
 }
 
-inline void Actor::setLevel(const int level)
+inline void Actor::setCurrentLevel(const int level)
 {
-    return this->setLevel(NIL, level);
+    return this->setCurrentLevel(NIL, level);
 }
 
-void Actor::setLevel(Scene* const scene, const int level)
+void Actor::setCurrentLevel(Scene* const scene, const int level)
 {
     auto& actorData = this->_actor_data;
     while (level > actorData->_lv)
@@ -344,12 +344,12 @@ void Actor::setLevel(Scene* const scene, const int level)
 
 }
 
-inline void Actor::setExperience(const int xp)
+inline void Actor::setCurrentExperience(const int xp)
 {
-    return this->setExperience(NIL, xp);
+    return this->setCurrentExperience(NIL, xp);
 }
 
-void Actor::setExperience(Scene* const scene, const int xp)
+void Actor::setCurrentExperience(Scene* const scene, const int xp)
 {
     auto& actorData = this->_actor_data;
     actorData->_xp = xp;
@@ -462,7 +462,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
     Actor& actor = *this;
     actor.removeStates(ret, scene, true);
     actor.refreshCostumes(ret, scene);
-    actor.setActions(actor.maxActions());
+    actor.setCurrentActions(actor.maximumActions());
     auto& actorCostData = actor._costume_data;
     QSharedDataPointer<RoleData>& roleData = actor._role_data;
     roleData->_hp = actor.maximumHp();
@@ -527,22 +527,22 @@ void Actor::recover(QString* const ret, Scene* const scene)
 void Actor::levelUp(Scene* const scene)
 {
     Actor& actor = *this;
-    int lv = actor.level();
-    int const maxp = actor.maxExperience(), xp = actor.experience(), maxLv = actor.maxLevel();
+    int lv = actor.currentLevel();
+    int const maxp = actor.maximumExperience(), xp = actor.currentExperience(), maxLv = actor.maximumLevel();
     QSharedDataPointer<RoleData>& roleData = actor._role_data;
     while (maxp <= xp && lv < maxLv)
     {
         roleData->_m_hp += 3;
         roleData->_m_mp += 2;
         roleData->_m_sp += 2;
-        actor.setMaxExperience(maxp * 2);
+        actor.setMaximumExperience(maxp * 2);
         actor.setOffense(actor.offense() + 1);
         actor.setDefense(actor.defense() + 1);
         actor.setWisdom(actor.wisdom() + 1);
         actor.setSpirit(actor.spirit() + 1);
         if (scene == NIL)
         {
-            actor.setAgility(actor.agility() + 1);
+            actor.Costume::setAgility(actor.agility() + 1);
         }
         else
         {
@@ -573,14 +573,14 @@ void Actor::updateAttributes(const bool remove, Scene* const scene, Costume& cos
     actor.setMaximumHp(actor.maximumHp() + (i * costume.maximumHp()));
     actor.setMaximumMp(actor.maximumMp() + (i * costume.maximumMp()));
     actor.setMaximumRp(actor.maximumRp() + (i * costume.maximumRp()));
-    actor.setMaxActions(actor.maxActions() + (i * costume.maxActions()));
+    actor.setMaximumActions(actor.maximumActions() + (i * costume.maximumActions()));
     actor.setOffense(actor.offense() + (i * costume.offense()));
     actor.setDefense(actor.defense() + (i * costume.defense()));
     actor.setSpirit(actor.spirit() + (i * costume.spirit()));
     actor.setWisdom(actor.wisdom() + (i * costume.wisdom()));
     if (scene == NIL)
     {
-        actor.setAgility(actor.agility() + (i * costume.agility()));
+        actor.Costume::setAgility(actor.agility() + (i * costume.agility()));
     }
     else
     {
@@ -811,7 +811,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     actorData->_extra = NIL;
     this->setRace(race);
     this->setJob(job);
-    this->setLevel(level);
+    this->setCurrentLevel(level);
     this->recover(NIL, NIL);
 }
 

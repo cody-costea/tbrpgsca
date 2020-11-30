@@ -54,7 +54,7 @@ int Role::statesSize() const
 
 bool Role::operator==(Role& role) const
 {
-    return this->id() == role.id();
+    return this->databaseId() == role.databaseId();
 }
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
@@ -99,7 +99,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
             {
                 int res = DEFAULT_RES;
                 {
-                    int const dmgType = role.dmgType();
+                    int const dmgType = role.damageType();
                     auto const last = trgResMap->cend();
                     for (auto it = trgResMap->cbegin(); it != last; ++it)
                     {

@@ -35,10 +35,13 @@ namespace tbrpgsca
         #define MIN_ROUND INT_MIN
 
         Q_OBJECT
-        PROP_FLAG_GET(hasCovers, Attribute::HasCovers, public)
-        PROP_FLAG_GET(usesGuards, Attribute::UseGuards, public)
-        PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::UseGuards, protected, usesGuards)
-        PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, protected, hasCovers)
+        PROP_FLAG_GET(hasCovers, Attribute::HasCovers, inline, public)
+        PROP_FLAG_GET(usesGuards, Attribute::UseGuards, inline, public)
+        PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, inline, protected, hasCovers)
+        PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::UseGuards, inline, protected, usesGuards)
+
+        Q_PROPERTY(bool usesGuards READ usesGuards WRITE setUseGuards NOTIFY usesGuardsChanged)
+        Q_PROPERTY(bool hasCovers READ hasCovers WRITE setHasCovers NOTIFY hasCoversChanged)
     public:
         enum Attribute {
             UseGuards = 1,

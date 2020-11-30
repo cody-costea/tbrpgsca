@@ -68,7 +68,7 @@ bool Ability::canPerform(Actor* const actor)
     assert(actor);
     QMap<Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
     return this->maximumMp() <= actor->maximumMp() && this->maximumHp() < actor->maximumHp() && this->maximumRp() <= actor->maximumRp()
-            && actor->level() >= this->requiredLevel() && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
+            && actor->currentLevel() >= this->requiredLevel() && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
 }
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
@@ -80,8 +80,8 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
 {
     assert(target);
     Ability& ability = *this;
-    int const dmgType = ability.dmgType() | user.dmgType();
-    if (target != &user && ((dmgType & target->reflectDmgType()) != 0))
+    int const dmgType = ability.damageType() | user.damageType();
+    if (target != &user && ((dmgType & target->reflectType()) != 0))
     {
         ret += Ability::ReflectTxt.arg(target->name());
         target = &user;
@@ -90,7 +90,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     {
         auto& usrCostData = user._costume_data;
         auto& trgCostData = target->_costume_data;
-        int canMiss = ability.canMiss() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = usrCostData->_agi,
+        int canMiss = ability.isMissable() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = usrCostData->_agi,
                 trgAgi = trgCostData->_agi, trgSpi = trgCostData->_spi, usrWis = usrCostData->_wis;
         if ((dmgType & Role::Element::Attack) == Role::Element::Attack)
         {

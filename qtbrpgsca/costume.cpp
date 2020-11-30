@@ -106,11 +106,11 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         }
         if (costume.currentHp() == 0 && costume.currentMp() == 0 && costume.currentRp() == 0)
         {
-            int const roleElm = costume.dmgType();
-            int const actorElm = actor.dmgType();
+            int const roleElm = costume.damageType();
+            int const actorElm = actor.damageType();
             if ((actorElm & roleElm) == roleElm)
             {
-                actor.setDmgType(actorElm ^ roleElm);
+                actor.setDamageType(actorElm ^ roleElm);
             }
         }
         else
@@ -184,7 +184,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         int const cFlags = costume.playFlags();
         if (costume.currentHp() == 0 && costume.currentMp() == 0 && costume.currentRp() == 0)
         {
-            actor.setDmgType(actor.dmgType() | costume.dmgType());
+            actor.setDamageType(actor.damageType() | costume.damageType());
         }
         actor.setPlayFlags(actor.playFlags() | cFlags);
         if (scene)

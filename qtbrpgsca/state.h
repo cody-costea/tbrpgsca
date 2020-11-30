@@ -20,8 +20,8 @@ namespace tbrpgsca
         #define STATE_END_DUR -3
 
         Q_OBJECT
-        PROP_FIELD_GET_CUSTOM(duration, int, public, _state_data->_dur)
-        PROP_FIELD_GET_CUSTOM(resistance, int, public, _state_data->_s_res)
+        PROP_FIELD(State, Resistance, resistance, int, inline, public, public, _state_data->_s_res)
+        PROP_FIELD(State, Duration, duration, int, inline, public, public, _state_data->_dur)
     public:
         int removedSkillsSize() const;
         bool hasRemovedSkill(Ability& skill) const;

@@ -163,8 +163,8 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
     coverCheck:
     if (this->hasCovers())
     {
-        int cvrType = target->coverDmgType();
-        if (this->hasCovers() && (skill->dmgType() & cvrType) == cvrType && target->currentHp() < target->maximumHp() / 3)
+        int cvrType = target->coverType();
+        if (this->hasCovers() && (skill->damageType() & cvrType) == cvrType && target->currentHp() < target->maximumHp() / 3)
         {
             Actor* coverer = NIL;
             QVector<Actor*>& party = *(this->_scene_data->_parties[side]);
@@ -245,11 +245,11 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
             if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
                     && (target->partySide() != user.partySide() || target->Costume::isConfused()))
             {
-                int const usrDmgType = ability.dmgType();
+                int const usrDmgType = ability.damageType();
                 for (int i = 0; i < cntSize; ++i)
                 {
                     Ability* const cntSkill = counters->at(i);
-                    int cntDmgType = cntSkill->dmgType();
+                    int cntDmgType = cntSkill->damageType();
                     if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == NIL || (cntSkill->currentHp() > counter->currentHp())))
                     {
                         counter = cntSkill;
@@ -299,12 +299,12 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
             return;
         }
     }
-    if (ability->isRanged() && ability->targetsAll())
+    if (ability->isRanged() && ability->isTargetingAll())
     {
         bool applyCosts = true;
         int const usrSide = user->partySide();
-        bool const sideTarget = ability->targetsSide();
-        bool const noSelfTarget = !ability->targetsSelf();
+        bool const sideTarget = ability->isTargetingSide();
+        bool const noSelfTarget = !ability->isTargetingSelf();
         QVector<QVector<Actor*>*>& parties = scene->_parties;
         int const pSize = parties.size();
         for (int j = 0; j < pSize; ++j)
@@ -330,10 +330,10 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
             }
         }
     }
-    else if (ability->targetsSide())
+    else if (ability->isTargetingSide())
     {
         //QVector<Actor*>* const targets = scene.targets;
-        int const side = ability->targetsSelf() ? user->partySide() : target->_actor_data->_old_side;
+        int const side = ability->isTargetingSelf() ? user->partySide() : target->_actor_data->_old_side;
         QVector<Actor*>& party = *(scene->_parties[side]);
         int const pSize = party.size();
         for (int i = 0; i < pSize; ++i)
@@ -349,7 +349,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     }
     else
     {
-        this->execute(*ret, *user, &user == &target || ability->targetsSelf() ? user
+        this->execute(*ret, *user, &user == &target || ability->isTargetingSelf() ? user
                      : (this->getGuardian(user, target, ability)), *ability, true);
     }
     if (item)
@@ -361,7 +361,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
         }
     }
     scene->_last_ability = ability;
-    user->setExperience(this, user->experience() + 1);
+    user->setCurrentExperience(this, user->currentExperience() + 1);
     if (events && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);
@@ -542,8 +542,8 @@ void Scene::endTurn(QString* const ret)
     auto& scene = *this->_scene_data;
     int current = scene._current;
     Actor* crActor = scene._cr_actor;
-    int cActions = (crActor->actions()) - 1;
-    crActor->setActions(cActions);
+    int cActions = (crActor->currentActions()) - 1;
+    crActor->setCurrentActions(cActions);
     while (cActions < 1)
     {
         if (crActor->currentHp() > 0)
@@ -675,7 +675,7 @@ void Scene::endTurn(QString* const ret)
                 emit this->spriteAct(this, crActor, NIL, true, NIL, NIL);
             }
         }
-        crActor->setActions((cActions = crActor->Costume::isStunned() ? 0 : crActor->maxActions()));
+        crActor->setCurrentActions((cActions = crActor->Costume::isStunned() ? 0 : crActor->maximumActions()));
     }
     scene._current = current;
     scene._original = current;
@@ -696,7 +696,7 @@ void Scene::endTurn(QString* const ret)
 bool Scene::canTarget(Actor* const user, Ability* const ability, Actor* const target)
 {
     assert(user && ability && target);
-    return ability->canPerform(user) && (ability->targetsSelf() || ((target->currentHp() > 0 || ability->isReviving())
+    return ability->canPerform(user) && (ability->isTargetingSelf() || ((target->currentHp() > 0 || ability->isReviving())
             && ((this->getGuardian(user, target, ability))) == target));
 }
 
@@ -782,7 +782,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
         for (int j = 0; j < pSize; ++j)
         {
             Actor& player = *(party[j]);
-            player.setActions(0);
+            player.setCurrentActions(0);
             if (surprised)
             {
                 player.setInitiative(useInit ? -(mInit + 1) : -1);

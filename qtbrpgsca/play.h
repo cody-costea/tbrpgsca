@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,32 +16,32 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
-#define PROP_FIELD_GET_CUSTOM(Name, Type, GetLevel, Field) \
-    GetLevel: inline Type Name() const \
+#define PROP_FIELD_GET_CUSTOM(Name, Type, Attribute, GetLevel, Field) \
+    GetLevel: Attribute Type Name() const \
     { \
         return this->Field; \
     }
 
-#define PROP_FIELD_GET_NEW(Name, Type, GetLevel, Field, FieldLevel) \
+#define PROP_FIELD_GET_NEW(Name, Type, Attribute, GetLevel, Field, FieldLevel) \
     FieldLevel: Type Field; \
-    PROP_FIELD_GET_CUSTOM(Name, Type, GetLevel, Field)
+    PROP_FIELD_GET_CUSTOM(Name, Type, Attribute, GetLevel, Field)
 
-#define PROP_FIELD_GET(Name, Type, Level) \
-    PROP_FIELD_GET_NEW(Name, Type, Level, _##Name, private)
+#define PROP_FIELD_GET(Name, Type, Attribute, Level) \
+    PROP_FIELD_GET_NEW(Name, Type, Attribute, Level, _##Name, private)
 
-#define PROP_REF_GET(Name, Type, Level, Field) \
-    Level: inline Type& Name() const \
+#define PROP_REF_GET(Name, Type, Attribute, Level, Field) \
+    Level: Attribute Type& Name() const \
     { \
         return *this->Field; \
     }
 
-#define PROP_REF_GET_NEW(Name, Type, Level, Field, FieldLevel) \
+#define PROP_REF_GET_NEW(Name, Type, Attribute, Level, Field, FieldLevel) \
     FieldLevel: Type* Field; \
-    PROP_REF_GET(Name, Type, GetLevel, Field)
+    PROP_REF_GET(Name, Type, Attribute, GetLevel, Field)
 
-#define PROP_FIELD_SET(SetName, Type, Level, GetName, Field) \
+#define PROP_FIELD_SET(SetName, Type, Attribute, Level, GetName, Field) \
     Level: Q_SIGNAL void GetName##Changed(Type const value); \
-    Q_SLOT inline void SetName(Type const value) \
+    Q_SLOT Attribute void SetName(Type const value) \
     { \
         auto field = this->GetName(); \
         if (field != value) \
@@ -51,62 +51,70 @@ namespace tbrpgsca
         } \
     }
 
-#define PROP_FIELD_SWAP(SwapName, SetName, GetType, SetType, Level, GetName) \
-    Level: inline GetType SwapName(SetType value) \
+#define PROP_FIELD_SWAP(SwapName, SetName, GetType, SetType, Attribute, Level, GetName) \
+    Level: Attribute GetType SwapName(SetType value) \
     { \
         GetType old = this->GetName(); \
         this->SetName(value); \
         return old; \
     }
 
-#define PROP_FIELD_WITH(Class, WithName, Type, Level, SetName) \
-    Level: inline Class& WithName(Type value) \
+#define PROP_FIELD_WITH(Class, WithName, Type, Attribute, Level, SetName) \
+    Level: Attribute Class& WithName(Type value) \
     { \
         this->SetName(value); \
         return *this; \
     }
 
-#define PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Level, GetName) \
-    PROP_FIELD_WITH(Class, WithName, Type, Level, SetName) \
-    PROP_FIELD_SWAP(SwapName, SetName, Type, Type, Level, GetName)
+#define PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName) \
+    PROP_FIELD_WITH(Class, WithName, Type, Attribute, Level, SetName) \
+    PROP_FIELD_SWAP(SwapName, SetName, Type, Type, Attribute, Level, GetName)
 
-#define PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, Level, GetName, Field) \
-    PROP_FIELD_SET(SetName, Type, Level, GetName, Field) \
-    PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Level, GetName)
+#define PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName, Field) \
+    PROP_FIELD_SET(SetName, Type, Attribute, Level, GetName, Field) \
+    PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName)
 
-#define PROP_CUSTOM_FIELD(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
-    PROP_FIELD_GET_NEW(GetName, Type, GetLevel, Field, private) \
-    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, SetLevel, GetName, Field) \
+#define PROP_CUSTOM_FIELD(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_FIELD_GET_CUSTOM(GetName, Type, Attribute, GetLevel, Field) \
+    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, Attribute, SetLevel, GetName, Field) \
     Q_PROPERTY(Type GetName READ GetName WRITE SetName NOTIFY GetName##Changed)
 
-#define PROP_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, GetName, set##PropName, swap##PropName, with##PropName, Type, GetLevel, SetLevel, _##GetName) \
+#define PROP_CUSTOM_NEW_FIELD(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_FIELD_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
+    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, Attribute, SetLevel, GetName, Field) \
+    Q_PROPERTY(Type GetName READ GetName WRITE SetName NOTIFY GetName##Changed)
+
+#define PROP_FIELD(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_CUSTOM_FIELD(Class, GetName, set##PropName, swap##PropName, with##PropName, Type, Attribute, GetLevel, SetLevel, Field) \
+
+#define PROP_NEW_FIELD(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel) \
+    PROP_CUSTOM_NEW_FIELD(Class, GetName, set##PropName, swap##PropName, with##PropName, Type, Attribute, GetLevel, SetLevel, _##GetName) \
 
 #if (defined(__clang__) || defined(_MSC_VER))
-#define PROP_DECL_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
-    PROP_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
+#define PROP_DECL_FIELD(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel) \
+    PROP_FIELD(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel) \
     __declspec(property(put = set##PropName, get = GetName)) Type PropName;
 #endif
 
-#define PROP_CAMEL_FIELD(Class, Name, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, get##Name, set##Name swap##Name, with##Name, Type, GetLevel, SetLevel, _##Name)
+#define PROP_CAMEL_FIELD(Class, Name, Type, Attribute, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, get##Name, set##Name swap##Name, with##Name, Type, Attribute, GetLevel, SetLevel, _##Name)
 
-#define PROP_SNAKE_FIELD(Class, Name, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, Name, set_##Name swap_##Name, with_##Name, Type, GetLevel, SetLevel, _##Name)
+#define PROP_SNAKE_FIELD(Class, Name, Type, Attribute, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, Name, set_##Name swap_##Name, with_##Name, Type, Attribute, GetLevel, SetLevel, _##Name)
 
-#define PROP_PASCAL_FIELD(Class, Name, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, Get##Name, Set##Name, Swap##Name, With##Name, Type, GetLevel, SetLevel, _##Name)
+#define PROP_PASCAL_FIELD(Class, Name, Type, Attribute, GetLevel, SetLevel) \
+    PROP_CUSTOM_FIELD(Class, Get##Name, Set##Name, Swap##Name, With##Name, Type, Attribute, GetLevel, SetLevel, _##Name)
 
-#define PROP_CUSTOM_REF(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
-    PROP_REF_GET_NEW(GetName, Type, GetLevel, Field, private) \
+#define PROP_CUSTOM_REF(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_REF_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
     PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type*, SetLevel, GetName, Field)
 
-#define PROP_REF(Class, GetName, SetName, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_REF(Class, GetName, set##SetName, swap##SetName, with##SetName, Type, GetLevel, SetLevel, _##GetName)
+#define PROP_REF(Class, GetName, SetName, Type, Attribute, GetLevel, SetLevel) \
+    PROP_CUSTOM_REF(Class, GetName, set##SetName, swap##SetName, with##SetName, Type, Attribute, GetLevel, SetLevel, _##GetName)
 
-#define PROP_FLAG_SET(SetName, Flag, Level, GetName) \
+#define PROP_FLAG_SET(SetName, Flag, Attribute, Level, GetName) \
     Level: Q_SIGNAL void GetName##Changed(bool const value); \
-    Q_SLOT inline void SetName(bool const value) \
+    Q_SLOT Attribute void SetName(bool const value) \
     { \
         bool const field = this->GetName(); \
         if (field != value) \
@@ -116,19 +124,19 @@ namespace tbrpgsca
         } \
     }
 
-#define PROP_FLAG_SET_ALL(Class, PropName, Flag, Level, GetName) \
-    PROP_FLAG_SET(set##PropName, Flag, Level, GetName) \
-    PROP_FIELD_WITH_SWAP(Class, set##PropName, swap##PropName, with##PropName, bool, Level, GetName)
+#define PROP_FLAG_SET_ALL(Class, PropName, Flag, Attribute, Level, GetName) \
+    PROP_FLAG_SET(set##PropName, Flag, Attribute, Level, GetName) \
+    PROP_FIELD_WITH_SWAP(Class, set##PropName, swap##PropName, with##PropName, bool, Attribute, Level, GetName)
 
-#define PROP_FLAG_GET(Name, Flag, Level) \
-    Level: inline bool Name() const \
+#define PROP_FLAG_GET(Name, Flag, Attribute, Level) \
+    Level: Attribute bool Name() const \
     { \
         return this->hasAllPlayFlags(Flag); \
     }
 
-#define PROP_FLAG(Class, QmlName, PropName, Flag, GetLevel, SetLevel) \
-    PROP_FLAG_GET(is##PropName, Flag, GetLevel) \
-    PROP_FLAG_SET_ALL(Class, PropName, Flag, SetLevel, is##PropName) \
+#define PROP_FLAG(Class, PropName, QmlName, Flag, Attribute, GetLevel, SetLevel) \
+    PROP_FLAG_GET(is##PropName, Flag, Attribute, GetLevel) \
+    PROP_FLAG_SET_ALL(Class, PropName, Flag, Attribute, SetLevel, is##PropName) \
     Q_PROPERTY(bool QmlName READ is##PropName WRITE set##PropName NOTIFY is##PropName##Changed)
 
 #define NIL nullptr
@@ -136,7 +144,7 @@ namespace tbrpgsca
     class Play : public QObject
     {
         Q_OBJECT
-        PROP_FIELD(Play, PlayFlags, playFlags, int, public, protected)
+        PROP_NEW_FIELD(Play, PlayFlags, playFlags, int, virtual inline, public, protected)
     public:
         template  <typename PlayAct>
         static void runOnMainThread(PlayAct fn, bool const newTimer)

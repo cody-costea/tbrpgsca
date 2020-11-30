@@ -24,9 +24,9 @@ namespace tbrpgsca
         #define CHAR_JOB 2
 
         Q_OBJECT
-        PROP_FLAG(Actor, aiPlayer, AiPlayer, Attribute::AiPlayer, public, public)
-        PROP_FLAG(Actor, randomAi, RandomAi, Attribute::RandomAi, public, public)
-        PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
+        PROP_FLAG(Actor, AiPlayer, aiPlayer, Attribute::AiPlayer, inline, public, public)
+        PROP_FLAG(Actor, RandomAi, randomAi, Attribute::RandomAi, inline, public, public)
+        /*PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
         PROP_FLAG_SET_ALL(Actor, Stunned, Costume::Attribute::Stun, public, isStunned)
         PROP_FLAG_SET_ALL(Actor, Reviving, Role::Attribute::Revive, public, isReviving)
         PROP_FLAG_SET_ALL(Actor, Enraged, Costume::Attribute::Enraged, public, isEnraged)
@@ -36,7 +36,6 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, Reflecting, Costume::Attribute::Reflect, public, isReflecting)
         PROP_FLAG_SET_ALL(Actor, Invincible, Costume::Attribute::Invincible, public, isInvincible)
         PROP_FLAG_SET_ALL(Actor, ShapeShifted, Costume::Attribute::ShapeShift, public, isShapeShifted)
-        PROP_FIELD_WITH_SWAP(Actor, setExperience, swapExperience, withExperience, int, public, experience)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, maximumHp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, maximumMp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumRp, swapMaximumRp, withMaximumRp, int, public, maximumRp)
@@ -49,31 +48,30 @@ namespace tbrpgsca
         PROP_FIELD_WITH_SWAP(Actor, setAgility, swapAgility, withAgility, int, public, agility)
         PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, wisdom)
         PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, spirit)
-        PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
-        PROP_FIELD_SET_ALL(Actor, setExtra, sawpExtra, withExtra, void*, public, extra, _actor_data->_extra)
         PROP_FIELD_SET_ALL(Actor, setDmgType, sawpDmgType, withDmgType, int, public, dmgType, _role_data->_dmg_type)
-        PROP_FIELD_SET_ALL(Actor, setActions, sawpActions, withActions, int, public, actions, _actor_data->_actions)
-        PROP_FIELD_SET_ALL(Actor, setPartySide, sawpPartySide, withPartySide, int, public, partySide, _actor_data->_side)
-        PROP_FIELD_SET_ALL(Actor, setInitiative, sawpInitiative, withInitiative, int, public, initiative, _actor_data->_init)
-        PROP_FIELD_SET_ALL(Actor, setMaxExperience, sawpMaxExperience, withMaxExperience, int, public, maxExperience, _actor_data->_maxp)
         PROP_FIELD_SET_ALL(Actor, setReflectDmgType, sawpReflectDmgType, withReflectDmgType, int, public, reflectDmgType, _costume_data->_rfl_type)
         PROP_FIELD_SET_ALL(Actor, setCoverDmgType, sawpCoverDmgType, withCoverDmgType, int, public, coverDmgType, _costume_data->_cvr_type)
-        PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, name, _role_data->_name)
-        PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, public, race)
-        PROP_FIELD_WITH_SWAP(Actor, setLevel, swapLevel, withLevel, int, public, level)
-        //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
-        PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, sprite)
-        PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, public, job)
-        PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
-        //PROP_FIELD(Actor, Extra, extra, void*, public, protected)
-        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _actor_data->_maxp)
-        PROP_FIELD_GET_CUSTOM(initiative, int, public, _actor_data->_init)
-        PROP_FIELD_GET_CUSTOM(actions, int, public, _actor_data->_actions)
-        PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _actor_data->_max_lv)
-        PROP_FIELD_GET_CUSTOM(partySide, int, public, _actor_data->_side)
-        PROP_FIELD_GET_CUSTOM(extra, void*, public, _actor_data->_extra)
-        PROP_FIELD_GET_CUSTOM(experience, int, public, _actor_data->_xp)
-        PROP_FIELD_GET_CUSTOM(level, int, public, _actor_data->_lv)
+        PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, name, _role_data->_name)*/
+        PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, inline, public, race)
+        PROP_FIELD_WITH_SWAP(Actor, setMaximumLevel, swapMaximumLevel, withMaximumLevel, int, inline, public, maximumLevel)
+        //PROP_FIELD_SET_ALL(Actor, setExtra, sawpExtra, withExtra, void*, inline, public, extra, _actor_data->_extra)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentLevel, swapCurrentLevel, withCurrentLevel, int, inline, public, currentLevel)
+        PROP_FIELD_SET_ALL(Actor, setCurrentActions, sawpCurrentActions, withCurrentActions, int, inline, public, currentActions, _actor_data->_actions)
+        PROP_FIELD_SET_ALL(Actor, setPartySide, sawpPartySide, withPartySide, int, inline, public, partySide, _actor_data->_side)
+        PROP_FIELD_SET_ALL(Actor, setInitiative, sawpInitiative, withInitiative, int, inline, public, initiative, _actor_data->_init)
+        PROP_FIELD_SET_ALL(Actor, setMaximumExperience, sawpMaximumExperience, withMaximumExperience, int, inline, public, maximumExperience, _actor_data->_maxp)
+        PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, inline, public, sprite)
+        PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, inline, public, job)
+        PROP_FIELD_WITH(Actor, withSprite, QString&, inline, public, setSprite)
+        PROP_FIELD(Actor, Extra, extra, void*, inline, public, protected, _actor_data->_extra)
+        PROP_FIELD_GET_CUSTOM(maximumExperience, int, inline, public, _actor_data->_maxp)
+        PROP_FIELD_GET_CUSTOM(currentActions, int, inline, public, _actor_data->_actions)
+        PROP_FIELD_GET_CUSTOM(maximumLevel, int, inline, public, _actor_data->_max_lv)
+        PROP_FIELD_GET_CUSTOM(initiative, int, inline, public, _actor_data->_init)
+        PROP_FIELD_GET_CUSTOM(partySide, int, inline, public, _actor_data->_side)
+        //PROP_FIELD_GET_CUSTOM(extra, void*, inline, public, _actor_data->_extra)
+        PROP_FIELD_GET_CUSTOM(currentExperience, int, inline, public, _actor_data->_xp)
+        PROP_FIELD_GET_CUSTOM(currentLevel, int, inline, public, _actor_data->_lv)
     public:
         enum Attribute {
             RandomAi = 2048,
@@ -103,25 +101,25 @@ namespace tbrpgsca
         void setStateResistance(State* const state, int const res);
         void setElementResistance(int const element, int const res);
         void setItems(const QSharedPointer<QMap<Ability*, int>>& items);
-        void setExperience(int const xp);
-        void setLevel(int const level);
+        void setCurrentExperience(int const xp);
+        void setCurrentLevel(int const level);
         void setSprite(QString& value);
         void setJob(Costume& job);
         void setRace(Costume& race);
-        void setMaxActions(int const mActions);
-        void setMaxLevel(int const maxLv);
-        void setAgility(int const agi);
+        void setMaximumActions(int const mActions) override;
+        void setMaximumLevel(int const maxLv);
+        /*void setAgility(int const agi);
         void setOffense(int const atk);
         void setDefense(int const def);
         void setWisdom(int const wis);
-        void setSpirit(int const spi);
-        void setMaximumHp(int const mHp);
-        void setMaximumMp(int const mMp);
-        void setMaximumRp(int const mSp);
+        void setSpirit(int const spi);*/
+        void setMaximumHp(int const mHp) override;
+        void setMaximumMp(int const mMp) override;
+        void setMaximumRp(int const mSp) override;
         void setCurrentHp(int const hp, QString& ret, bool const survive);
-        void setCurrentHp(int const hp);
-        void setCurrentMp(int const mp);
-        void setCurrentRp(int const sp);
+        void setCurrentHp(int const hp) override;
+        void setCurrentMp(int const mp) override;
+        void setCurrentRp(int const sp) override;
 
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
@@ -175,8 +173,8 @@ namespace tbrpgsca
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
         void switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
-        void setExperience(Scene* const scene, int const xp);
-        void setLevel(Scene* const scene, int const level);
+        void setCurrentExperience(Scene* const scene, int const xp);
+        void setCurrentLevel(Scene* const scene, int const level);
         void setRace(Scene* const scene, Costume& race);
         void setAgility(int const agi, Scene& scene);
         void setJob(Scene* const scene, Costume& job);
