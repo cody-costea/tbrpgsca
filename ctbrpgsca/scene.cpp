@@ -46,7 +46,7 @@ int Scene::getCurrentParty() const
     return crActor ? crActor->_side : -1;
 }
 
-Ability* Scene::getLastAbility() const
+const Ability* Scene::getLastAbility() const
 {
     return this->_last_ability;
 }
@@ -105,7 +105,7 @@ bool Scene::hasTargetedPlayer(Actor& player) const
     return players && players->contains(&player);
 }
 #endif
-Actor* Scene::getGuardian(Actor& user, Actor* target, Ability& skill) const
+Actor* Scene::getGuardian(Actor& user, Actor* target, const Ability& skill) const
 {
     int const side = target->_side;
 #if ALLOW_NO_GUARDS
@@ -220,14 +220,14 @@ void Scene::checkStatus(QString& ret)
 }
 
 template <typename SpriteRun>
-void Scene::execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
+void Scene::execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts)
 {
     Scene& scene = *this;
     bool const ko = target->_hp < 1;
     //bool const healing = ability.hp < 0;
     if ((/*healing &&*/ ability.isReviving()) || !ko)
     {
-        Ability* counter = nullptr;
+        const Ability* counter = nullptr;
         ability.execute(ret, this, actorEvent, user, target, applyCosts);
         if (ability._hp > -1)
         //if (!healing)
@@ -264,7 +264,7 @@ void Scene::execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Acto
 }
 
 template <typename SpriteRun>
-void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item)
+void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item)
 {
     Scene& scene = *this;
     ret += Scene::PerformsTxt.arg(user._name, ability._name);
@@ -341,7 +341,7 @@ void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor
     }
     if (item)
     {
-        QMap<Ability*, int>* const items = user._items;
+        QMap<const Ability*, int>* const items = user._items;
         if (items)
         {
             items->operator[](&ability) = items->value(&ability, 1) - 1;
@@ -360,13 +360,13 @@ void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor
 
 }
 
-int Scene::getAiSkill(Actor& user, QVector<Ability*>& skills, int const defSkill, bool const restore) const
+int Scene::getAiSkill(Actor& user, QVector<const Ability*>& skills, int const defSkill, bool const restore) const
 {
-    Ability* s = skills[defSkill];
+    const Ability* s = skills[defSkill];
     int ret = defSkill, sSize = skills.size();
     for (int i = defSkill + 1; i < sSize; ++i)
     {
-        Ability* a = skills[i];
+        const Ability* a = skills[i];
         if (a->canPerform(user) && ((defSkill > 0 && (a->_hp < s->_hp)
             && (a->isReviving() || !restore)) || (a->_hp > s->_hp)))
         {
@@ -382,7 +382,7 @@ void Scene::playAi(QString& ret, SpriteRun* const spriteRun, Actor& player)
 {
     Scene& scene = *this;
     QVector<Actor*>* party;
-    QVector<Ability*>& skills = *(player._a_skills);
+    QVector<const Ability*>& skills = *(player._a_skills);
     QVector<QVector<Actor*>*>& parties = scene._parties;
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
     if (player.Costume::isConfused())
@@ -416,7 +416,7 @@ void Scene::playAi(QString& ret, SpriteRun* const spriteRun, Actor& player)
             int const skillsSize = skills.size();
             for (int i = 0; i < skillsSize; ++i)
             {
-                Ability& s = *(skills[i]);
+                const Ability& s = *(skills[i]);
                 if (s.canPerform(player) && (s._hp < 0 && ((heal == 0) || s.isReviving())))
                 {
                     skillIndex = i;
@@ -428,7 +428,7 @@ void Scene::playAi(QString& ret, SpriteRun* const spriteRun, Actor& player)
     {
         Actor* target = nullptr;
         //Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
-        Ability& ability = *(skills[scene.getAiSkill(player, skills, skillIndex, heal == 1)]);
+        const Ability& ability = *(skills[scene.getAiSkill(player, skills, skillIndex, heal == 1)]);
         if (ability._hp > -1)
         {
             if (party == nullptr || player.isRandomAi())
@@ -627,19 +627,19 @@ void Scene::endTurn(QString& ret, SpriteRun* actorEvent, Actor* crActor)
             while (crActor->_hp < 1 || crActor->_init < mInit);
         }
         //crActor->actions = cActions = crActor->mActions;
-        QMap<Ability*, int>* const regSkills = crActor->_skills_rg_turn;
+        QMap<const Ability*, int>* const regSkills = crActor->_skills_rg_turn;
         if (regSkills)
         {
-            QMap<Ability*, int>* skillsQty = crActor->_skills_cr_qty;
+            QMap<const Ability*, int>* skillsQty = crActor->_skills_cr_qty;
             if (skillsQty == nullptr)
             {
-                skillsQty = new QMap<Ability*, int>();
+                skillsQty = new QMap<const Ability*, int>();
                 crActor->_skills_cr_qty = skillsQty;
             }
             auto const last = regSkills->cend();
             for (auto it = regSkills->cbegin(); it != last; ++it)
             {
-                Ability* const skill = it.key();
+                const Ability* const skill = it.key();
                 int const skillMaxQty = skill->_m_qty, skillCrQty = skillsQty->value(skill, skillMaxQty);
                 if (skillCrQty < skillMaxQty)
                 {
@@ -691,7 +691,7 @@ void Scene::endTurn(QString& ret, SpriteRun* actorEvent, Actor* crActor)
 
 }
 
-bool Scene::canTarget(Actor& user, Ability& ability, Actor& target)
+bool Scene::canTarget(Actor& user, const Ability& ability, Actor& target)
 {
     return ability.canPerform(user) && (ability.targetsSelf() || ((target._hp > 0 || ability.isReviving())
             && ((this->getGuardian(user, &target, ability))) == &target));
@@ -852,8 +852,8 @@ Scene::~Scene()
 #if USE_TEMPLATE
     template void Scene::playAi(QString& ret, ArenaWidget* const spriteRun, Actor& player);
     template void Scene::endTurn(QString& ret, ArenaWidget* const spriteRun, Actor* const actor);
-    template void Scene::perform(QString& ret, ArenaWidget* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
-    template void Scene::execute(QString& ret, ArenaWidget* const actorEvent, Actor& user, Actor* const target, Ability& ability, bool const applyCosts);
+    template void Scene::perform(QString& ret, ArenaWidget* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
+    template void Scene::execute(QString& ret, ArenaWidget* const actorEvent, Actor& user, Actor* const target,const Ability& ability, bool const applyCosts);
     template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                                 bool const useGuards, int const surprise, int const mInit);
     template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
@@ -862,8 +862,8 @@ Scene::~Scene()
 
 template void Scene::playAi(QString& ret, Scene::SpriteAct* const spriteRun, Actor& player);
 template void Scene::endTurn(QString& ret, Scene::SpriteAct* const spriteRun, Actor* const actor);
-template void Scene::perform(QString& ret, Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
-template void Scene::execute(QString& ret, Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, Ability& ability, bool const applyCosts);
+template void Scene::perform(QString& ret, Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
+template void Scene::execute(QString& ret, Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
 template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                                 bool const useGuards, int const surprise, int const mInit);
 template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,

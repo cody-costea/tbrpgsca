@@ -46,7 +46,7 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(maximumRp, int, public, _m_sp)
         PROP_FIELD_GET_CUSTOM(dmgElement, int, public, _dmg_type)
         PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
-        PROP_FIELD_GET_CUSTOM(id, int, public, _id)
+        //PROP_FIELD_GET_CUSTOM(id, int, public, _id)
     public:
         static QString HpTxt;
         static QString MpTxt;
@@ -55,26 +55,24 @@ namespace tbrpgsca
         static QString ResistTxt;
 
         QString sprite() const;
-        QList<State*> statesList() const;
-        int stateDuration(State& state) const;
-        bool hasState(State& state) const;
+        QList<const State*> statesList() const;
+        int stateDuration(const State& state) const;
+        bool hasState(const State& state) const;
         int statesSize() const;
 
-        void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
-
-        bool operator==(Role& role) const;
+        void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
     protected:
         QString _name,* _sprite;
-        int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
-        QMap<State*, int>* _state_dur;
+        signed int _dmg_type: 16, _hp: 24, _mp: 16, _sp: 16, _m_hp: 24, _m_mp: 16, _m_sp: 16;
+        QMap<const State*, int>* _state_dur;
 
         template <typename SpriteRun>
-        void damage(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent);
+        void damage(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-             int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);
+             int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<const State*, int>* const states);
 
-        Role(Role& role);
+        Role(const Role& role);
 
         ~Role();
 

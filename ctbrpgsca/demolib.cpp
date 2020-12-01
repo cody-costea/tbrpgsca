@@ -15,9 +15,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QVector<State*>& DemoLib::getStates()
+QVector<const State*>& DemoLib::getStates()
 {
-    QVector<State*>& states = this->states;
+    QVector<const State*>& states = this->states;
     if (states.size() == 0)
     {
         states.append(new State(1, tr("Regen"), "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
@@ -49,54 +49,54 @@ QVector<State*>& DemoLib::getStates()
     return states;
 }
 
-QVector<QMap<State*, int>*>& DemoLib::getStateMasks()
+QVector<QMap<const State*, int>*>& DemoLib::getStateMasks()
 {
-    QVector<QMap<State*, int>*>& stateMasks = this->stateMasks;
+    QVector<QMap<const State*, int>*>& stateMasks = this->stateMasks;
     if (stateMasks.size() == 0)
     {
-        QVector<State*>& states = this->getStates();
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[0], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[1], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[2], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[3], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[4], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[5], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[6], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[7], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[8], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[9], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[10], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[11], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[0], 0}, {states[2], 0}, {states[4], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[1], 0}, {states[3], 0}, {states[5], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[7], 0}, {states[8], 0}, {states[9], 0}}));
+        QVector<const State*>& states = this->getStates();
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[0], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[1], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[2], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[3], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[4], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[5], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[6], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[7], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[8], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[9], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[10], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[11], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[0], 0}, {states[2], 0}, {states[4], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[1], 0}, {states[3], 0}, {states[5], 0}}));
+        stateMasks.append(new QMap<const State*, int>(std::map<const State*, int> {{states[7], 0}, {states[8], 0}, {states[9], 0}}));
     }
     return stateMasks;
 }
 
-QVector<QVector<Ability*>*>& DemoLib::getAbilities()
+QVector<QVector<const Ability*>*>& DemoLib::getAbilities()
 {
-    QVector<QVector<Ability*>*>& abilities = this->abilities;
+    QVector<QVector<const Ability*>*>& abilities = this->abilities;
     if (abilities.size() == 0)
     {
-        QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
-        QVector<Ability*>* skillSet = new QVector<Ability*>();
+        QVector<QMap<const State*, int>*>& stateMasks = this->getStateMasks();
+        QVector<const Ability*>* skillSet = new QVector<const Ability*>();
         skillSet->append(new Ability(1, tr("Attack"), "", "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK, 10,0,-3, FLAG_TRG_ONE,0, -1,-1, false, false, nullptr, stateMasks[10]));
         skillSet->append(new Ability(2, tr("Defend"), "", "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF, 0,-1,-2, FLAG_TRG_SELF,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
-        skillSet = new QVector<Ability*>();
+        skillSet = new QVector<const Ability*>();
         skillSet->append(new Ability(3, tr("Heal"), "", "", false, true, false, false, 0, 0,3,0, DMG_TYPE_SPI, -13,0,0, FLAG_TRG_ONE,0, -1,-1, false, true, nullptr, nullptr));
         abilities.append(skillSet);
     }
     return abilities;
 }
 
-QVector<Costume*>& DemoLib::getRaces()
+QVector<const Costume*>& DemoLib::getRaces()
 {
-    QVector<Costume*>& races = this->races;
+    QVector<const Costume*>& races = this->races;
     if (races.size() == 0)
     {
-        QVector<Ability*>* abilities = this->getAbilities().at(0);
+        QVector<const Ability*>* abilities = this->getAbilities().at(0);
         races.append(new Costume(1, tr("Elf"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, false, nullptr, nullptr, nullptr));
         races.append(new Costume(2, tr("Gnome"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
@@ -117,12 +117,12 @@ QVector<Costume*>& DemoLib::getRaces()
     return races;
 }
 
-QVector<Costume*>& DemoLib::getJobs()
+QVector<const Costume*>& DemoLib::getJobs()
 {
-    QVector<Costume*>& jobs = this->jobs;
+    QVector<const Costume*>& jobs = this->jobs;
     if (jobs.size() == 0)
     {
-        QVector<QVector<Ability*>*>& abilities = this->getAbilities();
+        QVector<QVector<const Ability*>*>& abilities = this->getAbilities();
         jobs.append(new Costume(1, tr("Alchemist"), "Alchemist", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], false, nullptr, nullptr, nullptr));
         jobs.append(new Costume(2, tr("Berserker"), "Berserker", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
@@ -170,8 +170,8 @@ QVector<QVector<Actor*>*>& DemoLib::getEnemies()
     QVector<QVector<Actor*>*>& enemies = this->enemies;
     if (enemies.size() == 0)
     {
-        QVector<Costume*>& jobs = this->getJobs();
-        QVector<Costume*>& races = this->getRaces();
+        QVector<const Costume*>& jobs = this->getJobs();
+        QVector<const Costume*>& races = this->getRaces();
         QVector<Actor*>* enemy = new QVector<Actor*>();
         enemy->append(new Actor(5, tr("Goblin"), "", (*races[4]), (*jobs[9]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         enemy->append(new Actor(6, tr("Lizard"), "", (*races[5]), (*jobs[13]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
@@ -187,8 +187,8 @@ QVector<Actor*>& DemoLib::getPlayers()
     QVector<Actor*>& players = this->players;
     if (players.size() == 0)
     {
-        QVector<Costume*>& jobs = this->getJobs();
-        QVector<Costume*>& races = this->getRaces();
+        QVector<const Costume*>& jobs = this->getJobs();
+        QVector<const Costume*>& races = this->getRaces();
         players.append(new Actor(1, tr("Cody"), "", (*races[3]), (*jobs[7]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         players.append(new Actor(2, tr("Victoria"), "", (*races[0]), (*jobs[16]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         players.append(new Actor(4, tr("Stephanie"), "", (*races[2]), (*jobs[17]), 1,9, 1, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));

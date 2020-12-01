@@ -33,7 +33,7 @@ void ArenaWidget::afterPlay()
                else
                {
                    crActor = arena._cr_actor;
-                   QVector<Costume*>* usrRoles;
+                   QVector<const Costume*>* usrRoles;
                    if (((usrRoles = crActor->_dmg_roles)) && usrRoles->size() > 0)
                    {
                        arena.setEndTurn(true);
@@ -259,7 +259,7 @@ void ArenaWidget::prepareTargetBox(bool const freeMemory)
     return;
 }
 
-void ArenaWidget::prepareSkillsBox(Actor& actor, QVector<Ability*>& skills)
+void ArenaWidget::prepareSkillsBox(Actor& actor, QVector<const Ability*>& skills)
 {
     ArenaWidget& arena = *this;
     QComboBox& skillBox = *(arena._skills_box);
@@ -319,7 +319,7 @@ void ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int
         }
         if (itemIndex > -1)
         {
-            QMap<Ability*, int>* const items = crActor._items;
+            QMap<const Ability*, int>* const items = crActor._items;
             auto const it = items->cbegin() + itemIndex;
             arena._act_btn->setEnabled(it.value() > 0 && arena.canTarget(crActor, *(it.key()), trgActor));
         }
@@ -589,8 +589,8 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
 }
 
 #if USE_TEMPLATE
-bool ArenaWidget::operator()(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                            Actor* const target, Ability* const counter)
+bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
+                            Actor* const target, const Ability* const counter)
 {
    ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
 #if TRG_SPR_DELAY < 0
@@ -821,9 +821,9 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             Actor* const crActor = arena._cr_actor;
             Actor* const trgActor = arena._trg_actor;
             QString& ret = *(arena._ret_str); ret.clear();
-            QMap<Ability*, int>* const items = crActor->_items;
+            QMap<const Ability*, int>* const items = crActor->_items;
             auto const it = items->cbegin() + arena._items_box->currentIndex();
-            Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
+            const Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
             arena.perform(ret, SPRITE_ACT, *crActor, *trgActor, *ability, false);
         });
         connect(skillsBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [&arena](int const i)
@@ -837,7 +837,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
     }
     arena._spr_runs = 0;
 #if !USE_TEMPLATE
-    SpriteAct* const _spr_act = new SpriteAct([](Scene& scene, Actor* const user, Ability* const ability, bool const revive,
+    SpriteAct* const _spr_act = new SpriteAct([](Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
                                      Actor* const target, Ability* const counter) -> bool
         {
             ArenaWidget& arena = static_cast<ArenaWidget&>(scene);

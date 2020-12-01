@@ -42,8 +42,8 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Scene, HasCovers, FLAG_HAS_COVERS, protected, hasCovers)
     public:
         typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
-        typedef std::function<bool(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                                   Actor* const target, Ability* const counter)> SpriteAct;
+        typedef std::function<bool(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
+                                   Actor* const target, const Ability* const counter)> SpriteAct;
 
         static QString EscapeTxt;
         static QString VictoryTxt;
@@ -57,7 +57,7 @@ namespace tbrpgsca
         void endTurn(QString& ret, SpriteRun* const spriteRun, Actor* const actor);
 
         template <typename SpriteRun>
-        void perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor& target, Ability& ability, bool const item);
+        void perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
 
         template <typename SpriteRun>
         void playAi(QString& ret, SpriteRun* const spriteRun, Actor& player);
@@ -65,10 +65,10 @@ namespace tbrpgsca
         void checkStatus(QString& ret);
         void escape(QString& ret);
 
-        bool canTarget(Actor& user, Ability& ability, Actor& target);
+        bool canTarget(Actor& user, const Ability& ability, Actor& target);
 
-        int getAiSkill(Actor& user, QVector<Ability*>& skills, int const index, bool const nRestore) const;
-        Actor* getGuardian(Actor& user, Actor* target, Ability& skill) const;
+        int getAiSkill(Actor& user, QVector<const Ability*>& skills, int const index, bool const nRestore) const;
+        Actor* getGuardian(Actor& user, Actor* target, const Ability& skill) const;
 
         Actor& getPartyPlayer(int const party, int const player) const;
         bool hasPartyPlayer(int const party, Actor& player) const;
@@ -83,7 +83,7 @@ namespace tbrpgsca
         bool hasTargetedPlayer(Actor& player) const;
         int getTargetedPlayersSize() const;
 
-        Ability* getLastAbility() const;
+        const Ability* getLastAbility() const;
         Actor* getCurrentPlayer() const;
         int getCurrentParty() const;
         int getCurrent() const;
@@ -91,7 +91,7 @@ namespace tbrpgsca
 
         template <typename SpriteRun>
         void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
-                          bool const useGuards, int const surprise, int const mInit);
+                        bool const useGuards, int const surprise, int const mInit);
 
         template <typename SpriteRun>
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
@@ -101,7 +101,7 @@ namespace tbrpgsca
 
         ~Scene();
     protected:
-        Ability* _last_ability;
+        const Ability* _last_ability;
         QVector<SceneRun*>* _events;
         signed int _current: 8, _original: 8, _f_target: 8, _l_target: 8, _surprise: 2,_status: 2, _m_init: 28;
         QVector<QVector<Actor*>*> _parties;
@@ -116,7 +116,7 @@ namespace tbrpgsca
         void resetTurn(Actor& actor);
 
         template <typename SpriteRun>
-        void execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+        void execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Actor* target, const Ability& ability, bool const applyCosts);
 
         friend class Actor;
         friend class Ability;

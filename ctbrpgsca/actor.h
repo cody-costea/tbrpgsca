@@ -57,11 +57,11 @@ namespace tbrpgsca
         PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, Costume::spirit)
         PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
         PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, Role::name, _name)
-        PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, public, race)
+        PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, const Costume&, public, race)
         PROP_FIELD_WITH_SWAP(Actor, setLevel, swapLevel, withLevel, int, public, level)
         //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
         PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, Role::sprite)
-        PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, public, job)
+        PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, const Costume&, public, job)
         PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
         PROP_FIELD(Actor, Extra, extra, void*, public, protected)
         PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
@@ -74,29 +74,29 @@ namespace tbrpgsca
         static QString KoTxt;
         static QString RiseTxt;
 
-        QMap<Ability*, int> items() const;
+        QMap<const Ability*, int> items() const;
         //int getPartySide() const;
-        Costume& race() const;
-        Costume& job() const;
+        const Costume& race() const;
+        const Costume& job() const;
 
         int remainingSkillUses(Ability& skill) const;
         int regeneratingSkillTurn(Ability& skill) const;
 
-        Costume* unequipPos(char const pos);
-        Costume* equipItem(char const pos, Costume* const item);
-        char unequipItem(Costume& item);
+        const Costume* unequipPos(char const pos);
+        const Costume* equipItem(char const pos, const Costume* const item);
+        char unequipItem(const Costume& item);
 
         void recover(QString& ret);
         //Actor& applyRoles(QString& ret);
         void applyStates(QString& ret, bool const consume);
         void setElementResistance(int const element, int const res);
-        void setStateResistance(State* const state, int const res);
-        void setItems(QMap<Ability*, int>* items);
+        void setStateResistance(const State* const state, int const res);
+        void setItems(QMap<const Ability*, int>* items);
         void setLevel(int const level);
         void setExperience(int const xp);
         void setSprite(QString& value);
-        void setJob(Costume& job);
-        void setRace(Costume& race);
+        void setJob(const Costume& job);
+        void setRace(const Costume& race);
         //void setMaxActions(int const mActions);
         void setMaxLevel(int const maxLv);
         void setAgility(int const agi);
@@ -112,37 +112,37 @@ namespace tbrpgsca
         void setCurrentMp(int const mp);
         void setCurrentRp(int const sp);
 
-        Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
+        Actor(int const id, QString name, QString sprite, const Costume& race, const Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<State*, int>* const stRes, QMap<Ability*, int>* const items);
+              QMap<int, int>* const res, QMap<const State*, int>* const stRes, QMap<const Ability*, int>* const items);
 
-        Actor(Actor& actor);
+        Actor(const Actor& actor);
 
         ~Actor();
     protected:
-        int _lv, _max_lv, _xp, _maxp;
-        QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
-        QMap<char, Costume*> _equipment;
-        QVector<Costume*>* _dmg_roles;
+        signed int _lv: 8, _max_lv: 8, _xp: 32, _maxp: 32;
+        QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
+        QMap<char, const Costume*> _equipment;
+        QVector<const Costume*>* _dmg_roles;
 
         void levelUp(Scene* const scene);
-        inline void checkRegSkill(Ability& skill);
+        inline void checkRegSkill(const Ability& skill);
         void recover(QString* const ret, Scene* const scene);
         void removeStates(QString* const ret, Scene* const scene, bool const remove);
         void updateStates(bool const remove, QString* const ret, Scene* const scene,
-                            QMap<State*, int>& states, bool const includeWithDur);
-        void updateAttributes(bool const remove, Scene* const scene, Costume& costume);
-        void updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
-        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
-        void switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
+                            QMap<const State*, int>& states, bool const includeWithDur);
+        void updateAttributes(bool const remove, Scene* const scene, const Costume& costume);
+        void updateSkills(bool const remove, bool const counters, QVector<const Ability*>& skills);
+        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
+        void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
         void setExperience(Scene* const scene, int const xp);
         void setLevel(Scene* const scene, int const level);
-        void setRace(Scene* const scene, Costume& race);
+        void setRace(Scene* const scene, const Costume& race);
         void setAgility(int const agi, Scene& scene);
-        void setJob(Scene* const scene, Costume& job);
-        char unequipItem(Scene* const scene, Costume& item);
-        Costume* unequipPos(Scene* const scene, char const pos);
-        Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
+        void setJob(Scene* const scene, const Costume& job);
+        char unequipItem(Scene* const scene, const Costume& item);
+        const Costume* unequipPos(Scene* const scene, char const pos);
+        const Costume* equipItem(Scene* const scene, char const pos, const Costume* const item);
         void refreshCostumes(QString* const ret, Scene* const scene);
 
         template <typename SpriteRun>

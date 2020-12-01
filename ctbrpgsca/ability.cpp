@@ -21,40 +21,40 @@ QString Ability::MissesTxt = ", but misses %1";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
 
-int Ability::removedStateDuration(State& state) const
+int Ability::removedStateDuration(const State& state) const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<const State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
-QList<State*> Ability::removedStatesList() const
+QList<const State*> Ability::removedStatesList() const
 {
-    QMap<State*, int>* aStates = this->_r_states;
-    return aStates == nullptr ? QList<State*>() : aStates->keys();
+    QMap<const State*, int>* aStates = this->_r_states;
+    return aStates == nullptr ? QList<const State*>() : aStates->keys();
 }
 
-bool Ability::removedState(State& state) const
+bool Ability::removedState(const State& state) const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<const State*, int>* aStates = this->_r_states;
     return aStates && aStates->contains(&state);
 }
 
 int Ability::removedStatesSize() const
 {
-    QMap<State*, int>* aStates = this->_r_states;
+    QMap<const State*, int>* aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->size();
 }
 
-void Ability::replenish(Actor& user)
+void Ability::replenish(Actor& user) const
 {
-    Ability& ability = *this;
+    const Ability& ability = *this;
     int const mQty = ability._m_qty;
     if (mQty > 0)
     {
-        QMap<Ability*, int>* usrSkills = user._skills_cr_qty;
+        QMap<const Ability*, int>* usrSkills = user._skills_cr_qty;
         if (usrSkills == nullptr)
         {
-            usrSkills = new QMap<Ability*, int>();
+            usrSkills = new QMap<const Ability*, int>();
             user._skills_cr_qty = usrSkills;
         }
         usrSkills->operator[](this) = mQty;
@@ -62,23 +62,23 @@ void Ability::replenish(Actor& user)
 
 }
 
-bool Ability::canPerform(Actor& actor)
+bool Ability::canPerform(Actor& actor) const
 {
-    QMap<Ability*, int>* skillsQty = actor._skills_cr_qty;
+    QMap<const Ability*, int>* skillsQty = actor._skills_cr_qty;
     return this->_m_mp <= actor._mp && this->_m_hp < actor._hp && this->_m_sp <= actor._sp && actor._lv >= this->_lv_rq
                     && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
 
-void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
+void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts) const
 {
     return this->execute(ret, nullptr, static_cast<Scene::SpriteAct*>(nullptr), user, &target, applyCosts);
 }
 
 template <typename SpriteRun>
-void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts)
+void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const
 {
     assert(target);
-    Ability& ability = *this;
+    const Ability& ability = *this;
     int const dmgType = ability._dmg_type | user._dmg_type;
     if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
     {
@@ -142,7 +142,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
             }
             ability.damage(ret, scene, spriteRun, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
             {
-                QMap<State*, int>* aStates = ability._state_dur;
+                QMap<const State*, int>* aStates = ability._state_dur;
                 if (aStates)
                 {
                     auto const last = aStates->cend();
@@ -153,10 +153,10 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                 }
             }
             {
-                QMap<State*, int>* stateDur = target->_state_dur;
+                QMap<const State*, int>* stateDur = target->_state_dur;
                 if (stateDur)
                 {
-                    QMap<State*, int>* rStates = ability._r_states;
+                    QMap<const State*, int>* rStates = ability._r_states;
                     if (rStates)
                     {
                         auto const rLast = rStates->cend();
@@ -165,11 +165,11 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                             int const rDur = rIt.value();
                             if (rDur > STATE_END_DUR)
                             {
-                                State* const rState = rIt.key();
+                                const State* const rState = rIt.key();
                                 auto const last = stateDur->cend();
                                 for (auto it = stateDur->cbegin(); it != last; ++it)
                                 {
-                                    State* const aState = it.key();
+                                    const State* const aState = it.key();
                                     if (aState == rState)
                                     {
                                         if (it.value() > STATE_END_DUR)
@@ -186,11 +186,11 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
             }
             if (ability.isStealing())
             {
-                QMap<Ability*, int>* usrItems = user._items;
+                QMap<const Ability*, int>* usrItems = user._items;
                 //if (usrItems)
                 {
                     int trgItemsSize;
-                    QMap<Ability*, int>* trgItems = target->_items;
+                    QMap<const Ability*, int>* trgItems = target->_items;
                     if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
                             && (((std::rand() % 12) + user._agi / 4) > 4 + target->_agi / 3))
                     {
@@ -198,7 +198,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                         //if (itemId < trgItemsSize)
                         //{
                             int trgItemQty = 0;
-                            Ability* stolen = nullptr;
+                            const Ability* stolen = nullptr;
                             //Ability* stolen = trgItems->keys().at(itemId);
                             {
                                 i = 0;
@@ -217,7 +217,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                             {
                                 if (usrItems == nullptr)
                                 {
-                                    usrItems = new QMap<Ability*, int>();
+                                    usrItems = new QMap<const Ability*, int>();
                                     user.setNewItems(true);
                                     user._items = usrItems;
                                 }
@@ -250,10 +250,10 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
         int mQty = ability._m_qty;
         if (mQty > 0)
         {
-            QMap<Ability*, int>* usrSkillsQty = user._skills_cr_qty;
+            QMap<const Ability*, int>* usrSkillsQty = user._skills_cr_qty;
             if (usrSkillsQty == nullptr)
             {
-                usrSkillsQty = new QMap<Ability*, int>();
+                usrSkillsQty = new QMap<const Ability*, int>();
                 user._skills_cr_qty = usrSkillsQty;
             }
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
@@ -264,7 +264,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
 
 Ability::Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                  int const hpC, int const mpC, int const spC, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
-                 int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates)
+                 int const mQty, int const rQty, bool const absorb, bool const revive, QMap<const State*, int>* const aStates, QMap<const State*, int>* const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
     this->_lv_rq = lvRq;
@@ -294,7 +294,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_flags = flags;
 }
 
-Ability::Ability(Ability& ability) : Role(ability)
+Ability::Ability(const Ability& ability) : Role(ability)
 {
     this->_lv_rq = ability._lv_rq;
     this->_m_qty = ability._m_qty;
@@ -314,6 +314,6 @@ Ability::~Ability()
 }
 
 #if USE_TEMPLATE
-template void Ability::execute(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts);
+template void Ability::execute(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
 #endif
-template void Ability::execute(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts);
+template void Ability::execute(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;

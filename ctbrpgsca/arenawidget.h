@@ -98,7 +98,7 @@ namespace tbrpgsca
             ClickableLabel* _skill_lbl;
             QLabel* _actor_lbl;
             QString _pos;
-            int _spr;
+            int _spr: 4;
 
             friend class ArenaWidget;
         };
@@ -108,19 +108,19 @@ namespace tbrpgsca
         void prepareItemsBox(Actor& actor);
         void prepareTargetBox(bool const freeMemory);
         Actor* getPlayerFromTargetBox(int const index);
-        void prepareSkillsBox(Actor& actor, QVector<Ability*>& skills);
+        void prepareSkillsBox(Actor& actor, QVector<const Ability*>& skills);
         void recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
 
         void operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
     #if USE_TEMPLATE
-        bool operator()(Scene& scene, Actor* const user, Ability* const ability, bool const revive,
-                       Actor* const target, Ability* const counter);
+        bool operator()(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
+                       Actor* const target, const Ability* const counter);
     #endif
 
         QString* _ret_str;
-        int _spr_runs, _trg_count;
         QLayout* _ctr_lyt,* _main_lyt;
+        signed int _spr_runs: 16, _trg_count: 16;
         QPushButton* _act_btn,* _use_btn,* _flee_btn,* _auto_btn;
         QComboBox* _skills_box,* _items_box,* _target_box;
         QWidget* _ctr_wdt,* _act_wdt;

@@ -21,14 +21,14 @@ namespace tbrpgsca
          Q_DECLARE_TR_FUNCTIONS(DemoLib)
 
         public:
-            QVector<State*>& getStates();
             QVector<Actor*>& getPlayers();
-            QVector<QVector<Ability*>*>& getAbilities();
-            QVector<QMap<State*, int>*>& getStateMasks();
+            QVector<const State*>& getStates();
+            QVector<QVector<const Ability*>*>& getAbilities();
+            QVector<QMap<const State*, int>*>& getStateMasks();
             QVector<QVector<Actor*>*>& getEnemies();
-            QVector<Ability*>& getPartyItems();
-            QVector<Costume*>& getRaces();
-            QVector<Costume*>& getJobs();
+            QVector<const Ability*>& getPartyItems();
+            QVector<const Costume*>& getRaces();
+            QVector<const Costume*>& getJobs();
 
             DemoLib();
 
@@ -36,11 +36,11 @@ namespace tbrpgsca
         protected:
             QVector<Actor*> players;
             QVector<QVector<Actor*>*> enemies;
-            QVector<QMap<State*, int>*> stateMasks;
-            QVector<QVector<Ability*>*> abilities;
-            QVector<Costume*> races, jobs;
-            QVector<Ability*> pItems;
-            QVector<State*> states;
+            QVector<QMap<const State*, int>*> stateMasks;
+            QVector<QVector<const Ability*>*> abilities;
+            QVector<const Costume*> races, jobs;
+            QVector<const Ability*> pItems;
+            QVector<const State*> states;
     };
 
 }
