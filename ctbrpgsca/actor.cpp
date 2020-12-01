@@ -21,13 +21,13 @@ using namespace tbrpgsca;
 QString Actor::KoTxt = ", %1 falls unconscious";
 QString Actor::RiseTxt = ", but rises again";
 
-int Actor::remainingSkillUses(Ability& skill) const
+int Actor::remainingSkillUses(const Ability& skill) const
 {
     QMap<const Ability*, int>* crQty = this->_skills_cr_qty;
     return crQty ? crQty->value(&skill, 0) : 0;
 }
 
-int Actor::regeneratingSkillTurn(Ability& skill) const
+int Actor::regeneratingSkillTurn(const Ability& skill) const
 {
     QMap<const Ability*, int>* regTurn = this->_skills_rg_turn;
     return regTurn ? regTurn->value(&skill, 0) : 0;
@@ -328,12 +328,12 @@ inline void Actor::setMaxLevel(const int maxLv)
     this->_max_lv = maxLv;
 }
 
-inline void Actor::setLevel(const int level)
+inline void Actor::setCurrentLevel(const int level)
 {
-    return this->setLevel(nullptr, level);
+    return this->setCurrentLevel(nullptr, level);
 }
 
-void Actor::setLevel(Scene* const scene, const int level)
+void Actor::setCurrentLevel(Scene* const scene, const int level)
 {
     Actor& actor = *this;
     while (level > actor._lv)
@@ -345,12 +345,12 @@ void Actor::setLevel(Scene* const scene, const int level)
 
 }
 
-inline void Actor::setExperience(const int xp)
+inline void Actor::setCurrentExperience(const int xp)
 {
-    return this->setExperience(nullptr, xp);
+    return this->setCurrentExperience(nullptr, xp);
 }
 
-void Actor::setExperience(Scene* const scene, const int xp)
+void Actor::setCurrentExperience(Scene* const scene, const int xp)
 {
     Actor& actor = *this;
     actor._xp = xp;
@@ -799,7 +799,7 @@ Actor::Actor(int const id, QString name, QString sprite, const Costume& race, co
     this->setRace(race);
     this->setJob(job);
     this->_items = items;
-    this->setLevel(level);
+    this->setCurrentLevel(level);
     this->recover(nullptr, nullptr);
     this->_extra = nullptr;
 }

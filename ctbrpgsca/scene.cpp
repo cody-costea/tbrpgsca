@@ -348,7 +348,7 @@ void Scene::perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor
         }
     }
     this->_last_ability = &ability;
-    user.setExperience(this, user._xp + 1);
+    user.setCurrentExperience(this, user._xp + 1);
     if (events && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);

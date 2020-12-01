@@ -40,9 +40,9 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Costume::isReflecting)
         PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Costume::isInvincible)
         PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Costume::isShapeShifted)
-        PROP_CUSTOM_FIELD_NEW(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
         PROP_CUSTOM_FIELD_NEW(Actor, partySide, setPartySide, swapPartySide, withPartySide, int, public, public, _side)
-        PROP_FIELD_WITH_SWAP(Actor, setExperience, swapExperience, withExperience, int, public, experience)
+        PROP_CUSTOM_FIELD_NEW(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentExperience, swapCurrentExperience, withCurrentExperience, int, public, currentExperience)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, Role::maximumHp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, Role::maximumMp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumRp, swapMaximumRp, withMaximumRp, int, public, Role::maximumRp)
@@ -55,21 +55,21 @@ namespace tbrpgsca
         PROP_FIELD_WITH_SWAP(Actor, setAgility, swapAgility, withAgility, int, public, Costume::agility)
         PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, Costume::wisdom)
         PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, Costume::spirit)
-        PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maxLevel)
+        PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maximumLevel)
+        PROP_FIELD_WITH_SWAP(Actor, setCurrentLevel, swapCurrentLevel, withCurrentLevel, int, public, currentLevel)
+        //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
         PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, Role::name, _name)
         PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, const Costume&, public, race)
-        PROP_FIELD_WITH_SWAP(Actor, setLevel, swapLevel, withLevel, int, public, level)
-        //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
-        PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, Role::sprite)
         PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, const Costume&, public, job)
+        PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, public, Role::sprite)
         PROP_FIELD_WITH(Actor, withSprite, QString&, public, setSprite)
         PROP_FIELD(Actor, Extra, extra, void*, public, protected)
-        PROP_FIELD_GET_CUSTOM(maxExperience, int, public, _maxp)
+        PROP_FIELD_GET_CUSTOM(maximumExperience, int, public, _maxp)
         //PROP_FIELD_GET_CUSTOM(initiative, int, public, _init)
         //PROP_FIELD_GET_CUSTOM(actions, int, public, _actions)
-        PROP_FIELD_GET_CUSTOM(maxLevel, int, public, _max_lv)
-        PROP_FIELD_GET_CUSTOM(experience, int, public, _xp)
-        PROP_FIELD_GET_CUSTOM(level, int, public, _lv)
+        PROP_FIELD_GET_CUSTOM(maximumLevel, int, public, _max_lv)
+        PROP_FIELD_GET_CUSTOM(currentExperience, int, public, _xp)
+        PROP_FIELD_GET_CUSTOM(currentLevel, int, public, _lv)
     public:
         static QString KoTxt;
         static QString RiseTxt;
@@ -79,8 +79,8 @@ namespace tbrpgsca
         const Costume& race() const;
         const Costume& job() const;
 
-        int remainingSkillUses(Ability& skill) const;
-        int regeneratingSkillTurn(Ability& skill) const;
+        int remainingSkillUses(const Ability& skill) const;
+        int regeneratingSkillTurn(const Ability& skill) const;
 
         const Costume* unequipPos(char const pos);
         const Costume* equipItem(char const pos, const Costume* const item);
@@ -92,8 +92,8 @@ namespace tbrpgsca
         void setElementResistance(int const element, int const res);
         void setStateResistance(const State* const state, int const res);
         void setItems(QMap<const Ability*, int>* items);
-        void setLevel(int const level);
-        void setExperience(int const xp);
+        void setCurrentExperience(int const xp);
+        void setCurrentLevel(int const level);
         void setSprite(QString& value);
         void setJob(const Costume& job);
         void setRace(const Costume& race);
@@ -128,6 +128,10 @@ namespace tbrpgsca
         void levelUp(Scene* const scene);
         inline void checkRegSkill(const Ability& skill);
         void recover(QString* const ret, Scene* const scene);
+        char unequipItem(Scene* const scene, const Costume& item);
+        void refreshCostumes(QString* const ret, Scene* const scene);
+        const Costume* unequipPos(Scene* const scene, char const pos);
+        const Costume* equipItem(Scene* const scene, char const pos, const Costume* const item);
         void removeStates(QString* const ret, Scene* const scene, bool const remove);
         void updateStates(bool const remove, QString* const ret, Scene* const scene,
                             QMap<const State*, int>& states, bool const includeWithDur);
@@ -135,15 +139,11 @@ namespace tbrpgsca
         void updateSkills(bool const remove, bool const counters, QVector<const Ability*>& skills);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
         void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
-        void setExperience(Scene* const scene, int const xp);
-        void setLevel(Scene* const scene, int const level);
+        void setCurrentExperience(Scene* const scene, int const xp);
+        void setCurrentLevel(Scene* const scene, int const level);
         void setRace(Scene* const scene, const Costume& race);
-        void setAgility(int const agi, Scene& scene);
         void setJob(Scene* const scene, const Costume& job);
-        char unequipItem(Scene* const scene, const Costume& item);
-        const Costume* unequipPos(Scene* const scene, char const pos);
-        const Costume* equipItem(Scene* const scene, char const pos, const Costume* const item);
-        void refreshCostumes(QString* const ret, Scene* const scene);
+        void setAgility(int const agi, Scene& scene);
 
         template <typename SpriteRun>
         void applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const actorEvent);
