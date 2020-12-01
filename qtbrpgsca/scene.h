@@ -32,7 +32,8 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
-        #define MIN_ROUND INT_MIN
+        #define MIN_ROUND -134217727
+        #define MAX_ROUND 134217728
 
         Q_OBJECT
         PROP_FLAG_GET(hasCovers, Attribute::HasCovers, inline, public)
@@ -117,7 +118,7 @@ namespace tbrpgsca
         protected:
             Ability* _last_ability;
             QVector<SceneRun*>* _events;
-            int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
+            signed int _current, _original, _surprise: 2, _f_target, _l_target, _status: 2, _m_init: 28;
             QVector<QVector<Actor*>*> _parties;
             QVector<Actor*>* _players;
     #if USE_TARGET_LIST

@@ -34,7 +34,7 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
         #define FLAG_HAS_COVERS 2
-        #define MIN_ROUND INT_MIN
+        #define MIN_ROUND SHRT_MIN
 
         PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)
         PROP_FLAG_GET(usesGuards, FLAG_USE_GUARDS, public)
@@ -103,7 +103,7 @@ namespace tbrpgsca
     protected:
         Ability* _last_ability;
         QVector<SceneRun*>* _events;
-        int _flags, _current, _original, _surprise, _f_target, _l_target, _status, _m_init;
+        signed int _current: 8, _original: 8, _f_target: 8, _l_target: 8, _surprise: 2,_status: 2, _m_init: 28;
         QVector<QVector<Actor*>*> _parties;
         QVector<Actor*>* _players;
 #if USE_TARGET_LIST
