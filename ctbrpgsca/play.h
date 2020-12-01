@@ -63,12 +63,16 @@ namespace tbrpgsca
     PROP_FIELD_SET(SetName, Type, Level, Field) \
     PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Level, GetName)
 
-#define PROP_CUSTOM_FIELD(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
+#define PROP_CUSTOM_FIELD_NEW(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
     PROP_FIELD_GET_NEW(GetName, Type, GetLevel, Field, protected) \
     PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, SetLevel, GetName, Field)
 
+#define PROP_CUSTOM_FIELD(Class, GetName, SetName, SwapName, WithName, Type, GetLevel, SetLevel, Field) \
+    PROP_FIELD_GET_CUSTOM(GetName, Type, GetLevel, Field) \
+    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, SetLevel, GetName, Field)
+
 #define PROP_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
-    PROP_CUSTOM_FIELD(Class, GetName, set##PropName, swap##PropName, with##PropName, Type, GetLevel, SetLevel, _##GetName) \
+    PROP_CUSTOM_FIELD_NEW(Class, GetName, set##PropName, swap##PropName, with##PropName, Type, GetLevel, SetLevel, _##GetName) \
 
 #if (defined(__clang__) || defined(_MSC_VER))
 #define PROP_DECL_FIELD(Class, PropName, GetName, Type, GetLevel, SetLevel) \
@@ -114,23 +118,24 @@ namespace tbrpgsca
 
     class Play
     {
-        PROP_FIELD(Play, Flags, flags, int, public, protected)
+        PROP_CUSTOM_FIELD(Play, playFlags, setPlayFlags, swapPlayFlags, withPlayFlags, int, public, protected, _play_flags)
     public:
         inline bool hasAllFlags(int const flag) const
         {
-            return (this->_flags & flag) == flag;
+            return (this->_play_flags & flag) == flag;
         }
         inline bool hasAnyFlag(int const flag) const
         {
-            return (this->_flags & flag) != 0;
+            return (this->_play_flags & flag) != 0;
         }
     protected:
+        unsigned int _play_flags: 16;
         inline void setFlag(int const flag, bool const value)
         {
-            int const flags = this->_flags;
+            int const flags = this->_play_flags;
             if (value != ((flags & flag) == flag))
             {
-                this->_flags = flags ^ flag;
+                this->_play_flags = flags ^ flag;
             }
         }
 

@@ -11,7 +11,7 @@ using namespace tbrpgsca;
 
 Play::Play(int const flags)
 {
-    this->_flags = flags;
+    this->_play_flags = flags;
 }
 
 Play::Play() : Play(0) {}

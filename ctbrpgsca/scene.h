@@ -34,7 +34,8 @@ namespace tbrpgsca
         #define EVENT_END_SCENE 4
         #define FLAG_USE_GUARDS 1
         #define FLAG_HAS_COVERS 2
-        #define MIN_ROUND SHRT_MIN
+        #define MIN_ROUND -134217728
+        #define MAX_ROUND 134217727
 
         PROP_FLAG_GET(hasCovers, FLAG_HAS_COVERS, public)
         PROP_FLAG_GET(usesGuards, FLAG_USE_GUARDS, public)

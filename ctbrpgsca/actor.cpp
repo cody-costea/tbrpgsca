@@ -435,7 +435,7 @@ void Actor::applyStates(QString* const ret, Scene* const scene, SpriteRun* const
     if (stateDur)
     {
         auto const last = stateDur->cend();
-        for (auto it = stateDur->cbegin(); it != last; ++it)
+        for (auto it = stateDur->cbegin(); it != last; it += 1)
         {
             if (it.value() > STATE_END_DUR)
             {
@@ -480,7 +480,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
         {
             {
                 auto const last = res->cend();
-                for (auto it = res->cbegin(); it != last; ++it)
+                for (auto it = res->cbegin(); it != last; it += 1)
                 {
                     if (it.value() == 0)
                     {
@@ -501,7 +501,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
         {
             {
                 auto const last = stRes->cend();
-                for (auto it = stRes->cbegin(); it != last; ++it)
+                for (auto it = stRes->cbegin(); it != last; it += 1)
                 {
                     if (it.value() == 0)
                     {
@@ -521,7 +521,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
         if (skillsQty)
         {
             auto const last = skillsQty->cend();
-            for (auto it = skillsQty->cbegin(); it != last; ++it)
+            for (auto it = skillsQty->cbegin(); it != last; it += 1)
             {
                 const Ability* const ability = it.key();
                 skillsQty->operator[](ability) = ability->_m_qty;
@@ -604,7 +604,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
             if (aElmRes)
             {
                 auto const last = elmRes->cend();
-                for (auto it = elmRes->cbegin(); it != last; ++it)
+                for (auto it = elmRes->cbegin(); it != last; it += 1)
                 {
                     int const i = it.key(), v = it.value();
                     aElmRes->operator[](i) = aElmRes->value(i, v) - v;
@@ -619,7 +619,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
                 actor._res = aElmRes;
             }
             auto const last = elmRes->cend();
-            for (auto it = elmRes->cbegin(); it != last; ++it)
+            for (auto it = elmRes->cbegin(); it != last; it += 1)
             {
                 int const i = it.key(), v = it.value();
                 aElmRes->operator[](i) = aElmRes->value(i, 0) + v;
@@ -634,7 +634,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
             if (aStateRes)
             {
                 auto const last = stRes->cend();
-                for (auto it = stRes->cbegin(); it != last; ++it)
+                for (auto it = stRes->cbegin(); it != last; it += 1)
                 {
                     int v = it.value();
                     const State* const i = it.key();
@@ -650,7 +650,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
                 actor._st_res = aStateRes;
             }
             auto const last = stRes->cend();
-            for (auto it = stRes->cbegin(); it != last; ++it)
+            for (auto it = stRes->cbegin(); it != last; it += 1)
             {
                 int v = it.value();
                 const State* const i = it.key();
@@ -729,7 +729,7 @@ void Actor::updateStates(bool const remove, QString* const ret, Scene* const sce
         if (stateDur && stateDur->size() > 0)
         {
             auto const last = states.cend();
-            for (auto it = states.cbegin(); it != last; ++it)
+            for (auto it = states.cbegin(); it != last; it += 1)
             {
                 int const rDur = it.value();
                 if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
@@ -742,7 +742,7 @@ void Actor::updateStates(bool const remove, QString* const ret, Scene* const sce
     else
     {
         auto const last = states.cend();
-        for (auto it = states.cbegin(); it != last; ++it)
+        for (auto it = states.cbegin(); it != last; it += 1)
         {
             int const rDur = it.value();
             if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
@@ -759,7 +759,7 @@ void Actor::refreshCostumes(QString* const ret, Scene* const scene)
     {
         QMap<char, const Costume*>& equipment = actor._equipment;
         auto const last = equipment.cend();
-        for (auto it = equipment.cbegin(); it != last; ++it)
+        for (auto it = equipment.cbegin(); it != last; it += 1)
         {
             it.value()->refresh(ret, scene, actor, true, false);
         }
@@ -768,7 +768,7 @@ void Actor::refreshCostumes(QString* const ret, Scene* const scene)
     if (stateDur)
     {
         auto const last = stateDur->cend();
-        for (auto it = stateDur->cbegin(); it != last; ++it)
+        for (auto it = stateDur->cbegin(); it != last; it += 1)
         {
             if (it.value() > STATE_END_DUR)
             {

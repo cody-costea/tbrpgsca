@@ -146,7 +146,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                 if (aStates)
                 {
                     auto const last = aStates->cend();
-                    for (auto it = aStates->cbegin(); it != last; ++it)
+                    for (auto it = aStates->cbegin(); it != last; it += 1)
                     {
                         it.key()->inflict(&ret, scene, &user, *target, it.value(), user._side == target->_side);
                     }
@@ -167,7 +167,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                             {
                                 const State* const rState = rIt.key();
                                 auto const last = stateDur->cend();
-                                for (auto it = stateDur->cbegin(); it != last; ++it)
+                                for (auto it = stateDur->cbegin(); it != last; it += 1)
                                 {
                                     const State* const aState = it.key();
                                     if (aState == rState)
@@ -273,7 +273,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     //this->_attr_inc = attrInc;
     this->_sound = sound.length() > 0 ? new QString(sound) : nullptr;
     this->_r_states = rStates;
-    int flags = this->_flags;
+    int flags = this->_play_flags;
     if (canMiss)
     {
         flags |= FLAG_MISSABLE;
@@ -291,7 +291,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
         flags |= FLAG_ABSORB;
     }
     flags |= trg;
-    this->_flags = flags;
+    this->_play_flags = flags;
 }
 
 Ability::Ability(const Ability& ability) : Role(ability)

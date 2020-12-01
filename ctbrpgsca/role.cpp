@@ -221,7 +221,7 @@ Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int co
     this->_state_dur = aStates;
 }
 
-Role::Role(const Role& role) : Play(role._flags)
+Role::Role(const Role& role) : Play(role._play_flags)
 {
     this->_name = role._name;
     this->_sprite = role._sprite;

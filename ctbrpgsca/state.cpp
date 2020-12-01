@@ -72,7 +72,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                             rDur = rState->_dur;
                         }
                         auto const last = trgStates->cend();
-                        for (auto it = trgStates->cbegin(); it != last; ++it)
+                        for (auto it = trgStates->cbegin(); it != last; it += 1)
                         {
                             const State* const aState = it.key();
                             if (aState == rState)
@@ -264,7 +264,7 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
 {
     if (convert)
     {
-        this->_flags |= FLAG_CONVERT;
+        this->_play_flags |= FLAG_CONVERT;
     }
     this->_dur = dur;
     this->_s_res = sRes;
