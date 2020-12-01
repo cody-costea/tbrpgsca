@@ -51,7 +51,7 @@ const Costume& Actor::job() const
 
 const Costume* Actor::equipItem(const char pos, const Costume* const item)
 {
-    assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
+    //assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
     return this->equipItem(nullptr, pos, item);
 }
 
@@ -62,7 +62,7 @@ char Actor::unequipItem(const Costume& item)
 
 const Costume* Actor::unequipPos(const char pos)
 {
-    assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
+    //assert(pos != CHAR_NONE && pos != CHAR_RACE && pos != CHAR_JOB);
     return this->equipItem(nullptr, pos, nullptr);
 }
 

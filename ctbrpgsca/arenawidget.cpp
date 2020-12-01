@@ -838,7 +838,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
     arena._spr_runs = 0;
 #if !USE_TEMPLATE
     SpriteAct* const _spr_act = new SpriteAct([](Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
-                                     Actor* const target, Ability* const counter) -> bool
+                                     Actor* const target, const Ability* const counter) -> bool
         {
             ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
     #if TRG_SPR_DELAY < 0

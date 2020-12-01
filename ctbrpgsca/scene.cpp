@@ -235,7 +235,7 @@ void Scene::execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Acto
             if (target->isCountering() && (!target->Costume::isStunned())
                     && (target->_side != user._side || target->hasAnyFlag(FLAG_CONFUSE | FLAG_ENRAGED | FLAG_CONVERT)))
             {
-                counter = target->_a_skills->operator[](0);
+                counter = target->_a_skills->at(0);
                 counter->execute(ret, *target, user, false);
             }
         }
@@ -728,8 +728,9 @@ template <typename SpriteRun>
 void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorEvent, QVector<SceneRun*>* const events,
                          bool const useGuards, int const surprise, int const mInit)
 {
+    Q_UNUSED(useGuards)
     int partiesSize = parties.size();
-    assert(partiesSize > 1);
+    //assert(partiesSize > 1);
     QVector<Actor*>* players;
     Scene& scene = *this;
     bool useInit;
@@ -855,9 +856,9 @@ Scene::~Scene()
     template void Scene::perform(QString& ret, ArenaWidget* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
     template void Scene::execute(QString& ret, ArenaWidget* const actorEvent, Actor& user, Actor* const target,const Ability& ability, bool const applyCosts);
     template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
-                                bool const useGuards, int const surprise, int const mInit);
+                                    bool const useGuards, int const surprise, int const mInit);
     template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
-                      bool const useGuards, int const surprise, int const mInit);
+                          bool const useGuards, int const surprise, int const mInit);
 #endif
 
 template void Scene::playAi(QString& ret, Scene::SpriteAct* const spriteRun, Actor& player);
