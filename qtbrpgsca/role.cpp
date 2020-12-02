@@ -57,14 +57,14 @@ bool Role::operator==(Role& role) const
     return this->databaseId() == role.databaseId();
 }
 
-void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent)
+void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent) const
 {
     return this->damage(ret, NIL, absorber, target, dmg, percent);
 }
 
-void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent)
+void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
-    Role& role = *this;
+    const Role& role = *this;
     if (!actor.Costume::isInvincible())
     {
         int dmgHp, dmgMp, dmgSp;
@@ -239,7 +239,7 @@ Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int co
     this->_role_data = roleData;
 }
 
-Role::Role(Role& role) : Play(NIL, role.playFlags())
+Role::Role(const Role& role) : Play(NIL, role.playFlags())
 {
     this->_role_data = role._role_data;
 }

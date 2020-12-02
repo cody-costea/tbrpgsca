@@ -55,15 +55,15 @@ namespace tbrpgsca
         bool removedState(State& state) const;
         int removedStatesSize() const;
 
-        Q_INVOKABLE bool canPerform(Actor* const user);
-        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
-        void replenish(Actor& user);
+        Q_INVOKABLE bool canPerform(Actor* const user) const;
+        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts) const;
+        void replenish(Actor& user) const;
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                 int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
                 int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 
-        Ability(Ability& ability);
+        Ability(const Ability& ability);
 
         ~Ability();
     protected:
@@ -89,7 +89,7 @@ namespace tbrpgsca
 
         QSharedDataPointer<AbilityData> _ability_data;
 
-        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts);
+        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts) const;
 
         friend class Actor;
         friend class Costume;

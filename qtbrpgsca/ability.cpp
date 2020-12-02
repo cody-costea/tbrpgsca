@@ -45,17 +45,17 @@ int Ability::removedStatesSize() const
     return aStates == NIL ? 0 : aStates->size();
 }
 
-void Ability::replenish(Actor& user)
+void Ability::replenish(Actor& user) const
 {
-    Ability& ability = *this;
+    const Ability& ability = *this;
     int const mQty = ability.maximumUses();
     if (mQty > 0)
     {
         auto& userData = user._actor_data;
-        QMap<Ability*, int>* usrSkills = userData->_skills_cr_qty;
+        QMap<const Ability*, int>* usrSkills = userData->_skills_cr_qty;
         if (usrSkills == NIL)
         {
-            usrSkills = new QMap<Ability*, int>();
+            usrSkills = new QMap<const Ability*, int>();
             userData->_skills_cr_qty = usrSkills;
         }
         usrSkills->operator[](this) = mQty;
@@ -63,23 +63,23 @@ void Ability::replenish(Actor& user)
 
 }
 
-bool Ability::canPerform(Actor* const actor)
+bool Ability::canPerform(Actor* const actor) const
 {
     assert(actor);
-    QMap<Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
+    QMap<const Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
     return this->maximumMp() <= actor->maximumMp() && this->maximumHp() < actor->maximumHp() && this->maximumRp() <= actor->maximumRp()
             && actor->currentLevel() >= this->requiredLevel() && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
 }
 
-void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
+void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts) const
 {
     return this->execute(ret, NIL, user, &target, applyCosts);
 }
 
-void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts)
+void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts) const
 {
     assert(target);
-    Ability& ability = *this;
+    const Ability& ability = *this;
     int const dmgType = ability.damageType() | user.damageType();
     if (target != &user && ((dmgType & target->reflectType()) != 0))
     {
@@ -253,10 +253,10 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
         int mQty = ability.maximumUses();
         if (mQty > 0)
         {
-            QMap<Ability*, int>* usrSkillsQty = userData->_skills_cr_qty;
+            QMap<const Ability*, int>* usrSkillsQty = userData->_skills_cr_qty;
             if (usrSkillsQty == NIL)
             {
-                usrSkillsQty = new QMap<Ability*, int>();
+                usrSkillsQty = new QMap<const Ability*, int>();
                 userData->_skills_cr_qty = usrSkillsQty;
             }
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
@@ -309,7 +309,7 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_ability_data = dataPtr;
 }
 
-Ability::Ability(Ability& ability) : Role(ability)
+Ability::Ability(const Ability& ability) : Role(ability)
 {
     this->_ability_data = ability._ability_data;
 }

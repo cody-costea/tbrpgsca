@@ -634,19 +634,19 @@ void Scene::endTurn(QString* const ret)
         }
         //crActor->actions = cActions = crActor->mActions;
         auto& crActorData = crActor->_actor_data;
-        QMap<Ability*, int>* const regSkills = crActorData->_skills_rg_turn;
+        QMap<const Ability*, int>* const regSkills = crActorData->_skills_rg_turn;
         if (regSkills)
         {
-            QMap<Ability*, int>* skillsQty = crActorData->_skills_cr_qty;
+            QMap<const Ability*, int>* skillsQty = crActorData->_skills_cr_qty;
             if (skillsQty == NIL)
             {
-                skillsQty = new QMap<Ability*, int>();
+                skillsQty = new QMap<const Ability*, int>();
                 crActorData->_skills_cr_qty = skillsQty;
             }
             auto const last = regSkills->cend();
             for (auto it = regSkills->cbegin(); it != last; ++it)
             {
-                Ability* const skill = it.key();
+                const Ability* const skill = it.key();
                 int const skillMaxQty = skill->maximumUses(), skillCrQty = skillsQty->value(skill, skillMaxQty);
                 if (skillCrQty < skillMaxQty)
                 {

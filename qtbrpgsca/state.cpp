@@ -51,7 +51,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
     if (stateDur > STATE_END_DUR)
     {
         int stateRes;
-        QMap<State*, int>* stRes;
+        QMap<const State*, int>* stRes;
         if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
                 == NIL ? 0 : stRes->value(this, 0) + stRes->value(NIL, 0)) + stateRes)))
         {
@@ -124,9 +124,9 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
 
 }
 
-void State::remove(QString* const ret, Scene* const scene, Actor& actor)
+void State::remove(QString* const ret, Scene* const scene, Actor& actor) const
 {
-    State& state = *this;
+    const State& state = *this;
     state.blockSkills(actor, true);
     state.adopt(ret, scene, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
@@ -219,13 +219,13 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
 
 }
 
-void State::blockSkills(Actor& actor, const bool remove)
+void State::blockSkills(Actor& actor, const bool remove) const
 {
     QVector<Ability*>* rSkills = this->_state_data->_r_skills;
     if (rSkills)
     {
         auto& actorData = actor._actor_data;
-        QMap<Ability*, int>* iSkills = actorData->_skills_cr_qty;
+        QMap<const Ability*, int>* iSkills = actorData->_skills_cr_qty;
         if (remove)
         {
             if (iSkills)
@@ -247,7 +247,7 @@ void State::blockSkills(Actor& actor, const bool remove)
         {
             if (iSkills == NIL)
             {
-                iSkills = new QMap<Ability*, int>();
+                iSkills = new QMap<const Ability*, int>();
                 actorData->_skills_cr_qty = iSkills;
             }
             for (Ability* const skill : *rSkills)
@@ -263,7 +263,7 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
              bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
-             QMap<State*, int>* const stRes, QMap<int, int>* const res)
+             QMap<const State*, int>* const stRes, QMap<int, int>* const res)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res)
 {
@@ -278,17 +278,11 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
     this->_state_data = stateData;
 }
 
-State::State(State& state) : Costume(state)
+State::State(const State& state) : Costume(state)
 {
     this->_state_data = state._state_data;
 }
 
-State::StateData::~StateData()
-{
+State::StateData::~StateData() {}
 
-}
-
-State::~State()
-{
-
-}
+State::~State() {}

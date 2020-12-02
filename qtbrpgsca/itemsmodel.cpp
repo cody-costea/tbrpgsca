@@ -54,7 +54,7 @@ QVariant ItemsModel::data(const QModelIndex& index, int role) const
    case Qt::DisplayRole:
    {
        int usesQty;
-       QMap<Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
+       QMap<const Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
        return QString(tr("%7 X %1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability.name(), QString::number(ability.requiredLevel()),
             QString::number(ability.maximumHp()), QString::number(ability.maximumMp()), QString::number(ability.maximumRp()), (skillsQty == nullptr
             || (usesQty = skillsQty->value(&ability, -1)) < 0 ? "∞" : QString::number(usesQty)), QString::number(it.value()));

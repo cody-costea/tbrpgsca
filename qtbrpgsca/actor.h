@@ -88,17 +88,17 @@ namespace tbrpgsca
         Costume& race() const;
         Costume& job() const;
 
-        int remainingSkillUses(Ability& skill) const;
-        int regeneratingSkillTurn(Ability& skill) const;
+        int remainingSkillUses(const Ability& skill) const;
+        int regeneratingSkillTurn(const Ability& skill) const;
 
-        Costume* unequipPos(char const pos);
-        Costume* equipItem(char const pos, Costume* const item);
+        const Costume* unequipPos(char const pos);
+        const Costume* equipItem(char const pos, Costume* const item);
         char unequipItem(Costume& item);
 
         void recover(QString& ret);
         //Actor& applyRoles(QString& ret);
         void applyStates(QString& ret, bool const consume);
-        void setStateResistance(State* const state, int const res);
+        void setStateResistance(const State* const state, int const res);
         void setElementResistance(int const element, int const res);
         void setItems(const QSharedPointer<QMap<Ability*, int>>& items);
         void setCurrentExperience(int const xp);
@@ -123,13 +123,13 @@ namespace tbrpgsca
 
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items);
+              QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items);
 
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>&& items);
+              QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>&& items);
 
-        Actor(Actor& actor);
+        Actor(const Actor& actor);
 
         ~Actor();
     protected:
@@ -140,10 +140,10 @@ namespace tbrpgsca
 
         protected:
             int _lv, _max_lv, _xp, _maxp, _old_side, _init, _side, _actions;
-            QMap<Ability*, int>* _skills_cr_qty,* _skills_rg_turn;
+            QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn;
             QSharedPointer<QMap<Ability*, int>> _items;
+            QVector<const Costume*>* _dmg_roles;
             QMap<char, Costume*> _equipment;
-            QVector<Costume*>* _dmg_roles;
             void* _extra;
 
             friend class Scene;
@@ -161,17 +161,17 @@ namespace tbrpgsca
         QSharedDataPointer<ActorData> _actor_data;
 
         void levelUp(Scene* const scene);
-        inline void checkRegSkill(Ability& skill);
+        inline void checkRegSkill(const Ability& skill);
         void recover(QString* const ret, Scene* const scene);
         void applyDmgRoles(QString& ret, Scene* const scene);
         void removeStates(QString* const ret, Scene* const scene, bool const remove);
         void applyStates(QString* const ret, Scene* const scene, bool const consume);
         void updateStates(bool const remove, QString* const ret, Scene* const scene,
                             QMap<State*, int>& states, bool const includeWithDur);
-        void updateAttributes(bool const remove, Scene* const scene, Costume& costume);
+        void updateAttributes(bool const remove, Scene* const scene, const Costume& costume);
         void updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
-        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<State*, int>* const stRes);
-        void switchCostume(QString* const ret, Scene* const scene, Costume* const oldCostume, Costume* const newCostume);
+        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
+        void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
         void setCurrentExperience(Scene* const scene, int const xp);
         void setCurrentLevel(Scene* const scene, int const level);
@@ -179,8 +179,8 @@ namespace tbrpgsca
         void setAgility(int const agi, Scene& scene);
         void setJob(Scene* const scene, Costume& job);
         char unequipItem(Scene* const scene, Costume& item);
-        Costume* unequipPos(Scene* const scene, char const pos);
-        Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
+        const Costume* unequipPos(Scene* const scene, char const pos);
+        const Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
         void refreshCostumes(QString* const ret, Scene* const scene);
 
         friend class Scene;

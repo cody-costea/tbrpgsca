@@ -74,7 +74,7 @@ namespace tbrpgsca
         bool hasState(State& state) const;
         int statesSize() const;
 
-        Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent);
+        Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
 
         bool operator==(Role& role) const;
     protected:
@@ -98,12 +98,12 @@ namespace tbrpgsca
 
         QSharedDataPointer<RoleData> _role_data;
 
-        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent);
+        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);
 
-        Role(Role& role);
+        Role(const Role& role);
 
         ~Role();
 
