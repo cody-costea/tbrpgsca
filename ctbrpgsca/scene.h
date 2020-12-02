@@ -52,8 +52,6 @@ namespace tbrpgsca
         static QString FallenTxt;
         static QString FailTxt;
 
-        static bool actorAgiComp(Actor* const a, Actor* const b);
-
         template <typename SpriteRun>
         void endTurn(QString& ret, SpriteRun* const spriteRun, Actor* const actor);
 

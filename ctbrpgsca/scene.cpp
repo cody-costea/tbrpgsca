@@ -20,11 +20,6 @@ QString Scene::FallenTxt = "The party has fallen!";
 QString Scene::EscapeTxt = "The party has escaped!";
 QString Scene::FailTxt = "The party attempted to escape, but failed.";
 
-bool Scene::actorAgiComp(Actor* const a, Actor* const b)
-{
-    return (a->_agi > b->_agi);
-}
-
 int Scene::getCurrent() const
 {
     return this->_current;
@@ -702,7 +697,10 @@ void Scene::agiCalc()
     if (this->_m_init < 1)
     {
         QVector<Actor*>& players = *(this->_players);
-        std::sort(players.begin(), players.end(), Scene::actorAgiComp);
+        std::sort(players.begin(), players.end(), [](const Actor* const a, const Actor* const b) -> bool
+        {
+            return (a->_agi > b->_agi);
+        });
         this->_original = -1;
     }
 }

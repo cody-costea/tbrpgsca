@@ -20,11 +20,6 @@ QString Scene::FallenTxt = "The party has fallen!";
 QString Scene::EscapeTxt = "The party has escaped!";
 QString Scene::FailTxt = "The party attempted to escape, but failed.";
 
-bool Scene::actorAgiComp(Actor* const a, Actor* const b)
-{
-    return (a->agility() > b->agility());
-}
-
 int Scene::getCurrent() const
 {
     return this->_scene_data->_current;

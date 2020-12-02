@@ -61,7 +61,10 @@ namespace tbrpgsca
         static QString FallenTxt;
         static QString FailTxt;
 
-        static bool actorAgiComp(Actor* const a, Actor* const b);
+        inline static bool actorAgiComp(const Actor* const a, const Actor* const b)
+        {
+            return (a->agility() > b->agility());
+        }
 
         Q_INVOKABLE void playAi(QString* const ret, Actor* const player);
         Q_INVOKABLE void perform(QString* const ret, Actor* const user, Actor* const target, Ability* const ability, bool const item);
