@@ -32,8 +32,8 @@ namespace tbrpgsca
         #define EVENT_AFTER_ACT 2
         #define EVENT_NEW_TURN 3
         #define EVENT_END_SCENE 4
-        #define MIN_ROUND -134217727
-        #define MAX_ROUND 134217728
+        #define MIN_ROUND -134217728
+        #define MAX_ROUND 134217727
 
         Q_OBJECT
         PROP_FLAG_GET(hasCovers, Attribute::HasCovers, inline, public)

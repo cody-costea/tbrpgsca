@@ -106,11 +106,18 @@ namespace tbrpgsca
     PROP_CUSTOM_FIELD(Class, Get##Name, Set##Name, Swap##Name, With##Name, Type, Attribute, GetLevel, SetLevel, _##Name)
 
 #define PROP_CUSTOM_REF(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_REF_GET(GetName, Type, Attribute, GetLevel, Field) \
+    PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type*, SetLevel, GetName, Field)
+
+#define PROP_CUSTOM_NEW_REF(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, SetLevel, Field) \
     PROP_REF_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
     PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type*, SetLevel, GetName, Field)
 
-#define PROP_REF(Class, GetName, SetName, Type, Attribute, GetLevel, SetLevel) \
-    PROP_CUSTOM_REF(Class, GetName, set##SetName, swap##SetName, with##SetName, Type, Attribute, GetLevel, SetLevel, _##GetName)
+#define PROP_NEW_REF(Class, GetName, SetName, Type, Attribute, GetLevel, SetLevel) \
+    PROP_CUSTOM_NEW_REF(Class, GetName, set##SetName, swap##SetName, with##SetName, Type, Attribute, GetLevel, SetLevel, _##GetName)
+
+#define PROP_REF(Class, GetName, SetName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_CUSTOM_REF(Class, GetName, set##SetName, swap##SetName, with##SetName, Type, Attribute, GetLevel, SetLevel, Field)
 
 #define PROP_FLAG_SET(SetName, Flag, Attribute, Level, GetName) \
     Level: Q_SIGNAL void GetName##Changed(bool const value); \
