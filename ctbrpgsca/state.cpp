@@ -72,7 +72,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                             rDur = rState->_dur;
                         }
                         auto const last = trgStates->cend();
-                        for (auto it = trgStates->cbegin(); it != last; it += 1)
+                        for (auto it = trgStates->cbegin(); it != last; ++it)
                         {
                             const State* const aState = it.key();
                             if (aState == rState)

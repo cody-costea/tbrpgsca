@@ -76,7 +76,12 @@ namespace tbrpgsca
 
         Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
 
-        bool operator==(Role& role) const;
+        bool operator==(const Role& role) const;
+        bool operator!=(const Role& role) const;
+        bool operator<=(const Role& role) const;
+        bool operator>=(const Role& role) const;
+        bool operator<(const Role& role) const;
+        bool operator>(const Role& role) const;
     protected:
         class RoleData : public QSharedData
         {

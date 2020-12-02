@@ -637,7 +637,7 @@ void Scene::endTurn(QString& ret, SpriteRun* actorEvent, Actor* crActor)
                 crActor->_skills_cr_qty = skillsQty;
             }
             auto const last = regSkills->cend();
-            for (auto it = regSkills->cbegin(); it != last; it += 1)
+            for (auto it = regSkills->cbegin(); it != last; ++it)
             {
                 const Ability* const skill = it.key();
                 int const skillMaxQty = skill->_m_qty, skillCrQty = skillsQty->value(skill, skillMaxQty);

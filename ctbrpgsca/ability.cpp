@@ -146,7 +146,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                 if (aStates)
                 {
                     auto const last = aStates->cend();
-                    for (auto it = aStates->cbegin(); it != last; it += 1)
+                    for (auto it = aStates->cbegin(); it != last; ++it)
                     {
                         it.key()->inflict(&ret, scene, &user, *target, it.value(), user._side == target->_side);
                     }
@@ -167,7 +167,7 @@ void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteR
                             {
                                 const State* const rState = rIt.key();
                                 auto const last = stateDur->cend();
-                                for (auto it = stateDur->cbegin(); it != last; it += 1)
+                                for (auto it = stateDur->cbegin(); it != last; ++it)
                                 {
                                     const State* const aState = it.key();
                                     if (aState == rState)

@@ -52,9 +52,34 @@ int Role::statesSize() const
     return aStates == NIL ? 0 : aStates->size();
 }
 
-bool Role::operator==(Role& role) const
+bool Role::operator==(const Role& role) const
 {
     return this->databaseId() == role.databaseId();
+}
+
+bool Role::operator!=(const Role& role) const
+{
+    return this->databaseId() != role.databaseId();
+}
+
+bool Role::operator<=(const Role& role) const
+{
+    return this->databaseId() <= role.databaseId();
+}
+
+bool Role::operator>=(const Role& role) const
+{
+    return this->databaseId() >= role.databaseId();
+}
+
+bool Role::operator>(const Role& role) const
+{
+    return this->databaseId() > role.databaseId();
+}
+
+bool Role::operator<(const Role& role) const
+{
+    return this->databaseId() < role.databaseId();
 }
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent) const
