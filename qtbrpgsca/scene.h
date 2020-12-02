@@ -142,9 +142,10 @@ namespace tbrpgsca
 
         QSharedDataPointer<SceneData> _scene_data;
 
-        void agiCalc();
         void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
+
+        protected slots: void agiCalc();
 
         friend class Actor;
         friend class Ability;

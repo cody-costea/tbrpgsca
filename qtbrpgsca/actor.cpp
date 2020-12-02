@@ -163,13 +163,13 @@ inline void Actor::setWisdom(const int wis)
 inline void Actor::setAgility(const int agi)
 {
     this->_costume_data->_agi = agi;
-}*/
+}
 
 void Actor::setAgility(const int agi, Scene& scene)
 {
     this->Costume::setAgility(agi);
-    scene.agiCalc();
-}
+    //scene.agiCalc();
+}*/
 
 void Actor::setCurrentHp(const int hp, QString& ret, const bool survive)
 {
@@ -327,35 +327,25 @@ inline void Actor::setMaximumLevel(const int maxLv)
     this->_actor_data->_max_lv = maxLv;
 }
 
-inline void Actor::setCurrentLevel(const int level)
-{
-    return this->setCurrentLevel(NIL, level);
-}
-
-void Actor::setCurrentLevel(Scene* const scene, const int level)
+void Actor::setCurrentLevel(const int level)
 {
     auto& actorData = this->_actor_data;
     while (level > actorData->_lv)
     {
         actorData->_xp = actorData->_maxp;
-        this->levelUp(scene);
+        this->levelUp();
     }
     actorData->_lv = level;
 
 }
 
-inline void Actor::setCurrentExperience(const int xp)
-{
-    return this->setCurrentExperience(NIL, xp);
-}
-
-void Actor::setCurrentExperience(Scene* const scene, const int xp)
+void Actor::setCurrentExperience(const int xp)
 {
     auto& actorData = this->_actor_data;
     actorData->_xp = xp;
     if (xp >= actorData->_maxp)
     {
-        this->levelUp(scene);
+        this->levelUp();
     }
 }
 
@@ -524,7 +514,7 @@ void Actor::recover(QString* const ret, Scene* const scene)
     }
 }
 
-void Actor::levelUp(Scene* const scene)
+void Actor::levelUp()
 {
     Actor& actor = *this;
     int lv = actor.currentLevel();
@@ -540,14 +530,15 @@ void Actor::levelUp(Scene* const scene)
         actor.setDefense(actor.defense() + 1);
         actor.setWisdom(actor.wisdom() + 1);
         actor.setSpirit(actor.spirit() + 1);
-        if (scene == NIL)
+        actor.setAgility(actor.agility() + 1);
+        /*if (scene == NIL)
         {
             actor.Costume::setAgility(actor.agility() + 1);
         }
         else
         {
             actor.setAgility(actor.agility() + 1, *scene);
-        }
+        }*/
         lv += 1;
     }
     actor._actor_data->_lv = lv;
@@ -566,7 +557,7 @@ void Actor::switchCostume(QString* const ret, Scene* const scene, const Costume*
     }
 }
 
-void Actor::updateAttributes(const bool remove, Scene* const scene, const Costume& costume)
+void Actor::updateAttributes(const bool remove, const Costume& costume)
 {
     Actor& actor = *this;
     int const i = remove ? -1 : 1;
@@ -578,14 +569,15 @@ void Actor::updateAttributes(const bool remove, Scene* const scene, const Costum
     actor.setDefense(actor.defense() + (i * costume.defense()));
     actor.setSpirit(actor.spirit() + (i * costume.spirit()));
     actor.setWisdom(actor.wisdom() + (i * costume.wisdom()));
-    if (scene == NIL)
+    actor.setAgility(actor.agility() + (i * costume.agility()));
+    /*if (scene == NIL)
     {
         actor.Costume::setAgility(actor.agility() + (i * costume.agility()));
     }
     else
     {
         actor.setAgility(actor.agility() + (i * costume.agility()), *scene);
-    }
+    }*/
 }
 
 void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QMap<const State *, int>* const stRes)

@@ -356,7 +356,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
         }
     }
     scene->_last_ability = ability;
-    user->setCurrentExperience(this, user->currentExperience() + 1);
+    user->setCurrentExperience(user->currentExperience() + 1);
     if (events && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);
@@ -799,6 +799,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
                 //player.setRandomAi(true);
                 player.setAiPlayer(true);
             }
+            connect(&player, SIGNAL(Actor::agilityChanged), this, SLOT(Scene::agiCalc));
             player._actor_data->_old_side = i;
             player.setPartySide(i);
 #if ALLOW_COVERING

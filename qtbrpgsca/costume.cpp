@@ -90,7 +90,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
     const Costume& costume = *this;
     auto& actorData = actor._actor_data;
     auto& costumeData = costume._costume_data;
-    actor.updateAttributes(remove, scene, costume);
+    actor.updateAttributes(remove, costume);
     actor.updateResistance(remove, costumeData->_res, costumeData->_st_res);
     if (remove)
     {
