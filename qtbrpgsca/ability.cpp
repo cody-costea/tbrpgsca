@@ -73,10 +73,10 @@ bool Ability::canPerform(Actor* const actor) const
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts) const
 {
-    return this->execute(ret, NIL, user, &target, applyCosts);
+    return this->execute(ret, user, &target, applyCosts);
 }
 
-void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts) const
+void Ability::execute(QString& ret, Actor& user, Actor* target, bool const applyCosts) const
 {
     assert(target);
     const Ability& ability = *this;
@@ -144,7 +144,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     dmg = 0;
                 }
             }
-            ability.damage(ret, scene, (ability.isAbsorbing() ? &user : NIL), *target, dmg, false);
+            ability.damage(ret, (ability.isAbsorbing() ? &user : NIL), *target, dmg, false);
             {
                 QMap<State*, int>* aStates = ability._role_data->_state_dur;
                 if (aStates)
@@ -152,7 +152,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                     auto const last = aStates->cend();
                     for (auto it = aStates->cbegin(); it != last; ++it)
                     {
-                        it.key()->inflict(&ret, scene, &user, *target, it.value(), user.partySide() == target->partySide());
+                        it.key()->inflict(&ret, &user, *target, it.value(), user.partySide() == target->partySide());
                     }
                 }
             }
@@ -178,7 +178,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
                                     {
                                         if (it.value() > STATE_END_DUR)
                                         {
-                                            rState->disable(&ret, scene, *target, rDur, false);
+                                            rState->disable(&ret, *target, rDur, false);
                                         }
                                         break;
                                     }
@@ -249,7 +249,7 @@ void Ability::execute(QString& ret, Scene* const scene, Actor& user, Actor* targ
     {
         user.setCurrentRp(user.currentRp() - ability.maximumRp());
         user.setCurrentMp(user.currentMp() - ability.maximumMp());
-        user.setCurrentHp(user.currentHp() - ability.maximumHp(), &ret, scene, false);
+        user.setCurrentHp(user.currentHp() - ability.maximumHp());
         int mQty = ability.maximumUses();
         if (mQty > 0)
         {

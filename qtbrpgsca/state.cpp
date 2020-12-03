@@ -35,10 +35,10 @@ int State::removedSkillsSize() const
 
 void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
 {
-    return this->inflict(&ret, NIL, user, target, dur, always);
+    return this->inflict(&ret, user, target, dur, always);
 }
 
-void State::inflict(QString* const ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always)
+void State::inflict(QString* const ret, Actor* const user, Actor& target, int stateDur, const bool always)
 {
     if (stateDur == 0)
     {
@@ -89,7 +89,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                                     {
                                         return;
                                     }
-                                    rState->disable(ret, scene, target, rDur, false);
+                                    rState->disable(ret, target, rDur, false);
                                     if (rDur > 0 && aDur > 0)
                                     {
                                         stateDur -= aDur < rDur ? aDur : rDur;
@@ -108,7 +108,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
             int const crDur = trgStates->value(this, STATE_END_DUR);
             if (crDur == STATE_END_DUR)
             {
-                this->adopt(ret, scene, target, false, false);
+                this->adopt(ret, target, false, false);
                 trgStates->operator[](this) = stateDur;
             }
             else if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
@@ -124,11 +124,11 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
 
 }
 
-void State::remove(QString* const ret, Scene* const scene, Actor& actor) const
+void State::remove(QString* const ret, Actor& actor) const
 {
     const State& state = *this;
     state.blockSkills(actor, true);
-    state.adopt(ret, scene, actor, false, true);
+    state.adopt(ret, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
     {
         actor.setPartySide(static_cast<int>(actor._actor_data->_old_side));
@@ -138,10 +138,10 @@ void State::remove(QString* const ret, Scene* const scene, Actor& actor) const
 
 bool State::disable(Actor& actor, int const dur, const bool remove)
 {
-    return this->disable(NIL, NIL, actor, remove, dur);
+    return this->disable(NIL, actor, remove, dur);
 }
 
-bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int dur, const bool remove)
+bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove)
 {
     if (dur == 0)
     {
@@ -177,7 +177,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
                     }
                     if (crDur > STATE_END_DUR)
                     {
-                        this->remove(ret, scene, actor);
+                        this->remove(ret, actor);
                     }
                     return true;
                 }
@@ -193,10 +193,10 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
 
 void State::alter(QString& ret, Actor& actor, const bool consume)
 {
-    return this->alter(&ret, NIL, actor, consume);
+    return this->alter(&ret, actor, consume);
 }
 
-void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bool consume)
+void State::alter(QString* const ret, Actor& actor, const bool consume)
 {
     State& state = *this;
     QMap<State*, int>* sDur = actor._role_data->_state_dur;
@@ -213,7 +213,7 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
         else if (d == 0)
         {
             sDur->operator[](this) = STATE_END_DUR;
-            state.remove(ret, scene, actor);
+            state.remove(ret, actor);
         }
     }
 

@@ -72,20 +72,15 @@ bool Costume::isCountering() const
 
 void Costume::adopt(QString& ret, Actor& actor) const
 {
-    this->adopt(&ret, NIL, actor, true, false);
+    this->adopt(&ret, actor, true, false);
 }
 
 void Costume::abandon(QString& ret, Actor& actor) const
 {
-    this->adopt(&ret, NIL, actor, true, true);
+    this->adopt(&ret, actor, true, true);
 }
 
-void Costume::apply(QString& ret, Actor& actor) const
-{
-    this->apply(ret, NIL, actor);
-}
-
-void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove) const
+void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool const remove) const
 {
     const Costume& costume = *this;
     auto& actorData = actor._actor_data;
@@ -121,8 +116,8 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
                 dmgRoles->removeOne(&costume);
             }
         }
-        costume.refresh(ret, scene, actor, updStates, true);
-        actor.refreshCostumes(ret, scene);
+        costume.refresh(ret, actor, updStates, true);
+        actor.refreshCostumes(ret);
     }
     else
     {
@@ -131,7 +126,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
             QMap<State*, int>* const cStates = costume._role_data->_state_dur;
             if (cStates)
             {
-                actor.updateStates(false, ret, scene, *cStates, true);
+                actor.updateStates(false, ret, *cStates, true);
             }
         }
         if (costume.currentHp() != 0 || costume.currentMp() != 0 || costume.currentRp() != 0)
@@ -144,18 +139,18 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
             }
             dmgRoles->append(&costume);
         }
-        costume.refresh(ret, scene, actor, false, false);
+        costume.refresh(ret, actor, false, false);
     }
 }
 
-void Costume::apply(QString& ret, Scene* scene, Actor& actor) const
+void Costume::apply(QString& ret, Actor& actor) const
 {
     const Costume& role = *this;
     ret += QString(Costume::CausesTxt).arg(actor.name(), role.name());
-    role.damage(ret, scene, NIL, actor, 0, true);
+    role.damage(ret, NIL, actor, 0, true);
 }
 
-void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove) const
+void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bool const remove) const
 {
     const Costume& costume = *this;
     {
@@ -176,7 +171,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         QMap<State*, int>* cStates = costume._role_data->_state_dur;
         if (cStates)
         {
-            actor.updateStates(remove, ret, scene, *cStates, false);
+            actor.updateStates(remove, ret, *cStates, false);
         }
     }
     if (!remove)
@@ -187,7 +182,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
             actor.setDamageType(actor.damageType() | costume.damageType());
         }
         actor.setPlayFlags(actor.playFlags() | cFlags);
-        if (scene)
+        /*if (scene) //TODO: adapt without using "scene" pointer here
         {
 #if ALLOW_COVERING
             if ((cFlags & Attribute::Covering) == Attribute::Covering)
@@ -199,7 +194,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
             {
                 scene->checkStatus(ret);
             }
-        }
+        }*/
         if (costume.isShapeShifted())
         {
             QString* const spr = costume._role_data->_sprite;

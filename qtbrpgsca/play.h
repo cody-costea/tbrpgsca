@@ -40,14 +40,14 @@ namespace tbrpgsca
     PROP_REF_GET(Name, Type, Attribute, GetLevel, Field)
 
 #define PROP_FIELD_SET(SetName, Type, Attribute, Level, GetName, Field) \
-    Level: Q_SIGNAL void GetName##Changed(Type const value); \
+    Level: Q_SIGNAL void GetName##Changed(const Type newValue, const Type oldValue); \
     Q_SLOT Attribute void SetName(Type const value) \
     { \
         auto field = this->GetName(); \
         if (field != value) \
         { \
             this->Field = value; \
-            emit GetName##Changed(value); \
+            emit GetName##Changed(value, field); \
         } \
     }
 

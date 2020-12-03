@@ -89,7 +89,7 @@ namespace tbrpgsca
 
         QSharedDataPointer<AbilityData> _ability_data;
 
-        void execute(QString& ret, Scene* const scene, Actor& user, Actor* target, bool const applyCosts) const;
+        void execute(QString& ret, Actor& user, Actor* target, bool const applyCosts) const;
 
         friend class Actor;
         friend class Costume;

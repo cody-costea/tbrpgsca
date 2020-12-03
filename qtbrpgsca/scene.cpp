@@ -231,7 +231,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
     if ((/*healing &&*/ ability.isReviving()) || !ko)
     {
         Ability* counter = NIL;
-        ability.execute(ret, this, user, target, applyCosts);
+        ability.execute(ret, user, target, applyCosts);
         if (ability.currentHp() > -1)
         //if (!healing)
         {
@@ -543,7 +543,7 @@ void Scene::endTurn(QString* const ret)
     {
         if (crActor->currentHp() > 0)
         {
-            crActor->applyStates(ret, this, true);
+            crActor->applyStates(ret, true);
         }
         int mInit = scene._m_init;
         if (mInit > 0)
@@ -664,7 +664,7 @@ void Scene::endTurn(QString* const ret)
         }*/
         {
             bool const shapeShifted = crActor->Costume::isShapeShifted();
-            crActor->applyStates(ret, this, false);
+            crActor->applyStates(ret, false);
             if (shapeShifted && (!crActor->Costume::isShapeShifted()))
             {
                 emit this->spriteAct(this, crActor, NIL, true, NIL, NIL);
@@ -728,6 +728,63 @@ void Scene::escape(QString* const ret)
 {
     assert(ret);
     //TODO:
+}
+
+void Scene::actorHpChanged(int const newValue, int const oldValue)
+{
+    Actor& actor = *static_cast<Actor*>(QObject::sender());
+    QSharedDataPointer<Role::RoleData>& roleData = actor._role_data;
+    QString& ret = this->_scene_data->_ret;
+    if (newValue < 1)
+    {
+        if (oldValue != 0)
+        {
+            if (/*survive || */actor.Costume::isInvincible())
+            {
+                roleData->_hp = 1;
+            }
+            else
+            {
+                roleData->_sp = 0;
+                ret += Actor::KoTxt.arg(actor.name());
+                if (actor.initiative() > 0)
+                {
+                    actor.setInitiative(0);
+                }
+                if (actor.Role::isReviving())
+                {
+                    ret += Actor::RiseTxt;
+                    roleData->_hp = actor.maximumHp();
+                    if (actor.Costume::isShapeShifted())
+                    {
+                        emit this->spriteAct(this, &actor, NIL, true, NIL, NIL);
+                    }
+                    actor.removeStates(&ret, false);
+                }
+                else
+                {
+                    //roleData->_hp = 0;
+                    actor.removeStates(&ret, false);
+                    actor.setStunned(true);
+                    actor.setKnockedOut(true);
+                    this->checkStatus(&ret);
+                }
+            }
+        }
+    }
+    else
+    {
+        //int const oHp = actor.currentHp(), mHp = actor.maximumHp();
+        //roleData->_hp = newValue > mHp ? mHp : newValue;
+        if (oldValue < 1)
+        {
+            actor.setStunned(false);
+            actor.setKnockedOut(false);
+            actor.refreshCostumes(&ret);
+            //actor.applyStates(ret, scene, false);
+            this->resetTurn(actor);
+        }
+    }
 }
 
 void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
@@ -799,7 +856,8 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
                 //player.setRandomAi(true);
                 player.setAiPlayer(true);
             }
-            connect(&player, SIGNAL(Actor::agilityChanged), this, SLOT(Scene::agiCalc));
+            QObject::connect(&player, SIGNAL(Actor::currentHpChanged), this, SLOT(Scene::actorHpChanged));
+            QObject::connect(&player, SIGNAL(Actor::agilityChanged), this, SLOT(Scene::agiCalc));
             player._actor_data->_old_side = i;
             player.setPartySide(i);
 #if ALLOW_COVERING
@@ -863,4 +921,7 @@ Scene::SceneData::~SceneData()
     }
 }
 
-Scene::~Scene() {}
+Scene::~Scene()
+{
+    QObject::disconnect(this, NIL);
+}

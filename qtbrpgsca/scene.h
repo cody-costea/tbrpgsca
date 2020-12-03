@@ -40,6 +40,7 @@ namespace tbrpgsca
         PROP_FLAG_GET(usesGuards, Attribute::UseGuards, inline, public)
         PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, inline, protected, hasCovers)
         PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::UseGuards, inline, protected, usesGuards)
+        PROP_FIELD(Scene, ActText, actText, QString, inline, public, public, _scene_data->_ret)
 
         Q_PROPERTY(bool usesGuards READ usesGuards WRITE setUseGuards NOTIFY usesGuardsChanged)
         Q_PROPERTY(bool hasCovers READ hasCovers WRITE setHasCovers NOTIFY hasCoversChanged)
@@ -129,6 +130,7 @@ namespace tbrpgsca
     #endif
             //SpriteAct* _actor_run;
             Actor* _cr_actor;
+            QString _ret;
 
             friend class Actor;
             friend class Scene;
@@ -145,7 +147,9 @@ namespace tbrpgsca
         void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
 
-        protected slots: void agiCalc();
+    protected slots:
+        void agiCalc();
+        void actorHpChanged(int const newValue, int const oldValue);
 
         friend class Actor;
         friend class Ability;

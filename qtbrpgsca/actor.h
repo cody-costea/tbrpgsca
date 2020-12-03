@@ -162,24 +162,18 @@ namespace tbrpgsca
 
         void levelUp();
         inline void checkRegSkill(const Ability& skill);
-        void recover(QString* const ret, Scene* const scene);
-        void applyDmgRoles(QString& ret, Scene* const scene);
-        void removeStates(QString* const ret, Scene* const scene, bool const remove);
-        void applyStates(QString* const ret, Scene* const scene, bool const consume);
-        void updateStates(bool const remove, QString* const ret, Scene* const scene,
+        void recover(QString* const ret);
+        void applyDmgRoles(QString& ret);
+        void removeStates(QString* const ret, bool const remove);
+        void applyStates(QString* const ret, bool const consume);
+        void updateStates(bool const remove, QString* const ret,
                             QMap<State*, int>& states, bool const includeWithDur);
         void updateAttributes(bool const remove, const Costume& costume);
         void updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
-        void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
-        void setCurrentHp(int const hp, QString* const ret, Scene* const scene, bool const survive);
-        void setRace(Scene* const scene, Costume& race);
-        //void setAgility(int const agi, Scene& scene);
-        void setJob(Scene* const scene, Costume& job);
-        char unequipItem(Scene* const scene, Costume& item);
-        const Costume* unequipPos(Scene* const scene, char const pos);
-        const Costume* equipItem(Scene* const scene, char const pos, Costume* const item);
-        void refreshCostumes(QString* const ret, Scene* const scene);
+        void switchCostume(QString* const ret, const Costume* const oldCostume, const Costume* const newCostume);
+        void setCurrentHp(int const hp, QString* const ret, bool const survive);
+        void refreshCostumes(QString* const ret);
 
         friend class Scene;
         friend class Ability;

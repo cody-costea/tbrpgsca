@@ -103,8 +103,6 @@ namespace tbrpgsca
 
         QSharedDataPointer<RoleData> _role_data;
 
-        void damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
-
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
              int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states);
 

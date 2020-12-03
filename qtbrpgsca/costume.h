@@ -101,9 +101,8 @@ namespace tbrpgsca
 
         QSharedDataPointer<CostumeData> _costume_data;
 
-        void apply(QString& ret, Scene* const scene, Actor& actor) const;
-        void refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove) const;
-        void adopt(QString* const ret, Scene* const scene, Actor& actor, bool const upeStates, bool const rmeove) const;
+        void refresh(QString* const ret, Actor& actor, bool const updStates, bool const remove) const;
+        void adopt(QString* const ret, Actor& actor, bool const upeStates, bool const rmeove) const;
 
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,

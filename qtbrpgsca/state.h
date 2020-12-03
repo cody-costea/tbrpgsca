@@ -60,10 +60,10 @@ namespace tbrpgsca
 
         QSharedDataPointer<StateData> _state_data;
 
-        void alter(QString* const ret, Scene* const scene, Actor& actor, bool const consume);
-        void inflict(QString* const ret, Scene* const scene, Actor* user, Actor& target, int dur, bool const always);
-        bool disable(QString* const ret, Scene* const scene, Actor& actor, int dur, bool const remove);
-        void remove(QString* const ret, Scene* const scene, Actor& actor) const;
+        void alter(QString* const ret, Actor& actor, bool const consume);
+        void inflict(QString* const ret, Actor* user, Actor& target, int dur, bool const always);
+        bool disable(QString* const ret, Actor& actor, int dur, bool const remove);
+        void remove(QString* const ret, Actor& actor) const;
 
         friend class Actor;
         friend class Ability;

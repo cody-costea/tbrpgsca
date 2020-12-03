@@ -82,12 +82,7 @@ bool Role::operator<(const Role& role) const
     return this->databaseId() < role.databaseId();
 }
 
-void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent) const
-{
-    return this->damage(ret, NIL, absorber, target, dmg, percent);
-}
-
-void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
+void Role::damage(QString& ret, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
     const Role& role = *this;
     if (!actor.Costume::isInvincible())
@@ -219,8 +214,13 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
             {
                 ret += "+";
             }
+            const int cHp = actor.currentHp();
+            if (percent && dmgHp >= cHp)
+            {
+                dmgHp = cHp - 1;
+            }
             ret += (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
-            actor.setCurrentHp(actor.currentHp() - dmgHp, &ret, scene, percent);
+            actor.setCurrentHp(cHp - dmgHp);
             /*if (actor.hp < 1)
             {
                 ret += Actor::KoTxt.arg(actor.name);
@@ -230,7 +230,7 @@ void Role::damage(QString& ret, Scene* const scene, Actor* const absorber, Actor
         {
             absorber->setCurrentRp(absorber->currentRp() + dmgSp / 2);
             absorber->setCurrentMp(absorber->currentMp() + dmgMp / 2);
-            absorber->setCurrentHp(absorber->currentHp() + dmgHp / 2, &ret, scene, true);
+            absorber->setCurrentHp(absorber->currentHp() + dmgHp / 2);
         }
     }
 }
