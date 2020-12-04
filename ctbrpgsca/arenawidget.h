@@ -115,7 +115,7 @@ namespace tbrpgsca
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
     #if USE_TEMPLATE
         bool operator()(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
-                       Actor* const target, const Ability* const counter);
+                       Actor* const target, const Ability* const counter) const;
     #endif
 
         QString* _ret_str;

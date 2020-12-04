@@ -75,7 +75,7 @@ void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 }
 
 template <typename SpriteRun>
-void Ability::execute(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const
+void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const
 {
     assert(target);
     const Ability& ability = *this;
@@ -314,6 +314,6 @@ Ability::~Ability()
 }
 
 #if USE_TEMPLATE
-template void Ability::execute(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
 #endif
-template void Ability::execute(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;

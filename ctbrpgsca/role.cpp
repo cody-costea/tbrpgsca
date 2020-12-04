@@ -58,7 +58,7 @@ void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const 
 }
 
 template <typename SpriteRun>
-void Role::damage(QString& ret, Scene* const scene, SpriteRun* const spriteRun, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
+void Role::damage(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
     const Role& role = *this;
     if (!actor.Costume::isInvincible())
@@ -246,7 +246,7 @@ Role::~Role()
 }
 
 #if USE_TEMPLATE
-template void Role::damage(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+template void Role::damage(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
 #endif
 
-template void Role::damage(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+template void Role::damage(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;

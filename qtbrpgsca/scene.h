@@ -112,6 +112,7 @@ namespace tbrpgsca
     signals:
         void spriteAct(Scene* const scene, Actor* const user, Ability* const ability, bool const revive,
                                            Actor* const target, Ability* const counter);
+        void beginScene(QString ret);
 
     protected:
         class SceneData : public QSharedData

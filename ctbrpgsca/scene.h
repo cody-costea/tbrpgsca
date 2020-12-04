@@ -53,13 +53,13 @@ namespace tbrpgsca
         static QString FailTxt;
 
         template <typename SpriteRun>
-        void endTurn(QString& ret, SpriteRun* const spriteRun, Actor* const actor);
+        void endTurn(QString& ret, const SpriteRun* const spriteRun, Actor* const actor);
 
         template <typename SpriteRun>
-        void perform(QString& ret, SpriteRun* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
+        void perform(QString& ret, const SpriteRun* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
 
         template <typename SpriteRun>
-        void playAi(QString& ret, SpriteRun* const spriteRun, Actor& player);
+        void playAi(QString& ret, const SpriteRun* const spriteRun, Actor& player);
 
         void checkStatus(QString& ret);
         void escape(QString& ret);
@@ -89,11 +89,11 @@ namespace tbrpgsca
         int getStatus() const;
 
         template <typename SpriteRun>
-        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, const SpriteRun* const actorRun, QVector<SceneRun*>* const events,
                         bool const useGuards, int const surprise, int const mInit);
 
         template <typename SpriteRun>
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const SpriteRun* const actorRun, QVector<SceneRun*>* const events,
               bool const useGuards, int const surprise, int const mInit);
 
         Scene();
@@ -115,7 +115,7 @@ namespace tbrpgsca
         void resetTurn(Actor& actor);
 
         template <typename SpriteRun>
-        void execute(QString& ret, SpriteRun* const actorEvent, Actor& user, Actor* target, const Ability& ability, bool const applyCosts);
+        void execute(QString& ret, const SpriteRun* const actorEvent, Actor& user, Actor* target, const Ability& ability, bool const applyCosts);
 
         friend class Actor;
         friend class Ability;

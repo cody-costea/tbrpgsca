@@ -146,13 +146,13 @@ namespace tbrpgsca
         void setAgility(int const agi, Scene& scene);
 
         template <typename SpriteRun>
-        void applyDmgRoles(QString& ret, Scene* const scene, SpriteRun* const actorEvent);
+        void applyDmgRoles(QString& ret, Scene* const scene, const SpriteRun* const actorEvent);
 
         template <typename SpriteRun>
-        void applyStates(QString* const ret, Scene* const scene, SpriteRun* const spriteRun, bool const consume);
+        void applyStates(QString* const ret, Scene* const scene, const SpriteRun* const spriteRun, bool const consume);
 
         template <typename SpriteRun>
-        void setCurrentHp(QString* const ret, Scene* const scene, SpriteRun* const actorEvent, int const hp, bool const survive);
+        void setCurrentHp(QString* const ret, Scene* const scene, const SpriteRun* const actorEvent, int const hp, bool const survive);
 
     private:
 

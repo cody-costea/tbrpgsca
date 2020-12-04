@@ -590,7 +590,7 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
 
 #if USE_TEMPLATE
 bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
-                            Actor* const target, const Ability* const counter)
+                            Actor* const target, const Ability* const counter) const
 {
    ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
 #if TRG_SPR_DELAY < 0

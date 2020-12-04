@@ -8,34 +8,34 @@
 using namespace tbrpgsca;
 
 #if USE_TEMPLATE
-extern template void Scene::playAi(QString& ret, ArenaWidget* const spriteRun, Actor& player);
-extern template void Scene::endTurn(QString& ret, ArenaWidget* const spriteRun, Actor* const actor);
-extern template void Scene::perform(QString& ret, ArenaWidget* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
-extern template void Scene::execute(QString& ret, ArenaWidget* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
-extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
+extern template void Scene::playAi(QString& ret, const ArenaWidget* const spriteRun, Actor& player);
+extern template void Scene::endTurn(QString& ret, const ArenaWidget* const spriteRun, Actor* const actor);
+extern template void Scene::perform(QString& ret, const ArenaWidget* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
+extern template void Scene::execute(QString& ret, const ArenaWidget* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
+extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, const ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                             bool const useGuards, int const surprise, int const mInit);
-extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
+extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                   bool const useGuards, int const surprise, int const mInit);
-extern template void Ability::execute(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
-extern template void Actor::applyDmgRoles(QString& ret, Scene* const scene, ArenaWidget* const actorEvent);
-extern template void Actor::applyStates(QString* const ret, Scene* const scene, ArenaWidget* const spriteRun, bool const consume);
-extern template void Actor::setCurrentHp(QString* const ret, Scene* const scene, ArenaWidget* const actorEvent, int const hp, bool const survive);
-extern template void Role::damage(QString& ret, Scene* const scene, ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+extern template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+extern template void Actor::applyDmgRoles(QString& ret, Scene* const scene, const ArenaWidget* const actorEvent);
+extern template void Actor::applyStates(QString* const ret, Scene* const scene, const ArenaWidget* const spriteRun, bool const consume);
+extern template void Actor::setCurrentHp(QString* const ret, Scene* const scene, const ArenaWidget* const actorEvent, int const hp, bool const survive);
+extern template void Role::damage(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
 #endif
 
-extern template void Scene::playAi(QString& ret, Scene::SpriteAct* const spriteRun, Actor& player);
-extern template void Scene::endTurn(QString& ret, Scene::SpriteAct* const spriteRun, Actor* const actor);
-extern template void Scene::perform(QString& ret, Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
-extern template void Scene::execute(QString& ret, Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
-extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
+extern template void Scene::playAi(QString& ret, const Scene::SpriteAct* const spriteRun, Actor& player);
+extern template void Scene::endTurn(QString& ret, const Scene::SpriteAct* const spriteRun, Actor* const actor);
+extern template void Scene::perform(QString& ret, const Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
+extern template void Scene::execute(QString& ret, const Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
+extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, const Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                                 bool const useGuards, int const surprise, int const mInit);
-extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
+extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                       bool const useGuards, int const surprise, int const mInit);
-extern template void Ability::execute(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
-extern template void Actor::applyDmgRoles(QString& ret, Scene* const scene, Scene::SpriteAct* const actorEvent);
-extern template void Actor::applyStates(QString* const ret, Scene* const scene, Scene::SpriteAct* const spriteRun, bool const consume);
-extern template void Actor::setCurrentHp(QString* const ret, Scene* const scene, Scene::SpriteAct* const actorEvent, int const hp, bool const survive);
-extern template void Role::damage(QString& ret, Scene* const scene, Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+extern template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+extern template void Actor::applyDmgRoles(QString& ret, Scene* const scene, const Scene::SpriteAct* const actorEvent);
+extern template void Actor::applyStates(QString* const ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, bool const consume);
+extern template void Actor::setCurrentHp(QString* const ret, Scene* const scene, const Scene::SpriteAct* const actorEvent, int const hp, bool const survive);
+extern template void Role::damage(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
 
 int main(int argc, char* argv[])
 {
