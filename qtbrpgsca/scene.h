@@ -23,15 +23,6 @@ namespace tbrpgsca
 #define ALLOW_NO_GUARDS 1
 #define ALLOW_COVERING 1
 
-        #define STATUS_DEFEAT -2
-        #define STATUS_RETREAT -1
-        #define STATUS_ONGOING 0
-        #define STATUS_VICTORY 1
-        #define EVENT_BEGIN_SCENE 0
-        #define EVENT_BEFORE_ACT 1
-        #define EVENT_AFTER_ACT 2
-        #define EVENT_NEW_TURN 3
-        #define EVENT_END_SCENE 4
         #define MIN_ROUND -134217728
         #define MAX_ROUND 134217727
 
@@ -40,11 +31,31 @@ namespace tbrpgsca
         PROP_FLAG_GET(usesGuards, Attribute::UseGuards, inline, public)
         PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, inline, protected, hasCovers)
         PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::UseGuards, inline, protected, usesGuards)
-        PROP_FIELD(Scene, ActText, actText, QString, inline, public, public, _scene_data->_ret)
+        //PROP_FIELD(Scene, ActText, actText, QString*, inline, public, protected, _scene_data->_ret)
+        PROP_FIELD(Scene, Parties, parties, QVector<QVector<Actor*>*>, inline, public, protected, _scene_data->_parties)
 
         Q_PROPERTY(bool usesGuards READ usesGuards WRITE setUseGuards NOTIFY usesGuardsChanged)
         Q_PROPERTY(bool hasCovers READ hasCovers WRITE setHasCovers NOTIFY hasCoversChanged)
     public:
+        enum Events
+        {
+            Ending = 4,
+            Beginning = 0,
+            BeforeAct = 2,
+            AfterAct = 3,
+            NewTurn = 1
+        };
+        Q_ENUM(Events)
+
+        enum Status
+        {
+            Defeat = -2,
+            Retreat = -1,
+            Ongoing = 0,
+            Victory = 1
+        };
+        Q_ENUM(Status)
+
         enum Attribute {
             UseGuards = 1,
             HasCovers = 2
@@ -52,8 +63,8 @@ namespace tbrpgsca
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)
 
-        typedef std::function<bool(Scene& scene, QString* const ret)> SceneRun;
-        typedef std::function<void(Scene* const scene, Actor* const user, Ability* const ability, bool const revive,
+        typedef std::function<void(QString* const ret)> SceneRun;
+        typedef std::function<void(Actor* const user, Ability* const ability, bool const revive,
                                    Actor* const target, Ability* const counter)> SpriteAct;
 
         static QString EscapeTxt;
@@ -91,13 +102,18 @@ namespace tbrpgsca
         bool hasTargetedPlayer(Actor& player) const;
         int getTargetedPlayersSize() const;
 
-        Ability* getLastAbility() const;
-        Actor* getCurrentPlayer() const;
-        int getCurrentParty() const;
-        int getCurrent() const;
-        int getStatus() const;
+        //Q_INVOKABLE Ability* getLastAbility() const;
+        Q_INVOKABLE Actor* getCurrentPlayer() const;
+        Q_INVOKABLE int getCurrentParty() const;
+        Q_INVOKABLE int getCurrent() const;
+        Q_INVOKABLE int getStatus() const;
 
-        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
+        Q_INVOKABLE inline void initialize(QString& ret, bool const useGuards, int const surprise, int const mInit)
+        {
+            this->operator()(ret, &this->_scene_data->_parties, NIL, NIL, useGuards, surprise, mInit);
+        }
+
+        void operator()(QString& ret, QVector<QVector<Actor*>*>* parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                           bool const useGuards, int const surprise, int const mInit);
 
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
@@ -110,9 +126,13 @@ namespace tbrpgsca
         ~Scene();
 
     signals:
-        void spriteAct(Scene* const scene, Actor* const user, Ability* const ability, bool const revive,
-                                           Actor* const target, Ability* const counter);
-        void beginScene(QString ret);
+        void spriteAct(Actor* const user, Ability* const ability, bool const revive,
+                       Actor* const target, Ability* const counter);
+        void ending(QString* const ret);
+        void beginning(QString* const ret);
+        void beforeAct(QString* const ret, Actor* const user, Actor* const target, Ability* const ability);
+        void afterAct(QString* const ret, Actor* const user, Actor* const target, Ability* const ability);
+        void newTurn(QString* const ret, Actor* const current, Actor* const previous);
 
     protected:
         class SceneData : public QSharedData
@@ -121,8 +141,8 @@ namespace tbrpgsca
             ~SceneData();
 
         protected:
-            Ability* _last_ability;
-            QVector<SceneRun*>* _events;
+            //Ability* _last_ability;
+            //QVector<SceneRun*>* _events;
             signed int _current, _original, _surprise: 2, _f_target, _l_target, _status: 2, _m_init: 28;
             QVector<QVector<Actor*>*> _parties;
             QVector<Actor*>* _players;
@@ -131,7 +151,7 @@ namespace tbrpgsca
     #endif
             //SpriteAct* _actor_run;
             Actor* _cr_actor;
-            QString _ret;
+            QString* _ret;
 
             friend class Actor;
             friend class Scene;

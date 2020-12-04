@@ -498,13 +498,13 @@ void ArenaWidget::resizeScene(const QSize& newSize, const QSize* const oldSize)
                             pos = POS_RIGHT;
                         }
                     }
-                    QVector<Actor*>& party = *(parties[j]);
+                    QVector<Actor*>& party = *(parties.at(j));
                     int const sSize = party.size();
                     trgCount += sSize;
                     for (int i = 0; i < sSize; i += 1)
                     {
                         void** extras;
-                        Actor& actor = *(party[i]);
+                        Actor& actor = *(party.at(i));
                         {
                             void* const extra = actor._extra;
                             if (extra)

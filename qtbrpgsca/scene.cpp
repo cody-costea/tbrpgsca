@@ -41,10 +41,10 @@ int Scene::getCurrentParty() const
     return crActor == NIL ? -1 : crActor->partySide();
 }
 
-Ability* Scene::getLastAbility() const
+/*Ability* Scene::getLastAbility() const
 {
     return this->_scene_data->_last_ability;
-}
+}*/
 
 int Scene::getPartiesSize() const
 {
@@ -256,8 +256,8 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
                 }
             }
         }
-        emit this->spriteAct(this, applyCosts ? &user : NIL, &ability, (ko && target->currentHp() > 0),
-                       target, &user == target ? &ability : counter);
+        emit this->spriteAct(applyCosts ? &user : NIL, &ability, (ko && target->currentHp() > 0),
+                             target, &user == target ? &ability : counter);
 #if USE_TARGET_LIST
         QVector<Actor*>* targets = scene->_targets;
         if (targets == NIL)
@@ -285,7 +285,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
         }
     }
 #endif
-    QVector<SceneRun*>* events = scene->_events;
+    /*QVector<SceneRun*>* events = scene->_events;
     if (events && events->size() > EVENT_BEFORE_ACT)
     {
         auto event = events->at(EVENT_BEFORE_ACT);
@@ -293,7 +293,9 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
         {
             return;
         }
-    }
+    }*/
+    scene->_ret = ret;
+    emit this->beforeAct(ret, user, target, ability);
     if (ability->isRanged() && ability->isTargetingAll())
     {
         bool applyCosts = true;
@@ -355,17 +357,18 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
             items->operator[](ability) = items->value(ability, 1) - 1;
         }
     }
-    scene->_last_ability = ability;
+    //scene->_last_ability = ability;
     user->setCurrentExperience(user->currentExperience() + 1);
-    if (events && events->size() > EVENT_AFTER_ACT)
+    /*if (events && events->size() > EVENT_AFTER_ACT)
     {
         auto event = events->at(EVENT_AFTER_ACT);
         if (event && ((*event)(*this, ret)))
         {
             this->endTurn(ret);
         }
-    }
-
+    }*/
+    emit this->afterAct(ret, user, target, ability);
+    this->endTurn(ret);
 }
 
 int Scene::getAiSkill(Actor* const user, QVector<Ability*>* const skills, int const defSkill, bool const restore) const
@@ -537,6 +540,7 @@ void Scene::endTurn(QString* const ret)
     auto& scene = *this->_scene_data;
     int current = scene._current;
     Actor* crActor = scene._cr_actor;
+    Actor* oldActor = crActor;//scene._cr_actor;
     int cActions = (crActor->currentActions()) - 1;
     crActor->setCurrentActions(cActions);
     while (cActions < 1)
@@ -667,7 +671,7 @@ void Scene::endTurn(QString* const ret)
             crActor->applyStates(ret, false);
             if (shapeShifted && (!crActor->Costume::isShapeShifted()))
             {
-                emit this->spriteAct(this, crActor, NIL, true, NIL, NIL);
+                emit this->spriteAct(crActor, NIL, true, NIL, NIL);
             }
         }
         crActor->setCurrentActions((cActions = crActor->Costume::isStunned() ? 0 : crActor->maximumActions()));
@@ -675,17 +679,22 @@ void Scene::endTurn(QString* const ret)
     scene._current = current;
     scene._original = current;
     scene._cr_actor = crActor;
-    QVector<SceneRun*>* const events = scene._events;
+    /*QVector<SceneRun*>* const events = scene._events;
     if (events && events->size() > EVENT_NEW_TURN)
     {
         auto event = events->at(EVENT_NEW_TURN);
-        if (event && (*event)(*this, ret) && crActor->hasAnyPlayFlag(Actor::Attribute::AiPlayer | Costume::Attribute::Enraged | Costume::Attribute::Confuse)
-                /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
+        if (event && (*event)(*this, ret) && crActor->hasAnyPlayFlag(Actor::Attribute::AiPlayer | Costume::Attribute::Enraged | Costume::Attribute::Confuse))
         {
             this->playAi(ret, crActor);
         }
-    }
+    }*/
     ret->append(".");
+    emit this->newTurn(ret, crActor, oldActor);
+    if (crActor->hasAnyPlayFlag(Actor::Attribute::AiPlayer | Costume::Attribute::Enraged | Costume::Attribute::Confuse))
+    {
+        QString newText;
+        this->playAi(&newText, crActor);
+    }
 }
 
 bool Scene::canTarget(Actor* const user, Ability* const ability, Actor* const target)
@@ -734,7 +743,7 @@ void Scene::actorHpChanged(int const newValue, int const oldValue)
 {
     Actor& actor = *static_cast<Actor*>(QObject::sender());
     QSharedDataPointer<Role::RoleData>& roleData = actor._role_data;
-    QString& ret = this->_scene_data->_ret;
+    QString& ret = *this->_scene_data->_ret;
     if (newValue < 1)
     {
         if (oldValue != 0)
@@ -757,7 +766,7 @@ void Scene::actorHpChanged(int const newValue, int const oldValue)
                     roleData->_hp = actor.maximumHp();
                     if (actor.Costume::isShapeShifted())
                     {
-                        emit this->spriteAct(this, &actor, NIL, true, NIL, NIL);
+                        emit this->spriteAct(&actor, NIL, true, NIL, NIL);
                     }
                     actor.removeStates(&ret, false);
                 }
@@ -787,10 +796,10 @@ void Scene::actorHpChanged(int const newValue, int const oldValue)
     }
 }
 
-void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
+void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>* parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
                          bool const useGuards, int const surprise, int const mInit)
 {
-    int partiesSize = parties.size();
+    int partiesSize = parties->size();
     assert(partiesSize > 1);
     QVector<Actor*>* players;
     auto& scene = *this->_scene_data;
@@ -816,8 +825,34 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
     {
         connect(this, &Scene::spriteAct, *actorEvent);
     }
-    scene._events = events;
-    scene._parties = parties;
+    if (events)
+    {
+        if (events->size() > Events::Beginning)
+        {
+            connect(this, &Scene::beginning, *events->at(Events::Beginning));
+        }
+        if (events->size() > Events::NewTurn)
+        {
+            connect(this, &Scene::newTurn, *events->at(Events::NewTurn));
+        }
+        if (events->size() > Events::BeforeAct)
+        {
+            connect(this, &Scene::beforeAct, *events->at(Events::BeforeAct));
+        }
+        if (events->size() > Events::AfterAct)
+        {
+            connect(this, &Scene::afterAct, *events->at(Events::AfterAct));
+        }
+        if (events->size() > Events::Ending)
+        {
+            connect(this, &Scene::ending, *events->at(Events::Ending));
+        }
+    }
+    //scene._events = events;
+    if (parties != &scene._parties)
+    {
+        scene._parties = *parties;
+    }
     scene._players = players;
     //scene.current = scene.oldCurrent = 0;
     scene._surprise = surprise;
@@ -825,7 +860,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
     {
         bool const aiPlayer = i > 0;
         bool const surprised = (surprise == i);
-        QVector<Actor*>& party = *(parties[i]);
+        QVector<Actor*>& party = *(parties->at(i));
         int const pSize = party.size();
         if (crActor == NIL)
         {
@@ -885,14 +920,15 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteA
     {
         current = players->indexOf(crActor);
     }
-    SceneRun* event;
+    //SceneRun* event;
     scene._current = current;
     scene._original = current;
-    if (events && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE))) && (*event)(*this, &ret))
+    /*if (events && events->size() > EVENT_BEGIN_SCENE && ((event = events->at(EVENT_BEGIN_SCENE))) && (*event)(*this, &ret))
     {
         this->endTurn(&ret);
-    }
-
+    }*/
+    emit this->beginning(&ret);
+    this->endTurn(&ret);
 }
 
 Scene::Scene(QObject* const parent) : Play(parent, 0)
@@ -908,7 +944,7 @@ Scene::Scene(const Scene& scene) : Play(NIL, scene.playFlags())
 Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
              bool const useGuards, int const surprise, int const mInit, QObject* const parent) : Scene(parent)
 {
-    this->operator()(ret, parties, actorEvent, events, useGuards, surprise, mInit);
+    this->operator()(ret, &parties, actorEvent, events, useGuards, surprise, mInit);
 }
 
 Scene::SceneData::~SceneData()
