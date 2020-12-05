@@ -18,6 +18,7 @@ namespace tbrpgsca
     class Costume : public Role
     {
         Q_OBJECT
+        QML_ELEMENT
         PROP_FLAG(Costume, Stunned, stunned, Attribute::Stun, inline, public, public)
         PROP_FLAG(Costume, Enraged, enraged, Attribute::Enraged, inline, public, public)
         PROP_FLAG(Costume, KnockedOut, knockedOut, Attribute::Ko, inline, public, public)
@@ -72,7 +73,7 @@ namespace tbrpgsca
         Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
-                QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res);
+                QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit Costume(QObject* const parent = NIL);
 
@@ -106,10 +107,10 @@ namespace tbrpgsca
         void refresh(QString* const ret, Actor& actor, bool const updStates, bool const remove) const;
         void adopt(QString* const ret, Actor& actor, bool const upeStates, bool const rmeove) const;
 
-        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
-                int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
-                bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const skills,
-                QVector<Ability*>* const counters, QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res);
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+                int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
+                bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters, QMap<State*, int>* const states,
+                QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         friend class Actor;
         friend class Ability;
@@ -118,6 +119,10 @@ namespace tbrpgsca
         friend class Scene;
     };
 }
+
+Q_DECLARE_METATYPE(tbrpgsca::Costume)
+Q_DECLARE_METATYPE(tbrpgsca::Costume*)
+Q_DECLARE_INTERFACE(tbrpgsca::Costume, "com.codycostea.tbrpgsca.Costume")
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Costume::Attributes)
 

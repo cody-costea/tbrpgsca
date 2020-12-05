@@ -20,6 +20,7 @@ namespace tbrpgsca
         #define STATE_END_DUR -3
 
         Q_OBJECT
+        QML_ELEMENT
         PROP_FIELD(State, Resistance, resistance, int, inline, public, public, _state_data->_s_res)
         PROP_FIELD(State, Duration, duration, int, inline, public, public, _state_data->_dur)
     public:
@@ -36,7 +37,7 @@ namespace tbrpgsca
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
               bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
-              QMap<const State*, int>* const stRes, QMap<int, int>* const res);
+              QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit State(QObject* const parent = NIL);
 
@@ -74,5 +75,9 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_METATYPE(tbrpgsca::State)
+Q_DECLARE_METATYPE(tbrpgsca::State*)
+Q_DECLARE_INTERFACE(tbrpgsca::State, "com.codycostea.tbrpgsca.State")
 
 #endif // STATE_H

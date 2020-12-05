@@ -12,6 +12,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QApplication>
 #include <QThread>
 #include <QTimer>
+#include <QtQml>
 
 namespace tbrpgsca
 {
@@ -152,7 +153,7 @@ namespace tbrpgsca
     Q_PROPERTY(bool QmlName READ is##PropName WRITE set##PropName NOTIFY is##PropName##Changed)
 
 #define REG_QML(Type) \
-    qmlRegisterInterface<Type>(#Type, 1); \
+    qmlRegisterInterface<Type>(#Type, QML_PACK_VER); \
     qmlRegisterType<Type>(QML_PACK_NAME, QML_PACK_VER, QML_PACK_REV, #Type); \
     qRegisterMetaType<Type*>(#Type"*");
 
@@ -243,5 +244,9 @@ namespace tbrpgsca
     };
 
 }
+
+//Q_DECLARE_METATYPE(tbrpgsca::Play)
+Q_DECLARE_METATYPE(tbrpgsca::Play*)
+Q_DECLARE_INTERFACE(tbrpgsca::Play, "com.codycostea.tbrpgsca.Play")
 
 #endif // PLAY_H

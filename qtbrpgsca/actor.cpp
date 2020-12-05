@@ -674,16 +674,16 @@ void Actor::refreshCostumes(QString* const ret)
     }
 }
 
-Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
-             int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-             QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>&& items)
-    : Actor(id, name, sprite, race, job, level, maxLv, mActions, mHp, mMp, mSp, atk, def, spi, wis, agi, res, stRes, items) {}
+Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
+             int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
+             const QSharedPointer<QMap<Ability*, int>>&& items, QObject* const parent)
+    : Actor(id, name, sprite, race, job, level, maxLv, mActions, mHp, mMp, mSp, atk, def, spi, wis, agi, res, stRes, items, parent) {}
 
-Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
-             int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-             QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items)
+Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
+             int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
+             const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent)
     : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QVector<Ability*>(),
-              NIL, NIL, stRes, res)
+              NIL, NIL, stRes, res, parent)
 {
     QSharedDataPointer<ActorData> actorData(new ActorData);
     actorData->_lv = 1;

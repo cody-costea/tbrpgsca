@@ -121,6 +121,10 @@ namespace tbrpgsca
 
 }
 
+//Q_DECLARE_METATYPE(tbrpgsca::Role)
+Q_DECLARE_METATYPE(tbrpgsca::Role*)
+Q_DECLARE_INTERFACE(tbrpgsca::Role, "com.codycostea.tbrpgsca.Role")
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Role::Attributes)
 Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Role::Elements)
 #endif // ROLE_H

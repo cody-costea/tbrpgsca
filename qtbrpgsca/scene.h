@@ -27,6 +27,7 @@ namespace tbrpgsca
         #define MAX_ROUND 134217727
 
         Q_OBJECT
+        QML_ELEMENT
         PROP_FLAG_GET(hasCovers, Attribute::HasCovers, inline, public)
         PROP_FLAG_GET(usesGuards, Attribute::UseGuards, inline, public)
         PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, inline, protected, hasCovers)
@@ -182,6 +183,10 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_METATYPE(tbrpgsca::Scene)
+Q_DECLARE_METATYPE(tbrpgsca::Scene*)
+Q_DECLARE_INTERFACE(tbrpgsca::Scene, "com.codycostea.tbrpgsca.Scene")
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Scene::Attributes)
 

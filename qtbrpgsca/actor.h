@@ -24,6 +24,7 @@ namespace tbrpgsca
         #define CHAR_JOB 2
 
         Q_OBJECT
+        QML_ELEMENT
         PROP_FLAG(Actor, AiPlayer, aiPlayer, Attribute::AiPlayer, inline, public, public)
         PROP_FLAG(Actor, RandomAi, randomAi, Attribute::RandomAi, inline, public, public)
         /*PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
@@ -120,13 +121,13 @@ namespace tbrpgsca
         void setCurrentMp(int const mp) override;
         void setCurrentRp(int const sp) override;
 
-        Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
-              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items);
+        Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
+              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
+              const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent = NIL);
 
-        Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
-              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>&& items);
+        Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
+              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
+              const QSharedPointer<QMap<Ability*, int>>&& items, QObject* const parent = NIL);
 
         explicit Actor(QObject* const parent = NIL);
 
@@ -188,6 +189,10 @@ namespace tbrpgsca
     };
 
 }
+
+Q_DECLARE_METATYPE(tbrpgsca::Actor)
+Q_DECLARE_METATYPE(tbrpgsca::Actor*)
+Q_DECLARE_INTERFACE(tbrpgsca::Actor, "com.codycostea.tbrpgsca.Actor")
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(tbrpgsca::Actor::Attributes)
 
