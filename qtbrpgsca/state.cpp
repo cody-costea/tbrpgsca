@@ -259,7 +259,7 @@ void State::blockSkills(Actor& actor, const bool remove) const
 
 }
 
-State::State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
+State::State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
              bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
@@ -278,7 +278,16 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
     this->_state_data = stateData;
 }
 
-State::State(QObject* const parent) : Costume(parent) {}
+State::State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
+             int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+             bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
+             bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
+             QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+    : State(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
+            reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
+
+State::State(QObject* const parent) : State(0, QString(), QString(), false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false,
+                                            false, false, false, false, NIL, NIL, NIL, NIL, NIL, NIL, parent) {}
 
 State::State(const State& state) : Costume(state)
 {

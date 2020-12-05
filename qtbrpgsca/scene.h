@@ -19,7 +19,7 @@ namespace tbrpgsca
 
     class Scene : public Play
     {
-#define USE_TARGET_LIST 1
+#define USE_TARGET_LIST 0
 #define ALLOW_NO_GUARDS 1
 #define ALLOW_COVERING 1
 
@@ -118,6 +118,9 @@ namespace tbrpgsca
                           bool const useGuards, int const surprise, int const mInit);
 
         Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
+              bool const useGuards, int const surprise, int const mInit, QObject* const parent = NIL);
+
+        Scene(QString&& ret, QVector<QVector<Actor*>*>&& parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
               bool const useGuards, int const surprise, int const mInit, QObject* const parent = NIL);
 
         explicit Scene(QObject* const parent = NIL);

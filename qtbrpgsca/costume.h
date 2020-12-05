@@ -70,7 +70,12 @@ namespace tbrpgsca
         void abandon(QString& ret, Actor& actor) const;
         void apply(QString& ret, Actor& actor) const;
 
-        Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
+                int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
+                bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+
+        Costume(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
                 QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);

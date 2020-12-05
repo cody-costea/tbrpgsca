@@ -57,7 +57,8 @@ HEADERS += \
         scene.h \
         skillsmodel.h
 
-DISTFILES +=
+DISTFILES += \
+    tbrpgsca_ro_RO.ts
 
 CONFIG += mobility
 MOBILITY =
@@ -68,3 +69,36 @@ QMAKE_CXXFLAGS += -O3 #-fdeclspec
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+LANGUAGES = ro_RO
+# parameters: var, prepend, append
+defineReplace(prependAll) {
+    for(a,$$1):result += $$2$${a}$$3
+    return($$result)
+}
+
+TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/tbrpgsca_, .ts)
+
+TRANSLATIONS_FILES =
+
+qtPrepareTool(LRELEASE, lrelease)
+for(tsfile, TRANSLATIONS) {
+    qmfile = $$shadowed($$tsfile)
+    qmfile ~= s,.ts$,.qm,
+    qmdir = $$dirname(qmfile)
+    !exists($$qmdir) {
+        mkpath($$qmdir)|error("Aborting.")
+    }
+    command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+    system($$command)|error("Failed to run: $$command")
+    TRANSLATIONS_FILES += $$qmfile
+}
+
+android
+{
+    #ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    #DISTFILES += android/AndroidManifest.xml
+    trfiles.path = /assets
+    trfiles.files = $$OUT_PWD/tbrpgsca_ro_RO.qm
+    INSTALLS += trfiles
+}

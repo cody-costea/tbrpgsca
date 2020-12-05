@@ -275,13 +275,13 @@ Ability::AbilityData::~AbilityData()
     }
 }
 
-Ability::Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
+Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
                  int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates, parent)
 {
     QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
-    dataPtr->_sound = sound.length() > 0 ? new QString(sound) : NIL;
+    dataPtr->_sound = sound.isNull() ? NIL : new QString(sound);
     dataPtr->_attr_inc = attrInc;
     dataPtr->_lv_rq = lvRq;
     dataPtr->_m_qty = mQty;
@@ -309,7 +309,12 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_ability_data = dataPtr;
 }
 
-Ability::Ability(QObject* const parent) : Role(parent) {}
+Ability::Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
+                 int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates, QObject* const parent)
+    : Ability(id, name, sprite, sound, steal, range, melee, canMiss, lvRq, hpC, mpC, spC, dmgType, attrInc, hpDmg, mpDmg, spDmg, trg, elm, mQty, rQty, absorb, revive, aStates, rStates, parent) {}
+
+Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QString(), false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NIL, NIL, parent) {}
 
 Ability::Ability(const Ability& ability) : Role(ability)
 {

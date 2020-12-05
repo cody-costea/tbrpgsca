@@ -262,14 +262,21 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     this->_costume_data = costumeData;
 }
 
-Costume::Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                  bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
                  QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
               revive, skills, counters, states, stRes, res, parent) {}
 
-Costume::Costume(QObject* const parent) : Role(parent) {}
+Costume::Costume(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
+                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                 QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+    : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, range, automate, confuse, reflect, invincible,
+              revive, skills, counters, states, stRes, res, parent) {}
+
+Costume::Costume(QObject* const parent) : Costume(0, QString(), QString(), false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, NIL, NIL, NIL, NIL, NIL, parent) {}
 
 Costume::Costume(const Costume& costume) : Role(costume)
 {

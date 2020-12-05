@@ -33,7 +33,13 @@ namespace tbrpgsca
         bool disable(Actor& actor, int const dur, bool const remove);
         void blockSkills(Actor& actor, bool const remove) const;
 
-        State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
+        State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
+              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
+              bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
+              QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+
+        State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
               bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,

@@ -674,18 +674,19 @@ void Actor::refreshCostumes(QString* const ret)
     }
 }
 
-Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
+Actor::Actor(int const id, QString&& name, QString&& sprite, Costume&& race, Costume&& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
              const QSharedPointer<QMap<Ability*, int>>&& items, QObject* const parent)
     : Actor(id, name, sprite, race, job, level, maxLv, mActions, mHp, mMp, mSp, atk, def, spi, wis, agi, res, stRes, items, parent) {}
 
-Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
+Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
              const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent)
     : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QVector<Ability*>(),
               NIL, NIL, stRes, res, parent)
 {
     QSharedDataPointer<ActorData> actorData(new ActorData);
+    this->_actor_data = actorData;
     actorData->_lv = 1;
     actorData->_xp = 0;
     actorData->_maxp = 15;
@@ -699,7 +700,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->_role_data->_state_dur = NIL;
     actorData->_actions = mActions;
     actorData->_max_lv = maxLv;
-    actorData->_items = items;
+    actorData->_items = items.isNull() ? NIL : items;
     actorData->_extra = NIL;
     this->setRace(race);
     this->setJob(job);
@@ -707,7 +708,7 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->recover(NIL);
 }
 
-Actor::Actor(QObject* const parent) : Costume(parent) {}
+Actor::Actor(QObject* const parent) : Actor(0, NIL, NIL, Costume(this), Costume(this), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NIL, NIL, QSharedPointer<QMap<Ability*, int>>(), parent) {}
 
 Actor::Actor(const Actor& actor) : Costume(actor)
 {

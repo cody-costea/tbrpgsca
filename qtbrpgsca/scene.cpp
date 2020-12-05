@@ -933,7 +933,21 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>* parties, SpriteA
 
 Scene::Scene(QObject* const parent) : Play(parent, 0)
 {
-    this->_scene_data = QSharedDataPointer<SceneData>(new SceneData);
+    auto scene = QSharedDataPointer<SceneData>(new SceneData);
+    this->_scene_data = scene;
+    scene->_cr_actor = NIL;
+    scene->_players = NIL;
+#if USE_TARGET_LIST
+    scene->_targets = NIL;
+#endif
+    scene->_f_target = 0;
+    scene->_l_target = 0;
+    scene->_surprise = 0;
+    scene->_original = 0;
+    scene->_current = 0;
+    scene->_status = 0;
+    scene->_m_init = 0;
+    scene->_ret = NIL;
 }
 
 Scene::Scene(const Scene& scene) : Play(NIL, scene.playFlags())
@@ -946,6 +960,10 @@ Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, SpriteAct* const 
 {
     this->operator()(ret, &parties, actorEvent, events, useGuards, surprise, mInit);
 }
+
+Scene::Scene(QString&& ret, QVector<QVector<Actor*>*>&& parties, SpriteAct* const actorEvent, QVector<SceneRun*>* const events,
+             bool const useGuards, int const surprise, int const mInit, QObject* const parent)
+    : Scene(ret, parties, actorEvent, events, useGuards, surprise, mInit, parent) {}
 
 Scene::SceneData::~SceneData()
 {

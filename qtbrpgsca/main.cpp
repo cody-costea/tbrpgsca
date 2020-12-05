@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     SceneAct* scene = new SceneAct("", "", demoLib->PARTY, 4, false, demoLib->ENEMY, 4, true, 0);
     engine.rootContext()->setContextProperty("arena", scene);*/
 
-    //REG_QML(Play)
+    REG_QML(Play)
     REG_QML(Role)
     REG_QML(Scene)
     REG_QML(Ability)
