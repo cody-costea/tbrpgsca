@@ -16,6 +16,11 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 namespace tbrpgsca
 {
 
+#define QML_PACK_NAME "com.codycostea.tbrpgsca"
+#define QML_PACK_VER 1
+#define QML_PACK_REV 0
+
+
 #define PROP_FIELD_GET_CUSTOM(Name, Type, Attribute, GetLevel, Field) \
     GetLevel: Attribute Type Name() const \
     { \
@@ -146,6 +151,11 @@ namespace tbrpgsca
     PROP_FLAG_SET_ALL(Class, PropName, Flag, Attribute, SetLevel, is##PropName) \
     Q_PROPERTY(bool QmlName READ is##PropName WRITE set##PropName NOTIFY is##PropName##Changed)
 
+#define REG_QML(Type) \
+    qmlRegisterInterface<Type>(#Type, 1); \
+    qmlRegisterType<Type>(QML_PACK_NAME, QML_PACK_VER, QML_PACK_REV, #Type); \
+    qRegisterMetaType<Type*>(#Type"*");
+
 #define NIL nullptr
 
     class Play : public QObject
@@ -222,12 +232,12 @@ namespace tbrpgsca
             return *this;
         }
 
-        explicit Play(QObject* const parent = nullptr, int const flags = 0);
+        explicit Play(QObject* const parent = NIL, int const flags = 0);
 
         ~Play();
     private:
-        static inline QMetaObject::Connection* _conn = nullptr;
-        static inline QTimer* _timer = nullptr;
+        static inline QMetaObject::Connection* _conn = NIL;
+        static inline QTimer* _timer = NIL;
 
         friend class Role;
     };

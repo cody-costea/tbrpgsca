@@ -269,6 +269,8 @@ Costume::Costume(int const id, QString name, QString sprite, bool const shapeShi
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
               revive, skills, counters, states, stRes, res) {}
 
+Costume::Costume(QObject* const parent) : Role(parent) {}
+
 Costume::Costume(const Costume& costume) : Role(costume)
 {
     this->_costume_data = costume._costume_data;

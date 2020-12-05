@@ -116,7 +116,6 @@ namespace tbrpgsca
         void setMaximumHp(int const mHp) override;
         void setMaximumMp(int const mMp) override;
         void setMaximumRp(int const mSp) override;
-        void setCurrentHp(int const hp, QString& ret, bool const survive);
         void setCurrentHp(int const hp) override;
         void setCurrentMp(int const mp) override;
         void setCurrentRp(int const sp) override;
@@ -128,6 +127,8 @@ namespace tbrpgsca
         Actor(int const id, QString name, QString sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               QMap<int, int>* const res, QMap<const State*, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>&& items);
+
+        explicit Actor(QObject* const parent = NIL);
 
         Actor(const Actor& actor);
 

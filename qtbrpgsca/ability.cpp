@@ -309,6 +309,8 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     this->_ability_data = dataPtr;
 }
 
+Ability::Ability(QObject* const parent) : Role(parent) {}
+
 Ability::Ability(const Ability& ability) : Role(ability)
 {
     this->_ability_data = ability._ability_data;

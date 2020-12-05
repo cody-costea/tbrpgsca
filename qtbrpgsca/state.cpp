@@ -278,6 +278,8 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
     this->_state_data = stateData;
 }
 
+State::State(QObject* const parent) : Costume(parent) {}
+
 State::State(const State& state) : Costume(state)
 {
     this->_state_data = state._state_data;

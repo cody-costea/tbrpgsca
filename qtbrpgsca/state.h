@@ -38,6 +38,8 @@ namespace tbrpgsca
               bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
               QMap<const State*, int>* const stRes, QMap<int, int>* const res);
 
+        explicit State(QObject* const parent = NIL);
+
         State(const State& state);
 
         ~State();

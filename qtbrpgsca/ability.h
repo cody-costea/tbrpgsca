@@ -63,6 +63,8 @@ namespace tbrpgsca
                 int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg,
                 int const elm, int const mQty, int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates);
 
+        explicit Ability(QObject* const parent = NIL);
+
         Ability(const Ability& ability);
 
         ~Ability();

@@ -74,6 +74,8 @@ namespace tbrpgsca
                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
                 QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res);
 
+        explicit Costume(QObject* const parent = NIL);
+
         Costume(const Costume& costume);
 
         ~Costume();

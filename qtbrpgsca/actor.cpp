@@ -707,6 +707,8 @@ Actor::Actor(int const id, QString name, QString sprite, Costume& race, Costume&
     this->recover(NIL);
 }
 
+Actor::Actor(QObject* const parent) : Costume(parent) {}
+
 Actor::Actor(const Actor& actor) : Costume(actor)
 {
     this->_actor_data = actor._actor_data;
