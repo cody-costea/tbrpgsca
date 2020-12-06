@@ -708,7 +708,7 @@ Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costum
     this->recover(NIL);
 }
 
-Actor::Actor(QObject* const parent) : Actor(0, NIL, NIL, Costume(this), Costume(this), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NIL, NIL, QSharedPointer<QMap<Ability*, int>>(), parent) {}
+Actor::Actor(QObject* const parent) : Actor(0, NIL, NIL, Costume(NIL), Costume(NIL), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NIL, NIL, QSharedPointer<QMap<Ability*, int>>(), parent) {}
 
 Actor::Actor(const Actor& actor) : Costume(actor)
 {

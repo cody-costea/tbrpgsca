@@ -11,7 +11,7 @@ using namespace tbrpgsca;
 
 Play::Play(QObject* const parent, int const flags) : QObject(parent)
 {
-    this->_playFlags = flags;
+    this->_play_flags = flags;
 }
 
 Play::~Play() {}

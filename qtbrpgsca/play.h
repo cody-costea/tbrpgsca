@@ -162,7 +162,7 @@ namespace tbrpgsca
     class Play : public QObject
     {
         Q_OBJECT
-        PROP_NEW_FIELD(Play, PlayFlags, playFlags, int, virtual inline, public, protected)
+        PROP_FIELD(Play, PlayFlags, playFlags, int, inline, public, protected, _play_flags)
     public:
         template  <typename PlayAct>
         static void runOnMainThread(PlayAct fn, bool const newTimer)
@@ -211,19 +211,19 @@ namespace tbrpgsca
         }
         Q_INVOKABLE inline bool hasAllPlayFlags(int const flag) const
         {
-            return (this->_playFlags & flag) == flag;
+            return (this->_play_flags & flag) == flag;
         }
         Q_INVOKABLE inline bool hasAnyPlayFlag(int const flag) const
         {
-            return (this->_playFlags & flag) != 0;
+            return (this->_play_flags & flag) != 0;
         }
     protected:
         Q_INVOKABLE inline void setPlayFlag(int const flag, bool const value)
         {
-            int const flags = this->_playFlags;
+            int const flags = this->_play_flags;
             if (value != ((flags & flag) == flag))
             {
-                this->_playFlags = flags ^ flag;
+                this->_play_flags = flags ^ flag;
             }
         }
 
@@ -239,6 +239,8 @@ namespace tbrpgsca
     private:
         static inline QMetaObject::Connection* _conn = NIL;
         static inline QTimer* _timer = NIL;
+
+        int _play_flags = 0;
 
         friend class Role;
     };
