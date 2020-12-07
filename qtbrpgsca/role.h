@@ -25,6 +25,7 @@ namespace tbrpgsca
 #define DMG_RND 3
 
         Q_OBJECT
+        QML_ELEMENT
         PROP_FLAG(Role, Ranged, ranged, Attribute::Range, inline, public, public)
         PROP_FLAG(Role, Reviving, revives, Attribute::Revive, inline, public, public)
         PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, _role_data->_hp)

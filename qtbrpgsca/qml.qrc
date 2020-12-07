@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>MainForm.ui.qml</file>
         <file>sprites/current.png</file>
         <file>sprites/Crusader/bt_l_act.gif</file>
         <file>sprites/Crusader/bt_l_act.mng</file>
