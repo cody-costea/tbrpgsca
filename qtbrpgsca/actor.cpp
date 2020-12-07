@@ -147,26 +147,26 @@ void Actor::setAgility(const int agi, Scene& scene)
 
 void Actor::setCurrentHp(const int hp)
 {
-    int mHp = this->maximumHp();
-    this->_role_data->_hp = hp > mHp ? mHp : (hp < 1 ? 0 : hp);
+    const int mHp = this->maximumHp();
+    this->Costume::setCurrentHp(hp > mHp ? mHp : (hp < 1 ? 0 : hp));
 }
 
 void Actor::setCurrentMp(const int mp)
 {
-    int mMp = this->maximumMp();
-    this->_role_data->_mp = mp > mMp ? mMp : (mp < 1 ? 0 : mp);
+    const int mMp = this->maximumMp();
+    this->Costume::setCurrentMp(mp > mMp ? mMp : (mp < 1 ? 0 : mp));
 }
 
 void Actor::setCurrentRp(const int sp)
 {
-    int mSp = this->maximumRp();
-    this->_role_data->_sp = sp > mSp ? mSp : (sp < 1 ? 0 : sp);
+    const int mSp = this->maximumRp();
+    this->Costume::setCurrentRp(sp > mSp ? mSp : (sp < 1 ? 0 : sp));
 }
 
 void Actor::setMaximumActions(const int mActions)
 {
     Actor& actor = *this;
-    actor._costume_data->_m_actions = mActions;
+    actor.Costume::setMaximumActions(mActions);
     if (mActions < actor.currentActions())
     {
         actor.setCurrentActions(mActions);
@@ -176,33 +176,33 @@ void Actor::setMaximumActions(const int mActions)
 void Actor::setMaximumHp(const int mHp)
 {
     Actor& actor = *this;
-    QSharedDataPointer<RoleData>& roleData = actor._role_data;
-    roleData->_m_hp = mHp;
+    //QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    this->Costume::setMaximumHp(mHp);
     if (mHp < actor.currentHp())
     {
-        roleData->_hp = mHp;
+        this->Costume::setCurrentHp(mHp);
     }
 }
 
 void Actor::setMaximumMp(const int mMp)
 {
     Actor& actor = *this;
-    QSharedDataPointer<RoleData>& roleData = actor._role_data;
-    roleData->_m_mp = mMp;
+    //QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    this->Costume::setMaximumMp(mMp);
     if (mMp < actor.currentMp())
     {
-        roleData->_mp = mMp;
+        this->Costume::setCurrentMp(mMp);
     }
 }
 
 void Actor::setMaximumRp(const int mRp)
 {
     Actor& actor = *this;
-    QSharedDataPointer<RoleData>& roleData = actor._role_data;
-    roleData->_m_sp = mRp;
+    //QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    this->Costume::setMaximumRp(mRp);
     if (mRp < actor.currentRp())
     {
-        roleData->_sp = mRp;
+        this->Costume::setCurrentRp(mRp);
     }
 }
 
