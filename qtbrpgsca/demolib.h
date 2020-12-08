@@ -23,7 +23,7 @@ namespace tbrpgsca
         public:
             QVector<State*>& getStates();
             QVector<Actor*>& getPlayers();
-            QVector<QVector<Ability*>*>& getAbilities();
+            QVector<QList<Ability*>*>& getAbilities();
             QVector<QMap<State*, int>*>& getStateMasks();
             QVector<QVector<Actor*>*>& getEnemies();
             QVector<Ability*>& getPartyItems();
@@ -37,7 +37,7 @@ namespace tbrpgsca
             QVector<Actor*> players;
             QVector<QVector<Actor*>*> enemies;
             QVector<QMap<State*, int>*> stateMasks;
-            QVector<QVector<Ability*>*> abilities;
+            QVector<QList<Ability*>*> abilities;
             QVector<Costume*> races, jobs;
             QVector<Ability*> pItems;
             QVector<State*> states;

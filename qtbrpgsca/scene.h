@@ -87,7 +87,7 @@ namespace tbrpgsca
 
         Q_INVOKABLE bool canTarget(Actor* const user, Ability* const ability, Actor* const target);
 
-        Q_INVOKABLE int getAiSkill(Actor* const user, QVector<Ability*>* const skills, int const index, bool const nRestore) const;
+        Q_INVOKABLE int getAiSkill(Actor* const user, QList<Ability*>* const skills, int const index, bool const nRestore) const;
         Q_INVOKABLE Actor* getGuardian(Actor* const user, Actor* target, Ability* const skill) const;
 
         Actor& getPartyPlayer(int const party, int const player) const;

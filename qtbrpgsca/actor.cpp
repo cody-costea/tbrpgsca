@@ -319,7 +319,7 @@ void Actor::applyStates(QString* const ret, const bool consume)
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (it.value() > STATE_END_DUR)
+            if (it.value() > State::EndDur)
             {
                 it.key()->alter(ret, actor, consume);
             }
@@ -548,12 +548,12 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
     }
 }
 
-void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability*>& skills)
+void Actor::updateSkills(const bool remove, const bool counters, QList<Ability*>& skills)
 {
     Actor& actor = *this;
     auto& actorData = actor._actor_data;
     auto& actorCostData = actor._costume_data;
-    QVector<Ability*>* aSkills = counters ? actorCostData->_counters : actorCostData->_a_skills;
+    auto& aSkills = counters ? actorCostData->_counters : actorCostData->_a_skills;
     if (remove)
     {
         if (aSkills)
@@ -584,7 +584,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QVector<Ability
     {
         if (aSkills == NIL)
         {
-            aSkills = new QVector<Ability*>();
+            aSkills = new QList<Ability*>();
             if (counters)
             {
                 actorCostData->_counters = aSkills;
@@ -628,7 +628,7 @@ void Actor::updateStates(bool const remove, QString* const ret, QMap<State*, int
             for (auto it = states.cbegin(); it != last; ++it)
             {
                 int const rDur = it.value();
-                if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
+                if (includeWithDur || (rDur < 0 && rDur > State::EndDur))
                 {
                     it.key()->disable(ret, actor, rDur, includeWithDur);
                 }
@@ -641,7 +641,7 @@ void Actor::updateStates(bool const remove, QString* const ret, QMap<State*, int
         for (auto it = states.cbegin(); it != last; ++it)
         {
             int const rDur = it.value();
-            if (includeWithDur || (rDur < 0 && rDur > STATE_END_DUR))
+            if (includeWithDur || (rDur < 0 && rDur > State::EndDur))
             {
                 it.key()->inflict(ret, NIL, actor, rDur, true);
             }
@@ -666,7 +666,7 @@ void Actor::refreshCostumes(QString* const ret)
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (it.value() > STATE_END_DUR)
+            if (it.value() > State::EndDur)
             {
                 it.key()->refresh(ret, actor, false, false);
             }
@@ -682,7 +682,7 @@ Actor::Actor(int const id, QString&& name, QString&& sprite, Costume&& race, Cos
 Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<const State*, int>* const stRes,
              const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent)
-    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QVector<Ability*>(),
+    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QList<Ability*>(),
               NIL, NIL, stRes, res, parent)
 {
     QSharedDataPointer<ActorData> actorData(new ActorData);

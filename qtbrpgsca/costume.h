@@ -72,12 +72,12 @@ namespace tbrpgsca
 
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability*>* const skills, QList<Ability*>* const counters,
                 QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         Costume(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters,
+                bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability*>* const skills, QList<Ability*>* const counters,
                 QMap<State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit Costume(QObject* const parent = NIL);
@@ -93,7 +93,7 @@ namespace tbrpgsca
 
         protected:
             int _atk, _def, _spi, _wis, _agi, _m_actions, _cvr_type, _rfl_type;
-            QVector<Ability*>* _a_skills,* _counters;
+            QList<Ability*>* _a_skills,* _counters;
             QMap<const State*, int>* _st_res;
             QMap<int, int>* _res;
 
@@ -114,7 +114,7 @@ namespace tbrpgsca
 
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<Ability*>* const skills, QVector<Ability*>* const counters, QMap<State*, int>* const states,
+                bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability*>* const skills, QList<Ability*>* const counters, QMap<State*, int>* const states,
                 QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         friend class Actor;

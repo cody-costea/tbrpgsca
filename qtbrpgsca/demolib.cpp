@@ -74,17 +74,17 @@ QVector<QMap<State*, int>*>& DemoLib::getStateMasks()
     return stateMasks;
 }
 
-QVector<QVector<Ability*>*>& DemoLib::getAbilities()
+QVector<QList<Ability*>*>& DemoLib::getAbilities()
 {
-    QVector<QVector<Ability*>*>& abilities = this->abilities;
+    QVector<QList<Ability*>*>& abilities = this->abilities;
     if (abilities.size() == 0)
     {
         QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
-        QVector<Ability*>* skillSet = new QVector<Ability*>();
+        QList<Ability*>* skillSet = new QList<Ability*>();
         skillSet->append(new Ability(1, tr("Attack"), "", "", false, false, false, true, 0, 0,0,0, Role::Element::Attack,0, 10,0,-3, Ability::Attribute::TargetOne,0, -1,-1, false, false, nullptr, stateMasks[10]));
         skillSet->append(new Ability(2, tr("Defend"), "", "", false, false, false, false, 0, 0,0,0, Role::Element::Defense,0, 0,-1,-2, Ability::Attribute::TargetSelf,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
-        skillSet = new QVector<Ability*>();
+        skillSet = new QList<Ability*>();
         skillSet->append(new Ability(3, tr("Heal"), "", "", false, true, false, false, 0, 0,3,0, Role::Element::Spirit,0, -13,0,0, Ability::Attribute::TargetOne,0, -1,-1, false, true, nullptr, nullptr));
         abilities.append(skillSet);
     }
@@ -96,7 +96,7 @@ QVector<Costume*>& DemoLib::getRaces()
     QVector<Costume*>& races = this->races;
     if (races.size() == 0)
     {
-        QVector<Ability*>* abilities = this->getAbilities().at(0);
+        QList<Ability*>* abilities = this->getAbilities().at(0);
         races.append(new Costume(1, tr("Elf"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
         races.append(new Costume(2, tr("Gnome"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
@@ -122,7 +122,7 @@ QVector<Costume*>& DemoLib::getJobs()
     QVector<Costume*>& jobs = this->jobs;
     if (jobs.size() == 0)
     {
-        QVector<QVector<Ability*>*>& abilities = this->getAbilities();
+        QVector<QList<Ability*>*>& abilities = this->getAbilities();
         jobs.append(new Costume(1, tr("Alchemist"), "Alchemist", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(2, tr("Berserker"), "Berserker", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,

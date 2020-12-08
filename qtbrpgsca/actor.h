@@ -171,7 +171,7 @@ namespace tbrpgsca
         void updateStates(bool const remove, QString* const ret,
                             QMap<State*, int>& states, bool const includeWithDur);
         void updateAttributes(bool const remove, const Costume& costume);
-        void updateSkills(bool const remove, bool const counters, QVector<Ability*>& skills);
+        void updateSkills(bool const remove, bool const counters, QList<Ability*>& skills);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
         void switchCostume(QString* const ret, const Costume* const oldCostume, const Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, bool const survive);

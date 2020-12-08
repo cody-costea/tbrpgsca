@@ -18,8 +18,6 @@ namespace tbrpgsca
 
     class Ability : public Role
     {
-        #define DEFAULT_RES 3
-
         Q_OBJECT
         QML_ELEMENT
         PROP_FLAG(Ability, Stealing, steals, Attribute::Steal, inline, public, public)
@@ -34,6 +32,8 @@ namespace tbrpgsca
         PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, _ability_data->_m_qty)
         PROP_FIELD(Ability, UsesRegen, usesRegen, int, inline, public, public, _ability_data->_r_qty)
     public:
+        inline static constexpr int DefaultRes = 3;
+
         enum Attribute {
             Melee = 4,
             Steal = 8,

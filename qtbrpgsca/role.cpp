@@ -117,7 +117,7 @@ void Role::damage(QString& ret, Actor* const absorber, Actor& actor, int const d
             QMap<int, int>* trgResMap = actor._costume_data->_res;
             if (trgResMap)
             {
-                int res = DEFAULT_RES;
+                int res = Ability::DefaultRes;
                 {
                     int const dmgType = role.damageType();
                     auto const last = trgResMap->cend();
@@ -163,9 +163,9 @@ void Role::damage(QString& ret, Actor* const absorber, Actor& actor, int const d
             }
             else
             {
-                dmgHp /= DEFAULT_RES;
-                dmgMp /= DEFAULT_RES;
-                dmgSp /= DEFAULT_RES;
+                dmgHp /= Ability::DefaultRes;
+                dmgMp /= Ability::DefaultRes;
+                dmgSp /= Ability::DefaultRes;
             }
         }
         applyChanges:

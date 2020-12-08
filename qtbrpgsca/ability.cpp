@@ -167,7 +167,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                         for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                         {
                             int const rDur = rIt.value();
-                            if (rDur > STATE_END_DUR)
+                            if (rDur > State::EndDur)
                             {
                                 State* const rState = rIt.key();
                                 auto const last = stateDur->cend();
@@ -176,7 +176,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                                     State* const aState = it.key();
                                     if (aState == rState)
                                     {
-                                        if (it.value() > STATE_END_DUR)
+                                        if (it.value() > State::EndDur)
                                         {
                                             rState->disable(&ret, *target, rDur, false);
                                         }

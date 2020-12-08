@@ -225,7 +225,7 @@ void Scene::checkStatus(QString* const ret)
 
 void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
 {
-    auto& scene = this->_scene_data;
+    //auto& scene = this->_scene_data;
     bool const ko = target->currentHp() < 1;
     //bool const healing = ability.hp < 0;
     if ((/*healing &&*/ ability.isReviving()) || !ko)
@@ -236,7 +236,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         //if (!healing)
         {
             int cntSize;
-            QVector<Ability*>* const counters = target->_costume_data->_counters;
+            auto& counters = target->_costume_data->_counters;
             if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
                     && (target->partySide() != user.partySide() || target->Costume::isConfused()))
             {
@@ -371,7 +371,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     this->endTurn(ret);
 }
 
-int Scene::getAiSkill(Actor* const user, QVector<Ability*>* const skills, int const defSkill, bool const restore) const
+int Scene::getAiSkill(Actor* const user, QList<Ability*>* const skills, int const defSkill, bool const restore) const
 {
     assert(user && skills);
     Ability* s = skills->operator[](defSkill);
@@ -395,7 +395,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
     QVector<Actor*>* party;
     auto& scene = *this->_scene_data;
     QVector<QVector<Actor*>*>& parties = scene._parties;
-    QVector<Ability*>& skills = *(player->_costume_data->_a_skills);
+    auto& skills = *(player->_costume_data->_a_skills);
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
     if (player->Costume::isConfused())
     {

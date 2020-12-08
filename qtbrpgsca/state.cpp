@@ -23,13 +23,13 @@ Ability& State::removedSkill(int const n) const
 
 bool State::hasRemovedSkill(Ability& skill) const
 {
-    QVector<Ability*>* aSkills = this->_state_data->_r_skills;
+    auto& aSkills = this->_state_data->_r_skills;
     return aSkills && aSkills->contains(&skill);
 }
 
 int State::removedSkillsSize() const
 {
-    QVector<Ability*>* aSkills = this->_state_data->_r_skills;
+    auto& aSkills = this->_state_data->_r_skills;
     return aSkills == NIL ? 0 : aSkills->size();
 }
 
@@ -48,7 +48,7 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
             return;
         }
     }
-    if (stateDur > STATE_END_DUR)
+    if (stateDur > State::EndDur)
     {
         int stateRes;
         QMap<const State*, int>* stRes;
@@ -72,7 +72,7 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
                     {
                         int rDur = rIt.value();
                         State* const rState = rIt.key();
-                        if (rDur == 0 || rDur <= STATE_END_DUR)
+                        if (rDur == 0 || rDur <= State::EndDur)
                         {
                             rDur = rState->duration();
                         }
@@ -83,7 +83,7 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
                             if (aState == rState)
                             {
                                 int const aDur = it.value();
-                                if (aDur > STATE_END_DUR)
+                                if (aDur > State::EndDur)
                                 {
                                     if (aDur < 0 && rDur > aDur)
                                     {
@@ -105,8 +105,8 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
                 }
             }
             this->blockSkills(target, false);
-            int const crDur = trgStates->value(this, STATE_END_DUR);
-            if (crDur == STATE_END_DUR)
+            int const crDur = trgStates->value(this, State::EndDur);
+            if (crDur == State::EndDur)
             {
                 this->adopt(ret, target, false, false);
                 trgStates->operator[](this) = stateDur;
@@ -147,7 +147,7 @@ bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove
     {
         dur = this->duration();
     }
-    if (dur > STATE_END_DUR)
+    if (dur > State::EndDur)
     {
         QMap<State*, int>* sDur = actor._role_data->_state_dur;
         if (sDur == NIL)
@@ -156,7 +156,7 @@ bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove
         }
         else
         {
-            int const crDur = sDur->value(this, STATE_END_DUR);
+            int const crDur = sDur->value(this, State::EndDur);
             //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
             if (crDur > -1 || dur <= crDur)
             {
@@ -173,16 +173,16 @@ bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove
                     }
                     else
                     {
-                        sDur->operator[](this) = STATE_END_DUR;
+                        sDur->operator[](this) = State::EndDur;
                     }
-                    if (crDur > STATE_END_DUR)
+                    if (crDur > State::EndDur)
                     {
                         this->remove(ret, actor);
                     }
                     return true;
                 }
             }
-            return crDur <= STATE_END_DUR;
+            return crDur <= State::EndDur;
         }
     }
     else
@@ -202,7 +202,7 @@ void State::alter(QString* const ret, Actor& actor, const bool consume)
     QMap<State*, int>* sDur = actor._role_data->_state_dur;
     if (sDur /*&& actor.hp > 0*/)
     {
-        int const d = sDur->value(this, STATE_END_DUR);
+        int const d = sDur->value(this, State::EndDur);
         if (consume)
         {
             if (d > 0)
@@ -212,7 +212,7 @@ void State::alter(QString* const ret, Actor& actor, const bool consume)
         }
         else if (d == 0)
         {
-            sDur->operator[](this) = STATE_END_DUR;
+            sDur->operator[](this) = State::EndDur;
             state.remove(ret, actor);
         }
     }
@@ -221,7 +221,7 @@ void State::alter(QString* const ret, Actor& actor, const bool consume)
 
 void State::blockSkills(Actor& actor, const bool remove) const
 {
-    QVector<Ability*>* rSkills = this->_state_data->_r_skills;
+    auto& rSkills = this->_state_data->_r_skills;
     if (rSkills)
     {
         auto& actorData = actor._actor_data;
@@ -262,7 +262,7 @@ void State::blockSkills(Actor& actor, const bool remove) const
 State::State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
+             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QList<Ability*>* const rSkills, QMap<State*, int>* const states,
              QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res, parent)
@@ -281,7 +281,7 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
 State::State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QVector<Ability*>* const aSkills, QVector<Ability*>* const counters, QVector<Ability*>* const rSkills, QMap<State*, int>* const states,
+             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QList<Ability*>* const rSkills, QMap<State*, int>* const states,
              QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : State(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
             reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
