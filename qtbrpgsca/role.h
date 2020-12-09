@@ -26,8 +26,8 @@ namespace tbrpgsca
 
         Q_OBJECT
         QML_ELEMENT
-        PROP_FLAG(Role, Ranged, ranged, Attribute::Range, inline, public, public)
-        PROP_FLAG(Role, Reviving, revives, Attribute::Revive, inline, public, public)
+        PROP_FLAG(Role, Ranged, ranged, Attribute::RANGE, inline, public, public)
+        PROP_FLAG(Role, Reviving, revives, Attribute::REVIVE, inline, public, public)
         PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, _role_data->_hp)
         PROP_FIELD(Role, CurrentMp, currentMp, int, virtual inline, public, public, _role_data->_mp)
         PROP_FIELD(Role, CurrentRp, currentRp, int, virtual inline, public, public, _role_data->_sp)
@@ -36,29 +36,42 @@ namespace tbrpgsca
         PROP_FIELD(Role, MaximumRp, maximumRp, int, virtual inline, public, public, _role_data->_m_sp)
         PROP_FIELD(Role, DamageType, damageType, int, inline, public, public, _role_data->_dmg_type)
         PROP_FIELD(Role, DatabaseId, databaseId, int, inline, public, protected, _role_data->_id)
+        //PROP_REF(Role, Sprite, sprite, QString, inline, public, public, _role_data->_sprite)
         PROP_FIELD(Role, Name, name, QString, inline, public, public, _role_data->_name)
     public:
+        struct RoleDbId
+        {
+            Q_GADGET
+        public:
+            inline RoleDbId(const int id)
+            {
+                this->_id = id;
+            }
+        private:
+            int _id = 0;
+        };
+
         enum Attribute {
-            Revive = 1,
-            Range = 2
+            REVIVE = 1,
+            RANGE = 2
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)
 
         enum Element {
-            Attack = 1,
-            Defense = 2,
-            Spirit = 4,
-            Wisdom = 8,
-            Agility = 16,
-            Fire = 32,
-            Water = 64,
-            Wind = 128,
-            Earth = 256,
-            Psychic = 512,
-            Light = 1024,
-            Electric = 2048,
-            Ice = 4096,
+            ATTACK = 1,
+            DEFENSE = 2,
+            SPIRIT = 4,
+            WISDOM = 8,
+            AGILITY = 16,
+            FIRE = 32,
+            WATER = 64,
+            WIND = 128,
+            EARTH = 256,
+            PSYCHIC = 512,
+            LIGHT = 1024,
+            ELECTRIC = 2048,
+            ICE = 4096,
         };
         Q_DECLARE_FLAGS(Elements, Element)
         Q_FLAG(Elements)

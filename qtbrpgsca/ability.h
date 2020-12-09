@@ -20,13 +20,13 @@ namespace tbrpgsca
     {
         Q_OBJECT
         QML_ELEMENT
-        PROP_FLAG(Ability, Stealing, steals, Attribute::Steal, inline, public, public)
-        PROP_FLAG(Ability, OnlyMelee, melee, Attribute::Melee, inline, public, public)
-        PROP_FLAG(Ability, Missable, misses, Attribute::Missable, inline, public, public)
-        PROP_FLAG(Ability, Absorbing, absorbs, Attribute::Absorb, inline, public, public)
-        PROP_FLAG(Ability, TargetingAll, targetsAll, Attribute::TargetAll, inline, public, public)
-        PROP_FLAG(Ability, TargetingSide, targetsSide, Attribute::TargetSide, inline, public, public)
-        PROP_FLAG(Ability, TargetingSelf, targetsSelf, Attribute::TargetSelf, inline, public, public)
+        PROP_FLAG(Ability, Stealing, steals, Attribute::STEAL, inline, public, public)
+        PROP_FLAG(Ability, OnlyMelee, melee, Attribute::MELEE, inline, public, public)
+        PROP_FLAG(Ability, Missable, misses, Attribute::MISSABLE, inline, public, public)
+        PROP_FLAG(Ability, Absorbing, absorbs, Attribute::ABSORB, inline, public, public)
+        PROP_FLAG(Ability, TargetingAll, targetsAll, Attribute::TARGET_ALL, inline, public, public)
+        PROP_FLAG(Ability, TargetingSide, targetsSide, Attribute::TARGET_SIDE, inline, public, public)
+        PROP_FLAG(Ability, TargetingSelf, targetsSelf, Attribute::TARGET_SELF, inline, public, public)
         PROP_FIELD(Ability, RequiredLevel, requiredLevel, int, inline, public, public, _ability_data->_lv_rq)
         PROP_FIELD(Ability, AttributeIncrement, attributeIncrement, int, inline, public, public, _ability_data->_attr_inc)
         PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, _ability_data->_m_qty)
@@ -35,14 +35,14 @@ namespace tbrpgsca
         inline static constexpr int DefaultRes = 3;
 
         enum Attribute {
-            Melee = 4,
-            Steal = 8,
-            Absorb = 16,
-            Missable = 32,
-            TargetAll = 4,
-            TargetSide = 128,
-            TargetSelf = 64,
-            TargetOne = 0
+            MELEE = 4,
+            STEAL = 8,
+            ABSORB = 16,
+            MISSABLE = 32,
+            TARGET_ALL = 4,
+            TARGET_SIDE = 128,
+            TARGET_SELF = 64,
+            TARGET_ONE = 0
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)

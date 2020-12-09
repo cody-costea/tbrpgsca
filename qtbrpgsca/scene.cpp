@@ -138,7 +138,7 @@ Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill
                     }
                 }
                 else if ((fGuard == NIL || pos != -1) && guardian->currentHp() > 0
-                         && (!guardian->hasAnyPlayFlag(Costume::Attribute::Stun | Costume::Attribute::Confuse | Costume::Attribute::Convert))
+                         && (!guardian->hasAnyPlayFlag(Costume::Attribute::STUN | Costume::Attribute::CONFUSE | Costume::Attribute::CONVERT))
                          /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
                 {
                     (*guardPos) = guardian;
@@ -690,7 +690,7 @@ void Scene::endTurn(QString* const ret)
     }*/
     ret->append(".");
     emit this->newTurn(ret, crActor, oldActor);
-    if (crActor->hasAnyPlayFlag(Actor::Attribute::AiPlayer | Costume::Attribute::Enraged | Costume::Attribute::Confuse))
+    if (crActor->hasAnyPlayFlag(Actor::Attribute::AI_PLAYER | Costume::Attribute::ENRAGED | Costume::Attribute::CONFUSE))
     {
         QString newText;
         this->playAi(&newText, crActor);
@@ -827,25 +827,25 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>* parties, SpriteA
     }
     if (events)
     {
-        if (events->size() > Events::Beginning)
+        if (events->size() > Events::BEGINNING)
         {
-            connect(this, &Scene::beginning, *events->at(Events::Beginning));
+            connect(this, &Scene::beginning, *events->at(Events::BEGINNING));
         }
-        if (events->size() > Events::NewTurn)
+        if (events->size() > Events::NEW_TURN)
         {
-            connect(this, &Scene::newTurn, *events->at(Events::NewTurn));
+            connect(this, &Scene::newTurn, *events->at(Events::NEW_TURN));
         }
-        if (events->size() > Events::BeforeAct)
+        if (events->size() > Events::BEFORE_ACT)
         {
-            connect(this, &Scene::beforeAct, *events->at(Events::BeforeAct));
+            connect(this, &Scene::beforeAct, *events->at(Events::BEFORE_ACT));
         }
-        if (events->size() > Events::AfterAct)
+        if (events->size() > Events::AFTER_ACT)
         {
-            connect(this, &Scene::afterAct, *events->at(Events::AfterAct));
+            connect(this, &Scene::afterAct, *events->at(Events::AFTER_ACT));
         }
-        if (events->size() > Events::Ending)
+        if (events->size() > Events::ENDING)
         {
-            connect(this, &Scene::ending, *events->at(Events::Ending));
+            connect(this, &Scene::ending, *events->at(Events::ENDING));
         }
     }
     //scene._events = events;

@@ -63,7 +63,7 @@ DISTFILES += \
 CONFIG += mobility
 MOBILITY =
 
-QMAKE_CXXFLAGS += -O3 #-fdeclspec
+QMAKE_CXXFLAGS += -O3 -fdeclspec
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

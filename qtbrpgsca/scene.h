@@ -28,10 +28,10 @@ namespace tbrpgsca
 
         Q_OBJECT
         QML_ELEMENT
-        PROP_FLAG_GET(hasCovers, Attribute::HasCovers, inline, public)
-        PROP_FLAG_GET(usesGuards, Attribute::UseGuards, inline, public)
-        PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HasCovers, inline, protected, hasCovers)
-        PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::UseGuards, inline, protected, usesGuards)
+        PROP_FLAG_GET(hasCovers, Attribute::HAS_COVERS, inline, public)
+        PROP_FLAG_GET(usesGuards, Attribute::USE_GUARDS, inline, public)
+        PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HAS_COVERS, inline, protected, hasCovers)
+        PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::USE_GUARDS, inline, protected, usesGuards)
         //PROP_FIELD(Scene, ActText, actText, QString*, inline, public, protected, _scene_data->_ret)
         PROP_FIELD(Scene, Parties, parties, QVector<QVector<Actor*>*>, inline, public, protected, _scene_data->_parties)
 
@@ -40,26 +40,26 @@ namespace tbrpgsca
     public:
         enum Events
         {
-            Ending = 4,
-            Beginning = 0,
-            BeforeAct = 2,
-            AfterAct = 3,
-            NewTurn = 1
+            ENDING = 4,
+            BEGINNING = 0,
+            BEFORE_ACT = 2,
+            AFTER_ACT = 3,
+            NEW_TURN = 1
         };
         Q_ENUM(Events)
 
         enum Status
         {
-            Defeat = -2,
-            Retreat = -1,
-            Ongoing = 0,
-            Victory = 1
+            DEFEAT = -2,
+            RETREAT = -1,
+            ONGOING = 0,
+            VICTORY = 1
         };
         Q_ENUM(Status)
 
         enum Attribute {
-            UseGuards = 1,
-            HasCovers = 2
+            USE_GUARDS = 1,
+            HAS_COVERS = 2
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)

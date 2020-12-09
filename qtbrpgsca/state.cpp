@@ -273,7 +273,7 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
     stateData->_dur = dur;
     if (convert)
     {
-        this->setPlayFlags(this->playFlags() | Costume::Attribute::Convert);
+        this->setPlayFlags(this->playFlags() | Costume::Attribute::CONVERT);
     }
     this->_state_data = stateData;
 }

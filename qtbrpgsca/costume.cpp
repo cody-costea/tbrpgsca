@@ -228,35 +228,35 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     int flags = this->playFlags();
     if (stun)
     {
-        flags |= Attribute::Stun;
+        flags |= Attribute::STUN;
     }
     if (shapeShift)
     {
         QString* spr = this->_role_data->_sprite;
         if (spr && spr->length() > 0)
         {
-            flags |= Attribute::ShapeShift;
+            flags |= Attribute::SHAPE_SHIFT;
         }
     }
     if (automate)
     {
-        flags |= Attribute::Enraged;
+        flags |= Attribute::ENRAGED;
     }
     if (confuse)
     {
-        flags |= Attribute::Confuse;
+        flags |= Attribute::CONFUSE;
     }
     if (reflect)
     {
-        flags |= Attribute::Reflect;
+        flags |= Attribute::REFLECT;
     }
     if (invincible)
     {
-        flags |= Attribute::Invincible;
+        flags |= Attribute::INVINCIBLE;
     }
     if (ko)
     {
-        flags |= Attribute::Ko;
+        flags |= Attribute::KO;
     }
     this->setPlayFlags(flags);
     this->_costume_data = costumeData;

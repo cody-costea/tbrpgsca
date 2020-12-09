@@ -247,7 +247,7 @@ Role::RoleData::~RoleData()
 
 Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
            int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates, QObject* const parent)
-    : Play(parent, ((revive ? Attribute::Revive : 0) | (range ? Attribute::Range : 0)))
+    : Play(parent, ((revive ? Attribute::REVIVE : 0) | (range ? Attribute::RANGE : 0)))
 {
     QSharedDataPointer<RoleData> roleData(new RoleData);
     roleData->_sprite = sprite.isNull() ? NIL : new QString(sprite);

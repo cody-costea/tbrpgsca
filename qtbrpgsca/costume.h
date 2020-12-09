@@ -19,15 +19,15 @@ namespace tbrpgsca
     {
         Q_OBJECT
         QML_ELEMENT
-        PROP_FLAG(Costume, Stunned, stunned, Attribute::Stun, inline, public, public)
-        PROP_FLAG(Costume, Enraged, enraged, Attribute::Enraged, inline, public, public)
-        PROP_FLAG(Costume, KnockedOut, knockedOut, Attribute::Ko, inline, public, public)
-        PROP_FLAG(Costume, Covering, covers, Attribute::Covering, inline, public, public)
-        PROP_FLAG(Costume, Confused, confused, Attribute::Confuse, inline, public, public)
-        PROP_FLAG(Costume, Converted, converted, Attribute::Convert, inline, public, public)
-        PROP_FLAG(Costume, Reflecting, reflects, Attribute::Reflect, inline, public, public)
-        PROP_FLAG(Costume, Invincible, invincible, Attribute::Invincible, inline, public, public)
-        PROP_FLAG(Costume, ShapeShifted, shapeShifted, Attribute::ShapeShift, inline, public, public)
+        PROP_FLAG(Costume, Stunned, stunned, Attribute::STUN, inline, public, public)
+        PROP_FLAG(Costume, Enraged, enraged, Attribute::ENRAGED, inline, public, public)
+        PROP_FLAG(Costume, KnockedOut, knockedOut, Attribute::KO, inline, public, public)
+        PROP_FLAG(Costume, Covering, covers, Attribute::COVERING, inline, public, public)
+        PROP_FLAG(Costume, Confused, confused, Attribute::CONFUSE, inline, public, public)
+        PROP_FLAG(Costume, Converted, converted, Attribute::CONVERT, inline, public, public)
+        PROP_FLAG(Costume, Reflecting, reflects, Attribute::REFLECT, inline, public, public)
+        PROP_FLAG(Costume, Invincible, invincible, Attribute::INVINCIBLE, inline, public, public)
+        PROP_FLAG(Costume, ShapeShifted, shapeShifted, Attribute::SHAPE_SHIFT, inline, public, public)
         PROP_FIELD(Costume, MaximumActions, maximumActions, int, virtual inline, public, public, _costume_data->_m_actions)
         PROP_FIELD(Costume, ReflectType, reflectType, int, inline, public, public, _costume_data->_rfl_type)
         PROP_FIELD(Costume, CoverType, coverType, int, inline, public, public, _costume_data->_cvr_type)
@@ -38,15 +38,15 @@ namespace tbrpgsca
         PROP_FIELD(Costume, Spirit, spirit, int, inline, public, public, _costume_data->_spi)
     public:
         enum Attribute {
-            Enraged = 4,
-            Confuse = 8,
-            Convert = 16,
-            Reflect = 32,
-            ShapeShift = 64,
-            Invincible = 128,
-            Covering = 1024,
-            Stun = 256,
-            Ko = 512
+            ENRAGED = 4,
+            CONFUSE = 8,
+            CONVERT = 16,
+            REFLECT = 32,
+            SHAPE_SHIFT = 64,
+            INVINCIBLE = 128,
+            COVERING = 1024,
+            STUN = 256,
+            KO = 512
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)

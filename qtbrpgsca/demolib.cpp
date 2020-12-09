@@ -32,7 +32,7 @@ QVector<State*>& DemoLib::getStates()
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
         states.append(new State(6, tr("Weakness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(7, tr("Reflect"), "", false, 3,-1,0,Role::Element::Light, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new State(7, tr("Reflect"), "", false, 3,-1,0,Role::Element::LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, true, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
         states.append(new State(8, tr("Conversion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 true, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
@@ -81,11 +81,11 @@ QVector<QList<Ability*>*>& DemoLib::getAbilities()
     {
         QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
         QList<Ability*>* skillSet = new QList<Ability*>();
-        skillSet->append(new Ability(1, tr("Attack"), "", "", false, false, false, true, 0, 0,0,0, Role::Element::Attack,0, 10,0,-3, Ability::Attribute::TargetOne,0, -1,-1, false, false, nullptr, stateMasks[10]));
-        skillSet->append(new Ability(2, tr("Defend"), "", "", false, false, false, false, 0, 0,0,0, Role::Element::Defense,0, 0,-1,-2, Ability::Attribute::TargetSelf,0, -1,-1, false, false, nullptr, nullptr));
+        skillSet->append(new Ability(1, tr("Attack"), "", "", false, false, false, true, 0, 0,0,0, Role::Element::ATTACK,0, 10,0,-3, Ability::Attribute::TARGET_ONE,0, -1,-1, false, false, nullptr, stateMasks[10]));
+        skillSet->append(new Ability(2, tr("Defend"), "", "", false, false, false, false, 0, 0,0,0, Role::Element::DEFENSE,0, 0,-1,-2, Ability::Attribute::TARGET_SELF,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
         skillSet = new QList<Ability*>();
-        skillSet->append(new Ability(3, tr("Heal"), "", "", false, true, false, false, 0, 0,3,0, Role::Element::Spirit,0, -13,0,0, Ability::Attribute::TargetOne,0, -1,-1, false, true, nullptr, nullptr));
+        skillSet->append(new Ability(3, tr("Heal"), "", "", false, true, false, false, 0, 0,3,0, Role::Element::SPIRIT,0, -13,0,0, Ability::Attribute::TARGET_ONE,0, -1,-1, false, true, nullptr, nullptr));
         abilities.append(skillSet);
     }
     return abilities;

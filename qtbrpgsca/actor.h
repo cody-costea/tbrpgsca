@@ -25,8 +25,8 @@ namespace tbrpgsca
 
         Q_OBJECT
         QML_ELEMENT
-        PROP_FLAG(Actor, AiPlayer, aiPlayer, Attribute::AiPlayer, inline, public, public)
-        PROP_FLAG(Actor, RandomAi, randomAi, Attribute::RandomAi, inline, public, public)
+        PROP_FLAG(Actor, AiPlayer, aiPlayer, Attribute::AI_PLAYER, inline, public, public)
+        PROP_FLAG(Actor, RandomAi, randomAi, Attribute::RANDOM_AI, inline, public, public)
         /*PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
         PROP_FLAG_SET_ALL(Actor, Stunned, Costume::Attribute::Stun, public, isStunned)
         PROP_FLAG_SET_ALL(Actor, Reviving, Role::Attribute::Revive, public, isReviving)
@@ -75,8 +75,8 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(currentLevel, int, inline, public, _actor_data->_lv)
     public:
         enum Attribute {
-            RandomAi = 2048,
-            AiPlayer = 4096
+            RANDOM_AI = 2048,
+            AI_PLAYER = 4096
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)

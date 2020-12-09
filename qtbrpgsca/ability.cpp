@@ -92,31 +92,31 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
         auto& trgCostData = target->_costume_data;
         int canMiss = ability.isMissable() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = usrCostData->_agi,
                 trgAgi = trgCostData->_agi, trgSpi = trgCostData->_spi, usrWis = usrCostData->_wis;
-        if ((dmgType & Role::Element::Attack) == Role::Element::Attack)
+        if ((dmgType & Role::Element::ATTACK) == Role::Element::ATTACK)
         {
             dmg += usrCostData->_atk;
             def += trgCostData->_def;
             ++i;
         }
-        if ((dmgType & Role::Element::Defense) == Role::Element::Defense)
+        if ((dmgType & Role::Element::DEFENSE) == Role::Element::DEFENSE)
         {
             dmg += usrCostData->_def;
             def += trgCostData->_def;
             ++i;
         }
-        if ((dmgType & Role::Element::Spirit) == Role::Element::Spirit)
+        if ((dmgType & Role::Element::SPIRIT) == Role::Element::SPIRIT)
         {
             dmg += usrCostData->_spi;
             def += trgCostData->_wis;
             ++i;
         }
-        if ((dmgType & Role::Element::Wisdom) == Role::Element::Wisdom)
+        if ((dmgType & Role::Element::WISDOM) == Role::Element::WISDOM)
         {
             dmg += usrWis;
             def += trgSpi;
             ++i;
         }
-        if ((dmgType & Role::Element::Agility) == Role::Element::Agility)
+        if ((dmgType & Role::Element::AGILITY) == Role::Element::AGILITY)
         {
             dmg += usrAgi;
             def += trgAgi;
@@ -290,19 +290,19 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
     int flags = this->playFlags();
     if (canMiss)
     {
-        flags |= Attribute::Missable;
+        flags |= Attribute::MISSABLE;
     }
     if (melee)
     {
-        flags |= Attribute::Melee;
+        flags |= Attribute::MELEE;
     }
     if (steal)
     {
-        flags |= Attribute::Steal;
+        flags |= Attribute::STEAL;
     }
     if (absorb)
     {
-        flags |= Attribute::Absorb;
+        flags |= Attribute::ABSORB;
     }
     flags |= trg;
     this->setPlayFlags(flags);
