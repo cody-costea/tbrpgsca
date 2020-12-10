@@ -8,10 +8,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef ROLE_H
 #define ROLE_H
 
-#include <play.h>
 
 #include <QString>
 #include <QVector>
+
+#include "play.h"
+#include "dbid.h"
 
 namespace tbrpgsca
 {
@@ -26,31 +28,21 @@ namespace tbrpgsca
 
         Q_OBJECT
         QML_ELEMENT
+
         PROP_FLAG(Role, Ranged, ranged, Attribute::RANGE, inline, public, public)
         PROP_FLAG(Role, Reviving, revives, Attribute::REVIVE, inline, public, public)
+        PROP_READONLY_FIELD(Role, DatabaseId, databaseId, DbId, inline, public, _role_data->_id)
         PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, _role_data->_hp)
         PROP_FIELD(Role, CurrentMp, currentMp, int, virtual inline, public, public, _role_data->_mp)
         PROP_FIELD(Role, CurrentRp, currentRp, int, virtual inline, public, public, _role_data->_sp)
         PROP_FIELD(Role, MaximumHp, maximumHp, int, virtual inline, public, public, _role_data->_m_hp)
         PROP_FIELD(Role, MaximumMp, maximumMp, int, virtual inline, public, public, _role_data->_m_mp)
         PROP_FIELD(Role, MaximumRp, maximumRp, int, virtual inline, public, public, _role_data->_m_sp)
+        //PROP_READONLY_FIELD(Role, DatabaseId, databaseId, Role::RoleDbId, inline, public, _role_data->_id)
         PROP_FIELD(Role, DamageType, damageType, int, inline, public, public, _role_data->_dmg_type)
-        PROP_FIELD(Role, DatabaseId, databaseId, int, inline, public, protected, _role_data->_id)
         //PROP_REF(Role, Sprite, sprite, QString, inline, public, public, _role_data->_sprite)
         PROP_FIELD(Role, Name, name, QString, inline, public, public, _role_data->_name)
     public:
-        struct RoleDbId
-        {
-            Q_GADGET
-        public:
-            inline RoleDbId(const int id)
-            {
-                this->_id = id;
-            }
-        private:
-            int _id = 0;
-        };
-
         enum Attribute {
             REVIVE = 1,
             RANGE = 2
@@ -88,14 +80,32 @@ namespace tbrpgsca
         bool hasState(State& state) const;
         int statesSize() const;
 
-        Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
+        inline bool operator==(const Role& role) const
+        {
+            return this->databaseId() == role.databaseId();
+        }
+        inline bool operator!=(const Role& role) const
+        {
+            return this->databaseId() != role.databaseId();
+        }
+        inline bool operator<=(const Role& role) const
+        {
+            return this->databaseId() <= role.databaseId();
+        }
+        inline bool operator>=(const Role& role) const
+        {
+            return this->databaseId() >= role.databaseId();
+        }
+        inline bool operator<(const Role& role) const
+        {
+            return this->databaseId() < role.databaseId();
+        }
+        inline bool operator>(const Role& role) const
+        {
+            return this->databaseId() > role.databaseId();
+        }
 
-        bool operator==(const Role& role) const;
-        bool operator!=(const Role& role) const;
-        bool operator<=(const Role& role) const;
-        bool operator>=(const Role& role) const;
-        bool operator<(const Role& role) const;
-        bool operator>(const Role& role) const;
+        Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
     protected:
         class RoleData : public QSharedData
         {
@@ -103,8 +113,9 @@ namespace tbrpgsca
             ~RoleData();
 
         protected:
+            DbId _id;
             QString _name,* _sprite;
-            int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
+            int _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
             QMap<State*, int>* _state_dur;
 
             friend class Ability;

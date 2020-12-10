@@ -146,7 +146,7 @@ namespace tbrpgsca
     PROP_CUSTOM_NEW_FIELD_DATA(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, protected, Field) \
     Q_PROPERTY(Type GetName READ GetName NOTIFY GetName##Changed)
 
-#define PROP_READONLY_CUSTOM_FIELD(Class, PropName, GetName, Type, Attribute, GetLevel, Field) \
+#define PROP_READONLY_CUSTOM_FIELD(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, Field) \
     PROP_CUSTOM_FIELD_DATA(Class, GetName, SetName, SwapName, WithName, Type, Attribute, GetLevel, protected, Field) \
     Q_PROPERTY(Type GetName READ GetName NOTIFY GetName##Changed)
 

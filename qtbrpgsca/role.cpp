@@ -52,36 +52,6 @@ int Role::statesSize() const
     return aStates == NIL ? 0 : aStates->size();
 }
 
-bool Role::operator==(const Role& role) const
-{
-    return this->databaseId() == role.databaseId();
-}
-
-bool Role::operator!=(const Role& role) const
-{
-    return this->databaseId() != role.databaseId();
-}
-
-bool Role::operator<=(const Role& role) const
-{
-    return this->databaseId() <= role.databaseId();
-}
-
-bool Role::operator>=(const Role& role) const
-{
-    return this->databaseId() >= role.databaseId();
-}
-
-bool Role::operator>(const Role& role) const
-{
-    return this->databaseId() > role.databaseId();
-}
-
-bool Role::operator<(const Role& role) const
-{
-    return this->databaseId() < role.databaseId();
-}
-
 void Role::damage(QString& ret, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
     const Role& role = *this;
@@ -260,7 +230,7 @@ Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int co
     roleData->_hp = hpDmg;
     roleData->_mp = mpDmg;
     roleData->_sp = spDmg;
-    roleData->_id = id;
+    roleData->_id = DbId(id);
     this->_role_data = roleData;
 }
 
