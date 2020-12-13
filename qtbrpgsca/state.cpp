@@ -16,20 +16,20 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-Ability& State::removedSkill(int const n) const
+DbId State::removedSkillId(int const n) const
 {
-    return *(this->_state_data->_r_skills->at(n));
+    return (this->_state_data->_r_skills->at(n));
 }
 
-bool State::hasRemovedSkill(Ability& skill) const
+bool State::hasRemovedSkillId(const DbId skill) const
 {
-    auto& aSkills = this->_state_data->_r_skills;
-    return aSkills && aSkills->contains(&skill);
+    auto aSkills = this->_state_data->_r_skills;
+    return aSkills && aSkills->contains(skill);
 }
 
-int State::removedSkillsSize() const
+int State::removedSkillsIdsSize() const
 {
-    auto& aSkills = this->_state_data->_r_skills;
+    auto aSkills = this->_state_data->_r_skills;
     return aSkills == NIL ? 0 : aSkills->size();
 }
 
@@ -51,9 +51,9 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
     if (stateDur > State::EndDur)
     {
         int stateRes;
-        QMap<const State*, int>* stRes;
+        QMap<DbId, int>* stRes;
         if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
-                == NIL ? 0 : stRes->value(this, 0) + stRes->value(NIL, 0)) + stateRes)))
+                == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(DbId(0), 0)) + stateRes)))
         {
             QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
             QMap<State*, int>* trgStates = trgRoleData->_state_dur;
@@ -221,24 +221,34 @@ void State::alter(QString* const ret, Actor& actor, const bool consume)
 
 void State::blockSkills(Actor& actor, const bool remove) const
 {
-    auto& rSkills = this->_state_data->_r_skills;
+    auto rSkills = this->_state_data->_r_skills;
     if (rSkills)
     {
-        auto& actorData = actor._actor_data;
-        QMap<const Ability*, int>* iSkills = actorData->_skills_cr_qty;
+        auto actorData = actor._actor_data;
+        auto iSkills = actorData->_skills_cr_qty;
         if (remove)
         {
             if (iSkills)
             {
-                for (Ability* const skill : *rSkills)
+                auto const last = iSkills->cend();
+                auto const begin = iSkills->cbegin();
+                for (auto rSkill : *rSkills)
                 {
-                    if (skill->maximumUses() > 0)
+                    for (auto it = begin; it != last; ++it)
                     {
-                        iSkills->operator[](skill) = -1 * iSkills->value(skill, 0);
-                    }
-                    else
-                    {
-                        iSkills->remove(skill);
+                        auto iSkill = it.key();
+                        if (iSkill->databaseId() == rSkill)
+                        {
+                            if (iSkill->maximumUses() > 0)
+                            {
+                                iSkills->operator[](iSkill) = -1 * iSkills->value(iSkill, 0);
+                            }
+                            else
+                            {
+                                iSkills->remove(iSkill);
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -250,9 +260,17 @@ void State::blockSkills(Actor& actor, const bool remove) const
                 iSkills = new QMap<const Ability*, int>();
                 actorData->_skills_cr_qty = iSkills;
             }
-            for (Ability* const skill : *rSkills)
+            auto& aSkills = *(actor._costume_data->_a_skills);
+            for (auto rSkill : *rSkills)
             {
-                iSkills->operator[](skill) = skill->maximumUses() > 0 ? -1 * iSkills->value(skill, 0) : 0;
+                for (auto aSkill : aSkills)
+                {
+                    if (aSkill->databaseId() == rSkill)
+                    {
+                        iSkills->operator[](aSkill) = aSkill->maximumUses() > 0 ? -1 * iSkills->value(aSkill, 0) : 0;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -262,8 +280,8 @@ void State::blockSkills(Actor& actor, const bool remove) const
 State::State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QList<Ability*>* const rSkills, QMap<State*, int>* const states,
-             QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<DbId>* const rSkills, QMap<State*, int>* const states,
+             QMap<DbId, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res, parent)
 {
@@ -281,8 +299,8 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
 State::State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QList<Ability*>* const rSkills, QMap<State*, int>* const states,
-             QMap<const State*, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<DbId>* const rSkills, QMap<State*, int>* const states,
+             QMap<DbId, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : State(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
             reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
 

@@ -51,9 +51,9 @@ namespace tbrpgsca
         static QString ReflectTxt;
         static QString StolenTxt;
 
-        QList<State*> removedStatesList() const;
-        int removedStateDuration(State& state) const;
-        bool removedState(State& state) const;
+        QList<DbId> removedStatesList() const;
+        int removedStateDuration(DbId state) const;
+        bool removedState(DbId state) const;
         int removedStatesSize() const;
 
         Q_INVOKABLE bool canPerform(Actor* const user) const;
@@ -62,11 +62,11 @@ namespace tbrpgsca
 
         Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpCost,
                 int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates, QObject* const parent = NIL);
+                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<DbId, int>* const rStates, QObject* const parent = NIL);
 
         Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpCost,
                 int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates, QObject* const parent = NIL);
+                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<DbId, int>* const rStates, QObject* const parent = NIL);
 
         explicit Ability(QObject* const parent = NIL);
 
@@ -81,7 +81,7 @@ namespace tbrpgsca
 
         protected:
             int _lv_rq, _attr_inc, _m_qty, _r_qty;
-            QMap<State*, int>* _r_states;
+            QMap<DbId, int>* _r_states;
             QString* _sound;
 
             friend class Actor;

@@ -21,27 +21,27 @@ QString Ability::MissesTxt = ", but misses %1";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
 
-int Ability::removedStateDuration(State& state) const
+int Ability::removedStateDuration(DbId state) const
 {
-    QMap<State*, int>* aStates = this->_ability_data->_r_states;
-    return aStates == NIL ? 0 : aStates->value(&state, 0);
+    auto aStates = this->_ability_data->_r_states;
+    return aStates == NIL ? 0 : aStates->value(state, 0);
 }
 
-QList<State*> Ability::removedStatesList() const
+QList<DbId> Ability::removedStatesList() const
 {
-    QMap<State*, int>* aStates = this->_ability_data->_r_states;
-    return aStates == NIL ? QList<State*>() : aStates->keys();
+    auto aStates = this->_ability_data->_r_states;
+    return aStates == NIL ? QList<DbId>() : aStates->keys();
 }
 
-bool Ability::removedState(State& state) const
+bool Ability::removedState(DbId state) const
 {
-    QMap<State*, int>* aStates = this->_ability_data->_r_states;
-    return aStates && aStates->contains(&state);
+    auto aStates = this->_ability_data->_r_states;
+    return aStates && aStates->contains(state);
 }
 
 int Ability::removedStatesSize() const
 {
-    QMap<State*, int>* aStates = this->_ability_data->_r_states;
+    auto aStates = this->_ability_data->_r_states;
     return aStates == NIL ? 0 : aStates->size();
 }
 
@@ -160,7 +160,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                 QMap<State*, int>* stateDur = target->_role_data->_state_dur;
                 if (stateDur)
                 {
-                    QMap<State*, int>* rStates = ability._ability_data->_r_states;
+                    auto rStates = ability._ability_data->_r_states;
                     if (rStates)
                     {
                         auto const rLast = rStates->cend();
@@ -169,16 +169,16 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                             int const rDur = rIt.value();
                             if (rDur > State::EndDur)
                             {
-                                State* const rState = rIt.key();
+                                auto rState = rIt.key();
                                 auto const last = stateDur->cend();
                                 for (auto it = stateDur->cbegin(); it != last; ++it)
                                 {
                                     State* const aState = it.key();
-                                    if (aState == rState)
+                                    if (aState->databaseId() == rState)
                                     {
                                         if (it.value() > State::EndDur)
                                         {
-                                            rState->disable(&ret, *target, rDur, false);
+                                            aState->disable(&ret, *target, rDur, false);
                                         }
                                         break;
                                     }
@@ -277,7 +277,7 @@ Ability::AbilityData::~AbilityData()
 
 Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates, QObject* const parent)
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<DbId, int>* const rStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates, parent)
 {
     QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
@@ -311,7 +311,7 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
 
 Ability::Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<State*, int>* const rStates, QObject* const parent)
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<DbId, int>* const rStates, QObject* const parent)
     : Ability(id, name, sprite, sound, steal, range, melee, canMiss, lvRq, hpC, mpC, spC, dmgType, attrInc, hpDmg, mpDmg, spDmg, trg, elm, mQty, rQty, absorb, revive, aStates, rStates, parent) {}
 
 Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QString(), false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NIL, NIL, parent) {}

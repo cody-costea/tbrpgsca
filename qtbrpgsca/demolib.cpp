@@ -79,9 +79,9 @@ QVector<QList<Ability*>*>& DemoLib::getAbilities()
     QVector<QList<Ability*>*>& abilities = this->abilities;
     if (abilities.size() == 0)
     {
-        QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
+        //QVector<QMap<State*, int>*>& stateMasks = this->getStateMasks();
         QList<Ability*>* skillSet = new QList<Ability*>();
-        skillSet->append(new Ability(1, tr("Attack"), "", "", false, false, false, true, 0, 0,0,0, Role::Element::ATTACK,0, 10,0,-3, Ability::Attribute::TARGET_ONE,0, -1,-1, false, false, nullptr, stateMasks[10]));
+        skillSet->append(new Ability(1, tr("Attack"), "", "", false, false, false, true, 0, 0,0,0, Role::Element::ATTACK,0, 10,0,-3, Ability::Attribute::TARGET_ONE,0, -1,-1, false, false, nullptr, NIL));
         skillSet->append(new Ability(2, tr("Defend"), "", "", false, false, false, false, 0, 0,0,0, Role::Element::DEFENSE,0, 0,-1,-2, Ability::Attribute::TARGET_SELF,0, -1,-1, false, false, nullptr, nullptr));
         abilities.append(skillSet);
         skillSet = new QList<Ability*>();

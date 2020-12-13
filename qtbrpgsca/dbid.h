@@ -15,6 +15,10 @@ namespace tbrpgsca
         {
             return this->_id;
         }
+        /*inline int extra() const
+        {
+            return this->_extra;
+        }*/
         inline operator int() const
         {
             return this->value();
@@ -45,16 +49,18 @@ namespace tbrpgsca
         }
         inline DbId(const DbId& role) : DbId(role._id) {}
         //inline RoleDbId(const RoleDbId&& role) : RoleDbId(static_cast<const RoleDbId&>(role)) {}
-        explicit inline DbId(const int id)
+        explicit inline DbId(const int id/*, const int extra = 0*/)
         {
             this->_id = id;
+            //this->_extra = extra;
         }
         inline DbId()
         {
             this->_id = 0;
+            //this->_extra = 0;
         }
     private:
-        int _id;
+        int _id;//, _extra;
 
         friend class Role;
         friend class RoleData;
