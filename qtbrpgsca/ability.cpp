@@ -283,11 +283,13 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
     QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
     dataPtr->_sound = sound.isNull() ? NIL : new QString(sound);
     dataPtr->_attr_inc = attrInc;
+    dataPtr->_max_qty = mQty;
     dataPtr->_lv_rq = lvRq;
-    dataPtr->_m_qty = mQty;
-    dataPtr->_r_qty = rQty;
+    dataPtr->_reg_qty = rQty;
     dataPtr->_r_states = rStates;
     int flags = this->playFlags();
+    this->_reg_turn = 0;
+    this->_crt_qty = 0;
     if (canMiss)
     {
         flags |= Attribute::MISSABLE;
@@ -319,6 +321,8 @@ Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QStri
 Ability::Ability(const Ability& ability) : Role(ability)
 {
     this->_ability_data = ability._ability_data;
+    this->_reg_turn = ability._reg_turn;
+    this->_crt_qty = ability._crt_qty;
 }
 
 Ability::~Ability()

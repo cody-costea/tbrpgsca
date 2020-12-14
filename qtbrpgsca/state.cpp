@@ -42,7 +42,7 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
 {
     if (stateDur == 0)
     {
-        stateDur = this->duration();
+        stateDur = this->maximumDuration();
         if (stateDur == 0)
         {
             return;
@@ -74,7 +74,7 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
                         State* const rState = rIt.key();
                         if (rDur == 0 || rDur <= State::EndDur)
                         {
-                            rDur = rState->duration();
+                            rDur = rState->maximumDuration();
                         }
                         auto const last = trgStates->cend();
                         for (auto it = trgStates->cbegin(); it != last; ++it)
@@ -145,7 +145,7 @@ bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove
 {
     if (dur == 0)
     {
-        dur = this->duration();
+        dur = this->maximumDuration();
     }
     if (dur > State::EndDur)
     {
@@ -287,8 +287,9 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
 {
     QSharedDataPointer<StateData> stateData(new StateData);
     stateData->_r_skills = rSkills;
+    stateData->_max_dur = dur;
     stateData->_s_res = sRes;
-    stateData->_dur = dur;
+    this->_crt_dur = 0;
     if (convert)
     {
         this->setPlayFlags(this->playFlags() | Costume::Attribute::CONVERT);
@@ -310,6 +311,7 @@ State::State(QObject* const parent) : State(0, QString(), QString(), false, 0, 0
 State::State(const State& state) : Costume(state)
 {
     this->_state_data = state._state_data;
+    this->_crt_dur = state._crt_dur;
 }
 
 State::StateData::~StateData() {}

@@ -29,8 +29,10 @@ namespace tbrpgsca
         PROP_FLAG(Ability, TargetingSelf, targetsSelf, Attribute::TARGET_SELF, inline, public, public)
         PROP_FIELD(Ability, RequiredLevel, requiredLevel, int, inline, public, public, _ability_data->_lv_rq)
         PROP_FIELD(Ability, AttributeIncrement, attributeIncrement, int, inline, public, public, _ability_data->_attr_inc)
-        PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, _ability_data->_m_qty)
-        PROP_FIELD(Ability, UsesRegen, usesRegen, int, inline, public, public, _ability_data->_r_qty)
+        PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, _ability_data->_max_qty)
+        PROP_FIELD(Ability, UsesRegen, usesRegen, int, inline, public, public, _ability_data->_reg_qty)
+        PROP_FIELD(Ability, CurrentUses, currentUses, int, inline, public, public, _crt_qty)
+        PROP_FIELD(Ability, RegenTurn, regenTurn, int, inline, public, public, _reg_turn)
     public:
         inline static constexpr int DefaultRes = 3;
 
@@ -80,7 +82,7 @@ namespace tbrpgsca
             ~AbilityData();
 
         protected:
-            int _lv_rq, _attr_inc, _m_qty, _r_qty;
+            int _lv_rq, _attr_inc, _max_qty, _reg_qty;
             QMap<int, int>* _r_states;
             QString* _sound;
 
@@ -94,6 +96,7 @@ namespace tbrpgsca
             friend class Scene;
         };
 
+        int _crt_qty, _reg_turn;
         QSharedDataPointer<AbilityData> _ability_data;
 
         void execute(QString& ret, Actor& user, Actor* target, bool const applyCosts) const;
