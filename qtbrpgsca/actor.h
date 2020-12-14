@@ -99,7 +99,7 @@ namespace tbrpgsca
         void recover(QString& ret);
         //Actor& applyRoles(QString& ret);
         void applyStates(QString& ret, bool const consume);
-        void setStateResistance(const DbId state, int const res);
+        void setStateResistance(const int state, int const res);
         void setElementResistance(int const element, int const res);
         void setItems(const QSharedPointer<QMap<Ability*, int>>& items);
         void setCurrentExperience(int const xp);
@@ -122,11 +122,11 @@ namespace tbrpgsca
         void setCurrentRp(int const sp) override;
 
         Actor(int const id, QString& name, QString& sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
-              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<DbId, int>* const stRes,
+              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<int, int>* const stRes,
               const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent = NIL);
 
         Actor(int const id, QString&& name, QString&& sprite, Costume&& race, Costume&& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
-              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<DbId, int>* const stRes,
+              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<int, int>* const stRes,
               const QSharedPointer<QMap<Ability*, int>>&& items, QObject* const parent = NIL);
 
         explicit Actor(QObject* const parent = NIL);
@@ -172,7 +172,7 @@ namespace tbrpgsca
                             QMap<State*, int>& states, bool const includeWithDur);
         void updateAttributes(bool const remove, const Costume& costume);
         void updateSkills(bool const remove, bool const counters, QList<Ability*>& skills);
-        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<DbId, int>* const stRes);
+        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<int, int>* const stRes);
         void switchCostume(QString* const ret, const Costume* const oldCostume, const Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, bool const survive);
         void refreshCostumes(QString* const ret);

@@ -13,7 +13,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include <QVector>
 
 #include "play.h"
-#include "dbid.h"
 
 namespace tbrpgsca
 {
@@ -31,14 +30,14 @@ namespace tbrpgsca
 
         PROP_FLAG(Role, Ranged, ranged, Attribute::RANGE, inline, public, public)
         PROP_FLAG(Role, Reviving, revives, Attribute::REVIVE, inline, public, public)
-        PROP_READONLY_FIELD(Role, DatabaseId, databaseId, DbId, inline, public, _role_data->_id)
+        PROP_READONLY_FIELD(Role, DatabaseId, databaseId, int, inline, public, _role_data->_id)
         PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, _role_data->_hp)
         PROP_FIELD(Role, CurrentMp, currentMp, int, virtual inline, public, public, _role_data->_mp)
         PROP_FIELD(Role, CurrentRp, currentRp, int, virtual inline, public, public, _role_data->_sp)
         PROP_FIELD(Role, MaximumHp, maximumHp, int, virtual inline, public, public, _role_data->_m_hp)
         PROP_FIELD(Role, MaximumMp, maximumMp, int, virtual inline, public, public, _role_data->_m_mp)
         PROP_FIELD(Role, MaximumRp, maximumRp, int, virtual inline, public, public, _role_data->_m_sp)
-        //PROP_READONLY_FIELD(Role, DatabaseId, databaseId, Role::RoleDbId, inline, public, _role_data->_id)
+        //PROP_READONLY_FIELD(Role, DatabaseId, databaseId, Role::Roleint, inline, public, _role_data->_id)
         PROP_FIELD(Role, DamageType, damageType, int, inline, public, public, _role_data->_dmg_type)
         //PROP_REF(Role, Sprite, sprite, QString, inline, public, public, _role_data->_sprite)
         PROP_FIELD(Role, Name, name, QString, inline, public, public, _role_data->_name)
@@ -113,7 +112,7 @@ namespace tbrpgsca
             ~RoleData();
 
         protected:
-            DbId _id;
+            int _id;
             QString _name,* _sprite;
             int _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
             QMap<State*, int>* _state_dur;

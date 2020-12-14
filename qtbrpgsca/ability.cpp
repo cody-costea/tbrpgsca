@@ -21,19 +21,19 @@ QString Ability::MissesTxt = ", but misses %1";
 QString Ability::ReflectTxt = ", reflected by %1";
 QString Ability::StolenTxt = ", obtaining %1 from %2";
 
-int Ability::removedStateDuration(DbId state) const
+int Ability::removedStateDuration(int state) const
 {
     auto aStates = this->_ability_data->_r_states;
     return aStates == NIL ? 0 : aStates->value(state, 0);
 }
 
-QList<DbId> Ability::removedStatesList() const
+QList<int> Ability::removedStatesList() const
 {
     auto aStates = this->_ability_data->_r_states;
-    return aStates == NIL ? QList<DbId>() : aStates->keys();
+    return aStates == NIL ? QList<int>() : aStates->keys();
 }
 
-bool Ability::removedState(DbId state) const
+bool Ability::removedState(int state) const
 {
     auto aStates = this->_ability_data->_r_states;
     return aStates && aStates->contains(state);
@@ -277,7 +277,7 @@ Ability::AbilityData::~AbilityData()
 
 Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<DbId, int>* const rStates, QObject* const parent)
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates, parent)
 {
     QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
@@ -311,7 +311,7 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
 
 Ability::Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<DbId, int>* const rStates, QObject* const parent)
+                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
     : Ability(id, name, sprite, sound, steal, range, melee, canMiss, lvRq, hpC, mpC, spC, dmgType, attrInc, hpDmg, mpDmg, spDmg, trg, elm, mQty, rQty, absorb, revive, aStates, rStates, parent) {}
 
 Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QString(), false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NIL, NIL, parent) {}

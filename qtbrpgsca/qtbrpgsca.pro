@@ -48,7 +48,6 @@ include(deployment.pri)
 HEADERS += \
     ability.h \
         actor.h \
-    dbid.h \
         itemsmodel.h \
         costume.h \
         demolib.h \

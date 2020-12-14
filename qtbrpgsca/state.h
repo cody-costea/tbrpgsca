@@ -25,8 +25,8 @@ namespace tbrpgsca
         inline static constexpr int EndDur = -3;
 
         int removedSkillsIdsSize() const;
-        bool hasRemovedSkillId(const DbId skill) const;
-        DbId removedSkillId(int const n) const;
+        bool hasRemovedSkillId(const int skill) const;
+        int removedSkillId(int const n) const;
 
         void alter(QString& ret, Actor& actor, bool const consume);
         void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
@@ -36,14 +36,14 @@ namespace tbrpgsca
         State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<DbId>* const rSkills, QMap<State*, int>* const states,
-              QMap<DbId, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+              bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<DbId>* const rSkills, QMap<State*, int>* const states,
-              QMap<DbId, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+              bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit State(QObject* const parent = NIL);
 
@@ -58,7 +58,7 @@ namespace tbrpgsca
 
         protected:
             int _dur, _s_res;
-            QVector<DbId>* _r_skills;
+            QVector<int>* _r_skills;
 
             friend class Actor;
             friend class Ability;

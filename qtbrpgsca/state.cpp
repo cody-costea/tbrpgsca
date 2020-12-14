@@ -16,12 +16,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-DbId State::removedSkillId(int const n) const
+int State::removedSkillId(int const n) const
 {
     return (this->_state_data->_r_skills->at(n));
 }
 
-bool State::hasRemovedSkillId(const DbId skill) const
+bool State::hasRemovedSkillId(const int skill) const
 {
     auto aSkills = this->_state_data->_r_skills;
     return aSkills && aSkills->contains(skill);
@@ -51,9 +51,9 @@ void State::inflict(QString* const ret, Actor* const user, Actor& target, int st
     if (stateDur > State::EndDur)
     {
         int stateRes;
-        QMap<DbId, int>* stRes;
+        QMap<int, int>* stRes;
         if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
-                == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(DbId(0), 0)) + stateRes)))
+                == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(int(0), 0)) + stateRes)))
         {
             QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
             QMap<State*, int>* trgStates = trgRoleData->_state_dur;
@@ -280,8 +280,8 @@ void State::blockSkills(Actor& actor, const bool remove) const
 State::State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<DbId>* const rSkills, QMap<State*, int>* const states,
-             QMap<DbId, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+             QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res, parent)
 {
@@ -299,8 +299,8 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
 State::State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<DbId>* const rSkills, QMap<State*, int>* const states,
-             QMap<DbId, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+             QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : State(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
             reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
 

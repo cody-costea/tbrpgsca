@@ -230,7 +230,7 @@ Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int co
     roleData->_hp = hpDmg;
     roleData->_mp = mpDmg;
     roleData->_sp = spDmg;
-    roleData->_id = DbId(id);
+    roleData->_id = id;
     this->_role_data = roleData;
 }
 
