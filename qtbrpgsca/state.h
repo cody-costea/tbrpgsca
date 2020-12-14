@@ -36,13 +36,13 @@ namespace tbrpgsca
         State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
               QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
               QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit State(QObject* const parent = NIL);

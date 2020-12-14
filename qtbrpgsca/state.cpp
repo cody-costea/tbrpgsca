@@ -263,11 +263,11 @@ void State::blockSkills(Actor& actor, const bool remove) const
             auto& aSkills = *(actor._costume_data->_a_skills);
             for (auto rSkill : *rSkills)
             {
-                for (auto aSkill : aSkills)
+                for (auto& aSkill : aSkills)
                 {
-                    if (aSkill->databaseId() == rSkill)
+                    if (aSkill.databaseId() == rSkill)
                     {
-                        iSkills->operator[](aSkill) = aSkill->maximumUses() > 0 ? -1 * iSkills->value(aSkill, 0) : 0;
+                        iSkills->operator[](&aSkill) = aSkill.maximumUses() > 0 ? -1 * iSkills->value(&aSkill, 0) : 0;
                         break;
                     }
                 }
@@ -280,7 +280,7 @@ void State::blockSkills(Actor& actor, const bool remove) const
 State::State(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res, parent)
@@ -299,7 +299,7 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
 State::State(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability*>* const aSkills, QList<Ability*>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
+             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<State*, int>* const states,
              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : State(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
             reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}

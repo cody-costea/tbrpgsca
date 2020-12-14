@@ -33,7 +33,7 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
    }
 
    Actor* const actor = (this->_actor);
-   Ability& ability = *(actor->_costume_data->_a_skills->at(index.row()));
+   const Ability& ability = actor->_costume_data->_a_skills->at(index.row());
 
    switch (role)
    {

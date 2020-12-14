@@ -548,7 +548,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
     }
 }
 
-void Actor::updateSkills(const bool remove, const bool counters, QList<Ability*>& skills)
+void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>& skills)
 {
     Actor& actor = *this;
     auto actorData = actor._actor_data;
@@ -558,23 +558,23 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability*>
     {
         if (aSkills)
         {
-            for (Ability* const ability : skills)
+            for (Ability& ability : skills)
             {
                 aSkills->removeOne(ability);
-                if (ability->usesRegen() > 0)
+                if (ability.usesRegen() > 0)
                 {
                     QMap<const Ability*, int>* regTurn = actorData->_skills_rg_turn;
                     if (regTurn)
                     {
-                        regTurn->remove(ability);
+                        regTurn->remove(&ability);
                     }
                 }
-                if (ability->maximumUses() > 0)
+                if (ability.maximumUses() > 0)
                 {
                     QMap<const Ability*, int>* crQty = actorData->_skills_cr_qty;
                     if (crQty)
                     {
-                        crQty->remove(ability);
+                        crQty->remove(&ability);
                     }
                 }
             }
@@ -584,7 +584,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability*>
     {
         if (aSkills == NIL)
         {
-            aSkills = new QList<Ability*>();
+            aSkills = new QList<Ability>();
             if (counters)
             {
                 actorCostData->_counters = aSkills;
@@ -594,12 +594,12 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability*>
                 actorCostData->_a_skills = aSkills;
             }
         }
-        for (Ability* const ability : skills)
+        for (Ability& ability : skills)
         {
             if (!aSkills->contains(ability))
             {
                 aSkills->append(ability);
-                int const mQty = ability->maximumUses();
+                int const mQty = ability.maximumUses();
                 if (mQty > 0)
                 {
                     QMap<const Ability*, int>* crQty = actorData->_skills_cr_qty;
@@ -608,8 +608,8 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability*>
                         crQty = new QMap<const Ability*, int>();
                         actorData->_skills_cr_qty = crQty;
                     }
-                    crQty->operator[](ability) = mQty;
-                    actor.checkRegSkill(*ability);
+                    crQty->operator[](&ability) = mQty;
+                    actor.checkRegSkill(ability);
                 }
             }
         }
@@ -682,7 +682,7 @@ Actor::Actor(int const id, QString&& name, QString&& sprite, Costume&& race, Cos
 Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<int, int>* const stRes,
              const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent)
-    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QList<Ability*>(),
+    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QList<Ability>(),
               NIL, NIL, stRes, res, parent)
 {
     QSharedDataPointer<ActorData> actorData(new ActorData);

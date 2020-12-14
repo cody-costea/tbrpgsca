@@ -243,11 +243,11 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
                 int const usrDmgType = ability.damageType();
                 for (int i = 0; i < cntSize; ++i)
                 {
-                    Ability* const cntSkill = counters->at(i);
-                    int cntDmgType = cntSkill->damageType();
-                    if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == NIL || (cntSkill->currentHp() > counter->currentHp())))
+                    Ability& cntSkill = counters->operator[](i);
+                    int cntDmgType = cntSkill.damageType();
+                    if (((usrDmgType & cntDmgType) == cntDmgType) && (counter == NIL || (cntSkill.currentHp() > counter->currentHp())))
                     {
-                        counter = cntSkill;
+                        counter = &cntSkill;
                     }
                 }
                 if (counter)
@@ -371,14 +371,14 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     this->endTurn(ret);
 }
 
-int Scene::getAiSkill(Actor* const user, QList<Ability*>* const skills, int const defSkill, bool const restore) const
+int Scene::getAiSkill(Actor* const user, QList<Ability>* const skills, int const defSkill, bool const restore) const
 {
     assert(user && skills);
-    Ability* s = skills->operator[](defSkill);
+    Ability* s = &skills->operator[](defSkill);
     int ret = defSkill, sSize = skills->size();
     for (int i = defSkill + 1; i < sSize; ++i)
     {
-        Ability* a = skills->operator[](i);
+        Ability* a = &skills->operator[](i);
         if (a->canPerform(user) && ((defSkill > 0 && (a->currentHp() < s->currentHp())
             && (a->isReviving() || !restore)) || (a->currentHp() > s->currentHp())))
         {
@@ -393,7 +393,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
 {
     assert(ret && player);
     QVector<Actor*>* party;
-    auto& scene = *this->_scene_data;
+    auto scene = *this->_scene_data;
     QVector<QVector<Actor*>*>& parties = scene._parties;
     auto& skills = *(player->_costume_data->_a_skills);
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
@@ -428,7 +428,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
             int const skillsSize = skills.size();
             for (int i = 0; i < skillsSize; ++i)
             {
-                Ability& s = *(skills[i]);
+                Ability& s = skills[i];
                 if (s.canPerform(player) && (s.currentHp() < 0 && ((heal == 0) || s.isReviving())))
                 {
                     skillIndex = i;
@@ -440,7 +440,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
     {
         Actor* target = NIL;
         //Ability& ability = scene.getAiSkill(player, skills, skillIndex, heal == 1);
-        Ability& ability = *(skills[this->getAiSkill(player, &skills, skillIndex, heal == 1)]);
+        Ability& ability = skills[this->getAiSkill(player, &skills, skillIndex, heal == 1)];
         if (ability.currentHp() > -1)
         {
             if (party == NIL || player->isRandomAi())
@@ -523,7 +523,7 @@ void Scene::playAi(QString* const ret, Actor* const player)
         }
         if (target == NIL)
         {
-            this->perform(ret, player, player, heal < 0 ? (skills[this->getAiSkill
+            this->perform(ret, player, player, heal < 0 ? &(skills[this->getAiSkill
                           (player, &skills, 1, false)]) : &ability, false);
         }
         else
