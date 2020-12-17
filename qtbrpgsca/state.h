@@ -21,7 +21,7 @@ namespace tbrpgsca
         QML_ELEMENT
         PROP_FIELD(State, Resistance, resistance, int, inline, public, public, _state_data->_s_res)
         PROP_FIELD(State, MaximumDuration, maximumDuration, int, inline, public, public, _state_data->_max_dur)
-        PROP_FIELD(State, CurrentDuration, currentDuration, int, inline, public, public, _crt_dur)
+        //PROP_FIELD(State, CurrentDuration, currentDuration, int, inline, public, public, _crt_dur)
     public:
         inline static constexpr int EndDur = -3;
 
@@ -68,7 +68,7 @@ namespace tbrpgsca
             friend class Scene;
         };
 
-        int _crt_dur;
+        //int _crt_dur;
         QSharedDataPointer<StateData> _state_data;
 
         void alter(QString* const ret, Actor& actor, bool const consume);

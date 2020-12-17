@@ -1,0 +1,19 @@
+/*
+Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
+#include "play.hpp"
+
+using namespace tbrpgsca;
+
+Play::Play(int const flags)
+{
+    this->_play_flags = flags;
+}
+
+Play::Play() : Play(0) {}
+
+Play::~Play() {}

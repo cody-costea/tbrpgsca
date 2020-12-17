@@ -224,11 +224,12 @@ void State::blockSkills(Actor& actor, const bool remove) const
     auto rSkills = this->_state_data->_r_skills;
     if (rSkills)
     {
-        auto actorData = actor._actor_data;
-        auto iSkills = actorData->_skills_cr_qty;
+        auto& actorData = actor._actor_data;
+        auto& aSkills = *actor._costume_data->_a_skills;
+        //auto iSkills = actorData->_skills_cr_qty;
         if (remove)
         {
-            if (iSkills)
+            /*if (iSkills)
             {
                 auto const last = iSkills->cend();
                 auto const begin = iSkills->cbegin();
@@ -251,24 +252,32 @@ void State::blockSkills(Actor& actor, const bool remove) const
                         }
                     }
                 }
+            }*/
+            for (int const rSkillId : *rSkills)
+            {
+                for (Ability& aSkill : aSkills)
+                {
+                    if (aSkill.databaseId() == rSkillId)
+                    {
+                        const QVariant& crQty = aSkill.property("currentUses");
+                        if (!crQty.isNull())
+                        {
+                            int const crQtyInt = crQty.toInt();
+                            aSkill.setProperty("currentUses", crQtyInt == -1 ? QVariant() : QVariant((crQtyInt + 2) * -1));
+                        }
+                    }
+                }
             }
         }
         else
         {
-            if (iSkills == NIL)
+            for (int const rSkillId : *rSkills)
             {
-                iSkills = new QMap<const Ability*, int>();
-                actorData->_skills_cr_qty = iSkills;
-            }
-            auto& aSkills = *(actor._costume_data->_a_skills);
-            for (auto rSkill : *rSkills)
-            {
-                for (auto& aSkill : aSkills)
+                for (Ability& aSkill : aSkills)
                 {
-                    if (aSkill.databaseId() == rSkill)
+                    if (aSkill.databaseId() == rSkillId)
                     {
-                        iSkills->operator[](&aSkill) = aSkill.maximumUses() > 0 ? -1 * iSkills->value(&aSkill, 0) : 0;
-                        break;
+                        aSkill.setProperty("currentUses", QVariant(aSkill.maximumUses() == 0 ? -1 : ((aSkill.property("currentUses").toInt() * -1) - 2)));
                     }
                 }
             }
@@ -289,7 +298,7 @@ State::State(int const id, QString& name, QString& sprite, bool const shapeShift
     stateData->_r_skills = rSkills;
     stateData->_max_dur = dur;
     stateData->_s_res = sRes;
-    this->_crt_dur = 0;
+    //this->_crt_dur = 0;
     if (convert)
     {
         this->setPlayFlags(this->playFlags() | Costume::Attribute::CONVERT);
@@ -311,7 +320,7 @@ State::State(QObject* const parent) : State(0, QString(), QString(), false, 0, 0
 State::State(const State& state) : Costume(state)
 {
     this->_state_data = state._state_data;
-    this->_crt_dur = state._crt_dur;
+    //this->_crt_dur = state._crt_dur;
 }
 
 State::StateData::~StateData() {}

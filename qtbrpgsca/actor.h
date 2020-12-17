@@ -25,6 +25,8 @@ namespace tbrpgsca
 
         Q_OBJECT
         QML_ELEMENT
+        PROP_FLAG_GET(hasQtySkills, Attribute::QTY_SKILLS, inline, public)
+        PROP_FLAG_SET_ALL(Actor, HasQtySkills, Attribute::QTY_SKILLS, inline, protected, hasQtySkills)
         PROP_FLAG(Actor, AiPlayer, aiPlayer, Attribute::AI_PLAYER, inline, public, public)
         PROP_FLAG(Actor, RandomAi, randomAi, Attribute::RANDOM_AI, inline, public, public)
         /*PROP_FLAG_SET_ALL(Actor, Ranged, Role::Attribute::Range, public, isRanged)
@@ -76,7 +78,8 @@ namespace tbrpgsca
     public:
         enum Attribute {
             RANDOM_AI = 2048,
-            AI_PLAYER = 4096
+            AI_PLAYER = 4096,
+            QTY_SKILLS = 8192
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)
         Q_FLAG(Attributes)
@@ -89,8 +92,8 @@ namespace tbrpgsca
         Costume& race() const;
         Costume& job() const;
 
-        int remainingSkillUses(const Ability& skill) const;
-        int regeneratingSkillTurn(const Ability& skill) const;
+        //int remainingSkillUses(const Ability& skill) const;
+        //int regeneratingSkillTurn(const Ability& skill) const;
 
         const Costume* unequipPos(char const pos);
         const Costume* equipItem(char const pos, Costume* const item);
@@ -142,7 +145,7 @@ namespace tbrpgsca
 
         protected:
             int _lv, _max_lv, _xp, _maxp, _old_side, _init, _side, _actions;
-            QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn;
+            //QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn;
             QSharedPointer<QMap<Ability*, int>> _items;
             QVector<const Costume*>* _dmg_roles;
             QMap<char, Costume*> _equipment;
@@ -163,7 +166,7 @@ namespace tbrpgsca
         QSharedDataPointer<ActorData> _actor_data;
 
         void levelUp();
-        inline void checkRegSkill(const Ability& skill);
+        //inline void checkRegSkill(const Ability& skill);
         void recover(QString* const ret);
         void applyDmgRoles(QString& ret);
         void removeStates(QString* const ret, bool const remove);

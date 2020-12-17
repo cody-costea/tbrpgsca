@@ -23,38 +23,44 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++17 resources_big qtquickcompiler
+CONFIG += c++17 resources_big qtquickcompiler #objective_c
 
 SOURCES += \
-        ability.cpp \
-        actor.cpp \
-        arenawidget.cpp \
-        clickablelabel.cpp \
-        costume.cpp \
-        demolib.cpp \
-        itemsmodel.cpp \
         main.cpp \
-        play.cpp \
-        role.cpp \
-        scene.cpp \
-        skillsmodel.cpp \
-        state.cpp \
-        targetsmodel.cpp
+        library/cpp/ability.cpp \
+        library/cpp/actor.cpp \
+        library/cpp/arenawidget.cpp \
+        library/cpp/clickablelabel.cpp \
+        library/cpp/costume.cpp \
+        library/cpp/demolib.cpp \
+        library/cpp/itemsmodel.cpp \
+        library/cpp/play.cpp \
+        library/cpp/role.cpp \
+        library/cpp/scene.cpp \
+        library/cpp/skillsmodel.cpp \
+        library/cpp/state.cpp \
+        library/cpp/targetsmodel.cpp
 
 HEADERS += \
-        ability.h \
-        actor.h \
-        arenawidget.h \
-        clickablelabel.h \
-        costume.h \
-        demolib.h \
-        itemsmodel.h \
-        play.h \
-        role.h \
-        scene.h \
-        skillsmodel.h \
-        state.h \
-        targetsmodel.h
+        library/cpp/ability.hpp \
+        library/cpp/actor.hpp \
+        library/cpp/arenawidget.hpp \
+        library/cpp/clickablelabel.hpp \
+        library/cpp/costume.hpp \
+        library/cpp/demolib.hpp \
+        library/cpp/itemsmodel.hpp \
+        library/cpp/play.hpp \
+        library/cpp/role.hpp \
+        library/cpp/scene.hpp \
+        library/cpp/skillsmodel.hpp \
+        library/cpp/state.hpp \
+        library/cpp/targetsmodel.hpp
+
+#LIBS += -lobjc -framework Foundation
+
+#OBJECTIVE_HEADERS += \
+
+#OBJECTIVE_SOURCES += \
 
 FORMS +=
 

@@ -1,9 +1,10 @@
-#include "demolib.h"
-#include "arenawidget.h"
 #include <QApplication>
 #include <QMainWindow>
 #include <QScreen>
 #include <time.h>
+
+#include "library/cpp/demolib.hpp"
+#include "library/cpp/arenawidget.hpp"
 
 using namespace tbrpgsca;
 

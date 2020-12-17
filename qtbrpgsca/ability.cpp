@@ -45,38 +45,40 @@ int Ability::removedStatesSize() const
     return aStates == NIL ? 0 : aStates->size();
 }
 
-void Ability::replenish(Actor& user) const
+void Ability::replenish()
 {
     const Ability& ability = *this;
     int const mQty = ability.maximumUses();
-    if (mQty > 0)
+    if (mQty != 0)
     {
-        auto& userData = user._actor_data;
+        /*auto& userData = user._actor_data;
         QMap<const Ability*, int>* usrSkills = userData->_skills_cr_qty;
         if (usrSkills == NIL)
         {
             usrSkills = new QMap<const Ability*, int>();
             userData->_skills_cr_qty = usrSkills;
         }
-        usrSkills->operator[](this) = mQty;
+        usrSkills->operator[](this) = mQty;*/
+        this->setProperty("currentUses", QVariant(mQty > 0 ? mQty : 0));
+        this->setProperty("regenTurn", QVariant(0));
     }
-
 }
 
 bool Ability::canPerform(Actor* const actor) const
 {
     assert(actor);
-    QMap<const Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
-    return this->maximumMp() <= actor->maximumMp() && this->maximumHp() < actor->maximumHp() && this->maximumRp() <= actor->maximumRp()
-            && actor->currentLevel() >= this->requiredLevel() && (skillsQty == NIL || skillsQty->value(this, 1) > 0);
+    //QMap<const Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
+    int const crQty = this->property("currentUses").toInt();
+    return this->maximumMp() <= actor->currentMp() && this->maximumHp() < actor->currentHp() && this->maximumRp() <= actor->currentRp()
+            && actor->currentLevel() >= this->requiredLevel() && crQty > -1 && (this->maximumUses() == 0 || crQty > 0);
 }
 
-void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts) const
+void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 {
     return this->execute(ret, user, &target, applyCosts);
 }
 
-void Ability::execute(QString& ret, Actor& user, Actor* target, bool const applyCosts) const
+void Ability::execute(QString& ret, Actor& user, Actor* target, bool const applyCosts)
 {
     assert(target);
     const Ability& ability = *this;
@@ -251,15 +253,16 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
         user.setCurrentMp(user.currentMp() - ability.maximumMp());
         user.setCurrentHp(user.currentHp() - ability.maximumHp());
         int mQty = ability.maximumUses();
-        if (mQty > 0)
+        if (mQty != 0)
         {
-            QMap<const Ability*, int>* usrSkillsQty = userData->_skills_cr_qty;
+            /*QMap<const Ability*, int>* usrSkillsQty = userData->_skills_cr_qty;
             if (usrSkillsQty == NIL)
             {
                 usrSkillsQty = new QMap<const Ability*, int>();
                 userData->_skills_cr_qty = usrSkillsQty;
             }
-            usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
+            usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);*/
+            this->setProperty("currentUses", QVariant(this->property("currentUses").toInt() - 1));
         }
     }
 
@@ -288,8 +291,8 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
     dataPtr->_reg_qty = rQty;
     dataPtr->_r_states = rStates;
     int flags = this->playFlags();
-    this->_reg_turn = 0;
-    this->_crt_qty = 0;
+    //this->_reg_turn = 0;
+    //this->_crt_qty = 0;
     if (canMiss)
     {
         flags |= Attribute::MISSABLE;
@@ -321,8 +324,8 @@ Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QStri
 Ability::Ability(const Ability& ability) : Role(ability)
 {
     this->_ability_data = ability._ability_data;
-    this->_reg_turn = ability._reg_turn;
-    this->_crt_qty = ability._crt_qty;
+    //this->_reg_turn = ability._reg_turn;
+    //this->_crt_qty = ability._crt_qty;
 }
 
 Ability::~Ability()

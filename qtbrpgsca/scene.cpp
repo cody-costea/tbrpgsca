@@ -632,32 +632,28 @@ void Scene::endTurn(QString* const ret)
             while (crActor->currentHp() < 1 || crActor->initiative() < mInit);
         }
         //crActor->actions = cActions = crActor->mActions;
-        auto& crActorData = crActor->_actor_data;
-        QMap<const Ability*, int>* const regSkills = crActorData->_skills_rg_turn;
-        if (regSkills)
+        //auto& crActorData = crActor->_actor_data;
+        //QMap<const Ability*, int>* const regSkills = crActorData->_skills_rg_turn;
+        if (crActor->hasQtySkills())
         {
-            QMap<const Ability*, int>* skillsQty = crActorData->_skills_cr_qty;
-            if (skillsQty == NIL)
+            for (auto& ability : *crActor->_costume_data->_a_skills)
             {
-                skillsQty = new QMap<const Ability*, int>();
-                crActorData->_skills_cr_qty = skillsQty;
-            }
-            auto const last = regSkills->cend();
-            for (auto it = regSkills->cbegin(); it != last; ++it)
-            {
-                const Ability* const skill = it.key();
-                int const skillMaxQty = skill->maximumUses(), skillCrQty = skillsQty->value(skill, skillMaxQty);
-                if (skillCrQty < skillMaxQty)
+                int const mQty = abs(ability.maximumUses());
+                if (mQty != 0)
                 {
-                    int const skillRgTurn = it.value();//regSkills->value(skill, 0);
-                    if (skillRgTurn == skill->usesRegen())
+                    int const crQty = ability.property("currentUses").toInt();
+                    if (crQty > -1 && crQty < mQty)
                     {
-                        skillsQty->operator[](skill) = skillCrQty + 1;
-                        regSkills->operator[](skill) = 0;
-                    }
-                    else
-                    {
-                        regSkills->operator[](skill) = skillRgTurn + 1;
+                        int const regTurn = ability.property("regenTurn").toInt();
+                        if (regTurn == ability.usesRegen())
+                        {
+                            ability.setProperty("currentUses", QVariant(crQty + 1));
+                            ability.setProperty("regenTurn", QVariant(0));
+                        }
+                        else
+                        {
+                            ability.setProperty("regenTurn", QVariant(regTurn + 1));
+                        }
                     }
                 }
             }

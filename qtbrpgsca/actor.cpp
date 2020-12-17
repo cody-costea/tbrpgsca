@@ -20,18 +20,6 @@ using namespace tbrpgsca;
 QString Actor::KoTxt = ", %1 falls unconscious";
 QString Actor::RiseTxt = ", but rises again";
 
-int Actor::remainingSkillUses(const Ability& skill) const
-{
-    QMap<const Ability*, int>* crQty = this->_actor_data->_skills_cr_qty;
-    return crQty == NIL ? 0 : crQty->value(&skill, 0);
-}
-
-int Actor::regeneratingSkillTurn(const Ability& skill) const
-{
-    QMap<const Ability*, int>* regTurn = this->_actor_data->_skills_rg_turn;
-    return regTurn == NIL ? 0 : regTurn->value(&skill, 0);
-}
-
 QMap<Ability*, int> Actor::items() const
 {
     const auto items = this->_actor_data->_items;
@@ -327,7 +315,7 @@ void Actor::applyStates(QString* const ret, const bool consume)
     }
 }
 
-inline void Actor::checkRegSkill(const Ability& skill)
+/*inline void Actor::checkRegSkill(const Ability& skill)
 {
     Actor& actor = *this;
     auto actorData = actor._actor_data;
@@ -341,7 +329,7 @@ inline void Actor::checkRegSkill(const Ability& skill)
         }
         regSkills->operator[](&skill) = 0;
     }
-}
+}*/
 
 void Actor::recover(QString& ret)
 {
@@ -402,7 +390,7 @@ void Actor::recover(QString* const ret)
         }
     }
     {
-        QMap<const Ability*, int>* skillsQty = actor._actor_data->_skills_cr_qty;
+        /*QMap<const Ability*, int>* skillsQty = actor._actor_data->_skills_cr_qty;
         if (skillsQty)
         {
             auto const last = skillsQty->cend();
@@ -410,6 +398,13 @@ void Actor::recover(QString* const ret)
             {
                 const Ability* const ability = it.key();
                 skillsQty->operator[](ability) = ability->maximumUses();
+            }
+        }*/
+        if (actor.hasQtySkills())
+        {
+            for (auto& ability : *actor._costume_data->_a_skills)
+            {
+                ability.replenish();
             }
         }
     }
@@ -561,7 +556,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>&
             for (Ability& ability : skills)
             {
                 aSkills->removeOne(ability);
-                if (ability.usesRegen() > 0)
+                /*if (ability.usesRegen() > 0)
                 {
                     QMap<const Ability*, int>* regTurn = actorData->_skills_rg_turn;
                     if (regTurn)
@@ -576,7 +571,7 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>&
                     {
                         crQty->remove(&ability);
                     }
-                }
+                }*/
             }
         }
     }
@@ -599,17 +594,18 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>&
             if (!aSkills->contains(ability))
             {
                 aSkills->append(ability);
-                int const mQty = ability.maximumUses();
-                if (mQty > 0)
+                if (ability.maximumUses() != 0)
                 {
-                    QMap<const Ability*, int>* crQty = actorData->_skills_cr_qty;
+                    /*QMap<const Ability*, int>* crQty = actorData->_skills_cr_qty;
                     if (crQty == NIL)
                     {
                         crQty = new QMap<const Ability*, int>();
                         actorData->_skills_cr_qty = crQty;
                     }
                     crQty->operator[](&ability) = mQty;
-                    actor.checkRegSkill(ability);
+                    actor.checkRegSkill(ability);*/
+                    this->setHasQtySkills(true);
+                    ability.replenish();
                 }
             }
         }
@@ -695,8 +691,8 @@ Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costum
     actorData->_side = 0;
     actorData->_old_side = 0;
     actorData->_dmg_roles = NIL;
-    actorData->_skills_rg_turn = NIL;
-    actorData->_skills_cr_qty = NIL;
+    //actorData->_skills_rg_turn = NIL;
+    //actorData->_skills_cr_qty = NIL;
     this->_role_data->_state_dur = NIL;
     actorData->_actions = mActions;
     actorData->_max_lv = maxLv;
