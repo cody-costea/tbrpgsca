@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "ability.h"
 #include "costume.h"
 #include "actor.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 #include "role.h"
 
@@ -148,7 +148,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
             }
             ability.damage(ret, (ability.isAbsorbing() ? &user : NIL), *target, dmg, false);
             {
-                QMap<State*, int>* aStates = ability._role_data->_state_dur;
+                QMap<Ailment*, int>* aStates = ability._role_data->_state_dur;
                 if (aStates)
                 {
                     auto const last = aStates->cend();
@@ -159,7 +159,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                 }
             }
             {
-                QMap<State*, int>* stateDur = target->_role_data->_state_dur;
+                QMap<Ailment*, int>* stateDur = target->_role_data->_state_dur;
                 if (stateDur)
                 {
                     auto rStates = ability._ability_data->_r_states;
@@ -169,16 +169,16 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                         for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                         {
                             int const rDur = rIt.value();
-                            if (rDur > State::EndDur)
+                            if (rDur > Ailment::EndDur)
                             {
                                 auto rState = rIt.key();
                                 auto const last = stateDur->cend();
                                 for (auto it = stateDur->cbegin(); it != last; ++it)
                                 {
-                                    State* const aState = it.key();
+                                    Ailment* const aState = it.key();
                                     if (aState->databaseId() == rState)
                                     {
-                                        if (it.value() > State::EndDur)
+                                        if (it.value() > Ailment::EndDur)
                                         {
                                             aState->disable(&ret, *target, rDur, false);
                                         }
@@ -280,7 +280,7 @@ Ability::AbilityData::~AbilityData()
 
 Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
+                 int const rQty, bool const absorb, bool const revive, QMap<Ailment*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates, parent)
 {
     QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
@@ -316,7 +316,7 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
 
 Ability::Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
+                 int const rQty, bool const absorb, bool const revive, QMap<Ailment*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
     : Ability(id, name, sprite, sound, steal, range, melee, canMiss, lvRq, hpC, mpC, spC, dmgType, attrInc, hpDmg, mpDmg, spDmg, trg, elm, mQty, rQty, absorb, revive, aStates, rStates, parent) {}
 
 Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QString(), false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NIL, NIL, parent) {}

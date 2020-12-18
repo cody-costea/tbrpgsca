@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "actor.h"
 #include "costume.h"
 #include "ability.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 #include "role.h"
 
@@ -61,7 +61,7 @@ const Costume* Actor::equipItem(const char pos, Costume* const item)
 void Actor::removeStates(QString* const ret, bool const remove)
 {
     Actor& actor = *this;
-    QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
+    QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
     if (stateDur)
     {
         actor.updateStates(true, ret, *stateDur, true);
@@ -301,13 +301,13 @@ void Actor::applyStates(QString* const ret, const bool consume)
     {
         actor.applyDmgRoles(*ret);
     }
-    QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
+    QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
     if (stateDur)
     {
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (it.value() > State::EndDur)
+            if (it.value() > Ailment::EndDur)
             {
                 it.key()->alter(ret, actor, consume);
             }
@@ -612,19 +612,19 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>&
     }
 }
 
-void Actor::updateStates(bool const remove, QString* const ret, QMap<State*, int>& states, bool const includeWithDur)
+void Actor::updateStates(bool const remove, QString* const ret, QMap<Ailment*, int>& states, bool const includeWithDur)
 {
     Actor& actor = *this;
     if (remove)
     {
-        QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
+        QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
         if (stateDur && stateDur->size() > 0)
         {
             auto const last = states.cend();
             for (auto it = states.cbegin(); it != last; ++it)
             {
                 int const rDur = it.value();
-                if (includeWithDur || (rDur < 0 && rDur > State::EndDur))
+                if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
                 {
                     it.key()->disable(ret, actor, rDur, includeWithDur);
                 }
@@ -637,7 +637,7 @@ void Actor::updateStates(bool const remove, QString* const ret, QMap<State*, int
         for (auto it = states.cbegin(); it != last; ++it)
         {
             int const rDur = it.value();
-            if (includeWithDur || (rDur < 0 && rDur > State::EndDur))
+            if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
             {
                 it.key()->inflict(ret, NIL, actor, rDur, true);
             }
@@ -656,13 +656,13 @@ void Actor::refreshCostumes(QString* const ret)
             it.value()->refresh(ret, actor, true, false);
         }
     }
-    QMap<State*, int>* const stateDur = actor._role_data->_state_dur;
+    QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
     if (stateDur)
     {
         auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
-            if (it.value() > State::EndDur)
+            if (it.value() > Ailment::EndDur)
             {
                 it.key()->refresh(ret, actor, false, false);
             }

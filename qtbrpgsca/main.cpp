@@ -6,7 +6,7 @@
 #include "demolib.h"
 #include "ability.h"
 #include "costume.h"
-#include "state.h"
+#include "ailment.h"
 #include "actor.h"
 #include "scene.h"
 #include "role.h"
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     REG_QML(Scene)
     REG_QML(Ability)
     REG_QML(Costume)
-    REG_QML(State)
+    REG_QML(Ailment)
     REG_QML(Actor)
 
     QTranslator translator;

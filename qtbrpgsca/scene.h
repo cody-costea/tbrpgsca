@@ -163,7 +163,7 @@ namespace tbrpgsca
             friend class ArenaWidget;
             friend class TargetsModel;
             friend class Costume;
-            friend class State;
+            friend class Ailment;
             friend class Role;
         };
 
@@ -181,7 +181,7 @@ namespace tbrpgsca
         friend class ArenaWidget;
         friend class TargetsModel;
         friend class Costume;
-        friend class State;
+        friend class Ailment;
         friend class Role;
     };
 

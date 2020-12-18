@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "costume.h"
 #include "ability.h"
 #include "actor.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 #include "role.h"
 
@@ -123,7 +123,7 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
     {
         if (updStates)
         {
-            QMap<State*, int>* const cStates = costume._role_data->_state_dur;
+            QMap<Ailment*, int>* const cStates = costume._role_data->_state_dur;
             if (cStates)
             {
                 actor.updateStates(false, ret, *cStates, true);
@@ -168,7 +168,7 @@ void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bo
     }
     if (updStates)
     {
-        QMap<State*, int>* cStates = costume._role_data->_state_dur;
+        QMap<Ailment*, int>* cStates = costume._role_data->_state_dur;
         if (cStates)
         {
             actor.updateStates(remove, ret, *cStates, false);
@@ -210,7 +210,7 @@ Costume::CostumeData::~CostumeData() {}
 
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                  int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                 bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters, QMap<State*, int>* const states,
+                 bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters, QMap<Ailment*, int>* const states,
                  QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, elm, range, revive, states, parent)
 {
@@ -265,14 +265,14 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                  bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters,
-                 QMap<State*, int>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+                 QMap<Ailment*, int>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
               revive, skills, counters, states, stRes, res, parent) {}
 
 Costume::Costume(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                  bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters,
-                 QMap<State*, int>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+                 QMap<Ailment*, int>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, range, automate, confuse, reflect, invincible,
               revive, skills, counters, states, stRes, res, parent) {}
 

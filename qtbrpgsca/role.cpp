@@ -9,7 +9,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "ability.h"
 #include "costume.h"
 #include "actor.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 
 #include <QStringBuilder>
@@ -28,27 +28,27 @@ QString Role::sprite() const
     return spr ? *spr : QString();
 }
 
-int Role::stateDuration(State& state) const
+int Role::stateDuration(Ailment& state) const
 {
-    QMap<State*, int>* const aStates = this->_role_data->_state_dur;
+    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
     return aStates == NIL ? 0 : aStates->value(&state, 0);
 }
 
-QList<State*> Role::statesList() const
+QList<Ailment*> Role::statesList() const
 {
-    QMap<State*, int>* const aStates = this->_role_data->_state_dur;
-    return aStates == NIL ? QList<State*>() : aStates->keys();
+    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
+    return aStates == NIL ? QList<Ailment*>() : aStates->keys();
 }
 
-bool Role::hasState(State& state) const
+bool Role::hasState(Ailment& state) const
 {
-    QMap<State*, int>* const aStates = this->_role_data->_state_dur;
+    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
     return aStates && aStates->contains(&state);
 }
 
 int Role::statesSize() const
 {
-    QMap<State*, int>* const aStates = this->_role_data->_state_dur;
+    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
     return aStates == NIL ? 0 : aStates->size();
 }
 
@@ -216,7 +216,7 @@ Role::RoleData::~RoleData()
 }
 
 Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-           int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates, QObject* const parent)
+           int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* aStates, QObject* const parent)
     : Play(parent, ((revive ? Attribute::REVIVE : 0) | (range ? Attribute::RANGE : 0)))
 {
     QSharedDataPointer<RoleData> roleData(new RoleData);
@@ -235,7 +235,7 @@ Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int co
 }
 
 Role::Role(int const id, QString&& name, QString&& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-           int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* aStates, QObject* const parent)
+           int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* aStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, element, range, revive, aStates, parent) {}
 
 Role::Role(const Role& role) : Play(NIL, role.playFlags())

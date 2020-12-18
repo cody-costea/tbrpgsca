@@ -27,15 +27,16 @@ QML_IMPORT_MAJOR_VERSION = 1
 SOURCES += \
     ability.cpp \
         actor.cpp \
+    ailment.cpp \
         itemsmodel.cpp \
         costume.cpp \
         demolib.cpp \
         main.cpp \
         play.cpp \
         role.cpp \
-        state.cpp \
         scene.cpp \
-        skillsmodel.cpp
+        skillsmodel.cpp \
+    state.cpp
 
 RESOURCES += qml.qrc
 
@@ -48,14 +49,15 @@ include(deployment.pri)
 HEADERS += \
     ability.h \
         actor.h \
+    ailment.h \
         itemsmodel.h \
         costume.h \
         demolib.h \
         play.h \
         role.h \
-        state.h \
         scene.h \
-        skillsmodel.h
+        skillsmodel.h \
+    state.h
 
 DISTFILES += \
     tbrpgsca_ro_RO.ts

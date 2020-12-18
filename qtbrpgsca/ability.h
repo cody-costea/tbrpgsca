@@ -64,11 +64,11 @@ namespace tbrpgsca
 
         Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpCost,
                 int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent = NIL);
+                int const rQty, bool const absorb, bool const revive, QMap<Ailment*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent = NIL);
 
         Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpCost,
                 int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                int const rQty, bool const absorb, bool const revive, QMap<State*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent = NIL);
+                int const rQty, bool const absorb, bool const revive, QMap<Ailment*, int>* const aStates, QMap<int, int>* const rStates, QObject* const parent = NIL);
 
         explicit Ability(QObject* const parent = NIL);
 
@@ -92,7 +92,7 @@ namespace tbrpgsca
             friend class ArenaWidget;
             friend class SkillsModel;
             friend class ItemsModel;
-            friend class State;
+            friend class Ailment;
             friend class Scene;
         };
 
@@ -106,7 +106,7 @@ namespace tbrpgsca
         friend class ArenaWidget;
         friend class SkillsModel;
         friend class ItemsModel;
-        friend class State;
+        friend class Ailment;
         friend class Scene;
     };
 

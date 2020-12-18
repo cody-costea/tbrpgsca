@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "scene.h"
 #include "ability.h"
 #include "costume.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 #include "role.h"
 

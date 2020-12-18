@@ -18,7 +18,7 @@ namespace tbrpgsca
 {
 
     class Actor;
-    class State;
+    class Ailment;
     class Scene;
 
     class Role : public Play
@@ -74,9 +74,9 @@ namespace tbrpgsca
         static QString ResistTxt;
 
         QString sprite() const;
-        QList<State*> statesList() const;
-        int stateDuration(State& state) const;
-        bool hasState(State& state) const;
+        QList<Ailment*> statesList() const;
+        int stateDuration(Ailment& state) const;
+        bool hasState(Ailment& state) const;
         int statesSize() const;
 
         inline bool operator==(const Role& role) const
@@ -115,12 +115,12 @@ namespace tbrpgsca
             int _id;
             QString _name,* _sprite;
             int _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
-            QMap<State*, int>* _state_dur;
+            QMap<Ailment*, int>* _state_dur;
 
             friend class Ability;
             friend class Costume;
             friend class Actor;
-            friend class State;
+            friend class Ailment;
             friend class Scene;
             friend class Role;
         };
@@ -128,10 +128,10 @@ namespace tbrpgsca
         QSharedDataPointer<RoleData> _role_data;
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-             int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states, QObject* const parent = NIL);
+             int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* const states, QObject* const parent = NIL);
 
         Role(int const id, QString&& name, QString&& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-             int const mSp, int const element, bool const range, bool const revive, QMap<State*, int>* const states, QObject* const parent = NIL);
+             int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* const states, QObject* const parent = NIL);
 
         explicit Role(QObject* const parent = NIL);
 
@@ -142,7 +142,7 @@ namespace tbrpgsca
         friend class Actor;
         friend class Ability;
         friend class Costume;
-        friend class State;
+        friend class Ailment;
         friend class Scene;
     };
 

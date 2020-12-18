@@ -9,67 +9,67 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "ability.h"
 #include "costume.h"
 #include "demolib.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 #include "role.h"
 
 using namespace tbrpgsca;
 
-QVector<State*>& DemoLib::getStates()
+QVector<Ailment*>& DemoLib::getStates()
 {
-    QVector<State*>& states = this->states;
+    QVector<Ailment*>& states = this->states;
     if (states.size() == 0)
     {
-        states.append(new State(1, tr("Regen"), "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(1, tr("Regen"), "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, true, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(2, tr("Poison"), "", false, 7,0,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(2, tr("Poison"), "", false, 7,0,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(3, tr("Clarity"), "", false, 7,-1,0,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(3, tr("Clarity"), "", false, 7,-1,0,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(4, tr("Dizziness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(4, tr("Dizziness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(5, tr("Vigour"), "", false, 7,-1,0,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(5, tr("Vigour"), "", false, 7,-1,0,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(6, tr("Weakness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(6, tr("Weakness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(7, tr("Reflect"), "", false, 3,-1,0,Role::Element::LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(7, tr("Reflect"), "", false, 3,-1,0,Role::Element::LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, true, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(8, tr("Conversion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(8, tr("Conversion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 true, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(9, tr("Confusion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
+        states.append(new Ailment(9, tr("Confusion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(10, tr("Berserk"), "", false, 5,1,0,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
+        states.append(new Ailment(10, tr("Berserk"), "", false, 5,1,0,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(11, tr("Sleep"), "", false, 3,2,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+        states.append(new Ailment(11, tr("Sleep"), "", false, 3,2,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new State(12, tr("Stun"), "", false, 1,1,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+        states.append(new Ailment(12, tr("Stun"), "", false, 1,1,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
 
     }
     return states;
 }
 
-QVector<QMap<State*, int>*>& DemoLib::getStateMasks()
+QVector<QMap<Ailment*, int>*>& DemoLib::getStateMasks()
 {
-    QVector<QMap<State*, int>*>& stateMasks = this->stateMasks;
+    QVector<QMap<Ailment*, int>*>& stateMasks = this->stateMasks;
     if (stateMasks.size() == 0)
     {
-        QVector<State*>& states = this->getStates();
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[0], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[1], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[2], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[3], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[4], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[5], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[6], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[7], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[8], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[9], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[10], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[11], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[0], 0}, {states[2], 0}, {states[4], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[1], 0}, {states[3], 0}, {states[5], 0}}));
-        stateMasks.append(new QMap<State*, int>(std::map<State*, int> {{states[7], 0}, {states[8], 0}, {states[9], 0}}));
+        QVector<Ailment*>& states = this->getStates();
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[0], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[1], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[2], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[3], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[4], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[5], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[6], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[7], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[8], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[9], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[10], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[11], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[0], 0}, {states[2], 0}, {states[4], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[1], 0}, {states[3], 0}, {states[5], 0}}));
+        stateMasks.append(new QMap<Ailment*, int>(std::map<Ailment*, int> {{states[7], 0}, {states[8], 0}, {states[9], 0}}));
     }
     return stateMasks;
 }
