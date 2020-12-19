@@ -96,6 +96,13 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
                 dmgRoles->removeOne(&costume);
             }
         }
+        int const roleBlockedSkills = costume._b_skill_types;
+        int const actorBlockedSkills = actor._b_skill_types;
+        if ((actorBlockedSkills & roleBlockedSkills) == roleBlockedSkills)
+        {
+            actor._b_skill_types = actorBlockedSkills ^ roleBlockedSkills;
+        }
+        //actor._r_skill_types = actor._r_skill_types ^ costume._r_skill_types;
         costume.refresh(ret, scene, actor, updStates, true);
         actor.refreshCostumes(ret, scene);
     }
@@ -157,6 +164,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     if (!remove)
     {
         int const cFlags = costume._play_flags;
+        actor._b_skill_types |= costume._b_skill_types;
         if (costume._hp == 0 && costume._mp == 0 && costume._sp == 0)
         {
             actor._dmg_type |= costume._dmg_type;

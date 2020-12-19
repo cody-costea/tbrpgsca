@@ -49,7 +49,7 @@ namespace tbrpgsca
         bool removedState(const State& state) const;
         int removedStatesSize() const;
 
-        bool canPerform(Actor& user) const;
+        bool canPerform(const Actor& user) const;
         void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts) const;
         void replenish(Actor& user) const;
 

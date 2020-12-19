@@ -67,7 +67,7 @@ namespace tbrpgsca
 
         ~Costume();
     protected:
-        signed int _atk: 16, _def: 16, _spi: 16, _wis: 16, _agi: 16;
+        signed int _atk: 16, _def: 16, _spi: 16, _wis: 16, _agi: 16, _b_skill_types: 16;
         QVector<const Ability*>* _a_skills;
         QMap<const State*, int>* _st_res;
         QMap<int, int>* _res;

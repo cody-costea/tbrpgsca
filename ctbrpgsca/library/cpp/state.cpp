@@ -16,7 +16,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-const Ability& State::removedSkill(int const n) const
+/*const Ability& State::removedSkill(int const n) const
 {
     return *(this->_r_skills->at(n));
 }
@@ -31,7 +31,7 @@ int State::removedSkillsSize() const
 {
     QVector<const Ability*>* aSkills = this->_r_skills;
     return aSkills ? aSkills->size() : 0;
-}
+}*/
 
 void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always) const
 {
@@ -104,7 +104,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                 trgStates = new QMap<const State*, int>();
                 target._state_dur = trgStates;
             }
-            state.blockSkills(target, false);
+            //state.blockSkills(target, false);
             int const crDur = trgStates->value(this, STATE_END_DUR);
             if (crDur == STATE_END_DUR)
             {
@@ -127,7 +127,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
 void State::remove(QString* const ret, Scene* const scene, Actor& actor) const
 {
     const State& state = *this;
-    state.blockSkills(actor, true);
+    //state.blockSkills(actor, true);
     state.adopt(ret, scene, actor, false, true);
 }
 
@@ -214,7 +214,7 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
 
 }
 
-void State::blockSkills(Actor& actor, const bool remove) const
+/*void State::blockSkills(Actor& actor, const bool remove) const
 {
     const State& state = *this;
     QVector<const Ability*>* rSkills = state._r_skills;
@@ -252,13 +252,13 @@ void State::blockSkills(Actor& actor, const bool remove) const
         }
     }
 
-}
+}*/
 
 State::State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QVector<const Ability*>* const aSkills, QVector<const Ability*>* const counters, QVector<const Ability*>* const rSkills,
-             QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res)
+             bool const revive, QVector<const Ability*>* const aSkills, QVector<const Ability*>* const counters, QMap<const State*, int>* const states,
+             QMap<const State*, int>* const stRes, QMap<int, int>* const res)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res)
 {
@@ -268,14 +268,14 @@ State::State(int const id, QString name, QString sprite, bool const shapeShift, 
     }
     this->_dur = dur;
     this->_s_res = sRes;
-    this->_r_skills = rSkills;
+    //this->_r_skills = rSkills;
 }
 
 State::State(const State& state) : Costume(state)
 {
     this->_dur = state._dur;
     this->_s_res = state._s_res;
-    this->_r_skills = state._r_skills;
+    //this->_r_skills = state._r_skills;
 }
 
 State::~State()
