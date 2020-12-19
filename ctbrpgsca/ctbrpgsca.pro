@@ -32,7 +32,6 @@ SOURCES += \
         library/cpp/arenawidget.cpp \
         library/cpp/clickablelabel.cpp \
         library/cpp/costume.cpp \
-        library/cpp/demolib.cpp \
         library/cpp/itemsmodel.cpp \
         library/cpp/play.cpp \
         library/cpp/role.cpp \
@@ -47,7 +46,6 @@ HEADERS += \
         library/cpp/arenawidget.hpp \
         library/cpp/clickablelabel.hpp \
         library/cpp/costume.hpp \
-        library/cpp/demolib.hpp \
         library/cpp/itemsmodel.hpp \
         library/cpp/play.hpp \
         library/cpp/role.hpp \
@@ -67,7 +65,7 @@ FORMS +=
 CONFIG += mobility
 MOBILITY = 
 
-QMAKE_CXXFLAGS += -O3 #-fms-extensions #-fdeclspec
+QMAKE_CXXFLAGS += -O3 -fms-extensions #-fdeclspec
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

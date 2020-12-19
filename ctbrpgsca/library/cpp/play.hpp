@@ -8,6 +8,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef PLAY_H
 #define PLAY_H
 
+#include <QMap>
+#include <QCoreApplication>
+
 namespace tbrpgsca
 {
 
@@ -116,10 +119,26 @@ namespace tbrpgsca
     PROP_FLAG_GET(is##Name, Flag, GetLevel) \
     PROP_FLAG_SET_ALL(Class, Name, Flag, SetLevel, is##Name)
 
+    class Ability;
+    class Costume;
+    class Actor;
+    class State;
+
     class Play
     {
+        Q_DECLARE_TR_FUNCTIONS(Play)
         PROP_CUSTOM_FIELD(Play, playFlags, setPlayFlags, swapPlayFlags, withPlayFlags, int, public, protected, _play_flags)
-    public:
+    public:            
+        static void FreeDemoMemory();
+        static QVector<Actor*>& Players();
+        static QVector<const State*>& States();
+        static QVector<QVector<const Ability*>*>& Abilities();
+        static QVector<QMap<const State*, int>*>& StateMasks();
+        static QVector<QVector<Actor*>*>& Enemies();
+        static QVector<const Ability*>& PartyItems();
+        static QVector<const Costume*>& Races();
+        static QVector<const Costume*>& Jobs();
+
         inline bool hasAllFlags(int const flag) const
         {
             return (this->_play_flags & flag) == flag;
@@ -129,6 +148,14 @@ namespace tbrpgsca
             return (this->_play_flags & flag) != 0;
         }
     protected:
+        inline static QVector<Actor*> _Players;
+        inline static QVector<QVector<Actor*>*> _Enemies;
+        inline static QVector<QMap<const State*, int>*> _State_Masks;
+        inline static QVector<QVector<const Ability*>*> _Abilities;
+        inline static QVector<const Costume*> _Races, _Jobs;
+        inline static QVector<const Ability*> _PartyItems;
+        inline static QVector<const State*> _States;
+
         unsigned int _play_flags: 16;
         inline void setFlag(int const flag, bool const value)
         {

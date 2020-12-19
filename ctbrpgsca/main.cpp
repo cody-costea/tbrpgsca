@@ -1,9 +1,9 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QScreen>
+
 #include <time.h>
 
-#include "library/cpp/demolib.hpp"
 #include "library/cpp/arenawidget.hpp"
 
 using namespace tbrpgsca;
@@ -43,11 +43,11 @@ int main(int argc, char* argv[])
     srand(time(0));
     QSize size;//(240, 320);
     QString ret;
-    DemoLib demoLib;
+    //DemoLib demoLib;
     QApplication a(argc, argv);
     QVector<QVector<Actor*>*> parties;
-    parties.append(&(demoLib.getPlayers()));
-    parties.append(demoLib.getEnemies().at(0));
+    parties.append(&(Play::Players()));
+    parties.append(Play::Enemies().at(0));
     const QList<QScreen*>& screens = QApplication::screens();
     if (screens.size() > 0)
     {
