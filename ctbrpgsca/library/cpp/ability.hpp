@@ -49,9 +49,9 @@ namespace tbrpgsca
         bool removedState(const State& state) const;
         int removedStatesSize() const;
 
+        void replenish(Actor& user) const;
         bool canPerform(const Actor& user) const;
         void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts) const;
-        void replenish(Actor& user) const;
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                 int const hpCost, int const mpCost, int const spCost, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,

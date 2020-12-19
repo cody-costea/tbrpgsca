@@ -660,7 +660,7 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
     }
 }
 
-void Actor::updateSkills(const bool remove, const bool counters, QVector<const Ability*>& skills)
+void Actor::updateSkills(const bool remove, QVector<const Ability*>& skills)
 {
     Actor& actor = *this;
     QVector<const Ability*>* aSkills = actor._a_skills;
@@ -778,10 +778,10 @@ void Actor::refreshCostumes(QString* const ret, Scene* const scene)
     }
 }
 
-Actor::Actor(int const id, QString name, QString sprite, const Costume& race, const Costume& job, int const level, int const maxLv, int const mActions,
-             int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res,
+Actor::Actor(int const id, QString name, QString sprite, const Costume& race, const Costume& job, int const level, int const maxLv, int const mHp,
+             int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res,
              QMap<const State*, int>* const stRes, QMap<const Ability*, int>* const items)
-    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false,
+    : Costume(id, name, sprite, false, 0, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false,
               false, false, false, new QVector<const Ability*>(), false, nullptr, stRes, res)
 {
     this->_lv = 1;

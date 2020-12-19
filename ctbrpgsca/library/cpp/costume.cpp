@@ -145,7 +145,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
         QVector<const Ability*>* skills = costume._a_skills;
         if (skills)
         {
-            actor.updateSkills(remove, false, *skills);
+            actor.updateSkills(remove, *skills);
         }
         /*skills = costume._counters;
         if (skills)
@@ -194,7 +194,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
     }
 }
 
-Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const elm, int const blockedSkills, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
                  bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<const Ability*>* const skills,
                  bool const counters, QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res)
@@ -208,6 +208,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     this->_res = res;
     this->_st_res = stRes;
     this->_a_skills = skills;
+    this->_b_skill_types = blockedSkills;
     int flags = this->_play_flags;
     if (stun)
     {
@@ -248,11 +249,11 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     this->_play_flags = flags;
 }
 
-Costume::Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
+Costume::Costume(int const id, QString name, QString sprite, bool const shapeShift, int const elm, int const blockedSkills, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                  bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<const Ability*>* const skills, bool const counters,
                  QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res)
-    : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
+    : Costume(id, name, sprite, shapeShift, elm, blockedSkills, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
               revive, skills, counters, states, stRes, res) {}
 
 Costume::Costume(const Costume& costume) : Role(costume)

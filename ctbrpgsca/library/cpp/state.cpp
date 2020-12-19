@@ -254,12 +254,12 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
 
 }*/
 
-State::State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
+State::State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const blockedSkills, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
              bool const revive, QVector<const Ability*>* const aSkills, QVector<const Ability*>* const counters, QMap<const State*, int>* const states,
              QMap<const State*, int>* const stRes, QMap<int, int>* const res)
-    : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
+    : Costume(id, name, sprite, shapeShift, elm, blockedSkills, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res)
 {
     if (convert)

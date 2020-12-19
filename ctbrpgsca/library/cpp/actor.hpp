@@ -112,7 +112,7 @@ namespace tbrpgsca
         void setCurrentMp(int const mp);
         void setCurrentRp(int const sp);
 
-        Actor(int const id, QString name, QString sprite, const Costume& race, const Costume& job, int const level, int const maxLv, int const mActions,
+        Actor(int const id, QString name, QString sprite, const Costume& race, const Costume& job, int const level, int const maxLv,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               QMap<int, int>* const res, QMap<const State*, int>* const stRes, QMap<const Ability*, int>* const items);
 
@@ -125,25 +125,25 @@ namespace tbrpgsca
         QMap<char, const Costume*> _equipment;
         QVector<const Costume*>* _dmg_roles;
 
-        void levelUp(Scene* const scene);
         inline void checkRegSkill(const Ability& skill);
         void recover(QString* const ret, Scene* const scene);
         char unequipItem(Scene* const scene, const Costume& item);
         void refreshCostumes(QString* const ret, Scene* const scene);
         const Costume* unequipPos(Scene* const scene, char const pos);
         const Costume* equipItem(Scene* const scene, char const pos, const Costume* const item);
+        void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
         void removeStates(QString* const ret, Scene* const scene, bool const remove);
         void updateStates(bool const remove, QString* const ret, Scene* const scene,
-                            QMap<const State*, int>& states, bool const includeWithDur);
+                          QMap<const State*, int>& states, bool const includeWithDur);
+        void updateSkills(bool const remove, QVector<const Ability*>& skills);
         void updateAttributes(bool const remove, Scene* const scene, const Costume& costume);
-        void updateSkills(bool const remove, bool const counters, QVector<const Ability*>& skills);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
-        void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
         void setCurrentExperience(Scene* const scene, int const xp);
         void setCurrentLevel(Scene* const scene, int const level);
         void setRace(Scene* const scene, const Costume& race);
         void setJob(Scene* const scene, const Costume& job);
         void setAgility(int const agi, Scene& scene);
+        void levelUp(Scene* const scene);
 
         template <typename SpriteRun>
         void applyDmgRoles(QString& ret, Scene* const scene, const SpriteRun* const actorEvent);

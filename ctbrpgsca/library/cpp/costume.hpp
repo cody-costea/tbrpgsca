@@ -20,11 +20,11 @@ namespace tbrpgsca
         #define FLAG_ENRAGED 4
         #define FLAG_CONFUSE 8
         #define FLAG_CONVERT 16
-        #define FLAG_COUNTER 2048
-        #define FLAG_REFLECT 32
+        #define FLAG_COVERING 1024
         #define FLAG_SHAPE_SHIFT 64
         #define FLAG_INVINCIBLE 128
-        #define FLAG_COVERING 1024
+        #define FLAG_COUNTER 2048
+        #define FLAG_REFLECT 32
         #define FLAG_STUN 256
         #define FLAG_KO 512
 
@@ -58,7 +58,7 @@ namespace tbrpgsca
         void abandon(QString& ret, Actor& actor) const;
         void apply(QString& ret, Actor& actor) const;
 
-        Costume(int const id, QString name, QString sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
+        Costume(int const id, QString name, QString sprite, bool const shapeShift, int const element, int const blockedSkills, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<const Ability*>* const skills, bool const counters,
                 QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res);
@@ -76,7 +76,7 @@ namespace tbrpgsca
         void refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove) const;
         void adopt(QString* const ret, Scene* const scene, Actor& actor, bool const upeStates, bool const rmeove) const;
 
-        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const element, int blockedSkills, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
                 bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<const Ability*>* const skills,
                 bool const counters, QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res);
