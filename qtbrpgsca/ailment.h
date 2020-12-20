@@ -29,21 +29,19 @@ namespace tbrpgsca
         bool hasRemovedSkillId(const int skill) const;
         int removedSkillId(int const n) const;
 
-        void alter(QString& ret, Actor& actor, bool const consume);
-        void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
-        bool disable(Actor& actor, int const dur, bool const remove);
         void blockSkills(Actor& actor, bool const remove) const;
+        void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
 
         Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<Ailment*, int>* const states,
+              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
               QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
               bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<Ailment*, int>* const states,
+              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
               QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit Ailment(QObject* const parent = NIL);
@@ -71,10 +69,7 @@ namespace tbrpgsca
         int _max_dur;
         QSharedDataPointer<AilmentData> _state_data;
 
-        void alter(QString* const ret, Actor& actor, bool const consume);
         void inflict(QString* const ret, Actor* user, Actor& target, int dur, bool const always);
-        bool disable(QString* const ret, Actor& actor, int dur, bool const remove);
-        void remove(QString* const ret, Actor& actor) const;
 
         friend class Actor;
         friend class Ability;

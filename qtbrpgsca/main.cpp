@@ -1,12 +1,13 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickWindow>
 #include <QQmlContext>
 #include <QTranslator>
 
 #include "demolib.h"
 #include "ability.h"
 #include "costume.h"
-#include "ailment.h"
+#include "state.h"
 #include "actor.h"
 #include "scene.h"
 #include "role.h"
@@ -16,6 +17,8 @@ using namespace tbrpgsca;
 
 int main(int argc, char* argv[])
 {
+    //QQuickWindow::setSceneGraphBackend(QSGRendererInterface::VulkanRhi);
+    //QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Direct3D11Rhi);
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
@@ -32,6 +35,7 @@ int main(int argc, char* argv[])
     REG_QML(Costume)
     REG_QML(Ailment)
     REG_QML(Actor)
+    REG_QML(State)
 
     QTranslator translator;
     if (

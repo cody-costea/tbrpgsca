@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "actor.h"
 #include "costume.h"
 #include "ability.h"
-#include "ailment.h"
+#include "state.h"
 #include "scene.h"
 #include "role.h"
 
@@ -61,13 +61,13 @@ const Costume* Actor::equipItem(const char pos, Costume* const item)
 void Actor::removeStates(QString* const ret, bool const remove)
 {
     Actor& actor = *this;
-    QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
+    QList<Ailment>* const stateDur = actor._role_data->_a_states;
     if (stateDur)
     {
         actor.updateStates(true, ret, *stateDur, true);
         if (remove && stateDur->size() == 0)
         {
-            actor._role_data->_state_dur = NIL;
+            actor._role_data->_a_states = NIL;
             delete stateDur;
         }
     }
@@ -301,15 +301,24 @@ void Actor::applyStates(QString* const ret, const bool consume)
     {
         actor.applyDmgRoles(*ret);
     }
-    QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
+    QList<Ailment>* const stateDur = actor._role_data->_a_states;
     if (stateDur)
     {
-        auto const last = stateDur->cend();
+        /*auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
             if (it.value() > Ailment::EndDur)
             {
                 it.key()->alter(ret, actor, consume);
+            }
+        }*/
+        const int statesSize = stateDur->size();
+        for (int i = 0; i < statesSize; ++i)
+        {
+            State& aState = static_cast<State&>(stateDur->operator[](i));
+            if (aState.currentDuration() > Ailment::EndDur)
+            {
+                aState.alter(ret, actor, consume);
             }
         }
     }
@@ -612,15 +621,16 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>&
     }
 }
 
-void Actor::updateStates(bool const remove, QString* const ret, QMap<Ailment*, int>& states, bool const includeWithDur)
+void Actor::updateStates(bool const remove, QString* const ret, QList<Ailment>& states, bool const includeWithDur)
 {
     Actor& actor = *this;
     if (remove)
     {
-        QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
-        if (stateDur && stateDur->size() > 0)
+        int statesSize;
+        QList<Ailment>* const stateDur = actor._role_data->_a_states;
+        if (stateDur && (statesSize = stateDur->size()) > 0)
         {
-            auto const last = states.cend();
+            /*auto const last = states.cend();
             for (auto it = states.cbegin(); it != last; ++it)
             {
                 int const rDur = it.value();
@@ -628,18 +638,41 @@ void Actor::updateStates(bool const remove, QString* const ret, QMap<Ailment*, i
                 {
                     it.key()->disable(ret, actor, rDur, includeWithDur);
                 }
+            }*/
+            for (int i = 0; i < statesSize; ++i)
+            {
+                State& aState = static_cast<State&>(stateDur->operator[](i));
+                for (auto& rState : states)
+                {
+                    if (aState.databaseId() == rState.databaseId())
+                    {
+                        int const rDur = rState.maximumDuration();
+                        if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
+                        {
+                            aState.disable(ret, actor, rDur, includeWithDur);
+                        }
+                    }
+                }
             }
         }
     }
     else
     {
-        auto const last = states.cend();
+        /*auto const last = states.cend();
         for (auto it = states.cbegin(); it != last; ++it)
         {
             int const rDur = it.value();
             if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
             {
                 it.key()->inflict(ret, NIL, actor, rDur, true);
+            }
+        }*/
+        for (auto& aState : states)
+        {
+            int const rDur = aState.maximumDuration();
+            if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
+            {
+                aState.inflict(ret, NIL, actor, rDur, true);
             }
         }
     }
@@ -656,15 +689,24 @@ void Actor::refreshCostumes(QString* const ret)
             it.value()->refresh(ret, actor, true, false);
         }
     }
-    QMap<Ailment*, int>* const stateDur = actor._role_data->_state_dur;
+    QList<Ailment>* const stateDur = actor._role_data->_a_states;
     if (stateDur)
     {
-        auto const last = stateDur->cend();
+        /*auto const last = stateDur->cend();
         for (auto it = stateDur->cbegin(); it != last; ++it)
         {
             if (it.value() > Ailment::EndDur)
             {
                 it.key()->refresh(ret, actor, false, false);
+            }
+        }*/
+        const int aStatesSize = stateDur->size();
+        for (int i = 0; i < aStatesSize; ++i)
+        {
+            State& state = static_cast<State&>(stateDur->operator[](i));
+            if (state.currentDuration() > Ailment::EndDur)
+            {
+                state.refresh(ret, actor, false, false);
             }
         }
     }
@@ -693,7 +735,7 @@ Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costum
     actorData->_dmg_roles = NIL;
     //actorData->_skills_rg_turn = NIL;
     //actorData->_skills_cr_qty = NIL;
-    this->_role_data->_state_dur = NIL;
+    this->_role_data->_a_states = NIL;
     actorData->_actions = mActions;
     actorData->_max_lv = maxLv;
     actorData->_items = items.isNull() ? NIL : items;

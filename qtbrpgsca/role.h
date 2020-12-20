@@ -74,10 +74,10 @@ namespace tbrpgsca
         static QString ResistTxt;
 
         QString sprite() const;
-        QList<Ailment*> statesList() const;
+        /*QList<Ailment*> statesList() const;
         int stateDuration(Ailment& state) const;
         bool hasState(Ailment& state) const;
-        int statesSize() const;
+        int statesSize() const;*/
 
         inline bool operator==(const Role& role) const
         {
@@ -112,26 +112,26 @@ namespace tbrpgsca
             ~RoleData();
 
         protected:
-            int _id;
             QString _name,* _sprite;
-            int _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
-            QMap<Ailment*, int>* _state_dur;
+            int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
+            QList<Ailment>* _a_states;
 
             friend class Ability;
             friend class Costume;
-            friend class Actor;
             friend class Ailment;
+            friend class Actor;
             friend class Scene;
+            friend class State;
             friend class Role;
         };
 
         QSharedDataPointer<RoleData> _role_data;
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-             int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* const states, QObject* const parent = NIL);
+             int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* const states, QObject* const parent = NIL);
 
         Role(int const id, QString&& name, QString&& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-             int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* const states, QObject* const parent = NIL);
+             int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* const states, QObject* const parent = NIL);
 
         explicit Role(QObject* const parent = NIL);
 
@@ -144,6 +144,7 @@ namespace tbrpgsca
         friend class Costume;
         friend class Ailment;
         friend class Scene;
+        friend class State;
     };
 
 }

@@ -28,29 +28,29 @@ QString Role::sprite() const
     return spr ? *spr : QString();
 }
 
-int Role::stateDuration(Ailment& state) const
+/*int Role::stateDuration(Ailment& state) const
 {
-    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
+    QList<Ailment>* const aStates = this->_role_data->_a_states;
     return aStates == NIL ? 0 : aStates->value(&state, 0);
 }
 
 QList<Ailment*> Role::statesList() const
 {
-    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
+    QList<Ailment>* const aStates = this->_role_data->_a_states;
     return aStates == NIL ? QList<Ailment*>() : aStates->keys();
 }
 
 bool Role::hasState(Ailment& state) const
 {
-    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
+    QList<Ailment>* const aStates = this->_role_data->_a_states;
     return aStates && aStates->contains(&state);
 }
 
 int Role::statesSize() const
 {
-    QMap<Ailment*, int>* const aStates = this->_role_data->_state_dur;
+    QList<Ailment>* const aStates = this->_role_data->_a_states;
     return aStates == NIL ? 0 : aStates->size();
-}
+}*/
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
@@ -216,12 +216,12 @@ Role::RoleData::~RoleData()
 }
 
 Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-           int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* aStates, QObject* const parent)
+           int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* aStates, QObject* const parent)
     : Play(parent, ((revive ? Attribute::REVIVE : 0) | (range ? Attribute::RANGE : 0)))
 {
     QSharedDataPointer<RoleData> roleData(new RoleData);
     roleData->_sprite = sprite.isNull() ? NIL : new QString(sprite);
-    roleData->_state_dur = aStates;
+    roleData->_a_states = aStates;
     roleData->_dmg_type = element;
     roleData->_name = name;
     roleData->_m_hp = mHp;
@@ -235,7 +235,7 @@ Role::Role(int const id, QString& name, QString& sprite, int const hpDmg, int co
 }
 
 Role::Role(int const id, QString&& name, QString&& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
-           int const mSp, int const element, bool const range, bool const revive, QMap<Ailment*, int>* aStates, QObject* const parent)
+           int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* aStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, element, range, revive, aStates, parent) {}
 
 Role::Role(const Role& role) : Play(NIL, role.playFlags())

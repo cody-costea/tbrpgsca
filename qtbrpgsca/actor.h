@@ -160,6 +160,7 @@ namespace tbrpgsca
             friend class ItemsModel;
             friend class Costume;
             friend class Ailment;
+            friend class State;
             friend class Role;
         };
 
@@ -171,10 +172,9 @@ namespace tbrpgsca
         void applyDmgRoles(QString& ret);
         void removeStates(QString* const ret, bool const remove);
         void applyStates(QString* const ret, bool const consume);
-        void updateStates(bool const remove, QString* const ret,
-                            QMap<Ailment*, int>& states, bool const includeWithDur);
         void updateAttributes(bool const remove, const Costume& costume);
         void updateSkills(bool const remove, bool const counters, QList<Ability>& skills);
+        void updateStates(bool const remove, QString* const ret, QList<Ailment>& states, bool const includeWithDur);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<int, int>* const stRes);
         void switchCostume(QString* const ret, const Costume* const oldCostume, const Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, bool const survive);
@@ -188,6 +188,7 @@ namespace tbrpgsca
         friend class ItemsModel;
         friend class Costume;
         friend class Ailment;
+        friend class State;
         friend class Role;
     };
 

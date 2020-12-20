@@ -5,7 +5,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#include "ailment.h"
+#include "state.h"
 #include "ability.h"
 #include "costume.h"
 #include "actor.h"
@@ -31,192 +31,6 @@ int Ailment::removedSkillsIdsSize() const
 {
     auto aSkills = this->_state_data->_r_skills;
     return aSkills == NIL ? 0 : aSkills->size();
-}
-
-void Ailment::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
-{
-    return this->inflict(&ret, user, target, dur, always);
-}
-
-void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int stateDur, const bool always)
-{
-    if (stateDur == 0)
-    {
-        stateDur = this->maximumDuration();
-        if (stateDur == 0)
-        {
-            return;
-        }
-    }
-    if (stateDur > Ailment::EndDur)
-    {
-        int stateRes;
-        QMap<int, int>* stRes;
-        if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
-                == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(int(0), 0)) + stateRes)))
-        {
-            QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
-            QMap<Ailment*, int>* trgStates = trgRoleData->_state_dur;
-            if (trgStates == NIL)
-            {
-                trgStates = new QMap<Ailment*, int>();
-                trgRoleData->_state_dur = trgStates;
-            }
-            else
-            {
-                QMap<Ailment*, int>* const rStates = this->_role_data->_state_dur;
-                if (rStates)
-                {
-                    auto const rLast = rStates->cend();
-                    for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
-                    {
-                        int rDur = rIt.value();
-                        Ailment* const rState = rIt.key();
-                        if (rDur == 0 || rDur <= Ailment::EndDur)
-                        {
-                            rDur = rState->maximumDuration();
-                        }
-                        auto const last = trgStates->cend();
-                        for (auto it = trgStates->cbegin(); it != last; ++it)
-                        {
-                            Ailment* const aState = it.key();
-                            if (aState == rState)
-                            {
-                                int const aDur = it.value();
-                                if (aDur > Ailment::EndDur)
-                                {
-                                    if (aDur < 0 && rDur > aDur)
-                                    {
-                                        return;
-                                    }
-                                    rState->disable(ret, target, rDur, false);
-                                    if (rDur > 0 && aDur > 0)
-                                    {
-                                        stateDur -= aDur < rDur ? aDur : rDur;
-                                        if (stateDur < 1)
-                                        {
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            this->blockSkills(target, false);
-            int const crDur = trgStates->value(this, Ailment::EndDur);
-            if (crDur == Ailment::EndDur)
-            {
-                this->adopt(ret, target, false, false);
-                trgStates->operator[](this) = stateDur;
-            }
-            else if ((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur))
-            {
-                trgStates->operator[](this) = stateDur;
-            }
-            if (user && this->isConverted() && target.partySide() != user->partySide())
-            {
-                target.setPartySide(user->partySide());
-            }
-        }
-    }
-
-}
-
-void Ailment::remove(QString* const ret, Actor& actor) const
-{
-    const Ailment& state = *this;
-    state.blockSkills(actor, true);
-    state.adopt(ret, actor, false, true);
-    if (this->isConverted() && (!actor.isConverted()))
-    {
-        actor.setPartySide(static_cast<int>(actor._actor_data->_old_side));
-    }
-
-}
-
-bool Ailment::disable(Actor& actor, int const dur, const bool remove)
-{
-    return this->disable(NIL, actor, remove, dur);
-}
-
-bool Ailment::disable(QString* const ret, Actor& actor, int dur, const bool remove)
-{
-    if (dur == 0)
-    {
-        dur = this->maximumDuration();
-    }
-    if (dur > Ailment::EndDur)
-    {
-        QMap<Ailment*, int>* sDur = actor._role_data->_state_dur;
-        if (sDur == NIL)
-        {
-            return true;
-        }
-        else
-        {
-            int const crDur = sDur->value(this, Ailment::EndDur);
-            //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
-            if (crDur > -1 || dur <= crDur)
-            {
-                if (dur > 0 /*&& crDur > 0*/ && crDur > dur)
-                {
-                    sDur->operator[](this) = crDur - dur;
-                    return false;
-                }
-                else
-                {
-                    if (remove)
-                    {
-                        sDur->remove(this);
-                    }
-                    else
-                    {
-                        sDur->operator[](this) = Ailment::EndDur;
-                    }
-                    if (crDur > Ailment::EndDur)
-                    {
-                        this->remove(ret, actor);
-                    }
-                    return true;
-                }
-            }
-            return crDur <= Ailment::EndDur;
-        }
-    }
-    else
-    {
-        return false;
-    }
-}
-
-void Ailment::alter(QString& ret, Actor& actor, const bool consume)
-{
-    return this->alter(&ret, actor, consume);
-}
-
-void Ailment::alter(QString* const ret, Actor& actor, const bool consume)
-{
-    Ailment& state = *this;
-    QMap<Ailment*, int>* sDur = actor._role_data->_state_dur;
-    if (sDur /*&& actor.hp > 0*/)
-    {
-        int const d = sDur->value(this, Ailment::EndDur);
-        if (consume)
-        {
-            if (d > 0)
-            {
-                sDur->operator[](this) = d - 1;
-            }
-        }
-        else if (d == 0)
-        {
-            sDur->operator[](this) = Ailment::EndDur;
-            state.remove(ret, actor);
-        }
-    }
-
 }
 
 void Ailment::blockSkills(Actor& actor, const bool remove) const
@@ -286,10 +100,134 @@ void Ailment::blockSkills(Actor& actor, const bool remove) const
 
 }
 
+void Ailment::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
+{
+    return this->inflict(&ret, user, target, dur, always);
+}
+
+void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int stateDur, const bool always)
+{
+    if (stateDur == 0)
+    {
+        stateDur = this->maximumDuration();
+        if (stateDur == 0)
+        {
+            return;
+        }
+    }
+    if (stateDur > State::EndDur)
+    {
+        int stateRes;
+        QMap<int, int>* stRes;
+        if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
+                == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(int(0), 0)) + stateRes)))
+        {
+            int trgStatesSize;
+            QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
+            QList<Ailment>* trgStates = trgRoleData->_a_states;
+            if (trgStates == NIL)
+            {
+                trgStates = new QList<Ailment>();
+                trgRoleData->_a_states = trgStates;
+                trgStatesSize = 0;
+            }
+            else
+            {
+                trgStatesSize = trgStates->size();
+                QList<Ailment>* const rStates = this->_role_data->_a_states;
+                if (rStates)
+                {
+                    //auto const rLast = rStates->cend();
+                    //for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
+                    for (auto& rState : *rStates)
+                    {
+                        int rDur = rState.maximumDuration();//rIt.value();
+                        //Ailment* const rState = rIt.key();
+                        if (rDur == 0 || rDur <= State::EndDur)
+                        {
+                            rDur = rState.maximumDuration();
+                        }
+                        //auto const last = trgStates->cend();
+                        //for (auto it = trgStates->cbegin(); it != last; ++it)
+                        //for (auto& aState : *trgStates)
+                        for (int i = 0; i < trgStatesSize; ++i)
+                        {
+                            //Ailment* const aState = it.key();
+                            State& aState = static_cast<State&>(trgStates->operator[](i));
+                            if (aState.databaseId() == rState.databaseId())
+                            {
+                                int const aDur = aState.maximumDuration();//it.value();
+                                if (aDur > State::EndDur)
+                                {
+                                    if (aDur < 0 && rDur > aDur)
+                                    {
+                                        return;
+                                    }
+                                    aState.disable(ret, target, rDur, false);
+                                    if (rDur > 0 && aDur > 0)
+                                    {
+                                        stateDur -= aDur < rDur ? aDur : rDur;
+                                        if (stateDur < 1)
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            State* state = NIL;
+            //auto crState = static_cast<State*>(this); //TODO: instantiate new State from Ailment when necessary;
+            for (int i = 0; i < trgStatesSize; ++i)
+            {
+                State& crState = static_cast<State&>(trgStates->operator[](i));
+                if (crState.databaseId() == this->databaseId())
+                {
+                    state = &crState;
+                    break;
+                }
+            }
+            do
+            {
+                int crDur;
+                if (state)
+                {
+                    crDur = state->currentDuration();//trgStates->value(this, State::EndDur);
+                    if (crDur == State::EndDur)
+                    {
+                        state->adopt(ret, target, false, false);
+                        //trgStates->operator[](this) = stateDur;
+                    }
+                    else if (!((crDur > -1 && crDur < stateDur) || (stateDur < 0 && stateDur < crDur)))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    trgStates->append(State(this)); //TODO: rewrite in a better way;
+                    state = &static_cast<State&>(trgStates->operator[](trgStatesSize));
+                    state->adopt(ret, target, false, false);
+                }
+                state->setCurrentDuration(stateDur);
+            }
+            while (false);
+            state->blockSkills(target, false);
+            if (user && this->isConverted() && target.partySide() != user->partySide())
+            {
+                target.setPartySide(user->partySide());
+            }
+        }
+    }
+
+}
+
 Ailment::Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<Ailment*, int>* const states,
+             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Costume(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res, parent)
@@ -309,7 +247,7 @@ Ailment::Ailment(int const id, QString& name, QString& sprite, bool const shapeS
 Ailment::Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QMap<Ailment*, int>* const states,
+             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
     : Ailment(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
             reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
