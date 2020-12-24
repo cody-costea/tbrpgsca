@@ -213,6 +213,8 @@ QVector<const Costume*>& Play::Jobs()
                                  false, false, false, false, abilities[1], false, nullptr, nullptr, nullptr));
         jobs.append(new Costume(19, tr("Bard"), "Bard", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], false, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(20, tr("Fairy"), "Fairy", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], false, nullptr, nullptr, nullptr));
     }
     return jobs;
 }
@@ -243,7 +245,7 @@ QVector<Actor*>& Play::Players()
         QVector<const Costume*>& races = Play::Races();
         players.append(new Actor(1, tr("Cody"), "", (*races[3]), (*jobs[7]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         players.append(new Actor(2, tr("Victoria"), "", (*races[0]), (*jobs[16]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
-        players.append(new Actor(4, tr("Stephanie"), "", (*races[2]), (*jobs[17]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
+        players.append(new Actor(4, tr("Stephanie"), "", (*races[2]), (*jobs[19]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
         players.append(new Actor(3, tr("George"), "", (*races[1]), (*jobs[2]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr));
     }
     return players;

@@ -569,5 +569,19 @@
         <file>sprites/mng/Santa/bt_r_ko.mng</file>
         <file>sprites/mng/Santa/bt_r_restored.mng</file>
         <file>sprites/png/current.png</file>
+        <file>sprites/gif/Fairy/bt_l_act.gif</file>
+        <file>sprites/gif/Fairy/bt_l_cast.gif</file>
+        <file>sprites/gif/Fairy/bt_l_fallen.gif</file>
+        <file>sprites/gif/Fairy/bt_l_hit.gif</file>
+        <file>sprites/gif/Fairy/bt_l_idle.gif</file>
+        <file>sprites/gif/Fairy/bt_l_ko.gif</file>
+        <file>sprites/gif/Fairy/bt_l_restored.gif</file>
+        <file>sprites/gif/Fairy/bt_r_act.gif</file>
+        <file>sprites/gif/Fairy/bt_r_cast.gif</file>
+        <file>sprites/gif/Fairy/bt_r_fallen.gif</file>
+        <file>sprites/gif/Fairy/bt_r_hit.gif</file>
+        <file>sprites/gif/Fairy/bt_r_idle.gif</file>
+        <file>sprites/gif/Fairy/bt_r_ko.gif</file>
+        <file>sprites/gif/Fairy/bt_r_restored.gif</file>
     </qresource>
 </RCC>

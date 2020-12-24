@@ -161,6 +161,8 @@ QVector<Costume*>& DemoLib::getJobs()
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
         jobs.append(new Costume(19, tr("Bard"), "Bard", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
+        jobs.append(new Costume(20, tr("Fairy"), "Fairy", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+                                 false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
     }
     return jobs;
 }
