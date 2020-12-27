@@ -26,6 +26,13 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 CONFIG += c++17 resources_big qtquickcompiler #objective_c
 
 SOURCES += \
+        library/c/trability.c \
+        library/c/tractor.c \
+        library/c/trcostume.c \
+        library/c/trplay.c \
+        library/c/trrole.c \
+        library/c/trscene.c \
+        library/c/trstate.c \
         main.cpp \
         library/cpp/ability.cpp \
         library/cpp/actor.cpp \
@@ -41,6 +48,13 @@ SOURCES += \
         library/cpp/targetsmodel.cpp
 
 HEADERS += \
+        library/c/trability.h \
+        library/c/tractor.h \
+        library/c/trcostume.h \
+        library/c/trplay.h \
+        library/c/trrole.h \
+        library/c/trscene.h \
+        library/c/trstate.h \
         library/cpp/ability.hpp \
         library/cpp/actor.hpp \
         library/cpp/arenawidget.hpp \
