@@ -98,7 +98,11 @@ namespace tbrpgsca
             ClickableLabel* _skill_lbl;
             QLabel* _actor_lbl;
             QString _pos;
+#if USE_BIT_FIELDS
             int _spr: 4;
+#else
+            int _spr;
+#endif
 
             friend class ArenaWidget;
         };
@@ -120,7 +124,11 @@ namespace tbrpgsca
 
         QString* _ret_str;
         QLayout* _ctr_lyt,* _main_lyt;
+#if USE_BIT_FIELDS
         signed int _spr_runs: 16, _trg_count: 16;
+#else
+        signed int _spr_runs, _trg_count;
+#endif
         QPushButton* _act_btn,* _use_btn,* _flee_btn,* _auto_btn;
         QComboBox* _skills_box,* _items_box,* _target_box;
         QWidget* _ctr_wdt,* _act_wdt;

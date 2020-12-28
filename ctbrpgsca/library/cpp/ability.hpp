@@ -5,8 +5,8 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef ABILITY_H
-#define ABILITY_H
+#ifndef ABILITY_HPP
+#define ABILITY_HPP
 
 #include "role.hpp"
 
@@ -61,7 +61,11 @@ namespace tbrpgsca
 
         ~Ability();
     protected:
+#if USE_BIT_FIELDS
         signed int _lv_rq: 8, _m_qty: 12, _r_qty: 12;
+#else
+        signed int _lv_rq, _m_qty, _r_qty;
+#endif
         QMap<const State*, int>* _r_states;
         QString* _sound;
 
@@ -79,4 +83,4 @@ namespace tbrpgsca
 
 }
 
-#endif // ABILITY_H
+#endif // ABILITY_HPP

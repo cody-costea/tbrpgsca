@@ -5,8 +5,8 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef ACTOR_H
-#define ACTOR_H
+#ifndef ACTOR_HPP
+#define ACTOR_HPP
 
 #include "costume.hpp"
 
@@ -120,7 +120,11 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
+#if USE_BIT_FIELDS
         signed int _lv: 8, _max_lv: 8, _xp: 32, _maxp: 32;
+#else
+        signed int _lv, _max_lv, _xp, _maxp;
+#endif
         QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         QMap<char, const Costume*> _equipment;
         QVector<const Costume*>* _dmg_roles;
@@ -169,4 +173,4 @@ namespace tbrpgsca
 
 }
 
-#endif // ACTOR_H
+#endif // ACTOR_HPP

@@ -5,8 +5,8 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef ROLE_H
-#define ROLE_H
+#ifndef ROLE_HPP
+#define ROLE_HPP
 
 #include "play.hpp"
 
@@ -63,7 +63,11 @@ namespace tbrpgsca
         void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
     protected:
         QString _name,* _sprite;
+#if USE_BIT_FIELDS
         signed int _dmg_type: 16, _hp: 24, _mp: 16, _sp: 16, _m_hp: 24, _m_mp: 16, _m_sp: 16;
+#else
+        signed int _dmg_type, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp;
+#endif
         QMap<const State*, int>* _state_dur;
 
         template <typename SpriteRun>
@@ -84,4 +88,4 @@ namespace tbrpgsca
     };
 
 }
-#endif // ROLE_H
+#endif // ROLE_HPP

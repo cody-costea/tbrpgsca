@@ -5,8 +5,8 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef STATE_H
-#define STATE_H
+#ifndef STATE_HPP
+#define STATE_HPP
 
 #include "costume.hpp"
 
@@ -41,7 +41,11 @@ namespace tbrpgsca
 
         ~State();
     protected:
+#if USE_BIT_FIELDS
         signed int _dur: 16, _s_res: 16;
+#else
+        signed int _dur, _s_res;
+#endif
         //QVector<const Ability*>* _r_skills;
 
         void alter(QString* const ret, Scene* const scene, Actor& actor, bool const consume) const;
@@ -57,4 +61,4 @@ namespace tbrpgsca
 
 }
 
-#endif // STATE_H
+#endif // STATE_HPP

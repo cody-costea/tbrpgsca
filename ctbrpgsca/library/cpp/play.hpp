@@ -5,14 +5,16 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef PLAY_H
-#define PLAY_H
+#ifndef PLAY_HPP
+#define PLAY_HPP
 
 #include <QMap>
 #include <QCoreApplication>
 
 namespace tbrpgsca
 {
+
+#define USE_BIT_FIELDS 0
 
 #define PROP_FIELD_GET_CUSTOM(Name, Type, GetLevel, Field) \
     GetLevel: inline Type Name() const \
@@ -156,7 +158,11 @@ namespace tbrpgsca
         inline static QVector<const Ability*> _PartyItems;
         inline static QVector<const State*> _States;
 
+#if USE_BIT_FIELDS
         unsigned int _play_flags: 16;
+#else
+        unsigned int _play_flags;
+#endif
         inline void setFlag(int const flag, bool const value)
         {
             int const flags = this->_play_flags;
@@ -181,4 +187,4 @@ namespace tbrpgsca
 
 }
 
-#endif // PLAY_H
+#endif // PLAY_HPP

@@ -17,7 +17,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 typedef struct tr_role {
     struct tr_play;
     char *name, *sprite;
-    TR_BOOL ranged: 1, revives: 1;
+    //TR_BOOL ranged: 1, revives: 1;
     TR_NR dmg_type: 16, hp: 24, mp: 16, sp: 16, m_hp: 24, m_mp: 16, m_sp: 16;
 } TrRole;
 

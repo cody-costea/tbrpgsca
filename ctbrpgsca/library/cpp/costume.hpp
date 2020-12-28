@@ -5,8 +5,8 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef COSTUME_H
-#define COSTUME_H
+#ifndef COSTUME_HPP
+#define COSTUME_HPP
 
 #include "ability.hpp"
 #include "role.hpp"
@@ -67,7 +67,11 @@ namespace tbrpgsca
 
         ~Costume();
     protected:
+#if USE_BIT_FIELDS
         signed int _atk: 16, _def: 16, _spi: 16, _wis: 16, _agi: 16, _b_skill_types: 16;
+#else
+        signed int _atk, _def, _spi, _wis, _agi, _b_skill_types;
+#endif
         QVector<const Ability*>* _a_skills;
         QMap<const State*, int>* _st_res;
         QMap<int, int>* _res;
@@ -89,4 +93,4 @@ namespace tbrpgsca
     };
 }
 
-#endif // COSTUME_H
+#endif // COSTUME_HPP

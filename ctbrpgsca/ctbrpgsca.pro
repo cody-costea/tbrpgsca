@@ -23,7 +23,7 @@ DEFINES *= QT_USE_QSTRINGBUILDER
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++17 resources_big qtquickcompiler #objective_c
+CONFIG += c11 c++17 resources_big qtquickcompiler #objective_c
 
 SOURCES += \
         library/c/trability.c \
@@ -33,7 +33,6 @@ SOURCES += \
         library/c/trrole.c \
         library/c/trscene.c \
         library/c/trstate.c \
-        main.cpp \
         library/cpp/ability.cpp \
         library/cpp/actor.cpp \
         library/cpp/arenawidget.cpp \
@@ -45,7 +44,8 @@ SOURCES += \
         library/cpp/scene.cpp \
         library/cpp/skillsmodel.cpp \
         library/cpp/state.cpp \
-        library/cpp/targetsmodel.cpp
+        library/cpp/targetsmodel.cpp \
+        main.cpp
 
 HEADERS += \
         library/c/trability.h \
@@ -79,11 +79,17 @@ FORMS +=
 CONFIG += mobility
 MOBILITY = 
 
-QMAKE_CXXFLAGS += -O3 -fms-extensions #-fdeclspec
+QMAKE_CXXFLAGS += -O3 -fms-extensions -fdeclspec
+
+ANDROID_ABIS = armeabi-v7a arm64-v8a x86 x86_64
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+android {
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    DISTFILES += android/AndroidManifest.xml
+}
 RESOURCES += sprites.qrc

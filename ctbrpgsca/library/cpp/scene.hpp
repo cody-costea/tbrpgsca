@@ -5,8 +5,8 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef SCENE_HPP
+#define SCENE_HPP
 
 #include "actor.hpp"
 #include "play.hpp"
@@ -102,7 +102,11 @@ namespace tbrpgsca
     protected:
         const Ability* _last_ability;
         QVector<SceneRun*>* _events;
-        signed int _current: 8, _original: 8, _f_target: 8, _l_target: 8, _surprise: 2,_status: 2, _m_init: 28;
+#if USE_BIT_FIELDS
+        signed int _current: 8, _original: 8, _f_target: 8, _l_target: 8, _surprise: 2, _status: 2, _m_init: 28;
+#else
+        signed int _current, _original, _f_target, _l_target, _surprise, _status, _m_init;
+#endif
         QVector<QVector<Actor*>*> _parties;
         QVector<Actor*>* _players;
 #if USE_TARGET_LIST
@@ -128,4 +132,4 @@ namespace tbrpgsca
 
 }
 
-#endif // SCENE_H
+#endif // SCENE_HPP
