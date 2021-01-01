@@ -10,8 +10,14 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "trrole.h"
 
+#define TR_ABILITY_DATA \
+    TR_BYTE melee: 1, steal: 1, absorb: 1, missable: 1, trg_all: 1, trg_side: 1, trg_self: 1; \
+    TR_NR lv_rq: 8, m_qty: 12, r_qty: 12; \
+    char *sound;
+
 typedef struct tr_ability {
-    struct tr_role;
+    TR_ROLE_DATA
+    TR_ABILITY_DATA
 } TrAbility;
 
 #endif // CABILITY_H
