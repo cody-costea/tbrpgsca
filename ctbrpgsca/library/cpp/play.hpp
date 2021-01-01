@@ -161,7 +161,7 @@ namespace tbrpgsca
 #if USE_BIT_FIELDS
         unsigned int _play_flags: 16;
 #else
-        unsigned int _play_flags;
+        signed int _play_flags;
 #endif
         inline void setFlag(int const flag, bool const value)
         {

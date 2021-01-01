@@ -11,8 +11,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "trrole.h"
 
 #define TR_COSTUME_DATA \
-    TR_BYTE enrage: 1, confuse: 1, convert: 1, cover: 1, shapeshift: 1, invincible: 1, counter: 1, reflect: 1, active: 1, ko: 1; \
     TR_NR atk: 12, def: 12, spi: 12, wis: 12, agi: 12, block_type: 12;
+    //TR_BYTE enrage: 1, confuse: 1, convert: 1, cover: 1, shapeshift: 1, invincible: 1, counter: 1, reflect: 1, stun: 1, ko: 1;
 
 typedef struct tr_costume {
     TR_ROLE_DATA
