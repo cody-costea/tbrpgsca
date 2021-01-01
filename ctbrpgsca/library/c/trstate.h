@@ -11,7 +11,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "trcostume.h"
 
 #define TR_STATE_DATA \
-    TR_NR dur: 16, res: 16;
+    tr_nr dur: 16, res: 16;
 
 typedef struct tr_state {
     struct tr_costume mask;

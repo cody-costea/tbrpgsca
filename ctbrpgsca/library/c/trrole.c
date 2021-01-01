@@ -6,6 +6,8 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "trrole.h"
+#include "trcostume.h"
+#include "tractor.h"
 
 void tr_role_damage(char *ret, TrActor* user, TrActor* target, const TR_NR dmg, const TR_BOOL percent) {
 

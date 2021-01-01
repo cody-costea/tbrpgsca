@@ -79,7 +79,7 @@ FORMS +=
 CONFIG += mobility
 MOBILITY = 
 
-QMAKE_CXXFLAGS += -O3 -fms-extensions -fdeclspec
+QMAKE_CXXFLAGS += -O3 #-fms-extensions #-fdeclspec
 
 ANDROID_ABIS = armeabi-v7a arm64-v8a x86 x86_64
 

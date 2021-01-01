@@ -11,11 +11,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "trcostume.h"
 
 #define TR_ACTOR_DATA \
-    TR_NR c_lv: 16, m_lv: 16, c_xp: 30, m_xp: 30, ai_player: 1, random_ai: 1, new_items: 1, equip_dmg: 1;
+    tr_nr c_lv: 16, m_lv: 16, c_xp: 30, m_xp: 30, ai_player: 1, random_ai: 1, new_items: 1, equip_dmg: 1;
 
 typedef struct tr_actor {
     TR_ROLE_DATA
     TR_COSTUME_DATA
+    //struct tr_costume stats;
     TR_ACTOR_DATA
 } TrActor;
 
