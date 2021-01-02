@@ -156,7 +156,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             } else if (!Struct##_resize(Struct##_obj, IncSize > 0 ? size + IncSize : size * 2)) { \
                 return 0; \
             } \
-            Struct##_obj->count = (CountType)(size + 1); \
             data[j] = new_value; \
         } \
         return 1; \
@@ -167,6 +166,22 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             ptr = Struct##_new_alloc(IncSize > 0 ? IncSize : 1); \
         } \
         return Struct##_add(ptr, new_value); \
+    } \
+    static DataType Struct##_value_at(const Alias *Struct##_obj, const TR_BOOL index) { \
+        DataType *values = Struct##_obj->data; \
+        if (values && index < Struct##_obj->count) { \
+            return values[index]; \
+        } \
+        return EmptyValue; \
+    } \
+    static void Struct##_clear(const Alias *Struct##_obj, TR_BOOL index) { \
+        DataType *values = Struct##_obj->data; \
+        const TR_BOOL size = Struct##_obj->count; \
+        if (values) { \
+            for (; index < size; index += 1) { \
+                values[index] = EmptyValue; \
+            } \
+        } \
     }
 
 #define TR_MAP_TYPE(Struct, KeyType, ValueType, CountType, EmptyKey, EmptyValue, IncSize, Alias) \
@@ -311,7 +326,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
                 const KeyType key = keys[i]; \
                 if (key == new_key || key == EmptyKey) { \
                     values[i] == new_value; \
-                    goto plusCount; \
+                    return 1; \
                 } \
             } } \
             if (Struct##_resize(Struct##_obj, IncSize > 0 ? size + IncSize : size * 2)) { \
@@ -321,8 +336,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
                 return 0; \
             } \
         } \
-        plusCount: \
-        Struct##_obj->count = (CountType)(size + 1); \
         return 1; \
     } \
     static TR_BOOL Struct##_put_alloc(Alias **Struct##_obj, const KeyType new_key, const ValueType new_value) { \
@@ -332,6 +345,20 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
         } \
         return Struct##_put(ptr, new_key, new_value); \
     } \
+    static ValueType Struct##_value_at(const Alias *Struct##_obj, const TR_BOOL index) { \
+        ValueType *values = Struct##_obj->values; \
+        if (values && index < Struct##_obj->count) { \
+            return values[index]; \
+        } \
+        return EmptyValue; \
+    } \
+    static ValueType Struct##_key_at(const Alias *Struct##_obj, const TR_BOOL index) { \
+        KeyType *keys = Struct##_obj->keys; \
+        if (keys && index < Struct##_obj->count) { \
+            return keys[index]; \
+        } \
+        return EmptyKey; \
+    } \
     static ValueType Struct##_get(const Alias *Struct##_obj, const KeyType key) { \
         KeyType *keys = Struct##_obj->keys; \
         if (keys) { \
@@ -339,14 +366,29 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             if (size > 0) { \
                 TR_BOOL i; \
                 for (i = 0; i < size; i += 1) { \
-                    if (keys[i] == key) { \
+                    const KeyType key = keys[i]; \
+                    if (key == key) { \
                         return Struct##_obj->values[i]; \
+                    } \
+                    if (key == EmptyKey) { \
+                        return EmptyValue; \
                     } \
                 } \
             } \
         } \
         return EmptyValue; \
     } \
+    static void Struct##_clear(const Alias *Struct##_obj, TR_BOOL index) { \
+        const TR_BOOL size = Struct##_obj->count; \
+        ValueType *values = Struct##_obj->values; \
+        KeyType *keys = Struct##_obj->keys; \
+        if (values) { \
+            for (; index < size; index += 1) { \
+                values[index] = EmptyValue; \
+                keys[index] = EmptyKey; \
+            } \
+        } \
+    }
 
 typedef TR_NR tr_nr;
 typedef TR_BOOL tr_bool;
@@ -379,18 +421,10 @@ TR_MAP_TYPE(tr_index_map, TR_IX, TR_IX, TR_BYTE, -1, -1, 4, TrIndexMap)
 
 #define TR_ROLE_DATA \
     char *name, *sprite; \
-    tr_nr dmg_type: 12, c_hp: 12, c_mp: 10, c_sp: 10, m_hp: 12, m_mp: 10, m_sp: 10, flags: 12;
-    //TrIndexVector states;
+    tr_nr dmg_type: 12, c_hp: 12, c_mp: 10, c_sp: 10, m_hp: 12, m_mp: 10, m_sp: 10, flags: 12; \
+    TrIndexVector *states; \
+    TrIndexMap res;
 
-void tr_role_damage(char *ret, TrActor* user, TrActor* target, const TR_NR dmg, const TR_BOOL percent);
-
-/*TR_BOOL tr_index_map_resize(TrIndexMap *tr_index_map, const TR_BOOL size);
-
-TR_BOOL tr_index_map_add(TrIndexMap *tr_index_map, const TR_IX key, const TR_IX value, const TR_IX empty_key);
-
-TrIndexMap tr_index_map_new(const TR_BOOL size, const TR_IX empty_key, const TR_IX empty_value);
-TrIndexMap tr_index_map_array(const TR_IX keys[], const TR_IX values[], const TR_BOOL size);
-TrIndexMap tr_index_map_copy(const TrIndexMap *tr_index_map);
-TrIndexMap tr_index_map_init(const TR_BOOL size);*/
+void tr_role_damage(char *ret, TrActor *user, TrActor *target, const TR_NR dmg, const TR_BOOL percent);
 
 #endif // CROLE_H
