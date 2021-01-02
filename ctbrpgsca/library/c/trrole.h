@@ -71,7 +71,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
     static Alias Struct##_array(const DataType array[], const TR_BOOL size) { \
         Alias Struct##_obj = Struct##_init(size); \
         DataType *data = Struct##_obj.data; \
-        unsigned int i = 0; \
+        TR_BOOL i; \
         for (i = 0; i < size; i += 1) { \
             data[i] = array[i]; \
         } \
@@ -149,13 +149,15 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             TR_BOOL j = size - 1; \
             DataType *data = Struct##_obj->data; \
             if (data[j] == EmptyValue) { \
-                do { \
-                    size = j; \
-                } while (--j > 0 && data[j] == EmptyValue); \
+                TR_BOOL k = j; \
+                while (--k > 0 && data[k] == EmptyValue) { \
+                    j = k; \
+                } \
             } else if (!Struct##_resize(Struct##_obj, IncSize > 0 ? size + IncSize : size * 2)) { \
                 return 0; \
             } \
-            data[size] = new_value; \
+            Struct##_obj->count = (CountType)(size + 1); \
+            data[j] = new_value; \
         } \
         return 1; \
     } \
@@ -166,6 +168,185 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
         } \
         return Struct##_add(ptr, new_value); \
     }
+
+#define TR_MAP_TYPE(Struct, KeyType, ValueType, CountType, EmptyKey, EmptyValue, IncSize, Alias) \
+    typedef struct Struct { \
+        CountType count; \
+        ValueType *values; \
+        KeyType *keys; \
+    } Alias; \
+    static Alias Struct##_init(const TR_BOOL size) { \
+        Alias obj; \
+        obj.count = (CountType)size; \
+        obj.values = size > 0 ? (ValueType *)malloc(sizeof(ValueType) * size) : 0; \
+        obj.keys = size > 0 ? (KeyType *)malloc(sizeof(KeyType) * size) : 0; \
+        return obj; \
+    } \
+    static Alias Struct##_new(const TR_BOOL size) { \
+        if (size < 1) { \
+            Alias obj; \
+            obj.count = 0; \
+            obj.values = 0; \
+            obj.keys = 0; \
+            return obj; \
+        } \
+        Alias Struct##_obj = Struct##_init(size); \
+        KeyType *values = Struct##_obj.values; \
+        KeyType *keys = Struct##_obj.keys; \
+        TR_BOOL i = 0; \
+        for (i = 0; i < size; i += 1) { \
+            values[i] = EmptyValue; \
+            keys[i] = EmptyKey; \
+        } \
+        return Struct##_obj; \
+    } \
+    static Alias *Struct##_alloc() { \
+        return (Alias *)malloc(sizeof(Alias)); \
+    } \
+    static Alias *Struct##_new_alloc(const TR_BOOL size) { \
+        Alias *Struct##_obj = Struct##_alloc(); \
+        *Struct##_obj = Struct##_new(size); \
+        return Struct##_obj; \
+    } \
+    static Alias Struct##_array(const KeyType key_array[], const ValueType value_array[], const TR_BOOL size) { \
+        Alias Struct##_obj = Struct##_init(size); \
+        KeyType *values = Struct##_obj.values; \
+        KeyType *keys = Struct##_obj.keys; \
+        TR_BOOL i; \
+        for (i = 0; i < size; i += 1) { \
+            values[i] = value_array[i]; \
+            keys[i] = key_array[i]; \
+        } \
+        return Struct##_obj; \
+    } \
+    static Alias *Struct##_array_alloc(const KeyType key_array[], const ValueType value_array[], const TR_BOOL size) { \
+        Alias *Struct##_obj = Struct##_alloc(); \
+        *Struct##_obj = Struct##_array(key_array, value_array, size); \
+        return Struct##_obj; \
+    } \
+    static Alias Struct##_copy(Alias *Struct##_obj) { \
+        return Struct##_array(Struct##_obj->keys, Struct##_obj->values, Struct##_obj->count); \
+    } \
+    static Alias *Struct##_copy_alloc(Alias *Struct##_obj) { \
+        Alias *Struct##_ptr = Struct##_alloc(); \
+        *Struct##_ptr = Struct##_copy(Struct##_obj); \
+        return Struct##_ptr; \
+    } \
+    static void Struct##_free(Alias *Struct##_obj) { \
+        KeyType* keys = Struct##_obj->keys; \
+        if (keys) { \
+            ValueType* values = Struct##_obj->values; \
+            Struct##_obj->count = 0; \
+            Struct##_obj->values = 0; \
+            Struct##_obj->keys = 0; \
+            free(values); \
+            free(keys); \
+        } \
+    } \
+    static void Struct##_free_alloc(Alias **Struct##_obj) { \
+        Alias *ptr = *Struct##_obj; \
+        if (ptr) { \
+            *Struct##_obj = 0; \
+            Struct##_free(ptr); \
+            free(ptr); \
+        } \
+    } \
+    static TR_BOOL Struct##_resize(Alias *Struct##_obj, const TR_BOOL size) { \
+        const TR_BOOL count = Struct##_obj->count; \
+        ValueType* values; \
+        KeyType* keys; \
+        if (count < 1) { \
+            if (size > 0) { \
+                values = (ValueType *)malloc(sizeof(ValueType) * size); \
+                keys = (KeyType *)malloc(sizeof(KeyType) * size); \
+            } else { \
+                return 1; \
+            } \
+        } else { \
+            if (size > 0) { \
+                values = (ValueType *)realloc(Struct##_obj->values, sizeof(ValueType) * size); \
+                keys = (KeyType *)realloc(Struct##_obj->keys, sizeof(KeyType) * size); \
+                if (keys && values) { \
+                    TR_BOOL i; \
+                    for (i = count; i < size; i += 1) { \
+                        values[i] = EmptyValue; \
+                        keys[i] = EmptyKey; \
+                    } \
+                    Struct##_obj->keys = keys; \
+                    Struct##_obj->values = values; \
+                    Struct##_obj->count = (CountType)size; \
+                } else { \
+                    if (values) { \
+                        free(values);\
+                    } \
+                    if (keys) { \
+                        free(keys);\
+                    } \
+                    return 0; \
+                } \
+            } else { \
+                Struct##_free(Struct##_obj); \
+                return 1; \
+            } \
+        } \
+        Struct##_obj->count = (CountType)size; \
+        Struct##_obj->values = values; \
+        Struct##_obj->keys = keys; \
+        return 1; \
+    } \
+    static TR_BOOL Struct##_put(Alias *Struct##_obj, const KeyType new_key, const ValueType new_value) { \
+        TR_BOOL size = (TR_BOOL)Struct##_obj->count; \
+        if (size < 1) { \
+            if (Struct##_resize(Struct##_obj, IncSize > 0 ? IncSize : 1)) { \
+                Struct##_obj->values[0] = new_value; \
+                Struct##_obj->keys[0] = new_key; \
+            } else { \
+                return 0; \
+            } \
+        } else { \
+            TR_BOOL i; \
+            KeyType *keys = Struct##_obj->keys; \
+            ValueType *values = Struct##_obj->values; { \
+            for (i = 0; i < size; i += 1) { \
+                const KeyType key = keys[i]; \
+                if (key == new_key || key == EmptyKey) { \
+                    values[i] == new_value; \
+                    goto plusCount; \
+                } \
+            } } \
+            if (Struct##_resize(Struct##_obj, IncSize > 0 ? size + IncSize : size * 2)) { \
+                values[size] = new_value; \
+                keys[size] = new_key; \
+            } else { \
+                return 0; \
+            } \
+        } \
+        plusCount: \
+        Struct##_obj->count = (CountType)(size + 1); \
+        return 1; \
+    } \
+    static TR_BOOL Struct##_put_alloc(Alias **Struct##_obj, const KeyType new_key, const ValueType new_value) { \
+        Alias* ptr = *Struct##_obj; \
+        if  (!ptr) { \
+            ptr = Struct##_new_alloc(IncSize > 0 ? IncSize : 1); \
+        } \
+        return Struct##_put(ptr, new_key, new_value); \
+    } \
+    static ValueType Struct##_get(const Alias *Struct##_obj, const KeyType key) { \
+        KeyType *keys = Struct##_obj->keys; \
+        if (keys) { \
+            TR_BOOL size = (TR_BOOL)Struct##_obj->count; \
+            if (size > 0) { \
+                TR_BOOL i; \
+                for (i = 0; i < size; i += 1) { \
+                    if (keys[i] == key) { \
+                        return Struct##_obj->values[i]; \
+                    } \
+                } \
+            } \
+        } \
+        return EmptyValue; \
+    } \
 
 typedef TR_NR tr_nr;
 typedef TR_BOOL tr_bool;
@@ -180,12 +361,9 @@ typedef TR_IX TrIx;
 typedef struct tr_actor TrActor;
 
 TR_VEC_TYPE(tr_index_vec, TR_IX, TR_BYTE, -1, 4, TrIndexVector)
+TR_MAP_TYPE(tr_index_map, TR_IX, TR_IX, TR_BYTE, -1, -1, 4, TrIndexMap)
 
-typedef struct tr_index_map {
-    TR_IX *keys, *values;
-    TR_BYTE count;
-} TrIndexMap;
-    //TR_BYTE revive: 1, range: 1;
+//TR_BYTE revive: 1, range: 1;
 
 #define TR_HAS_ALL_FLAGS(Flags, Flag) \
     ((Flags & Flag) == Flag)
