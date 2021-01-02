@@ -10,7 +10,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef CROLE_H
 #define CROLE_H
 
-#include <malloc.h>
+//#include "malloc/malloc.h"
+#include "mm_malloc.h"
 
 #pragma pack(1)
 
@@ -33,18 +34,18 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define ELEMENT_PSYCHIC 512
 #define ELEMENT_LIGHT 1024
 
-#define TR_VEC_TYPE(Struct, DataType, CountType, EmptyValue, Alias) \
+#define TR_VEC_TYPE(Struct, DataType, CountType, EmptyValue, IncSize, Alias) \
     typedef struct Struct { \
         CountType count; \
         DataType *data; \
     } Alias; \
-    Alias Struct##_init(const TR_BOOL size) { \
+    static Alias Struct##_init(const TR_BOOL size) { \
         Alias obj; \
         obj.count = (CountType)size; \
         obj.data = size > 0 ? (DataType *)malloc(sizeof(DataType) * size) : 0; \
         return obj; \
     } \
-    Alias Struct##_new(const TR_BOOL size) { \
+    static Alias Struct##_new(const TR_BOOL size) { \
         if (size < 1) { \
             Alias obj; \
             obj.count = 0; \
@@ -59,15 +60,15 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
         } \
         return Struct##_obj; \
     } \
-    Alias *Struct##_alloc() { \
+    static Alias *Struct##_alloc() { \
         return (Alias *)malloc(sizeof(Alias)); \
     } \
-    Alias *Struct##_new_alloc(const TR_BOOL size) { \
+    static Alias *Struct##_new_alloc(const TR_BOOL size) { \
         Alias *Struct##_obj = Struct##_alloc(); \
         *Struct##_obj = Struct##_new(size); \
         return Struct##_obj; \
     } \
-    Alias Struct##_array(const DataType array[], const TR_BOOL size) { \
+    static Alias Struct##_array(const DataType array[], const TR_BOOL size) { \
         Alias Struct##_obj = Struct##_init(size); \
         DataType *data = Struct##_obj.data; \
         unsigned int i = 0; \
@@ -76,20 +77,20 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
         } \
         return Struct##_obj; \
     } \
-    Alias *Struct##_array_alloc(const DataType array[], const TR_BOOL size) { \
+    static Alias *Struct##_array_alloc(const DataType array[], const TR_BOOL size) { \
         Alias *Struct##_obj = Struct##_alloc(); \
         *Struct##_obj = Struct##_array(array, size); \
         return Struct##_obj; \
     } \
-    Alias Struct##_copy(Alias *Struct##_obj) { \
+    static Alias Struct##_copy(Alias *Struct##_obj) { \
         return Struct##_array(Struct##_obj->data, Struct##_obj->count); \
     } \
-    Alias *Struct##_copy_alloc(Alias *Struct##_obj) { \
+    static Alias *Struct##_copy_alloc(Alias *Struct##_obj) { \
         Alias *Struct##_ptr = Struct##_alloc(); \
         *Struct##_ptr = Struct##_copy(Struct##_obj); \
         return Struct##_ptr; \
     } \
-    void Struct##_free(Alias *Struct##_obj) { \
+    static void Struct##_free(Alias *Struct##_obj) { \
         DataType* data = Struct##_obj->data; \
         if (data) { \
             Struct##_obj->count = 0; \
@@ -97,7 +98,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             free(data); \
         } \
     } \
-    void Struct##_free_alloc(Alias **Struct##_obj) { \
+    static void Struct##_free_alloc(Alias **Struct##_obj) { \
         Alias *ptr = *Struct##_obj; \
         if (ptr) { \
             *Struct##_obj = 0; \
@@ -105,7 +106,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             free(ptr); \
         } \
     } \
-    TR_BOOL Struct##_resize(Alias *Struct##_obj, const TR_BOOL size) { \
+    static TR_BOOL Struct##_resize(Alias *Struct##_obj, const TR_BOOL size) { \
         const TR_BOOL count = Struct##_obj->count; \
         DataType* data; \
         if (count < 1) { \
@@ -136,10 +137,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
         Struct##_obj->data = data; \
         return 1; \
     } \
-    TR_BOOL Struct##_add(Alias *Struct##_obj, const DataType new_value) { \
+    static TR_BOOL Struct##_add(Alias *Struct##_obj, const DataType new_value) { \
         TR_BOOL size = (TR_BOOL)Struct##_obj->count; \
         if (size < 1) { \
-            if (Struct##_resize(Struct##_obj, 1)) { \
+            if (Struct##_resize(Struct##_obj, IncSize > 0 ? IncSize : 1)) { \
                 Struct##_obj->data[0] = new_value; \
             } else { \
                 return 0; \
@@ -151,12 +152,19 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
                 do { \
                     size = j; \
                 } while (--j > 0 && data[j] == EmptyValue); \
-            } else if (!Struct##_resize(Struct##_obj, size + 4)) { \
+            } else if (!Struct##_resize(Struct##_obj, IncSize > 0 ? size + IncSize : size * 2)) { \
                 return 0; \
             } \
             data[size] = new_value; \
         } \
         return 1; \
+    } \
+    static TR_BOOL Struct##_add_alloc(Alias **Struct##_obj, const DataType new_value) { \
+        Alias* ptr = *Struct##_obj; \
+        if  (!ptr) { \
+            ptr = Struct##_new_alloc(IncSize > 0 ? IncSize : 1); \
+        } \
+        return Struct##_add(ptr, new_value); \
     }
 
 typedef TR_NR tr_nr;
@@ -171,7 +179,7 @@ typedef TR_IX TrIx;
 
 typedef struct tr_actor TrActor;
 
-//TR_VEC_TYPE(tr_index_vec, TR_IX, TR_BYTE, -1, TrIndexVector)
+TR_VEC_TYPE(tr_index_vec, TR_IX, TR_BYTE, -1, 4, TrIndexVector)
 
 typedef struct tr_index_map {
     TR_IX *keys, *values;
