@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef CAILMENT_H
 #define CAILMENT_H
 
-#include "trcostume.h"
+#include "trability.h"
 
 #define TR_STATE_DATA \
     tr_nr dur: 16, res: 16;

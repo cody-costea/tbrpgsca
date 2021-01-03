@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef CABILITY_H
 #define CABILITY_H
 
-#include "trrole.h"
+#include "tractor.h"
 
 #define TR_ABILITY_DATA \
     tr_nr lv_rq: 8, m_qty: 12, r_qty: 12; \

@@ -419,11 +419,15 @@ TR_MAP_TYPE(tr_index_map, TR_IX, TR_IX, TR_BYTE, -1, -1, 4, TrIndexMap)
 #define TR_IF_HAS_ANY_FLAG(Flags, Flag, Conditions, Action) \
     if (Conditions TR_HAS_ANY_FLAG(Flags, Flag)) Action;
 
+#define TR_FLAGS_DATA \
+    tr_nr flags: 12;
+
 #define TR_ROLE_DATA \
     char *name, *sprite; \
-    tr_nr dmg_type: 12, c_hp: 12, c_mp: 10, c_sp: 10, m_hp: 12, m_mp: 10, m_sp: 10, flags: 12; \
+    TR_FLAGS_DATA \
+    tr_nr dmg_type: 12, c_hp: 12, c_mp: 10, c_sp: 10, m_hp: 12, m_mp: 10, m_sp: 10; \
     TrIndexVector *states; \
-    TrIndexMap res;
+    TrIndexMap *res;
 
 void tr_role_damage(char *ret, TrActor *user, TrActor *target, const TR_NR dmg, const TR_BOOL percent);
 

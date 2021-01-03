@@ -8,8 +8,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef CPLAY_H
 #define CPLAY_H
 
-typedef struct tr_play {
+#include "trscene.h"
+
+/*typedef struct tr_play {
     signed int flags: 16;
-} TrPlay;
+} TrPlay;*/
 
 #endif // CPLAY_H
