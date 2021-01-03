@@ -9,11 +9,16 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define ARENAWIDGET_H
 
 #include <QMovie>
+#include <QtGlobal>
 #include <QComboBox>
 #include <QPushButton>
 #include <QResizeEvent>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QMediaPlaylist>
 #include <QMediaPlayer>
+#endif
+
 #include <QTextEdit>
 #include <QLayout>
 #include <QWidget>
@@ -134,7 +139,9 @@ namespace tbrpgsca
         QWidget* _ctr_wdt,* _act_wdt;
         TargetsModel* _targets_mdl;
         QLabel* _info_txt,* _back_img;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QMediaPlayer* _ability_snd;
+#endif
         QVBoxLayout* _act_lyt;
         QTextEdit* _acts_txt;
         Actor* _trg_actor;

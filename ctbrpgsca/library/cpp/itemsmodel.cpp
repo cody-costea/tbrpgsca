@@ -38,8 +38,17 @@ QVariant ItemsModel::data(const QModelIndex& index, int role) const
    if (items == nullptr)
    {
        return QVariant();
-   }
-   auto const it = items->cbegin() + index.row();
+   }   
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            auto const it = items->cbegin() + index.row();
+#else
+            auto it = items->cbegin();
+            auto const itemIndex = index.row();
+            for (int i = 0; i < itemIndex; i += 1)
+            {
+                ++it;
+            }
+#endif
    if (it == items->cend())
    {
        return QVariant();
@@ -49,7 +58,7 @@ QVariant ItemsModel::data(const QModelIndex& index, int role) const
 
    switch (role)
    {
-   case Qt::TextColorRole:
+   case Qt::ForegroundRole:
        return QBrush(ability.canPerform(actor) ? Qt::yellow : Qt::gray);
    case Qt::DisplayRole:
    {

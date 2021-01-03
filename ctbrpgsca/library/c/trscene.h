@@ -13,7 +13,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define TR_SCENE_DATA \
     TR_FLAGS_DATA \
     tr_nr last_ability: 8, current: 4, original: 4, surprise: 2, status: 2, m_init: 8; \
-    tr_index_vec players;
+    TrIndexVector players;
 
 typedef struct tr_scene {
     TR_SCENE_DATA

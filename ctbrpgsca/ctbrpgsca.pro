@@ -4,9 +4,11 @@
 #
 #-------------------------------------------------
 
-QT += core gui multimedia opengl
+QT += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+lessThan(QT_MAJOR_VERSION, 6): QT += multimedia
 
 TARGET = ctbrpgsca
 TEMPLATE = app

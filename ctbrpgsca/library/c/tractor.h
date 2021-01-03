@@ -12,7 +12,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #define TR_ACTOR_DATA \
     tr_nr side: 8, init: 8, c_lv: 8, m_lv: 8, c_xp: 30, m_xp: 30, ai_player: 1, random_ai: 1, new_items: 1, equip_dmg: 1; \
-    tr_index_vec equipment;
+    TrIndexVector equipment;
 
 typedef struct tr_actor {
     TR_ROLE_DATA

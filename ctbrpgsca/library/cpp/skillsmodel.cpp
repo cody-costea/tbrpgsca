@@ -37,7 +37,8 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
 
    switch (role)
    {
-   case Qt::TextColorRole:
+   //case Qt::TextColorRole:
+   case Qt::ForegroundRole:
        return QBrush(ability.canPerform(actor) ? Qt::yellow : Qt::gray);
    case Qt::DisplayRole:
    {

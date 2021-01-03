@@ -320,7 +320,15 @@ void ArenaWidget::recheckTargeting(int const trgIndex, int const skillIndex, int
         if (itemIndex > -1)
         {
             QMap<const Ability*, int>* const items = crActor._items;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             auto const it = items->cbegin() + itemIndex;
+#else
+            auto it = items->cbegin();
+            for (int i = 0; i < itemIndex; i += 1)
+            {
+                ++it;
+            }
+#endif
             arena._act_btn->setEnabled(it.value() > 0 && arena.canTarget(crActor, *(it.key()), trgActor));
         }
     }
@@ -592,7 +600,7 @@ void ArenaWidget::resizeEvent(QResizeEvent* const event)
 bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
                             Actor* const target, const Ability* const counter) const
 {
-   ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
+    ArenaWidget& arena = static_cast<ArenaWidget&>(scene);
 #if TRG_SPR_DELAY < 0
    if (target)
    {
@@ -615,6 +623,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* con
                targetSpr.playSkill(*spr);
            }
 #if TRG_SPR_DELAY < 0
+ #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
            QString* const sndName = ability->_sound;
            if (sndName)
            {
@@ -639,6 +648,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* con
                sound->setMedia(QUrl(QString("qrc:/audio/%0").arg(*sndName)));
                sound->play();
            }
+  #endif
        }
    }
    usrSprPlay:
@@ -649,6 +659,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* con
    }
    if (user)
    {
+ #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
        if (ability)
        {
            QString* const sndName = ability->_sound;
@@ -677,6 +688,7 @@ bool ArenaWidget::operator()(Scene& scene, Actor* const user, const Ability* con
            }
        }
        usrSprPlay:
+ #endif
 #endif
        (*(static_cast<ActorSprite*>(static_cast<void**>(user->_extra)[0]))).playActor(
            user->_hp < 1 ? SPR_FALL : (ability == nullptr ? (revive ? SPR_IDLE : SPR_HIT)
@@ -697,6 +709,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
 {
     ArenaWidget& arena = *this;
     arena.setAutoFillBackground(true);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     if (songName.length() > 0)
     {
         QMediaPlayer* const songPlayer = new QMediaPlayer(this);
@@ -708,6 +721,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         //arena.song = songPlayer;
     }
     arena._ability_snd = nullptr;
+#endif
     {
         QPalette palette = arena.palette();
         QLabel* arenaImg = new QLabel(this);
@@ -716,14 +730,14 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
         palette.setColor(QPalette::Base, Qt::black);
         palette.setColor(QPalette::Window, Qt::black);
         palette.setColor(QPalette::Button, Qt::black);
-        palette.setColor(QPalette::Background, Qt::black);
+        //palette.setColor(QPalette::Background, Qt::black);
         palette.setColor(QPalette::ToolTipBase, Qt::black);
         palette.setColor(QPalette::Highlight, Qt::darkYellow);
         palette.setColor(QPalette::HighlightedText, Qt::black);
         palette.setColor(QPalette::AlternateBase, Qt::black);
         palette.setColor(QPalette::WindowText, Qt::yellow);
         palette.setColor(QPalette::ToolTipText, Qt::yellow);
-        palette.setColor(QPalette::Foreground, Qt::yellow);
+        //palette.setColor(QPalette::Foreground, Qt::yellow);
         palette.setColor(QPalette::ButtonText, Qt::yellow);
         palette.setColor(QPalette::BrightText, Qt::white);
         palette.setColor(QPalette::Text, Qt::yellow);
@@ -822,7 +836,16 @@ void ArenaWidget::operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*
             Actor* const trgActor = arena._trg_actor;
             QString& ret = *(arena._ret_str); ret.clear();
             QMap<const Ability*, int>* const items = crActor->_items;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             auto const it = items->cbegin() + arena._items_box->currentIndex();
+#else
+            auto it = items->cbegin();
+            auto const itemIndex = arena._items_box->currentIndex();
+            for (int i = 0; i < itemIndex; i += 1)
+            {
+                ++it;
+            }
+#endif
             const Ability* const ability = it.key(); items->operator[](ability) = it.value() - 1;
             arena.perform(ret, SPRITE_ACT, *crActor, *trgActor, *ability, false);
         });
