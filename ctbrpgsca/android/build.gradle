@@ -34,7 +34,7 @@ android {
      * Changing them manually might break the compilation!
      *******************************************************/
 
-    compileSdkVersion qtTargetSdkVersion //androidCompileSdkVersion.toInteger()
+    compileSdkVersion androidCompileSdkVersion.toInteger()
 
     buildToolsVersion '30.0.2' //'28.0.3'
 

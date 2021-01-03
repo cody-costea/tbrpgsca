@@ -13,7 +13,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //#include "malloc/malloc.h"
 #include "mm_malloc.h"
 
-#pragma pack(1)
+//#pragma pack(1)
 
 #define TR_IX signed char
 #define TR_BYTE unsigned char
