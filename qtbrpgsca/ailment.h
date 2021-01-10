@@ -48,7 +48,7 @@ namespace tbrpgsca
 
         Ailment(const Ailment& state);
 
-        ~Ailment();
+        virtual ~Ailment();
     protected:
         class AilmentData : public QSharedData
         {

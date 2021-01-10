@@ -84,7 +84,7 @@ namespace tbrpgsca
 
         Costume(const Costume& costume);
 
-        ~Costume();
+        virtual ~Costume();
     protected:
         class CostumeData : public QSharedData
         {

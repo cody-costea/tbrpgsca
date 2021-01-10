@@ -20,4 +20,9 @@ typedef struct tr_ability {
     TR_ABILITY_DATA
 } TrAbility;
 
+void tr_ability_replenish(const TrAbility *const ability, TrActor *const user);
+tr_bool tr_ability_can_perform(const TrAbility *const ability, const TrActor *const user);
+
+void tr_ability_execute(const TrAbility *const ability, char *ret, TrScene *const scene, TrActor *user, TrActor *target, const tr_bool applyCosts);
+
 #endif // CABILITY_H

@@ -22,7 +22,7 @@ namespace tbrpgsca
         void alter(QString& ret, Actor& actor, bool const consume);
         bool disable(Actor& actor, int const dur, bool const remove);
 
-        ~State();
+        virtual ~State();
     protected:
         int _cr_dur;
 

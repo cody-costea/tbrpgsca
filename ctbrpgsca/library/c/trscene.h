@@ -19,4 +19,18 @@ typedef struct tr_scene {
     TR_SCENE_DATA
 } TrScene;
 
+void tr_scene_end_turn(TrScene *const scene, char *ret, TrActor *const actor);
+
+void tr_scene_perform(TrScene *const scene, char *ret, TrActor *const user, TrActor *const target, const TrAbility *const ability, const tr_bool item);
+
+void tr_scene_play_ai(TrScene *const scene, char *ret, TrActor *const player);
+
+void tr_scene_check_status(TrScene *const scene, char *ret);
+void tr_scene_escape(TrScene *const scene, char *ret);
+
+tr_bool tr_scene_can_target(const TrScene *const scene, TrActor *const user, const TrAbility *const ability, TrActor *const target);
+
+tr_nr tr_scene_get_ai_skill(const TrScene *const scene, TrActor *const user, TrIndexVector *const skills, const tr_nr index, const tr_bool restore);
+TrActor* tr_scene_get_guardian(const TrScene *const scene, TrActor *const user, TrActor *const target, const TrAbility *const skill);
+
 #endif // CSCENE_H

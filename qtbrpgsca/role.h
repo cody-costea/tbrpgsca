@@ -137,7 +137,7 @@ namespace tbrpgsca
 
         Role(const Role& role);
 
-        ~Role();
+        virtual ~Role();
 
         friend class Actor;
         friend class Ability;

@@ -10,8 +10,15 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef CROLE_H
 #define CROLE_H
 
-//#include "malloc/malloc.h"
-#include "mm_malloc.h"
+#include <stdlib.h>
+#if ((defined(__GNUC__) || (defined(__clang__)) && !defined(_MSC_VER)))
+    #include "mm_malloc.h"
+#else
+    #include "malloc.h"
+#endif
+
+#define MULTI_RND 1
+#define DMG_RND 3
 
 //#pragma pack(1)
 
@@ -22,6 +29,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #define FLAG_REVIVE 1
 #define FLAG_RANGE 2
+
 #define DMG_TYPE_ATK 1
 #define DMG_TYPE_DEF 2
 #define DMG_TYPE_SPI 4
@@ -33,6 +41,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define ELEMENT_EARTH 256
 #define ELEMENT_PSYCHIC 512
 #define ELEMENT_LIGHT 1024
+#define DEFAULT_RES 3
 
 #define TR_VEC_TYPE(Struct, DataType, CountType, EmptyValue, IncSize, Alias) \
     typedef struct Struct { \
@@ -325,7 +334,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
             for (i = 0; i < size; i += 1) { \
                 const KeyType key = keys[i]; \
                 if (key == new_key || key == EmptyKey) { \
-                    values[i] == new_value; \
+                    values[i] = new_value; \
                     return 1; \
                 } \
             } } \
@@ -401,6 +410,7 @@ typedef TR_BYTE TrByte;
 typedef TR_IX TrIx;
 
 typedef struct tr_actor TrActor;
+typedef struct tr_scene TrScene;
 
 TR_VEC_TYPE(tr_index_vec, TR_IX, TR_BYTE, -1, 4, TrIndexVector)
 TR_MAP_TYPE(tr_index_map, TR_IX, TR_IX, TR_BYTE, -1, -1, 4, TrIndexMap)
@@ -429,6 +439,6 @@ TR_MAP_TYPE(tr_index_map, TR_IX, TR_IX, TR_BYTE, -1, -1, 4, TrIndexMap)
     TrIndexVector *states; \
     TrIndexMap *res;
 
-void tr_role_damage(char *ret, TrActor *user, TrActor *target, const TR_NR dmg, const TR_BOOL percent);
+void tr_role_damage(char *ret, TrScene *const Scene, TrActor *user, TrActor *target, const TR_NR dmg_type, TR_NR hp_dmg, TR_NR mp_dmg, TR_NR sp_dmg, const TR_NR rnd_dmg, const TR_BOOL percent);
 
 #endif // CROLE_H

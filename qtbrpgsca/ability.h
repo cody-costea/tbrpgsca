@@ -74,7 +74,7 @@ namespace tbrpgsca
 
         Ability(const Ability& ability);
 
-        ~Ability();
+        virtual ~Ability();
     protected:
         class AbilityData : public QSharedData
         {

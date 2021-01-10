@@ -18,4 +18,8 @@ typedef struct tr_state {
     TR_STATE_DATA
 } TrState;
 
+void tr_state_alter(const TrCostume *const costume, char *ret, TrActor *const actor, const tr_bool consume);
+void tr_state_inflict(const TrCostume *const costume, char *ret, TrActor *const user, TrActor *const target, const tr_nr dur, const tr_bool always);
+tr_bool tr_state_disable(const TrCostume *const costume, TrActor *const actor, const tr_nr dur, const tr_bool remove);
+
 #endif // CAILMENT_H

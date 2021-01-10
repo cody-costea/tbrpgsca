@@ -238,7 +238,7 @@ Role::Role(int const id, QString&& name, QString&& sprite, int const hpDmg, int 
            int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* aStates, QObject* const parent)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, element, range, revive, aStates, parent) {}
 
-Role::Role(const Role& role) : Play(NIL, role.playFlags())
+Role::Role(const Role& role) : Play(role.parent(), role.playFlags())
 {
     this->_role_data = role._role_data;
 }

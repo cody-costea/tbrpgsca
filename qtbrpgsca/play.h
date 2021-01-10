@@ -365,7 +365,7 @@ namespace tbrpgsca
 
         explicit Play(QObject* const parent = NIL, int const flags = 0);
 
-        ~Play();
+        virtual ~Play();
     private:
         static inline QMetaObject::Connection* _conn = NIL;
         static inline QTimer* _timer = NIL;

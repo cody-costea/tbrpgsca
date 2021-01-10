@@ -136,7 +136,7 @@ namespace tbrpgsca
 
         Actor(const Actor& actor);
 
-        ~Actor();
+        virtual ~Actor();
     protected:
         class ActorData : public QSharedData
         {
