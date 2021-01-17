@@ -14,9 +14,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-void State::remove(QString* const ret, Actor& actor) const
+void State::remove(QString* const ret, Actor& actor)
 {
-    const Ailment& state = *this;
+    Ailment& state = *this;
     state.blockSkills(actor, true);
     state.adopt(ret, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
@@ -83,13 +83,9 @@ bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove
     }
 }
 
-void State::alter(QString& ret, Actor& actor, const bool consume)
+void State::apply(QString* const ret, Actor& actor, const bool consume)
 {
-    return this->alter(&ret, actor, consume);
-}
-
-void State::alter(QString* const ret, Actor& actor, const bool consume)
-{
+    this->Costume::apply(ret, actor, consume);
     //QList<Ailment>* sDur = actor._role_data->_a_states;
     //if (sDur /*&& actor.hp > 0*/)
     {

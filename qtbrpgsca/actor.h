@@ -147,8 +147,8 @@ namespace tbrpgsca
             int _lv, _max_lv, _xp, _maxp, _old_side, _init, _side, _actions;
             //QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn;
             QSharedPointer<QMap<Ability*, int>> _items;
-            QVector<const Costume*>* _dmg_roles;
             QMap<char, Costume*> _equipment;
+            QVector<Costume*>* _dmg_roles;
             void* _extra;
 
             friend class Scene;
@@ -176,7 +176,7 @@ namespace tbrpgsca
         void updateSkills(bool const remove, bool const counters, QList<Ability>& skills);
         void updateStates(bool const remove, QString* const ret, QList<Ailment>& states, bool const includeWithDur);
         void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<int, int>* const stRes);
-        void switchCostume(QString* const ret, const Costume* const oldCostume, const Costume* const newCostume);
+        void switchCostume(QString* const ret, Costume* const oldCostume, Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, bool const survive);
         void refreshCostumes(QString* const ret);
 

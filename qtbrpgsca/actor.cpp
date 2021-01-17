@@ -265,12 +265,12 @@ void Actor::setStateResistance(const int state, const int res)
 void Actor::applyDmgRoles(QString& ret)
 {
     Actor& actor = *this;
-    QVector<const Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
+    QVector<Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
     if (dmgRoles && dmgRoles->size() > 0)
     {
-        for (const Costume* const role : *dmgRoles)
+        for (Costume* const role : *dmgRoles)
         {
-            role->apply(ret, actor);
+            role->apply(&ret, actor, true);
         }
         /*if (scene) //TODO: adapt without using "scene" pointer here
         {
@@ -318,7 +318,7 @@ void Actor::applyStates(QString* const ret, const bool consume)
             State& aState = static_cast<State&>(stateDur->operator[](i));
             if (aState.currentDuration() > Ailment::EndDur)
             {
-                aState.alter(ret, actor, consume);
+                aState.apply(ret, actor, consume);
             }
         }
     }
@@ -449,7 +449,7 @@ void Actor::levelUp()
     actor._actor_data->_lv = lv;
 }
 
-void Actor::switchCostume(QString* const ret, const Costume* const oldCost, const Costume* const newCost)
+void Actor::switchCostume(QString* const ret, Costume* const oldCost, Costume* const newCost)
 {
     Actor& actor = *this;
     if (oldCost)

@@ -66,9 +66,9 @@ namespace tbrpgsca
         bool hasCounterSkill(const Ability& skill) const;
         int counterSkillsSize() const;
 
-        void adopt(QString& ret, Actor& actor) const;
-        virtual void abandon(QString& ret, Actor& actor) const;
-        virtual void apply(QString& ret, Actor& actor) const;
+        Q_INVOKABLE void adopt(QString* const ret, Actor& actor);
+        Q_INVOKABLE virtual void apply(QString* const ret, Actor& actor, const bool consume);
+        Q_INVOKABLE virtual void remove(QString* const ret, Actor& actor);
 
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
@@ -110,7 +110,7 @@ namespace tbrpgsca
         QSharedDataPointer<CostumeData> _costume_data;
 
         void refresh(QString* const ret, Actor& actor, bool const updStates, bool const remove) const;
-        virtual void adopt(QString* const ret, Actor& actor, bool const upeStates, bool const rmeove) const;
+        virtual void adopt(QString* const ret, Actor& actor, bool const upeStates, bool const rmeove);
 
         Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,

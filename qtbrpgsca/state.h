@@ -19,16 +19,16 @@ namespace tbrpgsca
         QML_ELEMENT
         PROP_FIELD(State, CurrentDuration, currentDuration, int, inline, public, public, _cr_dur)
     public:
-        void alter(QString& ret, Actor& actor, bool const consume);
+        //void alter(QString& ret, Actor& actor, bool const consume);
+        void apply(QString* const ret, Actor& actor, bool const consume) override;
         bool disable(Actor& actor, int const dur, bool const remove);
+        void remove(QString* const ret, Actor& actor) override;
 
         virtual ~State();
     protected:
         int _cr_dur;
 
-        void alter(QString* const ret, Actor& actor, bool const consume);
         bool disable(QString* const ret, Actor& actor, int dur, bool const remove);
-        void remove(QString* const ret, Actor& actor) const;
 
         explicit State(const Ailment& ailment);
         explicit State(QObject* const parent = NIL);
