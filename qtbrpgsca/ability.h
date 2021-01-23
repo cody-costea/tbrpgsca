@@ -60,7 +60,7 @@ namespace tbrpgsca
 
         Q_INVOKABLE void replenish();
         Q_INVOKABLE bool canPerform(Actor* const user) const;
-        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
+        Q_INVOKABLE void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts);
 
         Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpCost,
                 int const mpCost, int const spCost, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,

@@ -73,6 +73,11 @@ void Actor::removeStates(QString* const ret, bool const remove)
     }
 }
 
+void Actor::applyStates(QString& ret, const bool consume)
+{
+    this->applyStates(&ret, consume);
+}
+
 inline void Actor::setRace(Costume& race)
 {
     Actor& actor = *this;
@@ -194,7 +199,7 @@ void Actor::setMaximumRp(const int mRp)
     }
 }
 
-inline void Actor::setSprite(QString& value)
+void Actor::setSprite(QString& value)
 {
     Actor& actor = *this;
     QSharedDataPointer<RoleData>& roleData = actor._role_data;
@@ -211,7 +216,7 @@ void Actor::setItems(const QSharedPointer<QMap<Ability*, int>>& items)
     this->_actor_data->_items = items;
 }
 
-inline void Actor::setMaximumLevel(const int maxLv)
+void Actor::setMaximumLevel(const int maxLv)
 {
     this->_actor_data->_max_lv = maxLv;
 }
@@ -265,12 +270,12 @@ void Actor::setStateResistance(const int state, const int res)
 void Actor::applyDmgRoles(QString& ret)
 {
     Actor& actor = *this;
-    QVector<Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
+    QVector<const Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
     if (dmgRoles && dmgRoles->size() > 0)
     {
-        for (Costume* const role : *dmgRoles)
+        for (const Costume* const role : *dmgRoles)
         {
-            role->apply(&ret, actor, true);
+            role->apply(ret, actor);
         }
         /*if (scene) //TODO: adapt without using "scene" pointer here
         {
@@ -301,24 +306,27 @@ void Actor::applyStates(QString* const ret, const bool consume)
     {
         actor.applyDmgRoles(*ret);
     }
-    QList<Ailment>* const stateDur = actor._role_data->_a_states;
-    if (stateDur)
+    if (!consume)
     {
-        /*auto const last = stateDur->cend();
-        for (auto it = stateDur->cbegin(); it != last; ++it)
+        QList<Ailment>* const stateDur = actor._role_data->_a_states;
+        if (stateDur)
         {
-            if (it.value() > Ailment::EndDur)
+            /*auto const last = stateDur->cend();
+            for (auto it = stateDur->cbegin(); it != last; ++it)
             {
-                it.key()->alter(ret, actor, consume);
-            }
-        }*/
-        const int statesSize = stateDur->size();
-        for (int i = 0; i < statesSize; ++i)
-        {
-            State& aState = static_cast<State&>(stateDur->operator[](i));
-            if (aState.currentDuration() > Ailment::EndDur)
+                if (it.value() > Ailment::EndDur)
+                {
+                    it.key()->alter(ret, actor, consume);
+                }
+            }*/
+            const int statesSize = stateDur->size();
+            for (int i = 0; i < statesSize; ++i)
             {
-                aState.apply(ret, actor, consume);
+                State& aState = static_cast<State&>(stateDur->operator[](i));
+                if (aState.currentDuration() > Ailment::EndDur)
+                {
+                    aState.alter(ret, actor, false);
+                }
             }
         }
     }
@@ -449,7 +457,7 @@ void Actor::levelUp()
     actor._actor_data->_lv = lv;
 }
 
-void Actor::switchCostume(QString* const ret, Costume* const oldCost, Costume* const newCost)
+void Actor::switchCostume(QString* const ret, const Costume* const oldCost, const Costume* const newCost)
 {
     Actor& actor = *this;
     if (oldCost)

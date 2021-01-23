@@ -70,19 +70,19 @@ bool Costume::isCountering() const
     return counters && counters->size() > 0;
 }
 
-void Costume::adopt(QString* const ret, Actor& actor)
+void Costume::adopt(QString& ret, Actor& actor) const
 {
-    this->adopt(ret, actor, true, false);
+    this->adopt(&ret, actor, true, false);
 }
 
-void Costume::remove(QString* const ret, Actor& actor)
+void Costume::abandon(QString& ret, Actor& actor) const
 {
-    this->adopt(ret, actor, true, true);
+    this->adopt(&ret, actor, true, true);
 }
 
-void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool const remove)
+void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool const remove) const
 {
-    Costume& costume = *this;
+    const Costume& costume = *this;
     auto& actorData = actor._actor_data;
     auto& costumeData = costume._costume_data;
     actor.updateAttributes(remove, costume);
@@ -110,7 +110,7 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
         }
         else
         {
-            auto dmgRoles = actorData->_dmg_roles;
+            QVector<const Costume*>* const dmgRoles = actorData->_dmg_roles;
             if (dmgRoles)
             {
                 dmgRoles->removeOne(&costume);
@@ -131,10 +131,10 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
         }
         if (costume.currentHp() != 0 || costume.currentMp() != 0 || costume.currentRp() != 0)
         {
-            auto dmgRoles = actorData->_dmg_roles;
+            QVector<const Costume*>* dmgRoles = actorData->_dmg_roles;
             if (dmgRoles == NIL)
             {
-                dmgRoles = new QVector<Costume*>();
+                dmgRoles = new QVector<const Costume*>();
                 actorData->_dmg_roles = dmgRoles;
             }
             dmgRoles->append(&costume);
@@ -143,14 +143,11 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
     }
 }
 
-void Costume::apply(QString* const ret, Actor& actor, const bool consume)
+void Costume::apply(QString& ret, Actor& actor) const
 {
-    if (consume)
-    {
-        const Costume& role = *this;
-        *ret += QString(Costume::CausesTxt).arg(actor.name(), role.name());
-        role.damage(*ret, NIL, actor, 0, true);
-    }
+    const Costume& role = *this;
+    ret += QString(Costume::CausesTxt).arg(actor.name(), role.name());
+    role.damage(ret, NIL, actor, 0, true);
 }
 
 void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bool const remove) const

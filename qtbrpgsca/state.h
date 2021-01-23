@@ -19,16 +19,19 @@ namespace tbrpgsca
         QML_ELEMENT
         PROP_FIELD(State, CurrentDuration, currentDuration, int, inline, public, public, _cr_dur)
     public:
-        //void alter(QString& ret, Actor& actor, bool const consume);
-        void apply(QString* const ret, Actor& actor, bool const consume) override;
+        void alter(QString& ret, Actor& actor, bool const consume);
         bool disable(Actor& actor, int const dur, bool const remove);
-        void remove(QString* const ret, Actor& actor) override;
+
+        Q_INVOKABLE void abandon(QString& ret, Actor& actor) const override;
+        Q_INVOKABLE void apply(QString& ret, Actor& actor) const override;
 
         virtual ~State();
     protected:
         int _cr_dur;
 
+        void alter(QString* const ret, Actor& actor, bool const consume);
         bool disable(QString* const ret, Actor& actor, int dur, bool const remove);
+        void remove(QString* const ret, Actor& actor) const;
 
         explicit State(const Ailment& ailment);
         explicit State(QObject* const parent = NIL);
@@ -48,6 +51,6 @@ namespace tbrpgsca
 
 //Q_DECLARE_METATYPE(tbrpgta::State)
 Q_DECLARE_METATYPE(tbrpgsca::State*)
-Q_DECLARE_INTERFACE(tbrpgsca::State, "com.codycostea.tbrpgta.State")
+Q_DECLARE_INTERFACE(tbrpgsca::State, "com.codycostea.tbrpgsca.State")
 
 #endif // STATE_H

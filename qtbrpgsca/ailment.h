@@ -30,7 +30,7 @@ namespace tbrpgsca
         int removedSkillId(int const n) const;
 
         void blockSkills(Actor& actor, bool const remove) const;
-        void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
+        Q_INVOKABLE void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
 
         Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
               int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
