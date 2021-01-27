@@ -90,11 +90,13 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         }
         else
         {
+#if USE_DMG_ROLES
             QVector<const Costume*>* const dmgRoles = actor._dmg_roles;
             if (dmgRoles)
             {
                 dmgRoles->removeOne(&costume);
             }
+#endif
         }
         int const roleBlockedSkills = costume._b_skill_types;
         int const actorBlockedSkills = actor._b_skill_types;
@@ -118,6 +120,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         }
         if (costume._hp != 0 || costume._mp != 0 || costume._sp != 0)
         {
+#if USE_DMG_ROLES
             QVector<const Costume*>* dmgRoles = actor._dmg_roles;
             if (dmgRoles == nullptr)
             {
@@ -125,6 +128,9 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
                 actor._dmg_roles = dmgRoles;
             }
             dmgRoles->append(&costume);
+#else
+            actor.setDmgRole(true);
+#endif
         }
         costume.refresh(ret, scene, actor, false, false);
     }

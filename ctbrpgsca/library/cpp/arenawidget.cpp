@@ -33,8 +33,12 @@ void ArenaWidget::afterPlay()
                else
                {
                    crActor = arena._cr_actor;
+#if USE_DMG_ROLES
                    QVector<const Costume*>* usrRoles;
                    if (((usrRoles = crActor->_dmg_roles)) && usrRoles->size() > 0)
+#else
+                   if (crActor->hasDmgRole())
+#endif
                    {
                        arena.setEndTurn(true);
                        arena.endTurn(ret, SPR_ACTION, crActor);

@@ -141,11 +141,11 @@ namespace tbrpgsca
         static QVector<const Costume*>& Races();
         static QVector<const Costume*>& Jobs();
 
-        inline bool hasAllFlags(int const flag) const
+        inline bool hasAllFlags(unsigned int const flag) const
         {
             return (this->_play_flags & flag) == flag;
         }
-        inline bool hasAnyFlag(int const flag) const
+        inline bool hasAnyFlag(unsigned int const flag) const
         {
             return (this->_play_flags & flag) != 0;
         }
@@ -161,7 +161,7 @@ namespace tbrpgsca
 #if USE_BIT_FIELDS
         unsigned int _play_flags: 16;
 #else
-        signed int _play_flags;
+        unsigned int _play_flags;
 #endif
         inline void setFlag(int const flag, bool const value)
         {

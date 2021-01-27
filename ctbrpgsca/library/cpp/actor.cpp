@@ -388,6 +388,7 @@ template <typename SpriteRun>
 void Actor::applyDmgRoles(QString& ret, Scene* const scene, const SpriteRun* const actorEvent)
 {
     Actor& actor = *this;
+#if USE_DMG_ROLES
     QVector<const Costume*>* const dmgRoles = actor._dmg_roles;
     if (dmgRoles && dmgRoles->size() > 0)
     {
@@ -395,6 +396,46 @@ void Actor::applyDmgRoles(QString& ret, Scene* const scene, const SpriteRun* con
         {
             role->apply(ret, scene, actor);
         }
+#else
+    if (actor.hasDmgRole())
+    {
+        //QVector<const Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
+        {
+            auto& equipment = actor._equipment;
+            //if (dmgRoles && dmgRoles->size() > 0)
+            if (equipment.size() > 0)
+            {
+                /*for (const Costume* const role : *dmgRoles)
+                {
+                    role->apply(ret, actor);
+                }*/
+                auto const last = equipment.cend();
+                for (auto it = equipment.cbegin(); it != last; ++it)
+                {
+                    auto& role = it.value();
+                    if (role->currentHp() != 0 || role->currentMp() != 0 || role->currentRp() != 0)
+                    {
+                        role->apply(ret, actor);
+                    }
+                }
+            }
+        }
+        {
+            auto& states = actor._state_dur;
+            if (states && states->size() > 0)
+            {
+                auto const last = states->cend();
+                for (auto it = states->cbegin(); it != last; ++it)
+                {
+                    auto& role = it.key();
+                    if (role->currentHp() != 0 || role->currentMp() != 0 || role->currentRp() != 0)
+                    {
+                        role->apply(ret, actor);
+                    }
+                }
+            }
+        }
+#endif
         if (scene)
         {
             //Scene::SpriteRun* const actorEvent = scene->_actor_run;
@@ -528,6 +569,16 @@ void Actor::recover(QString* const ret, Scene* const scene)
             }
         }
     }
+#if USE_DMG_ROLES
+    auto dmgRoles = this->_dmg_roles;
+    if (dmgRoles)
+    {
+        this->_dmg_roles = nullptr;
+        delete dmgRoles;
+    }
+#else
+    this->setDmgRole(false);
+#endif
 }
 
 void Actor::levelUp(Scene* const scene)
@@ -790,7 +841,9 @@ Actor::Actor(int const id, QString name, QString sprite, const Costume& race, co
     this->_side = 0;
     this->_init = 0;
     this->_side = 0;
+#if USE_DMG_ROLES
     this->_dmg_roles = nullptr;
+#endif
     this->_skills_rg_turn = nullptr;
     this->_skills_cr_qty = nullptr;
     this->_state_dur = nullptr;
@@ -860,6 +913,7 @@ Actor::Actor(const Actor& actor) : Costume(actor)
         }
     }
     {
+#if USE_DMG_ROLES
         QVector<const Costume*>* skillsRgTurn = actor._dmg_roles;
         if (skillsRgTurn)
         {
@@ -871,6 +925,7 @@ Actor::Actor(const Actor& actor) : Costume(actor)
         {
             this->_dmg_roles = nullptr;
         }
+#endif
     }
     {
         QVector<const Ability*>* skillsRgTurn = actor._a_skills;
@@ -927,12 +982,14 @@ Actor::~Actor()
         this->_a_skills = nullptr;
         delete skills;
     }
+#if USE_DMG_ROLES
     auto dmgRoles = this->_dmg_roles;
     if (dmgRoles)
     {
         this->_dmg_roles = nullptr;
         delete dmgRoles;
     }
+#endif
     if (this->hasNewItems())
     {
         //this->setNewItems(false);

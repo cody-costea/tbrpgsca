@@ -17,10 +17,13 @@ namespace tbrpgsca
 
     class Actor : public Costume
     {
+#define USE_DMG_ROLES 1
+
         #define FLAG_ACTIVE 32768
         #define FLAG_AI_PLAYER 8192
         #define FLAG_RANDOM_AI 16384
         #define FLAG_NEW_ITEMS 4096
+        #define FLAG_DMG_ROLE 65536
         #define CHAR_NONE 0
         #define CHAR_RACE 1
         #define CHAR_JOB 2
@@ -70,6 +73,10 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(maximumLevel, int, public, _max_lv)
         PROP_FIELD_GET_CUSTOM(currentExperience, int, public, _xp)
         PROP_FIELD_GET_CUSTOM(currentLevel, int, public, _lv)
+#if !USE_DMG_ROLES
+        PROP_FLAG_GET(hasDmgRole, FLAG_DMG_ROLE, public)
+        PROP_FLAG_SET_ALL(Actor, DmgRole, FLAG_DMG_ROLE, public, hasDmgRole)
+#endif
     public:
         static QString KoTxt;
         static QString RiseTxt;
@@ -127,8 +134,9 @@ namespace tbrpgsca
 #endif
         QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         QMap<char, const Costume*> _equipment;
+#if USE_DMG_ROLES
         QVector<const Costume*>* _dmg_roles;
-
+#endif
         inline void checkRegSkill(const Ability& skill);
         void recover(QString* const ret, Scene* const scene);
         char unequipItem(Scene* const scene, const Costume& item);
