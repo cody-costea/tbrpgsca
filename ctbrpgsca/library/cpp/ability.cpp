@@ -78,7 +78,7 @@ void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)
 template <typename SpriteRun>
 void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const
 {
-    assert(target);
+    //assert(target);
     const Ability& ability = *this;
     int const dmgType = ability._dmg_type | user._dmg_type;
     if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
@@ -279,6 +279,10 @@ Ability::Ability(int const id, QString name, QString sprite, QString sound, bool
     {
         flags |= FLAG_MISSABLE;
     }
+    /*if (revive)
+    {
+        flags |= FLAG_FOR_KO;
+    }*/
     if (melee)
     {
         flags |= FLAG_MELEE;

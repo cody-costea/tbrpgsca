@@ -430,7 +430,7 @@ TR_MAP_TYPE(tr_index_map, TR_IX, TR_IX, TR_BYTE, -1, -1, 4, TrIndexMap)
     if (Conditions TR_HAS_ANY_FLAG(Flags, Flag)) Action;
 
 #define TR_FLAGS_DATA \
-    tr_nr flags: 12;
+    tr_nr flags: 20;
 
 #define TR_ROLE_DATA \
     char *name, *sprite; \

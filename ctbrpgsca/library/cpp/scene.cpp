@@ -220,8 +220,8 @@ void Scene::execute(QString& ret, const SpriteRun* const actorEvent, Actor& user
     Scene& scene = *this;
     bool const ko = target->_hp < 1;
     //bool const healing = ability.hp < 0;
-    if ((/*healing &&*/ ability.isReviving()) || !ko)
-    {
+    //if ((/*healing &&*/ revive) || !ko)
+    //{
         const Ability* counter = nullptr;
         ability.execute(ret, this, actorEvent, user, target, applyCosts);
         if (ability._hp > -1)
@@ -254,7 +254,7 @@ void Scene::execute(QString& ret, const SpriteRun* const actorEvent, Actor& user
                                                     target, &user == target ? &ability : counter);
         }
 #endif
-    }
+    //}
 
 }
 
@@ -281,17 +281,19 @@ void Scene::perform(QString& ret, const SpriteRun* const spriteRun, Actor& user,
             return;
         }
     }
+    bool const revives = ability.isReviving();
+    bool const onlyKoTarget = ability.targetsOnlyKO();
     if (ability.isRanged() && ability.targetsAll())
     {
         bool applyCosts = true;
         int const usrSide = user._side;
         bool const sideTarget = ability.targetsSide();
-        bool const noSelfTarget = !ability.targetsSelf();
+        bool const selfTarget = ability.targetsSelf();
         QVector<QVector<Actor*>*>& parties = scene._parties;
         int const pSize = parties.size();
         for (int j = 0; j < pSize; j += 1)
         {
-            if (sideTarget && noSelfTarget && j == usrSide)
+            if (sideTarget && (!selfTarget) && j == usrSide)
             {
                 continue;
             }
@@ -300,39 +302,58 @@ void Scene::perform(QString& ret, const SpriteRun* const spriteRun, Actor& user,
             for (int i = 0; i < sSize; i += 1)
             {
                 Actor* const trg = players->at(i);
-                if (noSelfTarget && trg == &user)
+                /*bool const trgKo = trg->_hp < 1;
+                if ((noSelfTarget && trg == &user) || (trgKo && !revives) || (onlyKoTarget && !trgKo))
                 {
                     continue;
                 }
                 else
+                {*/
+                if ((selfTarget || trg != &user) && (revives || !(trg->_hp < 1 && onlyKoTarget)))
                 {
                     scene.execute(ret, spriteRun, user, trg, ability, applyCosts);
+                    applyCosts = false;
                 }
-                applyCosts = false;
             }
         }
     }
     else if (ability.targetsSide())
     {
+        bool applyCosts = true;
         //QVector<Actor*>* const targets = scene.targets;
         int const side = ability.targetsSelf() ? user._side : target._side;
         QVector<Actor*>& party = *(scene._parties[side]);
         int const pSize = party.size();
         for (int i = 0; i < pSize; i += 1)
         {
-            /*Actor* const trg = party.at(i);
-            if (targets);
-            if (targets)
+            Actor* const trg = party.at(i);
+            //if ((trg->_hp < 1 && revives) || (!onlyKoTarget))
+            if (revives || !(trg->_hp < 1 && onlyKoTarget))
             {
-                targets->append(trg);
-            }*/
-            scene.execute(ret, spriteRun, user, party.at(i), ability, i == 0);
+                scene.execute(ret, spriteRun, user, trg, ability, applyCosts);
+                applyCosts = true;
+            }
         }
     }
     else
     {
-        scene.execute(ret, spriteRun, user, &user == &target || ability.targetsSelf() ? &user
-            : (scene.getGuardian(user, &target, ability)), ability, true);
+        /*Actor* const trg = &user == &target || ability.targetsSelf() ? &user : (scene.getGuardian(user, &target, ability));
+        if ((trg->_hp < 1 && revives) || (!onlyKoTarget))
+        {
+            scene.execute(ret, spriteRun, user, trg, ability, true, revives);
+        }*/
+        if (&user == &target || ability.targetsSelf())
+        {
+            scene.execute(ret, spriteRun, user, &user, ability, true);
+        }
+        else
+        {
+            //bool const trgKo = target._hp < 0;
+            if (revives || !(target._hp < 1 && onlyKoTarget))
+            {
+                scene.execute(ret, spriteRun, user, (scene.getGuardian(user, &target, ability)), ability, true);
+            }
+        }
     }
     if (item)
     {
@@ -363,7 +384,8 @@ int Scene::getAiSkill(Actor& user, QVector<const Ability*>& skills, int const de
     {
         const Ability* a = skills.at(i);
         if (a->canPerform(user) && ((defSkill > 0 && (a->_hp < s->_hp)
-            && (a->isReviving() || !restore)) || (a->_hp > s->_hp)))
+            && ((restore && a->isReviving()) || !(restore || a->targetsOnlyKO())))
+            || (defSkill == 0 && a->_hp > s->_hp)))
         {
             ret = i;
             s = a;
@@ -688,8 +710,9 @@ void Scene::endTurn(QString& ret, const SpriteRun* actorEvent, Actor* crActor)
 
 bool Scene::canTarget(Actor& user, const Ability& ability, Actor& target)
 {
-    return ability.canPerform(user) && (ability.targetsSelf() || ((target._hp > 0 || ability.isReviving())
-            && ((this->getGuardian(user, &target, ability))) == &target));
+    int trgHp;
+    return ability.canPerform(user) && (ability.targetsSelf() || ((((trgHp = target._hp) > 0 && !ability.targetsOnlyKO())
+            || (trgHp < 1 && ability.isReviving())) && ((this->getGuardian(user, &target, ability))) == &target));
 }
 
 void Scene::agiCalc()

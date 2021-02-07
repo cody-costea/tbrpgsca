@@ -22,6 +22,7 @@ namespace tbrpgsca
         #define FLAG_STEAL 8
         #define FLAG_ABSORB 16
         #define FLAG_MISSABLE 32
+        #define FLAG_TRG_KO 256
         #define FLAG_TRG_ALL 4
         #define FLAG_TRG_SIDE 128
         #define FLAG_TRG_SELF 64
@@ -35,6 +36,7 @@ namespace tbrpgsca
         PROP_FLAG_GET(isAbsorbing, FLAG_ABSORB, public)
         PROP_FLAG_GET(targetsSide, FLAG_TRG_SIDE, public)
         PROP_FLAG_GET(targetsSelf, FLAG_TRG_SELF, public)
+        PROP_FLAG_GET(targetsOnlyKO, FLAG_TRG_KO, public)
         PROP_FIELD_GET_CUSTOM(requiredLevel, int, public, _lv_rq)
         //PROP_FIELD_GET_CUSTOM(attributeIncrement, int, public, _attr_inc)
         PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)

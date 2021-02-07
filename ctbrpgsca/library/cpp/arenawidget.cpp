@@ -250,9 +250,10 @@ void ArenaWidget::prepareTargetBox(bool const freeMemory)
         Actor& crActor = *(arena._cr_actor);
         QComboBox& skillsBox = *(arena._skills_box);
         int const oldSkillIndex = skillsBox.currentIndex();
-        bool const restore = i < arena._target_box->count() / 2;
-        int const newSkillIndex = arena.getAiSkill(crActor, *(crActor._a_skills), restore ? 1 : 0, restore);
-        arena._trg_actor = arena.getPlayerFromTargetBox(i);
+        bool const restore = i < arena._target_box->count() / 2;        
+        auto trgActor = arena.getPlayerFromTargetBox(i);
+        int const newSkillIndex = arena.getAiSkill(crActor, *(crActor._a_skills), restore ? 1 : 0, trgActor->_hp < 1);
+        arena._trg_actor = trgActor;
         skillsBox.setCurrentIndex(newSkillIndex);
         if (newSkillIndex == oldSkillIndex)
         {
@@ -269,8 +270,10 @@ void ArenaWidget::prepareSkillsBox(Actor& actor, QVector<const Ability*>& skills
     QComboBox& skillBox = *(arena._skills_box);
     skillBox.setModel(static_cast<SkillsModel*>(static_cast<void**>(actor._extra)[1]));
     QComboBox& targetBox = *(arena._target_box);
-    bool const restore = targetBox.currentIndex() < targetBox.count() / 2;
-    skillBox.setCurrentIndex(arena.getAiSkill(actor, skills, restore ? 1 : 0, restore));
+    int const trgIndex = targetBox.currentIndex();
+    bool const restore = trgIndex < targetBox.count() / 2;
+    auto trgActor = arena.getPlayerFromTargetBox(trgIndex);
+    skillBox.setCurrentIndex(arena.getAiSkill(actor, skills, restore ? 1 : 0, trgActor->_hp < 1));
     return;
 }
 
