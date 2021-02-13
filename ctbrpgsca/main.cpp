@@ -12,7 +12,7 @@ using namespace tbrpgsca;
 extern template void Scene::playAi(QString& ret, const ArenaWidget* const spriteRun, Actor& player);
 extern template void Scene::endTurn(QString& ret, const ArenaWidget* const spriteRun, Actor* const actor);
 extern template void Scene::perform(QString& ret, const ArenaWidget* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
-extern template void Scene::execute(QString& ret, const ArenaWidget* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
+extern template void Scene::execute(QString& ret, const ArenaWidget* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts, bool const ko);
 extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, const ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                             bool const useGuards, int const surprise, int const mInit);
 extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
@@ -27,7 +27,7 @@ extern template void Role::damage(QString& ret, Scene* const scene, const ArenaW
 extern template void Scene::playAi(QString& ret, const Scene::SpriteAct* const spriteRun, Actor& player);
 extern template void Scene::endTurn(QString& ret, const Scene::SpriteAct* const spriteRun, Actor* const actor);
 extern template void Scene::perform(QString& ret, const Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
-extern template void Scene::execute(QString& ret, const Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts);
+extern template void Scene::execute(QString& ret, const Scene::SpriteAct* const actorEvent, Actor& user, Actor* const target, const Ability& ability, bool const applyCosts, bool const ko);
 extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& parties, const Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                                 bool const useGuards, int const surprise, int const mInit);
 extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,

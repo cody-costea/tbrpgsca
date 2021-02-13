@@ -138,7 +138,7 @@ QVector<QVector<const Ability*>*>& Play::Abilities()
         abilities.append(skillSet);
         skillSet = new QVector<const Ability*>();
         skillSet->append(new Ability(3, tr("Heal"), "", "", false, true, false, false, 0, 0,3,0, DMG_TYPE_SPI, -13,0,0, FLAG_TRG_ONE,0, -1,-1, false, false, nullptr, nullptr));
-        skillSet->append(new Ability(3, tr("Raise"), "", "", false, true, false, false, 0, 0,10,0, DMG_TYPE_SPI, -7,0,0, FLAG_TRG_ONE | FLAG_TRG_KO,0, -1,-1, false, true, nullptr, nullptr));
+        skillSet->append(new Ability(4, tr("Raise"), "", "", false, true, false, false, 0, 0,10,0, DMG_TYPE_SPI, -7,0,0, FLAG_TRG_ONE | FLAG_TRG_KO,0, -1,-1, false, true, nullptr, nullptr));
         abilities.append(skillSet);
     }
     return abilities;

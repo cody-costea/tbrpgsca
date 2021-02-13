@@ -119,7 +119,7 @@ namespace tbrpgsca
         void resetTurn(Actor& actor);
 
         template <typename SpriteRun>
-        void execute(QString& ret, const SpriteRun* const actorEvent, Actor& user, Actor* target, const Ability& ability, bool const applyCosts);
+        void execute(QString& ret, const SpriteRun* const actorEvent, Actor& user, Actor* target, const Ability& ability, bool const applyCosts, bool const ko);
 
         friend class Actor;
         friend class Ability;
