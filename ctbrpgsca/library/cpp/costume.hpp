@@ -45,7 +45,7 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(wisdom, int, public, _wis)
         PROP_FIELD_GET_CUSTOM(agility, int, public, _agi)
     public:
-        static QString CausesTxt;
+        inline static const QString CausesTxt = TR_TXT_SCENE_CAUSES;
 
         int elementResistance(int const element) const;
         int stateResistance(State* const state) const;

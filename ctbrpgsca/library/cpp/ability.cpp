@@ -17,10 +17,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Ability::MissesTxt = ", but misses %1";
-QString Ability::ReflectTxt = ", reflected by %1";
-QString Ability::StolenTxt = ", obtaining %1 from %2";
-
 int Ability::removedStateDuration(const State& state) const
 {
     QMap<const State*, int>* aStates = this->_r_states;

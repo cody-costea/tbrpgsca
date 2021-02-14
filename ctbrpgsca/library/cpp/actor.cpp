@@ -18,9 +18,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Actor::KoTxt = ", %1 falls unconscious";
-QString Actor::RiseTxt = ", but rises again";
-
 int Actor::remainingSkillUses(const Ability& skill) const
 {
     QMap<const Ability*, int>* crQty = this->_skills_cr_qty;
@@ -205,7 +202,7 @@ void Actor::setCurrentHp(QString* const ret, Scene* const scene, const SpriteRun
                 {
                     if (ret)
                     {
-                        *ret = *ret % Actor::RiseTxt;
+                        *ret = *ret % TR_TXT_SCENE_RISES;
                     }
                     actor._hp = actor._m_hp;
                     if (scene && actor.Costume::isShapeShifted())

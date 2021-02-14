@@ -42,9 +42,9 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(maximumUses, int, public, _m_qty)
         PROP_FIELD_GET_CUSTOM(usesRegen, int, public, _r_qty)
     public:
-        static QString MissesTxt;
-        static QString ReflectTxt;
-        static QString StolenTxt;
+        inline static const QString MissesTxt = TR_TXT_SCENE_MISSES;
+        inline static const QString ReflectTxt = TR_TXT_SCENE_REFLECTS;
+        inline static const QString StolenTxt = TR_TXT_SCENE_STEALS;
 
         QList<const State*> removedStatesList() const;
         int removedStateDuration(const State& state) const;

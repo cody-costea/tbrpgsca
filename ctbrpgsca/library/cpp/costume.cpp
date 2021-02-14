@@ -16,8 +16,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Costume::CausesTxt = ", %1 is affected by %2";
-
 const Ability& Costume::addedSkill(int const n) const
 {
     return *(this->_a_skills->at(n));
@@ -140,7 +138,7 @@ void Costume::apply(QString& ret, Scene* scene, Actor& actor) const
 {
     const Costume& role = *this;
     Scene::SpriteAct* const spr = nullptr;
-    ret += QString(Costume::CausesTxt).arg(actor._name, role._name);
+    ret += Costume::CausesTxt.arg(actor._name, role._name);
     role.damage(ret, scene, spr, nullptr, actor, std::rand() % 4, true);
 }
 

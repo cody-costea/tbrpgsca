@@ -68,7 +68,8 @@ HEADERS += \
         library/cpp/scene.hpp \
         library/cpp/skillsmodel.hpp \
         library/cpp/state.hpp \
-        library/cpp/targetsmodel.hpp
+        library/cpp/targetsmodel.hpp \
+        library/translations.h
 
 #LIBS += -lobjc -framework Foundation
 

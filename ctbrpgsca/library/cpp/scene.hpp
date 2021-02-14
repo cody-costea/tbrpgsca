@@ -46,11 +46,7 @@ namespace tbrpgsca
         typedef std::function<bool(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
                                    Actor* const target, const Ability* const counter)> SpriteAct;
 
-        static QString EscapeTxt;
-        static QString VictoryTxt;
-        static QString PerformsTxt;
-        static QString FallenTxt;
-        static QString FailTxt;
+        inline static const QString PerformsTxt = TR_TXT_SCENE_PERFORMS;
 
         template <typename SpriteRun>
         void endTurn(QString& ret, const SpriteRun* const spriteRun, Actor* const actor);

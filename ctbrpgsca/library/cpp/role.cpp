@@ -16,12 +16,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-QString Role::HpTxt = "HP";
-QString Role::MpTxt = "MP";
-QString Role::RpTxt = "RP";
-QString Role::ResistTxt = ", resisted by %1";
-QString Role::SuffersTxt = ", %1 suffers ";
-
 QString Role::sprite() const
 {
     QString* const spr = this->_sprite;
@@ -153,7 +147,7 @@ void Role::damage(QString& ret, Scene* const scene, const SpriteRun* const sprit
             {
                 ret += "+";
             }
-            ret += (QString("%1 %2").arg(QString::number(-dmgSp), Role::RpTxt));
+            ret += (QString("%1 %2").arg(QString::number(-dmgSp), TR_TXT_STATS_SP));
             actor.setCurrentRp(actor._sp - dmgSp);
         }
         if (dmgMp != 0)
@@ -171,7 +165,7 @@ void Role::damage(QString& ret, Scene* const scene, const SpriteRun* const sprit
             {
                 ret += "+";
             }
-            ret += (QString("%1 %2").arg(QString::number(-dmgMp), Role::MpTxt));
+            ret += (QString("%1 %2").arg(QString::number(-dmgMp), TR_TXT_STATS_MP));
             actor.setCurrentMp(actor._mp - dmgMp);
         }
         if (dmgHp != 0)
@@ -189,7 +183,7 @@ void Role::damage(QString& ret, Scene* const scene, const SpriteRun* const sprit
             {
                 ret += "+";
             }
-            ret += (QString("%1 %2").arg(QString::number(-dmgHp), Role::HpTxt));
+            ret += (QString("%1 %2").arg(QString::number(-dmgHp), TR_TXT_STATS_HP));
             actor.setCurrentHp(&ret, scene, spriteRun, actor._hp - dmgHp, percent);
             /*if (actor.hp < 1)
             {

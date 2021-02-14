@@ -1,5 +1,5 @@
 /*
-Copyright (C) AD 2013-2020 Claudiu-Stefan Costea
+Copyright (C) AD 2013-2021 Claudiu-Stefan Costea
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +10,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <QMap>
 #include <QCoreApplication>
+
+#include "library/translations.h"
 
 namespace tbrpgsca
 {
@@ -128,7 +130,7 @@ namespace tbrpgsca
 
     class Play
     {
-        Q_DECLARE_TR_FUNCTIONS(Play)
+        //Q_DECLARE_TR_FUNCTIONS(Play)
         PROP_CUSTOM_FIELD(Play, playFlags, setPlayFlags, swapPlayFlags, withPlayFlags, int, public, protected, _play_flags)
     public:            
         static void FreeDemoMemory();

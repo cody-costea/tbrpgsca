@@ -48,11 +48,8 @@ namespace tbrpgsca
         PROP_FIELD_GET_CUSTOM(name, QString, public, _name)
         //PROP_FIELD_GET_CUSTOM(id, int, public, _id)
     public:
-        static QString HpTxt;
-        static QString MpTxt;
-        static QString RpTxt;
-        static QString SuffersTxt;
-        static QString ResistTxt;
+        inline static const QString SuffersTxt = TR_TXT_SCENE_SUFFERS;
+        inline static const QString ResistTxt = TR_TXT_SCENE_RESISTS;
 
         QString sprite() const;
         QList<const State*> statesList() const;

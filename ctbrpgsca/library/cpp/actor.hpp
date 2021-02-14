@@ -78,8 +78,7 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, DmgRole, FLAG_DMG_ROLE, public, hasDmgRole)
 #endif
     public:
-        static QString KoTxt;
-        static QString RiseTxt;
+        inline static const QString KoTxt = TR_TXT_SCENE_FALLS;
 
         QMap<const Ability*, int> items() const;
         //int getPartySide() const;
