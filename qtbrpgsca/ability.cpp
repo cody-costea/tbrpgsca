@@ -148,7 +148,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
             }
             ability.damage(ret, (ability.isAbsorbing() ? &user : NIL), *target, dmg, false);
             {
-                QList<Ailment>* aStates = ability._role_data->_a_states;
+                QList<Ailment>* aStates = ability.roleData()._a_states;
                 if (aStates)
                 {
                     /*auto const last = aStates->cend();
@@ -163,7 +163,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                 }
             }
             {
-                QList<Ailment>* stateDur = target->_role_data->_a_states;
+                QList<Ailment>* stateDur = target->roleData()._a_states;
                 if (stateDur)
                 {
                     int const aStatesSize = stateDur->size();

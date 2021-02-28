@@ -30,17 +30,17 @@ namespace tbrpgsca
 
         PROP_FLAG(Role, Ranged, ranged, Attribute::RANGE, inline, public, public)
         PROP_FLAG(Role, Reviving, revives, Attribute::REVIVE, inline, public, public)
-        PROP_READONLY_FIELD(Role, DatabaseId, databaseId, int, inline, public, _role_data->_id)
-        PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, _role_data->_hp)
-        PROP_FIELD(Role, CurrentMp, currentMp, int, virtual inline, public, public, _role_data->_mp)
-        PROP_FIELD(Role, CurrentRp, currentRp, int, virtual inline, public, public, _role_data->_sp)
-        PROP_FIELD(Role, MaximumHp, maximumHp, int, virtual inline, public, public, _role_data->_m_hp)
-        PROP_FIELD(Role, MaximumMp, maximumMp, int, virtual inline, public, public, _role_data->_m_mp)
-        PROP_FIELD(Role, MaximumRp, maximumRp, int, virtual inline, public, public, _role_data->_m_sp)
-        //PROP_READONLY_FIELD(Role, DatabaseId, databaseId, Role::Roleint, inline, public, _role_data->_id)
-        PROP_FIELD(Role, DamageType, damageType, int, inline, public, public, _role_data->_dmg_type)
-        //PROP_REF(Role, Sprite, sprite, QString, inline, public, public, _role_data->_sprite)
-        PROP_FIELD(Role, Name, name, QString, inline, public, public, _role_data->_name)
+        PROP_READONLY_FIELD(Role, DatabaseId, databaseId, int, inline, public, roleData()._id)
+        PROP_FIELD(Role, CurrentHp, currentHp, int, virtual inline, public, public, roleData()._hp)
+        PROP_FIELD(Role, CurrentMp, currentMp, int, virtual inline, public, public, roleData()._mp)
+        PROP_FIELD(Role, CurrentRp, currentRp, int, virtual inline, public, public, roleData()._sp)
+        PROP_FIELD(Role, MaximumHp, maximumHp, int, virtual inline, public, public, roleData()._m_hp)
+        PROP_FIELD(Role, MaximumMp, maximumMp, int, virtual inline, public, public, roleData()._m_mp)
+        PROP_FIELD(Role, MaximumRp, maximumRp, int, virtual inline, public, public, roleData()._m_sp)
+        //PROP_READONLY_FIELD(Role, DatabaseId, databaseId, Role::Roleint, inline, public, roleData()._id)
+        PROP_FIELD(Role, DamageType, damageType, int, inline, public, public, roleData()._dmg_type)
+        //PROP_REF(Role, Sprite, sprite, QString, inline, public, public, roleData()._sprite)
+        PROP_FIELD(Role, Name, name, QString, inline, public, public, roleData()._name)
     public:
         enum Attribute {
             REVIVE = 1,
@@ -106,15 +106,18 @@ namespace tbrpgsca
 
         Q_INVOKABLE void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
     protected:
-        class RoleData : public QSharedData
+        class RoleSheet : public PlaySheet
         {
         public:
-            ~RoleData();
+            virtual ~RoleSheet();
 
         protected:
             QString _name,* _sprite;
             int _id, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp, _dmg_type;
             QList<Ailment>* _a_states;
+
+            RoleSheet(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+                      int const mMp, int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* const aStates);
 
             friend class Ability;
             friend class Costume;
@@ -125,7 +128,15 @@ namespace tbrpgsca
             friend class Role;
         };
 
-        QSharedDataPointer<RoleData> _role_data;
+        inline RoleSheet& roleMutData()
+        {
+            return (*static_cast<RoleSheet*>(this->_play_data.data()));
+        }
+
+        inline const RoleSheet& roleData() const
+        {
+            return (*static_cast<const RoleSheet*>(this->_play_data.data()));
+        }
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
              int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* const states, QObject* const parent = NIL);
@@ -133,7 +144,11 @@ namespace tbrpgsca
         Role(int const id, QString&& name, QString&& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp,
              int const mSp, int const element, bool const range, bool const revive, QList<Ailment>* const states, QObject* const parent = NIL);
 
+        explicit Role(QObject* const parent, RoleSheet* const roleDataPtr);
+
         explicit Role(QObject* const parent = NIL);
+
+        Role(const Role&& role);
 
         Role(const Role& role);
 

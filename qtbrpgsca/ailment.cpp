@@ -123,18 +123,18 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
                 == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(int(0), 0)) + stateRes)))
         {
             int trgStatesSize;
-            QSharedDataPointer<RoleData>& trgRoleData = target._role_data;
-            QList<Ailment>* trgStates = trgRoleData->_a_states;
+            auto& trgRoleData = target.roleMutData();
+            QList<Ailment>* trgStates = trgRoleData._a_states;
             if (trgStates == NIL)
             {
                 trgStates = new QList<Ailment>();
-                trgRoleData->_a_states = trgStates;
+                trgRoleData._a_states = trgStates;
                 trgStatesSize = 0;
             }
             else
             {
                 trgStatesSize = trgStates->size();
-                QList<Ailment>* const rStates = this->_role_data->_a_states;
+                QList<Ailment>* const rStates = this->roleData()._a_states;
                 if (rStates)
                 {
                     //auto const rLast = rStates->cend();

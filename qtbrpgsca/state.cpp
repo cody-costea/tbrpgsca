@@ -39,7 +39,7 @@ bool State::disable(QString* const ret, Actor& actor, int dur, const bool remove
     }
     if (dur > State::EndDur)
     {
-        QList<Ailment>* sDur = actor._role_data->_a_states;
+        QList<Ailment>* sDur = actor.roleData()._a_states;
         if (sDur == NIL)
         {
             return true;
@@ -90,7 +90,7 @@ void State::alter(QString& ret, Actor& actor, const bool consume)
 
 void State::alter(QString* const ret, Actor& actor, const bool consume)
 {
-    //QList<Ailment>* sDur = actor._role_data->_a_states;
+    //QList<Ailment>* sDur = actor.roleData()._a_states;
     //if (sDur /*&& actor.hp > 0*/)
     {
         int const d = this->currentDuration();//sDur->value(this, State::EndDur);

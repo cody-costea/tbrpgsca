@@ -738,7 +738,7 @@ void Scene::escape(QString* const ret)
 void Scene::actorHpChanged(int const newValue, int const oldValue)
 {
     Actor& actor = *static_cast<Actor*>(QObject::sender());
-    QSharedDataPointer<Role::RoleData>& roleData = actor._role_data;
+    auto& roleData = actor.roleMutData();
     QString& ret = *this->_scene_data->_ret;
     if (newValue < 1)
     {
@@ -746,11 +746,11 @@ void Scene::actorHpChanged(int const newValue, int const oldValue)
         {
             if (/*survive || */actor.Costume::isInvincible())
             {
-                roleData->_hp = 1;
+                roleData._hp = 1;
             }
             else
             {
-                roleData->_sp = 0;
+                roleData._sp = 0;
                 ret += Actor::KoTxt.arg(actor.name());
                 if (actor.initiative() > 0)
                 {
@@ -759,7 +759,7 @@ void Scene::actorHpChanged(int const newValue, int const oldValue)
                 if (actor.Role::isReviving())
                 {
                     ret += Actor::RiseTxt;
-                    roleData->_hp = actor.maximumHp();
+                    roleData._hp = actor.maximumHp();
                     if (actor.Costume::isShapeShifted())
                     {
                         emit this->spriteAct(&actor, NIL, true, NIL, NIL);

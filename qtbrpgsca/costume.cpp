@@ -95,9 +95,9 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
         {
             actor.setPlayFlags(actorFlags ^ roleFlags);
         }
-        if (costume.isShapeShifted() && costume._role_data->_sprite)
+        if (costume.isShapeShifted() && costume.roleData()._sprite)
         {
-            (*actor._role_data->_sprite) = *(actor.job()._role_data->_sprite);
+            (*actor.roleMutData()._sprite) = *(actor.job().roleMutData()._sprite);
         }
         if (costume.currentHp() == 0 && costume.currentMp() == 0 && costume.currentRp() == 0)
         {
@@ -123,7 +123,7 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
     {
         if (updStates)
         {
-            QList<Ailment>* const cStates = costume._role_data->_a_states;
+            QList<Ailment>* const cStates = costume.roleData()._a_states;
             if (cStates)
             {
                 actor.updateStates(false, ret, *cStates, true);
@@ -168,7 +168,7 @@ void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bo
     }
     if (updStates)
     {
-        QList<Ailment>* cStates = costume._role_data->_a_states;
+        QList<Ailment>* cStates = costume.roleData()._a_states;
         if (cStates)
         {
             actor.updateStates(remove, ret, *cStates, false);
@@ -197,10 +197,10 @@ void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bo
         }*/
         if (costume.isShapeShifted())
         {
-            QString* const spr = costume._role_data->_sprite;
+            QString* const spr = costume.roleData()._sprite;
             if (spr)
             {
-                (*actor._role_data->_sprite) = *spr;
+                (*actor.roleData()._sprite) = *spr;
             }
         }
     }
@@ -232,7 +232,7 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     }
     if (shapeShift)
     {
-        QString* spr = this->_role_data->_sprite;
+        QString* spr = this->roleData()._sprite;
         if (spr && spr->length() > 0)
         {
             flags |= Attribute::SHAPE_SHIFT;

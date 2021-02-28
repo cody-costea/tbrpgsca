@@ -60,7 +60,7 @@ namespace tbrpgsca
         auto field = this->GetName(); \
         if (field != value) \
         { \
-            this->Field = value; \
+            const_cast<Type&>(this->Field) = value; \
             emit GetName##Changed(value, field); \
         } \
     }
@@ -348,6 +348,29 @@ namespace tbrpgsca
             return (this->_play_flags & flag) != 0;
         }
     protected:
+        class PlaySheet : public QSharedData
+        {
+        public:
+            virtual ~PlaySheet();
+
+        protected:
+            int _play_flags;
+
+            explicit PlaySheet();
+
+            explicit PlaySheet(int const flags);
+
+            friend class Ability;
+            friend class Costume;
+            friend class Ailment;
+            friend class Actor;
+            friend class Scene;
+            friend class Role;
+            friend class Play;
+        };
+
+        QSharedDataPointer<PlaySheet> _play_data;
+
         Q_INVOKABLE inline void setPlayFlag(int const flag, bool const value)
         {
             int const flags = this->_play_flags;
@@ -363,7 +386,17 @@ namespace tbrpgsca
             return *this;
         }
 
+        explicit Play(QObject* const parent, QSharedDataPointer<PlaySheet>&& playData);
+
+        explicit Play(QObject* const parent, QSharedDataPointer<PlaySheet>& playData);
+
+        explicit Play(QObject* const parent, PlaySheet* const playDataPtr);
+
         explicit Play(QObject* const parent = NIL, int const flags = 0);
+
+        explicit Play(const Play&& play);
+
+        explicit Play(const Play& play);
 
         virtual ~Play();
     private:

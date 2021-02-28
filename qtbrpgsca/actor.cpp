@@ -61,13 +61,13 @@ const Costume* Actor::equipItem(const char pos, Costume* const item)
 void Actor::removeStates(QString* const ret, bool const remove)
 {
     Actor& actor = *this;
-    QList<Ailment>* const stateDur = actor._role_data->_a_states;
+    QList<Ailment>* const stateDur = actor.roleMutData()._a_states;
     if (stateDur)
     {
         actor.updateStates(true, ret, *stateDur, true);
         if (remove && stateDur->size() == 0)
         {
-            actor._role_data->_a_states = NIL;
+            actor.roleMutData()._a_states = NIL;
             delete stateDur;
         }
     }
@@ -78,7 +78,7 @@ void Actor::applyStates(QString& ret, const bool consume)
     this->applyStates(&ret, consume);
 }
 
-inline void Actor::setRace(Costume& race)
+void Actor::setRace(Costume& race)
 {
     Actor& actor = *this;
     actor.equipItem(CHAR_RACE, &race);
@@ -90,17 +90,17 @@ void Actor::setJob(Costume& job)
     actor.equipItem(CHAR_JOB, &job);
     if (!actor.Costume::isShapeShifted())
     {
-        QString* spr = job._role_data->_sprite;
+        QString* spr = job.roleMutData()._sprite;
         if (spr)
         {
-            QString* actorSpr = actor._role_data->_sprite;
+            QString* actorSpr = actor.roleMutData()._sprite;
             if (actorSpr)
             {
                 (*actorSpr) = *spr;
             }
             else
             {
-                actor._role_data->_sprite = new QString(*spr);
+                actor.roleMutData()._sprite = new QString(*spr);
             }
         }
     }
@@ -202,13 +202,13 @@ void Actor::setMaximumRp(const int mRp)
 void Actor::setSprite(QString& value)
 {
     Actor& actor = *this;
-    QSharedDataPointer<RoleData>& roleData = actor._role_data;
-    QString* sprite = roleData->_sprite;
+    auto& roleData = actor.roleMutData();
+    QString* sprite = roleData._sprite;
     if (sprite)
     {
         delete sprite;
     }
-    roleData->_sprite = new QString(value);
+    roleData._sprite = new QString(value);
 }
 
 void Actor::setItems(const QSharedPointer<QMap<Ability*, int>>& items)
@@ -308,7 +308,7 @@ void Actor::applyStates(QString* const ret, const bool consume)
     }
     if (!consume)
     {
-        QList<Ailment>* const stateDur = actor._role_data->_a_states;
+        QList<Ailment>* const stateDur = actor.roleMutData()._a_states;
         if (stateDur)
         {
             /*auto const last = stateDur->cend();
@@ -360,10 +360,10 @@ void Actor::recover(QString* const ret)
     actor.refreshCostumes(ret);
     actor.setCurrentActions(actor.maximumActions());
     auto actorCostData = actor._costume_data;
-    QSharedDataPointer<RoleData>& roleData = actor._role_data;
-    roleData->_hp = actor.maximumHp();
-    roleData->_mp = actor.maximumMp();
-    roleData->_sp = 0;
+    auto& roleData = actor.roleMutData();
+    roleData._hp = actor.maximumHp();
+    roleData._mp = actor.maximumMp();
+    roleData._sp = 0;
     {
         QMap<int, int>* const res = actorCostData->_res;
         if (res)
@@ -432,12 +432,12 @@ void Actor::levelUp()
     Actor& actor = *this;
     int lv = actor.currentLevel();
     int const maxp = actor.maximumExperience(), xp = actor.currentExperience(), maxLv = actor.maximumLevel();
-    QSharedDataPointer<RoleData>& roleData = actor._role_data;
+    auto& roleData = actor.roleMutData();
     while (maxp <= xp && lv < maxLv)
     {
-        roleData->_m_hp += 3;
-        roleData->_m_mp += 2;
-        roleData->_m_sp += 2;
+        roleData._m_hp += 3;
+        roleData._m_mp += 2;
+        roleData._m_sp += 2;
         actor.setMaximumExperience(maxp * 2);
         actor.setOffense(actor.offense() + 1);
         actor.setDefense(actor.defense() + 1);
@@ -635,7 +635,7 @@ void Actor::updateStates(bool const remove, QString* const ret, QList<Ailment>& 
     if (remove)
     {
         int statesSize;
-        QList<Ailment>* const stateDur = actor._role_data->_a_states;
+        QList<Ailment>* const stateDur = actor.roleMutData()._a_states;
         if (stateDur && (statesSize = stateDur->size()) > 0)
         {
             /*auto const last = states.cend();
@@ -697,7 +697,7 @@ void Actor::refreshCostumes(QString* const ret)
             it.value()->refresh(ret, actor, true, false);
         }
     }
-    QList<Ailment>* const stateDur = actor._role_data->_a_states;
+    QList<Ailment>* const stateDur = actor.roleMutData()._a_states;
     if (stateDur)
     {
         /*auto const last = stateDur->cend();
@@ -743,7 +743,7 @@ Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costum
     actorData->_dmg_roles = NIL;
     //actorData->_skills_rg_turn = NIL;
     //actorData->_skills_cr_qty = NIL;
-    this->_role_data->_a_states = NIL;
+    this->roleMutData()._a_states = NIL;
     actorData->_actions = mActions;
     actorData->_max_lv = maxLv;
     actorData->_items = items.isNull() ? NIL : items;
@@ -794,16 +794,16 @@ Actor::Actor(const Actor& actor) : Costume(actor)
         }
     }
     {
-        QMap<State*, int>* crSkillsQty = actor._role_data->_state_dur;
+        QMap<State*, int>* crSkillsQty = actor.roleMutData()._state_dur;
         if (crSkillsQty == NIL)
         {
-            this->_role_data->_state_dur = NIL;
+            this->roleMutData()._state_dur = NIL;
         }
         else
         {
             QMap<State*, int>* nSkillsQty = new QMap<State*, int>();
             (*nSkillsQty) = (*crSkillsQty);
-            this->_role_data->_state_dur = nSkillsQty;
+            this->roleMutData()._state_dur = nSkillsQty;
         }
     }
     {
