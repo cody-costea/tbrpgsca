@@ -27,10 +27,10 @@ namespace tbrpgsca
         PROP_FLAG(Ability, TargetingAll, targetsAll, Attribute::TARGET_ALL, inline, public, public)
         PROP_FLAG(Ability, TargetingSide, targetsSide, Attribute::TARGET_SIDE, inline, public, public)
         PROP_FLAG(Ability, TargetingSelf, targetsSelf, Attribute::TARGET_SELF, inline, public, public)
-        PROP_FIELD(Ability, RequiredLevel, requiredLevel, int, inline, public, public, _ability_data->_lv_rq)
-        PROP_FIELD(Ability, AttributeIncrement, attributeIncrement, int, inline, public, public, _ability_data->_attr_inc)
-        PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, _ability_data->_max_qty)
-        PROP_FIELD(Ability, UsesRegen, usesRegen, int, inline, public, public, _ability_data->_reg_qty)
+        PROP_FIELD(Ability, RequiredLevel, requiredLevel, int, inline, public, public, abilityData()._lv_rq)
+        PROP_FIELD(Ability, AttributeIncrement, attributeIncrement, int, inline, public, public, abilityData()._attr_inc)
+        PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, abilityData()._max_qty)
+        PROP_FIELD(Ability, UsesRegen, usesRegen, int, inline, public, public, abilityData()._reg_qty)
         //PROP_FIELD(Ability, CurrentUses, currentUses, int, inline, public, public, _crt_qty)
         //PROP_FIELD(Ability, RegenTurn, regenTurn, int, inline, public, public, _reg_turn)
     public:
@@ -72,19 +72,26 @@ namespace tbrpgsca
 
         explicit Ability(QObject* const parent = NIL);
 
+        Ability(const Ability&& ability);
+
         Ability(const Ability& ability);
 
         virtual ~Ability();
     protected:
-        class AbilityData : public QSharedData
+        class AbilitySheet : public RoleSheet
         {
         public:
-            ~AbilityData();
+            virtual ~AbilitySheet();
 
         protected:
             int _lv_rq, _attr_inc, _max_qty, _reg_qty;
             QMap<int, int>* _r_states;
             QString* _sound;
+
+            AbilitySheet(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee,
+                         bool const canMiss, int const lvRq, int const hpCost, int const mpCost, int const spCost, int const dmgType, int const attrInc,
+                         int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty, int const rQty, bool const absorb,
+                         bool const revive, QList<Ailment>* const aStates, QMap<int, int>* const rStates);
 
             friend class Actor;
             friend class Costume;
@@ -96,10 +103,19 @@ namespace tbrpgsca
             friend class Scene;
         };
 
-        //int _crt_qty, _reg_turn;
-        QSharedDataPointer<AbilityData> _ability_data;
+        inline AbilitySheet& abilityMutData()
+        {
+            return (*static_cast<AbilitySheet*>(this->_play_data.data()));
+        }
+
+        inline const AbilitySheet& abilityData() const
+        {
+            return (*static_cast<const AbilitySheet*>(this->_play_data.data()));
+        }
 
         void execute(QString& ret, Actor& user, Actor* target, bool const applyCosts);
+
+        explicit Ability(QObject* const parent, AbilitySheet* const abilityDataPtr);
 
         friend class Actor;
         friend class Costume;

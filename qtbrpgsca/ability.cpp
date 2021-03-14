@@ -23,25 +23,25 @@ QString Ability::StolenTxt = ", obtaining %1 from %2";
 
 int Ability::removedStateDuration(int state) const
 {
-    auto aStates = this->_ability_data->_r_states;
+    auto aStates = this->abilityData()._r_states;
     return aStates == NIL ? 0 : aStates->value(state, 0);
 }
 
 QList<int> Ability::removedStatesList() const
 {
-    auto aStates = this->_ability_data->_r_states;
+    auto aStates = this->abilityData()._r_states;
     return aStates == NIL ? QList<int>() : aStates->keys();
 }
 
 bool Ability::removedState(int state) const
 {
-    auto aStates = this->_ability_data->_r_states;
+    auto aStates = this->abilityData()._r_states;
     return aStates && aStates->contains(state);
 }
 
 int Ability::removedStatesSize() const
 {
-    auto aStates = this->_ability_data->_r_states;
+    auto aStates = this->abilityData()._r_states;
     return aStates == NIL ? 0 : aStates->size();
 }
 
@@ -90,26 +90,26 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
     }
     auto& userData = user._actor_data;
     {
-        auto& usrCostData = user._costume_data;
-        auto& trgCostData = target->_costume_data;
-        int canMiss = ability.isMissable() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = usrCostData->_agi,
-                trgAgi = trgCostData->_agi, trgSpi = trgCostData->_spi, usrWis = usrCostData->_wis;
+        auto& usrCostData = user.costumeData();
+        auto& trgCostData = target->costumeData();
+        int canMiss = ability.isMissable() ? 4 : 0, def = 0, i = 0, dmg = 0, usrAgi = usrCostData._agi,
+                trgAgi = trgCostData._agi, trgSpi = trgCostData._spi, usrWis = usrCostData._wis;
         if ((dmgType & Role::Element::ATTACK) == Role::Element::ATTACK)
         {
-            dmg += usrCostData->_atk;
-            def += trgCostData->_def;
+            dmg += usrCostData._atk;
+            def += trgCostData._def;
             ++i;
         }
         if ((dmgType & Role::Element::DEFENSE) == Role::Element::DEFENSE)
         {
-            dmg += usrCostData->_def;
-            def += trgCostData->_def;
+            dmg += usrCostData._def;
+            def += trgCostData._def;
             ++i;
         }
         if ((dmgType & Role::Element::SPIRIT) == Role::Element::SPIRIT)
         {
-            dmg += usrCostData->_spi;
-            def += trgCostData->_wis;
+            dmg += usrCostData._spi;
+            def += trgCostData._wis;
             ++i;
         }
         if ((dmgType & Role::Element::WISDOM) == Role::Element::WISDOM)
@@ -167,7 +167,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                 if (stateDur)
                 {
                     int const aStatesSize = stateDur->size();
-                    auto rStates = ability._ability_data->_r_states;
+                    auto rStates = ability.abilityData()._r_states;
                     if (rStates)
                     {
                         auto const rLast = rStates->cend();
@@ -215,7 +215,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                     int trgItemsSize;
                     auto& trgItems = target->_actor_data->_items;
                     if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
-                            && (((std::rand() % 12) + usrCostData->_agi / 4) > 4 + trgCostData->_agi / 3))
+                            && (((std::rand() % 12) + usrCostData._agi / 4) > 4 + trgCostData._agi / 3))
                     {
                         int const itemId = std::rand() % trgItemsSize;
                         //if (itemId < trgItemsSize)
@@ -285,7 +285,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
 
 }
 
-Ability::AbilityData::~AbilityData()
+Ability::AbilitySheet::~AbilitySheet()
 {
     QString* const sound = this->_sound;
     if (sound)
@@ -295,19 +295,19 @@ Ability::AbilityData::~AbilityData()
     }
 }
 
-Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
-                 int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
-                 int const rQty, bool const absorb, bool const revive, QList<Ailment>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
-    : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates, parent)
+Ability::AbilitySheet::AbilitySheet(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee,
+                                    bool const canMiss, int const lvRq, int const hpC, int const mpC, int const spC, int const dmgType, int const attrInc,
+                                    int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty, int const rQty,
+                                    bool const absorb, bool const revive, QList<Ailment>* const aStates, QMap<int, int>* const rStates)
+    : RoleSheet(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
-    QSharedDataPointer<AbilityData> dataPtr(new AbilityData);
-    dataPtr->_sound = sound.isNull() ? NIL : new QString(sound);
-    dataPtr->_attr_inc = attrInc;
-    dataPtr->_max_qty = mQty;
-    dataPtr->_lv_rq = lvRq;
-    dataPtr->_reg_qty = rQty;
-    dataPtr->_r_states = rStates;
-    int flags = this->playFlags();
+    this->_sound = sound.isNull() ? NIL : new QString(sound);
+    this->_attr_inc = attrInc;
+    this->_max_qty = mQty;
+    this->_lv_rq = lvRq;
+    this->_reg_qty = rQty;
+    this->_r_states = rStates;
+    int flags = this->_play_flags;
     //this->_reg_turn = 0;
     //this->_crt_qty = 0;
     if (canMiss)
@@ -327,9 +327,14 @@ Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, b
         flags |= Attribute::ABSORB;
     }
     flags |= trg;
-    this->setPlayFlags(flags);
-    this->_ability_data = dataPtr;
+    this->_play_flags = flags;
 }
+
+Ability::Ability(int const id, QString& name, QString& sprite, QString& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
+                 int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
+                 int const rQty, bool const absorb, bool const revive, QList<Ailment>* const aStates, QMap<int, int>* const rStates, QObject* const parent)
+    : Role(parent, new AbilitySheet(id, name, sprite, sound, steal, range, melee, canMiss, lvRq, hpC, mpC, spC, dmgType, attrInc, hpDmg, mpDmg, spDmg,
+                                    trg, elm, mQty, rQty, absorb, revive, aStates, rStates)) {}
 
 Ability::Ability(int const id, QString&& name, QString&& sprite, QString&& sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq, int const hpC,
                  int const mpC, int const spC, int const dmgType, int const attrInc, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm, int const mQty,
@@ -338,18 +343,8 @@ Ability::Ability(int const id, QString&& name, QString&& sprite, QString&& sound
 
 Ability::Ability(QObject* const parent) : Ability(0, QString(), QString(), QString(), false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, NIL, NIL, parent) {}
 
-Ability::Ability(const Ability& ability) : Role(ability)
-{
-    this->_ability_data = ability._ability_data;
-    //this->_reg_turn = ability._reg_turn;
-    //this->_crt_qty = ability._crt_qty;
-}
+Ability::Ability(const Ability&& ability) : Ability(static_cast<const Ability&>(ability)) {}
 
-Ability::~Ability()
-{
-    QString* const sound = this->_ability_data->_sound;
-    if (sound)
-    {
-        delete sound;
-    }
-}
+Ability::Ability(const Ability& ability) : Role(ability) {}
+
+Ability::~Ability() {}

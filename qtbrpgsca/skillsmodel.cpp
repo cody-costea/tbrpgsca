@@ -22,7 +22,7 @@ SkillsModel::~SkillsModel()
 int SkillsModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
-    return this->_actor->_costume_data->_a_skills->size();
+    return this->_actor->costumeData()._a_skills->size();
 }
 
 QVariant SkillsModel::data(const QModelIndex& index, int role) const
@@ -33,7 +33,7 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
    }
 
    Actor* const actor = (this->_actor);
-   const Ability& ability = actor->_costume_data->_a_skills->at(index.row());
+   const Ability& ability = actor->costumeData()._a_skills->at(index.row());
 
    switch (role)
    {

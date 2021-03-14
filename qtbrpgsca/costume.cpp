@@ -20,53 +20,53 @@ QString Costume::CausesTxt = ", %1 is affected by %2";
 
 Ability Costume::addedSkill(int const n) const
 {
-    return (this->_costume_data->_a_skills->at(n));
+    return (this->costumeData()._a_skills->at(n));
 }
 
 bool Costume::hasAddedSkill(const Ability& skill) const
 {
-    auto aSkills = this->_costume_data->_a_skills;
+    auto aSkills = this->costumeData()._a_skills;
     return aSkills && aSkills->contains(skill);
 }
 
 int Costume::addedSkillsSize() const
 {
-    auto aSkills = this->_costume_data->_a_skills;
+    auto aSkills = this->costumeData()._a_skills;
     return aSkills == NIL ? 0 : aSkills->size();
 }
 
 Ability Costume::counterSkill(int const n) const
 {
-    return (this->_costume_data->_counters->at(n));
+    return (this->costumeData()._counters->at(n));
 }
 
 bool Costume::hasCounterSkill(const Ability& skill) const
 {
-    auto counters = this->_costume_data->_counters;
+    auto counters = this->costumeData()._counters;
     return counters && counters->contains(skill);
 }
 
 int Costume::counterSkillsSize() const
 {
-    auto counters = this->_costume_data->_counters;
+    auto counters = this->costumeData()._counters;
     return counters == NIL ? 0 : counters->size();
 }
 
 int Costume::elementResistance(const int element) const
 {
-    QMap<int, int>* res = this->_costume_data->_res;
+    QMap<int, int>* res = this->costumeData()._res;
     return res == NIL ? 0 : res->value(element, 0);
 }
 
 int Costume::stateResistance(const int state) const
 {
-    auto stRes = this->_costume_data->_st_res;
+    auto stRes = this->costumeData()._st_res;
     return stRes == NIL ? 0 : stRes->value(state, 0);
 }
 
 bool Costume::isCountering() const
 {
-    auto& counters = this->_costume_data->_counters;
+    auto& counters = this->costumeData()._counters;
     return counters && counters->size() > 0;
 }
 
@@ -84,9 +84,9 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
 {
     const Costume& costume = *this;
     auto& actorData = actor._actor_data;
-    auto& costumeData = costume._costume_data;
+    auto& costumeData = costume.costumeData();
     actor.updateAttributes(remove, costume);
-    actor.updateResistance(remove, costumeData->_res, costumeData->_st_res);
+    actor.updateResistance(remove, costumeData._res, costumeData._st_res);
     if (remove)
     {
         int const roleFlags = costume.playFlags();
@@ -154,13 +154,13 @@ void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bo
 {
     const Costume& costume = *this;
     {
-        auto costumeData = costume._costume_data;
-        auto skills = costumeData->_a_skills;
+        auto costumeData = costume.costumeData();
+        auto skills = costumeData._a_skills;
         if (skills)
         {
             actor.updateSkills(remove, false, *skills);
         }
-        auto counters = costumeData->_counters;
+        auto counters = costumeData._counters;
         if (counters)
         {
             actor.updateSkills(remove, true, *counters);
@@ -206,33 +206,33 @@ void Costume::refresh(QString* const ret, Actor& actor, bool const updStates, bo
     }
 }
 
-Costume::CostumeData::~CostumeData() {}
+Costume::CostumeSheet::~CostumeSheet() {}
 
-Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                 bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters, QList<Ailment>* const states,
-                 QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
-    : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, elm, range, revive, states, parent)
+Costume::CostumeSheet::CostumeSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg,
+                                    int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi,
+                                    int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse, bool const reflect,
+                                    bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters,
+                                    QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res)
+    : RoleSheet(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, elm, range, revive, states)
 {
-    QSharedDataPointer<CostumeData> costumeData(new CostumeData);
-    costumeData->_m_actions = mActions;
-    costumeData->_counters = counters;
-    costumeData->_a_skills = skills;
-    costumeData->_atk = atk;
-    costumeData->_def = def;
-    costumeData->_spi = spi;
-    costumeData->_wis = wis;
-    costumeData->_agi = agi;
-    costumeData->_res = res;
-    costumeData->_st_res = stRes;
-    int flags = this->playFlags();
+    this->_m_actions = mActions;
+    this->_counters = counters;
+    this->_a_skills = skills;
+    this->_atk = atk;
+    this->_def = def;
+    this->_spi = spi;
+    this->_wis = wis;
+    this->_agi = agi;
+    this->_res = res;
+    this->_st_res = stRes;
+    int flags = this->_play_flags;
     if (stun)
     {
         flags |= Attribute::STUN;
     }
     if (shapeShift)
     {
-        QString* spr = this->roleData()._sprite;
+        QString* spr = this->_sprite;
         if (spr && spr->length() > 0)
         {
             flags |= Attribute::SHAPE_SHIFT;
@@ -258,9 +258,15 @@ Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeS
     {
         flags |= Attribute::KO;
     }
-    this->setPlayFlags(flags);
-    this->_costume_data = costumeData;
+    this->_play_flags = flags;
 }
+
+Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
+                 int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
+                 bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters, QList<Ailment>* const states,
+                 QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+    : Costume(parent, new CostumeSheet(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range,
+                                       automate, confuse, reflect, ko, invincible, revive, skills, counters, states, stRes, res)) {}
 
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const elm, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
@@ -278,9 +284,10 @@ Costume::Costume(int const id, QString&& name, QString&& sprite, bool const shap
 
 Costume::Costume(QObject* const parent) : Costume(0, QString(), QString(), false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false, false, NIL, NIL, NIL, NIL, NIL, parent) {}
 
-Costume::Costume(const Costume& costume) : Role(costume)
-{
-    this->_costume_data = costume._costume_data;
-}
+Costume::Costume(QObject* const parent, CostumeSheet* const costumeDataPtr) : Role(parent, costumeDataPtr) {}
+
+Costume::Costume(const Costume&& costume) : Costume(static_cast<const Costume&>(costume)) {}
+
+Costume::Costume(const Costume& costume) : Role(costume) {}
 
 Costume::~Costume() {}

@@ -236,7 +236,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         //if (!healing)
         {
             int cntSize;
-            auto& counters = target->_costume_data->_counters;
+            auto& counters = target->costumeData()._counters;
             if (counters && (cntSize = counters->size()) > 0 && (!target->Costume::isStunned())
                     && (target->partySide() != user.partySide() || target->Costume::isConfused()))
             {
@@ -393,9 +393,9 @@ void Scene::playAi(QString* const ret, Actor* const player)
 {
     assert(ret && player);
     QVector<Actor*>* party;
-    auto scene = *this->_scene_data;
+    auto& scene = *this->_scene_data;
     QVector<QVector<Actor*>*>& parties = scene._parties;
-    auto& skills = *(player->_costume_data->_a_skills);
+    auto& skills = *(player->costumeData()._a_skills);
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
     if (player->Costume::isConfused())
     {
@@ -636,7 +636,7 @@ void Scene::endTurn(QString* const ret)
         //QMap<const Ability*, int>* const regSkills = crActorData->_skills_rg_turn;
         if (crActor->hasQtySkills())
         {
-            for (auto& ability : *crActor->_costume_data->_a_skills)
+            for (auto& ability : *crActor->costumeData()._a_skills)
             {
                 int const mQty = abs(ability.maximumUses());
                 if (mQty != 0)

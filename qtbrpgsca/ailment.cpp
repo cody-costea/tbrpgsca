@@ -39,7 +39,7 @@ void Ailment::blockSkills(Actor& actor, const bool remove) const
     if (rSkills)
     {
         //auto& actorData = actor._actor_data;
-        auto& aSkills = *actor._costume_data->_a_skills;
+        auto& aSkills = *actor.costumeData()._a_skills;
         //auto iSkills = actorData->_skills_cr_qty;
         if (remove)
         {
@@ -119,7 +119,7 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
     {
         int stateRes;
         QMap<int, int>* stRes;
-        if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target._costume_data->_st_res)
+        if (always || (stateRes = this->resistance()) < 0 || ((std::rand() % 10) > (((stRes = target.costumeData()._st_res)
                 == NIL ? 0 : stRes->value(this->databaseId(), 0) + stRes->value(int(0), 0)) + stateRes)))
         {
             int trgStatesSize;
