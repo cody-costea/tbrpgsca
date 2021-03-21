@@ -22,18 +22,18 @@ QString Actor::RiseTxt = ", but rises again";
 
 QMap<Ability*, int> Actor::items() const
 {
-    const auto items = this->_actor_data->_items;
+    const auto items = this->actorData()._items;
     return items == NIL? QMap<Ability*, int>() : *items;
 }
 
 Costume& Actor::race() const
 {
-    return *(this->_actor_data->_equipment[CHAR_RACE]);
+    return *(this->actorData()._equipment[CHAR_RACE]);
 }
 
 Costume& Actor::job() const
 {
-    return *(this->_actor_data->_equipment[CHAR_JOB]);
+    return *(this->actorData()._equipment[CHAR_JOB]);
 }
 
 const Costume* Actor::unequipPos(const char pos)
@@ -43,7 +43,7 @@ const Costume* Actor::unequipPos(const char pos)
 
 char Actor::unequipItem(Costume& item)
 {
-    QMap<char, Costume*>& equipment = this->_actor_data->_equipment;
+    const QMap<char, Costume*>& equipment = this->actorData()._equipment;
     char const old = equipment.key(&item, CHAR_NONE);
     this->equipItem(old, NIL);
     return old;
@@ -51,7 +51,7 @@ char Actor::unequipItem(Costume& item)
 
 const Costume* Actor::equipItem(const char pos, Costume* const item)
 {
-    QMap<char, Costume*>& equipment = this->_actor_data->_equipment;
+    QMap<char, Costume*>& equipment = this->actorMutData()._equipment;
     Costume* old = equipment.value(pos, NIL);
     switchCostume(NIL, old, item);
     equipment[pos] = item;
@@ -213,31 +213,31 @@ void Actor::setSprite(QString& value)
 
 void Actor::setItems(const QSharedPointer<QMap<Ability*, int>>& items)
 {
-    this->_actor_data->_items = items;
+    this->actorMutData()._items = items;
 }
 
 void Actor::setMaximumLevel(const int maxLv)
 {
-    this->_actor_data->_max_lv = maxLv;
+    this->actorMutData()._max_lv = maxLv;
 }
 
 void Actor::setCurrentLevel(const int level)
 {
-    auto actorData = this->_actor_data;
-    while (level > actorData->_lv)
+    auto& actorData = this->actorMutData();
+    while (level > actorData._lv)
     {
-        actorData->_xp = actorData->_maxp;
+        actorData._xp = actorData._maxp;
         this->levelUp();
     }
-    actorData->_lv = level;
+    actorData._lv = level;
 
 }
 
 void Actor::setCurrentExperience(const int xp)
 {
-    auto actorData = this->_actor_data;
-    actorData->_xp = xp;
-    if (xp >= actorData->_maxp)
+    auto& actorData = this->actorMutData();
+    actorData._xp = xp;
+    if (xp >= actorData._maxp)
     {
         this->levelUp();
     }
@@ -270,7 +270,7 @@ void Actor::setStateResistance(const int state, const int res)
 void Actor::applyDmgRoles(QString& ret)
 {
     Actor& actor = *this;
-    QVector<const Costume*>* const dmgRoles = actor._actor_data->_dmg_roles;
+    QVector<const Costume*>* const dmgRoles = actor.actorData()._dmg_roles;
     if (dmgRoles && dmgRoles->size() > 0)
     {
         for (const Costume* const role : *dmgRoles)
@@ -407,7 +407,7 @@ void Actor::recover(QString* const ret)
         }
     }
     {
-        /*QMap<const Ability*, int>* skillsQty = actor._actor_data->_skills_cr_qty;
+        /*QMap<const Ability*, int>* skillsQty = actor.actorData()._skills_cr_qty;
         if (skillsQty)
         {
             auto const last = skillsQty->cend();
@@ -432,7 +432,7 @@ void Actor::levelUp()
     Actor& actor = *this;
     int lv = actor.currentLevel();
     int const maxp = actor.maximumExperience(), xp = actor.currentExperience(), maxLv = actor.maximumLevel();
-    auto& roleData = actor.roleMutData();
+    auto& roleData = actor.actorMutData();
     while (maxp <= xp && lv < maxLv)
     {
         roleData._m_hp += 3;
@@ -454,7 +454,7 @@ void Actor::levelUp()
         }*/
         lv += 1;
     }
-    actor._actor_data->_lv = lv;
+    roleData._lv = lv;
 }
 
 void Actor::switchCostume(QString* const ret, const Costume* const oldCost, const Costume* const newCost)
@@ -563,9 +563,8 @@ void Actor::updateResistance(const bool remove, QMap<int, int>* const elmRes, QM
 void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>& skills)
 {
     Actor& actor = *this;
-    auto actorData = actor._actor_data;
-    auto actorCostData = actor.costumeData();
-    auto aSkills = counters ? actorCostData._counters : actorCostData._a_skills;
+    auto actorData = actor.actorData();
+    auto aSkills = counters ? actorData._counters : actorData._a_skills;
     if (remove)
     {
         if (aSkills)
@@ -599,11 +598,11 @@ void Actor::updateSkills(const bool remove, const bool counters, QList<Ability>&
             aSkills = new QList<Ability>();
             if (counters)
             {
-                actorCostData._counters = aSkills;
+                actorData._counters = aSkills;
             }
             else
             {
-                actorCostData._a_skills = aSkills;
+                actorData._a_skills = aSkills;
             }
         }
         for (Ability& ability : skills)
@@ -690,7 +689,7 @@ void Actor::refreshCostumes(QString* const ret)
 {
     Actor& actor = *this;
     {
-        QMap<char, Costume*>& equipment = actor._actor_data->_equipment;
+        const QMap<char, Costume*>& equipment = actor.actorData()._equipment;
         auto const last = equipment.cend();
         for (auto it = equipment.cbegin(); it != last; ++it)
         {
@@ -720,6 +719,33 @@ void Actor::refreshCostumes(QString* const ret)
     }
 }
 
+Actor::ActorSheet::ActorSheet(int const id, QString& name, QString& sprite, /*Costume& race, Costume& job, int const level,*/ int const maxLv, int const mActions,
+                              int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                              QMap<int, int>* const res, QMap<int, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items)
+    : CostumeSheet(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false,
+                   false, false, false, false, false, new QList<Ability>(), NIL, NIL, stRes, res)
+{
+    this->_lv = 1;
+    this->_xp = 0;
+    this->_maxp = 15;
+    this->_side = 0;
+    this->_init = 0;
+    this->_side = 0;
+    this->_old_side = 0;
+    this->_dmg_roles = NIL;
+    //this->_skills_rg_turn = NIL;
+    //this->_skills_cr_qty = NIL;
+    this->_a_states = NIL;
+    this->_actions = mActions;
+    this->_max_lv = maxLv;
+    this->_items = items.isNull() ? NIL : items;
+    this->_extra = NIL;
+    /*this->setRace(race);
+    this->setJob(job);
+    this->setCurrentLevel(level);
+    this->recover(NIL);*/
+}
+
 Actor::Actor(int const id, QString&& name, QString&& sprite, Costume&& race, Costume&& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<int, int>* const stRes,
              const QSharedPointer<QMap<Ability*, int>>&& items, QObject* const parent)
@@ -728,26 +754,8 @@ Actor::Actor(int const id, QString&& name, QString&& sprite, Costume&& race, Cos
 Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costume& job, int const level, int const maxLv, int const mActions, int const mHp, int const mMp,
              int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, QMap<int, int>* const res, QMap<int, int>* const stRes,
              const QSharedPointer<QMap<Ability*, int>>& items, QObject* const parent)
-    : Costume(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false, false, false, false, false, false, new QList<Ability>(),
-              NIL, NIL, stRes, res, parent)
+    : Actor(parent, new ActorSheet(id, name, sprite, maxLv, mActions, mHp, mMp, mSp, atk, def, spi, wis, agi, res, stRes, items))
 {
-    QSharedDataPointer<ActorData> actorData(new ActorData);
-    this->_actor_data = actorData;
-    actorData->_lv = 1;
-    actorData->_xp = 0;
-    actorData->_maxp = 15;
-    actorData->_side = 0;
-    actorData->_init = 0;
-    actorData->_side = 0;
-    actorData->_old_side = 0;
-    actorData->_dmg_roles = NIL;
-    //actorData->_skills_rg_turn = NIL;
-    //actorData->_skills_cr_qty = NIL;
-    this->roleMutData()._a_states = NIL;
-    actorData->_actions = mActions;
-    actorData->_max_lv = maxLv;
-    actorData->_items = items.isNull() ? NIL : items;
-    actorData->_extra = NIL;
     this->setRace(race);
     this->setJob(job);
     this->setCurrentLevel(level);
@@ -756,10 +764,14 @@ Actor::Actor(int const id, QString& name, QString& sprite, Costume& race, Costum
 
 Actor::Actor(QObject* const parent) : Actor(0, NIL, NIL, Costume(NIL), Costume(NIL), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NIL, NIL, QSharedPointer<QMap<Ability*, int>>(), parent) {}
 
+Actor::Actor(QObject* const parent, ActorSheet* const actorDataPtr) : Costume(parent, actorDataPtr) {}
+
+Actor::Actor(const Actor&& actor) : Actor(static_cast<const Actor&>(actor)) {}
+
 Actor::Actor(const Actor& actor) : Costume(actor)
 {
-    this->_actor_data = actor._actor_data;
-    /*auto& copyCostData = actor.costumeData();
+    /*this->_actor_data = actor._actor_data;
+    auto& copyCostData = actor.costumeData();
     auto& actorCostData = this->costumeData();
     QVector<Ability*>* aSkills = new QVector<Ability*>();
     this->_items = actor.hasNewItems() ? new QMap<Ability*, int>(*(actor._items)) : actor._items;
@@ -847,7 +859,7 @@ Actor::Actor(const Actor& actor) : Costume(actor)
     }*/
 }
 
-Actor::ActorData::~ActorData()
+Actor::ActorSheet::~ActorSheet()
 {
     auto dmgRoles = this->_dmg_roles;
     if (dmgRoles)

@@ -22,7 +22,7 @@ ItemsModel::~ItemsModel()
 int ItemsModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
-    const auto& items = this->_actor->_actor_data->_items;
+    const auto& items = this->_actor->actorData()._items;
     return items == nullptr ? 0 : items->size();
 }
 
@@ -34,7 +34,7 @@ QVariant ItemsModel::data(const QModelIndex& index, int role) const
    }
 
    Actor* const actor = this->_actor;
-   const auto& items = actor->_actor_data->_items;
+   const auto& items = actor->actorData()._items;
    if (items == nullptr)
    {
        return QVariant();
@@ -54,7 +54,7 @@ QVariant ItemsModel::data(const QModelIndex& index, int role) const
    case Qt::DisplayRole:
    {
        int usesQty;
-       //QMap<const Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
+       //QMap<const Ability*, int>* skillsQty = actor->actorData()._skills_cr_qty;
        return QString(tr("%7 X %1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability.name(), QString::number(ability.requiredLevel()),
             QString::number(ability.maximumHp()), QString::number(ability.maximumMp()), QString::number(ability.maximumRp()), (ability.maximumUses() == 0
             ? "∞" : ((usesQty = ability.property("currentUses").toInt()) < 0 ? "!" : QString::number(usesQty))), QString::number(it.value()));

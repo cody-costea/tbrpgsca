@@ -57,24 +57,24 @@ namespace tbrpgsca
         PROP_FIELD_SET_ALL(Actor, setName, sawpName, withName, QString, public, name, _role_data->_name)*/
         PROP_FIELD_WITH_SWAP(Actor, setRace, swapRace, withRace, Costume&, inline, public, race)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumLevel, swapMaximumLevel, withMaximumLevel, int, inline, public, maximumLevel)
-        //PROP_FIELD_SET_ALL(Actor, setExtra, sawpExtra, withExtra, void*, inline, public, extra, _actor_data->_extra)
+        //PROP_FIELD_SET_ALL(Actor, setExtra, sawpExtra, withExtra, void*, inline, public, extra, actorData()._extra)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentLevel, swapCurrentLevel, withCurrentLevel, int, inline, public, currentLevel)
-        PROP_FIELD_SET_ALL(Actor, setCurrentActions, sawpCurrentActions, withCurrentActions, int, inline, public, currentActions, _actor_data->_actions)
-        PROP_FIELD_SET_ALL(Actor, setPartySide, sawpPartySide, withPartySide, int, inline, public, partySide, _actor_data->_side)
-        PROP_FIELD_SET_ALL(Actor, setInitiative, sawpInitiative, withInitiative, int, inline, public, initiative, _actor_data->_init)
-        PROP_FIELD_SET_ALL(Actor, setMaximumExperience, sawpMaximumExperience, withMaximumExperience, int, inline, public, maximumExperience, _actor_data->_maxp)
+        PROP_FIELD_SET_ALL(Actor, setCurrentActions, sawpCurrentActions, withCurrentActions, int, inline, public, currentActions, actorData()._actions)
+        PROP_FIELD_SET_ALL(Actor, setPartySide, sawpPartySide, withPartySide, int, inline, public, partySide, actorData()._side)
+        PROP_FIELD_SET_ALL(Actor, setInitiative, sawpInitiative, withInitiative, int, inline, public, initiative, actorData()._init)
+        PROP_FIELD_SET_ALL(Actor, setMaximumExperience, sawpMaximumExperience, withMaximumExperience, int, inline, public, maximumExperience, actorData()._maxp)
         PROP_FIELD_SWAP(swapSprite, setSprite, QString, QString&, inline, public, sprite)
         PROP_FIELD_WITH_SWAP(Actor, setJob, swapJob, withJob, Costume&, inline, public, job)
         PROP_FIELD_WITH(Actor, withSprite, QString&, inline, public, setSprite)
-        PROP_FIELD(Actor, Extra, extra, void*, inline, public, protected, _actor_data->_extra)
-        PROP_FIELD_GET_CUSTOM(maximumExperience, int, inline, public, _actor_data->_maxp)
-        PROP_FIELD_GET_CUSTOM(currentActions, int, inline, public, _actor_data->_actions)
-        PROP_FIELD_GET_CUSTOM(maximumLevel, int, inline, public, _actor_data->_max_lv)
-        PROP_FIELD_GET_CUSTOM(initiative, int, inline, public, _actor_data->_init)
-        PROP_FIELD_GET_CUSTOM(partySide, int, inline, public, _actor_data->_side)
-        //PROP_FIELD_GET_CUSTOM(extra, void*, inline, public, _actor_data->_extra)
-        PROP_FIELD_GET_CUSTOM(currentExperience, int, inline, public, _actor_data->_xp)
-        PROP_FIELD_GET_CUSTOM(currentLevel, int, inline, public, _actor_data->_lv)
+        PROP_FIELD(Actor, Extra, extra, void*, inline, public, protected, actorData()._extra)
+        PROP_FIELD_GET_CUSTOM(maximumExperience, int, inline, public, actorData()._maxp)
+        PROP_FIELD_GET_CUSTOM(currentActions, int, inline, public, actorData()._actions)
+        PROP_FIELD_GET_CUSTOM(maximumLevel, int, inline, public, actorData()._max_lv)
+        PROP_FIELD_GET_CUSTOM(initiative, int, inline, public, actorData()._init)
+        PROP_FIELD_GET_CUSTOM(partySide, int, inline, public, actorData()._side)
+        //PROP_FIELD_GET_CUSTOM(extra, void*, inline, public, actorData()._extra)
+        PROP_FIELD_GET_CUSTOM(currentExperience, int, inline, public, actorData()._xp)
+        PROP_FIELD_GET_CUSTOM(currentLevel, int, inline, public, actorData()._lv)
     public:
         enum Attribute {
             RANDOM_AI = 2048,
@@ -134,14 +134,16 @@ namespace tbrpgsca
 
         explicit Actor(QObject* const parent = NIL);
 
+        Actor(const Actor&& actor);
+
         Actor(const Actor& actor);
 
         virtual ~Actor();
     protected:
-        class ActorData : public QSharedData
+        class ActorSheet : public CostumeSheet
         {
         public:
-            ~ActorData();
+            virtual ~ActorSheet();
 
         protected:
             int _lv, _max_lv, _xp, _maxp, _old_side, _init, _side, _actions;
@@ -150,6 +152,10 @@ namespace tbrpgsca
             QVector<const Costume*>* _dmg_roles;
             QMap<char, Costume*> _equipment;
             void* _extra;
+
+            ActorSheet(int const id, QString& name, QString& sprite, /*Costume& race, Costume& job, int const level,*/ int const maxLv, int const mActions,
+                       int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                       QMap<int, int>* const res, QMap<int, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items);
 
             friend class Scene;
             friend class Actor;
@@ -164,7 +170,15 @@ namespace tbrpgsca
             friend class Role;
         };
 
-        QSharedDataPointer<ActorData> _actor_data;
+        inline ActorSheet& actorMutData()
+        {
+            return (*static_cast<ActorSheet*>(this->_play_data.data()));
+        }
+
+        inline const ActorSheet& actorData() const
+        {
+            return (*static_cast<const ActorSheet*>(this->_play_data.data()));
+        }
 
         void levelUp();
         //inline void checkRegSkill(const Ability& skill);
@@ -179,6 +193,8 @@ namespace tbrpgsca
         void switchCostume(QString* const ret, const Costume* const oldCostume, const Costume* const newCostume);
         void setCurrentHp(int const hp, QString* const ret, bool const survive);
         void refreshCostumes(QString* const ret);
+
+        explicit Actor(QObject* const parent, ActorSheet* const actorDataPtr);
 
         friend class Scene;
         friend class Ability;

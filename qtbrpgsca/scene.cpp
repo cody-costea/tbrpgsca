@@ -105,12 +105,12 @@ bool Scene::hasTargetedPlayer(Actor& player) const
 Actor* Scene::getGuardian(Actor* const user, Actor* target, Ability* const skill) const
 {
     assert(user && skill);
-    int const side = target->_actor_data->_old_side;
+    int const side = target->actorData()._old_side;
 #if ALLOW_NO_GUARDS
     if (this->usesGuards())
 #endif
     {
-        if (user->_actor_data->_old_side != side && ((!skill->isRanged()) && ((!user->Role::isRanged()) || skill->isOnlyMelee())))
+        if (user->actorData()._old_side != side && ((!skill->isRanged()) && ((!user->Role::isRanged()) || skill->isOnlyMelee())))
         {
             int pos = -1;
             Actor* fGuard = NIL,* lGuard = NIL;
@@ -262,7 +262,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         QVector<Actor*>* targets = scene->_targets;
         if (targets == NIL)
         {
-            targets = new QVector<Actor*>(scene->_parties[target->_actor_data->_old_side]->size());
+            targets = new QVector<Actor*>(scene->_parties[target->actorData()._old_side]->size());
             scene->_targets = targets;
         }
         targets->append(target);
@@ -330,7 +330,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     else if (ability->isTargetingSide())
     {
         //QVector<Actor*>* const targets = scene.targets;
-        int const side = ability->isTargetingSelf() ? user->partySide() : target->_actor_data->_old_side;
+        int const side = ability->isTargetingSelf() ? user->partySide() : target->actorData()._old_side;
         QVector<Actor*>& party = *(scene->_parties[side]);
         int const pSize = party.size();
         for (int i = 0; i < pSize; ++i)
@@ -351,7 +351,7 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     }
     if (item)
     {
-        const auto& items = user->_actor_data->_items;
+        const auto& items = user->actorData()._items;
         if (items)
         {
             items->operator[](ability) = items->value(ability, 1) - 1;
@@ -889,7 +889,7 @@ void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>* parties, SpriteA
             }
             QObject::connect(&player, SIGNAL(Actor::currentHpChanged), this, SLOT(Scene::actorHpChanged));
             QObject::connect(&player, SIGNAL(Actor::agilityChanged), this, SLOT(Scene::agiCalc));
-            player._actor_data->_old_side = i;
+            player.actorMutData()._old_side = i;
             player.setPartySide(i);
 #if ALLOW_COVERING
             if (player.Costume::isCovering())

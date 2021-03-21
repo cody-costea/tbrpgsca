@@ -21,9 +21,8 @@ void State::remove(QString* const ret, Actor& actor) const
     state.adopt(ret, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
     {
-        actor.setPartySide(static_cast<int>(actor._actor_data->_old_side));
+        actor.setPartySide(static_cast<int>(actor.actorData()._old_side));
     }
-
 }
 
 bool State::disable(Actor& actor, int const dur, const bool remove)

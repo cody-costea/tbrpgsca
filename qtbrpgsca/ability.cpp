@@ -51,7 +51,7 @@ void Ability::replenish()
     int const mQty = ability.maximumUses();
     if (mQty != 0)
     {
-        /*auto& userData = user._actor_data;
+        /*auto& userData = user.actorData();
         QMap<const Ability*, int>* usrSkills = userData->_skills_cr_qty;
         if (usrSkills == NIL)
         {
@@ -67,7 +67,7 @@ void Ability::replenish()
 bool Ability::canPerform(Actor* const actor) const
 {
     assert(actor);
-    //QMap<const Ability*, int>* skillsQty = actor->_actor_data->_skills_cr_qty;
+    //QMap<const Ability*, int>* skillsQty = actor->actorData()->_skills_cr_qty;
     int const crQty = this->property("currentUses").toInt();
     return this->maximumMp() <= actor->currentMp() && this->maximumHp() < actor->currentHp() && this->maximumRp() <= actor->currentRp()
             && actor->currentLevel() >= this->requiredLevel() && crQty > -1 && (this->maximumUses() == 0 || crQty > 0);
@@ -88,7 +88,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
         ret += Ability::ReflectTxt.arg(target->name());
         target = &user;
     }
-    auto& userData = user._actor_data;
+    auto& userData = user.actorMutData();
     {
         auto& usrCostData = user.costumeData();
         auto& trgCostData = target->costumeData();
@@ -209,11 +209,11 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
             }
             if (ability.isStealing())
             {
-                auto& usrItems = userData->_items;
+                auto& usrItems = userData._items;
                 //if (usrItems)
                 {
                     int trgItemsSize;
-                    auto& trgItems = target->_actor_data->_items;
+                    auto& trgItems = target->actorData()._items;
                     if (trgItems && trgItems != usrItems && (trgItemsSize = trgItems->size()) > 0
                             && (((std::rand() % 12) + usrCostData._agi / 4) > 4 + trgCostData._agi / 3))
                     {
@@ -241,7 +241,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                                 if (usrItems == NIL)
                                 {
                                     usrItems = QSharedPointer<QMap<Ability*, int>>();
-                                    userData->_items = usrItems;
+                                    userData._items = usrItems;
                                 }
                                 usrItems->operator[](stolen) = usrItems->value(stolen, 0) + 1;
                                 if (trgItemQty < 2)

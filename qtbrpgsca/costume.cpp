@@ -83,7 +83,7 @@ void Costume::abandon(QString& ret, Actor& actor) const
 void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool const remove) const
 {
     const Costume& costume = *this;
-    auto& actorData = actor._actor_data;
+    auto& actorData = actor.actorMutData();
     auto& costumeData = costume.costumeData();
     actor.updateAttributes(remove, costume);
     actor.updateResistance(remove, costumeData._res, costumeData._st_res);
@@ -110,7 +110,7 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
         }
         else
         {
-            QVector<const Costume*>* const dmgRoles = actorData->_dmg_roles;
+            QVector<const Costume*>* const dmgRoles = actorData._dmg_roles;
             if (dmgRoles)
             {
                 dmgRoles->removeOne(&costume);
@@ -131,11 +131,11 @@ void Costume::adopt(QString* const ret, Actor& actor, bool const updStates, bool
         }
         if (costume.currentHp() != 0 || costume.currentMp() != 0 || costume.currentRp() != 0)
         {
-            QVector<const Costume*>* dmgRoles = actorData->_dmg_roles;
+            QVector<const Costume*>* dmgRoles = actorData._dmg_roles;
             if (dmgRoles == NIL)
             {
                 dmgRoles = new QVector<const Costume*>();
-                actorData->_dmg_roles = dmgRoles;
+                actorData._dmg_roles = dmgRoles;
             }
             dmgRoles->append(&costume);
         }
