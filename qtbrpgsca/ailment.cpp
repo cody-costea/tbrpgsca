@@ -5,7 +5,7 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#include "state.h"
+#include "ailment.h"
 #include "ability.h"
 #include "costume.h"
 #include "actor.h"
@@ -109,13 +109,9 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
 {
     if (stateDur == 0)
     {
-        stateDur = this->maximumDuration();
-        if (stateDur == 0)
-        {
-            return;
-        }
+        return;
     }
-    if (stateDur > State::EndDur)
+    if (stateDur > Ailment::EndDur)
     {
         int stateRes;
         QMap<int, int>* stRes;
@@ -137,27 +133,21 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
                 QList<Ailment>* const rStates = this->roleData()._a_states;
                 if (rStates)
                 {
-                    //auto const rLast = rStates->cend();
-                    //for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                     for (auto& rState : *rStates)
                     {
-                        int rDur = rState.maximumDuration();//rIt.value();
-                        //Ailment* const rState = rIt.key();
-                        if (rDur == 0 || rDur <= State::EndDur)
+                        int rDur = rState.duration();
+                        /*if (rDur == 0 || rDur <= Ailment::EndDur)
                         {
                             rDur = rState.maximumDuration();
-                        }
-                        //auto const last = trgStates->cend();
-                        //for (auto it = trgStates->cbegin(); it != last; ++it)
-                        //for (auto& aState : *trgStates)
+                        }*/
                         for (int i = 0; i < trgStatesSize; ++i)
                         {
                             //Ailment* const aState = it.key();
-                            State& aState = static_cast<State&>(trgStates->operator[](i));
+                            Ailment& aState = static_cast<Ailment&>(trgStates->operator[](i));
                             if (aState.databaseId() == rState.databaseId())
                             {
-                                int const aDur = aState.maximumDuration();//it.value();
-                                if (aDur > State::EndDur)
+                                int const aDur = aState.duration();//maximumDuration();
+                                if (aDur > Ailment::EndDur)
                                 {
                                     if (aDur < 0 && rDur > aDur)
                                     {
@@ -166,23 +156,24 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
                                     aState.disable(ret, target, rDur, false);
                                     if (rDur > 0 && aDur > 0)
                                     {
-                                        stateDur -= aDur < rDur ? aDur : rDur;
+                                        stateDur -= rDur;//aDur < rDur ? aDur : rDur;
                                         if (stateDur < 1)
                                         {
                                             return;
                                         }
                                     }
                                 }
+
                             }
                         }
                     }
                 }
             }
-            State* state = NIL;
-            //auto crState = static_cast<State*>(this); //TODO: instantiate new State from Ailment when necessary;
+            Ailment* state = NIL;
+            //auto crState = static_cast<Ailment*>(this); //TODO: instantiate new State from Ailment when necessary;
             for (int i = 0; i < trgStatesSize; ++i)
             {
-                State& crState = static_cast<State&>(trgStates->operator[](i));
+                Ailment& crState = static_cast<Ailment&>(trgStates->operator[](i));
                 if (crState.databaseId() == this->databaseId())
                 {
                     state = &crState;
@@ -194,8 +185,8 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
                 int crDur;
                 if (state)
                 {
-                    crDur = state->currentDuration();//trgStates->value(this, State::EndDur);
-                    if (crDur == State::EndDur)
+                    crDur = state->duration();//trgStates->value(this, Ailment::EndDur);
+                    if (crDur == Ailment::EndDur)
                     {
                         state->adopt(ret, target, false, false);
                         //trgStates->operator[](this) = stateDur;
@@ -207,11 +198,11 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
                 }
                 else
                 {
-                    trgStates->append(State(this)); //TODO: rewrite in a better way;
-                    state = &static_cast<State&>(trgStates->operator[](trgStatesSize));
+                    trgStates->append(Ailment(this)); //TODO: rewrite in a better way;
+                    state = &static_cast<Ailment&>(trgStates->operator[](trgStatesSize));
                     state->adopt(ret, target, false, false);
                 }
-                state->setCurrentDuration(stateDur);
+                state->setDuration(stateDur);
             }
             while (false);
             state->blockSkills(target, false);
@@ -222,6 +213,115 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
         }
     }
 
+}
+
+void Ailment::remove(QString* const ret, Actor& actor) const
+{
+    const Ailment& state = *this;
+    state.blockSkills(actor, true);
+    state.adopt(ret, actor, false, true);
+    if (this->isConverted() && (!actor.isConverted()))
+    {
+        actor.setPartySide(static_cast<int>(actor.actorData()._old_side));
+    }
+}
+
+bool Ailment::disable(Actor& actor, int const dur, const bool remove)
+{
+    return this->disable(NIL, actor, remove, dur);
+}
+
+bool Ailment::disable(QString* const ret, Actor& actor, int dur, const bool remove)
+{
+    if (dur == 0)
+    {
+        //dur = this->maximumDuration();
+        return false;
+    }
+    if (dur > Ailment::EndDur)
+    {
+        QList<Ailment>* sDur = actor.roleData()._a_states;
+        if (sDur == NIL)
+        {
+            return true;
+        }
+        else
+        {
+            int const crDur = this->duration();//sDur->value(this, Ailment::EndDur);
+            //if (dur == -2 || (crDur > -2 && (dur == -1 || crDur > -1)))
+            if (crDur > -1 || dur <= crDur)
+            {
+                if (dur > 0 /*&& crDur > 0*/ && crDur > dur)
+                {
+                    //sDur->operator[](this) = crDur - dur;
+                    this->setDuration(crDur - dur);
+                    return false;
+                }
+                else
+                {
+                    if (remove)
+                    {
+                        sDur->removeOne(*this);
+                    }
+                    else
+                    {
+                        //sDur->operator[](this) = Ailment::EndDur;
+                        this->setDuration(Ailment::EndDur);
+                    }
+                    if (crDur > Ailment::EndDur)
+                    {
+                        this->remove(ret, actor);
+                    }
+                    return true;
+                }
+            }
+            return crDur <= Ailment::EndDur;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void Ailment::alter(QString& ret, Actor& actor, const bool consume)
+{
+    return this->alter(&ret, actor, consume);
+}
+
+void Ailment::alter(QString* const ret, Actor& actor, const bool consume)
+{
+    //QList<Ailment>* sDur = actor.roleData()._a_states;
+    //if (sDur /*&& actor.hp > 0*/)
+    {
+        int const d = this->duration();//sDur->value(this, Ailment::EndDur);
+        if (consume)
+        {
+            if (d > 0)
+            {
+                //sDur->operator[](this) = d - 1;
+                this->setDuration(d - 1);
+            }
+        }
+        else if (d == 0)
+        {
+            //sDur->operator[](this) = Ailment::EndDur;
+            this->setDuration(Ailment::EndDur);
+            this->remove(ret, actor);
+        }
+    }
+
+}
+
+void Ailment::apply(QString& ret, Actor& actor) const
+{
+    this->Costume::apply(ret, actor);
+    const_cast<Ailment*>(this)->alter(&ret, actor, true);
+}
+
+void Ailment::abandon(QString& ret, Actor& actor) const
+{
+    this->remove(&ret, actor);
 }
 
 Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const elm,
@@ -250,7 +350,7 @@ Ailment::Ailment(int const id, QString& name, QString& sprite, bool const shapeS
     : Costume(parent, new AilmentSheet(id, name, sprite, shapeShift,sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun,
                                        range, automate, confuse, convert, reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res))
 {
-    this->_max_dur = dur;
+    this->_dur = dur;
 }
 
 Ailment::Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,

@@ -35,8 +35,7 @@ SOURCES += \
         play.cpp \
         role.cpp \
         scene.cpp \
-        skillsmodel.cpp \
-    state.cpp
+        skillsmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -56,8 +55,7 @@ HEADERS += \
         play.h \
         role.h \
         scene.h \
-        skillsmodel.h \
-    state.h
+        skillsmodel.h
 
 DISTFILES += \
     tbrpgsca_ro_RO.ts

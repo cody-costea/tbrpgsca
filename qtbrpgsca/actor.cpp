@@ -8,7 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #include "actor.h"
 #include "costume.h"
 #include "ability.h"
-#include "state.h"
+#include "ailment.h"
 #include "scene.h"
 #include "role.h"
 
@@ -322,8 +322,8 @@ void Actor::applyStates(QString* const ret, const bool consume)
             const int statesSize = stateDur->size();
             for (int i = 0; i < statesSize; ++i)
             {
-                State& aState = static_cast<State&>(stateDur->operator[](i));
-                if (aState.currentDuration() > Ailment::EndDur)
+                Ailment& aState = static_cast<Ailment&>(stateDur->operator[](i));
+                if (aState.duration() > Ailment::EndDur)
                 {
                     aState.alter(ret, actor, false);
                 }
@@ -648,12 +648,12 @@ void Actor::updateStates(bool const remove, QString* const ret, QList<Ailment>& 
             }*/
             for (int i = 0; i < statesSize; ++i)
             {
-                State& aState = static_cast<State&>(stateDur->operator[](i));
+                Ailment& aState = static_cast<Ailment&>(stateDur->operator[](i));
                 for (auto& rState : states)
                 {
                     if (aState.databaseId() == rState.databaseId())
                     {
-                        int const rDur = rState.maximumDuration();
+                        int const rDur = rState.duration();
                         if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
                         {
                             aState.disable(ret, actor, rDur, includeWithDur);
@@ -676,7 +676,7 @@ void Actor::updateStates(bool const remove, QString* const ret, QList<Ailment>& 
         }*/
         for (auto& aState : states)
         {
-            int const rDur = aState.maximumDuration();
+            int const rDur = aState.duration();
             if (includeWithDur || (rDur < 0 && rDur > Ailment::EndDur))
             {
                 aState.inflict(ret, NIL, actor, rDur, true);
@@ -710,8 +710,8 @@ void Actor::refreshCostumes(QString* const ret)
         const int aStatesSize = stateDur->size();
         for (int i = 0; i < aStatesSize; ++i)
         {
-            State& state = static_cast<State&>(stateDur->operator[](i));
-            if (state.currentDuration() > Ailment::EndDur)
+            Ailment& state = static_cast<Ailment&>(stateDur->operator[](i));
+            if (state.duration() > Ailment::EndDur)
             {
                 state.refresh(ret, actor, false, false);
             }

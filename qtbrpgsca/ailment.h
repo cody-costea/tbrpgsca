@@ -19,7 +19,7 @@ namespace tbrpgsca
     {
         Q_OBJECT
         QML_ELEMENT
-        PROP_FIELD(Ailment, MaximumDuration, maximumDuration, int, inline, public, public, _max_dur)
+        PROP_FIELD(Ailment, Duration, duration, int, inline, public, public, _dur)
         PROP_FIELD(Ailment, Resistance, resistance, int, inline, public, public, stateData()._s_res)
         //PROP_FIELD(Ailment, CurrentDuration, currentDuration, int, inline, public, public, _crt_dur)
     public:
@@ -30,6 +30,12 @@ namespace tbrpgsca
         int removedSkillId(int const n) const;
 
         void blockSkills(Actor& actor, bool const remove) const;
+        void alter(QString& ret, Actor& actor, bool const consume);
+        bool disable(Actor& actor, int const dur, bool const remove);
+
+        Q_INVOKABLE void abandon(QString& ret, Actor& actor) const override;
+        Q_INVOKABLE void apply(QString& ret, Actor& actor) const override;
+
         Q_INVOKABLE void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
 
         Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
@@ -75,7 +81,7 @@ namespace tbrpgsca
             friend class Scene;
         };
 
-        int _max_dur;
+        int _dur;
 
         inline AilmentSheet& stateMutData()
         {
@@ -86,6 +92,10 @@ namespace tbrpgsca
         {
             return (*static_cast<const AilmentSheet*>(this->_play_data.data()));
         }
+
+        void remove(QString* const ret, Actor& actor) const;
+        void alter(QString* const ret, Actor& actor, bool const consume);
+        bool disable(QString* const ret, Actor& actor, int dur, bool const remove);
 
         void inflict(QString* const ret, Actor* user, Actor& target, int dur, bool const always);
 

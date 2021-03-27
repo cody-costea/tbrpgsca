@@ -7,8 +7,8 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "ability.h"
 #include "costume.h"
+#include "ailment.h"
 #include "actor.h"
-#include "state.h"
 #include "scene.h"
 #include "role.h"
 
@@ -158,7 +158,7 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                     }*/
                     for (auto& aState : *aStates)
                     {
-                        aState.inflict(&ret, &user, *target, aState.maximumDuration(), user.partySide() == target->partySide());
+                        aState.inflict(&ret, &user, *target, aState.duration(), user.partySide() == target->partySide());
                     }
                 }
             }
@@ -192,10 +192,10 @@ void Ability::execute(QString& ret, Actor& user, Actor* target, bool const apply
                                 }*/
                                 for (int i = 0; i < aStatesSize; ++i)
                                 {
-                                    State& aState = static_cast<State&>(stateDur->operator[](i));
+                                    Ailment& aState = static_cast<Ailment&>(stateDur->operator[](i));
                                     if (aState.databaseId() == rState)
                                     {
-                                        if (aState.maximumDuration() > Ailment::EndDur)
+                                        if (aState.duration() > Ailment::EndDur)
                                         {
                                             aState.disable(&ret, *target, rDur, false);
                                         }
