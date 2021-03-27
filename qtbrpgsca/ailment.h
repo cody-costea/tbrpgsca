@@ -20,7 +20,7 @@ namespace tbrpgsca
         Q_OBJECT
         QML_ELEMENT
         PROP_FIELD(Ailment, MaximumDuration, maximumDuration, int, inline, public, public, _max_dur)
-        PROP_FIELD(Ailment, Resistance, resistance, int, inline, public, public, _state_data->_s_res)
+        PROP_FIELD(Ailment, Resistance, resistance, int, inline, public, public, stateData()._s_res)
         //PROP_FIELD(Ailment, CurrentDuration, currentDuration, int, inline, public, public, _crt_dur)
     public:
         inline static constexpr int EndDur = -3;
@@ -46,18 +46,27 @@ namespace tbrpgsca
 
         explicit Ailment(QObject* const parent = NIL);
 
+        Ailment(const Ailment&& state);
+
         Ailment(const Ailment& state);
 
         virtual ~Ailment();
     protected:
-        class AilmentData : public QSharedData
+        class AilmentSheet : public CostumeSheet
         {
         public:
-            ~AilmentData();
+            virtual ~AilmentSheet();
 
         protected:
             int _s_res;
             QVector<int>* _r_skills;
+
+            AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const element,
+                         int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def,
+                         int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
+                         bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const aSkills,
+                         QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes,
+                         QMap<int, int>* const res);
 
             friend class Actor;
             friend class Ability;
@@ -67,9 +76,20 @@ namespace tbrpgsca
         };
 
         int _max_dur;
-        QSharedDataPointer<AilmentData> _state_data;
+
+        inline AilmentSheet& stateMutData()
+        {
+            return (*static_cast<AilmentSheet*>(this->_play_data.data()));
+        }
+
+        inline const AilmentSheet& stateData() const
+        {
+            return (*static_cast<const AilmentSheet*>(this->_play_data.data()));
+        }
 
         void inflict(QString* const ret, Actor* user, Actor& target, int dur, bool const always);
+
+        explicit Ailment(QObject* const parent, AilmentSheet* const dataPtr);
 
         friend class Actor;
         friend class Ability;
