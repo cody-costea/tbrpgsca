@@ -32,8 +32,8 @@ namespace tbrpgsca
         PROP_FLAG_GET(usesGuards, Attribute::USE_GUARDS, inline, public)
         PROP_FLAG_SET_ALL(Scene, HasCovers, Attribute::HAS_COVERS, inline, protected, hasCovers)
         PROP_FLAG_SET_ALL(Scene, UseGuards, Attribute::USE_GUARDS, inline, protected, usesGuards)
-        //PROP_FIELD(Scene, ActText, actText, QString*, inline, public, protected, _scene_data->_ret)
-        PROP_FIELD(Scene, Parties, parties, QVector<QVector<Actor*>*>, inline, public, protected, _scene_data->_parties)
+        //PROP_FIELD(Scene, ActText, actText, QString*, inline, public, protected, sceneData()._ret)
+        PROP_FIELD(Scene, Parties, parties, QVector<QVector<Actor*>*>, inline, public, protected, sceneData()._parties)
 
         Q_PROPERTY(bool usesGuards READ usesGuards WRITE setUseGuards NOTIFY usesGuardsChanged)
         Q_PROPERTY(bool hasCovers READ hasCovers WRITE setHasCovers NOTIFY hasCoversChanged)
@@ -111,7 +111,7 @@ namespace tbrpgsca
 
         Q_INVOKABLE inline void initialize(QString& ret, bool const useGuards, int const surprise, int const mInit)
         {
-            this->operator()(ret, &this->_scene_data->_parties, NIL, NIL, useGuards, surprise, mInit);
+            this->operator()(ret, &this->sceneMutData()._parties, NIL, NIL, useGuards, surprise, mInit);
         }
 
         void operator()(QString& ret, QVector<QVector<Actor*>*>* parties, SpriteAct* const actorRun, QVector<SceneRun*>* const events,
@@ -125,9 +125,11 @@ namespace tbrpgsca
 
         explicit Scene(QObject* const parent = NIL);
 
+        Scene(const Scene&& scene);
+
         Scene(const Scene& scene);
 
-        ~Scene();
+        virtual ~Scene();
 
     signals:
         void spriteAct(Actor* const user, Ability* const ability, bool const revive,
@@ -139,10 +141,10 @@ namespace tbrpgsca
         void newTurn(QString* const ret, Actor* const current, Actor* const previous);
 
     protected:
-        class SceneData : public QSharedData
+        class SceneSheet : public PlaySheet
         {
         public:
-            ~SceneData();
+            virtual ~SceneSheet();
 
         protected:
             //Ability* _last_ability;
@@ -157,6 +159,8 @@ namespace tbrpgsca
             Actor* _cr_actor;
             QString* _ret;
 
+            explicit SceneSheet();
+
             friend class Actor;
             friend class Scene;
             friend class Ability;
@@ -167,10 +171,20 @@ namespace tbrpgsca
             friend class Role;
         };
 
-        QSharedDataPointer<SceneData> _scene_data;
+        inline SceneSheet& sceneMutData()
+        {
+            return (*static_cast<SceneSheet*>(this->_play_data.data()));
+        }
+
+        inline const SceneSheet& sceneData() const
+        {
+            return (*static_cast<const SceneSheet*>(this->_play_data.data()));
+        }
 
         void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
         void resetTurn(Actor& actor);
+
+        explicit Scene(QObject* const parent, SceneSheet* const dataPtr);
 
     protected slots:
         void agiCalc();
