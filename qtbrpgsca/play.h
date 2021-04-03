@@ -292,7 +292,7 @@ namespace tbrpgsca
     {
         Q_OBJECT
         QML_ELEMENT
-        PROP_FIELD(Play, PlayFlags, playFlags, int, inline, public, protected, _play_flags)
+        PROP_FIELD(Play, PlayFlags, playFlags, int, inline, public, protected, playData()._play_flags)
     public:
         template  <typename PlayAct>
         static void runOnMainThread(PlayAct fn, bool const newTimer)
@@ -341,11 +341,11 @@ namespace tbrpgsca
         }
         Q_INVOKABLE inline bool hasAllPlayFlags(int const flag) const
         {
-            return (this->_play_flags & flag) == flag;
+            return (this->playFlags() & flag) == flag;
         }
         Q_INVOKABLE inline bool hasAnyPlayFlag(int const flag) const
         {
-            return (this->_play_flags & flag) != 0;
+            return (this->playFlags() & flag) != 0;
         }
     protected:
         class PlaySheet : public QSharedData
@@ -371,12 +371,23 @@ namespace tbrpgsca
 
         QSharedDataPointer<PlaySheet> _play_data;
 
+        inline PlaySheet& playMutData()
+        {
+            return (*static_cast<PlaySheet*>(this->_play_data.data()));
+        }
+
+        inline const PlaySheet& playData() const
+        {
+            return (*static_cast<const PlaySheet*>(this->_play_data.data()));
+        }
+
         Q_INVOKABLE inline void setPlayFlag(int const flag, bool const value)
         {
-            int const flags = this->_play_flags;
+            auto& playData = this->playMutData();
+            int const flags = playData._play_flags;
             if (value != ((flags & flag) == flag))
             {
-                this->_play_flags = flags ^ flag;
+                playData._play_flags = flags ^ flag;
             }
         }
 
@@ -402,8 +413,6 @@ namespace tbrpgsca
     private:
         static inline QMetaObject::Connection* _conn = NIL;
         static inline QTimer* _timer = NIL;
-
-        int _play_flags = 0;
 
         friend class Role;
     };
