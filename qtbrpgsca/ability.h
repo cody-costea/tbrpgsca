@@ -27,6 +27,7 @@ namespace tbrpgsca
         PROP_FLAG(Ability, TargetingAll, targetsAll, Attribute::TARGET_ALL, inline, public, public)
         PROP_FLAG(Ability, TargetingSide, targetsSide, Attribute::TARGET_SIDE, inline, public, public)
         PROP_FLAG(Ability, TargetingSelf, targetsSelf, Attribute::TARGET_SELF, inline, public, public)
+        PROP_FLAG(Ability, TargetingOnlyKo, targetsOnlyKo, Attribute::TARGET_KO, inline, public, public)
         PROP_FIELD(Ability, RequiredLevel, requiredLevel, int, inline, public, public, abilityData()._lv_rq)
         PROP_FIELD(Ability, AttributeIncrement, attributeIncrement, int, inline, public, public, abilityData()._attr_inc)
         PROP_FIELD(Ability, MaximumUses, maximumUses, int, inline, public, public, abilityData()._max_qty)
@@ -41,9 +42,10 @@ namespace tbrpgsca
             STEAL = 8,
             ABSORB = 16,
             MISSABLE = 32,
-            TARGET_ALL = 4,
+            TARGET_KO = 256,
             TARGET_SIDE = 128,
             TARGET_SELF = 64,
+            TARGET_ALL = 4,
             TARGET_ONE = 0
         };
         Q_DECLARE_FLAGS(Attributes, Attribute)

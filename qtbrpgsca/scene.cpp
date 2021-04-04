@@ -223,13 +223,13 @@ void Scene::checkStatus(QString* const ret)
 
 }
 
-void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts)
+void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& ability, bool const applyCosts, bool const ko)
 {
     //auto& scene = this->sceneMutData();
-    bool const ko = target->currentHp() < 1;
+    //bool const ko = target->currentHp() < 1;
     //bool const healing = ability.hp < 0;
-    if ((/*healing &&*/ ability.isReviving()) || !ko)
-    {
+    //if ((/*healing &&*/ ability.isReviving()) || !ko)
+    //{
         Ability* counter = NIL;
         ability.execute(ret, user, target, applyCosts);
         if (ability.currentHp() > -1)
@@ -267,7 +267,7 @@ void Scene::execute(QString& ret, Actor& user, Actor* const target, Ability& abi
         }
         targets->append(target);
 #endif
-    }
+    //}
 
 }
 
@@ -296,17 +296,19 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
     }*/
     scene._ret = ret;
     emit this->beforeAct(ret, user, target, ability);
+    bool const revives = ability->isReviving();
+    bool const onlyKoTarget = ability->isTargetingOnlyKo();
     if (ability->isRanged() && ability->isTargetingAll())
     {
         bool applyCosts = true;
         int const usrSide = user->partySide();
         bool const sideTarget = ability->isTargetingSide();
-        bool const noSelfTarget = !ability->isTargetingSelf();
+        bool const selfTarget = ability->isTargetingSelf();
         QVector<QVector<Actor*>*>& parties = scene._parties;
         int const pSize = parties.size();
         for (int j = 0; j < pSize; ++j)
         {
-            if (sideTarget && noSelfTarget && j == usrSide)
+            if (sideTarget && (!selfTarget) && j == usrSide)
             {
                 continue;
             }
@@ -315,20 +317,24 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
             for (int i = 0; i < sSize; ++i)
             {
                 Actor* const trg = players->at(i);
-                if (noSelfTarget && trg == user)
+                bool const trgKo = trg->currentHp() < 1;
+                /*if (noSelfTarget && trg == user)
                 {
                     continue;
                 }
                 else
+                {*/
+                if ((selfTarget || trg != user) && (revives || !(trgKo && onlyKoTarget)))
                 {
-                    this->execute(*ret, *user, trg, *ability, applyCosts);
+                    this->execute(*ret, *user, trg, *ability, applyCosts, trgKo);
+                    applyCosts = false;
                 }
-                applyCosts = false;
             }
         }
     }
     else if (ability->isTargetingSide())
     {
+        bool applyCosts = true;
         //QVector<Actor*>* const targets = scene.targets;
         int const side = ability->isTargetingSelf() ? user->partySide() : target->actorData()._old_side;
         QVector<Actor*>& party = *(scene._parties[side]);
@@ -341,13 +347,29 @@ void Scene::perform(QString* const ret, Actor* const user, Actor* const target, 
             {
                 targets->append(trg);
             }*/
-            this->execute(*ret, *user, party[i], *ability, i == 0);
+            Actor* const trg = party.at(i);
+            bool const trgKo = trg->currentHp() < 1;
+            if (revives || !(trgKo && onlyKoTarget))
+            {
+                this->execute(*ret, *user, trg, *ability, applyCosts, trgKo);
+                applyCosts = true;
+            }
         }
     }
     else
     {
-        this->execute(*ret, *user, &user == &target || ability->isTargetingSelf() ? user
-                     : (this->getGuardian(user, target, ability)), *ability, true);
+        if (user == target || ability->isTargetingSelf())
+        {
+            this->execute(*ret, *user, user, *ability, true, false);
+        }
+        else
+        {
+            bool const trgKo = target->currentHp() < 1;
+            if (revives || !(trgKo && onlyKoTarget))
+            {
+                this->execute(*ret, *user, (this->getGuardian(user, target, ability)), *ability, true, trgKo);
+            }
+        }
     }
     if (item)
     {
@@ -380,7 +402,8 @@ int Scene::getAiSkill(Actor* const user, QList<Ability>* const skills, int const
     {
         Ability* a = &skills->operator[](i);
         if (a->canPerform(user) && ((defSkill > 0 && (a->currentHp() < s->currentHp())
-            && (a->isReviving() || !restore)) || (a->currentHp() > s->currentHp())))
+            && ((restore && a->isReviving()) || !(restore || a->isTargetingOnlyKo())))
+            || (a->currentHp() > s->currentHp())))
         {
             ret = i;
             s = a;
@@ -695,9 +718,10 @@ void Scene::endTurn(QString* const ret)
 
 bool Scene::canTarget(Actor* const user, Ability* const ability, Actor* const target)
 {
+    int trgHp;
     assert(user && ability && target);
-    return ability->canPerform(user) && (ability->isTargetingSelf() || ((target->currentHp() > 0 || ability->isReviving())
-            && ((this->getGuardian(user, target, ability))) == target));
+    return ability->canPerform(user) && (ability->isTargetingSelf() || ((((trgHp = target->currentHp()) > 0 && !ability->isTargetingOnlyKo())
+           || (trgHp < 1 && ability->isReviving())) && ((this->getGuardian(user, target, ability))) == target));
 }
 
 void Scene::agiCalc()

@@ -181,7 +181,7 @@ namespace tbrpgsca
             return (*static_cast<const SceneSheet*>(this->_play_data.data()));
         }
 
-        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts);
+        void execute(QString& ret, Actor& user, Actor* target, Ability& ability, bool const applyCosts, bool const ko);
         void resetTurn(Actor& actor);
 
         explicit Scene(QObject* const parent, SceneSheet* const dataPtr);
