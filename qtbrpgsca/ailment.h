@@ -33,22 +33,22 @@ namespace tbrpgsca
         void alter(QString& ret, Actor& actor, bool const consume);
         bool disable(Actor& actor, int const dur, bool const remove);
 
-        Q_INVOKABLE void abandon(QString& ret, Actor& actor) const override;
-        Q_INVOKABLE void apply(QString& ret, Actor& actor) const override;
+        Q_INVOKABLE void abandon(QString& ret, tbrpgsca::Actor& actor) const override;
+        Q_INVOKABLE void apply(QString& ret, tbrpgsca::Actor& actor) const override;
 
-        Q_INVOKABLE void inflict(QString& ret, Actor* user, Actor& target, int const dur, bool const always);
+        Q_INVOKABLE void inflict(QString& ret, tbrpgsca::Actor* user, tbrpgsca::Actor& target, int const dur, bool const always);
 
-        Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
-              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
-              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+        Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const blockedSkillTypes,
+                int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive,
+                QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res,
+                QObject* const parent = NIL);
 
-        Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const hpDmg,
-              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-              bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
-              QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+        Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const element, int const blockedSkillTypes,
+                int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive,
+                QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res,
+                QObject* const parent = NIL);
 
         explicit Ailment(QObject* const parent = NIL);
 
@@ -67,12 +67,11 @@ namespace tbrpgsca
             int _s_res;
             QVector<int>* _r_skills;
 
-            AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const element,
-                         int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def,
-                         int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                         bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const aSkills,
-                         QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes,
-                         QMap<int, int>* const res);
+            AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const element, int const blockedSkillTypes,
+                         int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis,
+                         int const agi, bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko,
+                         bool const invincible, bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills,
+                         QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res);
 
             friend class Actor;
             friend class Ability;

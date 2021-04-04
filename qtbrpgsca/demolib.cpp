@@ -20,29 +20,29 @@ QVector<Ailment*>& DemoLib::getStates()
     QVector<Ailment*>& states = this->states;
     if (states.size() == 0)
     {
-        states.append(new Ailment(1, tr("Regen"), "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(1, tr("Regen"), "", false, 7,-1,0,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, true, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(2, tr("Poison"), "", false, 7,0,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(2, tr("Poison"), "", false, 7,0,0,0,0, 7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(3, tr("Clarity"), "", false, 7,-1,0,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(3, tr("Clarity"), "", false, 7,-1,0,0,0, 0,-7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(4, tr("Dizziness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(4, tr("Dizziness"), "", false, 7,0,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(5, tr("Vigour"), "", false, 7,-1,0,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(5, tr("Vigour"), "", false, 7,-1,0,0,0, 0,0,-7, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(6, tr("Weakness"), "", false, 7,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(6, tr("Weakness"), "", false, 7,0,0,0,0, 0,7,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(7, tr("Reflect"), "", false, 3,-1,0,Role::Element::LIGHT, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(7, tr("Reflect"), "", false, 3,-1,0,Role::Element::LIGHT,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 false, true, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(8, tr("Conversion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
+        states.append(new Ailment(8, tr("Conversion"), "", false, 5,3,0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                                 true, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(9, tr("Confusion"), "", false, 5,3,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
+        states.append(new Ailment(9, tr("Confusion"), "", false, 5,3,0,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, false, false, false, true,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(10, tr("Berserk"), "", false, 5,1,0,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
+        states.append(new Ailment(10, tr("Berserk"), "", false, 5,1,0,0,0, 0,0,0, 0,0,0, 5,-3,-3,-3,3, false, false, true, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(11, tr("Sleep"), "", false, 3,2,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+        states.append(new Ailment(11, tr("Sleep"), "", false, 3,2,0,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
-        states.append(new Ailment(12, tr("Stun"), "", false, 1,1,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
+        states.append(new Ailment(12, tr("Stun"), "", false, 1,1,0,0,0, 0,0,0, 0,0,0, -1,-1,-1,-1,-1, true, false, false, false,
                                 false, false, false, false, false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr));
 
     }
@@ -97,21 +97,21 @@ QVector<Costume*>& DemoLib::getRaces()
     if (races.size() == 0)
     {
         auto abilities = this->getAbilities().at(0);
-        races.append(new Costume(1, tr("Elf"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(1, tr("Elf"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(2, tr("Gnome"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(2, tr("Gnome"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(3, tr("Human"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(3, tr("Human"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(4, tr("Half-Orc"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(4, tr("Half-Orc"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(5, tr("Goblin"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(5, tr("Goblin"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(6, tr("Lizard"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(6, tr("Lizard"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(7, tr("Ogre"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(7, tr("Ogre"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
-        races.append(new Costume(8, tr("Troll"), "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
+        races.append(new Costume(8, tr("Troll"), "", false, 0,0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                                  false, false, false, false, abilities, nullptr, nullptr, nullptr, nullptr));
     }
     return races;
@@ -123,45 +123,45 @@ QVector<Costume*>& DemoLib::getJobs()
     if (jobs.size() == 0)
     {
         auto& abilities = this->getAbilities();
-        jobs.append(new Costume(1, tr("Alchemist"), "Alchemist", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(1, tr("Alchemist"), "Alchemist", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(2, tr("Berserker"), "Berserker", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(2, tr("Berserker"), "Berserker", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(3, tr("Crusader"), "Crusader", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(3, tr("Crusader"), "Crusader", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(4, tr("Corsair"), "Corsair", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(4, tr("Corsair"), "Corsair", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(5, tr("Dragoon"), "Dragoon", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(5, tr("Dragoon"), "Dragoon", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(6, tr("Druid"), "Druid", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(6, tr("Druid"), "Druid", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(7, tr("Hesychast"), "Hesychast", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(7, tr("Hesychast"), "Hesychast", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(8, tr("Paladin"), "Knight", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(8, tr("Paladin"), "Knight", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(9, tr("Gladiator"), "Hero", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(9, tr("Gladiator"), "Hero", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(10, tr("Ninja"), "Ninja", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(10, tr("Ninja"), "Ninja", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(11, tr("Ranger"), "Ranger", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(11, tr("Ranger"), "Ranger", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(12, tr("Reaver"), "Reaver", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(12, tr("Reaver"), "Reaver", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(13, tr("Shaman"), "Shaman", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(13, tr("Shaman"), "Shaman", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(14, tr("Warmage"), "Warmage", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(14, tr("Warmage"), "Warmage", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(15, tr("Wizard"), "Wizard", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(15, tr("Wizard"), "Wizard", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(16, tr("Cleric"), "Santa", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(16, tr("Cleric"), "Santa", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(17, tr("Valkyrie"), "Valkyrie", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(17, tr("Valkyrie"), "Valkyrie", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(18, tr("Sorceress"), "Sorceress", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(18, tr("Sorceress"), "Sorceress", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(19, tr("Bard"), "Bard", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(19, tr("Bard"), "Bard", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
-        jobs.append(new Costume(20, tr("Fairy"), "Fairy", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
+        jobs.append(new Costume(20, tr("Fairy"), "Fairy", false, 0,0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                                  false, false, false, false, abilities[1], nullptr, nullptr, nullptr, nullptr));
     }
     return jobs;
@@ -208,19 +208,19 @@ DemoLib::DemoLib()
 
 DemoLib::~DemoLib()
 {
-    for (auto job : this->jobs)
+    for (auto job : qAsConst(this->jobs))
     {
         delete job;
     }
-    for (auto race : this->races)
+    for (auto race : qAsConst(this->races))
     {
         delete race;
     }
-    for (auto actor : this->players)
+    for (auto actor : qAsConst(this->players))
     {
         delete actor;
     }
-    for (auto abilities : this->abilities)
+    for (auto abilities : qAsConst(this->abilities))
     {
         /*for (auto ability : (*abilities))
         {
@@ -228,19 +228,19 @@ DemoLib::~DemoLib()
         }*/
         delete abilities;
     }
-    for (auto enemies : this->enemies)
+    for (auto enemies : qAsConst(this->enemies))
     {
-        for (auto enemy : *enemies)
+        for (auto enemy : qAsConst(*enemies))
         {
             delete enemy;
         }
         delete enemies;
     }
-    for (auto mask : this->stateMasks)
+    for (auto mask : qAsConst(this->stateMasks))
     {
         delete mask;
     }
-    for (auto state : this->states)
+    for (auto state : qAsConst(this->states))
     {
         delete state;
     }

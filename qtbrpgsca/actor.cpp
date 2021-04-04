@@ -722,8 +722,8 @@ void Actor::refreshCostumes(QString* const ret)
 Actor::ActorSheet::ActorSheet(int const id, QString& name, QString& sprite, /*Costume& race, Costume& job, int const level,*/ int const maxLv, int const mActions,
                               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
                               QMap<int, int>* const res, QMap<int, int>* const stRes, const QSharedPointer<QMap<Ability*, int>>& items)
-    : CostumeSheet(id, name, sprite, false, mActions, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false, false, false,
-                   false, false, false, false, false, new QList<Ability>(), NIL, NIL, stRes, res)
+    : CostumeSheet(id, name, sprite, false, mActions, 0, 0, mHp, mMp, 0, mHp, mMp, mSp, atk, def, spi, wis, agi, false,
+                   false, false, false, false, false, false, false, new QList<Ability>(), NIL, NIL, stRes, res)
 {
     this->_lv = 1;
     this->_xp = 0;

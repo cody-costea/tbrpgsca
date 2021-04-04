@@ -324,14 +324,13 @@ void Ailment::abandon(QString& ret, Actor& actor) const
     this->remove(&ret, actor);
 }
 
-Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const elm,
-                                    int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def,
-                                    int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                                    bool const convert, bool const reflect, bool const ko,bool const invincible, bool const revive, QList<Ability>* const aSkills,
-                                    QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes,
-                                    QMap<int, int>* const res)
-    : CostumeSheet(id, name, sprite, shapeShift, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi,
-                   stun, range, automate, confuse, reflect, ko, invincible, revive, aSkills, counters, states, stRes, res)
+Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
+                                    int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis,
+                                    int const agi, bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko,
+                                    bool const invincible, bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills,
+                                    QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res)
+    : CostumeSheet(id, name, sprite, shapeShift, mActions, elm, blockedSkillTypes, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi,
+                   wis, agi, stun, range, automate, confuse, reflect, ko, invincible, revive, aSkills, counters, states, stRes, res)
 {
     this->_r_skills = rSkills;
     this->_s_res = sRes;
@@ -342,26 +341,25 @@ Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite
     }
 }
 
-Ailment::Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
-             int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-             bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
-             QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
-    : Costume(parent, new AilmentSheet(id, name, sprite, shapeShift,sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun,
-                                       range, automate, confuse, convert, reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res))
+Ailment::Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
+                 int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                 bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive,
+                 QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res,
+                 QObject* const parent)
+    : Costume(parent, new AilmentSheet(id, name, sprite, shapeShift,sRes, mActions, elm, blockedSkillTypes, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis,
+                                       agi, stun, range, automate, confuse, convert, reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res))
 {
     this->_dur = dur;
 }
 
-Ailment::Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const hpDmg,
-             int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-             bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
-             QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
-    : Ailment(id, name, sprite, shapeShift, dur, sRes, mActions, elm, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, convert,
-            reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
+Ailment::Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
+                 int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                 bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states,
+                 QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent)
+    : Ailment(id, name, sprite, shapeShift, dur, sRes, mActions, elm, blockedSkillTypes, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi,
+              stun, range, automate, confuse, convert, reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res, parent) {}
 
-Ailment::Ailment(QObject* const parent) : Ailment(0, QString(), QString(), false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false,
+Ailment::Ailment(QObject* const parent) : Ailment(0, QString(), QString(), false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false,
                                                   false, false, false, false, NIL, NIL, NIL, NIL, NIL, NIL, parent) {}
 
 Ailment::Ailment(const Ailment&& state) : Ailment(static_cast<const Ailment&>(state)) {}

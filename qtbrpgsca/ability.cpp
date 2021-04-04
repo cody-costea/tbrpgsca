@@ -66,11 +66,12 @@ void Ability::replenish()
 
 bool Ability::canPerform(Actor* const actor) const
 {
+    int crQty;
     assert(actor);
+    int const blockedSkills = actor->blockedSkillTypes();
     //QMap<const Ability*, int>* skillsQty = actor->actorData()->_skills_cr_qty;
-    int const crQty = this->property("currentUses").toInt();
-    return this->maximumMp() <= actor->currentMp() && this->maximumHp() < actor->currentHp() && this->maximumRp() <= actor->currentRp()
-            && actor->currentLevel() >= this->requiredLevel() && crQty > -1 && (this->maximumUses() == 0 || crQty > 0);
+    return (this->damageType() & blockedSkills) == 0 && this->maximumMp() <= actor->currentMp() && this->maximumHp() < actor->currentHp() && this->maximumRp() <= actor->currentRp()
+            && actor->currentLevel() >= this->requiredLevel() && (crQty = this->property("currentUses").toInt()) > -1 && (this->maximumUses() == 0 || crQty > 0);
 }
 
 void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts)

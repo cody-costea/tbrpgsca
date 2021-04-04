@@ -29,6 +29,7 @@ namespace tbrpgsca
         PROP_FLAG(Costume, Invincible, invincible, Attribute::INVINCIBLE, inline, public, public)
         PROP_FLAG(Costume, ShapeShifted, shapeShifted, Attribute::SHAPE_SHIFT, inline, public, public)
         PROP_FIELD(Costume, MaximumActions, maximumActions, int, virtual inline, public, public, costumeData()._m_actions)
+        PROP_FIELD(Costume, BlockedSkillTypes, blockedSkillTypes, int, inline, public, public, costumeData()._blk_type)
         PROP_FIELD(Costume, ReflectType, reflectType, int, inline, public, public, costumeData()._rfl_type)
         PROP_FIELD(Costume, CoverType, coverType, int, inline, public, public, costumeData()._cvr_type)
         PROP_FIELD(Costume, Agility, agility, int, inline, public, public, costumeData()._agi)
@@ -66,19 +67,19 @@ namespace tbrpgsca
         bool hasCounterSkill(const Ability& skill) const;
         int counterSkillsSize() const;
 
-        Q_INVOKABLE void adopt(QString& ret, Actor& actor) const;
-        Q_INVOKABLE virtual void abandon(QString& ret, Actor& actor) const;
-        Q_INVOKABLE virtual void apply(QString& ret, Actor& actor) const;
+        Q_INVOKABLE void adopt(QString& ret, tbrpgsca::Actor& actor) const;
+        Q_INVOKABLE virtual void abandon(QString& ret, tbrpgsca::Actor& actor) const;
+        Q_INVOKABLE virtual void apply(QString& ret, tbrpgsca::Actor& actor) const;
 
-        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
-                int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters,
-                QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const blockedSkillTypes, int const hpDmg,
+                int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                bool const range, bool const automate, bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability>* const skills,
+                QList<Ability>* const counters, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
-        Costume(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg,
-                int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters,
-                QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+        Costume(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const mActions, int const element, int const blockedSkillTypes, int const hpDmg,
+                int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                bool const range, bool const automate, bool const confuse, bool const reflect, bool const invincible, bool const revive, QList<Ability>* const skills,
+                QList<Ability>* const counters, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
 
         explicit Costume(QObject* const parent = NIL);
 
@@ -94,14 +95,14 @@ namespace tbrpgsca
             virtual ~CostumeSheet();
 
         protected:
-            int _atk, _def, _spi, _wis, _agi, _m_actions, _cvr_type, _rfl_type;
+            int _atk, _def, _spi, _wis, _agi, _m_actions, _cvr_type, _rfl_type, _blk_type;
             QList<Ability>* _a_skills,* _counters;
             QMap<int, int>* _st_res,* _res;
 
-            CostumeSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-                         int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                         bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters, QList<Ailment>* const states,
-                         QMap<int, int>* const stRes, QMap<int, int>* const res);
+            CostumeSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const blockedSkillTypes, int const hpDmg,
+                         int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                         bool const stun, bool const range, bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive,
+                         QList<Ability>* const skills, QList<Ability>* const counters, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res);
 
             friend class Actor;
             friend class Costume;
@@ -127,10 +128,11 @@ namespace tbrpgsca
         void refresh(QString* const ret, Actor& actor, bool const updStates, bool const remove) const;
         virtual void adopt(QString* const ret, Actor& actor, bool const upeStates, bool const rmeove) const;
 
-        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-                int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse,
-                bool const reflect, bool const ko, bool const invincible, bool const revive, QList<Ability>* const skills, QList<Ability>* const counters, QList<Ailment>* const states,
-                QMap<int, int>* const stRes, QMap<int, int>* const res, QObject* const parent = NIL);
+        Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const mActions, int const element, int const blockedSkillTypes, int const hpDmg,
+                int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
+                bool const stun, bool const range, bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive,
+                QList<Ability>* const skills, QList<Ability>* const counters, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res,
+                QObject* const parent = NIL);
 
         explicit Costume(QObject* const parent, CostumeSheet* const costumeDataPtr);
 
