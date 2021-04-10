@@ -53,6 +53,19 @@ namespace tbrpgsca
     FieldLevel: Type* Field = NIL; \
     PROP_REF_GET(Name, Type, Attribute, GetLevel, Field)
 
+
+#define PROP_FIELD_SET_MUT(SetName, Type, Attribute, Level, GetName, Field) \
+    Level: Q_SIGNAL void GetName##Changed(Type newValue, Type oldValue); \
+    Q_SLOT Attribute void SetName(Type const value) \
+    { \
+        auto field = this->GetName(); \
+        if (field != value) \
+        { \
+            this->Field = value; \
+            emit GetName##Changed(value, field); \
+        } \
+    }
+
 #define PROP_FIELD_SET(SetName, Type, Attribute, Level, GetName, Field) \
     Level: Q_SIGNAL void GetName##Changed(Type newValue, Type oldValue); \
     Q_SLOT Attribute void SetName(Type const value) \
@@ -120,6 +133,10 @@ namespace tbrpgsca
 
 #define PROP_FIELD_SET_ALL(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName, Field) \
     PROP_FIELD_SET(SetName, Type, Attribute, Level, GetName, Field) \
+    PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName)
+
+#define PROP_FIELD_SET_MUT_ALL(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName, Field) \
+    PROP_FIELD_SET_MUT(SetName, Type, Attribute, Level, GetName, Field) \
     PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName)
 
 #define PROP_REF_SET_ALL(Class, PropName, Type, Attribute, Level, GetName, Field) \

@@ -19,17 +19,21 @@ namespace tbrpgsca
     {
         Q_OBJECT
         QML_ELEMENT
-        PROP_FIELD(Ailment, Duration, duration, int, inline, public, public, _dur)
-        PROP_FIELD(Ailment, Resistance, resistance, int, inline, public, public, stateData()._s_res)
+        /*PROP_FIELD(Ailment, Duration, duration, int, inline, public, public, _dur)
+        PROP_FIELD(Ailment, Resistance, resistance, int, inline, public, public, stateData()._s_res)*/
         //PROP_FIELD(Ailment, CurrentDuration, currentDuration, int, inline, public, public, _crt_dur)
+        PROP_FIELD_GET_CUSTOM(duration, int, inline, public, _dur)
+        PROP_FIELD_GET_CUSTOM(resistance, int, inline, public, _s_res)
+        PROP_FIELD_SET_MUT_ALL(Ailment, setDuration, swapDuration, withDuration, int, inline, public, duration, _dur)
+        PROP_FIELD_SET_MUT_ALL(Ailment, setResistance, swapResistance, withResistance, int, inline, public, resistance, _s_res)
     public:
         inline static constexpr int EndDur = -3;
 
-        int removedSkillsIdsSize() const;
+        /*int removedSkillsIdsSize() const;
         bool hasRemovedSkillId(const int skill) const;
         int removedSkillId(int const n) const;
 
-        void blockSkills(Actor& actor, bool const remove) const;
+        void blockSkills(Actor& actor, bool const remove) const;*/
         void alter(QString& ret, Actor& actor, bool const consume);
         bool disable(Actor& actor, int const dur, bool const remove);
 
@@ -50,6 +54,10 @@ namespace tbrpgsca
                 QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res,
                 QObject* const parent = NIL);
 
+        explicit Ailment(const Costume&& costume, int const dur, int const sRes, bool const convert);
+
+        explicit Ailment(const Costume& costume, int const dur, int const sRes, bool const convert);
+
         explicit Ailment(QObject* const parent = NIL);
 
         Ailment(const Ailment&& state);
@@ -58,7 +66,7 @@ namespace tbrpgsca
 
         virtual ~Ailment();
     protected:
-        class AilmentSheet : public CostumeSheet
+        /*class AilmentSheet : public CostumeSheet
         {
         public:
             virtual ~AilmentSheet();
@@ -80,8 +88,6 @@ namespace tbrpgsca
             friend class Scene;
         };
 
-        int _dur;
-
         inline AilmentSheet& stateMutData()
         {
             return (*static_cast<AilmentSheet*>(this->_play_data.data()));
@@ -90,7 +96,9 @@ namespace tbrpgsca
         inline const AilmentSheet& stateData() const
         {
             return (*static_cast<const AilmentSheet*>(this->_play_data.data()));
-        }
+        }*/
+
+        int _dur: 16, _s_res: 16;
 
         void remove(QString* const ret, Actor& actor) const;
         void alter(QString* const ret, Actor& actor, bool const consume);
@@ -98,7 +106,7 @@ namespace tbrpgsca
 
         void inflict(QString* const ret, Actor* user, Actor& target, int dur, bool const always);
 
-        explicit Ailment(QObject* const parent, AilmentSheet* const dataPtr);
+        //explicit Ailment(QObject* const parent, AilmentSheet* const dataPtr);
 
         friend class Actor;
         friend class Ability;

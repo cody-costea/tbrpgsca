@@ -16,7 +16,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-int Ailment::removedSkillId(int const n) const
+/*int Ailment::removedSkillId(int const n) const
 {
     return (this->stateData()._r_skills->at(n));
 }
@@ -43,30 +43,6 @@ void Ailment::blockSkills(Actor& actor, const bool remove) const
         //auto iSkills = actorData->_skills_cr_qty;
         if (remove)
         {
-            /*if (iSkills)
-            {
-                auto const last = iSkills->cend();
-                auto const begin = iSkills->cbegin();
-                for (auto rSkill : *rSkills)
-                {
-                    for (auto it = begin; it != last; ++it)
-                    {
-                        auto iSkill = it.key();
-                        if (iSkill->databaseId() == rSkill)
-                        {
-                            if (iSkill->maximumUses() > 0)
-                            {
-                                iSkills->operator[](iSkill) = -1 * iSkills->value(iSkill, 0);
-                            }
-                            else
-                            {
-                                iSkills->remove(iSkill);
-                            }
-                            break;
-                        }
-                    }
-                }
-            }*/
             for (int const rSkillId : *rSkills)
             {
                 for (Ability& aSkill : aSkills)
@@ -97,8 +73,7 @@ void Ailment::blockSkills(Actor& actor, const bool remove) const
             }
         }
     }
-
-}
+}*/
 
 void Ailment::inflict(QString& ret, Actor* user, Actor& target, int dur, const bool always)
 {
@@ -205,7 +180,7 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
                 state->setDuration(stateDur);
             }
             while (false);
-            state->blockSkills(target, false);
+            //state->blockSkills(target, false);
             if (user && this->isConverted() && target.partySide() != user->partySide())
             {
                 target.setPartySide(user->partySide());
@@ -218,7 +193,7 @@ void Ailment::inflict(QString* const ret, Actor* const user, Actor& target, int 
 void Ailment::remove(QString* const ret, Actor& actor) const
 {
     const Ailment& state = *this;
-    state.blockSkills(actor, true);
+    //state.blockSkills(actor, true);
     state.adopt(ret, actor, false, true);
     if (this->isConverted() && (!actor.isConverted()))
     {
@@ -324,7 +299,7 @@ void Ailment::abandon(QString& ret, Actor& actor) const
     this->remove(&ret, actor);
 }
 
-Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
+/*Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite, bool const shapeShift, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
                                     int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis,
                                     int const agi, bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko,
                                     bool const invincible, bool const revive, QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills,
@@ -339,17 +314,25 @@ Ailment::AilmentSheet::AilmentSheet(int const id, QString& name, QString& sprite
     {
         this->_play_flags = this->_play_flags | Costume::Attribute::CONVERT;
     }
-}
+}*/
 
 Ailment::Ailment(int const id, QString& name, QString& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
                  int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
                  bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible, bool const revive,
                  QList<Ability>* const aSkills, QList<Ability>* const counters, QVector<int>* const rSkills, QList<Ailment>* const states, QMap<int, int>* const stRes, QMap<int, int>* const res,
                  QObject* const parent)
-    : Costume(parent, new AilmentSheet(id, name, sprite, shapeShift,sRes, mActions, elm, blockedSkillTypes, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis,
-                                       agi, stun, range, automate, confuse, convert, reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res))
+    : Costume(parent, new CostumeSheet(id, name, sprite, shapeShift, mActions, elm, blockedSkillTypes, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis,
+                                       agi, stun, range, automate, confuse, reflect, ko, invincible, revive, aSkills, counters, states, stRes, res))
+    /*: Costume(parent, new AilmentSheet(id, name, sprite, shapeShift,sRes, mActions, elm, blockedSkillTypes, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis,
+                                       agi, stun, range, automate, confuse, convert, reflect, ko, invincible, revive, aSkills, counters, rSkills, states, stRes, res))*/
 {
     this->_dur = dur;
+    this->_s_res = sRes;
+    auto& data = this->costumeMutData();
+    if (convert)
+    {
+        data._play_flags = data._play_flags | Costume::Attribute::CONVERT;
+    }
 }
 
 Ailment::Ailment(int const id, QString&& name, QString&& sprite, bool const shapeShift, int const dur, int const sRes, int const mActions, int const elm, int const blockedSkillTypes,
@@ -362,10 +345,27 @@ Ailment::Ailment(int const id, QString&& name, QString&& sprite, bool const shap
 Ailment::Ailment(QObject* const parent) : Ailment(0, QString(), QString(), false, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, false,
                                                   false, false, false, false, NIL, NIL, NIL, NIL, NIL, NIL, parent) {}
 
+Ailment::Ailment(const Costume&& costume, int const dur, int const sRes, bool const convert) : Ailment(static_cast<const Costume&>(costume), dur, sRes, convert) {}
+
+Ailment::Ailment(const Costume& costume, int const dur, int const sRes, bool const convert) : Costume(costume)
+{
+    this->_dur = dur;
+    this->_s_res = sRes;
+    auto& data = this->costumeMutData();
+    if (convert)
+    {
+        data._play_flags = data._play_flags | Costume::Attribute::CONVERT;
+    }
+}
+
 Ailment::Ailment(const Ailment&& state) : Ailment(static_cast<const Ailment&>(state)) {}
 
-Ailment::Ailment(const Ailment& state) : Costume(state) {}
+Ailment::Ailment(const Ailment& state) : Costume(state)
+{
+    this->_s_res =state._s_res;
+    this->_dur = state._dur;
+}
 
-Ailment::AilmentSheet::~AilmentSheet() {}
+//Ailment::AilmentSheet::~AilmentSheet() {}
 
 Ailment::~Ailment() {}
