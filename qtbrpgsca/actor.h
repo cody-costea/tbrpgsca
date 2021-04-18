@@ -75,6 +75,7 @@ namespace tbrpgsca
         //PROP_FIELD_GET_CUSTOM(extra, void*, inline, public, actorData()._extra)
         PROP_FIELD_GET_CUSTOM(currentExperience, int, inline, public, actorData()._xp)
         PROP_FIELD_GET_CUSTOM(currentLevel, int, inline, public, actorData()._lv)
+        PROP_CUSTOM_NEW_SHR_REF(Actor, ItemsTest, itemsTest, Ability, inline, public, public, _itemsTest)
     public:
         enum Attribute {
             RANDOM_AI = 2048,

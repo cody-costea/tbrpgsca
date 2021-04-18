@@ -9,6 +9,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #define PLAY_H
 
 #include <QObject>
+#include <QWeakPointer>
+#include <QSharedPointer>
+#include <QScopedPointer>
 #include <QApplication>
 #include <QThread>
 #include <QTimer>
@@ -35,6 +38,34 @@ namespace tbrpgsca
 #define PROP_FIELD_GET(Name, Type, Attribute, Level) \
     PROP_FIELD_GET_NEW(Name, Type, Attribute, Level, _##Name, private)
 
+#define PROP_SMT_REF_GET(Name, Type, Attribute, Level, Field) \
+    private: Attribute Type* Name##Ptr() const \
+    { \
+        return const_cast<Type*>(this->Field.data()); \
+    } \
+    Level: Attribute Type& Name() const \
+    { \
+        return *this->Field; \
+    } \
+    Q_INVOKABLE Attribute bool has##Name() \
+    { \
+        return !this->Field.isNull(); \
+    }
+
+#define PROP_WK_REF_GET(Name, Type, Attribute, Level, Field) \
+    private: Attribute Type* Name##Ptr() const \
+    { \
+        return const_cast<Type*>(this->Field.lock().data()); \
+    } \
+    Level: Attribute Type& Name() const \
+    { \
+        return *(this->Field.lock()); \
+    } \
+    Q_INVOKABLE Attribute bool has##Name() \
+    { \
+        return !this->Field.isNull(); \
+    }
+
 #define PROP_REF_GET(Name, Type, Attribute, Level, Field) \
     private: Attribute Type* Name##Ptr() const \
     { \
@@ -49,10 +80,21 @@ namespace tbrpgsca
         return this->Field; \
     }
 
-#define PROP_REF_GET_NEW(Name, Type, Attribute, Level, Field, FieldLevel) \
+#define PROP_OWN_REF_GET_NEW(Name, Type, Attribute, GetLevel, Field, FieldLevel) \
+    FieldLevel: QScopedPointer<Type> Field; \
+    PROP_SMT_REF_GET(Name, Type, Attribute, GetLevel, Field)
+
+#define PROP_SHR_REF_GET_NEW(Name, Type, Attribute, GetLevel, Field, FieldLevel) \
+    FieldLevel: QSharedPointer<Type> Field; \
+    PROP_SMT_REF_GET(Name, Type, Attribute, GetLevel, Field)
+
+#define PROP_WK_REF_GET_NEW(Name, Type, Attribute, GetLevel, Field, FieldLevel) \
+    FieldLevel: QWeakPointer<Type> Field; \
+    PROP_WK_REF_GET(Name, Type, Attribute, GetLevel, Field)
+
+#define PROP_REF_GET_NEW(Name, Type, Attribute, GetLevel, Field, FieldLevel) \
     FieldLevel: Type* Field = NIL; \
     PROP_REF_GET(Name, Type, Attribute, GetLevel, Field)
-
 
 #define PROP_FIELD_SET_MUT(SetName, Type, Attribute, Level, GetName, Field) \
     Level: Q_SIGNAL void GetName##Changed(Type newValue, Type oldValue); \
@@ -78,6 +120,45 @@ namespace tbrpgsca
         } \
     }
 
+#define PROP_SMT_REF_SET(PropName, Type, Attribute, Level, GetName, Field) \
+    private: Q_SLOT Attribute void set##PropName##Ptr(Type* const value) \
+    { \
+        auto field = this->GetName##Ptr(); \
+        if (field != value) \
+        { \
+            this->Field.reset(value); \
+            emit GetName##Changed(value, field); \
+        } \
+    } \
+    Level: Q_SIGNAL void GetName##Changed(Type* newValue, Type* oldValue); \
+    Q_SLOT Attribute void reset##PropName(Type& value) \
+    { \
+        set##PropName##Ptr(&value); \
+    }
+
+#define PROP_WK_REF_SET(PropName, Type, Attribute, Level, GetName, Field) \
+    Level: Q_SIGNAL void GetName##Changed(Type* newValue, Type* oldValue); \
+    Q_SLOT Attribute void reset##PropName(QSharedPointer<Type>& value) \
+    { \
+        auto field = this->GetName##Ptr(); \
+        auto valData = value.data(); \
+        if (field != valData) \
+        { \
+            this->Field = value; \
+            emit GetName##Changed(valData, field); \
+        } \
+    } \
+    Q_SLOT Attribute void reset##PropName(QWeakPointer<Type>& value) \
+    { \
+        auto field = this->GetName##Ptr(); \
+        auto valData = value.lock().data(); \
+        if (field != valData) \
+        { \
+            this->Field.swap(value); \
+            emit GetName##Changed(valData, field); \
+        } \
+    }
+
 #define PROP_REF_SET(PropName, Type, Attribute, Level, GetName, Field) \
     private: Q_SLOT Attribute void set##PropName##Ptr(Type* const value) \
     { \
@@ -100,7 +181,7 @@ namespace tbrpgsca
     } \
     Q_SLOT Attribute Type* swap##PropName(Type& value) \
     { \
-        Type* const old = GetName##Ptr();\
+        Type* const old = GetName##Ptr(); \
         set##PropName##Ptr(&value); \
         return old; \
     }
@@ -117,6 +198,18 @@ namespace tbrpgsca
     Level: Attribute Class& WithName(Type value) \
     { \
         this->SetName(value); \
+        return *this; \
+    }
+
+#define PROP_WK_REF_WITH(Class, PropName, WithName, Type, Attribute, Level) \
+    Level: Attribute Class& WithName(QSharedPointer<Type>& value) \
+    { \
+        this->reset##PropName(value); \
+        return *this; \
+    } \
+    Level: Attribute Class& WithName(QWeakPointer<Type>& value) \
+    { \
+        this->reset##PropName(value); \
         return *this; \
     }
 
@@ -138,6 +231,14 @@ namespace tbrpgsca
 #define PROP_FIELD_SET_MUT_ALL(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName, Field) \
     PROP_FIELD_SET_MUT(SetName, Type, Attribute, Level, GetName, Field) \
     PROP_FIELD_WITH_SWAP(Class, SetName, SwapName, WithName, Type, Attribute, Level, GetName)
+
+#define PROP_SMT_REF_SET_ALL(Class, PropName, Type, Attribute, Level, GetName, Field) \
+    PROP_SMT_REF_SET(PropName, Type, Attribute, Level, GetName, Field) \
+    PROP_REF_WITH(Class, PropName, with##PropName, Type, Attribute, Level)
+
+#define PROP_WK_REF_SET_ALL(Class, PropName, Type, Attribute, Level, GetName, Field) \
+    PROP_WK_REF_SET(PropName, Type, Attribute, Level, GetName, Field) \
+    PROP_WK_REF_WITH(Class, PropName, with##PropName, Type, Attribute, Level)
 
 #define PROP_REF_SET_ALL(Class, PropName, Type, Attribute, Level, GetName, Field) \
     PROP_REF_SET(PropName, Type, Attribute, Level, GetName, Field) \
@@ -191,9 +292,24 @@ namespace tbrpgsca
     PROP_REF_SET_ALL(Class, PropName, Type, Attribute, SetLevel, GetName, Field) \
     Q_PROPERTY(Type* GetName READ GetName##Ptr WRITE set##PropName##Ptr NOTIFY GetName##Changed)
 
+#define PROP_CUSTOM_NEW_OWN_REF(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_OWN_REF_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
+    PROP_SMT_REF_SET_ALL(Class, PropName, Type, Attribute, SetLevel, GetName, Field) \
+    Q_PROPERTY(Type* GetName READ GetName##Ptr WRITE set##PropName##Ptr NOTIFY GetName##Changed)
+
+#define PROP_CUSTOM_NEW_SHR_REF(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_SHR_REF_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
+    PROP_SMT_REF_SET_ALL(Class, PropName, Type, Attribute, SetLevel, GetName, Field) \
+    Q_PROPERTY(Type* GetName READ GetName##Ptr WRITE set##PropName##Ptr NOTIFY GetName##Changed)
+
+#define PROP_CUSTOM_NEW_WK_REF(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel, Field) \
+    PROP_WK_REF_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
+    PROP_WK_REF_SET_ALL(Class, PropName, Type, Attribute, SetLevel, GetName, Field) \
+    Q_PROPERTY(Type* GetName READ GetName##Ptr NOTIFY GetName##Changed)
+
 #define PROP_CUSTOM_NEW_REF(Class, PropName, GetName, Type, Attribute, GetLevel, SetLevel, Field) \
     PROP_REF_GET_NEW(GetName, Type, Attribute, GetLevel, Field, private) \
-    PROP_REF_SET_ALL(Class, PropName, Type, SetLevel, GetName, Field) \
+    PROP_REF_SET_ALL(Class, PropName, Type, Attribute, SetLevel, GetName, Field) \
     Q_PROPERTY(Type* GetName READ GetName##Ptr WRITE set##PropName##Ptr NOTIFY GetName##Changed)
 
 #define PROP_FLAG_SET(SetName, Flag, Attribute, Level, GetName) \
