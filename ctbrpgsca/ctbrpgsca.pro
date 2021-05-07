@@ -71,6 +71,15 @@ HEADERS += \
         library/cpp/targetsmodel.hpp \
         library/translations.h
 
+#equals(QT_ARCH, arm): LIBS += library/dbc/arm32/*.obj \
+#                              library/rust/arm32/*.obj
+#equals(QT_ARCH, arm64-v8a): LIBS += library/dbc/arm64/*.obj \
+#                                    library/rust/arm64/*.obj
+#equals(QT_ARCH, x86_64): LIBS += library/dbc/x64/*.obj \
+#                                 library/rust/x64/*.obj
+#equals(QT_ARCH, i386): LIBS += library/dbc/x86/*.obj \
+#                               library/rust/x86/*.obj
+
 #LIBS += -lobjc -framework Foundation
 
 #OBJECTIVE_HEADERS += \

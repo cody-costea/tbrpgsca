@@ -1,0 +1,6 @@
+{
+    "name": "tbrpgsca",
+    "targetName": "tbrpgsca",
+    "targetType": "staticLibrary",
+    "targetPath": "lib"
+}
