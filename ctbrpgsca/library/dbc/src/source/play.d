@@ -40,6 +40,11 @@ alias Txt = char*;
 alias Chr = char;
 alias Nr = int;
 
+//static if (COMPRESS_POINTERS > 0)
+//{
+    private Vct!(void*) _ptrList; //TODO: multiple thread shared access safety and analyze better solutions
+//}
+
 struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
 {
     static if (own != 0)
@@ -87,7 +92,7 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
             auto cntPtr = count.ptr;
             if (cntPtr)
             {
-                auto cntNr = *cntPtr;
+                const auto cntNr = *cntPtr;
                 if (cntNr == 1)
                 {
                     this.clean;
@@ -109,7 +114,6 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
     else static if (cmpsType > 0)
     {
         enum SHIFT_LEN = cmpsType > 2 ? 2 : (cmpsType - 1);
-        private static Vct!(void*) _ptrList; //TODO: multiple thread shared access safety and analyze better solutions
         private uint _ptr = 0U;
 
         private static bool clearList(uint ptr)
@@ -118,10 +122,11 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
             {
                 return false;
             }
-            auto ptrList = &this._ptrList;
             if ((ptr & 1U) == 1U)
             {
+                auto ptrList = &_ptrList;
                 ptr >>>= 1;
+                
                 if (ptr == ptrList.length)
                 {
                     size_t ptrListLen = void;
@@ -156,7 +161,7 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
             //uintptr_t ptrNr = void;
             else if ((ptr & 1U) == 1U)
             {
-                return cast(T*)this._ptrList[(ptr >>> 1) - 1U];
+                return cast(T*)_ptrList[(ptr >>> 1) - 1U];
             }
             else
             {
@@ -169,7 +174,7 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
         private void listPtr(T* ptr)
         {
             uint oldPtr = this._ptr;
-            auto ptrList = &this._ptrList;
+            auto ptrList = &_ptrList;
             if ((oldPtr & 1U) == 1U)
             {
                 oldPtr >>>= 1;
@@ -179,7 +184,7 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
                     return;
                 }
             }
-            ulong ptrLength = ptrList.length;
+            size_t ptrLength = ptrList.length;
             for (uint i = 0; i < ptrLength; i += 1U)
             {
                 if ((*ptrList)[i] == nil)
@@ -230,7 +235,7 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
             uintptr_t ptrNr = cast(uintptr_t)ptr; //<< 16) >>> 16;
             if (ptrNr < (4294967296UL << SHIFT_LEN))
             {
-                static if (own == 0)
+                static if (own < 0)
                 {
                     clearList(this._ptr);
                 }
@@ -262,7 +267,7 @@ struct CmpsPtr(T, const int own = 0, const int cmpsType = COMPRESS_POINTERS)
             pragma(inline, true):
             ~this()
             {
-                static if (own == 0)
+                static if (own < 1)
                 {
                     //this._ptr.clearList;
                     clearList(this._ptr);
