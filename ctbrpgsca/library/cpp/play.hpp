@@ -30,7 +30,7 @@ The following negative values can also be used, but they are not safe and will l
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
 */
-    #define COMPRESS_POINTERS 3
+    #define COMPRESS_POINTERS -4//3
 #else
     #define COMPRESS_POINTERS 0
 #endif
@@ -227,7 +227,7 @@ The following negative values can also be used, but they are not safe and will l
                 oldPtr >>= 1;
                 if (oldPtr > 0U)
                 {
-                    (*ptrList)[oldPtr - 1U] = ptr;
+                    (*ptrList)[oldPtr - 1U] = const_cast<void*>(reinterpret_cast<const void*>(ptr));
                     return;
                 }
             }
@@ -236,12 +236,12 @@ The following negative values can also be used, but they are not safe and will l
             {
                 if (ptrList->at(i) == nullptr)
                 {
-                    ptrList->operator[](i) = ptr;
+                    ptrList->operator[](i) = const_cast<void*>(reinterpret_cast<const void*>(ptr));
                     this->_ptr = (i << 1U) | 1U;
                     return;
                 }
             }
-            ptrList->push_back(ptr);
+            ptrList->push_back(const_cast<void*>(reinterpret_cast<const void*>(ptr)));
             this->_ptr = static_cast<uint32_t>(((ptrListLen + 1) << 1) | 1);
             uniqueLocker.unlock();
         }
@@ -313,7 +313,7 @@ The following negative values can also be used, but they are not safe and will l
             }
         }
 #else
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < 0 ? COMPRESS_POINTERS + 1 : COMPRESS_POINTERS> class CmprPtr
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0> class CmprPtr
     {
     #if COMPRESS_POINTERS == 0
         static constexpr uint CmpsLengthShift(const int cmpsLevel)
@@ -457,6 +457,66 @@ The following negative values can also be used, but they are not safe and will l
                 this->_ptr = cloned._ptr;
             }
             return *this;
+        }
+
+        inline bool operator<(const T* const ptr) const
+        {
+            return this->ptr() < ptr;
+        }
+
+        inline bool operator<(const CmprPtr<T, own, level>& cloned) const
+        {
+            return this->_ptr < cloned._ptr;
+        }
+
+        inline bool operator>(const T* const ptr) const
+        {
+            return this->ptr() > ptr;
+        }
+
+        inline bool operator>(const CmprPtr<T, own, level>& cloned) const
+        {
+            return this->_ptr > cloned._ptr;
+        }
+
+        inline bool operator<=(const T* const ptr) const
+        {
+            return this->ptr() <= ptr;
+        }
+
+        inline bool operator<=(const CmprPtr<T, own, level>& cloned) const
+        {
+            return this->_ptr <= cloned._ptr;
+        }
+
+        inline bool operator>=(const T* const ptr) const
+        {
+            return this->ptr() >= ptr;
+        }
+
+        inline bool operator>=(const CmprPtr<T, own, level>& cloned) const
+        {
+            return this->_ptr >= cloned._ptr;
+        }
+
+        inline bool operator==(const T* const ptr) const
+        {
+            return this->ptr() == ptr;
+        }
+
+        inline bool operator==(const CmprPtr<T, own, level>& cloned) const
+        {
+            return this->_ptr == cloned._ptr;
+        }
+
+        inline bool operator!=(const T* const ptr) const
+        {
+            return this->ptr() != ptr;;
+        }
+
+        inline bool operator!=(const CmprPtr<T, own, level>& cloned)
+        {
+            return this->_ptr != cloned._ptr;
         }
 
         inline CmprPtr(const CmprPtr<T, own, level>& cloned)
