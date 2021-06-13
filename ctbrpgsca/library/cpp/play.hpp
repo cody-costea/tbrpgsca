@@ -30,7 +30,7 @@ The following negative values can also be used, but they are not safe and will l
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
 */
-    #define COMPRESS_POINTERS 3//-4
+    #define COMPRESS_POINTERS 3
 #else
     #define COMPRESS_POINTERS 0
 #endif
@@ -39,12 +39,12 @@ The following negative values can also be used, but they are not safe and will l
 
 #define CONVERT_DELEGATE(Type, Attribute, Field) \
     Attribute operator Type() const { return Field; } \
-    Attribute operator Type*() { return &(Field); } \
-    Attribute operator Type&() { return Field; }
+    Attribute operator Type*() const { return &(Field); } \
+    Attribute operator Type&() const { return Field; }
 
 #define FORWARD_DELEGATE(Type, Attribute, Field) \
-    Attribute Type& operator*() { return Field; } \
-    Attribute Type* operator->() { return &(Field); } \
+    Attribute Type& operator*() const { return Field; } \
+    Attribute Type* operator->() const { return &(Field); } \
     CONVERT_DELEGATE(Type, Attribute, Field)
 
 #define FORWARD_DELEGATE_PTR(Type, Attribute, Field) \
@@ -290,7 +290,7 @@ The following negative values can also be used, but they are not safe and will l
             }
             else if (listed(ptr))
             {
-                return reinterpret_cast<T*>(_ptrList[(ptr >> 1) - 1U]);
+                return static_cast<T*>(_ptrList[(ptr >> 1) - 1U]);
             }
             else
             {
@@ -359,16 +359,9 @@ The following negative values can also be used, but they are not safe and will l
     protected:
         inline void setAddr(T* const ptr)
         {
-            /*if (ptr)
-            {*/
-                uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-                assert(addr < (4294967296UL << SHIFT_LEN)); //TODO: analyze alternative solutions
-                this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
-            /*}
-            else
-            {
-                this->_ptr = 0;
-            }*/
+            uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+            assert(addr < (4294967296UL << SHIFT_LEN)); //TODO: analyze alternative solutions
+            this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
         }
 
     public:
