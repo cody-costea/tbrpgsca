@@ -19,18 +19,18 @@ namespace tbrpgsca
 {
 #if Q_PROCESSOR_WORDSIZE > 4
 /*
-If the COMPRESS_POINTERS enum is set to a non-zero value, 64bit pointers will be compressed into 32bit integers, according to the following options:
+If the COMPRESS_POINTERS macro is set to a non-zero value, 64bit pointers will be compressed into 32bit integers, according to the following options:
     +3 can compress addresses up to 16GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
     +2 can compress addresses up to 8GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
     +1 can compress addresses up to 4GB, at the expense of the lower tag bit, which can no longer be used for other purporses
-Attempting to compress an address higher than the mentioned limits, will lead however to increased CPU and RAM usage and cannot be shared between threads;
+Attempting to compress an address higher than the mentioned limits, will lead however to increased usage of both CPU and RAM;
 The following negative values can also be used, but they are not safe and will lead to crashes, when the memory limits are exceeded:
     -4 can compress addresses up to 32GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
     -3 can compress addresses up to 16GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
 */
-    #define COMPRESS_POINTERS -4//-4
+    #define COMPRESS_POINTERS 3//-4
 #else
     #define COMPRESS_POINTERS 0
 #endif
@@ -39,6 +39,7 @@ The following negative values can also be used, but they are not safe and will l
 
 #define CONVERT_DELEGATE(Type, Attribute, Field) \
     Attribute operator Type() const { return Field; } \
+    Attribute operator Type*() { return &(Field); } \
     Attribute operator Type&() { return Field; }
 
 #define FORWARD_DELEGATE(Type, Attribute, Field) \
@@ -161,18 +162,18 @@ The following negative values can also be used, but they are not safe and will l
     static class PtrList
     {
     protected:
-        static std::vector<void*> _ptrList;
-        static std::mutex _locker;
+        inline static std::vector<void*> _ptrList;
+        inline static std::mutex _locker;
 
         inline static bool listed(const uint32_t ptr)
         {
             return (ptr & 1U) == 1U;
         }
 
-        PtrList() {};
+        inline PtrList() {};
     };
 
-    template<typename T, const bool own = false, const int level = COMPRESS_POINTERS - 1> class CmpsPtr : PtrList
+    template<typename T, const bool own = false, const int level = COMPRESS_POINTERS - 1> class CmprPtr : PtrList
     {
         static constexpr uint CmpsLengthShift(int cmpsLevel)
         {
@@ -240,12 +241,12 @@ The following negative values can also be used, but they are not safe and will l
                     return;
                 }
             }
-            ptrList->insert(ptr);
+            ptrList->push_back(ptr);
             this->_ptr = static_cast<uint32_t>(((ptrListLen + 1) << 1) | 1);
             uniqueLocker.unlock();
         }
 
-        inline void setAddr(T* const ptr)
+        void setAddr(T* const ptr)
         {
             if (this->ptr() == ptr)
             {
@@ -289,15 +290,17 @@ The following negative values can also be used, but they are not safe and will l
             }
             else if (listed(ptr))
             {
-                return static_cast<T*>(_ptrList[(ptr >> 1) - 1U]);
+                return reinterpret_cast<T*>(_ptrList[(ptr >> 1) - 1U]);
             }
             else
             {
-                return static_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
+                return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
             }
         }
 
-        inline ~CmpsPtr()
+        inline CmprPtr() {}
+
+        inline ~CmprPtr()
         {
             if constexpr(own)
             {
@@ -310,7 +313,7 @@ The following negative values can also be used, but they are not safe and will l
             }
         }
 #else
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < 0 ? COMPRESS_POINTERS + 1 : COMPRESS_POINTERS> class CmpsPtr
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < 0 ? COMPRESS_POINTERS + 1 : COMPRESS_POINTERS> class CmprPtr
     {
     #if COMPRESS_POINTERS == 0
         static constexpr uint CmpsLengthShift(const int cmpsLevel)
@@ -336,6 +339,11 @@ The following negative values can also be used, but they are not safe and will l
         {
             return this->_ptr;
         }
+
+        inline CmprPtr()
+        {
+         this->setPtr(nullptr);
+        }
     #else
         static constexpr uint CmpsLengthShift(int cmpsLevel)
         {
@@ -351,9 +359,16 @@ The following negative values can also be used, but they are not safe and will l
     protected:
         inline void setAddr(T* const ptr)
         {
-            uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-            assert(addr < (4294967296UL << SHIFT_LEN)); //TODO: analyze alternative solutions
-            this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
+            /*if (ptr)
+            {*/
+                uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+                assert(addr < (4294967296UL << SHIFT_LEN)); //TODO: analyze alternative solutions
+                this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
+            /*}
+            else
+            {
+                this->_ptr = 0;
+            }*/
         }
 
     public:
@@ -364,11 +379,16 @@ The following negative values can also be used, but they are not safe and will l
 
         inline T* ptr() const
         {
-            return static_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
+            return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
+        }
+
+        inline CmprPtr()
+        {
+            this->_ptr = 0U;
         }
     #endif
     public:
-        inline ~CmpsPtr()
+        inline ~CmprPtr()
         {
             if constexpr(own)
             {
@@ -403,7 +423,7 @@ The following negative values can also be used, but they are not safe and will l
             this->setAddr(ptr);
         }
 
-        inline CmpsPtr<T, own, level>& withPtr(T* const ptr)
+        inline CmprPtr<T, own, level>& withPtr(T* const ptr)
         {
             this->setPtr(ptr);
             return *this;
@@ -422,7 +442,12 @@ The following negative values can also be used, but they are not safe and will l
             this->setAddr(ptr);
         }
 
-        inline CmpsPtr& operator=(T* const ptr)
+        inline operator bool() const
+        {
+            return this->_ptr;
+        }
+
+        inline CmprPtr& operator=(T* const ptr)
         {
             if (this->ptr() != ptr)
             {
@@ -431,7 +456,7 @@ The following negative values can also be used, but they are not safe and will l
             return *this;
         }
 
-        inline CmpsPtr& operator=(const CmpsPtr<T, own, level>& cloned)
+        inline CmprPtr& operator=(const CmprPtr<T, own, level>& cloned)
         {
             if (this != &cloned)
             {
@@ -441,22 +466,15 @@ The following negative values can also be used, but they are not safe and will l
             return *this;
         }
 
-        inline CmpsPtr(const CmpsPtr<T, own, level>& cloned)
+        inline CmprPtr(const CmprPtr<T, own, level>& cloned)
         {
             static_assert(!own, "Attempting to clone unique pointer.");
             this->_ptr = cloned._ptr;
         }
 
-        inline CmpsPtr(T* const ptr)
+        inline CmprPtr(T* const ptr)
         {
             this->setAddr(ptr);
-        }
-
-        inline CmpsPtr()
-        {
-#if COMPRESS_POINTERS < 1
-            this->setPtr(nullptr);
-#endif
         }
     };
 
