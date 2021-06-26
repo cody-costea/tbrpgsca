@@ -13,6 +13,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "library/translations.h"
 
+#include <atomic>
 #include <mutex>
 
 namespace tbrpgsca
@@ -44,8 +45,7 @@ The following negative values can also be used, but they are not safe and will l
 
 #define FORWARD_DELEGATE(Type, Attribute, Field) \
     Attribute Type& operator*() const { return Field; } \
-    Attribute Type* operator->() const { return &(Field); } \
-    CONVERT_DELEGATE(Type, Attribute, Field)
+    Attribute Type* operator->() const { return &(Field); }
 
 #define FORWARD_DELEGATE_PTR(Type, Attribute, Field) \
     FORWARD_DELEGATE(Type, Attribute, *Field)
@@ -158,6 +158,138 @@ The following negative values can also be used, but they are not safe and will l
     PROP_FLAG_GET(is##Name, Flag, GetLevel) \
     PROP_FLAG_SET_ALL(Class, Name, Flag, SetLevel, is##Name)
 
+#define CMPS_METHODS(Type) \
+inline T* swapPtr(T* const ptr) \
+{ \
+    auto _ptr = this->ptr(); \
+    this->setAddr(ptr); \
+    return _ptr; \
+} \
+inline T* takePtr() \
+{ \
+    return this->swapPtr(nullptr); \
+} \
+inline Type& withPtr(T* const ptr) \
+{ \
+    this->setPtr(ptr); \
+    return *this; \
+} \
+inline void resetPtr(T* const ptr) \
+{ \
+    auto _ptr = this->ptr(); \
+    if (_ptr) \
+    { \
+        delete _ptr; \
+    } \
+    this->setAddr(ptr); \
+} \
+inline operator bool() const \
+{ \
+    return this->_ptr; \
+} \
+inline Type& operator=(T* const ptr) \
+{ \
+    if (this->ptr() != ptr) \
+    { \
+        this->setPtr(ptr); \
+    } \
+    return *this; \
+} \
+inline bool operator<(const T* const ptr) const \
+{ \
+    return this->ptr() < ptr; \
+} \
+inline bool operator<(const Type& cloned) const \
+{ \
+    return this->_ptr < cloned._ptr; \
+} \
+inline bool operator>(const T* const ptr) const \
+{ \
+    return this->ptr() > ptr; \
+} \
+inline bool operator>(const Type& cloned) const \
+{ \
+    return this->_ptr > cloned._ptr; \
+} \
+inline bool operator<=(const T* const ptr) const \
+{ \
+    return this->ptr() <= ptr; \
+} \
+inline bool operator<=(const Type& cloned) const \
+{ \
+    return this->_ptr <= cloned._ptr; \
+} \
+inline bool operator>=(const T* const ptr) const \
+{ \
+    return this->ptr() >= ptr; \
+} \
+inline bool operator>=(const Type& cloned) const \
+{ \
+    return this->_ptr >= cloned._ptr; \
+} \
+inline bool operator==(const T* const ptr) const \
+{ \
+    return this->ptr() == ptr; \
+} \
+inline bool operator==(const Type& cloned) const \
+{ \
+    return this->_ptr == cloned._ptr; \
+} \
+inline bool operator!=(const T* const ptr) const \
+{ \
+    return this->ptr() != ptr; \
+} \
+inline bool operator!=(const Type& cloned) \
+{ \
+    return this->_ptr != cloned._ptr; \
+} \
+inline Type& operator=(Type&& cloned) \
+{ \
+    if (this != &cloned) \
+    { \
+        this->move(cloned); \
+    } \
+    return *this; \
+} \
+inline Type& operator=(const Type& cloned) \
+{ \
+    if (this != &cloned) \
+    { \
+        this->copy(cloned); \
+    } \
+    return *this; \
+} \
+inline void setRef(const Type& cloned) \
+{ \
+    this->setPtr(&cloned); \
+} \
+inline Type(const Type& cloned) \
+{ \
+    this->copy(cloned); \
+} \
+inline Type(Type&& cloned) \
+{ \
+    this->move(cloned); \
+} \
+inline Type(const T&& ptr) \
+{ \
+    this->setAddr(&ptr); \
+} \
+inline Type(const T& ptr) \
+{ \
+    this->setAddr(&ptr); \
+} \
+inline Type(T* const ptr) \
+{ \
+    this->setAddr(ptr); \
+} \
+inline T& ref() const \
+{ \
+    return *this->ptr(); \
+}
+
+#define COMMA ,
+
 #if COMPRESS_POINTERS > 0
     static class PtrList
     {
@@ -173,7 +305,7 @@ The following negative values can also be used, but they are not safe and will l
         inline PtrList() {};
     };
 
-    template<typename T, const bool own = false, const int level = COMPRESS_POINTERS - 1> class CmprPtr : PtrList
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 1> class CmprPtr : PtrList
     {
         static constexpr uint CmpsLengthShift(int cmpsLevel)
         {
@@ -395,139 +527,130 @@ The following negative values can also be used, but they are not safe and will l
 #endif
     protected:
         static constexpr int SHIFT_LEN = CmpsLengthShift(level);
-    public:
-        //FORWARD_DELEGATE(T, inline, *(ptr()))
-        FORWARD_DELEGATE_PTR(T, inline, ptr());
-        inline T* swapPtr(T* const ptr)
+
+        inline void copy(const CmprPtr<T, own, level>& cloned)
         {
-            auto _ptr = this->ptr();
-            this->setAddr(ptr);
-            return _ptr;
+            static_assert(own < 1, "Attempting to clone unique pointer.");
+            this->_ptr = cloned._ptr;
+            if constexpr(own < 0)
+            {
+                const_cast<CmprPtr<T, own, level>&>(cloned)._ptr = 0U;
+            }
         }
 
-        inline T* takePtr()
+        inline void move(CmprPtr<T, own, level>&& cloned)
         {
-            return this->swapPtr(nullptr);
+            this->_ptr = cloned._ptr;
+            cloned._ptr = 0U;
         }
+
+    public:
+        FORWARD_DELEGATE_PTR(T, inline, ptr());
+        CONVERT_DELEGATE_PTR(T, inline, ptr());
+        CMPS_METHODS(CmprPtr<T COMMA own COMMA level>)
 
         inline void setPtr(T* const ptr)
         {
             static_assert(!own, "Attempting to change unique pointer.");
             this->setAddr(ptr);
         }
+    };
 
-        inline CmprPtr<T, own, level>& withPtr(T* const ptr)
+    template <typename T, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class CmprCnt
+    {
+        //static_assert(std::is_integral<C>::value, "Reference counter type must be an integral.");
+        CmprPtr<C, 0, 3> _ref_cnt;
+        CmprPtr<T, 0, level> _ptr;
+
+    protected:
+        void clean()
         {
-            this->setPtr(ptr);
-            return *this;
+            auto ptr = this->ptr();
+            if (ptr)
+            {
+                delete ptr;
+            }
+            auto cnt = this->_ref_cnt.ptr();
+            if (cnt)
+            {
+                delete cnt;
+            }
         }
 
-        inline void resetPtr(T* const ptr)
+        inline void reset()
         {
-            if constexpr(own)
+            this->_ref_cnt.setPtr(new C(0U));
+        }
+
+        inline void increase()
+        {
+            (*(this->_ref_cnt)) += 1U;
+        }
+
+        inline void decrease()
+        {
+            if (--(*(this->_ref_cnt)) < 1U)
             {
-                auto _ptr = this->ptr();
-                if (_ptr)
+                this->clean();
+            }
+        }
+
+        void setAddr(T* const ptr, const bool decrease = true)
+        {
+            if (decrease)
+            {
+                auto old = this->ptr();
+                if (old)
                 {
-                    delete _ptr;
+                    this->decrease();
                 }
             }
-            this->setAddr(ptr);
+            this->_ptr.setPtr(ptr);
+            this->reset();
         }
 
-        inline operator bool() const
+        inline void copy(const CmprCnt<T, C, level>& cloned)
         {
-            return this->_ptr;
-        }
-
-        inline CmprPtr& operator=(T* const ptr)
-        {
-            if (this->ptr() != ptr)
-            {
-                this->setPtr(ptr);
-            }
-            return *this;
-        }
-
-        inline CmprPtr& operator=(const CmprPtr<T, own, level>& cloned)
-        {
-            if (this != &cloned)
-            {
-                static_assert(!own, "Attempting to copy unique pointer.");
-                this->_ptr = cloned._ptr;
-            }
-            return *this;
-        }
-
-        inline bool operator<(const T* const ptr) const
-        {
-            return this->ptr() < ptr;
-        }
-
-        inline bool operator<(const CmprPtr<T, own, level>& cloned) const
-        {
-            return this->_ptr < cloned._ptr;
-        }
-
-        inline bool operator>(const T* const ptr) const
-        {
-            return this->ptr() > ptr;
-        }
-
-        inline bool operator>(const CmprPtr<T, own, level>& cloned) const
-        {
-            return this->_ptr > cloned._ptr;
-        }
-
-        inline bool operator<=(const T* const ptr) const
-        {
-            return this->ptr() <= ptr;
-        }
-
-        inline bool operator<=(const CmprPtr<T, own, level>& cloned) const
-        {
-            return this->_ptr <= cloned._ptr;
-        }
-
-        inline bool operator>=(const T* const ptr) const
-        {
-            return this->ptr() >= ptr;
-        }
-
-        inline bool operator>=(const CmprPtr<T, own, level>& cloned) const
-        {
-            return this->_ptr >= cloned._ptr;
-        }
-
-        inline bool operator==(const T* const ptr) const
-        {
-            return this->ptr() == ptr;
-        }
-
-        inline bool operator==(const CmprPtr<T, own, level>& cloned) const
-        {
-            return this->_ptr == cloned._ptr;
-        }
-
-        inline bool operator!=(const T* const ptr) const
-        {
-            return this->ptr() != ptr;;
-        }
-
-        inline bool operator!=(const CmprPtr<T, own, level>& cloned)
-        {
-            return this->_ptr != cloned._ptr;
-        }
-
-        inline CmprPtr(const CmprPtr<T, own, level>& cloned)
-        {
-            static_assert(!own, "Attempting to clone unique pointer.");
+            cloned.increase();
             this->_ptr = cloned._ptr;
+            this->_ref_cnt = cloned._ref_cnt;
         }
 
-        inline CmprPtr(T* const ptr)
+        inline void move(CmprCnt<T, C, level>&& cloned)
+        {
+            this->_ptr = cloned._ptr;
+            this->_ref_cnt = cloned._ref_cnt;
+            cloned._ref_cnt._ptr = 0U;
+            cloned._ptr._ptr = 0U;
+        }
+
+    public:
+        FORWARD_DELEGATE_PTR(T, inline, ptr())
+        CONVERT_DELEGATE_PTR(T, inline, ptr())
+        CMPS_METHODS(CmprCnt<T COMMA C COMMA level>)
+        inline T* ptr() const
+        {
+            return this->_ptr.ptr();
+        }
+
+        inline void setPtr(T* const ptr)
         {
             this->setAddr(ptr);
+        }
+
+        /*inline CmprShr(const CmprPtr<T, false, level>& cloned)
+        {
+            this->setAddr(cloned.ptr());
+        }*/
+
+        inline CmprCnt<T, C, level>()
+        {
+            this->setAddr(nullptr, false);
+        }
+
+        inline ~CmprCnt<T, C, level>()
+        {
+            this->decrease();
         }
     };
 
