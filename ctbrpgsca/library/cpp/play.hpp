@@ -31,7 +31,7 @@ The following negative values can also be used, but they are not safe and will l
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
 */
-    #define COMPRESS_POINTERS -4//3
+    #define COMPRESS_POINTERS 4//3
 #else
     #define COMPRESS_POINTERS 0
 #endif
@@ -187,12 +187,14 @@ inline operator bool() const \
 { \
     return this->_ptr; \
 } \
+inline Type& operator=(std::nullptr_t) \
+{ \
+    this->setPtr(static_cast<std::nullptr_t>(nullptr)); \
+    return *this; \
+} \
 inline Type& operator=(T* const ptr) \
 { \
-    if (this->ptr() != ptr) \
-    { \
-        this->setPtr(ptr); \
-    } \
+    this->setPtr(ptr); \
     return *this; \
 } \
 inline bool operator<(const T* const ptr) const \
@@ -259,31 +261,26 @@ inline Type& operator=(const Type& cloned) \
     } \
     return *this; \
 } \
-inline Type& operator=(T&& cloned) \
-{ \
-    this->setPtr(&cloned); \
-    return *this; \
-} \
 inline Type& operator=(T& cloned) \
 { \
     this->setPtr(&cloned); \
     return *this; \
 } \
-inline void setRef(Type& cloned) \
+inline void setPtr(std::nullptr_t) \
 { \
-    this->setPtr(&cloned); \
+    this->setAddr(static_cast<std::nullptr_t>(nullptr)); \
 } \
 inline Type(const Type& cloned) \
 { \
     this->copy(cloned); \
 } \
+inline void setRef(T& cloned) \
+{ \
+    this->setPtr(&cloned); \
+} \
 inline Type(Type&& cloned) \
 { \
     this->move(cloned); \
-} \
-inline Type(T&& ptr) \
-{ \
-    this->setAddr(&ptr); \
 } \
 inline Type(T& ptr) \
 { \
@@ -301,7 +298,7 @@ inline T& ref() const \
 #define COMMA ,
 
 #if COMPRESS_POINTERS > 0
-    static class PtrList
+    static class BasePtr
     {
     protected:
         inline static std::vector<void*> _ptrList;
@@ -312,10 +309,10 @@ inline T& ref() const \
             return (ptr & 1U) == 1U;
         }
 
-        inline PtrList() {};
+        inline BasePtr() {};
     };
 
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 1> class CmprPtr : PtrList
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 1> class CmprPtr : protected BasePtr
     {
         static constexpr uint CmpsLengthShift(int cmpsLevel)
         {
@@ -388,6 +385,14 @@ inline T& ref() const \
             uniqueLocker.unlock();
         }
 
+        inline void setAddr(std::nullptr_t)
+        {
+            if (clearList(this->_ptr))
+            {
+                this->_ptr = 0U;
+            }
+        }
+
         void setAddr(T* const ptr)
         {
             if (this->ptr() == ptr)
@@ -396,11 +401,8 @@ inline T& ref() const \
             }
             else if (ptr == nullptr)
             {
-                if (clearList(this->_ptr))
-                {
-                    this->_ptr = 0U;
-                    return;
-                }
+                this->setAddr(static_cast<std::nullptr_t>(nullptr));
+                return;
             }
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
             if (addr < (4294967296UL << SHIFT_LEN))
@@ -455,8 +457,8 @@ inline T& ref() const \
             }
         }
 #else
-    static class PtrList {};
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0> class CmprPtr : PtrList
+    static class BasePtr {};
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0> class CmprPtr : protected BasePtr
     {
     #if COMPRESS_POINTERS == 0
         static constexpr uint CmpsLengthShift(const int cmpsLevel)
@@ -500,6 +502,11 @@ inline T& ref() const \
         u_int32_t _ptr;
 
     protected:
+        inline void setAddr(std::nullptr_t)
+        {
+            this->_ptr = 0U;
+        }
+
         inline void setAddr(T* const ptr)
         {
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
@@ -567,7 +574,7 @@ inline T& ref() const \
         }
     };
 
-    template <typename T, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class CmprCnt : PtrList
+    template <typename T, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class CmprCnt : protected BasePtr
     {
         //static_assert(std::is_integral<C>::value, "Reference counter type must be an integral.");
         CmprPtr<C, 0, 3> _ref_cnt;
@@ -665,37 +672,125 @@ inline T& ref() const \
         }
     };
 
-    template<typename T, typename P = CmprPtr<T>> class CmprRef : protected P
+    template<typename T, typename P = CmprPtr<T>, const bool allowDef = true> class CmprOpt : protected P
     {
-        static_assert(std::is_base_of<PtrList, P>::value, "Only references to compressed pointer types can be wrapped.");
+        static_assert(std::is_base_of<BasePtr, P>::value, "Only references to compressed pointer types can be wrapped.");
     public:
-        CONVERT_DELEGATE_PTR(T, inline explicit, P::ptr())
-        using P::operator->;
-        using P::operator*;
+        FORWARD_DELEGATE(T, inline, refOrDef())
+        CONVERT_DELEGATE(T, inline explicit, refOrFail())
+        using P::operator bool;
+        using P::operator==;
+        using P::operator!=;
+        using P::operator>=;
+        using P::operator<=;
+        using P::operator>;
+        using P::operator<;
         using P::setRef;
-        using P::ref;
+        //using P::ref;
 
-        inline CmprRef<T, P>& operator=(T& cloned)
+        inline void resetRef()
         {
-            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+            this->P::setPtr(nullptr);
         }
 
-        inline CmprRef<T, P>& operator=(T&& cloned)
+        inline T& ref() const = delete;
+
+        inline bool hasRef() const
         {
-            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+            return this->_ptr;
         }
 
-        inline CmprRef<T, P>& operator=(CmprRef<T, P>&& cloned)
+        inline T& refOrFail() const
         {
-            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+            return this->P::ref();
         }
 
-        inline CmprRef<T, P>& operator=(const CmprRef<T, P>& cloned)
+        inline T& refOrElse(T& def) const
         {
-            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+            T* ptr = this->P::ptr();
+            return ptr ? *ptr : def;
         }
 
-        inline bool operator<(const T& cloned) const
+        template<typename... Args>
+        inline T& refOrNew(Args&&... args)
+        {
+            T* ptr = this->P::ptr();
+            if (ptr == nullptr)
+            {
+                ptr = new T(std::forward<Args>(args)...);
+                P::setAddr(ptr);
+            }
+            return ptr;
+        }
+
+        inline T& refOrDef() const
+        {
+            if constexpr(allowDef)
+            {
+                return const_cast<CmprOpt<T, P, allowDef>*>(this)->refOrNew();
+            }
+            else
+            {
+                return this->refOrFail();
+            }
+        }
+
+        inline T& refOrSet(T& def)
+        {
+            T* ptr = this->P::ptr();
+            if (ptr == nullptr)
+            {
+                ptr = &def;
+                P::setAddr(ptr);
+            }
+            return ptr;
+        }
+
+        template<typename F>
+        inline void runIfRef(F callback)
+        {
+            T* ptr = this->P::ptr();
+            if (ptr)
+            {
+                callback(*ptr);
+            }
+        }
+
+        template<typename F, typename R>
+        inline R callIfRef(F callback, R defValue)
+        {
+            T* ptr = this->P::ptr();
+            if (ptr)
+            {
+                return callback(*ptr);
+            }
+            else
+            {
+                return defValue;
+            }
+        }
+
+        inline CmprOpt<T, P, allowDef>& operator=(T& cloned)
+        {
+            return static_cast<CmprOpt<T, P, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprOpt<T, P, allowDef>& operator=(T&& cloned)
+        {
+            return static_cast<CmprOpt<T, P, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprOpt<T, P, allowDef>& operator=(CmprOpt<T, P, allowDef>&& cloned)
+        {
+            return static_cast<CmprOpt<T, P, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprOpt<T, P, allowDef>& operator=(const CmprOpt<T, P, allowDef>& cloned)
+        {
+            return static_cast<CmprOpt<T, P, allowDef>&>(P::operator=(cloned));
+        }
+
+        /*inline bool operator<(const T& cloned) const
         {
             return P::operator<(cloned);
         }
@@ -755,11 +850,102 @@ inline T& ref() const \
             return P::operator!=(cloned);
         }
 
-        inline CmprRef<T, P>(const CmprRef<T, P>& cloned) : P(cloned) {}
-        inline CmprRef<T, P>(const T& cloned) : P(cloned) {}
-        inline CmprRef<T, P>(T&& moved) : P(moved) {}
-        inline CmprRef<T, P>(P&& moved) : P(moved) {}
-        inline CmprRef<T, P>() : P() {}
+        inline operator bool() const
+        {
+            return this->hasRef();
+        }*/
+
+        inline CmprOpt<T, P>(const CmprOpt<T, P, allowDef>& cloned) : P(cloned) {}
+        inline CmprOpt<T, P>(CmprOpt<T, P, allowDef>&& moved) : P(moved) {}
+        inline CmprOpt<T, P>(const T& cloned) : P(cloned) {}
+        inline CmprOpt<T, P>(T&& moved) : P(moved) {}
+        inline CmprOpt<T, P>() : P() {}
+    };
+
+    template<typename T, typename P = CmprPtr<T>, const bool lazy = false, const bool allowDef = false> class CmprRef : public CmprOpt<T, P, allowDef>
+    {
+    public:
+        //CONVERT_DELEGATE(T, inline, P::ref())
+        using P::operator T&;
+        using P::operator T*;
+        using P::operator T;
+        using P::operator->;
+        using P::operator*;
+        using P::ref;
+
+        inline bool hasRef() const
+        {
+            if constexpr(lazy)
+            {
+                return CmprOpt<T, P>::hasRef();
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        inline void resetRef() = delete;
+
+        inline T& refOrFail() const = delete;
+
+        inline T& refOrElse(T& def) const = delete;
+
+        template<typename F>
+        inline void runIfRef(F callback) = delete;
+
+        template<typename F, typename R>
+        inline R callIfRef(F callback) = delete;
+
+        inline auto refOrDef() -> std::enable_if<lazy && allowDef, T&>
+        {
+            return this->CmprOpt<T, P, allowDef>::refOrDef();
+        }
+
+        template<typename... Args>
+        inline auto refOrNew(Args&&... args) -> std::enable_if<lazy, T&>
+        {
+            return this->CmprOpt<T, P, allowDef>::refOrNew(std::forward<Args>(args)...);
+        }
+
+        inline auto refOrSet(T& cloned) -> std::enable_if<lazy, T&>
+        {
+            return this->CmprOpt<T, P, allowDef>::refOrSet(cloned);
+        }
+
+        inline CmprRef<T, P, lazy, allowDef>& operator=(T& cloned)
+        {
+            return static_cast<CmprRef<T, P, lazy, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprRef<T, P, lazy, allowDef>& operator=(T&& cloned)
+        {
+            return static_cast<CmprRef<T, P, lazy, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprRef<T, P, lazy, allowDef>& operator=(CmprRef<T, P, lazy, allowDef>&& cloned)
+        {
+            return static_cast<CmprRef<T, P, lazy, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprRef<T, P, lazy, allowDef>& operator=(const CmprRef<T, P, lazy, allowDef>& cloned)
+        {
+            return static_cast<CmprRef<T, P, lazy, allowDef>&>(P::operator=(cloned));
+        }
+
+        inline CmprOpt<T, P, allowDef>& operator=(CmprOpt<T, P, allowDef>&& cloned) = delete;
+
+        inline CmprOpt<T, P, allowDef>& operator=(const CmprOpt<T, P, allowDef>& cloned) = delete;
+
+
+        inline CmprRef<T, P>(const CmprRef<T, P, lazy, allowDef>& cloned) : CmprOpt<T, P>(cloned) {}
+        inline CmprRef<T, P>(CmprRef<T, P, lazy, allowDef>&& moved) : CmprOpt<T, P>(moved) {}
+        inline CmprRef<T, P>(const T& cloned) : CmprOpt<T, P>(cloned) {}
+        inline CmprRef<T, P>(T&& moved) : CmprOpt<T, P>(moved) {}
+        inline CmprRef<T, P>() : CmprOpt<T, P>()
+        {
+            static_assert(lazy, "Non-lazy reference must be initialized.");
+        }
     };
 
     class Ability;
