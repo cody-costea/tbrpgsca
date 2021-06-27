@@ -259,7 +259,17 @@ inline Type& operator=(const Type& cloned) \
     } \
     return *this; \
 } \
-inline void setRef(const Type& cloned) \
+inline Type& operator=(T&& cloned) \
+{ \
+    this->setPtr(&cloned); \
+    return *this; \
+} \
+inline Type& operator=(T& cloned) \
+{ \
+    this->setPtr(&cloned); \
+    return *this; \
+} \
+inline void setRef(Type& cloned) \
 { \
     this->setPtr(&cloned); \
 } \
@@ -271,11 +281,11 @@ inline Type(Type&& cloned) \
 { \
     this->move(cloned); \
 } \
-inline Type(const T&& ptr) \
+inline Type(T&& ptr) \
 { \
     this->setAddr(&ptr); \
 } \
-inline Type(const T& ptr) \
+inline Type(T& ptr) \
 { \
     this->setAddr(&ptr); \
 } \
@@ -445,7 +455,8 @@ inline T& ref() const \
             }
         }
 #else
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0> class CmprPtr
+    static class PtrList {};
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0> class CmprPtr : PtrList
     {
     #if COMPRESS_POINTERS == 0
         static constexpr uint CmpsLengthShift(const int cmpsLevel)
@@ -556,7 +567,7 @@ inline T& ref() const \
         }
     };
 
-    template <typename T, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class CmprCnt
+    template <typename T, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class CmprCnt : PtrList
     {
         //static_assert(std::is_integral<C>::value, "Reference counter type must be an integral.");
         CmprPtr<C, 0, 3> _ref_cnt;
@@ -652,6 +663,103 @@ inline T& ref() const \
         {
             this->decrease();
         }
+    };
+
+    template<typename T, typename P = CmprPtr<T>> class CmprRef : protected P
+    {
+        static_assert(std::is_base_of<PtrList, P>::value, "Only references to compressed pointer types can be wrapped.");
+    public:
+        CONVERT_DELEGATE_PTR(T, inline explicit, P::ptr())
+        using P::operator->;
+        using P::operator*;
+        using P::setRef;
+        using P::ref;
+
+        inline CmprRef<T, P>& operator=(T& cloned)
+        {
+            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+        }
+
+        inline CmprRef<T, P>& operator=(T&& cloned)
+        {
+            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+        }
+
+        inline CmprRef<T, P>& operator=(CmprRef<T, P>&& cloned)
+        {
+            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+        }
+
+        inline CmprRef<T, P>& operator=(const CmprRef<T, P>& cloned)
+        {
+            return static_cast<CmprRef<T, P>&>(P::operator=(cloned));
+        }
+
+        inline bool operator<(const T& cloned) const
+        {
+            return P::operator<(cloned);
+        }
+
+        inline bool operator<(const P& cloned) const
+        {
+            return P::operator<(cloned);
+        }
+
+        inline bool operator>(const T& cloned) const
+        {
+            return P::operator>(cloned);
+        }
+
+        inline bool operator>(const P& cloned) const
+        {
+            return P::operator>(cloned);
+        }
+
+        inline bool operator<=(const T& cloned) const
+        {
+            return P::operator<=(cloned);
+        }
+
+        inline bool operator<=(const P& cloned) const
+        {
+            return P::operator<=(cloned);
+        }
+
+        inline bool operator>=(const T& cloned) const
+        {
+            return P::operator>=(cloned);
+        }
+
+        inline bool operator>=(const P& cloned) const
+        {
+            return P::operator>=(cloned);
+        }
+
+        inline bool operator==(const T& cloned) const
+        {
+            return P::operator==(cloned);
+        }
+
+        inline bool operator==(const P& cloned) const
+        {
+            return P::operator==(cloned);
+        }
+
+        inline bool operator!=(const T& cloned) const
+        {
+            return P::operator!=(cloned);
+        }
+
+        inline bool operator!=(const P& cloned) const
+        {
+            return P::operator!=(cloned);
+        }
+
+        inline CmprRef<T, P>(const CmprRef<T, P>& cloned) : P(cloned) {}
+        inline CmprRef<T, P>(const T& cloned) : P(cloned) {}
+        inline CmprRef<T, P>(T&& moved) : P(moved) {}
+        inline CmprRef<T, P>(P&& moved) : P(moved) {}
+        inline CmprRef<T, P>() : P() {}
     };
 
     class Ability;
