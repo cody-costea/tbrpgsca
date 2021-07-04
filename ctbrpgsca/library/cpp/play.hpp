@@ -167,7 +167,7 @@ The following negative values can also be used, but they are not safe and will l
 namespace
 {
 
-    template <typename T, typename P> class BasePtr
+    template <typename T, class P> class BasePtr
     {
     protected:
         inline BasePtr<T, P>(const P& cloned)
@@ -191,7 +191,11 @@ namespace
         }
 
         inline BasePtr<T, P>() {}
+    };
 #if COMPRESS_POINTERS > 0
+    class PtrList
+    {
+    protected:
         inline static std::vector<void*> _ptrList;
         inline static std::mutex _locker;
 
@@ -199,11 +203,9 @@ namespace
         {
             return (ptr & 1U) == 1U;
         }
-
-        inline BasePtr() {};
     };
 
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 1> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 1> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>, protected PtrList
     {
         static constexpr uint CmpsLengthShift(int cmpsLevel)
         {
@@ -225,7 +227,7 @@ namespace
             }
             if (listed(ptr))
             {
-                auto uniqueLocker = std::unique_lock(_locker);
+                auto uniqueLocker = std::unique_lock(PtrList::_locker);
                 uniqueLocker.lock();
                 auto ptrList = &_ptrList;
                 if ((ptr >>= 1) == ptrList->size())
@@ -249,7 +251,7 @@ namespace
         void listPtr(T* const ptr)
         {
             uint32_t oldPtr = this->_ptr;
-            auto uniqueLocker = std::unique_lock(_locker);
+            auto uniqueLocker = std::unique_lock(PtrList::_locker);
             uniqueLocker.lock();
             auto ptrList = &_ptrList;
             if (listed(oldPtr))
@@ -298,7 +300,7 @@ namespace
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
             if (addr < (4294967296UL << SHIFT_LEN))
             {
-                if constexpr(own)
+                //if constexpr(own)
                 {
                     clearList(this->_ptr);
                 }
@@ -348,7 +350,6 @@ namespace
             }
         }
 #else
-    };
     template<typename T, const int own = 0, const int level = COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>
     {
     #if COMPRESS_POINTERS == 0
@@ -457,6 +458,12 @@ namespace
         FORWARD_DELEGATE_PTR(T, inline, ptr());
         CONVERT_DELEGATE_PTR(T, inline, ptr());
         //CMPS_METHODS(BaseCmp<T COMMA own COMMA level>)
+
+        inline void setPtr(std::nullptr_t)
+        {
+            static_assert(!own, "Attempting to change unique pointer.");
+            this->setAddr(static_cast<std::nullptr_t>(nullptr));
+        }
 
         inline void setPtr(T* const ptr)
         {
@@ -574,9 +581,9 @@ namespace
     protected:
         inline T& def() const
         {
-            if constexpr(std::is_nothrow_default_constructible<T>::value)
+            if constexpr(std::is_default_constructible<T>::value)
             {
-                return const_cast<BaseOpt<T, P, opt, allowPtr>*>(this)->refOrNew();
+                return (const_cast<BaseOpt<T, P, opt, allowPtr>*>(this))->refOrNew();
             }
             else
             {
@@ -590,8 +597,8 @@ namespace
         }
 
     public:
-        using P::operator->;
         using P::operator*;
+        using P::operator->;
 
         //FORWARD_DELEGATE(T, inline, def())
         CONVERT_DELEGATE(T, inline explicit, obj())
@@ -877,7 +884,7 @@ namespace
 
 namespace tbrpgsca
 {
-    template<typename T, const int own = 0, const int opt = 1, const bool ptr = true, const int level = COMPRESS_POINTERS>
+    template<typename T, const int own = 0, const int opt = -1, const bool ptr = true, const int level = COMPRESS_POINTERS>
     using CmpsPtr = BaseOpt<T, BaseCmp<T, own, level>, opt, ptr>;
     template<typename T, typename C = std::atomic<uint32_t>, const int opt = -1, const bool ptr = false, const int level = COMPRESS_POINTERS>
     using CmpsCnt = BaseOpt<T, BaseCnt<T, C, level>, opt, ptr>;
