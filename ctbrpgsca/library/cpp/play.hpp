@@ -29,7 +29,7 @@ The following negative values can also be used, but they are not safe and will l
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
 */
-    #define COMPRESS_POINTERS -4//3
+    #define COMPRESS_POINTERS 4//3
 #else
     #define COMPRESS_POINTERS 0
 #endif
@@ -379,7 +379,7 @@ namespace
 
         inline BaseCmp()
         {
-         this->setPtr(nullptr);
+            this->setPtr(nullptr);
         }
     #else
         static constexpr uint CmpsLengthShift(int cmpsLevel)

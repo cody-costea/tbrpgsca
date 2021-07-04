@@ -58,6 +58,30 @@ void Ability::replenish(Actor& user) const
 
 }
 
+void Ability::applyCosts(Actor &user) const
+{
+    this->applyCosts(nullptr, user, nullptr, static_cast<Scene::SpriteAct*>(nullptr));
+}
+
+template <typename SpriteRun>
+void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const SpriteRun* const spriteRun) const
+{
+    user.setCurrentRp(user._sp - this->_m_sp);
+    user.setCurrentMp(user._mp - this->_m_mp);
+    user.setCurrentHp(ret, scene, spriteRun, user._hp - this->_m_hp, false);
+    int mQty = this->_m_qty;
+    if (mQty > 0)
+    {
+        QMap<const Ability*, int>* usrSkillsQty = user._skills_cr_qty;
+        if (usrSkillsQty == nullptr)
+        {
+            usrSkillsQty = new QMap<const Ability*, int>();
+            user._skills_cr_qty = usrSkillsQty;
+        }
+        usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
+    }
+}
+
 bool Ability::canPerform(const Actor& actor) const
 {
     int const blockedSkills = actor._b_skill_types;
@@ -66,13 +90,13 @@ bool Ability::canPerform(const Actor& actor) const
             && this->_m_sp <= actor._sp && actor._lv >= this->_lv_rq && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
 
-void Ability::execute(QString& ret, Actor& user, Actor& target, bool applyCosts) const
+void Ability::execute(QString& ret, Actor& user, Actor& target) const
 {
-    return this->execute(ret, nullptr, static_cast<Scene::SpriteAct*>(nullptr), user, &target, applyCosts);
+    return this->execute(ret, nullptr, static_cast<Scene::SpriteAct*>(nullptr), user, &target);
 }
 
 template <typename SpriteRun>
-void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const
+void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target) const
 {
     //assert(target);
     const Ability& ability = *this;
@@ -239,7 +263,7 @@ void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const s
             ret += Ability::MissesTxt.arg(target->_name);
         }
     }
-    if (applyCosts)
+    /*if (applyCosts)
     {
         user.setCurrentRp(user._sp - ability._m_sp);
         user.setCurrentMp(user._mp - ability._m_mp);
@@ -255,7 +279,7 @@ void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const s
             }
             usrSkillsQty->operator[](this) = (usrSkillsQty->value(this, mQty) - 1);
         }
-    }
+    }*/
 
 }
 
@@ -315,6 +339,8 @@ Ability::~Ability()
 }
 
 #if USE_TEMPLATE
-template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+template void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const ArenaWidget* const spriteRun) const;
+template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target) const;
 #endif
-template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+template void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const Scene::SpriteAct* const spriteRun) const;
+template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target) const;

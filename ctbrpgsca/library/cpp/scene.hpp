@@ -96,7 +96,7 @@ namespace tbrpgsca
 
         ~Scene();
     protected:
-        const Ability* _last_ability;
+        CmpsPtr<Ability> _last_ability;
         QVector<SceneRun*>* _events;
 #if USE_BIT_FIELDS
         signed int _current: 8, _original: 8, _f_target: 8, _l_target: 8, _surprise: 2, _status: 2, _m_init: 28;

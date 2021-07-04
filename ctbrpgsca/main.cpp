@@ -17,7 +17,8 @@ extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& 
                             bool const useGuards, int const surprise, int const mInit);
 extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                   bool const useGuards, int const surprise, int const mInit);
-extern template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+extern template void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const ArenaWidget* const spriteRun) const;
+extern template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target) const;
 extern template void Actor::applyDmgRoles(QString& ret, Scene* const scene, const ArenaWidget* const actorEvent);
 extern template void Actor::applyStates(QString* const ret, Scene* const scene, const ArenaWidget* const spriteRun, bool const consume);
 extern template void Actor::setCurrentHp(QString* const ret, Scene* const scene, const ArenaWidget* const actorEvent, int const hp, bool const survive);
@@ -32,7 +33,8 @@ extern template void Scene::operator()(QString& ret, QVector<QVector<Actor*>*>& 
                                 bool const useGuards, int const surprise, int const mInit);
 extern template Scene::Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                       bool const useGuards, int const surprise, int const mInit);
-extern template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+extern template void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const Scene::SpriteAct* const spriteRun) const;
+extern template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target) const;
 extern template void Actor::applyDmgRoles(QString& ret, Scene* const scene, const Scene::SpriteAct* const actorEvent);
 extern template void Actor::applyStates(QString* const ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, bool const consume);
 extern template void Actor::setCurrentHp(QString* const ret, Scene* const scene, const Scene::SpriteAct* const actorEvent, int const hp, bool const survive);

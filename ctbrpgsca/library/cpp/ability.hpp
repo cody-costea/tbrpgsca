@@ -52,8 +52,9 @@ namespace tbrpgsca
         int removedStatesSize() const;
 
         void replenish(Actor& user) const;
+        void applyCosts(Actor& user) const;
         bool canPerform(const Actor& user) const;
-        void execute(QString& ret, Actor& user, Actor& target, bool const applyCosts) const;
+        void execute(QString& ret, Actor& user, Actor& target) const;
 
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                 int const hpCost, int const mpCost, int const spCost, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
@@ -72,7 +73,10 @@ namespace tbrpgsca
         QString* _sound;
 
         template <typename SpriteRun>
-        void execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target, bool const applyCosts) const;
+        void applyCosts(QString* ret, Actor& user, Scene* const scene, const SpriteRun* const spriteRun) const;
+
+        template <typename SpriteRun>
+        void execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target) const;
 
         friend class Actor;
         friend class Costume;
