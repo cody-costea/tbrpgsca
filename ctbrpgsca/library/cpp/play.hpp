@@ -40,12 +40,16 @@ The following negative values can also be used, but they are not safe and will l
 
 #define CONVERT_DELEGATE(Type, Attribute, Field) \
     Attribute operator Type() const { return Field; } \
-    Attribute operator Type*() const { return &(Field); } \
-    Attribute operator Type&() const { return Field; }
+    Attribute operator const Type*() const { return &(Field); } \
+    Attribute operator const Type&() const { return Field; } \
+    Attribute operator Type*() { return &(Field); } \
+    Attribute operator Type&() { return Field; }
 
 #define FORWARD_DELEGATE(Type, Attribute, Field) \
-    Attribute Type& operator*() const { return Field; } \
-    Attribute Type* operator->() const { return &(Field); }
+    Attribute const Type& operator*() const { return Field; } \
+    Attribute const Type* operator->() const { return &(Field); } \
+    Attribute Type* operator->() { return &(Field); } \
+    Attribute Type& operator*() { return Field; }
 
 #define FORWARD_DELEGATE_PTR(Type, Attribute, Field) \
     FORWARD_DELEGATE(Type, Attribute, *Field)
@@ -198,7 +202,8 @@ namespace
     class PtrList
     {
     protected:
-        inline static std::vector<void*> _ptrList;
+        inline static u_int32_t _null_idx = 0U;
+        inline static std::vector<void*> _ptr_list;
         //inline static std::mutex _locker;
         inline static QMutex _locker;
 
@@ -219,7 +224,7 @@ namespace
             return cmpsLevel > 1 ? 2 : cmpsLevel;
         }
 
-        u_int32_t _ptr = 0;
+        u_int32_t _ptr = 0U;
 
     protected:
         static bool clearList(uint32_t ptr)
@@ -234,7 +239,7 @@ namespace
                 auto uniqueLocker = QMutexLocker(&PtrList::_locker);
                 //uniqueLocker.lock();
                 //_locker.lock();
-                auto ptrList = &_ptrList;
+                auto ptrList = &_ptr_list;
                 if ((ptr >>= 1) == ptrList->size())
                 {
                     size_t ptrListLen;
@@ -243,10 +248,20 @@ namespace
                         ptrList->pop_back();
                     }
                     while ((ptrListLen = ptrList->size()) > 0 && (--ptr) == ptrListLen && ptrList->at(ptr - 1U) == nullptr);
+                    if (_null_idx > ptrListLen - 2)
+                    {
+                        _null_idx = 0U;
+                    }
+                    ptrList->shrink_to_fit();
                 }
                 else
                 {
-                    (*ptrList)[ptr - 1U] = nullptr;
+                    auto idx = ptr - 1U;
+                    (*ptrList)[idx] = nullptr;
+                    if (idx < _null_idx)
+                    {
+                        _null_idx = idx;
+                    }
                 }
                 uniqueLocker.unlock();
                 //_locker.unlock();
@@ -262,7 +277,7 @@ namespace
             auto uniqueLocker = QMutexLocker(&PtrList::_locker);
             //uniqueLocker.lock();
             //_locker.lock();
-            auto ptrList = &_ptrList;
+            auto ptrList = &_ptr_list;
             if (listed(oldPtr))
             {
                 oldPtr >>= 1;
@@ -272,20 +287,23 @@ namespace
                     return;
                 }
             }
-            size_t ptrListLen = ptrList->size();
-            for (uint32_t i = 0; i < ptrListLen; i += 1U)
+            uint32_t ptrListLen = ptrList->size();
+            for (uint32_t i = _null_idx; i < ptrListLen; i += 1U)
             {
                 if (ptrList->at(i) == nullptr)
                 {
+                    //_null_idx = i == ptrListLen - 1 ? 0U : i + 1U;
                     ptrList->operator[](i) = const_cast<void*>(reinterpret_cast<const void*>(ptr));
                     this->_ptr = (i << 1U) | 1U;
+                    _null_idx = i + 1U;
                     return;
                 }
             }
+            _null_idx = ptrListLen;
             ptrList->push_back(const_cast<void*>(reinterpret_cast<const void*>(ptr)));
-            this->_ptr = static_cast<uint32_t>(((ptrListLen + 1) << 1) | 1);            
+            this->_ptr = static_cast<uint32_t>(((ptrListLen + 1) << 1) | 1);
             //qDebug() << "listPtr: this->_ptr = " << _ptr;
-            uniqueLocker.unlock();
+            //uniqueLocker.unlock();
             //_locker.unlock();
         }
 
@@ -342,7 +360,7 @@ namespace
             }
             else if (listed(ptr))
             {
-                return static_cast<T*>(_ptrList[(ptr >> 1) - 1U]);
+                return static_cast<T*>(_ptr_list[(ptr >> 1) - 1U]);
             }
             else
             {
@@ -543,8 +561,8 @@ namespace
         }
 
     public:
-        //FORWARD_DELEGATE_PTR(T, inline, ptr())
-        //CONVERT_DELEGATE_PTR(T, inline, ptr())
+        FORWARD_DELEGATE_PTR(T, inline, ptr())
+        CONVERT_DELEGATE_PTR(T, inline, ptr())
         //CMPS_METHODS(BaseCnt<T COMMA C COMMA level>)
         inline auto detach(const bool always = true) const -> std::enable_if<(cow != 0), void>
         {
@@ -583,51 +601,6 @@ namespace
             this->setAddr(cloned.ptr());
         }*/
 
-        inline operator const T&() const
-        {
-            return *this->ptr();
-        }
-
-        inline operator const T*() const
-        {
-            return this->ptr();
-        }
-
-        inline const T* operator->() const
-        {
-            return this->ptr();
-        }
-
-        inline const T& operator*() const
-        {
-            return *this->ptr();
-        }
-
-        inline operator T() const
-        {
-            return *this->ptr();
-        }
-
-        inline T* operator->()
-        {
-            return this->ptr();
-        }
-
-        inline T& operator*()
-        {
-            return *this->ptr();
-        }
-
-        inline operator T&()
-        {
-            return *this->ptr();
-        }
-
-        inline operator T*()
-        {
-            return this->ptr();
-        }
-
         inline BaseCnt<T, cow, C, level>()
         {
             this->setAddr(nullptr);
@@ -660,7 +633,12 @@ namespace
             }
         }
 
-        inline T& obj() const
+        inline const T& obj() const
+        {
+            return *this->P::ptr();
+        }
+
+        inline T& obj()
         {
             return *this->P::ptr();
         }
@@ -681,7 +659,12 @@ namespace
         using P::setRef;*/
         //using P::ref;
 
-        inline auto ptr() const -> std::enable_if<(opt > 1), T*>
+        inline auto ptr() -> std::enable_if<(opt > 1), T*>
+        {
+            return this->P::ptr();
+        }
+
+        inline auto ptr() const -> std::enable_if<(opt > 1), const T*>
         {
             return this->P::ptr();
         }
@@ -841,7 +824,12 @@ namespace
             this->P::setPtr(&cloned);
         }
 
-        inline auto ref() const -> std::enable_if<opt == 0, T&>
+        inline auto ref() -> std::enable_if<opt == 0, T&>
+        {
+            return this->obj();
+        }
+
+        inline auto ref() const -> std::enable_if<opt == 0, const T&>
         {
             return this->obj();
         }
@@ -856,7 +844,12 @@ namespace
             return this->operator bool();
         }
 
-        inline auto refOrFail() const -> std::enable_if<opt != 0, T&>
+        inline auto refOrFail() -> std::enable_if<opt != 0, T&>
+        {
+            return this->obj();
+        }
+
+        inline auto refOrFail() const -> std::enable_if<opt != 0, const T&>
         {
             return this->obj();
         }
