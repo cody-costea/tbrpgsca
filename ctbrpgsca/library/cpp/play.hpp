@@ -8,32 +8,36 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef PLAY_HPP
 #define PLAY_HPP
 
-#include <QMap>
-#include <QDebug>
-#include <QCoreApplication>
-#include <QMutex>
-
-#include "library/translations.h"
-
 #include <atomic>
 #include <mutex>
+
+#include <QMap>
+#include <QDebug>
+#include <QMutex>
+#include <QCoreApplication>
+
+#include "library/translations.h"
 
 #if Q_PROCESSOR_WORDSIZE > 4
 /*
 If the COMPRESS_POINTERS macro is set to a non-zero value, 64bit pointers will be compressed into 32bit integers, according to the following options:
-    +3 can compress addresses up to 16GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
-    +2 can compress addresses up to 8GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
-    +1 can compress addresses up to 4GB, at the expense of the lower tag bit, which can no longer be used for other purporses
-Attempting to compress an address higher than the mentioned limits, will lead however to increased usage of both CPU and RAM;
+    +4 can compress addresses up to 16GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
+    +3 can compress addresses up to 8GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
+    +2 can compress addresses up to 4GB, at the expense of the lower tag bit, which can no longer be used for other purporses
+    +1 always stores the pointer in a thread-safe vector, returning its index, thus preserving its full form (including higher bits)
+Attempting to compress an address higher than the mentioned limits, will result in the pointer being stored in a thread-safe vector;
 The following negative values can also be used, but they are not safe and will lead to crashes, when the memory limits are exceeded:
     -4 can compress addresses up to 32GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
     -3 can compress addresses up to 16GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
+Setting the ALIGN_POINTERS macro can increase the number of lower bits available for compression, but will reduce usable memory
 */
     #define COMPRESS_POINTERS 4//3
+    #define ALIGN_POINTERS 8
 #else
     #define COMPRESS_POINTERS 0
+    #define ALIGN_POINTERS 0
 #endif
 
 #define USE_BIT_FIELDS 1
@@ -202,7 +206,7 @@ namespace
     class PtrList
     {
     protected:
-        inline static u_int32_t _null_idx = 0U;
+        inline static uint32_t _null_idx = 0U;
         inline static std::vector<void*> _ptr_list;
         //inline static std::mutex _locker;
         inline static QMutex _locker;
@@ -213,18 +217,29 @@ namespace
         }
     };
 
-    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 1> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>, protected PtrList
+    template<typename T, const int own = 0, const int level = COMPRESS_POINTERS - 2> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>, protected PtrList
     {
-        static constexpr uint CmpsLengthShift(int cmpsLevel)
+        static constexpr uint32_t CmpsLengthShift(int cmpsLevel)
         {
-            if (cmpsLevel < 0)
+            if (cmpsLevel == -1)
             {
-                cmpsLevel *= -1;
+                return 0;
             }
+            if (cmpsLevel < -1)
+            {
+                cmpsLevel = (cmpsLevel * -1) - 1;
+            }
+#if ALIGN_POINTERS
+            uint32_t bits = 0;
+            uint32_t alignment = ALIGN_POINTERS;
+            while (alignment >>= 1) bits += 1;
+            return static_cast<uint32_t>(cmpsLevel) > bits ? bits : cmpsLevel;
+#else
             return cmpsLevel > 1 ? 2 : cmpsLevel;
+#endif
         }
 
-        u_int32_t _ptr = 0U;
+        uint32_t _ptr = 0U;
 
     protected:
         static bool clearList(uint32_t ptr)
@@ -318,7 +333,7 @@ namespace
 
         void setAddr(T* const ptr)
         {
-            //qDebug() << "setAddr: ptr = " << ptr;
+            //qDebug() << "setAddr: ptr = " << QString::number(reinterpret_cast<uint64_t>(ptr), 2);
             if (this->ptr() == ptr)
             {
                 return;
@@ -328,20 +343,27 @@ namespace
                 this->setAddr(static_cast<std::nullptr_t>(nullptr));
                 return;
             }
-            uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-            if (addr < (4294967296UL << SHIFT_LEN))
-            //if (addr < (10000UL))
+            if constexpr(level == -1)
             {
-                //if constexpr(own)
-                {
-                    clearList(this->_ptr);
-                }
-                this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
-                //qDebug() << "setAddr: this->_ptr = " << _ptr;
+                this->listPtr(ptr);
             }
             else
             {
-                this->listPtr(ptr);
+                uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+                if (addr < (4294967296UL << SHIFT_LEN))
+                //if (addr < (10000UL))
+                {
+                    //if constexpr(own)
+                    {
+                        clearList(this->_ptr);
+                    }
+                    this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
+                    //qDebug() << "setAddr: this->_ptr = " << _ptr;
+                }
+                else
+                {
+                    this->listPtr(ptr);
+                }
             }
         }
 
@@ -424,7 +446,7 @@ namespace
             return cmpsLevel > 2 ? 3 : cmpsLevel;
         }
 
-        u_int32_t _ptr;
+        uint32_t _ptr;
 
     protected:
         inline void setAddr(std::nullptr_t)
@@ -509,14 +531,14 @@ namespace
         CONSTRUCT_CMPS_PTR(T, BaseCmp<T COMMA own COMMA level>, BasePtr<T COMMA BaseCmp<T COMMA own COMMA level>>)
     };
 
-    template <typename T, const int cow = 0, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class BaseCnt : protected BasePtr<T, BaseCnt<T, cow, C, level>>
+    template <typename T, const int cow = 0, const bool weak = false, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS> class BaseCnt : protected BasePtr<T, BaseCnt<T, cow, weak, C, level>>
     {
-        //static_assert(std::is_integral<C>::value, "Reference counter type must be an integral.");
+        static_assert(cow == 0 || !weak, "Copy-on-write not allowed for weak references.");
         BaseCmp<C, 0, 3> _ref_cnt;
         BaseCmp<T, 0, level> _ptr;
 
     protected:
-        inline void increase()
+        inline auto increase() -> std::enable_if<(!weak), void>
         {
             auto cnt = this->_ref_cnt;
             if (cnt)
@@ -525,7 +547,7 @@ namespace
             }
         }
 
-        inline void decrease()
+        inline auto decrease() -> std::enable_if<(!weak), void>
         {
             auto ptr = this->_ptr.ptr();
             if (ptr)
@@ -545,14 +567,17 @@ namespace
             this->_ref_cnt.setPtr(ptr ? new C(1U) : nullptr);
         }
 
-        inline void copy(const BaseCnt<T, cow, C, level>& cloned)
+        inline void copy(const BaseCnt<T, cow, weak, C, level>& cloned)
         {
-            cloned.increase();
+            if constexpr(!weak)
+            {
+                cloned.increase();
+            }
             this->_ptr = cloned._ptr;
             this->_ref_cnt = cloned._ref_cnt;
         }
 
-        inline void move(BaseCnt<T, cow, C, level>&& cloned)
+        inline void move(BaseCnt<T, cow, weak, C, level>&& cloned)
         {
             this->_ptr = cloned._ptr;
             this->_ref_cnt = cloned._ref_cnt;
@@ -590,6 +615,7 @@ namespace
             return this->_ptr.ptr();
         }
 
+        //inline auto setPtr(T* const ptr) -> std::enable_if<(!weak), void>
         inline void setPtr(T* const ptr)
         {
             this->decrease();
@@ -601,19 +627,22 @@ namespace
             this->setAddr(cloned.ptr());
         }*/
 
-        inline BaseCnt<T, cow, C, level>()
+        inline BaseCnt<T, cow, weak, C, level>()
         {
             this->setAddr(nullptr);
         }
 
-        inline ~BaseCnt<T, cow, C, level>()
+        inline ~BaseCnt<T, cow, weak, C, level>()
         {
-            this->decrease();
+            if constexpr(!weak)
+            {
+                this->decrease();
+            }
         }
 
         template <typename A, class B> friend class BasePtr;
 
-        CONSTRUCT_CMPS_PTR(T, BaseCnt<T COMMA cow COMMA C COMMA level>, BasePtr<T COMMA BaseCnt<T COMMA cow COMMA C COMMA level>>)
+        CONSTRUCT_CMPS_PTR(T, BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>, BasePtr<T COMMA BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>>)
     };
 
     template<typename T, class P, const int opt = -1> class BaseOpt : public P
@@ -944,12 +973,68 @@ namespace
     };
 }
 
+#if ALIGN_POINTERS
+#ifdef _MSC_VER
+inline void* alloc(const std::size_t size)
+{
+    return _aligned_malloc(size, ALIGN_POINTERS);
+}
+
+inline void clear(void* ptr) noexcept
+{
+    _aligned_free(ptr);
+}
+#else
+inline void* alloc(const std::size_t size)
+{
+    return std::aligned_alloc(ALIGN_POINTERS, size);
+}
+
+inline void clear(void* ptr) noexcept
+{
+    free(ptr);
+}
+#endif
+
+inline void* operator new(const std::size_t size, std::nothrow_t)
+{
+    return alloc(size);
+}
+
+inline void* operator new(const std::size_t size)
+{
+    auto ptr = alloc(size);
+    if (ptr)
+    {
+        return ptr;
+    }
+    else
+    {
+        throw std::bad_alloc {};
+    }
+}
+
+inline void operator delete(void* ptr) noexcept
+{
+    clear(ptr);
+}
+#else
+inline void* alloc(const std::size_t size)
+{
+    return std::malloc(size);
+}
+
+inline void clear(void* ptr) noexcept
+{
+    free(ptr);
+}
+#endif
 namespace tbrpgsca
 {
     template<typename T, const int own = 0, const int opt = -1, const int level = COMPRESS_POINTERS>
     using CmpsPtr = BaseOpt<T, BaseCmp<T, own, level>, opt>;
-    template<typename T, const int cow = 0, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS>
-    using CmpsCnt = BaseOpt<T, BaseCnt<T, cow, C, level>, opt>;
+    template<typename T, const bool weak, const int cow = 0, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = COMPRESS_POINTERS>
+    using CmpsCnt = BaseOpt<T, BaseCnt<T, cow, weak, C, level>, opt>;
 
     class Ability;
     class Costume;
