@@ -25,20 +25,23 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #if Q_PROCESSOR_WORDSIZE > 4
 /*
 If the COMPRESS_POINTERS macro is set to a non-zero value, 64bit pointers will be compressed into 32bit integers, according to the following options:
+    +5 can compress addresses up to 32GB, at the expense of the 4 lower tag bits, which can no longer be used for other purporses
     +4 can compress addresses up to 16GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
     +3 can compress addresses up to 8GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
     +2 can compress addresses up to 4GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     +1 always stores the pointer in a thread-safe vector, returning its index, thus preserving its full form (including higher bits)
 Attempting to compress an address higher than the mentioned limits, will result in the pointer being stored in a thread-safe vector;
 The following negative values can also be used, but they are not safe and will lead to crashes, when the memory limits are exceeded:
+    -5 can compress addresses up to 64GB, at the expense of the 4 lower tag bits, which can no longer be used for other purporses
     -4 can compress addresses up to 32GB, at the expense of the 3 lower tag bits, which can no longer be used for other purporses
     -3 can compress addresses up to 16GB, at the expense of the 2 lower tag bits, which can no longer be used for other purporses
     -2 can compress addresses up to 8GB, at the expense of the lower tag bit, which can no longer be used for other purporses
     -1 can compress addresses up to 4GB, leaving the 3 lower tag bits to be used for other purporses
-Setting the ALIGN_PTR_LOW_BITS macro can increase the number of lower bits available for compression, but will reduce usable memory
+Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the number of lower bits available in pointers for shifting,
+thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS 7//3
+    #define COMPRESS_POINTERS -7//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -170,14 +173,6 @@ Setting the ALIGN_PTR_LOW_BITS macro can increase the number of lower bits avail
     PROP_FLAG_GET(is##Name, Flag, GetLevel) \
     PROP_FLAG_SET_ALL(Class, Name, Flag, SetLevel, is##Name)
 
-#define CONSTRUCT_CMPS_PTR(Type, Class, Base) \
-    inline Class(const Class& cloned) : Base(cloned) {} \
-    inline Class(Class&& cloned) : Base(cloned) {} \
-    inline Class(Type* const ptr) : Base(ptr) {} \
-    inline Class(Type& ptr) : Base(ptr) {}
-
-#define COMMA ,
-
 namespace
 {
 
@@ -204,12 +199,12 @@ namespace
 
         inline const T& obj() const
         {
-            return *static_cast<const P*>(this)->P::ptr();
+            return *static_cast<const P*>(this)->P::addr();
         }
 
         inline T& obj()
         {
-            return *static_cast<P*>(this)->P::ptr();
+            return *static_cast<P*>(this)->P::addr();
         }
 
         inline BasePtr<T, P, opt>(const P& cloned)
@@ -235,61 +230,49 @@ namespace
 
         inline BasePtr<T, P, opt>()
         {
-            static_assert(opt != 0, "This reference is not optional and must be initialized.");
+            static_assert(opt != 0 && opt > -2, "This reference is not optional and must be initialized.");
         }
 
     public:
-        //using P::operator*;
-        //using P::operator->;
-
         FORWARD_DELEGATE(T, inline, def())
         CONVERT_DELEGATE(T, inline explicit, obj())
-        /*using P::operator bool;
-        using P::operator==;
-        using P::operator!=;
-        using P::operator>=;
-        using P::operator<=;
-        using P::operator>;
-        using P::operator<;
-        using P::setRef;*/
-        //using P::ref;
 
         inline auto ptr() -> std::enable_if<(opt > 1), T*>
         {
-            return static_cast<P*>(this)->P::ptr();
+            return static_cast<P*>(this)->P::addr();
         }
 
         inline auto ptr() const -> std::enable_if<(opt > 1), const T*>
         {
-            return static_cast<P*>(this)->P::ptr();
+            return static_cast<P*>(this)->P::addr();
         }
 
         inline auto swapPtr(T* const ptr) -> std::enable_if<(opt > 1), T*>
         {
-            auto _ptr = static_cast<P*>(this)->ptr();
-            static_cast<P*>(this)->P::setPtr(ptr);
+            auto _ptr = static_cast<P*>(this)->addr();
+            static_cast<P*>(this)->P::setPntr(ptr);
             return _ptr;
         }
 
-        inline auto takePtr() -> std::enable_if<(opt > 1), T*>
+        inline auto takeaddr() -> std::enable_if<(opt > 1), T*>
         {
             return this->swapPtr(nullptr);
         }
 
         inline auto withPtr(T* const ptr) -> std::enable_if<(opt > 1), P&>
         {
-            static_cast<P*>(this)->P::setPtr(ptr);
+            static_cast<P*>(this)->P::setPntr(ptr);
             return *this;
         }
 
-        inline auto resetPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
+        inline auto resetPntr(T* const ptr) -> std::enable_if<(opt > 1), void>
         {
-            auto _ptr = static_cast<P*>(this)->ptr();
+            auto _ptr = static_cast<P*>(this)->addr();
             if (_ptr)
             {
                 delete _ptr;
             }
-            static_cast<P*>(this)->P::setPtr(ptr);
+            static_cast<P*>(this)->P::setPntr(ptr);
         }
 
         inline T& operator()() const
@@ -309,21 +292,25 @@ namespace
             }
         }
 
-        inline auto operator=(std::nullptr_t) -> std::enable_if<(opt > 1), P&>
+        //inline auto operator=(std::nullptr_t) -> std::enable_if<(opt > 1), P&>
+        inline P& operator=(std::nullptr_t)
         {
-            static_cast<P*>(this)->P::setPtr(static_cast<std::nullptr_t>(nullptr));
-            return *this;
+            static_assert(opt > 1, "Assignment from pointers not allowed.");
+            static_cast<P*>(this)->P::setPntr(static_cast<std::nullptr_t>(nullptr));
+            return *static_cast<P*>(this);
         }
 
-        inline auto operator=(T* const ptr) -> std::enable_if<(opt > 1), P&>
+        //inline auto operator=(T* const ptr) -> std::enable_if<(opt > 1), P&>
+        inline P& operator=(T* const ptr)
         {
-            static_cast<P*>(this)->P::setPtr(ptr);
-            return *this;
+            static_assert(opt > 1, "Assignment from pointers not allowed.");
+            static_cast<P*>(this)->P::setPntr(ptr);
+            return *static_cast<P*>(this);
         }
 
         inline bool operator<(const T* const ptr) const
         {
-            return static_cast<P*>(this)->ptr() < ptr;
+            return static_cast<P*>(this)->addr() < ptr;
         }
 
         inline bool operator<(const P& cloned) const
@@ -333,7 +320,7 @@ namespace
 
         inline bool operator>(const T* const ptr) const
         {
-            return static_cast<P*>(this)->ptr() > ptr;
+            return static_cast<P*>(this)->addr() > ptr;
         }
 
         inline bool operator>(const P& cloned) const
@@ -343,7 +330,7 @@ namespace
 
         inline bool operator<=(const T* const ptr) const
         {
-            return static_cast<P*>(this)->ptr() <= ptr;
+            return static_cast<P*>(this)->addr() <= ptr;
         }
         inline bool operator<=(const P& cloned) const
         {
@@ -352,7 +339,7 @@ namespace
 
         inline bool operator>=(const T* const ptr) const
         {
-            return static_cast<P*>(this)->ptr() >= ptr;
+            return static_cast<P*>(this)->addr() >= ptr;
         }
 
         inline bool operator>=(const P& cloned) const
@@ -362,7 +349,7 @@ namespace
 
         inline bool operator==(const T* const ptr) const
         {
-            return static_cast<P*>(this)->ptr() == ptr;
+            return static_cast<P*>(this)->addr() == ptr;
         }
 
         inline bool operator==(const P& cloned) const
@@ -372,7 +359,7 @@ namespace
 
         inline bool operator!=(const T* const ptr) const
         {
-            return static_cast<P*>(this)->ptr() != ptr;
+            return static_cast<P*>(this)->addr() != ptr;
         }
 
         inline bool operator!=(const P& cloned)
@@ -398,25 +385,24 @@ namespace
             return *static_cast<P*>(this);
         }
 
-        inline P& operator=(const T& cloned)
+        //inline auto operator=(const T& cloned) -> std::enable_if<(opt > -2), P&>
+        inline P& operator=(T& cloned)
         {
-            static_cast<P*>(this)->P::setPtr(&(const_cast<T&>(cloned)));
+            //this->setRef(cloned);
+            //return *(static_cast<P*>(this));
+            static_assert(opt > -2, "Cannot re-assign weak reference.");
+            static_cast<P*>(this)->P::setPntr(&(const_cast<T&>(cloned)));
             return *static_cast<P*>(this);
         }
 
-        inline auto setPtr(std::nullptr_t) -> std::enable_if<(opt > 0), void>
+        inline auto setPtr(std::nullptr_t) -> std::enable_if<(opt > 1), void>
         {
-            static_cast<P*>(this)->P::setPtr(static_cast<std::nullptr_t>(nullptr));
+            static_cast<P*>(this)->P::setPntr(static_cast<std::nullptr_t>(nullptr));
         }
 
-        /*inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 0), void>
+        inline auto setRef(T& cloned) -> std::enable_if<(opt > -2), void>
         {
-            static_cast<P*>(this)->P::setPtr(ptr);
-        }*/
-
-        inline void setRef(T& cloned)
-        {
-            static_cast<P*>(this)->P::setPtr(&cloned);
+            static_cast<P*>(this)->P::setPntr(&cloned);
         }
 
         inline auto ref() -> std::enable_if<opt == 0, T&>
@@ -431,7 +417,7 @@ namespace
 
         inline auto resetRef() -> std::enable_if<(opt > 0), void>
         {
-            static_cast<P*>(this)->P::setPtr(nullptr);
+            static_cast<P*>(this)->P::setPntr(nullptr);
         }
 
         inline auto hasRef() const -> std::enable_if<opt != 0, bool>
@@ -451,18 +437,18 @@ namespace
 
         inline auto refOrElse(T& def) const -> std::enable_if<opt != 0, T&>
         {
-            T* ptr = static_cast<P*>(this)->P::ptr();
+            auto ptr = static_cast<P*>(this)->P::addr();
             return ptr ? *ptr : def;
         }
 
         template<typename... Args>
-        inline auto refOrNew(Args&&... args) -> std::enable_if<opt != 0, T&>
+        inline auto refOrNew(Args&&... args) -> std::enable_if<(opt != 0 && opt > -2), T&>
         {
-            T* ptr = static_cast<P*>(this)->P::ptr();
+            auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr == nullptr)
             {
                 ptr = new T(std::forward<Args>(args)...);
-                static_cast<P*>(this)->P::setPtr(ptr);
+                static_cast<P*>(this)->P::setPntr(ptr);
             }
             return *ptr;
         }
@@ -472,26 +458,26 @@ namespace
             return this->def();
         }
 
-        inline auto refOrSet(T& def) -> std::enable_if<opt != 0, T&>
+        inline auto refOrSet(T& def) -> std::enable_if<(opt != 0 && opt > -2), T&>
         {
-            T* ptr = static_cast<P*>(this)->P::ptr();
+            auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr == nullptr)
             {
                 ptr = &def;
-                static_cast<P*>(this)->P::setPtr(ptr);
+                static_cast<P*>(this)->P::setPntr(ptr);
             }
             return *ptr;
         }
 
         inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
         {
-            static_cast<P*>(this)->P::setPtr(ptr);
+            static_cast<P*>(this)->P::setPntr(ptr);
         }
 
         template<typename F>
         inline auto runIfRef(F callback) -> std::enable_if<opt != 0, void>
         {
-            T* ptr = static_cast<P*>(this)->P::ptr();
+            auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr)
             {
                 callback(*ptr);
@@ -501,7 +487,7 @@ namespace
         template<typename F, typename R>
         inline auto callIfRef(F callback, R defValue) -> std::enable_if<opt != 0, R>
         {
-            T* ptr = static_cast<P*>(this)->P::ptr();
+            auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr)
             {
                 return callback(*ptr);
@@ -540,7 +526,7 @@ namespace
             {
                 cmpsLevel = (cmpsLevel * -1) - 1;
             }
-#if ALIGN_PTR_LOW_BITS
+#if ALIGN_PTR_LOW_BITS > 0
 #define ALIGN_POINTERS 1U << ALIGN_PTR_LOW_BITS
             uint32_t bits = ALIGN_PTR_LOW_BITS - 1;
             return static_cast<uint32_t>(cmpsLevel) > bits ? bits : cmpsLevel;
@@ -594,6 +580,23 @@ namespace
             return true;
         }
 
+        inline T* addr() const
+        {
+            const uint32_t ptr = this->_ptr;
+            if (ptr == 0)
+            {
+                return nullptr;
+            }
+            else if (listed(ptr))
+            {
+                return static_cast<T*>(_ptr_list[(ptr >> 1) - 1U]);
+            }
+            else
+            {
+                return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
+            }
+        }
+
         void listPtr(T* const ptr)
         {
             //qDebug() << "listPtr: ptr = " << ptr;
@@ -645,7 +648,7 @@ namespace
         {
             //qDebug() << "level = " << level;
             //qDebug() << "setAddr: ptr = " << QString::number(reinterpret_cast<uint64_t>(ptr), 2);
-            if (this->ptr() == ptr)
+            if (this->addr() == ptr)
             {
                 return;
             }
@@ -686,30 +689,13 @@ namespace
             return !listed(this->_ptr);
         }
 
-        inline T* ptr() const
-        {
-            const uint32_t ptr = this->_ptr;
-            if (ptr == 0)
-            {
-                return nullptr;
-            }
-            else if (listed(ptr))
-            {
-                return static_cast<T*>(_ptr_list[(ptr >> 1) - 1U]);
-            }
-            else
-            {
-                return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
-            }
-        }
-
         inline BaseCmp<T, own, opt, level>() {}
 
         inline ~BaseCmp<T, own, opt, level>()
         {
             if constexpr(own)
             {
-                auto ptr = this->ptr();
+                auto ptr = this->addr();
                 if (ptr)
                 {
                     clearList(this->_ptr);
@@ -719,7 +705,8 @@ namespace
         }
 #else
 #define CMPS_LEVEL COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0
-    template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL> class BaseCmp : public BasePtr<T, BaseCmp<T, own, opt, level>, opt>
+    template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL>
+    class BaseCmp : public BasePtr<T, BaseCmp<T, own, opt, level>, opt>
     {
     #if COMPRESS_POINTERS == 0
         static constexpr uint CmpsLengthShift(const int cmpsLevel)
@@ -741,14 +728,14 @@ namespace
             return false;
         }
 
-        inline T* ptr() const
+        inline T* addr() const
         {
             return this->_ptr;
         }
 
         inline BaseCmp<T, own, opt, level>()
         {
-            this->setPtr(nullptr);
+            this->setPntr(nullptr);
         }
     #else
         static constexpr uint CmpsLengthShift(int cmpsLevel)
@@ -757,7 +744,7 @@ namespace
             {
                 cmpsLevel *= -1;
             }
-#if ALIGN_PTR_LOW_BITS
+#if ALIGN_PTR_LOW_BITS > 0
 #define ALIGN_POINTERS 1U << ALIGN_PTR_LOW_BITS
             uint32_t bits = ALIGN_PTR_LOW_BITS;
             return static_cast<uint32_t>(cmpsLevel) > bits ? bits : cmpsLevel;
@@ -787,7 +774,7 @@ namespace
             return true;
         }
 
-        inline T* ptr() const
+        inline T* addr() const
         {
             return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
         }
@@ -802,7 +789,7 @@ namespace
         {
             if constexpr(own)
             {
-                auto ptr = this->ptr();
+                auto ptr = this->addr();
                 if (ptr)
                 {
                     delete ptr;
@@ -829,11 +816,19 @@ namespace
             cloned._ptr = 0U;
         }
 
+        inline void setPntr(std::nullptr_t)
+        {
+            static_assert(!own, "Attempting to change unique pointer.");
+            this->setAddr(static_cast<std::nullptr_t>(nullptr));
+        }
+
+        inline void setPntr(T* const ptr)
+        {
+            static_assert(!own, "Attempting to change unique pointer.");
+            this->setAddr(ptr);
+        }
+
     public:
-        //using P::ref;
-        //FORWARD_DELEGATE_PTR(T, inline, ptr());
-        //CONVERT_DELEGATE_PTR(T, inline, ptr());
-        //CMPS_METHODS(BaseCmp<T COMMA own COMMA level>)
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::BasePtr;
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator*;
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator->;
@@ -846,28 +841,14 @@ namespace
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator>;
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator<;
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator=;
-        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::setRef;
-
-        inline void setPtr(std::nullptr_t)
-        {
-            static_assert(!own, "Attempting to change unique pointer.");
-            this->setAddr(static_cast<std::nullptr_t>(nullptr));
-        }
-
-        inline void setPtr(T* const ptr)
-        {
-            static_assert(!own, "Attempting to change unique pointer.");
-            this->setAddr(ptr);
-        }
+        //using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::setRef;
 
         template <typename A, class B, const int o> friend class BasePtr;
-
-        //CONSTRUCT_CMPS_PTR(T, BaseCmp<T COMMA own COMMA opt COMMA level>, BasePtr<T COMMA BaseCmp<T COMMA own COMMA opt COMMA level>>)
     };
 
     template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
               typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
-    class BaseCnt : public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>
+    class BaseCnt : public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
     {
         static_assert(cow > 0 || !weak, "Copy-on-write not allowed for weak references.");
         BaseCmp<C, 0, 2, 3> _ref_cnt;
@@ -885,10 +866,10 @@ namespace
 
         inline auto decrease() -> std::enable_if<(!weak), void>
         {
-            auto ptr = this->_ptr.ptr();
+            auto ptr = this->_ptr.addr();
             if (ptr)
             {
-                auto cnt = this->_ref_cnt.ptr();
+                auto cnt = this->_ref_cnt.addr();
                 if (--(*cnt) == 0U)
                 {
                     delete ptr;
@@ -897,10 +878,15 @@ namespace
             }
         }
 
+        inline T* addr() const
+        {
+            return this->_ptr.addr();
+        }
+
         void setAddr(T* const ptr)
         {
-            this->_ptr.setPtr(ptr);            
-            this->_ref_cnt.setPtr(ptr ? new C(1U) : nullptr);
+            this->_ptr.setPntr(ptr);
+            this->_ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
         }
 
         inline void copy(const BaseCnt<T, cow, weak, opt, C, level>& cloned)
@@ -921,55 +907,66 @@ namespace
             cloned._ptr._ptr = 0U;
         }
 
+        inline auto setPntr(T* const ptr) -> std::enable_if<(!weak), void>
+        //inline void setPntr(T* const ptr)
+        {
+            this->decrease();
+            this->setAddr(ptr);
+        }
+
     public:
-        //FORWARD_DELEGATE_PTR(T, inline, ptr())
-        //CONVERT_DELEGATE_PTR(T, inline, ptr())
-        //CMPS_METHODS(BaseCnt<T COMMA C COMMA level>)        
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::BasePtr;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator*;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator->;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator();
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator bool;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator==;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator!=;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator>=;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator<=;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator>;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator<;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator=;
-        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::setRef;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::BasePtr;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator*;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator->;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator();
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator bool;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator==;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator!=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator>=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator<=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator>;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator<;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator=;
+        //using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::setRef;
 
         inline auto detach(const bool always = true) const -> std::enable_if<(cow != 0), void>
         {
-            auto ptr = this->_ptr.ptr();
+            auto ptr = this->_ptr.addr();
             if (ptr)
             {
                 if (always || (*this->_ref_cnt) > 1)
                 {
-                    this->setPtr(new T(*ptr));
+                    this->setPntr(new T(*ptr));
                 }
             }
         }
 
-        inline const T* ptr() const
+        inline auto ptr() const -> std::enable_if<(opt > 1), std::conditional<weak, const BaseCnt<T, 0, false, opt, C, level>, const T*>>
         {
-            return this->_ptr.ptr();
-        }
-
-        inline T* ptr()
-        {
-            if constexpr(cow > 0)
+            if constexpr(weak)
             {
-                this->detach(false);
+                return *this;
             }
-            return this->_ptr.ptr();
+            else
+            {
+                return this->addr();
+            }
         }
 
-        //inline auto setPtr(T* const ptr) -> std::enable_if<(!weak), void>
-        inline void setPtr(T* const ptr)
+        inline auto ptr() -> std::enable_if<(opt > 1), std::conditional<weak, BaseCnt<T, 0, false, opt, C, level>, T*>>
         {
-            this->decrease();
-            this->setAddr(ptr);
+            if constexpr(weak)
+            {
+                return *this;
+            }
+            else
+            {
+                if constexpr(cow > 0)
+                {
+                    this->detach(false);
+                }
+                return this->_ptr.addr();
+            }
         }
 
         inline auto weakRef() -> std::enable_if<(cow > 0 && !weak), BaseCnt<T, 0, true, opt, C, level>>
@@ -984,7 +981,7 @@ namespace
 
         /*inline CmprShr(const BaseCmp<T, false, level>& cloned)
         {
-            this->setAddr(cloned.ptr());
+            this->setAddr(cloned.addr());
         }*/
 
         inline BaseCnt<T, cow, weak, opt, C, level>()
@@ -1001,40 +998,6 @@ namespace
         }
 
         template <typename A, class B, const int o> friend class BasePtr;
-
-        //CONSTRUCT_CMPS_PTR(T, BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>, BasePtr<T COMMA BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>>)
-    };
-
-    template<typename T, class P, const int opt = -1> class BaseOpt : public P
-    {
-        static_assert(std::is_base_of<BasePtr<T, P>, P>::value, "Only references to compressed pointer types can be extended.");
-
-
-
-        /*inline BaseOpt<T, P, opt>& operator=(T& cloned)
-        {
-            return static_cast<BaseOpt<T, P, opt>&>(P::operator=(cloned));
-        }
-
-        inline BaseOpt<T, P>& operator=(T* const cloned) = delete;
-
-        inline BaseOpt<T, P>& operator=(const P& cloned) = delete;*/
-
-        inline BaseOpt<T, P, opt>(const T& cloned) : P(cloned) {}
-        inline BaseOpt<T, P, opt>(const T* cloned) : P(cloned)
-        {
-            static_assert(opt > 1, "Construction from pointers not allowed.");
-        }
-        inline BaseOpt<T, P, opt>(P&& moved) : P(std::forward<P&&>(moved)) {}
-        inline BaseOpt<T, P, opt>(const P& cloned) : P(cloned) {}
-        inline BaseOpt<T, P, opt>(const P* cloned) : P(cloned)
-        {
-            static_assert(opt > 1, "Construction from pointers not allowed.");
-        }
-        inline BaseOpt<T, P, opt>() : P()
-        {
-            static_assert(opt, "Reference is not optional.");
-        }
     };
 }
 
