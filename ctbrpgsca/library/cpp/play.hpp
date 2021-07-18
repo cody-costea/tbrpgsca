@@ -41,7 +41,7 @@ Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the numbe
 thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS -7//3
+    #define COMPRESS_POINTERS 7//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -254,7 +254,7 @@ namespace
             return _ptr;
         }
 
-        inline auto takeaddr() -> std::enable_if<(opt > 1), T*>
+        inline auto takePtr() -> std::enable_if<(opt > 1), T*>
         {
             return this->swapPtr(nullptr);
         }
@@ -265,13 +265,13 @@ namespace
             return *this;
         }
 
-        inline auto resetPntr(T* const ptr) -> std::enable_if<(opt > 1), void>
+        inline auto resetPtr(T* const ptr = nullptr) -> std::enable_if<(opt > 1), void>
         {
-            auto _ptr = static_cast<P*>(this)->addr();
+            /*auto _ptr = static_cast<P*>(this)->addr();
             if (_ptr)
             {
                 delete _ptr;
-            }
+            }*/
             static_cast<P*>(this)->P::setPntr(ptr);
         }
 
@@ -417,7 +417,7 @@ namespace
 
         inline auto resetRef() -> std::enable_if<(opt > 0), void>
         {
-            static_cast<P*>(this)->P::setPntr(nullptr);
+            static_cast<P*>(this)->P::setPntr(static_cast<std::nullptr_t>(nullptr));
         }
 
         inline auto hasRef() const -> std::enable_if<opt != 0, bool>
