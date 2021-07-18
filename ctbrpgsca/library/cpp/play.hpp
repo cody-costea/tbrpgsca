@@ -181,35 +181,336 @@ Setting the ALIGN_PTR_LOW_BITS macro can increase the number of lower bits avail
 namespace
 {
 
-    template <typename T, class P> class BasePtr
+    template <typename T, class P, const int opt = -1> class BasePtr
     {
-    protected:template<typename... Args>
+    protected:
+        template<typename... Args>
         inline static P make(Args&&... args)
         {
             return P(new T(std::forward<Args>(args)...));
         }
 
-        inline BasePtr<T, P>(const P& cloned)
+        inline T& def() const
+        {
+            if constexpr(std::is_default_constructible<T>::value)
+            {
+                return (const_cast<BasePtr<T, P, opt>*>(this))->refOrNew();
+            }
+            else
+            {
+                return const_cast<BasePtr<T, P, opt>*>(this)->obj();
+            }
+        }
+
+        inline const T& obj() const
+        {
+            return *static_cast<const P*>(this)->P::ptr();
+        }
+
+        inline T& obj()
+        {
+            return *static_cast<P*>(this)->P::ptr();
+        }
+
+        inline BasePtr<T, P, opt>(const P& cloned)
         {
             static_cast<P*>(this)->P::copy(cloned);
         }
 
-        inline BasePtr<T, P>(P&& cloned)
+        inline BasePtr<T, P, opt>(P&& cloned)
         {
             static_cast<P*>(this)->P::move(std::forward<P&&>(cloned));
         }
 
-        inline BasePtr<T, P>(T& ptr)
+        inline BasePtr<T, P, opt>(T& ptr)
         {
             static_cast<P*>(this)->P::setAddr(&ptr);
         }
 
-        inline BasePtr<T, P>(T* const ptr)
+        inline BasePtr<T, P, opt>(T* const ptr)
         {
+            static_assert(opt != 0, "This reference is not optional and cannot be initialized from nullable pointers.");
             static_cast<P*>(this)->P::setAddr(ptr);
         }
 
-        inline BasePtr<T, P>() {}
+        inline BasePtr<T, P, opt>()
+        {
+            static_assert(opt != 0, "This reference is not optional and must be initialized.");
+        }
+
+    public:
+        //using P::operator*;
+        //using P::operator->;
+
+        FORWARD_DELEGATE(T, inline, def())
+        CONVERT_DELEGATE(T, inline explicit, obj())
+        /*using P::operator bool;
+        using P::operator==;
+        using P::operator!=;
+        using P::operator>=;
+        using P::operator<=;
+        using P::operator>;
+        using P::operator<;
+        using P::setRef;*/
+        //using P::ref;
+
+        inline auto ptr() -> std::enable_if<(opt > 1), T*>
+        {
+            return static_cast<P*>(this)->P::ptr();
+        }
+
+        inline auto ptr() const -> std::enable_if<(opt > 1), const T*>
+        {
+            return static_cast<P*>(this)->P::ptr();
+        }
+
+        inline auto swapPtr(T* const ptr) -> std::enable_if<(opt > 1), T*>
+        {
+            auto _ptr = static_cast<P*>(this)->ptr();
+            static_cast<P*>(this)->P::setPtr(ptr);
+            return _ptr;
+        }
+
+        inline auto takePtr() -> std::enable_if<(opt > 1), T*>
+        {
+            return this->swapPtr(nullptr);
+        }
+
+        inline auto withPtr(T* const ptr) -> std::enable_if<(opt > 1), P&>
+        {
+            static_cast<P*>(this)->P::setPtr(ptr);
+            return *this;
+        }
+
+        inline auto resetPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
+        {
+            auto _ptr = static_cast<P*>(this)->ptr();
+            if (_ptr)
+            {
+                delete _ptr;
+            }
+            static_cast<P*>(this)->P::setPtr(ptr);
+        }
+
+        inline T& operator()() const
+        {
+            return this->def();
+        }
+
+        inline operator bool() const
+        {
+            if constexpr(opt != 0)
+            {
+                return static_cast<P*>(this)->_ptr;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        inline auto operator=(std::nullptr_t) -> std::enable_if<(opt > 1), P&>
+        {
+            static_cast<P*>(this)->P::setPtr(static_cast<std::nullptr_t>(nullptr));
+            return *this;
+        }
+
+        inline auto operator=(T* const ptr) -> std::enable_if<(opt > 1), P&>
+        {
+            static_cast<P*>(this)->P::setPtr(ptr);
+            return *this;
+        }
+
+        inline bool operator<(const T* const ptr) const
+        {
+            return static_cast<P*>(this)->ptr() < ptr;
+        }
+
+        inline bool operator<(const P& cloned) const
+        {
+            return static_cast<P*>(this)->_ptr < cloned._ptr;
+        }
+
+        inline bool operator>(const T* const ptr) const
+        {
+            return static_cast<P*>(this)->ptr() > ptr;
+        }
+
+        inline bool operator>(const P& cloned) const
+        {
+            return static_cast<P*>(this)->_ptr > cloned._ptr;
+        }
+
+        inline bool operator<=(const T* const ptr) const
+        {
+            return static_cast<P*>(this)->ptr() <= ptr;
+        }
+        inline bool operator<=(const P& cloned) const
+        {
+            return static_cast<P*>(this)->_ptr <= cloned._ptr;
+        }
+
+        inline bool operator>=(const T* const ptr) const
+        {
+            return static_cast<P*>(this)->ptr() >= ptr;
+        }
+
+        inline bool operator>=(const P& cloned) const
+        {
+            return static_cast<P*>(this)->_ptr >= cloned._ptr;
+        }
+
+        inline bool operator==(const T* const ptr) const
+        {
+            return static_cast<P*>(this)->ptr() == ptr;
+        }
+
+        inline bool operator==(const P& cloned) const
+        {
+            return static_cast<P*>(this)->_ptr == cloned._ptr;
+        }
+
+        inline bool operator!=(const T* const ptr) const
+        {
+            return static_cast<P*>(this)->ptr() != ptr;
+        }
+
+        inline bool operator!=(const P& cloned)
+        {
+            return static_cast<P*>(this)->_ptr != cloned._ptr;
+        }
+
+        inline P& operator=(P&& cloned)
+        {
+            if (this != &cloned)
+            {
+                static_cast<P*>(this)->move(std::forward<P&&>(cloned));
+            }
+            return *static_cast<P*>(this);
+        }
+
+        inline P& operator=(const P& cloned)
+        {
+            if (this != &cloned)
+            {
+                static_cast<P*>(this)->copy(cloned);
+            }
+            return *static_cast<P*>(this);
+        }
+
+        inline P& operator=(const T& cloned)
+        {
+            static_cast<P*>(this)->P::setPtr(&(const_cast<T&>(cloned)));
+            return *static_cast<P*>(this);
+        }
+
+        inline auto setPtr(std::nullptr_t) -> std::enable_if<(opt > 0), void>
+        {
+            static_cast<P*>(this)->P::setPtr(static_cast<std::nullptr_t>(nullptr));
+        }
+
+        /*inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 0), void>
+        {
+            static_cast<P*>(this)->P::setPtr(ptr);
+        }*/
+
+        inline void setRef(T& cloned)
+        {
+            static_cast<P*>(this)->P::setPtr(&cloned);
+        }
+
+        inline auto ref() -> std::enable_if<opt == 0, T&>
+        {
+            return this->obj();
+        }
+
+        inline auto ref() const -> std::enable_if<opt == 0, const T&>
+        {
+            return this->obj();
+        }
+
+        inline auto resetRef() -> std::enable_if<(opt > 0), void>
+        {
+            static_cast<P*>(this)->P::setPtr(nullptr);
+        }
+
+        inline auto hasRef() const -> std::enable_if<opt != 0, bool>
+        {
+            return this->operator bool();
+        }
+
+        inline auto refOrFail() -> std::enable_if<opt != 0, T&>
+        {
+            return this->obj();
+        }
+
+        inline auto refOrFail() const -> std::enable_if<opt != 0, const T&>
+        {
+            return this->obj();
+        }
+
+        inline auto refOrElse(T& def) const -> std::enable_if<opt != 0, T&>
+        {
+            T* ptr = static_cast<P*>(this)->P::ptr();
+            return ptr ? *ptr : def;
+        }
+
+        template<typename... Args>
+        inline auto refOrNew(Args&&... args) -> std::enable_if<opt != 0, T&>
+        {
+            T* ptr = static_cast<P*>(this)->P::ptr();
+            if (ptr == nullptr)
+            {
+                ptr = new T(std::forward<Args>(args)...);
+                static_cast<P*>(this)->P::setPtr(ptr);
+            }
+            return *ptr;
+        }
+
+        inline auto refOrDef() const -> std::enable_if<std::is_nothrow_default_constructible<T>::value, T&>
+        {
+            return this->def();
+        }
+
+        inline auto refOrSet(T& def) -> std::enable_if<opt != 0, T&>
+        {
+            T* ptr = static_cast<P*>(this)->P::ptr();
+            if (ptr == nullptr)
+            {
+                ptr = &def;
+                static_cast<P*>(this)->P::setPtr(ptr);
+            }
+            return *ptr;
+        }
+
+        inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
+        {
+            static_cast<P*>(this)->P::setPtr(ptr);
+        }
+
+        template<typename F>
+        inline auto runIfRef(F callback) -> std::enable_if<opt != 0, void>
+        {
+            T* ptr = static_cast<P*>(this)->P::ptr();
+            if (ptr)
+            {
+                callback(*ptr);
+            }
+        }
+
+        template<typename F, typename R>
+        inline auto callIfRef(F callback, R defValue) -> std::enable_if<opt != 0, R>
+        {
+            T* ptr = static_cast<P*>(this)->P::ptr();
+            if (ptr)
+            {
+                return callback(*ptr);
+            }
+            else
+            {
+                return defValue;
+            }
+        }
     };
 #if COMPRESS_POINTERS > 0
     class PtrList
@@ -226,7 +527,8 @@ namespace
         }
     };
 #define CMPS_LEVEL COMPRESS_POINTERS - 2
-    template<typename T, const int own = 0, const int level = CMPS_LEVEL> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>, protected PtrList
+    template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL>
+    class BaseCmp : public BasePtr<T, BaseCmp<T, own, opt, level>, opt>, protected PtrList
     {
         static constexpr uint32_t CmpsLengthShift(int cmpsLevel)
         {
@@ -401,9 +703,9 @@ namespace
             }
         }
 
-        inline BaseCmp() {}
+        inline BaseCmp<T, own, opt, level>() {}
 
-        inline ~BaseCmp()
+        inline ~BaseCmp<T, own, opt, level>()
         {
             if constexpr(own)
             {
@@ -417,7 +719,7 @@ namespace
         }
 #else
 #define CMPS_LEVEL COMPRESS_POINTERS < -1 ? COMPRESS_POINTERS + 1 : 0
-    template<typename T, const int own = 0, const int level = CMPS_LEVEL> class BaseCmp : protected BasePtr<T, BaseCmp<T, own, level>>
+    template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL> class BaseCmp : public BasePtr<T, BaseCmp<T, own, opt, level>, opt>
     {
     #if COMPRESS_POINTERS == 0
         static constexpr uint CmpsLengthShift(const int cmpsLevel)
@@ -444,7 +746,7 @@ namespace
             return this->_ptr;
         }
 
-        inline BaseCmp()
+        inline BaseCmp<T, own, opt, level>()
         {
             this->setPtr(nullptr);
         }
@@ -456,6 +758,7 @@ namespace
                 cmpsLevel *= -1;
             }
 #if ALIGN_PTR_LOW_BITS
+#define ALIGN_POINTERS 1U << ALIGN_PTR_LOW_BITS
             uint32_t bits = ALIGN_PTR_LOW_BITS;
             return static_cast<uint32_t>(cmpsLevel) > bits ? bits : cmpsLevel;
 #else
@@ -489,13 +792,13 @@ namespace
             return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
         }
 
-        inline BaseCmp()
+        inline BaseCmp<T, own, opt, level>()
         {
             this->_ptr = 0U;
         }
     #endif
     public:
-        inline ~BaseCmp()
+        inline ~BaseCmp<T, own, opt, level>()
         {
             if constexpr(own)
             {
@@ -510,26 +813,40 @@ namespace
     protected:
         static constexpr int SHIFT_LEN = CmpsLengthShift(level);
 
-        inline void copy(const BaseCmp<T, own, level>& cloned)
+        inline void copy(const BaseCmp<T, own, opt, level>& cloned)
         {
             static_assert(own < 1, "Attempting to clone unique pointer.");
             this->_ptr = cloned._ptr;
             if constexpr(own < 0)
             {
-                const_cast<BaseCmp<T, own, level>&>(cloned)._ptr = 0U;
+                const_cast<BaseCmp<T, own, opt, level>&>(cloned)._ptr = 0U;
             }
         }
 
-        inline void move(BaseCmp<T, own, level>&& cloned)
+        inline void move(BaseCmp<T, own, opt, level>&& cloned)
         {
             this->_ptr = cloned._ptr;
             cloned._ptr = 0U;
         }
 
     public:
-        FORWARD_DELEGATE_PTR(T, inline, ptr());
-        CONVERT_DELEGATE_PTR(T, inline, ptr());
+        //using P::ref;
+        //FORWARD_DELEGATE_PTR(T, inline, ptr());
+        //CONVERT_DELEGATE_PTR(T, inline, ptr());
         //CMPS_METHODS(BaseCmp<T COMMA own COMMA level>)
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::BasePtr;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator*;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator->;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator();
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator bool;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator==;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator!=;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator>=;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator<=;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator>;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator<;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator=;
+        using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::setRef;
 
         inline void setPtr(std::nullptr_t)
         {
@@ -543,16 +860,18 @@ namespace
             this->setAddr(ptr);
         }
 
-        template <typename A, class B> friend class BasePtr;
+        template <typename A, class B, const int o> friend class BasePtr;
 
-        CONSTRUCT_CMPS_PTR(T, BaseCmp<T COMMA own COMMA level>, BasePtr<T COMMA BaseCmp<T COMMA own COMMA level>>)
+        //CONSTRUCT_CMPS_PTR(T, BaseCmp<T COMMA own COMMA opt COMMA level>, BasePtr<T COMMA BaseCmp<T COMMA own COMMA opt COMMA level>>)
     };
 
-    template <typename T, const int cow = 0, const bool weak = false, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL> class BaseCnt : protected BasePtr<T, BaseCnt<T, cow, weak, C, level>>
+    template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
+              typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
+    class BaseCnt : public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>
     {
         static_assert(cow > 0 || !weak, "Copy-on-write not allowed for weak references.");
-        BaseCmp<C, 0, 3> _ref_cnt;
-        BaseCmp<T, 0, level> _ptr;
+        BaseCmp<C, 0, 2, 3> _ref_cnt;
+        BaseCmp<T, 0, 2, level> _ptr;
 
     protected:
         inline auto increase() -> std::enable_if<(!weak), void>
@@ -584,7 +903,7 @@ namespace
             this->_ref_cnt.setPtr(ptr ? new C(1U) : nullptr);
         }
 
-        inline void copy(const BaseCnt<T, cow, weak, C, level>& cloned)
+        inline void copy(const BaseCnt<T, cow, weak, opt, C, level>& cloned)
         {
             if constexpr(!weak)
             {
@@ -594,7 +913,7 @@ namespace
             this->_ref_cnt = cloned._ref_cnt;
         }
 
-        inline void move(BaseCnt<T, cow, weak, C, level>&& cloned)
+        inline void move(BaseCnt<T, cow, weak, opt, C, level>&& cloned)
         {
             this->_ptr = cloned._ptr;
             this->_ref_cnt = cloned._ref_cnt;
@@ -603,9 +922,23 @@ namespace
         }
 
     public:
-        FORWARD_DELEGATE_PTR(T, inline, ptr())
-        CONVERT_DELEGATE_PTR(T, inline, ptr())
-        //CMPS_METHODS(BaseCnt<T COMMA C COMMA level>)
+        //FORWARD_DELEGATE_PTR(T, inline, ptr())
+        //CONVERT_DELEGATE_PTR(T, inline, ptr())
+        //CMPS_METHODS(BaseCnt<T COMMA C COMMA level>)        
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::BasePtr;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator*;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator->;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator();
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator bool;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator==;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator!=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator>=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator<=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator>;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator<;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::operator=;
+        using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, opt>::setRef;
+
         inline auto detach(const bool always = true) const -> std::enable_if<(cow != 0), void>
         {
             auto ptr = this->_ptr.ptr();
@@ -639,12 +972,12 @@ namespace
             this->setAddr(ptr);
         }
 
-        inline auto weakRef() -> std::enable_if<(cow > 0 && !weak), BaseCnt<T, 0, true, C, level>>
+        inline auto weakRef() -> std::enable_if<(cow > 0 && !weak), BaseCnt<T, 0, true, opt, C, level>>
         {
             return *this;
         }
 
-        inline auto sharedRef() -> std::enable_if<(weak), BaseCnt<T, 0, false, C, level>>
+        inline auto sharedRef() -> std::enable_if<(weak), BaseCnt<T, 0, false, opt, C, level>>
         {
             return *this;
         }
@@ -654,12 +987,12 @@ namespace
             this->setAddr(cloned.ptr());
         }*/
 
-        inline BaseCnt<T, cow, weak, C, level>()
+        inline BaseCnt<T, cow, weak, opt, C, level>()
         {
             this->setAddr(nullptr);
         }
 
-        inline ~BaseCnt<T, cow, weak, C, level>()
+        inline ~BaseCnt<T, cow, weak, opt, C, level>()
         {
             if constexpr(!weak)
             {
@@ -667,311 +1000,16 @@ namespace
             }
         }
 
-        template <typename A, class B> friend class BasePtr;
+        template <typename A, class B, const int o> friend class BasePtr;
 
-        CONSTRUCT_CMPS_PTR(T, BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>, BasePtr<T COMMA BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>>)
+        //CONSTRUCT_CMPS_PTR(T, BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>, BasePtr<T COMMA BaseCnt<T COMMA cow COMMA weak COMMA C COMMA level>>)
     };
 
     template<typename T, class P, const int opt = -1> class BaseOpt : public P
     {
         static_assert(std::is_base_of<BasePtr<T, P>, P>::value, "Only references to compressed pointer types can be extended.");
 
-    protected:
-        inline T& def() const
-        {
-            if constexpr(std::is_default_constructible<T>::value)
-            {
-                return (const_cast<BaseOpt<T, P, opt>*>(this))->refOrNew();
-            }
-            else
-            {
-                return this->refOrFail();
-            }
-        }
 
-        inline const T& obj() const
-        {
-            return *this->P::ptr();
-        }
-
-        inline T& obj()
-        {
-            return *this->P::ptr();
-        }
-
-    public:
-        using P::operator*;
-        using P::operator->;
-
-        //FORWARD_DELEGATE(T, inline, def())
-        CONVERT_DELEGATE(T, inline explicit, obj())
-        /*using P::operator bool;
-        using P::operator==;
-        using P::operator!=;
-        using P::operator>=;
-        using P::operator<=;
-        using P::operator>;
-        using P::operator<;
-        using P::setRef;*/
-        //using P::ref;
-
-        inline auto ptr() -> std::enable_if<(opt > 1), T*>
-        {
-            return this->P::ptr();
-        }
-
-        inline auto ptr() const -> std::enable_if<(opt > 1), const T*>
-        {
-            return this->P::ptr();
-        }
-
-        inline auto swapPtr(T* const ptr) -> std::enable_if<(opt > 1), T*>
-        {
-            auto _ptr = this->ptr();
-            this->P::setPtr(ptr);
-            return _ptr;
-        }
-
-        inline auto takePtr() -> std::enable_if<(opt > 1), T*>
-        {
-            return this->swapPtr(nullptr);
-        }
-
-        inline auto withPtr(T* const ptr) -> std::enable_if<(opt > 1), BaseOpt<T, P, opt>&>
-        {
-            this->P::setPtr(ptr);
-            return *this;
-        }
-
-        inline auto resetPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
-        {
-            auto _ptr = this->ptr();
-            if (_ptr)
-            {
-                delete _ptr;
-            }
-            this->P::setPtr(ptr);
-        }
-
-        inline T& operator()() const
-        {
-            return this->def();
-        }
-
-        inline operator bool() const
-        {
-            if constexpr(opt != 0)
-            {
-                return this->_ptr;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        inline auto operator=(std::nullptr_t) -> std::enable_if<(opt > 1), BaseOpt<T, P, opt>&>
-        {
-            this->P::setPtr(static_cast<std::nullptr_t>(nullptr));
-            return *this;
-        }
-
-        inline auto operator=(T* const ptr) -> std::enable_if<(opt > 1), BaseOpt<T, P, opt>&>
-        {
-            this->P::setPtr(ptr);
-            return *this;
-        }
-
-        inline bool operator<(const T* const ptr) const
-        {
-            return this->ptr() < ptr;
-        }
-
-        inline bool operator<(const BaseOpt<T, P, opt>& cloned) const
-        {
-            return this->_ptr < cloned._ptr;
-        }
-
-        inline bool operator>(const T* const ptr) const
-        {
-            return this->ptr() > ptr;
-        }
-
-        inline bool operator>(const BaseOpt<T, P, opt>& cloned) const
-        {
-            return this->_ptr > cloned._ptr;
-        }
-
-        inline bool operator<=(const T* const ptr) const
-        {
-            return this->ptr() <= ptr;
-        }
-        inline bool operator<=(const BaseOpt<T, P, opt>& cloned) const
-        {
-            return this->_ptr <= cloned._ptr;
-        }
-
-        inline bool operator>=(const T* const ptr) const
-        {
-            return this->ptr() >= ptr;
-        }
-
-        inline bool operator>=(const BaseOpt<T, P, opt>& cloned) const
-        {
-            return this->_ptr >= cloned._ptr;
-        }
-
-        inline bool operator==(const T* const ptr) const
-        {
-            return this->ptr() == ptr;
-        }
-
-        inline bool operator==(const BaseOpt<T, P, opt>& cloned) const
-        {
-            return this->_ptr == cloned._ptr;
-        }
-
-        inline bool operator!=(const T* const ptr) const
-        {
-            return this->ptr() != ptr;
-        }
-
-        inline bool operator!=(const BaseOpt<T, P, opt>& cloned)
-        {
-            return this->_ptr != cloned._ptr;
-        }
-
-        inline BaseOpt<T, P, opt>& operator=(BaseOpt<T, P, opt>&& cloned)
-        {
-            if (this != &cloned)
-            {
-                this->move(std::forward<BaseOpt<T, P, opt>&&>(cloned));
-            }
-            return *this;
-        }
-
-        inline BaseOpt<T, P, opt>& operator=(const BaseOpt<T, P, opt>& cloned)
-        {
-            if (this != &cloned)
-            {
-                this->copy(cloned);
-            }
-            return *this;
-        }
-
-        inline BaseOpt<T, P, opt>& operator=(T& cloned)
-        {
-            this->P::setPtr(&cloned);
-            return *this;
-        }
-
-        inline auto setPtr(std::nullptr_t) -> std::enable_if<(opt > 0), void>
-        {
-            this->P::setPtr(static_cast<std::nullptr_t>(nullptr));
-        }
-
-        /*inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 0), void>
-        {
-            this->P::setPtr(ptr);
-        }*/
-
-        inline void setRef(T& cloned)
-        {
-            this->P::setPtr(&cloned);
-        }
-
-        inline auto ref() -> std::enable_if<opt == 0, T&>
-        {
-            return this->obj();
-        }
-
-        inline auto ref() const -> std::enable_if<opt == 0, const T&>
-        {
-            return this->obj();
-        }
-
-        inline auto resetRef() -> std::enable_if<(opt > 0), void>
-        {
-            this->P::setPtr(nullptr);
-        }
-
-        inline auto hasRef() const -> std::enable_if<opt != 0, bool>
-        {
-            return this->operator bool();
-        }
-
-        inline auto refOrFail() -> std::enable_if<opt != 0, T&>
-        {
-            return this->obj();
-        }
-
-        inline auto refOrFail() const -> std::enable_if<opt != 0, const T&>
-        {
-            return this->obj();
-        }
-
-        inline auto refOrElse(T& def) const -> std::enable_if<opt != 0, T&>
-        {
-            T* ptr = this->P::ptr();
-            return ptr ? *ptr : def;
-        }
-
-        template<typename... Args>
-        inline auto refOrNew(Args&&... args) -> std::enable_if<opt != 0, T&>
-        {
-            T* ptr = this->P::ptr();
-            if (ptr == nullptr)
-            {
-                ptr = new T(std::forward<Args>(args)...);
-                this->P::setPtr(ptr);
-            }
-            return *ptr;
-        }
-
-        inline auto refOrDef() const -> std::enable_if<std::is_nothrow_default_constructible<T>::value, T&>
-        {
-            return this->def();
-        }
-
-        inline auto refOrSet(T& def) -> std::enable_if<opt != 0, T&>
-        {
-            T* ptr = this->P::ptr();
-            if (ptr == nullptr)
-            {
-                ptr = &def;
-                this->P::setPtr(ptr);
-            }
-            return *ptr;
-        }
-
-        inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
-        {
-            this->P::setPtr(ptr);
-        }
-
-        template<typename F>
-        inline auto runIfRef(F callback) -> std::enable_if<opt != 0, void>
-        {
-            T* ptr = this->P::ptr();
-            if (ptr)
-            {
-                callback(*ptr);
-            }
-        }
-
-        template<typename F, typename R>
-        inline auto callIfRef(F callback, R defValue) -> std::enable_if<opt != 0, R>
-        {
-            T* ptr = this->P::ptr();
-            if (ptr)
-            {
-                return callback(*ptr);
-            }
-            else
-            {
-                return defValue;
-            }
-        }
 
         /*inline BaseOpt<T, P, opt>& operator=(T& cloned)
         {
@@ -1066,9 +1104,9 @@ inline void clear(void* ptr) noexcept
 namespace tbrpgsca
 {
     template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL>
-    using CmpsPtr = BaseOpt<T, BaseCmp<T, own, level>, opt>;
+    using CmpsPtr = BaseCmp<T, own, opt, level>;
     template<typename T, const bool weak, const int cow = 0, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
-    using CmpsCnt = BaseOpt<T, BaseCnt<T, cow, weak, C, level>, opt>;
+    using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
 
     class Ability;
     class Costume;
