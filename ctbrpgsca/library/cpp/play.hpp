@@ -237,43 +237,43 @@ namespace
         FORWARD_DELEGATE(T, inline, def())
         CONVERT_DELEGATE(T, inline explicit, obj())
 
-        inline auto ptr() -> std::enable_if<(opt > 1), T*>
+        template<typename R = T*>
+        inline auto ptr() -> std::enable_if_t<(opt > 1), R>
         {
             return static_cast<P*>(this)->P::addr();
         }
 
-        inline auto ptr() const -> std::enable_if<(opt > 1), const T*>
+        template<typename R = const T*>
+        inline auto ptr() const -> std::enable_if_t<(opt > 1), R>
         {
             return static_cast<P*>(this)->P::addr();
         }
 
-        inline auto swapPtr(T* const ptr) -> std::enable_if<(opt > 1), T*>
+        template<typename R = T*>
+        inline auto swapPtr(T* const ptr) -> std::enable_if_t<(opt > 1), R>
         {
             auto _ptr = static_cast<P*>(this)->addr();
             static_cast<P*>(this)->P::setPntr(ptr);
             return _ptr;
         }
 
-        inline auto takePtr() -> std::enable_if<(opt > 1), T*>
+        template<typename R = T*>
+        inline auto takePtr() -> std::enable_if_t<(opt > 1), R>
         {
             return this->swapPtr(nullptr);
         }
 
-        inline auto withPtr(T* const ptr) -> std::enable_if<(opt > 1), P&>
+        template<typename R = P&>
+        inline auto withPtr(T* const ptr) -> std::enable_if_t<(opt > 1), R>
         {
             static_cast<P*>(this)->P::setPntr(ptr);
             return *this;
         }
 
-        inline auto resetPtr(T* const ptr = nullptr) -> std::enable_if<(opt > 1), void>
+        /*inline auto resetPtr(T* const ptr = nullptr) -> std::enable_if_t<(opt > 1), void>
         {
-            /*auto _ptr = static_cast<P*>(this)->addr();
-            if (_ptr)
-            {
-                delete _ptr;
-            }*/
             static_cast<P*>(this)->P::setPntr(ptr);
-        }
+        }*/
 
         inline T& operator()() const
         {
@@ -292,7 +292,7 @@ namespace
             }
         }
 
-        //inline auto operator=(std::nullptr_t) -> std::enable_if<(opt > 1), P&>
+        //inline auto operator=(std::nullptr_t) -> std::enable_if_t<(opt > 1), P&>
         inline P& operator=(std::nullptr_t)
         {
             static_assert(opt > 1, "Assignment from pointers not allowed.");
@@ -300,7 +300,7 @@ namespace
             return *static_cast<P*>(this);
         }
 
-        //inline auto operator=(T* const ptr) -> std::enable_if<(opt > 1), P&>
+        //inline auto operator=(T* const ptr) -> std::enable_if_t<(opt > 1), P&>
         inline P& operator=(T* const ptr)
         {
             static_assert(opt > 1, "Assignment from pointers not allowed.");
@@ -385,7 +385,7 @@ namespace
             return *static_cast<P*>(this);
         }
 
-        //inline auto operator=(const T& cloned) -> std::enable_if<(opt > -2), P&>
+        //inline auto operator=(const T& cloned) -> std::enable_if_t<(opt > -2), P&>
         inline P& operator=(T& cloned)
         {
             //this->setRef(cloned);
@@ -395,54 +395,63 @@ namespace
             return *static_cast<P*>(this);
         }
 
-        inline auto setPtr(std::nullptr_t) -> std::enable_if<(opt > 1), void>
+        template<typename R = void>
+        inline auto setPtr(std::nullptr_t) -> std::enable_if_t<(opt > 1), R>
         {
             static_cast<P*>(this)->P::setPntr(static_cast<std::nullptr_t>(nullptr));
         }
 
-        inline auto setRef(T& cloned) -> std::enable_if<(opt > -2), void>
+        template<typename R = void>
+        inline auto setRef(T& cloned) -> std::enable_if_t<(opt > -2), R>
         {
             static_cast<P*>(this)->P::setPntr(&cloned);
         }
 
-        inline auto ref() -> std::enable_if<opt == 0, T&>
+        template<typename R = T&>
+        inline auto ref() -> std::enable_if_t<opt == 0, R>
         {
             return this->obj();
         }
 
-        inline auto ref() const -> std::enable_if<opt == 0, const T&>
+        template<typename R = const T&>
+        inline auto ref() const -> std::enable_if_t<opt == 0, R>
         {
             return this->obj();
         }
 
-        inline auto resetRef() -> std::enable_if<(opt > 0), void>
+        template<typename R = void>
+        inline auto resetRef() -> std::enable_if_t<(opt > 0), R>
         {
             static_cast<P*>(this)->P::setPntr(static_cast<std::nullptr_t>(nullptr));
         }
 
-        inline auto hasRef() const -> std::enable_if<opt != 0, bool>
+        template<typename R = bool>
+        inline auto hasRef() const -> std::enable_if_t<opt != 0, R>
         {
             return this->operator bool();
         }
 
-        inline auto refOrFail() -> std::enable_if<opt != 0, T&>
+        template<typename R = T&>
+        inline auto refOrFail() -> std::enable_if_t<opt != 0, R>
         {
             return this->obj();
         }
 
-        inline auto refOrFail() const -> std::enable_if<opt != 0, const T&>
+        template<typename R = const T&>
+        inline auto refOrFail() const -> std::enable_if_t<opt != 0, R>
         {
             return this->obj();
         }
 
-        inline auto refOrElse(T& def) const -> std::enable_if<opt != 0, T&>
+        template<typename R = T&>
+        inline auto refOrElse(T& def) const -> std::enable_if_t<opt != 0, R>
         {
             auto ptr = static_cast<P*>(this)->P::addr();
             return ptr ? *ptr : def;
         }
 
-        template<typename... Args>
-        inline auto refOrNew(Args&&... args) -> std::enable_if<(opt != 0 && opt > -2), T&>
+        template<typename... Args, typename R = T&>
+        inline auto refOrNew(Args&&... args) -> std::enable_if_t<(opt != 0 && opt > -2), R>
         {
             auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr == nullptr)
@@ -453,12 +462,14 @@ namespace
             return *ptr;
         }
 
-        inline auto refOrDef() const -> std::enable_if<std::is_nothrow_default_constructible<T>::value, T&>
+        template<typename R = T&>
+        inline auto refOrDef() const -> std::enable_if_t<std::is_nothrow_default_constructible<T>::value, R>
         {
             return this->def();
         }
 
-        inline auto refOrSet(T& def) -> std::enable_if<(opt != 0 && opt > -2), T&>
+        template<typename R = T&>
+        inline auto refOrSet(T& def) -> std::enable_if_t<(opt != 0 && opt > -2), R>
         {
             auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr == nullptr)
@@ -469,13 +480,14 @@ namespace
             return *ptr;
         }
 
-        inline auto setPtr(T* const ptr) -> std::enable_if<(opt > 1), void>
+        template<typename R = void>
+        inline auto setPtr(T* const ptr) -> std::enable_if_t<(opt > 1), R>
         {
             static_cast<P*>(this)->P::setPntr(ptr);
         }
 
-        template<typename F>
-        inline auto runIfRef(F callback) -> std::enable_if<opt != 0, void>
+        template<typename F, typename R = void>
+        inline auto runIfRef(F callback) -> std::enable_if_t<opt != 0, R>
         {
             auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr)
@@ -485,7 +497,7 @@ namespace
         }
 
         template<typename F, typename R>
-        inline auto callIfRef(F callback, R defValue) -> std::enable_if<opt != 0, R>
+        inline auto callIfRef(F callback, R defValue) -> std::enable_if_t<opt != 0, R>
         {
             auto ptr = static_cast<P*>(this)->P::addr();
             if (ptr)
@@ -843,19 +855,22 @@ namespace
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator=;
         //using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::setRef;
 
-        template <typename A, class B, const int o> friend class BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template <typename, class, const int> friend class BasePtr;
+
     };
 
     template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
               typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     class BaseCnt : public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
     {
-        static_assert(cow > 0 || !weak, "Copy-on-write not allowed for weak references.");
+        static_assert(cow == 0 || !weak, "Copy-on-write not allowed for weak references.");
         BaseCmp<C, 0, 2, 3> _ref_cnt;
         BaseCmp<T, 0, 2, level> _ptr;
 
     protected:
-        inline auto increase() -> std::enable_if<(!weak), void>
+        template<typename R = void>
+        inline auto increase() -> std::enable_if_t<(!weak), R>
         {
             auto cnt = this->_ref_cnt;
             if (cnt)
@@ -864,7 +879,8 @@ namespace
             }
         }
 
-        inline auto decrease() -> std::enable_if<(!weak), void>
+        template<typename R = void>
+        inline auto decrease() -> std::enable_if_t<(!weak), R>
         {
             auto ptr = this->_ptr.addr();
             if (ptr)
@@ -907,7 +923,8 @@ namespace
             cloned._ptr._ptr = 0U;
         }
 
-        inline auto setPntr(T* const ptr) -> std::enable_if<(!weak), void>
+        template<typename R = void>
+        inline auto setPntr(T* const ptr) -> std::enable_if_t<(!weak), R>
         //inline void setPntr(T* const ptr)
         {
             this->decrease();
@@ -929,7 +946,8 @@ namespace
         using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::operator=;
         //using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::setRef;
 
-        inline auto detach(const bool always = true) const -> std::enable_if<(cow != 0), void>
+        template<typename R = void>
+        inline auto detach(const bool always = true) const -> std::enable_if_t<(cow != 0), R>
         {
             auto ptr = this->_ptr.addr();
             if (ptr)
@@ -941,7 +959,8 @@ namespace
             }
         }
 
-        inline auto ptr() const -> std::enable_if<(opt > 1), std::conditional<weak, const BaseCnt<T, 0, false, opt, C, level>, const T*>>
+        template<typename R = std::conditional_t<weak, const BaseCnt<T, 0, false, opt, C, level>, const T*>>
+        inline auto ptr() const -> std::enable_if_t<(opt > 1), R>
         {
             if constexpr(weak)
             {
@@ -953,7 +972,8 @@ namespace
             }
         }
 
-        inline auto ptr() -> std::enable_if<(opt > 1), std::conditional<weak, BaseCnt<T, 0, false, opt, C, level>, T*>>
+        template<typename R = std::conditional_t<weak, BaseCnt<T, 0, false, opt, C, level>, T*>>
+        inline auto ptr() -> std::enable_if_t<(opt > 1), R>
         {
             if constexpr(weak)
             {
@@ -969,12 +989,14 @@ namespace
             }
         }
 
-        inline auto weakRef() -> std::enable_if<(cow > 0 && !weak), BaseCnt<T, 0, true, opt, C, level>>
+        template<typename R = BaseCnt<T, 0, true, opt, C, level>>
+        inline auto weakRef() -> std::enable_if_t<(cow > 0 && !weak), R>
         {
             return *this;
         }
 
-        inline auto sharedRef() -> std::enable_if<(weak), BaseCnt<T, 0, false, opt, C, level>>
+        template<typename R = BaseCnt<T, 0, false, opt, C, level>>
+        inline auto sharedRef() -> std::enable_if_t<(weak), R>
         {
             return *this;
         }
