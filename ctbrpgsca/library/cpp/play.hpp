@@ -860,13 +860,99 @@ namespace
 
     };
 
+    template <typename T, typename C, const int level>
+    struct CntData
+    {
+    protected:
+        BaseCmp<C, 0, 2, 9> _ref_cnt;
+        BaseCmp<T, 0, 2, level> _ptr;
+    };
+
+    template <typename T, typename P, typename C, const int level>
+    struct ShrData : T
+    {
+    protected:
+        BaseCmp<std::vector<BaseCmp<P, 0, 2, 3>>, 0, 2, 9> _weak_vct;
+        BaseCmp<QMutex, 0, 2, 9> _locker;
+
+        void track(P& weakRef)
+        {
+            auto locker = this->_locker.ptr();
+            if (locker == nullptr)
+            {
+                locker = new QMutex;
+                this->_locker.setPtr(locker);
+            }
+            auto uniqueLocker = QMutexLocker(locker);
+            auto weakVct = this->_weak_vct.ptr();
+            if (weakVct == nullptr)
+            {
+                weakVct = new std::vector<BaseCmp<P, 0, 2, 3>>;
+                this->_weak_vct.setPtr(weakVct);
+            }
+            weakVct.push_back(BaseCmp<P, 0, 2, 3>(weakRef));
+            //uniqueLocker.unlock();
+        }
+
+        void untrack(P* weakRef)
+        {
+            auto locker = this->_locker.ptr();
+            if (locker)
+            {
+                auto uniqueLocker = QMutexLocker(locker);
+                auto weakVct = this->_weak_vct.ptr();
+                if (weakVct)
+                {
+                    auto weakEnd = weakVct.end();
+                    for (auto itr = weakVct.begin(); itr != weakEnd; ++itr)
+                    {
+                        if (itr->addr() == weakRef)
+                        {
+                            weakVct.erase(itr);
+                            break;
+                        }
+                    }
+                }
+                //uniqueLocker.unlock();
+            }
+
+        }
+
+        void nullify()
+        {
+            auto locker = this->_locker.ptr();
+            if (locker)
+            {
+                auto uniqueLocker = QMutexLocker(locker);
+                auto weakVct = this->_weak_vct.ptr();
+                if (weakVct)
+                {
+                    const int vctSize = weakVct.size();
+                    for (unsigned int i = 0; i < vctSize; i += 1)
+                    {
+                        ((*weakVct)[i])->setPtr(nullptr);
+                    }
+                }
+                delete weakVct;
+                this->_locker.setPtr(nullptr);
+                //this->_weak_vct.setPtr(nullptr);
+                uniqueLocker.unlock();
+                delete locker;
+            }
+        }
+
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template <typename, class, const int> friend class BasePtr;
+    };
+
     template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
               typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
-    class BaseCnt : public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
+    class BaseCnt : public std::conditional_t<cow == 0, ShrData<CntData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, CntData<T, C, level>>,
+                    public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
     {
-        static_assert(cow == 0 || !weak, "Copy-on-write not allowed for weak references.");
-        BaseCmp<C, 0, 2, 3> _ref_cnt;
-        BaseCmp<T, 0, 2, level> _ptr;
+        static_assert(cow < 1 || !weak, "Copy-on-write not allowed for weak references.");
+        //BaseCmp<C, 0, 2, 3> _ref_cnt;
+        //BaseCmp<T, 0, 2, level> _ptr;
 
     protected:
         template<typename R = void>
@@ -885,6 +971,10 @@ namespace
             auto ptr = this->_ptr.addr();
             if (ptr)
             {
+                if constexpr(cow == 0 && !weak) //tracking weak references
+                {
+                    this->nullify();
+                }
                 auto cnt = this->_ref_cnt.addr();
                 if (--(*cnt) == 0U)
                 {
@@ -913,12 +1003,24 @@ namespace
             }
             this->_ptr = cloned._ptr;
             this->_ref_cnt = cloned._ref_cnt;
+            if constexpr(cow == 0)
+            {
+                this->_weak_vct = cloned._weak_vct;
+                this->_locker = cloned._locker;
+            }
         }
 
         inline void move(BaseCnt<T, cow, weak, opt, C, level>&& cloned)
         {
             this->_ptr = cloned._ptr;
-            this->_ref_cnt = cloned._ref_cnt;
+            this->_ref_cnt = cloned._ref_cnt;            
+            if constexpr(cow == 0)
+            {
+                this->_weak_vct = cloned._weak_vct;
+                this->_locker = cloned._locker;
+                cloned._weak_vct._ptr = 0U;
+                cloned._locker._ptr = 0U;
+            }
             cloned._ref_cnt._ptr = 0U;
             cloned._ptr._ptr = 0U;
         }
@@ -992,7 +1094,16 @@ namespace
         template<typename R = BaseCnt<T, 0, true, opt, C, level>>
         inline auto weakRef() -> std::enable_if_t<(cow > 0 && !weak), R>
         {
-            return *this;
+            if constexpr(cow == 0) //tracking weak references
+            {
+                BaseCnt<T, 0, true, opt, C, level> weakRef = *this;
+                this->track(weakRef);
+                return weakRef;
+            }
+            else
+            {
+                return *this;
+            }
         }
 
         template<typename R = BaseCnt<T, 0, false, opt, C, level>>
@@ -1013,7 +1124,14 @@ namespace
 
         inline ~BaseCnt<T, cow, weak, opt, C, level>()
         {
-            if constexpr(!weak)
+            if constexpr(weak)
+            {
+                if constexpr(cow == 0) //tracking weak references
+                {
+                    this->untrack(this);
+                }
+            }
+            else
             {
                 this->decrease();
             }
