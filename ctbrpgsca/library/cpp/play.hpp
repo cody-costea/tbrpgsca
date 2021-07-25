@@ -214,7 +214,7 @@ namespace
 
         inline BasePtr<T, P, opt>(P&& cloned)
         {
-            static_cast<P*>(this)->P::move(std::forward<P&&>(cloned));
+            static_cast<P*>(this)->P::move(std::forward<P>(cloned));
         }
 
         inline BasePtr<T, P, opt>(T& ptr)
@@ -371,7 +371,7 @@ namespace
         {
             if (this != &cloned)
             {
-                static_cast<P*>(this)->move(std::forward<P&&>(cloned));
+                static_cast<P*>(this)->move(std::forward<P>(cloned));
             }
             return *static_cast<P*>(this);
         }
@@ -586,7 +586,7 @@ namespace
                         _null_idx = idx;
                     }
                 }
-                uniqueLocker.unlock();
+                //uniqueLocker.unlock();
                 //_locker.unlock();
             }
             return true;
@@ -856,6 +856,9 @@ namespace
         //using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::setRef;
 
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template <typename, typename, typename, const int> friend struct RefData;
+        template <typename, typename, typename, const int> friend struct ShrData;
+        template <typename, typename, const int> friend struct CntData;
         template <typename, class, const int> friend class BasePtr;
 
     };
@@ -866,14 +869,27 @@ namespace
     protected:
         BaseCmp<C, 0, 2, 9> _ref_cnt;
         BaseCmp<T, 0, 2, level> _ptr;
+
+        inline CntData<T, C, level>& data()
+        {
+            return *this;
+        }
+
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template <typename, typename, typename, const int> friend struct RefData;
     };
 
     template <typename T, typename P, typename C, const int level>
     struct ShrData : T
     {
     protected:
-        BaseCmp<std::vector<BaseCmp<P, 0, 2, 3>>, 0, 2, 9> _weak_vct;
+        BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9> _weak_vct;
         BaseCmp<QMutex, 0, 2, 9> _locker;
+
+        inline ShrData<T, P, C, level>& data()
+        {
+            return *this;
+        }
 
         void track(P& weakRef)
         {
@@ -887,10 +903,10 @@ namespace
             auto weakVct = this->_weak_vct.ptr();
             if (weakVct == nullptr)
             {
-                weakVct = new std::vector<BaseCmp<P, 0, 2, 3>>;
+                weakVct = new std::vector<BaseCmp<P, 0, 2, 9>>;
                 this->_weak_vct.setPtr(weakVct);
             }
-            weakVct.push_back(BaseCmp<P, 0, 2, 3>(weakRef));
+            weakVct.push_back(BaseCmp<P, 0, 2, 9>(weakRef));
             //uniqueLocker.unlock();
         }
 
@@ -906,7 +922,7 @@ namespace
                     auto weakEnd = weakVct.end();
                     for (auto itr = weakVct.begin(); itr != weakEnd; ++itr)
                     {
-                        if (itr->addr() == weakRef)
+                        if ((*itr)->addr() == weakRef)
                         {
                             weakVct.erase(itr);
                             break;
@@ -927,10 +943,10 @@ namespace
                 auto weakVct = this->_weak_vct.ptr();
                 if (weakVct)
                 {
-                    const int vctSize = weakVct.size();
+                    const int vctSize = weakVct->size();
                     for (unsigned int i = 0; i < vctSize; i += 1)
                     {
-                        ((*weakVct)[i])->setPtr(nullptr);
+                        ((*weakVct)[i])->setAddr(nullptr);
                     }
                 }
                 delete weakVct;
@@ -942,12 +958,48 @@ namespace
         }
 
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template <typename, typename, typename, const int> friend struct RefData;
+        template <typename, class, const int> friend class BasePtr;
+    };
+
+    template <typename T, typename P, typename C, const int level>
+    struct RefData
+    {
+    protected:
+        BaseCmp<ShrData<T, P, C, level>, 1, 2, 9> _ref_data;
+
+        inline ShrData<T, P, C, level>& data()
+        {
+            return *(this->_ref_data.ptr());
+        }
+
+        inline void track(P& weakRef)
+        {
+            this->data().track(weakRef);
+        }
+
+        inline void untrack(P* weakRef)
+        {
+            this->data().untrack(weakRef);
+        }
+
+        inline void nullify()
+        {
+            this->data().nullify();
+        }
+
+        RefData<T, P, C, level>()
+        {
+            this->_ref_data = BaseCmp<ShrData<T, P, C, level>, 1, 2, 9>(new ShrData<T, P, C, level>);
+        }
+
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
         template <typename, class, const int> friend class BasePtr;
     };
 
     template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
               typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
-    class BaseCnt : public std::conditional_t<cow == 0, ShrData<CntData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, CntData<T, C, level>>,
+    class BaseCnt : public std::conditional_t<cow == 0, RefData<CntData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, CntData<T, C, level>>,
                     public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
     {
         static_assert(cow < 1 || !weak, "Copy-on-write not allowed for weak references.");
@@ -958,7 +1010,7 @@ namespace
         template<typename R = void>
         inline auto increase() -> std::enable_if_t<(!weak), R>
         {
-            auto cnt = this->_ref_cnt;
+            auto cnt = this->data()._ref_cnt;
             if (cnt)
             {
                 (*cnt) += 1U;
@@ -968,14 +1020,14 @@ namespace
         template<typename R = void>
         inline auto decrease() -> std::enable_if_t<(!weak), R>
         {
-            auto ptr = this->_ptr.addr();
+            auto ptr = this->data()._ptr.addr();
             if (ptr)
             {
                 if constexpr(cow == 0 && !weak) //tracking weak references
                 {
                     this->nullify();
                 }
-                auto cnt = this->_ref_cnt.addr();
+                auto cnt = this->data()._ref_cnt.addr();
                 if (--(*cnt) == 0U)
                 {
                     delete ptr;
@@ -986,13 +1038,22 @@ namespace
 
         inline T* addr() const
         {
-            return this->_ptr.addr();
+            /*if constexpr(cow == 0 && weak) //tracking weak references
+            {
+                auto locker = this->data()._locker.ptr();
+                if (locker)
+                {
+                    auto uniqueLocker = QMutexLocker(locker);
+                    return this->data()._ptr.addr();
+                }
+            }*/
+            return const_cast<BaseCnt<T, cow, weak, opt, C, level>*>(this)->data()._ptr.addr();
         }
 
-        void setAddr(T* const ptr)
+        inline void setAddr(T* const ptr)
         {
-            this->_ptr.setPntr(ptr);
-            this->_ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
+            this->data()._ptr.setPntr(ptr);
+            this->data()._ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
         }
 
         inline void copy(const BaseCnt<T, cow, weak, opt, C, level>& cloned)
@@ -1001,23 +1062,23 @@ namespace
             {
                 cloned.increase();
             }
-            this->_ptr = cloned._ptr;
-            this->_ref_cnt = cloned._ref_cnt;
-            if constexpr(cow == 0)
+            this->data()._ptr = cloned.data()._ptr;
+            this->data()._ref_cnt = cloned.data()._ref_cnt;
+            if constexpr(cow == 0) //tracking weak references
             {
-                this->_weak_vct = cloned._weak_vct;
-                this->_locker = cloned._locker;
+                this->data()._weak_vct = cloned.data()._weak_vct;
+                this->data()._locker = cloned.data()._locker;
             }
         }
 
         inline void move(BaseCnt<T, cow, weak, opt, C, level>&& cloned)
         {
-            this->_ptr = cloned._ptr;
-            this->_ref_cnt = cloned._ref_cnt;            
-            if constexpr(cow == 0)
+            this->data()._ptr = cloned.data()._ptr;
+            this->data()._ref_cnt = cloned.data()._ref_cnt;
+            if constexpr(cow == 0) //tracking weak references
             {
-                this->_weak_vct = cloned._weak_vct;
-                this->_locker = cloned._locker;
+                this->data()._weak_vct = cloned.data()._weak_vct;
+                this->data()._locker = cloned.data()._locker;
                 cloned._weak_vct._ptr = 0U;
                 cloned._locker._ptr = 0U;
             }
@@ -1049,12 +1110,12 @@ namespace
         //using BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>::setRef;
 
         template<typename R = void>
-        inline auto detach(const bool always = true) const -> std::enable_if_t<(cow != 0), R>
+        inline auto detach(const bool always = true) const -> std::enable_if_t<(cow != 0 && !weak), R>
         {
-            auto ptr = this->_ptr.addr();
+            auto ptr = this->data()._ptr.addr();
             if (ptr)
             {
-                if (always || (*this->_ref_cnt) > 1)
+                if (always || (*this->data()._ref_cnt) > 1)
                 {
                     this->setPntr(new T(*ptr));
                 }
@@ -1087,7 +1148,7 @@ namespace
                 {
                     this->detach(false);
                 }
-                return this->_ptr.addr();
+                return this->data()._ptr.addr();
             }
         }
 
@@ -1137,8 +1198,20 @@ namespace
             }
         }
 
-        template <typename A, class B, const int o> friend class BasePtr;
+        template <typename, typename, typename, const int> friend struct ShrData;
+        template <typename, typename, const int> friend struct CntData;
+        template <typename, class, const int> friend class BasePtr;
     };
+
+    /*template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
+              typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
+    class BaseShr : public BasePtr<T, BaseShr<T, cow, weak, opt, C, level>, weak ? -2 : opt>
+    {
+        BaseCmp<BaseCnt<T, cow, weak, opt, C, level>, 1, 2, 9> _shr_ref;
+
+    public:
+        template <typename, class, const int> friend class BasePtr;
+    };*/
 }
 
 #if ALIGN_POINTERS
@@ -1208,7 +1281,7 @@ namespace tbrpgsca
 {
     template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL>
     using CmpsPtr = BaseCmp<T, own, opt, level>;
-    template<typename T, const bool weak, const int cow = 0, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
+    template<typename T, const bool weak = false, const int cow = 0, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
 
     class Ability;
