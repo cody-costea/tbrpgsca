@@ -187,7 +187,7 @@ namespace
 
         inline T& def() const
         {
-            if constexpr(std::is_default_constructible<T>::value)
+            if constexpr(std::is_default_constructible<T>::value && (opt == 0 || opt < -1))
             {
                 return (const_cast<BasePtr<T, P, opt>*>(this))->refOrNew();
             }
@@ -205,32 +205,6 @@ namespace
         inline T& obj()
         {
             return *static_cast<P*>(this)->P::addr();
-        }
-
-        inline BasePtr<T, P, opt>(const P& cloned)
-        {
-            static_cast<P*>(this)->P::copy(cloned);
-        }
-
-        inline BasePtr<T, P, opt>(P&& cloned)
-        {
-            static_cast<P*>(this)->P::move(std::forward<P>(cloned));
-        }
-
-        inline BasePtr<T, P, opt>(T& ptr)
-        {
-            static_cast<P*>(this)->P::setAddr(&ptr);
-        }
-
-        inline BasePtr<T, P, opt>(T* const ptr)
-        {
-            static_assert(opt != 0, "This reference is not optional and cannot be initialized from nullable pointers.");
-            static_cast<P*>(this)->P::setAddr(ptr);
-        }
-
-        inline BasePtr<T, P, opt>()
-        {
-            static_assert(opt != 0 && opt > -2, "This reference is not optional and must be initialized.");
         }
 
     public:
@@ -508,6 +482,32 @@ namespace
             {
                 return defValue;
             }
+        }
+
+        inline BasePtr<T, P, opt>(const P& cloned)
+        {
+            static_cast<P*>(this)->P::copy(cloned);
+        }
+
+        inline BasePtr<T, P, opt>(P&& cloned)
+        {
+            static_cast<P*>(this)->P::move(std::forward<P>(cloned));
+        }
+
+        inline BasePtr<T, P, opt>(T& ptr)
+        {
+            static_cast<P*>(this)->P::setAddr(&ptr);
+        }
+
+        inline BasePtr<T, P, opt>(T* const ptr)
+        {
+            static_assert(opt != 0, "This reference is not optional and cannot be initialized from nullable pointers.");
+            static_cast<P*>(this)->P::setAddr(ptr);
+        }
+
+        inline BasePtr<T, P, opt>()
+        {
+            static_assert(opt != 0 && opt > -2, "This reference is not optional and must be initialized.");
         }
     };
 #if COMPRESS_POINTERS > 0
@@ -919,12 +919,12 @@ namespace
                 auto weakVct = this->_weak_vct.ptr();
                 if (weakVct)
                 {
-                    auto weakEnd = weakVct.end();
-                    for (auto itr = weakVct.begin(); itr != weakEnd; ++itr)
+                    auto weakEnd = weakVct->end();
+                    for (auto itr = weakVct->begin(); itr != weakEnd; ++itr)
                     {
-                        if ((*itr)->addr() == weakRef)
+                        if (itr->addr() == weakRef)
                         {
-                            weakVct.erase(itr);
+                            weakVct->erase(itr);
                             break;
                         }
                     }
