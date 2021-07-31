@@ -870,7 +870,7 @@ namespace
         BaseCmp<C, 0, 2, 9> _ref_cnt;
         BaseCmp<T, 0, 2, level> _ptr;
 
-        inline CntData<T, C, level>& data()
+        inline CntData<T, C, level>& countData()
         {
             return *this;
         }
@@ -886,7 +886,7 @@ namespace
         BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9> _weak_vct;
         BaseCmp<QMutex, 0, 2, 9> _locker;
 
-        inline ShrData<T, P, C, level>& data()
+        inline ShrData<T, P, C, level>& countData()
         {
             return *this;
         }
@@ -968,24 +968,24 @@ namespace
     protected:
         BaseCmp<ShrData<T, P, C, level>, 1, 2, 9> _ref_data;
 
-        inline ShrData<T, P, C, level>& data()
+        inline ShrData<T, P, C, level>& countData()
         {
             return *(this->_ref_data.ptr());
         }
 
         inline void track(P& weakRef)
         {
-            this->data().track(weakRef);
+            this->countData().track(weakRef);
         }
 
         inline void untrack(P* weakRef)
         {
-            this->data().untrack(weakRef);
+            this->countData().untrack(weakRef);
         }
 
         inline void nullify()
         {
-            this->data().nullify();
+            this->countData().nullify();
         }
 
         RefData<T, P, C, level>()
@@ -1010,7 +1010,7 @@ namespace
         template<typename R = void>
         inline auto increase() -> std::enable_if_t<(!weak), R>
         {
-            auto cnt = this->data()._ref_cnt;
+            auto cnt = this->countData()._ref_cnt;
             if (cnt)
             {
                 (*cnt) += 1U;
@@ -1020,7 +1020,7 @@ namespace
         template<typename R = void>
         inline auto decrease() -> std::enable_if_t<(!weak), R>
         {
-            auto& tData = this->data();
+            auto& tData = this->countData();
             auto ptr = tData._ptr.addr();
             if (ptr)
             {
@@ -1048,12 +1048,12 @@ namespace
                     return tData._ptr.addr();
                 }
             }*/
-            return const_cast<BaseCnt<T, cow, weak, opt, C, level>*>(this)->data()._ptr.addr();
+            return const_cast<BaseCnt<T, cow, weak, opt, C, level>*>(this)->countData()._ptr.addr();
         }
 
         inline void setAddr(T* const ptr)
         {
-            auto& tData = this->data();
+            auto& tData = this->countData();
             tData._ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
             tData._ptr.setPntr(ptr);
         }
@@ -1064,8 +1064,8 @@ namespace
             {
                 cloned.increase();
             }
-            auto& tData = this->data();
-            auto& cData = cloned.data();
+            auto& tData = this->countData();
+            auto& cData = cloned.countData();
             tData._ref_cnt = cData._ref_cnt;
             tData._ptr = cData._ptr;
             if constexpr(cow == 0) //tracking weak references
@@ -1078,7 +1078,7 @@ namespace
         inline void move(BaseCnt<T, cow, weak, opt, C, level>&& cloned)
         {
             this->copy(cloned);
-            auto& cData = cloned.data();
+            auto& cData = cloned.countData();
             if constexpr(cow == 0) //tracking weak references
             {
                 cData._weak_vct._ptr = 0U;
@@ -1114,7 +1114,7 @@ namespace
         template<typename R = void>
         inline auto detach(const bool always = true) const -> std::enable_if_t<(cow != 0 && !weak), R>
         {
-            auto& tData = this->data();
+            auto& tData = this->countData();
             auto ptr = tData._ptr.addr();
             if (ptr)
             {
@@ -1151,7 +1151,7 @@ namespace
                 {
                     this->detach(false);
                 }
-                return this->data()._ptr.addr();
+                return this->countData()._ptr.addr();
             }
         }
 
