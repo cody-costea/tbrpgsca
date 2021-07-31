@@ -1020,14 +1020,15 @@ namespace
         template<typename R = void>
         inline auto decrease() -> std::enable_if_t<(!weak), R>
         {
-            auto ptr = this->data()._ptr.addr();
+            auto& tData = this->data();
+            auto ptr = tData._ptr.addr();
             if (ptr)
             {
                 if constexpr(cow == 0 && !weak) //tracking weak references
                 {
                     this->nullify();
                 }
-                auto cnt = this->data()._ref_cnt.addr();
+                auto cnt = tData._ref_cnt.addr();
                 if (--(*cnt) == 0U)
                 {
                     delete ptr;
@@ -1040,11 +1041,11 @@ namespace
         {
             /*if constexpr(cow == 0 && weak) //tracking weak references
             {
-                auto locker = this->data()._locker.ptr();
+                auto locker = tData._locker.ptr();
                 if (locker)
                 {
                     auto uniqueLocker = QMutexLocker(locker);
-                    return this->data()._ptr.addr();
+                    return tData._ptr.addr();
                 }
             }*/
             return const_cast<BaseCnt<T, cow, weak, opt, C, level>*>(this)->data()._ptr.addr();
@@ -1052,8 +1053,9 @@ namespace
 
         inline void setAddr(T* const ptr)
         {
-            this->data()._ptr.setPntr(ptr);
-            this->data()._ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
+            auto& tData = this->data();
+            tData._ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
+            tData._ptr.setPntr(ptr);
         }
 
         inline void copy(const BaseCnt<T, cow, weak, opt, C, level>& cloned)
@@ -1062,28 +1064,28 @@ namespace
             {
                 cloned.increase();
             }
-            this->data()._ptr = cloned.data()._ptr;
-            this->data()._ref_cnt = cloned.data()._ref_cnt;
+            auto& tData = this->data();
+            auto& cData = cloned.data();
+            tData._ref_cnt = cData._ref_cnt;
+            tData._ptr = cData._ptr;
             if constexpr(cow == 0) //tracking weak references
             {
-                this->data()._weak_vct = cloned.data()._weak_vct;
-                this->data()._locker = cloned.data()._locker;
+                tData._weak_vct = cData._weak_vct;
+                tData._locker = cData._locker;
             }
         }
 
         inline void move(BaseCnt<T, cow, weak, opt, C, level>&& cloned)
         {
-            this->data()._ptr = cloned.data()._ptr;
-            this->data()._ref_cnt = cloned.data()._ref_cnt;
+            this->copy(cloned);
+            auto& cData = cloned.data();
             if constexpr(cow == 0) //tracking weak references
             {
-                this->data()._weak_vct = cloned.data()._weak_vct;
-                this->data()._locker = cloned.data()._locker;
-                cloned._weak_vct._ptr = 0U;
-                cloned._locker._ptr = 0U;
+                cData._weak_vct._ptr = 0U;
+                cData._locker._ptr = 0U;
             }
-            cloned._ref_cnt._ptr = 0U;
-            cloned._ptr._ptr = 0U;
+            cData._ref_cnt._ptr = 0U;
+            cData._ptr._ptr = 0U;
         }
 
         template<typename R = void>
@@ -1112,10 +1114,11 @@ namespace
         template<typename R = void>
         inline auto detach(const bool always = true) const -> std::enable_if_t<(cow != 0 && !weak), R>
         {
-            auto ptr = this->data()._ptr.addr();
+            auto& tData = this->data();
+            auto ptr = tData._ptr.addr();
             if (ptr)
             {
-                if (always || (*this->data()._ref_cnt) > 1)
+                if (always || (*tData._ref_cnt) > 1)
                 {
                     this->setPntr(new T(*ptr));
                 }
@@ -1281,7 +1284,7 @@ namespace tbrpgsca
 {
     template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL>
     using CmpsPtr = BaseCmp<T, own, opt, level>;
-    template<typename T, const bool weak = false, const int cow = 0, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
+    template<typename T, const bool weak = false, const int cow = -1, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
 
     class Ability;
