@@ -855,24 +855,51 @@ namespace
         using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::operator=;
         //using BasePtr<T, BaseCmp<T, own, opt, level>, opt>::setRef;
 
-        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
         template <typename, typename, typename, const int> friend struct RefData;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
         template <typename, typename, typename, const int> friend struct ShrData;
-        template <typename, typename, const int> friend struct CntData;
+        template <typename, typename, const int> friend struct PtrData;
         template <typename, class, const int> friend class BasePtr;
 
     };
 
-    template <typename T, typename C, const int level>
+    template <typename C>
     struct CntData
     {
-    protected:
+    private:
         BaseCmp<C, 0, 2, 9> _ref_cnt;
-        BaseCmp<T, 0, 2, level> _ptr;
 
-        inline CntData<T, C, level>& countData()
+    protected:
+        inline CntData<C>& countData()
         {
             return *this;
+        }
+
+        inline BaseCmp<C, 0, 2, 9>& cntDataRef()
+        {
+            return this->_ref_cnt;
+        }
+
+        template <typename, typename, const int> friend struct PtrData;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template <typename, typename, typename, const int> friend struct RefData;
+    };
+
+    template <typename T, typename C, const int level>
+    struct PtrData : CntData<C>
+    {
+    private:
+        BaseCmp<T, 0, 2, level> _ptr;
+
+    protected:
+        inline PtrData<T, C, level>& countData()
+        {
+            return *this;
+        }
+
+        inline BaseCmp<T, 0, 2, level>& ptrDataRef()
+        {
+            return this->_ptr;
         }
 
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
@@ -882,13 +909,24 @@ namespace
     template <typename T, typename P, typename C, const int level>
     struct ShrData : T
     {
-    protected:
+    private:
         BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9> _weak_vct;
         BaseCmp<QMutex, 0, 2, 9> _locker;
 
+    protected:
         inline ShrData<T, P, C, level>& countData()
         {
             return *this;
+        }
+
+        inline BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9>& vctDataRef()
+        {
+            return this->_weak_vct;
+        }
+
+        inline BaseCmp<QMutex, 0, 2, 9>& lckDataRef()
+        {
+            return this->_locker;
         }
 
         void track(P& weakRef)
@@ -965,12 +1003,33 @@ namespace
     template <typename T, typename P, typename C, const int level>
     struct RefData
     {
-    protected:
+    private:
         BaseCmp<ShrData<T, P, C, level>, 1, 2, 9> _ref_data;
 
+    protected:
         inline ShrData<T, P, C, level>& countData()
         {
             return *(this->_ref_data.ptr());
+        }
+
+        inline BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9>& vctDataRef()
+        {
+            return this->countData().vctDataRef();
+        }
+
+        inline BaseCmp<QMutex, 0, 2, 9>& lckDataRef()
+        {
+            return this->countData().lckDataRef();
+        }
+
+        inline BaseCmp<T, 0, 2, level>& ptrDataRef()
+        {
+            return this->countData().ptrRef();
+        }
+
+        inline BaseCmp<C, 0, 2, 9>& cntDataRef()
+        {
+            return this->countData().cntDataReF();
         }
 
         inline void track(P& weakRef)
@@ -988,7 +1047,7 @@ namespace
             this->countData().nullify();
         }
 
-        RefData<T, P, C, level>()
+        inline RefData<T, P, C, level>()
         {
             this->_ref_data = BaseCmp<ShrData<T, P, C, level>, 1, 2, 9>(new ShrData<T, P, C, level>);
         }
@@ -999,7 +1058,7 @@ namespace
 
     template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
               typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
-    class BaseCnt : public std::conditional_t<cow == 0, RefData<CntData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, CntData<T, C, level>>,
+    class BaseCnt : public std::conditional_t<cow == 0, RefData<PtrData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, PtrData<T, C, level>>,
                     public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
     {
         static_assert(cow < 1 || !weak, "Copy-on-write not allowed for weak references.");
@@ -1010,7 +1069,7 @@ namespace
         template<typename R = void>
         inline auto increase() -> std::enable_if_t<(!weak), R>
         {
-            auto cnt = this->countData()._ref_cnt;
+            auto cnt = this->cntDataRef();
             if (cnt)
             {
                 (*cnt) += 1U;
@@ -1021,14 +1080,14 @@ namespace
         inline auto decrease() -> std::enable_if_t<(!weak), R>
         {
             auto& tData = this->countData();
-            auto ptr = tData._ptr.addr();
+            auto ptr = tData.ptrDataRef().addr();
             if (ptr)
             {
                 if constexpr(cow == 0 && !weak) //tracking weak references
                 {
                     this->nullify();
                 }
-                auto cnt = tData._ref_cnt.addr();
+                auto cnt = tData.cntDataRef().addr();
                 if (--(*cnt) == 0U)
                 {
                     delete ptr;
@@ -1041,21 +1100,21 @@ namespace
         {
             /*if constexpr(cow == 0 && weak) //tracking weak references
             {
-                auto locker = tData._locker.ptr();
+                auto locker = tData.lckDataRef().ptr();
                 if (locker)
                 {
                     auto uniqueLocker = QMutexLocker(locker);
-                    return tData._ptr.addr();
+                    return tData.ptrDataRef().addr();
                 }
             }*/
-            return const_cast<BaseCnt<T, cow, weak, opt, C, level>*>(this)->countData()._ptr.addr();
+            return const_cast<BaseCnt<T, cow, weak, opt, C, level>*>(this)->countData().ptrDataRef().addr();
         }
 
         inline void setAddr(T* const ptr)
         {
             auto& tData = this->countData();
-            tData._ref_cnt.setPntr(ptr ? new C(1U) : nullptr);
-            tData._ptr.setPntr(ptr);
+            tData.cntDataRef().setPntr(ptr ? new C(1U) : nullptr);
+            tData.ptrDataRef().setPntr(ptr);
         }
 
         inline void copy(const BaseCnt<T, cow, weak, opt, C, level>& cloned)
@@ -1066,12 +1125,12 @@ namespace
             }
             auto& tData = this->countData();
             auto& cData = cloned.countData();
-            tData._ref_cnt = cData._ref_cnt;
-            tData._ptr = cData._ptr;
+            tData.cntDataRef() = cData.cntDataRef();
+            tData.ptrDataRef() = cData.ptrDataRef();
             if constexpr(cow == 0) //tracking weak references
             {
-                tData._weak_vct = cData._weak_vct;
-                tData._locker = cData._locker;
+                tData.vctDataRef() = cData.vctDataRef();
+                tData.lckDataRef() = cData.lckDataRef();
             }
         }
 
@@ -1081,11 +1140,11 @@ namespace
             auto& cData = cloned.countData();
             if constexpr(cow == 0) //tracking weak references
             {
-                cData._weak_vct._ptr = 0U;
-                cData._locker._ptr = 0U;
+                cData.vctDataRef()._ptr = 0U;
+                cData.lckDataRef()._ptr = 0U;
             }
-            cData._ref_cnt._ptr = 0U;
-            cData._ptr._ptr = 0U;
+            cData.cntDataRef()._ptr = 0U;
+            cData.ptrDataRef()._ptr = 0U;
         }
 
         template<typename R = void>
@@ -1115,10 +1174,10 @@ namespace
         inline auto detach(const bool always = true) const -> std::enable_if_t<(cow != 0 && !weak), R>
         {
             auto& tData = this->countData();
-            auto ptr = tData._ptr.addr();
+            auto ptr = tData.ptrDataRef().addr();
             if (ptr)
             {
-                if (always || (*tData._ref_cnt) > 1)
+                if (always || (*tData.cntDataRef()) > 1)
                 {
                     this->setPntr(new T(*ptr));
                 }
@@ -1151,7 +1210,7 @@ namespace
                 {
                     this->detach(false);
                 }
-                return this->countData()._ptr.addr();
+                return this->countData().ptrDataRef().addr();
             }
         }
 
@@ -1202,7 +1261,7 @@ namespace
         }
 
         template <typename, typename, typename, const int> friend struct ShrData;
-        template <typename, typename, const int> friend struct CntData;
+        template <typename, typename, const int> friend struct PtrData;
         template <typename, class, const int> friend class BasePtr;
     };
 
