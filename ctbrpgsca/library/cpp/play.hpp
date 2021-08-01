@@ -41,7 +41,7 @@ Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the numbe
 thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS 7//3
+    #define COMPRESS_POINTERS -7//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -350,7 +350,7 @@ namespace
             return *static_cast<P*>(this);
         }
 
-        inline P& operator=(const P& cloned)
+        inline P& operator=(P& cloned)
         {
             if (this != &cloned)
             {
@@ -799,7 +799,7 @@ namespace
     public:
         inline ~BaseCmp<T, own, opt, level>()
         {
-            if constexpr(own)
+            if constexpr(own != 0)
             {
                 auto ptr = this->addr();
                 if (ptr)
@@ -911,7 +911,7 @@ namespace
     {
     private:
         BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9> _weak_vct;
-        BaseCmp<QMutex, 0, 2, 9> _locker;
+        BaseCmp<QMutex, 0, 2, 9> _locker = new QMutex;
 
     protected:
         inline TckData<T, P, C, level>& countData()
@@ -1004,7 +1004,7 @@ namespace
     struct RefData
     {
     private:
-        BaseCmp<TckData<T, P, C, level>, 1, 2, 9> _ref_data;
+        BaseCmp<TckData<T, P, C, level>, 1, 2, 9> _ref_data = BaseCmp<TckData<T, P, C, level>, 1, 2, 9>(new TckData<T, P, C, level>);
 
     protected:
         inline TckData<T, P, C, level>& countData()
@@ -1049,7 +1049,7 @@ namespace
 
         inline RefData<T, P, C, level>()
         {
-            this->_ref_data = BaseCmp<TckData<T, P, C, level>, 1, 2, 9>(new TckData<T, P, C, level>);
+            //this->_ref_data = BaseCmp<TckData<T, P, C, level>, 1, 2, 9>(new TckData<T, P, C, level>);
         }
 
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
@@ -1277,7 +1277,7 @@ namespace
 }
 
 #if ALIGN_POINTERS
-    #ifdef _MSC_VER
+    #ifdef Q_OS_WINDOWS
 inline void* alloc(const std::size_t size)
 {
     return _aligned_malloc(size, ALIGN_POINTERS);
