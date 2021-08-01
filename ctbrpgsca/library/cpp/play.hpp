@@ -705,7 +705,7 @@ namespace
 
         inline ~BaseCmp<T, own, opt, level>()
         {
-            if constexpr(own)
+            if constexpr(own != 0)
             {
                 auto ptr = this->addr();
                 if (ptr)
@@ -857,8 +857,8 @@ namespace
 
         template <typename, typename, typename, const int> friend struct RefData;
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
-        template <typename, typename, typename, const int> friend struct ShrData;
-        template <typename, typename, const int> friend struct PtrData;
+        template <typename, typename, typename, const int> friend struct TckData;
+        template <typename, typename, const int> friend struct ShrData;
         template <typename, class, const int> friend class BasePtr;
 
     };
@@ -880,19 +880,19 @@ namespace
             return this->_ref_cnt;
         }
 
-        template <typename, typename, const int> friend struct PtrData;
+        template <typename, typename, const int> friend struct ShrData;
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
         template <typename, typename, typename, const int> friend struct RefData;
     };
 
     template <typename T, typename C, const int level>
-    struct PtrData : CntData<C>
+    struct ShrData : CntData<C>
     {
     private:
         BaseCmp<T, 0, 2, level> _ptr;
 
     protected:
-        inline PtrData<T, C, level>& countData()
+        inline ShrData<T, C, level>& countData()
         {
             return *this;
         }
@@ -907,14 +907,14 @@ namespace
     };
 
     template <typename T, typename P, typename C, const int level>
-    struct ShrData : T
+    struct TckData : T
     {
     private:
         BaseCmp<std::vector<BaseCmp<P, 0, 2, 9>>, 0, 2, 9> _weak_vct;
         BaseCmp<QMutex, 0, 2, 9> _locker;
 
     protected:
-        inline ShrData<T, P, C, level>& countData()
+        inline TckData<T, P, C, level>& countData()
         {
             return *this;
         }
@@ -987,10 +987,10 @@ namespace
                         ((*weakVct)[i])->setAddr(nullptr);
                     }
                 }
-                delete weakVct;
                 this->_locker.setPtr(nullptr);
-                //this->_weak_vct.setPtr(nullptr);
+                this->_weak_vct.setPtr(nullptr);
                 uniqueLocker.unlock();
+                delete weakVct;
                 delete locker;
             }
         }
@@ -1004,10 +1004,10 @@ namespace
     struct RefData
     {
     private:
-        BaseCmp<ShrData<T, P, C, level>, 1, 2, 9> _ref_data;
+        BaseCmp<TckData<T, P, C, level>, 1, 2, 9> _ref_data;
 
     protected:
-        inline ShrData<T, P, C, level>& countData()
+        inline TckData<T, P, C, level>& countData()
         {
             return *(this->_ref_data.ptr());
         }
@@ -1049,7 +1049,7 @@ namespace
 
         inline RefData<T, P, C, level>()
         {
-            this->_ref_data = BaseCmp<ShrData<T, P, C, level>, 1, 2, 9>(new ShrData<T, P, C, level>);
+            this->_ref_data = BaseCmp<TckData<T, P, C, level>, 1, 2, 9>(new TckData<T, P, C, level>);
         }
 
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
@@ -1058,7 +1058,7 @@ namespace
 
     template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
               typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
-    class BaseCnt : public std::conditional_t<cow == 0, RefData<PtrData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, PtrData<T, C, level>>,
+    class BaseCnt : public std::conditional_t<cow == 0, RefData<ShrData<T, C, level>, BaseCnt<T, 0, true, opt, C, level>, C, level>, ShrData<T, C, level>>,
                     public BasePtr<T, BaseCnt<T, cow, weak, opt, C, level>, weak ? -2 : opt>
     {
         static_assert(cow < 1 || !weak, "Copy-on-write not allowed for weak references.");
@@ -1260,8 +1260,8 @@ namespace
             }
         }
 
-        template <typename, typename, typename, const int> friend struct ShrData;
-        template <typename, typename, const int> friend struct PtrData;
+        template <typename, typename, typename, const int> friend struct TckData;
+        template <typename, typename, const int> friend struct ShrData;
         template <typename, class, const int> friend class BasePtr;
     };
 
