@@ -1341,10 +1341,156 @@ inline void clear(void* ptr) noexcept
 #endif
 namespace tbrpgsca
 {
-    template<typename T, const int own = 0, const int opt = -1, const int level = CMPS_LEVEL>
+    template<typename T = void, const int own = 0, const int opt = 2, const int level = CMPS_LEVEL>
     using CmpsPtr = BaseCmp<T, own, opt, level>;
-    template<typename T, const bool weak = false, const int cow = -1, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
+    template<typename T = void, const bool weak = false, const int cow = -1, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
+
+    namespace
+    {
+        template <typename P>
+        struct FixedData
+        {
+            P _data;
+        };
+
+        template <typename P, typename L>
+        struct VarData
+        {
+            L _length: 31;
+            bool _init;
+            P _data;
+        };
+    }
+
+    template<typename T, typename P = CmpsPtr<T>, typename L = uint32_t, const L fixedSize = 0, const bool dispose = fixedSize < 1>
+    class CmpsArray : protected std::conditional_t<fixedSize < 1, VarData<P, L>, FixedData<P>>
+    {
+
+    protected:
+        inline T& from(const L index) const
+        {
+            return this->_data.ptr()[index];
+        }
+
+    public:
+        inline const L size() const
+        {
+            if constexpr(fixedSize < 1)
+            {
+                return this->_length;
+            }
+            else
+            {
+                return fixedSize;
+            }
+        }
+
+        inline const T& at(const L index) const
+        {
+            return this->from(index);
+        }
+
+        bool contains(const T& comp) const
+        {
+            const auto size = this->size();
+            for (L i = 0U; i < size; i += 1)
+            {
+                if (this->at(i) == comp)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        inline const T& operator[](const L index) const
+        {
+            return this->from(index);
+        }
+
+        inline T& operator[](const L index)
+        {
+            return this->from(index);
+        }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>(const CmpsArray<T, P, L, fixedSize, dispose>& copy)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = copy._length;
+                this->_init = false;
+            }
+            this->_data = copy._data;
+        }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize)
+        {
+            this->_data = beginPtr;
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = size;
+                this->_init = false;
+            }
+        }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>(const T* beginPtr, const L size = fixedSize)
+        {
+            this->_data = beginPtr;
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = size;
+                this->_init = false;
+            }
+        }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>(std::initializer_list<T> list)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                L i = 0U;
+                auto end = list.end();
+                auto size = list.size();
+                //auto data = new (std::nothrow) T[size];
+                auto data = new T[size];
+                if (data)
+                {
+                    for (auto it = list.begin(); i < size && it != end; ++it)
+                    {
+                        data[i++] = *it;
+                    }
+                    this->_length = size;
+                    this->_data = P(data);
+                    this->_init = true;
+                }
+                else
+                {
+                    this->_length = 0;
+                    this->_data = P(nullptr);
+                    this->_init = false;
+                }
+            }
+            else
+            {
+                this->_data = list.begin();
+            }
+        }
+
+        inline ~CmpsArray<T, P, L, fixedSize, dispose>()
+        {
+            if constexpr(dispose)
+            {
+                if constexpr(fixedSize < 1)
+                {
+                    if (!this->_init)
+                    {
+                        return;
+                    }
+                }
+                delete[] this->_data.ptr();
+            }
+        }
+    };
 
     class Ability;
     class Costume;
