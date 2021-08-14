@@ -1357,8 +1357,8 @@ namespace tbrpgsca
         template <typename P, typename L>
         struct VarData
         {
-            L _length: 31;
-            bool _init;
+            L _length: (sizeof(L) * 8) - 1;
+            bool _init: 1;
             P _data;
         };
     }
@@ -1370,8 +1370,10 @@ namespace tbrpgsca
     protected:
         inline T& from(const L index) const
         {
-            return this->_data.ptr()[index];
+            return const_cast<CmpsArray*>(this)->_data.ptr()[index];
         }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>() {}
 
     public:
         inline const L size() const
@@ -1388,7 +1390,7 @@ namespace tbrpgsca
 
         inline const T& at(const L index) const
         {
-            return this->from(index);
+            return const_cast<CmpsArray*>(this)->from(index);
         }
 
         bool contains(const T& comp) const
@@ -1404,21 +1406,73 @@ namespace tbrpgsca
             return false;
         }
 
-        inline const T& operator[](const L index) const
+        L indexOf(const T& comp) const
         {
-            return this->from(index);
+            const auto size = this->size();
+            for (L i = 0U; i < size; i += 1)
+            {
+               if (this->at(i) == comp)
+               {
+                   return i;
+               }
+            }
+            return size; //TODO: analyze if something better can be done for unsigned values;
+        }
+
+        inline P ptr() const
+        {
+            return this->_data;
+        }
+
+        inline operator P() const
+        {
+           return this->ptr();
+        }
+
+        inline operator bool() const
+        {
+            return const_cast<CmpsArray*>(this)->_data;
         }
 
         inline T& operator[](const L index)
         {
-            return this->from(index);
+           return this->from(index);
         }
 
-        inline CmpsArray<T, P, L, fixedSize, dispose>(const CmpsArray<T, P, L, fixedSize, dispose>& copy)
+        inline const T& operator[](const L index) const
+        {
+           return this->from(index);
+        }
+
+        template<L n = 0>
+        inline operator CmpsArray<T, P, L, n, false>() const
+        {
+            static_assert(n <= fixedSize, "The compressed array passed, has fewer elements than required.");
+            CmpsArray<T, P, L, n, false> ret;
+            ret._data = this->_data;
+            if constexpr(n < 1)
+            {
+                ret._length = this->size();
+                ret._init = false;
+            }
+            return ret;
+        }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>(std::nullptr_t)
         {
             if constexpr(fixedSize < 1)
             {
-                this->_length = copy._length;
+                this->_init = false;
+                this->_length = 0;
+            }
+            this->_data = P(nullptr);
+        }
+
+        inline CmpsArray<T, P, L, fixedSize, dispose>(const CmpsArray& copy)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = copy.size();
                 this->_init = false;
             }
             this->_data = copy._data;
@@ -1487,7 +1541,12 @@ namespace tbrpgsca
                         return;
                     }
                 }
-                delete[] this->_data.ptr();
+                auto ptr = this->_data.ptr();
+                if (ptr)
+                {
+                    this->_data.setPtr(nullptr);
+                    delete[] ptr;
+                }
             }
         }
     };
