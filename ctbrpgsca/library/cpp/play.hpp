@@ -1440,13 +1440,13 @@ namespace
            return this->from(index);
         }
 
-        template<L n>
-        inline operator BaseVct<T, P, L, n, false>() const
+        template<L newSize = 0>
+        inline operator BaseVct<T, P, L, newSize, false>() const
         {
-            static_assert(n <= fixedSize, "The compressed array passed, has fewer elements than required.");
-            BaseVct<T, P, L, n, false> ret;
+            static_assert(newSize <= fixedSize, "The compressed array passed, has fewer elements than required.");
+            BaseVct<T, P, L, newSize, false> ret;
             ret._data = this->_data;
-            if constexpr(n < 1)
+            if constexpr(newSize < 1)
             {
                 ret._length = this->size();
                 ret._init = false;
@@ -1605,7 +1605,7 @@ namespace tbrpgsca
     using CmpsPtr = BaseCmp<T, own, opt, level>;
     template<typename T = void, const bool weak = false, const int cow = -1, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
-    template<typename T, typename P = BaseCmp<T>, typename L = uint32_t, const L fixedSize = 0, const bool dispose = fixedSize < 1>
+    template<typename T, typename L = uint32_t, const L fixedSize = 0, typename P = CmpsPtr<T>, const bool dispose = fixedSize < 1>
     using CmpsVct = BaseVct<T, P, L, fixedSize, dispose>;
 
     class Ability;
