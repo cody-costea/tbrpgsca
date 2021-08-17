@@ -258,7 +258,7 @@ namespace
         {
             if constexpr(opt != 0)
             {
-                return static_cast<P*>(this)->_ptr;
+                return const_cast<P*>(static_cast<const P*>(this))->_ptr;
             }
             else
             {
@@ -791,10 +791,7 @@ namespace
             return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
         }
 
-        inline BaseCmp<T, own, opt, level>()
-        {
-            this->_ptr = 0U;
-        }
+        inline BaseCmp<T, own, opt, level>() : _ptr(0U) {}
     #endif
     public:
         inline ~BaseCmp<T, own, opt, level>()
@@ -857,6 +854,7 @@ namespace
 
         template <typename, typename, typename, const int> friend struct RefData;
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
         template <typename, typename, typename, const int> friend struct TckData;
         template <typename, typename, const int> friend struct ShrData;
         template <typename, class, const int> friend class BasePtr;
@@ -995,6 +993,7 @@ namespace
             }
         }
 
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
         template <typename, typename, typename, const int> friend struct RefData;
         template <typename, class, const int> friend class BasePtr;
@@ -1052,6 +1051,7 @@ namespace
             //this->_ref_data = BaseCmp<TckData<T, P, C, level>, 1, 2, 9>(new TckData<T, P, C, level>);
         }
 
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
         template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
         template <typename, class, const int> friend class BasePtr;
     };
@@ -1260,8 +1260,9 @@ namespace
             }
         }
 
-        template <typename, typename, typename, const int> friend struct TckData;
         template <typename, typename, const int> friend struct ShrData;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
+        template <typename, typename, typename, const int> friend struct TckData;
         template <typename, class, const int> friend class BasePtr;
     };
 
@@ -1274,6 +1275,265 @@ namespace
     public:
         template <typename, class, const int> friend class BasePtr;
     };*/
+
+    template <typename P>
+    struct FixData
+    {
+        P _data;
+    };
+
+    template <typename P, typename L>
+    struct VarData
+    {
+        L _length: (sizeof(L) * 8) - 1;
+        bool _init: 1;
+        P _data;
+    };
+
+    template<typename T, typename P = BaseCmp<T>, typename L = uint32_t, const L fixedSize = 0, const bool dispose = fixedSize < 1>
+    class BaseVct : protected std::conditional_t<fixedSize < 1, VarData<P, L>, FixData<P>>
+    {
+
+    protected:
+        inline void clear()
+        {
+            if constexpr(dispose || fixedSize < 1)
+            {
+               if constexpr(fixedSize < 1)
+               {
+                   if (!this->_init)
+                   {
+                       return;
+                   }
+               }
+               auto ptr = this->_data.addr();
+               if (ptr)
+               {
+                   this->_data.setPntr(nullptr);
+                   delete[] ptr;
+               }
+            }
+        }
+
+        inline T& from(const L index) const
+        {
+            return const_cast<BaseVct*>(this)->_data.addr()[index];
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>() {}
+
+    public:
+        inline T* begin()
+        {
+            return this->_data.addr();
+        }
+
+        inline T* end()
+        {
+            return &(this->_data.addr()[this->_length - 1]);
+        }
+
+        inline const T* cbegin() const
+        {
+            return this->_data.addr();
+        }
+
+        inline const T* cend() const
+        {
+            return &(this->_data.addr()[this->_length - 1]);
+        }
+
+        inline T* begin() const
+        {
+            return this->_data.addr();
+        }
+
+        inline T* end() const
+        {
+            return &(this->_data.addr()[this->_length - 1]);
+        }
+
+        inline const L size() const
+        {
+            if constexpr(fixedSize < 1)
+            {
+                return this->_length;
+            }
+            else
+            {
+                return fixedSize;
+            }
+        }
+
+        inline const T& at(const L index) const
+        {
+            return const_cast<BaseVct*>(this)->from(index);
+        }
+
+        bool contains(const T& comp) const
+        {
+            const auto size = this->size();
+            for (L i = 0U; i < size; i += 1)
+            {
+                if (this->at(i) == comp)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        L indexOf(const T& comp) const
+        {
+            const auto size = this->size();
+            for (L i = 0U; i < size; i += 1)
+            {
+               if (this->at(i) == comp)
+               {
+                   return i;
+               }
+            }
+            return size; //TODO: analyze if something better can be done for unsigned values;
+        }
+
+        template<typename R = bool, typename... Args>
+        auto resize(const L nSize, Args&&... args) -> std::enable_if_t<(fixedSize < 1), R>
+        {
+            T* nArr = new (std::nothrow) T[nSize] { T(std::forward<Args>(args)...) };
+            if (nArr == nullptr)
+            {
+                return false;
+            }
+            const auto oSize = this->size();
+            for (L i = 0U; i < oSize && i < nSize; i += 1)
+            {
+                nArr[i] = this->at(i);
+            }
+            this->clear();
+            this->_data.setPtr(nArr);
+            this->_length = nSize;
+            return true;
+        }
+
+        inline P ptr() const
+        {
+            return this->_data;
+        }
+
+        inline operator P() const
+        {
+           return this->ptr();
+        }
+
+        inline operator bool() const
+        {
+            return const_cast<BaseVct*>(this)->_data;
+        }
+
+        inline T& operator[](const L index)
+        {
+           return this->from(index);
+        }
+
+        inline const T& operator[](const L index) const
+        {
+           return this->from(index);
+        }
+
+        template<L n>
+        inline operator BaseVct<T, P, L, n, false>() const
+        {
+            static_assert(n <= fixedSize, "The compressed array passed, has fewer elements than required.");
+            BaseVct<T, P, L, n, false> ret;
+            ret._data = this->_data;
+            if constexpr(n < 1)
+            {
+                ret._length = this->size();
+                ret._init = false;
+            }
+            return ret;
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>(std::nullptr_t)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                this->_init = false;
+                this->_length = 0;
+            }
+            this->_data = P(nullptr);
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>(const BaseVct& copy)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = copy.size();
+                this->_init = false;
+            }
+            this->_data = copy._data;
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize)
+        {
+            static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
+            this->_data = beginPtr;
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = size < 0 ? size * -1 : size;
+                this->_init = false;
+            }
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>(const T* beginPtr, const L size = fixedSize)
+        {
+            static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
+            this->_data = beginPtr;
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = size < 0 ? size * -1 : size;
+                this->_init = false;
+            }
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>(std::initializer_list<T> list)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                L i = 0U;
+                auto end = list.end();
+                auto size = list.size();
+                //auto data = new (std::nothrow) T[size];
+                auto data = new T[size];
+                if (data)
+                {
+                    for (auto it = list.begin(); i < size && it != end; ++it)
+                    {
+                        data[i++] = *it;
+                    }
+                    this->_length = size;
+                    this->_data = P(data);
+                    this->_init = true;
+                }
+                else
+                {
+                    this->_length = 0;
+                    this->_data = P(nullptr);
+                    this->_init = false;
+                }
+            }
+            else
+            {
+                this->_data = list.begin();
+            }
+        }
+
+        inline ~BaseVct<T, P, L, fixedSize, dispose>()
+        {
+            this->clear();
+        }
+    };
+
 }
 
 #if ALIGN_POINTERS
@@ -1345,211 +1605,8 @@ namespace tbrpgsca
     using CmpsPtr = BaseCmp<T, own, opt, level>;
     template<typename T = void, const bool weak = false, const int cow = -1, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
-
-    namespace
-    {
-        template <typename P>
-        struct FixedData
-        {
-            P _data;
-        };
-
-        template <typename P, typename L>
-        struct VarData
-        {
-            L _length: (sizeof(L) * 8) - 1;
-            bool _init: 1;
-            P _data;
-        };
-    }
-
-    template<typename T, typename P = CmpsPtr<T>, typename L = uint32_t, const L fixedSize = 0, const bool dispose = fixedSize < 1>
-    class CmpsArray : protected std::conditional_t<fixedSize < 1, VarData<P, L>, FixedData<P>>
-    {
-
-    protected:
-        inline T& from(const L index) const
-        {
-            return const_cast<CmpsArray*>(this)->_data.ptr()[index];
-        }
-
-        inline CmpsArray<T, P, L, fixedSize, dispose>() {}
-
-    public:
-        inline const L size() const
-        {
-            if constexpr(fixedSize < 1)
-            {
-                return this->_length;
-            }
-            else
-            {
-                return fixedSize;
-            }
-        }
-
-        inline const T& at(const L index) const
-        {
-            return const_cast<CmpsArray*>(this)->from(index);
-        }
-
-        bool contains(const T& comp) const
-        {
-            const auto size = this->size();
-            for (L i = 0U; i < size; i += 1)
-            {
-                if (this->at(i) == comp)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        L indexOf(const T& comp) const
-        {
-            const auto size = this->size();
-            for (L i = 0U; i < size; i += 1)
-            {
-               if (this->at(i) == comp)
-               {
-                   return i;
-               }
-            }
-            return size; //TODO: analyze if something better can be done for unsigned values;
-        }
-
-        inline P ptr() const
-        {
-            return this->_data;
-        }
-
-        inline operator P() const
-        {
-           return this->ptr();
-        }
-
-        inline operator bool() const
-        {
-            return const_cast<CmpsArray*>(this)->_data;
-        }
-
-        inline T& operator[](const L index)
-        {
-           return this->from(index);
-        }
-
-        inline const T& operator[](const L index) const
-        {
-           return this->from(index);
-        }
-
-        template<L n = 0>
-        inline operator CmpsArray<T, P, L, n, false>() const
-        {
-            static_assert(n <= fixedSize, "The compressed array passed, has fewer elements than required.");
-            CmpsArray<T, P, L, n, false> ret;
-            ret._data = this->_data;
-            if constexpr(n < 1)
-            {
-                ret._length = this->size();
-                ret._init = false;
-            }
-            return ret;
-        }
-
-        inline CmpsArray<T, P, L, fixedSize, dispose>(std::nullptr_t)
-        {
-            if constexpr(fixedSize < 1)
-            {
-                this->_init = false;
-                this->_length = 0;
-            }
-            this->_data = P(nullptr);
-        }
-
-        inline CmpsArray<T, P, L, fixedSize, dispose>(const CmpsArray& copy)
-        {
-            if constexpr(fixedSize < 1)
-            {
-                this->_length = copy.size();
-                this->_init = false;
-            }
-            this->_data = copy._data;
-        }
-
-        inline CmpsArray<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize)
-        {
-            this->_data = beginPtr;
-            if constexpr(fixedSize < 1)
-            {
-                this->_length = size;
-                this->_init = false;
-            }
-        }
-
-        inline CmpsArray<T, P, L, fixedSize, dispose>(const T* beginPtr, const L size = fixedSize)
-        {
-            this->_data = beginPtr;
-            if constexpr(fixedSize < 1)
-            {
-                this->_length = size;
-                this->_init = false;
-            }
-        }
-
-        inline CmpsArray<T, P, L, fixedSize, dispose>(std::initializer_list<T> list)
-        {
-            if constexpr(fixedSize < 1)
-            {
-                L i = 0U;
-                auto end = list.end();
-                auto size = list.size();
-                //auto data = new (std::nothrow) T[size];
-                auto data = new T[size];
-                if (data)
-                {
-                    for (auto it = list.begin(); i < size && it != end; ++it)
-                    {
-                        data[i++] = *it;
-                    }
-                    this->_length = size;
-                    this->_data = P(data);
-                    this->_init = true;
-                }
-                else
-                {
-                    this->_length = 0;
-                    this->_data = P(nullptr);
-                    this->_init = false;
-                }
-            }
-            else
-            {
-                this->_data = list.begin();
-            }
-        }
-
-        inline ~CmpsArray<T, P, L, fixedSize, dispose>()
-        {
-            if constexpr(dispose)
-            {
-                if constexpr(fixedSize < 1)
-                {
-                    if (!this->_init)
-                    {
-                        return;
-                    }
-                }
-                auto ptr = this->_data.ptr();
-                if (ptr)
-                {
-                    this->_data.setPtr(nullptr);
-                    delete[] ptr;
-                }
-            }
-        }
-    };
+    template<typename T, typename P = BaseCmp<T>, typename L = uint32_t, const L fixedSize = 0, const bool dispose = fixedSize < 1>
+    using CmpsVct = BaseVct<T, P, L, fixedSize, dispose>;
 
     class Ability;
     class Costume;
