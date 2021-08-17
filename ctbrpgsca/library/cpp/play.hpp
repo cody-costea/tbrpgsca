@@ -734,15 +734,15 @@ namespace
             this->_ptr = ptr;
         }
 
+        inline T* addr() const
+        {
+            return this->_ptr;
+        }
+
     public:
         inline bool comrpessed() const
         {
             return false;
-        }
-
-        inline T* addr() const
-        {
-            return this->_ptr;
         }
 
         inline BaseCmp<T, own, opt, level>()
@@ -767,7 +767,12 @@ namespace
 
         uint32_t _ptr;
 
-    protected:
+    protected:        
+        inline T* addr() const
+        {
+            return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
+        }
+
         inline void setAddr(std::nullptr_t)
         {
             this->_ptr = 0U;
@@ -784,11 +789,6 @@ namespace
         inline bool comrpessed() const
         {
             return true;
-        }
-
-        inline T* addr() const
-        {
-            return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
         }
 
         inline BaseCmp<T, own, opt, level>() : _ptr(0U) {}
