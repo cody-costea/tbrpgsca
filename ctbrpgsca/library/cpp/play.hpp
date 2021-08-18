@@ -258,7 +258,7 @@ namespace
         {
             if constexpr(opt != 0)
             {
-                return const_cast<P*>(static_cast<const P*>(this))->_ptr;
+                return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr;
             }
             else
             {
@@ -1410,7 +1410,7 @@ namespace
                 nArr[i] = this->at(i);
             }
             this->clear();
-            this->_data.setPtr(nArr);
+            this->_data.setPntr(nArr);
             this->_length = nSize;
             return true;
         }
@@ -1474,25 +1474,25 @@ namespace
             this->_data = copy._data;
         }
 
-        inline BaseVct<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize)
+        inline BaseVct<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize, const bool own = false)
         {
             static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
             this->_data = beginPtr;
             if constexpr(fixedSize < 1)
             {
                 this->_length = size < 0 ? size * -1 : size;
-                this->_init = false;
+                this->_init = own;
             }
         }
 
-        inline BaseVct<T, P, L, fixedSize, dispose>(const T* beginPtr, const L size = fixedSize)
+        inline BaseVct<T, P, L, fixedSize, dispose>(const T* beginPtr, const L size = fixedSize, const bool own = false)
         {
             static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
             this->_data = beginPtr;
             if constexpr(fixedSize < 1)
             {
                 this->_length = size < 0 ? size * -1 : size;
-                this->_init = false;
+                this->_init = own;
             }
         }
 
@@ -1517,13 +1517,14 @@ namespace
                 }
                 else
                 {
-                    this->_length = 0;
+                    this->_length = 0U;
                     this->_data = P(nullptr);
                     this->_init = false;
                 }
             }
             else
             {
+                static_assert(fixedSize <= list.size(), "The initialization list passed, has fewer elements than required.");
                 this->_data = list.begin();
             }
         }
