@@ -441,7 +441,7 @@ void Scene::playAi(QString& ret, const SpriteRun* const spriteRun, Actor& player
                     break;
                 }
             }*/
-            skillIndex = (player.skill<true>(0, [heal, &player](const Ability& s, const Ability&) -> bool
+            skillIndex = (player.skill<true>(0, [heal, &player](const Ability& s, const Ability*) -> bool
             {
                 return s.canPerform(player) && (s._hp < 0 && ((heal == 0) || s.isReviving()));
             })).index;

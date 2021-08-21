@@ -834,9 +834,6 @@ namespace cmpsptr
         inline void setAddr(T* const ptr)
         {
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-            qDebug() << "SHIFT_LEN = " << SHIFT_LEN;
-            qDebug() << "addr = " << addr;
-            qDebug() << "1073741824UL * " << (2 << SHIFT_LEN) << " = " << (1073741824UL * (2 << SHIFT_LEN));
             assert(addr < 1073741824UL * (2 << SHIFT_LEN)); //TODO: analyze alternative solutions
             this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
         }

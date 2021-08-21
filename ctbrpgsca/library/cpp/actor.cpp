@@ -48,7 +48,7 @@ const Costume& Actor::job() const
 
 uint32_t Actor::skillsCount() const
 {
-    uint32_t len = 0U;
+    uint32_t len = _def_skills.size();
     auto equipment = this->_equipment;
     for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
     {
@@ -64,7 +64,11 @@ uint32_t Actor::skillsCount() const
 
 const Ability* Actor::skill(u_int32_t idx) const
 {
-    uint32_t len = 0;
+    uint32_t len = _def_skills.size();
+    if (idx < len)
+    {
+        return &_def_skills[idx];
+    }
     auto equipment = this->_equipment;
     for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
     {
@@ -106,11 +110,11 @@ Actor::SkillSearch Actor::aiSkill(uint32_t const defSkill, bool const restore) c
         }
     }
     return ret;*/
-    return this->skill<false>(defSkill, [restore, defSkill, this](const Ability& a, const Ability& s) -> bool
+    return this->skill<false>(defSkill, [restore, defSkill, this](const Ability& a, const Ability* s) -> bool
     {
-        return a.canPerform(*this) && ((defSkill > 0 && (a._hp < s._hp)
+        return s == nullptr || (a.canPerform(*this) && ((defSkill > 0 && (a._hp < s->_hp)
             && ((restore && a.isReviving()) || !(restore || a.targetsOnlyKO())))
-            || (defSkill == 0 && a._hp > s._hp));
+            || (defSkill == 0 && a._hp > s->_hp)));
     });
 }
 

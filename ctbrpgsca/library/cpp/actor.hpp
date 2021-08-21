@@ -137,6 +137,27 @@ namespace tbrpgsca
         const Ability* skill(F compFun) const
         {
             const Ability* ability = nullptr;
+            {
+                const uint32_t defSize = _def_skills.size();
+                for (uint32_t i = 0U; i < defSize; i += 1U)
+                {
+                    auto skill = &_def_skills.at(i);
+                    if constexpr(first)
+                    {
+                        if (compFun(*skill))
+                        {
+                            return skill;
+                        }
+                    }
+                    else
+                    {
+                        if (compFun(*skill, ability))
+                        {
+                            ability = skill;
+                        }
+                    }
+                }
+            }
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
@@ -151,16 +172,16 @@ namespace tbrpgsca
                         for (uint32_t k = 0U; k < cnt; k += 1U)
                         {
                             auto skill = &skills.at(k);
-                            if constexpr(first)
+                            if (compFun(*skill, ability))
                             {
-                                if (compFun(*skill))
+                                if constexpr(first)
                                 {
-                                    return skill;
+                                    if (compFun(*skill))
+                                    {
+                                        return skill;
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if (compFun(*skill, ability))
+                                else
                                 {
                                     ability = skill;
                                 }
@@ -175,9 +196,27 @@ namespace tbrpgsca
         template<const bool first, typename F>
         SkillSearch skill(uint32_t idx, F compFun) const
         {
-            uint32_t len = 0;
             uint32_t ret = idx;
+            uint32_t len = _def_skills.size();
             const Ability* ability = nullptr;
+            {
+                for (; idx < len; idx += 1U)
+                {
+                    auto skill = &_def_skills.at(idx);
+                    if (compFun(*skill, ability))
+                    {
+                        if constexpr(first)
+                        {
+                            return SkillSearch(skill, idx);
+                        }
+                        else
+                        {
+                            ability = skill;
+                            ret = idx;
+                        }
+                    }
+                }
+            }
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
@@ -206,7 +245,7 @@ namespace tbrpgsca
                             for (; idx < size; idx += 1U)
                             {
                                 auto skill = &skills.at(idx);
-                                if (compFun(*skill, *ability))
+                                if (compFun(*skill, ability))
                                 {
                                     if constexpr(first)
                                     {
@@ -224,14 +263,32 @@ namespace tbrpgsca
                     }
                 }
             }
-            return SkillSearch(ability, idx);
+            return SkillSearch(ability, ret);
         }
 
         template<const bool first, typename F>
         uint32_t skillIndex(F compFun) const
         {
-            uint32_t len = 0U, ret = 0U;
+            uint32_t ret = 0U;
+            uint32_t len = _def_skills.size();
             const Ability* ability = nullptr;
+            {
+                for (uint32_t i = 0U; i < len; i += 1U)
+                {
+                    auto skill = &_def_skills.at(i);
+                    if (compFun(*skill, ability))
+                    {
+                        if constexpr(first)
+                        {
+                            return i;
+                        }
+                        else
+                        {
+                            ret = i;
+                        }
+                    }
+                }
+            }
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
@@ -246,16 +303,14 @@ namespace tbrpgsca
                         for (uint32_t k = 0U; k < cnt; k += 1U)
                         {
                             auto skill = &skills.at(k);
-                            if constexpr(first)
+
+                            if (compFun(*skill, ability))
                             {
-                                if (compFun(*skill))
+                                if constexpr(first)
                                 {
                                     return k + len;
                                 }
-                            }
-                            else
-                            {
-                                if (compFun(*skill, ability))
+                                else
                                 {
                                     ret = k + len;
                                 }
@@ -308,6 +363,12 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
+        inline const static CmpsVct<const Ability, uint32_t, 2U> _def_skills
+        {
+            Ability(1, TR_TXT_SKILL_ATTACK, "", "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK, 10,0,-3, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, nullptr/*&(Play::StateMasks()[10])*/),
+            Ability(2, TR_TXT_SKILL_DEFEND, "", "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF, 0,-1,-2, FLAG_TRG_SELF,0, 0,0, false, false, nullptr, nullptr)
+        };
+
 #if USE_BIT_FIELDS
         signed int _lv: 8, _max_lv: 8, _xp: 32, _maxp: 32;
 #else
