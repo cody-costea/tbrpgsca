@@ -19,9 +19,9 @@ namespace tbrpgsca
 
     class Scene : public Play
     {
-#define USE_TARGET_LIST 1
-#define ALLOW_NO_GUARDS 1
-#define ALLOW_COVERING 1
+#define USE_TARGET_LIST 0
+#define ALLOW_NO_GUARDS 0
+#define ALLOW_COVERING 0
 
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1

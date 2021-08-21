@@ -42,7 +42,7 @@ Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the numbe
 thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS -7//3
+    #define COMPRESS_POINTERS 7//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -174,7 +174,27 @@ thus allowing compression of larger adresses, but will reduce usable memory, as 
     PROP_FLAG_GET(is##Name, Flag, GetLevel) \
     PROP_FLAG_SET_ALL(Class, Name, Flag, SetLevel, is##Name)
 
-namespace
+namespace tbrpgsca
+{
+
+    class Play;
+    class State;
+    class Scene;
+    class Ability;
+    class ItemsModel;
+    class ArenaWidget;
+    class TargetsModel;
+    class SkillsModel;
+    class Fighter;
+    class Costume;
+    class Skill;
+    class Actor;
+    class Role;
+    class Suit;
+
+}
+
+namespace cmpsptr
 {
 
     template <typename T, class P, const int opt = -1> class BasePtr
@@ -345,7 +365,7 @@ namespace
 #else
         inline bool operator!=(const P& cloned) const
         {
-            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr()) != cloned.addr());
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() != cloned.addr();
         }
 
         inline bool operator==(const P& cloned) const
@@ -711,7 +731,7 @@ namespace
                 uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
                 //qDebug() << "4294967296UL << SHIFT_LEN = " << QString::number(4294967296UL << SHIFT_LEN);
                 //qDebug() << "SHIFT_LEN = " << QString::number(SHIFT_LEN);
-                if (addr < (4294967296UL << SHIFT_LEN))
+                if (addr < 1073741824UL * (2 << SHIFT_LEN))
                 //if (addr < (10000UL))
                 {
                     //if constexpr(own)
@@ -814,7 +834,10 @@ namespace
         inline void setAddr(T* const ptr)
         {
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-            assert(addr < (4294967296UL << SHIFT_LEN)); //TODO: analyze alternative solutions
+            qDebug() << "SHIFT_LEN = " << SHIFT_LEN;
+            qDebug() << "addr = " << addr;
+            qDebug() << "1073741824UL * " << (2 << SHIFT_LEN) << " = " << (1073741824UL * (2 << SHIFT_LEN));
+            assert(addr < 1073741824UL * (2 << SHIFT_LEN)); //TODO: analyze alternative solutions
             this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
         }
 
@@ -892,17 +915,17 @@ namespace
         template <typename, typename, const int> friend struct ShrData;
         template <typename, class, const int> friend class BasePtr;
 
-        friend class Suit;
-        friend class Scene;
-        friend class Ability;
-        friend class ArenaWidget;
-        friend class TargetsModel;
-        friend class SkillsModel;
-        friend class ItemsModel;
-        friend class Costume;
-        friend class State;
-        friend class Role;
-        friend class Play;
+        friend class tbrpgsca::Suit;
+        friend class tbrpgsca::Scene;
+        friend class tbrpgsca::Ability;
+        friend class tbrpgsca::ArenaWidget;
+        friend class tbrpgsca::TargetsModel;
+        friend class tbrpgsca::SkillsModel;
+        friend class tbrpgsca::ItemsModel;
+        friend class tbrpgsca::Costume;
+        friend class tbrpgsca::State;
+        friend class tbrpgsca::Role;
+        friend class tbrpgsca::Play;
 
     };
 
@@ -1310,17 +1333,17 @@ namespace
         template <typename, typename, typename, const int> friend struct TckData;
         template <typename, class, const int> friend class BasePtr;
 
-        friend class Suit;
-        friend class Scene;
-        friend class Ability;
-        friend class ArenaWidget;
-        friend class TargetsModel;
-        friend class SkillsModel;
-        friend class ItemsModel;
-        friend class Costume;
-        friend class State;
-        friend class Role;
-        friend class Play;
+        friend class tbrpgsca::Suit;
+        friend class tbrpgsca::Scene;
+        friend class tbrpgsca::Ability;
+        friend class tbrpgsca::ArenaWidget;
+        friend class tbrpgsca::TargetsModel;
+        friend class tbrpgsca::SkillsModel;
+        friend class tbrpgsca::ItemsModel;
+        friend class tbrpgsca::Costume;
+        friend class tbrpgsca::State;
+        friend class tbrpgsca::Role;
+        friend class tbrpgsca::Play;
     };
 
     /*template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
@@ -1399,24 +1422,25 @@ inline void clear(void* ptr) noexcept
 }
 #endif
 
-namespace
+namespace cmpsptr
 {
+
     template <typename P>
     struct FixData
     {
         P _data;
 
-        friend class Suit;
-        friend class Scene;
-        friend class Ability;
-        friend class ArenaWidget;
-        friend class TargetsModel;
-        friend class SkillsModel;
-        friend class ItemsModel;
-        friend class Costume;
-        friend class State;
-        friend class Role;
-        friend class Play;
+        friend class tbrpgsca::Suit;
+        friend class tbrpgsca::Scene;
+        friend class tbrpgsca::Ability;
+        friend class tbrpgsca::ArenaWidget;
+        friend class tbrpgsca::TargetsModel;
+        friend class tbrpgsca::SkillsModel;
+        friend class tbrpgsca::ItemsModel;
+        friend class tbrpgsca::Costume;
+        friend class tbrpgsca::State;
+        friend class tbrpgsca::Role;
+        friend class tbrpgsca::Play;
 
         template<typename, typename, typename X, const X, const bool> friend class BaseVct;
     };
@@ -1428,17 +1452,17 @@ namespace
         bool _init: 1;
         P _data;
 
-        friend class Suit;
-        friend class Scene;
-        friend class Ability;
-        friend class ArenaWidget;
-        friend class TargetsModel;
-        friend class SkillsModel;
-        friend class ItemsModel;
-        friend class Costume;
-        friend class State;
-        friend class Role;
-        friend class Play;
+        friend class tbrpgsca::Suit;
+        friend class tbrpgsca::Scene;
+        friend class tbrpgsca::Ability;
+        friend class tbrpgsca::ArenaWidget;
+        friend class tbrpgsca::TargetsModel;
+        friend class tbrpgsca::SkillsModel;
+        friend class tbrpgsca::ItemsModel;
+        friend class tbrpgsca::Costume;
+        friend class tbrpgsca::State;
+        friend class tbrpgsca::Role;
+        friend class tbrpgsca::Play;
 
         template<typename, typename, typename X, const X, const bool> friend class BaseVct;
     };
@@ -1783,17 +1807,17 @@ namespace
             this->clear();
         }
 
-        friend class Suit;
-        friend class Scene;
-        friend class Ability;
-        friend class ArenaWidget;
-        friend class TargetsModel;
-        friend class SkillsModel;
-        friend class ItemsModel;
-        friend class Costume;
-        friend class State;
-        friend class Role;
-        friend class Play;
+        friend class tbrpgsca::Suit;
+        friend class tbrpgsca::Scene;
+        friend class tbrpgsca::Ability;
+        friend class tbrpgsca::ArenaWidget;
+        friend class tbrpgsca::TargetsModel;
+        friend class tbrpgsca::SkillsModel;
+        friend class tbrpgsca::ItemsModel;
+        friend class tbrpgsca::Costume;
+        friend class tbrpgsca::State;
+        friend class tbrpgsca::Role;
+        friend class tbrpgsca::Play;
 
         template<typename, typename, typename X, const X, const bool> friend class BaseVct;
     };
@@ -1801,17 +1825,15 @@ namespace
 
 namespace tbrpgsca
 {
+
+    using namespace cmpsptr;
+
     template<typename T = void, const int own = 0, const int opt = 2, const int level = CMPS_LEVEL>
     using CmpsPtr = BaseCmp<T, own, opt, level>;
     template<typename T = void, const bool weak = false, const int cow = -1, const int opt = -1, typename C = std::atomic<uint32_t>, const int level = CMPS_LEVEL>
     using CmpsCnt = BaseCnt<T, cow, weak, opt, C, level>;
     template<typename T, typename L = uint32_t, const L fixedSize = 0, typename P = CmpsPtr<T>, const bool dispose = fixedSize < 1>
     using CmpsVct = BaseVct<T, P, L, fixedSize, dispose>;
-
-    class Ability;
-    class Costume;
-    class Actor;
-    class State;
 
     class Play
     {
