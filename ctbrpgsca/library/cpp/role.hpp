@@ -57,6 +57,16 @@ namespace tbrpgsca
         bool hasState(const State& state) const;
         int statesSize() const;
 
+        inline bool operator==(const Role& cmp) const
+        {
+            return this->name() == cmp.name();
+        }
+
+        inline bool operator!=(const Role& cmp) const
+        {
+            return this->name() != cmp.name();
+        }
+
         void damage(QString& ret, Actor* const user, Actor& target, int const dmg, bool const percent) const;
     protected:
         QString _name,* _sprite;
@@ -65,15 +75,19 @@ namespace tbrpgsca
 #else
         signed int _dmg_type, _hp, _mp, _sp, _m_hp, _m_mp, _m_sp;
 #endif
-        QMap<const State*, int>* _state_dur;
+        CmpsPtr<QMap<CmpsPtr<const State>, int>> _state_dur;
 
         template <typename SpriteRun>
-        void damage(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+        void damage(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+
+        Role& operator=(const Role& role);
 
         Role(int const id, QString& name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-             int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<const State*, int>* const states);
+             int const mMp, int const mSp, int const element, bool const range, bool const revive, CmpsPtr<QMap<CmpsPtr<const State>, int>> const states);
 
         Role(const Role& role);
+
+        inline Role() : Play() {}
 
         ~Role();
 
@@ -82,6 +96,10 @@ namespace tbrpgsca
         friend class Costume;
         friend class State;
         friend class Scene;
+
+        template <typename, class, const int> friend class BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
     };
 
 }

@@ -34,8 +34,8 @@ namespace tbrpgsca
         State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const element, int const blockedSkills,
               int const hpDmg, int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi,
               int const wis, int const agi, bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect,
-              bool const ko, bool const invincible, bool const revive, QVector<const Ability*>* const aSkills, QVector<const Ability*>* const counters,
-              QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res);
+              bool const ko, bool const invincible, bool const revive, CmpsVct<CmpsVct<const Ability>, uint32_t, 2U> aSkills, bool const counters,
+              CmpsPtr<QMap<CmpsPtr<const State>, int>> const states, CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes, QMap<int, int>* const res);
 
         State(const State& state);
 
@@ -48,15 +48,21 @@ namespace tbrpgsca
 #endif
         //QVector<const Ability*>* _r_skills;
 
-        void alter(QString* const ret, Scene* const scene, Actor& actor, bool const consume) const;
-        void inflict(QString* const ret, Scene* const scene, Actor* user, Actor& target, int dur, bool const always) const;
-        bool disable(QString* const ret, Scene* const scene, Actor& actor, int dur, bool const remove) const;
-        void remove(QString* const ret, Scene* const scene, Actor& actor) const;
+        void alter(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, bool const consume) const;
+        void inflict(QString* const ret, CmpsPtr<Scene> scene, Actor* user, Actor& target, int dur, bool const always) const;
+        bool disable(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, int dur, bool const remove) const;
+        void remove(QString* const ret, CmpsPtr<Scene> scene, Actor& actor) const;
+
+        inline State() : Costume() {}
 
         friend class Actor;
         friend class Ability;
         friend class Costume;
         friend class Scene;
+
+        template <typename, class, const int> friend class BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
     };
 
 }

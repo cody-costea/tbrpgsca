@@ -17,29 +17,29 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-int Ability::removedStateDuration(const State& state) const
+/*int Ability::removedStateDuration(const State& state) const
 {
-    QMap<const State*, int>* aStates = this->_r_states;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->value(&state, 0);
 }
 
 QList<const State*> Ability::removedStatesList() const
 {
-    QMap<const State*, int>* aStates = this->_r_states;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> aStates = this->_r_states;
     return aStates == nullptr ? QList<const State*>() : aStates->keys();
 }
 
 bool Ability::removedState(const State& state) const
 {
-    QMap<const State*, int>* aStates = this->_r_states;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> aStates = this->_r_states;
     return aStates && aStates->contains(&state);
 }
 
 int Ability::removedStatesSize() const
 {
-    QMap<const State*, int>* aStates = this->_r_states;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> aStates = this->_r_states;
     return aStates == nullptr ? 0 : aStates->size();
-}
+}*/
 
 void Ability::replenish(Actor& user) const
 {
@@ -64,7 +64,7 @@ void Ability::applyCosts(Actor &user) const
 }
 
 template <typename SpriteRun>
-void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const SpriteRun* const spriteRun) const
+void Ability::applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun) const
 {
     user.setCurrentRp(user._sp - this->_m_sp);
     user.setCurrentMp(user._mp - this->_m_mp);
@@ -96,7 +96,7 @@ void Ability::execute(QString& ret, Actor& user, Actor& target) const
 }
 
 template <typename SpriteRun>
-void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target) const
+void Ability::execute(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun, Actor& user, Actor* target) const
 {
     //assert(target);
     const Ability& ability = *this;
@@ -163,7 +163,7 @@ void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const s
             }
             ability.damage(ret, scene, spriteRun, (ability.isAbsorbing() ? &user : nullptr), *target, dmg, false);
             {
-                QMap<const State*, int>* aStates = ability._state_dur;
+                CmpsPtr<QMap<CmpsPtr<const State>, int>> aStates = ability._state_dur;
                 if (aStates)
                 {
                     auto const last = aStates->cend();
@@ -174,10 +174,10 @@ void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const s
                 }
             }
             {
-                QMap<const State*, int>* stateDur = target->_state_dur;
+                CmpsPtr<QMap<CmpsPtr<const State>, int>> stateDur = target->_state_dur;
                 if (stateDur)
                 {
-                    QMap<const State*, int>* rStates = ability._r_states;
+                    CmpsPtr<QMap<CmpsPtr<const State>, int>> rStates = ability._r_states;
                     if (rStates)
                     {
                         auto const rLast = rStates->cend();
@@ -186,11 +186,11 @@ void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const s
                             int const rDur = rIt.value();
                             if (rDur > STATE_END_DUR)
                             {
-                                const State* const rState = rIt.key();
+                                auto rState = rIt.key().ptr();
                                 auto const last = stateDur->cend();
                                 for (auto it = stateDur->cbegin(); it != last; ++it)
                                 {
-                                    const State* const aState = it.key();
+                                    auto aState = it.key().ptr();
                                     if (aState == rState)
                                     {
                                         if (it.value() > STATE_END_DUR)
@@ -283,9 +283,28 @@ void Ability::execute(QString& ret, Scene* const scene, const SpriteRun* const s
 
 }
 
+Ability& Ability::operator=(const Ability& ability)
+{
+    return const_cast<Ability&>(const_cast<const Ability*>(this)->operator=(ability));
+}
+
+Ability& Ability::operator=(const Ability& copied) const
+{
+    auto& ability = const_cast<Ability&>(*this);
+    ability.Role::operator=(ability);
+    ability._lv_rq = copied._lv_rq;
+    ability._m_qty = copied._m_qty;
+    ability._r_qty = copied._r_qty;
+    //this->_attr_inc = attrInc;
+    auto snd = copied._sound;
+    ability._sound = snd ? new QString(*snd) : nullptr;
+    ability._r_states = copied._r_states;
+    return ability;
+}
+
 Ability::Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                  int const hpC, int const mpC, int const spC, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
-                 int const mQty, int const rQty, bool const absorb, bool const revive, QMap<const State*, int>* const aStates, QMap<const State*, int>* const rStates)
+                 int const mQty, int const rQty, bool const absorb, bool const revive, CmpsPtr<QMap<CmpsPtr<const State>, int>> const aStates, CmpsPtr<QMap<CmpsPtr<const State>, int>> const rStates)
     : Role(id, name, sprite, hpDmg, mpDmg, spDmg, hpC, mpC, spC, (elm | dmgType), range, hpDmg < 0 && revive, aStates)
 {
     this->_lv_rq = lvRq;
@@ -339,8 +358,8 @@ Ability::~Ability()
 }
 
 #if USE_TEMPLATE
-template void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const ArenaWidget* const spriteRun) const;
-template void Ability::execute(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target) const;
+template void Ability::applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun) const;
+template void Ability::execute(QString& ret, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target) const;
 #endif
-template void Ability::applyCosts(QString* ret, Actor& user, Scene* const scene, const Scene::SpriteAct* const spriteRun) const;
-template void Ability::execute(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target) const;
+template void Ability::applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun) const;
+template void Ability::execute(QString& ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target) const;

@@ -38,7 +38,7 @@ void State::inflict(QString& ret, Actor* user, Actor& target, int dur, const boo
     return this->inflict(&ret, nullptr, user, target, dur, always);
 }
 
-void State::inflict(QString* const ret, Scene* const scene, Actor* const user, Actor& target, int stateDur, const bool always) const
+void State::inflict(QString* const ret, CmpsPtr<Scene> scene, Actor* const user, Actor& target, int stateDur, const bool always) const
 {
     const State& state = *this;
     if (stateDur == 0)
@@ -52,21 +52,21 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
     if (stateDur > STATE_END_DUR)
     {
         int stateRes;
-        QMap<const State*, int>* stRes;
+        CmpsPtr<QMap<CmpsPtr<const State>, int>> stRes;
         if (always || (stateRes = state._s_res) < 0 || ((std::rand() % 10) > (((stRes = target._st_res)
                 == nullptr ? 0 : stRes->value(this, 0) + stRes->value(nullptr, 0)) + stateRes)))
         {
-            QMap<const State*, int>* trgStates = target._state_dur;
+            CmpsPtr<QMap<CmpsPtr<const State>, int>> trgStates = target._state_dur;
             if (trgStates)
             {
-                QMap<const State*, int>* const rStates = state._state_dur;
+                CmpsPtr<QMap<CmpsPtr<const State>, int>> const rStates = state._state_dur;
                 if (rStates)
                 {
                     auto const rLast = rStates->cend();
                     for (auto rIt = rStates->cbegin(); rIt != rLast; ++rIt)
                     {
                         int rDur = rIt.value();
-                        const State* const rState = rIt.key();
+                        const State* const rState = rIt.key().ptr();
                         if (rDur == 0 || rDur <= STATE_END_DUR)
                         {
                             rDur = rState->_dur;
@@ -74,7 +74,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
                         auto const last = trgStates->cend();
                         for (auto it = trgStates->cbegin(); it != last; ++it)
                         {
-                            const State* const aState = it.key();
+                            const State* const aState = it.key().ptr();
                             if (aState == rState)
                             {
                                 int const aDur = it.value();
@@ -101,7 +101,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
             }
             else
             {
-                trgStates = new QMap<const State*, int>();
+                trgStates = new QMap<CmpsPtr<const State>, int>();
                 target._state_dur = trgStates;
             }
             //state.blockSkills(target, false);
@@ -124,7 +124,7 @@ void State::inflict(QString* const ret, Scene* const scene, Actor* const user, A
 
 }
 
-void State::remove(QString* const ret, Scene* const scene, Actor& actor) const
+void State::remove(QString* const ret, CmpsPtr<Scene> scene, Actor& actor) const
 {
     const State& state = *this;
     //state.blockSkills(actor, true);
@@ -136,7 +136,7 @@ bool State::disable(Actor& actor, int const dur, const bool remove) const
     return this->disable(nullptr, nullptr, actor, remove, dur);
 }
 
-bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int dur, const bool remove) const
+bool State::disable(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, int dur, const bool remove) const
 {
     if (dur == 0)
     {
@@ -144,7 +144,7 @@ bool State::disable(QString* const ret, Scene* const scene, Actor& actor, int du
     }
     if (dur > STATE_END_DUR)
     {
-        QMap<const State*, int>* sDur = actor._state_dur;
+        CmpsPtr<QMap<CmpsPtr<const State>, int>> sDur = actor._state_dur;
         if (sDur)
         {
             int const crDur = sDur->value(this, STATE_END_DUR);
@@ -191,10 +191,10 @@ void State::alter(QString& ret, Actor& actor, const bool consume) const
     return this->alter(&ret, nullptr, actor, consume);
 }
 
-void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bool consume) const
+void State::alter(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, const bool consume) const
 {
     const State& state = *this;
-    QMap<const State*, int>* sDur = actor._state_dur;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> sDur = actor._state_dur;
     if (sDur /*&& actor.hp > 0*/)
     {
         int const d = sDur->value(this, STATE_END_DUR);
@@ -257,8 +257,8 @@ void State::alter(QString* const ret, Scene* const scene, Actor& actor, const bo
 State::State(int const id, QString name, QString sprite, bool const shapeShift, int const dur, int const sRes, int const elm, int const blockedSkills, int const hpDmg,
              int const mpDmg, int const spDmg, int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
              bool const stun, bool const range, bool const automate, bool const confuse, bool const convert, bool const reflect, bool const ko, bool const invincible,
-             bool const revive, QVector<const Ability*>* const aSkills, QVector<const Ability*>* const counters, QMap<const State*, int>* const states,
-             QMap<const State*, int>* const stRes, QMap<int, int>* const res)
+             bool const revive, CmpsVct<CmpsVct<const Ability>, uint32_t, 2U> aSkills, bool const counters, CmpsPtr<QMap<CmpsPtr<const State>, int>> const states,
+             CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes, QMap<int, int>* const res)
     : Costume(id, name, sprite, shapeShift, elm, blockedSkills, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range, automate, confuse, reflect, ko,
               invincible, revive, aSkills, counters, states, stRes, res)
 {

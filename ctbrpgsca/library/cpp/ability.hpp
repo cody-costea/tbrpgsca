@@ -56,9 +56,11 @@ namespace tbrpgsca
         bool canPerform(const Actor& user) const;
         void execute(QString& ret, Actor& user, Actor& target) const;
 
+        Ability& operator=(const Ability& ability);
+
         Ability(int const id, QString name, QString sprite, QString sound, bool const steal, bool const range, bool const melee, bool const canMiss, int const lvRq,
                 int const hpCost, int const mpCost, int const spCost, int const dmgType, int const hpDmg, int const mpDmg, int const spDmg, int const trg, int const elm,
-                int const mQty, int const rQty, bool const absorb, bool const revive, QMap<const State*, int>* const aStates, QMap<const State*, int>* const rStates);
+                int const mQty, int const rQty, bool const absorb, bool const revive, CmpsPtr<QMap<CmpsPtr<const State>, int>> const aStates, CmpsPtr<QMap<CmpsPtr<const State>, int>> const rStates);
 
         Ability(const Ability& ability);
 
@@ -69,14 +71,19 @@ namespace tbrpgsca
 #else
         signed int _lv_rq, _m_qty, _r_qty;
 #endif
-        QMap<const State*, int>* _r_states;
+        //CmpsPtr<QMap<CmpsPtr<const State>, int>> _state_dur;
+        CmpsPtr<QMap<CmpsPtr<const State>, int>> _r_states;
         QString* _sound;
 
         template <typename SpriteRun>
-        void applyCosts(QString* ret, Actor& user, Scene* const scene, const SpriteRun* const spriteRun) const;
+        void applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun) const;
 
         template <typename SpriteRun>
-        void execute(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor& user, Actor* target) const;
+        void execute(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun, Actor& user, Actor* target) const;
+
+        Ability& operator=(const Ability& ability) const;
+
+        inline Ability() : Role() {}
 
         friend class Actor;
         friend class Costume;
@@ -85,6 +92,10 @@ namespace tbrpgsca
         friend class ItemsModel;
         friend class State;
         friend class Scene;
+
+        template <typename, class, const int> friend class BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
     };
 
 }

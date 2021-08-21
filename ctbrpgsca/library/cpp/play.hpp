@@ -8,6 +8,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #ifndef PLAY_HPP
 #define PLAY_HPP
 
+#include <cstring>
 #include <atomic>
 #include <mutex>
 
@@ -214,13 +215,13 @@ namespace
         template<typename R = T*>
         inline auto ptr() -> std::enable_if_t<(opt > 1), R>
         {
-            return static_cast<P*>(this)->P::addr();
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->P::addr();
         }
 
         template<typename R = const T*>
         inline auto ptr() const -> std::enable_if_t<(opt > 1), R>
         {
-            return static_cast<P*>(this)->P::addr();
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->P::addr();
         }
 
         template<typename R = T*>
@@ -284,62 +285,94 @@ namespace
 
         inline bool operator<(const T* const ptr) const
         {
-            return static_cast<P*>(this)->addr() < ptr;
-        }
-
-        inline bool operator<(const P& cloned) const
-        {
-            return static_cast<P*>(this)->_ptr < cloned._ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() < ptr;
         }
 
         inline bool operator>(const T* const ptr) const
         {
-            return static_cast<P*>(this)->addr() > ptr;
-        }
-
-        inline bool operator>(const P& cloned) const
-        {
-            return static_cast<P*>(this)->_ptr > cloned._ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() > ptr;
         }
 
         inline bool operator<=(const T* const ptr) const
         {
-            return static_cast<P*>(this)->addr() <= ptr;
-        }
-        inline bool operator<=(const P& cloned) const
-        {
-            return static_cast<P*>(this)->_ptr <= cloned._ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() <= ptr;
         }
 
         inline bool operator>=(const T* const ptr) const
         {
-            return static_cast<P*>(this)->addr() >= ptr;
-        }
-
-        inline bool operator>=(const P& cloned) const
-        {
-            return static_cast<P*>(this)->_ptr >= cloned._ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() >= ptr;
         }
 
         inline bool operator==(const T* const ptr) const
         {
-            return static_cast<P*>(this)->addr() == ptr;
-        }
-
-        inline bool operator==(const P& cloned) const
-        {
-            return static_cast<P*>(this)->_ptr == cloned._ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() == ptr;
         }
 
         inline bool operator!=(const T* const ptr) const
         {
-            return static_cast<P*>(this)->addr() != ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() != ptr;
+        }
+#if COMPRESS_POINTERS < 1
+        inline bool operator!=(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr != cloned._ptr;
         }
 
-        inline bool operator!=(const P& cloned)
+        inline bool operator==(const P& cloned) const
         {
-            return static_cast<P*>(this)->_ptr != cloned._ptr;
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr == cloned._ptr;
         }
+
+        inline bool operator<=(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr <= cloned._ptr;
+        }
+
+        inline bool operator<(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr < cloned._ptr;
+        }
+
+        inline bool operator>(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr > cloned._ptr;
+        }
+
+        inline bool operator>=(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->_ptr >= cloned._ptr;
+        }
+#else
+        inline bool operator!=(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr()) != cloned.addr());
+        }
+
+        inline bool operator==(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() == cloned.addr();
+        }
+
+        inline bool operator<=(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() <= cloned.addr();
+        }
+
+        inline bool operator<(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() < cloned.addr();
+        }
+
+        inline bool operator>(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() > cloned.addr();
+        }
+
+        inline bool operator>=(const P& cloned) const
+        {
+            return static_cast<P*>(const_cast<BasePtr<T, P, opt>*>(this))->addr() >= cloned.addr();
+        }
+#endif
 
         inline P& operator=(P&& cloned)
         {
@@ -859,6 +892,18 @@ namespace
         template <typename, typename, const int> friend struct ShrData;
         template <typename, class, const int> friend class BasePtr;
 
+        friend class Suit;
+        friend class Scene;
+        friend class Ability;
+        friend class ArenaWidget;
+        friend class TargetsModel;
+        friend class SkillsModel;
+        friend class ItemsModel;
+        friend class Costume;
+        friend class State;
+        friend class Role;
+        friend class Play;
+
     };
 
     template <typename C>
@@ -1264,6 +1309,18 @@ namespace
         template<typename, typename, typename L, const L, const bool> friend class BaseVct;
         template <typename, typename, typename, const int> friend struct TckData;
         template <typename, class, const int> friend class BasePtr;
+
+        friend class Suit;
+        friend class Scene;
+        friend class Ability;
+        friend class ArenaWidget;
+        friend class TargetsModel;
+        friend class SkillsModel;
+        friend class ItemsModel;
+        friend class Costume;
+        friend class State;
+        friend class Role;
+        friend class Play;
     };
 
     /*template <typename T, const int cow = 0, const bool weak = false, const int opt = -1,
@@ -1276,10 +1333,92 @@ namespace
         template <typename, class, const int> friend class BasePtr;
     };*/
 
+}
+
+#if ALIGN_POINTERS
+    #ifdef Q_OS_WINDOWS
+inline void* alloc(const std::size_t size)
+{
+    return _aligned_malloc(size, ALIGN_POINTERS);
+}
+
+inline void clear(void* ptr) noexcept
+{
+    _aligned_free(ptr);
+}
+    #else
+inline void clear(void* ptr) noexcept
+{
+    free(ptr);
+}
+        #ifdef Q_OS_ANDROID
+inline void* alloc(const std::size_t size)
+{
+    void* ptr;
+    posix_memalign(&ptr, ALIGN_POINTERS, size);
+    return ptr;
+}
+        #else
+inline void* alloc(const std::size_t size)
+{
+    return std::aligned_alloc(ALIGN_POINTERS, size);
+}
+        #endif
+    #endif
+inline void* operator new(const std::size_t size, std::nothrow_t)
+{
+    return alloc(size);
+}
+
+inline void* operator new(const std::size_t size)
+{
+    auto ptr = alloc(size);
+    if (ptr)
+    {
+        return ptr;
+    }
+    else
+    {
+        throw std::bad_alloc {};
+    }
+}
+
+inline void operator delete(void* ptr) noexcept
+{
+    clear(ptr);
+}
+#else
+inline void* alloc(const std::size_t size)
+{
+    return std::malloc(size);
+}
+
+inline void clear(void* ptr) noexcept
+{
+    free(ptr);
+}
+#endif
+
+namespace
+{
     template <typename P>
     struct FixData
     {
         P _data;
+
+        friend class Suit;
+        friend class Scene;
+        friend class Ability;
+        friend class ArenaWidget;
+        friend class TargetsModel;
+        friend class SkillsModel;
+        friend class ItemsModel;
+        friend class Costume;
+        friend class State;
+        friend class Role;
+        friend class Play;
+
+        template<typename, typename, typename X, const X, const bool> friend class BaseVct;
     };
 
     template <typename P, typename L>
@@ -1288,6 +1427,20 @@ namespace
         L _length: (sizeof(L) * 8) - 1;
         bool _init: 1;
         P _data;
+
+        friend class Suit;
+        friend class Scene;
+        friend class Ability;
+        friend class ArenaWidget;
+        friend class TargetsModel;
+        friend class SkillsModel;
+        friend class ItemsModel;
+        friend class Costume;
+        friend class State;
+        friend class Role;
+        friend class Play;
+
+        template<typename, typename, typename X, const X, const bool> friend class BaseVct;
     };
 
     template<typename T, typename P = BaseCmp<T>, typename L = uint32_t, const L fixedSize = 0, const bool dispose = fixedSize < 1>
@@ -1320,8 +1473,6 @@ namespace
             return const_cast<BaseVct*>(this)->_data.addr()[index];
         }
 
-        inline BaseVct<T, P, L, fixedSize, dispose>() {}
-
     public:
         inline T* begin()
         {
@@ -1330,7 +1481,7 @@ namespace
 
         inline T* end()
         {
-            return &(this->_data.addr()[this->_length - 1]);
+            return &(this->_data.addr()[this->size() - 1]);
         }
 
         inline const T* cbegin() const
@@ -1340,7 +1491,7 @@ namespace
 
         inline const T* cend() const
         {
-            return &(this->_data.addr()[this->_length - 1]);
+            return &(this->_data.addr()[this->size() - 1]);
         }
 
         inline T* begin() const
@@ -1350,7 +1501,7 @@ namespace
 
         inline T* end() const
         {
-            return &(this->_data.addr()[this->_length - 1]);
+            return &(this->_data.addr()[this->size() - 1]);
         }
 
         inline const L size() const
@@ -1420,6 +1571,96 @@ namespace
             return this->_data;
         }
 
+        inline bool operator<(const T* const ptr) const
+        {
+            return this->ptr().addr() < ptr;
+        }
+
+        inline bool operator>(const T* const ptr) const
+        {
+            return this->ptr().addr() > ptr;
+        }
+
+        inline bool operator<=(const T* const ptr) const
+        {
+            return this->ptr().addr() <= ptr;
+        }
+
+        inline bool operator>=(const T* const ptr) const
+        {
+            return this->ptr().addr() >= ptr;
+        }
+
+        inline bool operator==(const T* const ptr) const
+        {
+            return this->ptr().addr() == ptr;
+        }
+
+        inline bool operator!=(const T* const ptr) const
+        {
+            return this->ptr().addr() != ptr;
+        }
+
+        inline bool operator!=(const P& cloned) const
+        {
+            return this->ptr() != cloned.ptr();
+        }
+
+        inline bool operator==(const P& cloned) const
+        {
+            return this->ptr() == cloned.ptr();
+        }
+
+        inline bool operator<=(const P& cloned) const
+        {
+            return this->ptr() <= cloned.ptr();
+        }
+
+        inline bool operator<(const P& cloned) const
+        {
+            return this->ptr() < cloned.ptr();
+        }
+
+        inline bool operator>(const P& cloned) const
+        {
+            return this->ptr() > cloned.ptr();
+        }
+
+        inline bool operator>=(const P& cloned) const
+        {
+            return this->ptr() >= cloned.ptr();
+        }
+
+        inline bool operator!=(const BaseVct& cloned) const
+        {
+            return this->ptr() != cloned.ptr();
+        }
+
+        inline bool operator==(const BaseVct& cloned) const
+        {
+            return this->ptr() == cloned.ptr();
+        }
+
+        inline bool operator<=(const BaseVct& cloned) const
+        {
+            return this->ptr() <= cloned.ptr();
+        }
+
+        inline bool operator<(const BaseVct& cloned) const
+        {
+            return this->ptr() < cloned.ptr();
+        }
+
+        inline bool operator>(const BaseVct& cloned) const
+        {
+            return this->ptr() > cloned.ptr();
+        }
+
+        inline bool operator>=(const BaseVct& cloned) const
+        {
+            return this->ptr() >= cloned.ptr();
+        }
+
         inline operator P() const
         {
            return this->ptr();
@@ -1443,18 +1684,20 @@ namespace
         template<L newSize = 0>
         inline operator BaseVct<T, P, L, newSize, false>() const
         {
-            static_assert(newSize <= fixedSize, "The compressed array passed, has fewer elements than required.");
+            static_assert(fixedSize < 1 || newSize <= fixedSize, "The compressed array passed, has fewer elements than required.");
             BaseVct<T, P, L, newSize, false> ret;
             ret._data = this->_data;
             if constexpr(newSize < 1)
             {
-                ret._length = this->size();
+                const auto size = this->size();
+                assert(size <= newSize);
+                ret._length = size;
                 ret._init = false;
             }
             return ret;
         }
 
-        inline BaseVct<T, P, L, fixedSize, dispose>(std::nullptr_t)
+        /*inline BaseVct<T, P, L, fixedSize, dispose>(std::nullptr_t)
         {
             if constexpr(fixedSize < 1)
             {
@@ -1462,7 +1705,7 @@ namespace
                 this->_length = 0;
             }
             this->_data = P(nullptr);
-        }
+        }*/
 
         inline BaseVct<T, P, L, fixedSize, dispose>(const BaseVct& copy)
         {
@@ -1476,7 +1719,8 @@ namespace
 
         inline BaseVct<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize, const bool own = false)
         {
-            static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
+            //static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
+            assert(fixedSize < 1 || size <= fixedSize);
             this->_data = beginPtr;
             if constexpr(fixedSize < 1)
             {
@@ -1485,10 +1729,11 @@ namespace
             }
         }
 
-        inline BaseVct<T, P, L, fixedSize, dispose>(const T* beginPtr, const L size = fixedSize, const bool own = false)
+        inline BaseVct<T, P, L, fixedSize, dispose>(T* beginPtr = nullptr, const L size = fixedSize, const bool own = false)
         {
-            static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
-            this->_data = beginPtr;
+            //static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
+            assert(fixedSize < 1 || size <= fixedSize);
+            this->_data = P(beginPtr);
             if constexpr(fixedSize < 1)
             {
                 this->_length = size < 0 ? size * -1 : size;
@@ -1504,15 +1749,18 @@ namespace
                 auto end = list.end();
                 auto size = list.size();
                 //auto data = new (std::nothrow) T[size];
-                auto data = new T[size];
+                auto length = sizeof(T) * size;
+                auto data = alloc(length);
                 if (data)
                 {
-                    for (auto it = list.begin(); i < size && it != end; ++it)
+                    /*for (auto it = list.begin(); i < size && it != end; ++it)
                     {
                         data[i++] = *it;
-                    }
+                    }*/
+                    //std::memcpy(const_cast<void*>(static_cast<const void*>(const_cast<const T*>(data))), list.begin(), length);
+                    std::memcpy(data, list.begin(), length);
                     this->_length = size;
-                    this->_data = P(data);
+                    this->_data = P(static_cast<T*>(data));
                     this->_init = true;
                 }
                 else
@@ -1524,7 +1772,8 @@ namespace
             }
             else
             {
-                static_assert(fixedSize <= list.size(), "The initialization list passed, has fewer elements than required.");
+                //static_assert(fixedSize <= list.size(), "The initialization list passed, has fewer elements than required.");
+                assert(fixedSize <= list.size());
                 this->_data = list.begin();
             }
         }
@@ -1533,73 +1782,23 @@ namespace
         {
             this->clear();
         }
+
+        friend class Suit;
+        friend class Scene;
+        friend class Ability;
+        friend class ArenaWidget;
+        friend class TargetsModel;
+        friend class SkillsModel;
+        friend class ItemsModel;
+        friend class Costume;
+        friend class State;
+        friend class Role;
+        friend class Play;
+
+        template<typename, typename, typename X, const X, const bool> friend class BaseVct;
     };
-
 }
 
-#if ALIGN_POINTERS
-    #ifdef Q_OS_WINDOWS
-inline void* alloc(const std::size_t size)
-{
-    return _aligned_malloc(size, ALIGN_POINTERS);
-}
-
-inline void clear(void* ptr) noexcept
-{
-    _aligned_free(ptr);
-}
-    #else
-inline void clear(void* ptr) noexcept
-{
-    free(ptr);
-}
-        #ifdef Q_OS_ANDROID
-inline void* alloc(const std::size_t size)
-{
-    void* ptr;
-    posix_memalign(&ptr, ALIGN_POINTERS, size);
-    return ptr;
-}
-        #else
-inline void* alloc(const std::size_t size)
-{
-    return std::aligned_alloc(ALIGN_POINTERS, size);
-}
-        #endif
-    #endif
-inline void* operator new(const std::size_t size, std::nothrow_t)
-{
-    return alloc(size);
-}
-
-inline void* operator new(const std::size_t size)
-{
-    auto ptr = alloc(size);
-    if (ptr)
-    {
-        return ptr;
-    }
-    else
-    {
-        throw std::bad_alloc {};
-    }
-}
-
-inline void operator delete(void* ptr) noexcept
-{
-    clear(ptr);
-}
-#else
-inline void* alloc(const std::size_t size)
-{
-    return std::malloc(size);
-}
-
-inline void clear(void* ptr) noexcept
-{
-    free(ptr);
-}
-#endif
 namespace tbrpgsca
 {
     template<typename T = void, const int own = 0, const int opt = 2, const int level = CMPS_LEVEL>
@@ -1620,14 +1819,14 @@ namespace tbrpgsca
         PROP_CUSTOM_FIELD(Play, playFlags, setPlayFlags, swapPlayFlags, withPlayFlags, int, public, protected, _play_flags)
     public:
         static void FreeDemoMemory();
-        static QVector<Actor*>& Players();
-        static QVector<const State*>& States();
-        static QVector<QVector<const Ability*>*>& Abilities();
-        static QVector<QMap<const State*, int>*>& StateMasks();
-        static QVector<QVector<Actor*>*>& Enemies();
-        static QVector<const Ability*>& PartyItems();
-        static QVector<const Costume*>& Races();
-        static QVector<const Costume*>& Jobs();
+        static CmpsVct<Actor> Players();
+        static CmpsVct<const State, uint32_t, 12> States();
+        static CmpsVct<CmpsVct<const Ability>> Abilities();
+        static CmpsVct<QMap<CmpsPtr<const State>, int>> StateMasks();
+        static CmpsVct<CmpsVct<Actor>> Enemies();
+        static CmpsVct<const Ability> PartyItems();
+        static CmpsVct<const Costume> Races();
+        static CmpsVct<const Costume> Jobs();
 
         inline bool hasAllFlags(unsigned int const flag) const
         {
@@ -1638,13 +1837,13 @@ namespace tbrpgsca
             return (this->_play_flags & flag) != 0;
         }
     protected:
-        inline static QVector<Actor*> _Players;
+        /*inline static QVector<Actor*> _Players;
         inline static QVector<QVector<Actor*>*> _Enemies;
         inline static QVector<QMap<const State*, int>*> _State_Masks;
-        inline static QVector<QVector<const Ability*>*> _Abilities;
+        inline static CmpsVct<CmpsVct<const Ability>> _Abilities;
         inline static QVector<const Costume*> _Races, _Jobs;
         inline static QVector<const Ability*> _PartyItems;
-        inline static QVector<const State*> _States;
+        inline static QVector<const State*> _States;*/
 
 #if USE_BIT_FIELDS
         unsigned int _play_flags: 16;
@@ -1666,11 +1865,21 @@ namespace tbrpgsca
             return *this;
         }
 
-        Play();
+        inline Play& operator=(const Play& play)
+        {
+             this->_play_flags = play._play_flags;
+        }
 
-        Play(int const flags);
+        inline Play(int const flags = 0)
+        {
+             this->_play_flags = flags;
+        }
 
-        ~Play();
+        inline ~Play() {}
+
+        template <typename, class, const int> friend class BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
     };
 
 }

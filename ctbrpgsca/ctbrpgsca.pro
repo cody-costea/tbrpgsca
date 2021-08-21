@@ -46,6 +46,7 @@ SOURCES += \
         library/cpp/scene.cpp \
         library/cpp/skillsmodel.cpp \
         library/cpp/state.cpp \
+        library/cpp/suit.cpp \
         library/cpp/targetsmodel.cpp \
         main.cpp
 
@@ -68,6 +69,7 @@ HEADERS += \
         library/cpp/scene.hpp \
         library/cpp/skillsmodel.hpp \
         library/cpp/state.hpp \
+        library/cpp/suit.hpp \
         library/cpp/targetsmodel.hpp \
         library/translations.h
 

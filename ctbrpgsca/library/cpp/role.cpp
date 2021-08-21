@@ -22,29 +22,29 @@ QString Role::sprite() const
     return spr ? *spr : QString();
 }
 
-int Role::stateDuration(const State& state) const
+/*int Role::stateDuration(const State& state) const
 {
-    QMap<const State*, int>* const aStates = this->_state_dur;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> const aStates = this->_state_dur;
     return aStates ? aStates->value(&state, 0) : 0;
 }
 
 QList<const State*> Role::statesList() const
 {
-    QMap<const State*, int>* const aStates = this->_state_dur;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> const aStates = this->_state_dur;
     return aStates ? aStates->keys() : QList<const State*>();
 }
 
 bool Role::hasState(const State& state) const
 {
-    QMap<const State*, int>* const aStates = this->_state_dur;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> const aStates = this->_state_dur;
     return aStates && aStates->contains(&state);
 }
 
 int Role::statesSize() const
 {
-    QMap<const State*, int>* const aStates = this->_state_dur;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> const aStates = this->_state_dur;
     return aStates ? aStates->size() : 0;
-}
+}*/
 
 void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const dmg, bool const percent) const
 {
@@ -52,7 +52,7 @@ void Role::damage(QString& ret, Actor* const absorber, Actor& target, int const 
 }
 
 template <typename SpriteRun>
-void Role::damage(QString& ret, Scene* const scene, const SpriteRun* const spriteRun, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
+void Role::damage(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
     const Role& role = *this;
     if (!actor.Costume::isInvincible())
@@ -199,8 +199,25 @@ void Role::damage(QString& ret, Scene* const scene, const SpriteRun* const sprit
     }
 }
 
+Role& Role::operator=(const Role &role)
+{
+    this->Play::operator=(role);
+    this->_name = role._name;
+    auto spr = role._sprite;
+    this->_sprite = spr ? new QString(*spr) : nullptr;
+    this->_m_hp = role._m_hp;
+    this->_m_mp = role._m_mp;
+    this->_m_sp = role._m_sp;
+    this->_hp = role._hp;
+    this->_mp = role._mp;
+    this->_sp = role._sp;
+    this->_dmg_type = role._dmg_type;
+    this->_state_dur = role._state_dur;
+    return *this;
+}
+
 Role::Role(int const id, QString &name, QString& sprite, int const hpDmg, int const mpDmg, int const spDmg, int const mHp,
-           int const mMp, int const mSp, int const element, bool const range, bool const revive, QMap<const State*, int>* aStates)
+           int const mMp, int const mSp, int const element, bool const range, bool const revive, CmpsPtr<QMap<CmpsPtr<const State>, int>> aStates)
     : Play(((revive ? FLAG_REVIVE : 0) | (range ? FLAG_RANGE : 0)))
 {
     this->_name = name;
@@ -240,7 +257,7 @@ Role::~Role()
 }
 
 #if USE_TEMPLATE
-template void Role::damage(QString& ret, Scene* const scene, const ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+template void Role::damage(QString& ret, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
 #endif
 
-template void Role::damage(QString& ret, Scene* const scene, const Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+template void Role::damage(QString& ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;

@@ -15,9 +15,9 @@ namespace tbrpgsca
 
     class Scene;
 
-    class Actor : public Costume
+    class Actor : public Suit
     {
-#define USE_DMG_ROLES 1
+#define USE_DMG_ROLES 0
 
         #define FLAG_ACTIVE 32768
         #define FLAG_AI_PLAYER 8192
@@ -78,6 +78,47 @@ namespace tbrpgsca
         PROP_FLAG_SET_ALL(Actor, DmgRole, FLAG_DMG_ROLE, public, hasDmgRole)
 #endif
     public:
+        enum EquipPos : uint8_t
+        {
+            JOB = 0U,
+            RACE = 1U,
+            HEAD = 2U,
+            BODY = 3U,
+            WEAPON = 4U,
+            SHIELD = 5U,
+            EXTRA1 = 6U,
+            EXTRA2 = 7U,
+            COUNT = 8U
+        };
+
+        struct SkillSearch
+        {
+            const uint32_t index;
+            const Ability* const ability;
+
+            inline operator const int() const
+            {
+                return this->index;
+            }
+
+            inline operator const uint32_t() const
+            {
+                return this->index;
+            }
+
+            inline operator const Ability*() const
+            {
+                return this->ability;
+            }
+
+            inline operator const Ability&() const
+            {
+                return *this->ability;
+            }
+
+            inline SkillSearch(const Ability* const ability, const uint32_t index) : index(index), ability(ability) {}
+        };
+
         inline static const QString KoTxt = TR_TXT_SCENE_FALLS;
 
         QMap<const Ability*, int> items() const;
@@ -85,12 +126,153 @@ namespace tbrpgsca
         const Costume& race() const;
         const Costume& job() const;
 
+        uint32_t skillsCount() const;
+        //const Ability* skill(uint32_t index) const;
+        const CmpsVct<CmpsPtr<Ability>>& skills() const;
         int remainingSkillUses(const Ability& skill) const;
         int regeneratingSkillTurn(const Ability& skill) const;
 
-        const Costume* unequipPos(char const pos);
-        const Costume* equipItem(char const pos, const Costume* const item);
-        char unequipItem(const Costume& item);
+        const Ability* skill(uint32_t idx) const;
+        template<const bool first, typename F>
+        const Ability* skill(F compFun) const
+        {
+            const Ability* ability = nullptr;
+            auto equipment = this->_equipment;
+            for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
+            {
+                auto skillVct = equipment[i].ptr()->_a_skills;
+                if (skillVct)
+                {
+                    uint32_t vctSize = skillVct.size();
+                    for (uint32_t j = 0U; j < vctSize; j += 1U)
+                    {
+                        auto skills = skillVct[j];
+                        uint32_t cnt = skills.size();
+                        for (uint32_t k = 0U; k < cnt; k += 1U)
+                        {
+                            auto skill = &skills.at(k);
+                            if constexpr(first)
+                            {
+                                if (compFun(*skill))
+                                {
+                                    return skill;
+                                }
+                            }
+                            else
+                            {
+                                if (compFun(*skill, ability))
+                                {
+                                    ability = skill;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return ability;
+        }
+
+        template<const bool first, typename F>
+        SkillSearch skill(uint32_t idx, F compFun) const
+        {
+            uint32_t len = 0;
+            uint32_t ret = idx;
+            const Ability* ability = nullptr;
+            auto equipment = this->_equipment;
+            for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
+            {
+                auto skillVct = equipment[i].ptr()->_a_skills;
+                if (skillVct)
+                {
+                    uint32_t vctSize = skillVct.size();
+                    for (uint32_t j = 0U; j < vctSize; j += 1U)
+                    {
+                        auto skills = skillVct[j];
+                        uint32_t size = skills.size();
+                        uint32_t cnt = len + size;
+                        //if (ret < (len += size))
+                        if (ret < cnt)
+                        {
+                            if (ability)
+                            {
+                                idx = 0U;
+                            }
+                            else
+                            {
+                                idx = (ret - len);
+                                ability = &skills.at(idx);
+                                idx += 1;
+                            }
+                            for (; idx < size; idx += 1U)
+                            {
+                                auto skill = &skills.at(idx);
+                                if (compFun(*skill, *ability))
+                                {
+                                    if constexpr(first)
+                                    {
+                                        return SkillSearch(skill, idx + len);
+                                    }
+                                    else
+                                    {
+                                        ability = skill;
+                                        ret = idx + len;
+                                    }
+                                }
+                            }
+                        }
+                        len = cnt;
+                    }
+                }
+            }
+            return SkillSearch(ability, idx);
+        }
+
+        template<const bool first, typename F>
+        uint32_t skillIndex(F compFun) const
+        {
+            uint32_t len = 0U, ret = 0U;
+            const Ability* ability = nullptr;
+            auto equipment = this->_equipment;
+            for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
+            {
+                auto skillVct = equipment[i].ptr()->_a_skills;
+                if (skillVct)
+                {
+                    uint32_t vctSize = skillVct.size();
+                    for (uint32_t j = 0U; j < vctSize; j += 1U)
+                    {
+                        auto skills = skillVct[j];
+                        uint32_t cnt = skills.size();
+                        for (uint32_t k = 0U; k < cnt; k += 1U)
+                        {
+                            auto skill = &skills.at(k);
+                            if constexpr(first)
+                            {
+                                if (compFun(*skill))
+                                {
+                                    return k + len;
+                                }
+                            }
+                            else
+                            {
+                                if (compFun(*skill, ability))
+                                {
+                                    ret = k + len;
+                                }
+                            }
+                        }
+                        len += cnt;
+                    }
+                }
+            }
+            return ret;
+        }
+
+        SkillSearch aiSkill(uint32_t const defSkill, bool const restore) const;
+
+        CmpsPtr<const Costume> unequipPos(const EquipPos pos);
+        CmpsPtr<const Costume> equipItem(const EquipPos pos, const CmpsPtr<const Costume> item);
+        EquipPos unequipItem(const Costume& item);
 
         void recover(QString& ret);
         //Actor& applyRoles(QString& ret);
@@ -120,7 +302,7 @@ namespace tbrpgsca
 
         Actor(int const id, QString name, QString sprite, const Costume& race, const Costume& job, int const level, int const maxLv,
               int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi,
-              QMap<int, int>* const res, QMap<const State*, int>* const stRes, QMap<const Ability*, int>* const items);
+              QMap<int, int>* const res, CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes, QMap<const Ability*, int>* const items);
 
         Actor(const Actor& actor);
 
@@ -131,41 +313,46 @@ namespace tbrpgsca
 #else
         signed int _lv, _max_lv, _xp, _maxp;
 #endif
+        QMap<int, int>* _res;
+        CmpsPtr<QMap<CmpsPtr<const State>, int>> _st_res;
+        //CmpsPtr<QMap<CmpsPtr<const State>, int>> _state_dur;
+        //CmpsVct<CmpsVct<const Ability>, uint32_t, 2U, CmpsPtr<CmpsVct<const Ability>>> _a_skills;
         QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
-        QMap<char, const Costume*> _equipment;
+        CmpsVct<CmpsPtr<const Costume>, uint32_t, EquipPos::COUNT> _equipment;
+        //QMap<char, CmpsPtr<Costume>> _equipment;
 #if USE_DMG_ROLES
-        QVector<const Costume*>* _dmg_roles;
+        QVector<CmpsPtr<Costume>>* _dmg_roles;
 #endif
         inline void checkRegSkill(const Ability& skill);
-        void recover(QString* const ret, Scene* const scene);
-        char unequipItem(Scene* const scene, const Costume& item);
-        void refreshCostumes(QString* const ret, Scene* const scene);
-        const Costume* unequipPos(Scene* const scene, char const pos);
-        const Costume* equipItem(Scene* const scene, char const pos, const Costume* const item);
-        void switchCostume(QString* const ret, Scene* const scene, const Costume* const oldCostume, const Costume* const newCostume);
-        void removeStates(QString* const ret, Scene* const scene, bool const remove);
-        void updateStates(bool const remove, QString* const ret, Scene* const scene,
-                          QMap<const State*, int>& states, bool const includeWithDur);
-        void updateSkills(bool const remove, QVector<const Ability*>& skills);
-        void updateAttributes(bool const remove, Scene* const scene, const Costume& costume);
-        void updateResistance(bool const remove, QMap<int, int>* const elmRes, QMap<const State*, int>* const stRes);
-        void setCurrentExperience(Scene* const scene, int const xp);
-        void setCurrentLevel(Scene* const scene, int const level);
-        void setRace(Scene* const scene, const Costume& race);
-        void setJob(Scene* const scene, const Costume& job);
+        void recover(QString* const ret, CmpsPtr<Scene> scene);
+        EquipPos unequipItem(CmpsPtr<Scene> scene, const Costume& item);
+        void refreshCostumes(QString* const ret, CmpsPtr<Scene> scene);
+        CmpsPtr<const Costume> unequipPos(CmpsPtr<Scene> scene, EquipPos const pos);
+        CmpsPtr<const Costume> equipItem(CmpsPtr<Scene> scene, EquipPos const pos, const CmpsPtr<const Costume> item);
+        void switchCostume(QString* const ret, CmpsPtr<Scene> scene, const CmpsPtr<const Costume> oldCostume, const CmpsPtr<const Costume> newCostume);
+        void removeStates(QString* const ret, CmpsPtr<Scene> scene, bool const remove);
+        void updateStates(bool const remove, QString* const ret, CmpsPtr<Scene> scene,
+                          const QMap<CmpsPtr<const State>, int>& states, bool const includeWithDur);
+        void updateAttributes(bool const remove, CmpsPtr<Scene> scene, const Costume& costume);
+        void updateResistance(bool const remove, QMap<int, int>* const elmRes, CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes);
+        //void updateSkills(bool const remove, CmpsVct<const Ability> skills);
+        void setCurrentExperience(CmpsPtr<Scene> scene, int const xp);
+        void setCurrentLevel(CmpsPtr<Scene> scene, int const level);
+        void setRace(CmpsPtr<Scene> scene, const Costume& race);
+        void setJob(CmpsPtr<Scene> scene, const Costume& job);
         void setAgility(int const agi, Scene& scene);
-        void levelUp(Scene* const scene);
+        void levelUp(CmpsPtr<Scene> scene);
 
         template <typename SpriteRun>
-        void applyDmgRoles(QString& ret, Scene* const scene, const SpriteRun* const actorEvent);
+        void applyDmgRoles(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const actorEvent);
 
         template <typename SpriteRun>
-        void applyStates(QString* const ret, Scene* const scene, const SpriteRun* const spriteRun, bool const consume);
+        void applyStates(QString* const ret, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun, bool const consume);
 
         template <typename SpriteRun>
-        void setCurrentHp(QString* const ret, Scene* const scene, const SpriteRun* const actorEvent, int const hp, bool const survive);
+        void setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const SpriteRun* const actorEvent, int const hp, bool const survive);
 
-    private:
+        inline Actor() : Suit() {}
 
         friend class Scene;
         friend class Ability;
@@ -176,6 +363,10 @@ namespace tbrpgsca
         friend class Costume;
         friend class State;
         friend class Role;
+
+        template <typename, class, const int> friend class BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
     };
 
 }

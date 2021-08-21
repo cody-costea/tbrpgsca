@@ -12,6 +12,7 @@ using namespace tbrpgsca;
 SkillsModel::SkillsModel(Actor& actor, QObject* const parent) : QAbstractListModel(parent)
 {
     this->_actor = &actor;
+    this->_length = -1;
 }
 
 SkillsModel::~SkillsModel()
@@ -22,7 +23,14 @@ SkillsModel::~SkillsModel()
 int SkillsModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
-    return this->_actor->_a_skills->size();
+    int len = this->_length;
+    if (len < 0)
+    {
+        len = this->_actor.ptr()->skillsCount();
+        const_cast<SkillsModel*>(this)->_length = len;
+    }
+    return len;
+    //return this->_actor->_a_skills->size();
 }
 
 QVariant SkillsModel::data(const QModelIndex& index, int role) const
@@ -31,22 +39,20 @@ QVariant SkillsModel::data(const QModelIndex& index, int role) const
    {
        return QVariant();
    }
-
-   Actor& actor = *(this->_actor);
-   const Ability& ability = *(actor._a_skills->at(index.row()));
-
+   const Actor& actor = *(this->_actor.ptr());
+   const Ability* ability = actor.skill(index.row());
    switch (role)
    {
    //case Qt::TextColorRole:
    case Qt::ForegroundRole:
-       return QBrush(ability.canPerform(actor) ? Qt::yellow : Qt::gray);
+       return QBrush(ability->canPerform(actor) ? Qt::yellow : Qt::gray);
    case Qt::DisplayRole:
    {
        int usesQty;
        QMap<const Ability*, int>* skillsQty = actor._skills_cr_qty;
-       return QString(tr("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability._name, QString::number(ability._lv_rq),
-            QString::number(ability._m_hp), QString::number(ability._m_mp), QString::number(ability._m_sp), (skillsQty == nullptr
-            || (usesQty = skillsQty->value(&ability, -1)) < 0 ? "∞" : QString::number(usesQty)));
+       return QString(tr("%1 (Lv: %2, HPc: %3, MPc: %4, RPc: %5, Qty: %6)")).arg(ability->_name, QString::number(ability->_lv_rq),
+            QString::number(ability->_m_hp), QString::number(ability->_m_mp), QString::number(ability->_m_sp), (skillsQty == nullptr
+            || (usesQty = skillsQty->value(ability, -1)) < 0 ? "∞" : QString::number(usesQty)));
    }
    default:
        return QVariant();

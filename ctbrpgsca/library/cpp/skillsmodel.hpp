@@ -22,14 +22,15 @@ namespace tbrpgsca
     {
         Q_OBJECT
     public:
-       SkillsModel(Actor& actor, QObject* const parent = 0);
-       ~SkillsModel();
+        SkillsModel(Actor& actor, QObject* const parent = 0);
+        ~SkillsModel();
 
-       int rowCount(const QModelIndex& parent = QModelIndex()) const;
-       QVariant data(const QModelIndex& index, int role) const;
+        int rowCount(const QModelIndex& parent = QModelIndex()) const;
+        QVariant data(const QModelIndex& index, int role) const;
 
     private:
-       Actor* _actor;
+        CmpsPtr<Actor> _actor;
+        int _length;
     };
 
 }

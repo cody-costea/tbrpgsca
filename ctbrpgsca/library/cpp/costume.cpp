@@ -16,22 +16,23 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-const Ability& Costume::addedSkill(int const n) const
+/*const Ability& Costume::addedSkill(int const n) const
 {
-    return *(this->_a_skills->at(n));
+    return this->_a_skills.at(n);
 }
 
 bool Costume::hasAddedSkill (const Ability& skill) const
 {
-    QVector<const Ability*>* aSkills = this->_a_skills;
-    return aSkills && aSkills->contains(&skill);
+    //auto aSkills = this->_a_skills;
+    //return aSkills && aSkills->contains(skill);
+    return this->_a_skills.contains(skill);
 }
 
 int Costume::addedSkillsSize() const
 {
-    QVector<const Ability*>* aSkills = this->_a_skills;
-    return aSkills ? aSkills->size() : 0;
-}
+    auto aSkills = this->_a_skills;
+    return aSkills ? aSkills.size() : 0;
+}*/
 
 int Costume::elementResistance(const int element) const
 {
@@ -41,7 +42,7 @@ int Costume::elementResistance(const int element) const
 
 int Costume::stateResistance(State* const state) const
 {
-    QMap<const State*, int>* stRes = this->_st_res;
+    CmpsPtr<QMap<CmpsPtr<const State>, int>> stRes = this->_st_res;
     return stRes ? stRes->value(state, 0) : 0;
 }
 
@@ -60,7 +61,7 @@ void Costume::apply(QString& ret, Actor& actor) const
     this->apply(ret, nullptr, actor);
 }
 
-void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove) const
+void Costume::adopt(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, bool const updStates, bool const remove) const
 {
     const Costume& costume = *this;
     actor.updateAttributes(remove, scene, costume);
@@ -89,7 +90,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         else
         {
 #if USE_DMG_ROLES
-            QVector<const Costume*>* const dmgRoles = actor._dmg_roles;
+            auto const dmgRoles = actor._dmg_roles;
             if (dmgRoles)
             {
                 dmgRoles->removeOne(&costume);
@@ -110,7 +111,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
     {
         if (updStates)
         {
-            QMap<const State*, int>* const cStates = costume._state_dur;
+            CmpsPtr<QMap<CmpsPtr<const State>, int>> const cStates = costume._state_dur;
             if (cStates)
             {
                 actor.updateStates(false, ret, scene, *cStates, true);
@@ -119,10 +120,10 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
         if (costume._hp != 0 || costume._mp != 0 || costume._sp != 0)
         {
 #if USE_DMG_ROLES
-            QVector<const Costume*>* dmgRoles = actor._dmg_roles;
+            auto dmgRoles = actor._dmg_roles;
             if (dmgRoles == nullptr)
             {
-                dmgRoles = new QVector<const Costume*>();
+                dmgRoles = new QVector<CmpsPtr<Costume>>();
                 actor._dmg_roles = dmgRoles;
             }
             dmgRoles->append(&costume);
@@ -134,7 +135,7 @@ void Costume::adopt(QString* const ret, Scene* const scene, Actor& actor, bool c
     }
 }
 
-void Costume::apply(QString& ret, Scene* scene, Actor& actor) const
+void Costume::apply(QString& ret, CmpsPtr<Scene> scene, Actor& actor) const
 {
     const Costume& role = *this;
     Scene::SpriteAct* const spr = nullptr;
@@ -142,27 +143,22 @@ void Costume::apply(QString& ret, Scene* scene, Actor& actor) const
     role.damage(ret, scene, spr, nullptr, actor, std::rand() % 4, true);
 }
 
-void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool const updStates, bool const remove) const
+void Costume::refresh(QString* const ret, CmpsPtr<Scene> scn, Actor& actor, bool const updStates, bool const remove) const
 {
     const Costume& costume = *this;
-    {
-        QVector<const Ability*>* skills = costume._a_skills;
+    /*{
+        auto skills = costume._a_skills;
         if (skills)
         {
             actor.updateSkills(remove, *skills);
         }
-        /*skills = costume._counters;
-        if (skills)
-        {
-            actor.updateSkills(remove, true, *skills);
-        }*/
-    }
+    }*/
     if (updStates)
     {
-        QMap<const State*, int>* cStates = costume._state_dur;
+        CmpsPtr<QMap<CmpsPtr<const State>, int>> cStates = costume._state_dur;
         if (cStates)
         {
-            actor.updateStates(remove, ret, scene, *cStates, false);
+            actor.updateStates(remove, ret, scn, *cStates, false);
         }
     }
     if (!remove)
@@ -174,6 +170,7 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
             actor._dmg_type |= costume._dmg_type;
         }
         actor._play_flags |= cFlags;
+        auto scene = scn.ptr();
         if (scene)
         {
 #if ALLOW_COVERING
@@ -199,77 +196,29 @@ void Costume::refresh(QString* const ret, Scene* const scene, Actor& actor, bool
 }
 
 Costume::Costume(int const id, QString& name, QString& sprite, bool const shapeShift, int const elm, int const blockedSkills, int const hpDmg, int const mpDmg, int const spDmg,
-                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range,
-                 bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, QVector<const Ability*>* const skills,
-                 bool const counters, QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res)
-    : Role(id, name, sprite, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, elm, range, revive, states)
+                 int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const stun, bool const range, bool const automate,
+                 bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, CmpsVct<CmpsVct<const Ability>, uint32_t, 2U> const skills,
+                 bool const counters, CmpsPtr<QMap<CmpsPtr<const State>, int>> const states, CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes, QMap<int, int>* const res)
+    : Suit(id, name, sprite, shapeShift, elm, blockedSkills, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, stun, range,
+           counters, automate, confuse, reflect, ko, invincible, revive, states), _res(res), _st_res(stRes), _a_skills(skills)
 {
-    this->_atk = atk;
-    this->_def = def;
-    this->_spi = spi;
-    this->_wis = wis;
-    this->_agi = agi;
-    this->_res = res;
+    /*this->_res = res;
     this->_st_res = stRes;
-    this->_a_skills = skills;
-    this->_b_skill_types = blockedSkills;
-    int flags = this->_play_flags;
-    if (stun)
-    {
-        flags |= FLAG_STUN;
-    }
-    if (counters)
-    {
-        flags |= FLAG_COUNTER;
-    }
-    if (shapeShift)
-    {
-        QString* spr = this->_sprite;
-        if (spr && spr->length() > 0)
-        {
-            flags |= FLAG_SHAPE_SHIFT;
-        }
-    }
-    if (automate)
-    {
-        flags |= FLAG_ENRAGED;
-    }
-    if (confuse)
-    {
-        flags |= FLAG_CONFUSE;
-    }
-    if (reflect)
-    {
-        flags |= FLAG_REFLECT;
-    }
-    if (invincible)
-    {
-        flags |= FLAG_INVINCIBLE;
-    }
-    if (ko)
-    {
-        flags |= FLAG_KO;
-    }
-    this->_play_flags = flags;
+    this->_a_skills = skills;*/
 }
 
 Costume::Costume(int const id, QString name, QString sprite, bool const shapeShift, int const elm, int const blockedSkills, int const hpDmg, int const mpDmg, int const spDmg,
                  int const mHp, int const mMp, int const mSp, int const atk, int const def, int const spi, int const wis, int const agi, bool const range, bool const automate,
-                 bool const confuse, bool const reflect, bool const invincible, bool const revive, QVector<const Ability*>* const skills, bool const counters,
-                 QMap<const State*, int>* const states, QMap<const State*, int>* const stRes, QMap<int, int>* const res)
+                 bool const confuse, bool const reflect, bool const invincible, bool const revive, CmpsVct<CmpsVct<const Ability>, uint32_t, 2U> const skills, bool const counters,
+                 CmpsPtr<QMap<CmpsPtr<const State>, int>> const states, CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes, QMap<int, int>* const res)
     : Costume(id, name, sprite, shapeShift, elm, blockedSkills, hpDmg, mpDmg, spDmg, mHp, mMp, mSp, atk, def, spi, wis, agi, false, range, automate, confuse, reflect, false, invincible,
               revive, skills, counters, states, stRes, res) {}
 
-Costume::Costume(const Costume& costume) : Role(costume)
+Costume::Costume(const Costume& costume) : Suit(costume), _res(costume._res), _st_res(costume._st_res), _a_skills(costume._a_skills)
 {
-    this->_atk = costume._atk;
-    this->_def = costume._def;
-    this->_spi = costume._spi;
-    this->_wis = costume._wis;
-    this->_agi = costume._agi;
-    this->_res = costume._res;
-    this->_a_skills = costume._a_skills;
-    this->_st_res = costume._st_res;
+    //this->_res = costume._res;
+    //this->_a_skills = costume._a_skills;
+    //this->_st_res = costume._st_res;
 }
 
 Costume::~Costume() {}

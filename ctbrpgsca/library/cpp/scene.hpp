@@ -19,9 +19,9 @@ namespace tbrpgsca
 
     class Scene : public Play
     {
-#define USE_TARGET_LIST 0
-#define ALLOW_NO_GUARDS 0
-#define ALLOW_COVERING 0
+#define USE_TARGET_LIST 1
+#define ALLOW_NO_GUARDS 1
+#define ALLOW_COVERING 1
 
         #define STATUS_DEFEAT -2
         #define STATUS_RETREAT -1
@@ -65,7 +65,7 @@ namespace tbrpgsca
         int getAiSkill(Actor& user, QVector<const Ability*>& skills, int const index, bool const nRestore) const;
         Actor* getGuardian(Actor& user, Actor* target, const Ability& skill) const;
 
-        Actor& getPartyPlayer(int const party, int const player) const;
+        Actor& getPartyPlayer(int const party, int const player);
         bool hasPartyPlayer(int const party, Actor& player) const;
         int getPartyPlayersSize(int const party) const;
         int getPartiesSize() const;
@@ -85,11 +85,11 @@ namespace tbrpgsca
         int getStatus() const;
 
         template <typename SpriteRun>
-        void operator()(QString& ret, QVector<QVector<Actor*>*>& parties, const SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        void operator()(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, const SpriteRun* const actorRun, QVector<SceneRun*>* const events,
                         bool const useGuards, int const surprise, int const mInit);
 
         template <typename SpriteRun>
-        Scene(QString& ret, QVector<QVector<Actor*>*>& parties, const SpriteRun* const actorRun, QVector<SceneRun*>* const events,
+        Scene(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, const SpriteRun* const actorRun, QVector<SceneRun*>* const events,
               bool const useGuards, int const surprise, int const mInit);
 
         Scene();
@@ -103,7 +103,7 @@ namespace tbrpgsca
 #else
         signed int _current, _original, _f_target, _l_target, _surprise, _status, _m_init;
 #endif
-        QVector<QVector<Actor*>*> _parties;
+        CmpsVct<CmpsVct<Actor>, uint32_t, 2U> _parties;
         QVector<Actor*>* _players;
 #if USE_TARGET_LIST
         QVector<Actor*>* _targets;

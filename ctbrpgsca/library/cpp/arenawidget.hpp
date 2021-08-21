@@ -77,12 +77,12 @@ namespace tbrpgsca
 
         explicit ArenaWidget(QWidget* const parent = nullptr);
 
-        ArenaWidget(QWidget* parent, QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
+        ArenaWidget(QWidget* parent, QSize size, QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, QVector<SceneRun*>* const events,
                     QString backImage, QString songName, int const surprise, int const mInit);
 
         ~ArenaWidget();
 
-        void operator()(QSize size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
+        void operator()(QSize size, QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, QVector<SceneRun*>* const events,
                                 QString backImage, QString songName, int const surprise, int const mInit);
     protected:
         struct ActorSprite : QObject
@@ -115,12 +115,12 @@ namespace tbrpgsca
         void afterAct();
         void afterPlay();
         void prepareItemsBox(Actor& actor);
+        void prepareSkillsBox(Actor& actor);
         void prepareTargetBox(bool const freeMemory);
         Actor* getPlayerFromTargetBox(int const index);
-        void prepareSkillsBox(Actor& actor, QVector<const Ability*>& skills);
         void recheckTargeting(int const trgIndex, int const skillIndex, int const itemIndex);
 
-        void operator()(QSize& size, QString& ret, QVector<QVector<Actor*>*>& parties, QVector<SceneRun*>* const events,
+        void operator()(QSize& size, QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, QVector<SceneRun*>* const events,
                                 QString& backImage, QString& arenaSong, int const surprise, int const mInit, bool const doScene);
     #if USE_TEMPLATE
         bool operator()(Scene& scene, Actor* const user, const Ability* const ability, bool const revive,
