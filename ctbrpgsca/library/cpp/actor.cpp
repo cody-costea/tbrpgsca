@@ -1114,8 +1114,8 @@ Actor::~Actor()
 template void Actor::applyDmgRoles(QString& ret, CmpsPtr<Scene> scene, const ArenaWidget* const actorEvent);
 template void Actor::applyStates(QString* const ret, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun, bool const consume);
 template void Actor::setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const ArenaWidget* const actorEvent, int const hp, bool const survive);
-#endif
-
+#else
 template void Actor::applyDmgRoles(QString& ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const actorEvent);
 template void Actor::applyStates(QString* const ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun, bool const consume);
 template void Actor::setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const actorEvent, int const hp, bool const survive);
+#endif

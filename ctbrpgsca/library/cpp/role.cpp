@@ -258,6 +258,6 @@ Role::~Role()
 
 #if USE_TEMPLATE
 template void Role::damage(QString& ret, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
-#endif
-
+#else
 template void Role::damage(QString& ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun, Actor* const absorber, Actor& target, int dmg, bool const percent) const;
+#endif

@@ -93,9 +93,9 @@ namespace tbrpgsca
         friend class State;
         friend class Scene;
 
-        template <typename, class, const int> friend class BasePtr;
-        template <typename, const int, const bool, const int, typename, const int> friend class BaseCnt;
-        template<typename, typename, typename L, const L, const bool> friend class BaseVct;
+        template <typename, class, const int> friend class cmpsptr::BasePtr;
+        template <typename, const int, const bool, const int, typename, const int> friend class cmpsptr::BaseCnt;
+        template<typename, typename, typename L, const L, const bool> friend class cmpsptr::BaseVct;
     };
 
 }

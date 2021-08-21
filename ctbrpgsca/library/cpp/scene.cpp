@@ -891,8 +891,7 @@ template void Scene::operator()(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 
                                 bool const useGuards, int const surprise, int const mInit);
 template Scene::Scene(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, const ArenaWidget* const actorRun, QVector<SceneRun*>* const events,
                       bool const useGuards, int const surprise, int const mInit);
-#endif
-
+#else
 template void Scene::playAi(QString& ret, const Scene::SpriteAct* const spriteRun, Actor& player);
 template void Scene::endTurn(QString& ret, const Scene::SpriteAct* const spriteRun, Actor* const actor);
 template void Scene::perform(QString& ret, const Scene::SpriteAct* const spriteRun, Actor& user, Actor& target, const Ability& ability, bool const item);
@@ -901,3 +900,4 @@ template void Scene::operator()(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 
                                 bool const useGuards, int const surprise, int const mInit);
 template Scene::Scene(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& parties, const Scene::SpriteAct* const actorRun, QVector<SceneRun*>* const events,
                       bool const useGuards, int const surprise, int const mInit);
+#endif
