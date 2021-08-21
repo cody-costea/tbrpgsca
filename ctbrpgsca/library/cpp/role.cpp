@@ -55,7 +55,7 @@ template <typename SpriteRun>
 void Role::damage(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const spriteRun, Actor* const absorber, Actor& actor, int const dmg, bool const percent) const
 {
     const Role& role = *this;
-    if (!actor.Costume::isInvincible())
+    if (!actor.Suit::isInvincible())
     {
         int dmgHp, dmgMp, dmgSp;
         if (percent)

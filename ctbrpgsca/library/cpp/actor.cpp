@@ -18,6 +18,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
+const CmpsVct<const Ability, uint32_t, 2U> Actor::_def_skills
+{
+    Ability(1, TR_TXT_SKILL_ATTACK, "", "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK, 10,0,-3, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, &(Play::StateMasks()[10])),
+    Ability(2, TR_TXT_SKILL_DEFEND, "", "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF, 0,-1,-2, FLAG_TRG_SELF,0, 0,0, false, false, nullptr, nullptr)
+};
+
 int Actor::remainingSkillUses(const Ability& skill) const
 {
     QMap<const Ability*, int>* crQty = this->_skills_cr_qty;
@@ -62,7 +68,7 @@ uint32_t Actor::skillsCount() const
     return len;
 }
 
-const Ability* Actor::skill(u_int32_t idx) const
+const Ability* Actor::skill(uint32_t idx) const
 {
     uint32_t len = _def_skills.size();
     if (idx < len)
@@ -197,7 +203,7 @@ void Actor::setJob(CmpsPtr<Scene> scene, const Costume& job)
 {
     Actor& actor = *this;
     actor.equipItem(scene, EquipPos::JOB, &job);
-    if (!actor.Costume::isShapeShifted())
+    if (!actor.Suit::isShapeShifted())
     {
         QString* spr = job._sprite;
         if (spr)
@@ -260,7 +266,7 @@ void Actor::setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const SpriteR
     {
         if (actor._hp != 0)
         {
-            if (survive || actor.Costume::isInvincible())
+            if (survive || actor.Suit::isInvincible())
             {
                 actor._hp = 1;
             }
@@ -282,7 +288,7 @@ void Actor::setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const SpriteR
                         *ret = *ret % TR_TXT_SCENE_RISES;
                     }
                     actor._hp = actor._m_hp;
-                    if (scene && actor.Costume::isShapeShifted())
+                    if (scene && actor.Suit::isShapeShifted())
                     {
                         //Scene::SpriteRun* const actorEvent = scene->_actor_run;
                         if (actorEvent)

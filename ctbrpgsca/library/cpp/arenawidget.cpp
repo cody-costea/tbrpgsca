@@ -52,7 +52,7 @@ void ArenaWidget::afterPlay()
                crActor = arena._cr_actor;
                arena._acts_txt->append(ret); ret.clear();
                if (arena.isAutomatic() || crActor->_side != 0 || crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
-                       /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
+                       /*crActor->isAiPlayer() || crActor->Suit::isConfused() || crActor->Suit::isEnraged()*/)
                {
                    arena._info_txt->setText("");
                    arena.setAiTurn(true);
@@ -92,7 +92,7 @@ void ArenaWidget::ActorSprite::playActor(int const spr)
     ActorSprite& actSprite = *this;
     QMovie& movie = *(actSprite._actor_mov);
     Actor& sprActor = *(actSprite._actor);
-    if (actSprite._spr != spr || sprActor.Costume::isShapeShifted())
+    if (actSprite._spr != spr || sprActor.Suit::isShapeShifted())
     {
         QString s;
         switch (spr)
@@ -822,7 +822,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, CmpsVct<CmpsVct<Actor>, 
                 arena.setAutomatic(true);
                 arena._auto_btn->setText(tr("Manual"));
                 if (crActor->_side == 0 || !(crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
-                    /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/))
+                    /*crActor->isAiPlayer() || crActor->Suit::isConfused() || crActor->Suit::isEnraged()*/))
                 {
                     arena.playAi(ret, SPRITE_ACT, *crActor);
                     arena.enableControls(false);
@@ -979,7 +979,7 @@ void ArenaWidget::operator()(QSize& size, QString& ret, CmpsVct<CmpsVct<Actor>, 
     }*/
     Actor* const crActor = arena._cr_actor;
     if (crActor->_side != 0 || crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONFUSE | FLAG_ENRAGED)
-        /*crActor->isAiPlayer() || crActor->Costume::isConfused() || crActor->Costume::isEnraged()*/)
+        /*crActor->isAiPlayer() || crActor->Suit::isConfused() || crActor->Suit::isEnraged()*/)
     {
         arena.playAi(*returnTxt, SPR_ACTION, *crActor);
         arena.enableControls(false);

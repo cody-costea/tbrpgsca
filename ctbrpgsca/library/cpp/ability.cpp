@@ -101,7 +101,7 @@ void Ability::execute(QString& ret, CmpsPtr<Scene> scene, const SpriteRun* const
     //assert(target);
     const Ability& ability = *this;
     int const dmgType = ability._dmg_type | user._dmg_type;
-    if (dmgType == DMG_TYPE_WIS && target != &user && target->Costume::isReflecting())
+    if (dmgType == DMG_TYPE_WIS && target != &user && target->Suit::isReflecting())
     {
         ret += Ability::ReflectTxt.arg(target->_name);
         target = &user;

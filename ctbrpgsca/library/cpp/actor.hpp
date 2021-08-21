@@ -34,30 +34,30 @@ namespace tbrpgsca
         PROP_FLAG(Actor, RandomAi, FLAG_RANDOM_AI, public, public)
         PROP_FLAG_SET_ALL(Actor, Ranged, FLAG_RANGE, public, Role::isRanged)
         PROP_FLAG_SET_ALL(Actor, NewItems, FLAG_NEW_ITEMS, public, hasNewItems)
-        PROP_FLAG_SET_ALL(Actor, Stunned, FLAG_STUN, public, Costume::isStunned)
+        PROP_FLAG_SET_ALL(Actor, Stunned, FLAG_STUN, public, Suit::isStunned)
         PROP_FLAG_SET_ALL(Actor, Reviving, FLAG_REVIVE, public, Role::isReviving)
-        PROP_FLAG_SET_ALL(Actor, Enraged, FLAG_ENRAGED, public, Costume::isEnraged)
-        PROP_FLAG_SET_ALL(Actor, KnockedOut, FLAG_KO, public, Costume::isKnockedOut)
-        PROP_FLAG_SET_ALL(Actor, Confused, FLAG_CONFUSE, public, Costume::isConfused)
-        PROP_FLAG_SET_ALL(Actor, Covering, FLAG_COVERING, public, Costume::isCovering)
-        PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Costume::isReflecting)
-        PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Costume::isInvincible)
-        PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Costume::isShapeShifted)
+        PROP_FLAG_SET_ALL(Actor, Enraged, FLAG_ENRAGED, public, Suit::isEnraged)
+        PROP_FLAG_SET_ALL(Actor, KnockedOut, FLAG_KO, public, Suit::isKnockedOut)
+        PROP_FLAG_SET_ALL(Actor, Confused, FLAG_CONFUSE, public, Suit::isConfused)
+        PROP_FLAG_SET_ALL(Actor, Covering, FLAG_COVERING, public, Suit::isCovering)
+        PROP_FLAG_SET_ALL(Actor, Reflecting, FLAG_REFLECT, public, Suit::isReflecting)
+        PROP_FLAG_SET_ALL(Actor, Invincible, FLAG_INVINCIBLE, public, Suit::isInvincible)
+        PROP_FLAG_SET_ALL(Actor, ShapeShifted, FLAG_SHAPE_SHIFT, public, Suit::isShapeShifted)
         PROP_CUSTOM_FIELD_NEW(Actor, partySide, setPartySide, swapPartySide, withPartySide, int, public, public, _side)
         PROP_CUSTOM_FIELD_NEW(Actor, initiative, setInitiative, swapInitiative, withInitive, int, public, public, _init)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentExperience, swapCurrentExperience, withCurrentExperience, int, public, currentExperience)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumHp, swapMaximumHp, withMaximumHp, int, public, Role::maximumHp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumMp, swapMaximumMp, withMaximumMp, int, public, Role::maximumMp)
         PROP_FIELD_WITH_SWAP(Actor, setMaximumRp, swapMaximumRp, withMaximumRp, int, public, Role::maximumRp)
-        //PROP_FIELD_WITH_SWAP(Actor, setMaxActions, swapMaxActions, withMaxActions, int, public, Costume::maxActions)
+        //PROP_FIELD_WITH_SWAP(Actor, setMaxActions, swapMaxActions, withMaxActions, int, public, Suit::maxActions)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentHp, swapCurrentHp, withCurrentHp, int, public, Role::currentHp)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentMp, swapCurrentMp, withCurrentMp, int, public, Role::currentMp)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentRp, swapCurrentRp, withCurrentRp, int, public, Role::currentRp)
-        PROP_FIELD_WITH_SWAP(Actor, setOffense, swapOffense, withOffense, int, public, Costume::offense)
-        PROP_FIELD_WITH_SWAP(Actor, setDefense, swapDefense, withDefense, int, public, Costume::defense)
-        PROP_FIELD_WITH_SWAP(Actor, setAgility, swapAgility, withAgility, int, public, Costume::agility)
-        PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, Costume::wisdom)
-        PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, Costume::spirit)
+        PROP_FIELD_WITH_SWAP(Actor, setOffense, swapOffense, withOffense, int, public, Suit::offense)
+        PROP_FIELD_WITH_SWAP(Actor, setDefense, swapDefense, withDefense, int, public, Suit::defense)
+        PROP_FIELD_WITH_SWAP(Actor, setAgility, swapAgility, withAgility, int, public, Suit::agility)
+        PROP_FIELD_WITH_SWAP(Actor, setWisdom, swapWisdom, withWisdom, int, public, Suit::wisdom)
+        PROP_FIELD_WITH_SWAP(Actor, setSpirit, swapSpirit, withSpirit, int, public, Suit::spirit)
         PROP_FIELD_WITH_SWAP(Actor, setMaxLevel, swapMaxLevel, withMaxLevel, int, public, maximumLevel)
         PROP_FIELD_WITH_SWAP(Actor, setCurrentLevel, swapCurrentLevel, withCurrentLevel, int, public, currentLevel)
         //PROP_FIELD_WITH_SWAP(Actor, setItems, items, withItems, QMap<Ability*, int>*, public, items)
@@ -363,11 +363,7 @@ namespace tbrpgsca
 
         ~Actor();
     protected:
-        inline const static CmpsVct<const Ability, uint32_t, 2U> _def_skills
-        {
-            Ability(1, TR_TXT_SKILL_ATTACK, "", "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK, 10,0,-3, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, nullptr/*&(Play::StateMasks()[10])*/),
-            Ability(2, TR_TXT_SKILL_DEFEND, "", "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF, 0,-1,-2, FLAG_TRG_SELF,0, 0,0, false, false, nullptr, nullptr)
-        };
+        const static CmpsVct<const Ability, uint32_t, 2U> _def_skills;
 
 #if USE_BIT_FIELDS
         signed int _lv: 8, _max_lv: 8, _xp: 32, _maxp: 32;

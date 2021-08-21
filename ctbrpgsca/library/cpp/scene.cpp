@@ -129,7 +129,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, const Ability& skill) cons
                     }
                 }
                 else if ((fGuard == nullptr || pos != -1) && guardian->_hp > 0 && (!guardian->hasAnyFlag(FLAG_STUN | FLAG_CONVERT | FLAG_CONFUSE))
-                         /*(!guardian->Costume::isStunned()) && (!guardian->Costume::isConfused())*/)
+                         /*(!guardian->Suit::isStunned()) && (!guardian->Suit::isConfused())*/)
                 {
                     (*guardPos) = guardian;
                 }
@@ -153,7 +153,7 @@ Actor* Scene::getGuardian(Actor& user, Actor* target, const Ability& skill) cons
         for (auto& player : party)
         {
             auto actor = &player;
-            if (actor != target && actor->Costume::isCovering() && (coverer == nullptr || (actor->_hp > coverer->_hp)))
+            if (actor != target && actor->Suit::isCovering() && (coverer == nullptr || (actor->_hp > coverer->_hp)))
             {
                 coverer = actor;
             }
@@ -178,7 +178,7 @@ void Scene::checkStatus(QString& ret)
         {
             for (int k = 0; k < partySize; ++k)
             {
-                if (!(party.at(k).Costume::isKnockedOut()))
+                if (!(party.at(k).Suit::isKnockedOut()))
                 {
                     goto enemyCheck;
                 }
@@ -196,7 +196,7 @@ void Scene::checkStatus(QString& ret)
                 partySize = party.size();
                 for (int j = 0; j < partySize; j += 1)
                 {
-                    if (!(party.at(j).Costume::isKnockedOut()))
+                    if (!(party.at(j).Suit::isKnockedOut()))
                     {
                         return;
                     }
@@ -226,7 +226,7 @@ void Scene::execute(QString& ret, const SpriteRun* const actorEvent, Actor& user
         if (ability._hp > -1)
         //if (!healing)
         {
-            if (target->isCountering() && (!target->Costume::isStunned())
+            if (target->isCountering() && (!target->Suit::isStunned())
                     && (target->_side != user._side || target->hasAnyFlag(FLAG_CONFUSE | FLAG_ENRAGED | FLAG_CONVERT)))
             {
                 counter = target->skill(0);
@@ -403,7 +403,7 @@ void Scene::playAi(QString& ret, const SpriteRun* const spriteRun, Actor& player
     //QVector<const Ability*>& skills = *(player._a_skills);
     auto parties = scene._parties;
     int side, sSize, skillIndex = 0, heal = -1, pSize = parties.size();
-    if (player.Costume::isConfused())
+    if (player.Suit::isConfused())
     {
         party = nullptr;
         side = -1;
@@ -479,7 +479,7 @@ void Scene::playAi(QString& ret, const SpriteRun* const spriteRun, Actor& player
                 }
                 int trg = rand() % sSize;
                 target = &party[trg];
-                while (target->Costume::isKnockedOut())
+                while (target->Suit::isKnockedOut())
                 {
                     if (++trg == sSize)
                     {
@@ -504,12 +504,12 @@ void Scene::playAi(QString& ret, const SpriteRun* const spriteRun, Actor& player
                         do
                         {
                             target = &players[trg];
-                        } while (((++trg) < sSize) && (target->Costume::isKnockedOut() || target->_side == side));
+                        } while (((++trg) < sSize) && (target->Suit::isKnockedOut() || target->_side == side));
                     }
                     for (int i = trg + 1; i < sSize; i += 1)
                     {
                         auto iPlayer = &players[i];
-                        if (iPlayer->_side != side && (!iPlayer->Costume::isKnockedOut()) && iPlayer->_hp < target->_hp)
+                        if (iPlayer->_side != side && (!iPlayer->Suit::isKnockedOut()) && iPlayer->_hp < target->_hp)
                         {
                             target = iPlayer;
                         }
@@ -684,9 +684,9 @@ void Scene::endTurn(QString& ret, const SpriteRun* actorEvent, Actor* crActor)
             crActor->actions = cActions = 0;
         }*/
         {
-            bool const shapeShifted = crActor->Costume::isShapeShifted();
+            bool const shapeShifted = crActor->Suit::isShapeShifted();
             crActor->applyStates(&ret, this, actorEvent, false);
-            if (shapeShifted && (!crActor->Costume::isShapeShifted()))
+            if (shapeShifted && (!crActor->Suit::isShapeShifted()))
             {
                 //SpriteRun* const actorEvent = scene._actor_run;
                 if (actorEvent)
@@ -695,7 +695,7 @@ void Scene::endTurn(QString& ret, const SpriteRun* actorEvent, Actor* crActor)
                 }
             }
         }
-        crActor->setActive(!(inactive = crActor->Costume::isStunned()));
+        crActor->setActive(!(inactive = crActor->Suit::isStunned()));
     } while (inactive);
     scene._cr_actor = crActor;
     scene._current = current;
@@ -705,7 +705,7 @@ void Scene::endTurn(QString& ret, const SpriteRun* actorEvent, Actor* crActor)
     {
         auto event = events->at(EVENT_NEW_TURN);
         if (event && (*event)(scene, &ret) && crActor->hasAnyFlag(FLAG_AI_PLAYER | FLAG_CONVERT | FLAG_ENRAGED | FLAG_CONFUSE)
-                /*(crActor->isAiPlayer() || crActor->Costume::isEnraged() || crActor->Costume::isConfused())*/)
+                /*(crActor->isAiPlayer() || crActor->Suit::isEnraged() || crActor->Suit::isConfused())*/)
         {
             scene.playAi(ret, actorEvent, (*crActor));
         }
@@ -825,7 +825,7 @@ void Scene::operator()(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& part
             }
             player._side = i;
 #if ALLOW_COVERING
-            if (player.Costume::isCovering())
+            if (player.Suit::isCovering())
             {
                 scene.setHasCovers(true);
             }
