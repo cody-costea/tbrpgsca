@@ -53,7 +53,7 @@ namespace tbrpgsca
         bool disable(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, int dur, bool const remove) const;
         void remove(QString* const ret, CmpsPtr<Scene> scene, Actor& actor) const;
 
-        inline State() : Costume() {}
+        inline State() : Costume(), _dur(0), _s_res(0) {}
 
         friend class Actor;
         friend class Ability;

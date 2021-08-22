@@ -87,7 +87,7 @@ namespace tbrpgsca
 
         Role(const Role& role);
 
-        inline Role() : Play() {}
+        inline Role() : Play(), _sprite(nullptr), _dmg_type(0), _hp(0), _mp(0), _sp(0), _m_hp(0), _m_mp(0), _m_sp(0), _state_dur(nullptr) {}
 
         ~Role();
 

@@ -157,6 +157,7 @@ Actor::EquipPos Actor::unequipItem(CmpsPtr<Scene> scene, const Costume& item)
             return static_cast<EquipPos>(i);
         }
     }
+    return EquipPos::COUNT;
 }
 
 CmpsPtr<const Costume> Actor::equipItem(CmpsPtr<Scene> scene, const EquipPos pos, const CmpsPtr<const Costume> item)
@@ -892,7 +893,11 @@ void Actor::refreshCostumes(QString* const ret, CmpsPtr<Scene> scene)
         auto const last = equipment.cend();
         for (auto it = equipment.cbegin(); it != last; ++it)
         {
-            it->ptr()->refresh(ret, scene, actor, true, false);
+            auto costume = it->ptr();
+            if (costume)
+            {
+                costume->refresh(ret, scene, actor, true, false);
+            }
         }
     }
     CmpsPtr<QMap<CmpsPtr<const State>, int>> const stateDur = actor._state_dur;
@@ -1114,8 +1119,9 @@ Actor::~Actor()
 template void Actor::applyDmgRoles(QString& ret, CmpsPtr<Scene> scene, const ArenaWidget* const actorEvent);
 template void Actor::applyStates(QString* const ret, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun, bool const consume);
 template void Actor::setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const ArenaWidget* const actorEvent, int const hp, bool const survive);
-#else
+#endif
+//#else
 template void Actor::applyDmgRoles(QString& ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const actorEvent);
 template void Actor::applyStates(QString* const ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun, bool const consume);
 template void Actor::setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const actorEvent, int const hp, bool const survive);
-#endif
+//#endif

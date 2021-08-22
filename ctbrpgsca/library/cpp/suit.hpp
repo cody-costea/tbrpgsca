@@ -60,7 +60,7 @@ namespace tbrpgsca
 
         Suit(const Suit& suit);
 
-        inline Suit() : Role() {}
+        inline Suit() : Role(), _atk(0), _def(0), _spi(0), _wis(0), _agi(0), _b_skill_types(0) {}
 
         template <typename, class, const int> friend class cmpsptr::BasePtr;
         template <typename, const int, const bool, const int, typename, const int> friend class cmpsptr::BaseCnt;

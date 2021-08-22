@@ -43,7 +43,7 @@ namespace tbrpgsca
         QMap<int, int>* _res;
         CmpsPtr<QMap<CmpsPtr<const State>, int>> _st_res;
         CmpsVct<CmpsVct<const Ability>, uint32_t, 2U> _a_skills;
-        CmpsPtr<QMap<CmpsPtr<const State>, int>> _state_dur;
+        //CmpsPtr<QMap<CmpsPtr<const State>, int>> _state_dur;
 
         void apply(QString& ret, CmpsPtr<Scene> scene, Actor& actor) const;
         void refresh(QString* const ret, CmpsPtr<Scene> scene, Actor& actor, bool const updStates, bool const remove) const;
@@ -54,7 +54,7 @@ namespace tbrpgsca
                 bool const automate, bool const confuse, bool const reflect, bool const ko, bool const invincible, bool const revive, CmpsVct<CmpsVct<const Ability>, uint32_t, 2U> const skills,
                 bool const counters, CmpsPtr<QMap<CmpsPtr<const State>, int>> const states, CmpsPtr<QMap<CmpsPtr<const State>, int>> const stRes, QMap<int, int>* const res);
 
-        inline Costume() : Suit() {}
+        inline Costume() : Suit(), _res(nullptr), _st_res(nullptr) , _a_skills(nullptr) {}
 
         friend class Actor;
         friend class Ability;
@@ -63,6 +63,7 @@ namespace tbrpgsca
         friend class DemoLib;
         friend class State;
         friend class Scene;
+        friend class Play;
 
         template <typename, class, const int> friend class cmpsptr::BasePtr;
         template <typename, const int, const bool, const int, typename, const int> friend class cmpsptr::BaseCnt;

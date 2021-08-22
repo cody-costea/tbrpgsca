@@ -155,7 +155,7 @@ void Costume::refresh(QString* const ret, CmpsPtr<Scene> scn, Actor& actor, bool
     }*/
     if (updStates)
     {
-        CmpsPtr<QMap<CmpsPtr<const State>, int>> cStates = costume._state_dur;
+        auto cStates = costume._state_dur;
         if (cStates)
         {
             actor.updateStates(remove, ret, scn, *cStates, false);

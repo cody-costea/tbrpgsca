@@ -42,7 +42,7 @@ Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the numbe
 thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS 7//3
+    #define COMPRESS_POINTERS 3//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -834,7 +834,9 @@ namespace cmpsptr
         inline void setAddr(T* const ptr)
         {
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-            assert(addr < 1073741824UL * (2 << SHIFT_LEN)); //TODO: analyze alternative solutions
+            qDebug() << "SHIFT_LEN = " << QString::number(SHIFT_LEN);
+            qDebug() << "1073741824UL * " << (2UL << SHIFT_LEN) << " = " << (1073741824UL * (2 << SHIFT_LEN));
+            assert(addr < 1073741824UL * (2UL << SHIFT_LEN)); //TODO: analyze alternative solutions
             this->_ptr = static_cast<uint32_t>(addr >> SHIFT_LEN);
         }
 
@@ -1443,11 +1445,10 @@ namespace cmpsptr
     };
 
     template <typename P, typename L>
-    struct VarData
+    struct VarData : public FixData<P>
     {
+        L _init: 1;
         L _length: (sizeof(L) * 8) - 1;
-        bool _init: 1;
-        P _data;
 
         friend class tbrpgsca::Suit;
         friend class tbrpgsca::Scene;
@@ -1475,7 +1476,7 @@ namespace cmpsptr
             {
                if constexpr(fixedSize < 1)
                {
-                   if (!this->_init)
+                   if (!this->init())
                    {
                        return;
                    }
@@ -1492,6 +1493,40 @@ namespace cmpsptr
         inline T& from(const L index) const
         {
             return const_cast<BaseVct*>(this)->_data.addr()[index];
+        }
+
+        inline void copy(const BaseVct<T, P, L, 0, true>& copy)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                auto size = copy.size();
+                assert(fixedSize < 1 || fixedSize < size);
+                this->_length = size;
+                this->_init = false;
+            }
+            this->_data = copy._data;
+        }
+
+        inline void copy(const BaseVct<T, P, L, fixedSize, false>& copy)
+        {
+            if constexpr(fixedSize < 1)
+            {
+                this->_length = copy.size();
+                this->_init = false;
+            }
+            this->_data = copy._data;
+        }
+
+        inline bool init() const
+        {
+            if constexpr(fixedSize < 1)
+            {
+                return this->_init;
+            }
+            else
+            {
+                return false;
+            }
         }
 
     public:
@@ -1590,6 +1625,32 @@ namespace cmpsptr
         inline P ptr() const
         {
             return this->_data;
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>& operator=(std::nullptr_t)
+        {
+            this->clear();
+            if (fixedSize < 1)
+            {
+                this->_length = 0;
+                this->_init = false;
+            }
+            this->_data = nullptr;
+            return *this;
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>& operator=(const BaseVct<T, P, L, 0, true>& copy)
+        {
+            this->clear();
+            this->copy(copy);
+            return *this;
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>& operator=(const BaseVct<T, P, L, fixedSize, false>& copy)
+        {
+            this->clear();
+            this->copy(copy);
+            return *this;
         }
 
         inline bool operator<(const T* const ptr) const
@@ -1702,16 +1763,17 @@ namespace cmpsptr
            return this->from(index);
         }
 
-        template<L newSize = 0>
-        inline operator BaseVct<T, P, L, newSize, false>() const
+        //template<L newSize = 0>
+        inline operator BaseVct<T, P, L, 0, true>() const
         {
-            static_assert(fixedSize < 1 || newSize <= fixedSize, "The compressed array passed, has fewer elements than required.");
-            BaseVct<T, P, L, newSize, false> ret;
+            //static_assert(fixedSize < 1 || newSize <= fixedSize, "The compressed array passed, has fewer elements than required.");
+            //BaseVct<T, P, L, newSize, false> ret;
+            BaseVct<T, P, L, 0, false> ret;
             ret._data = this->_data;
-            if constexpr(newSize < 1)
+            //if constexpr(newSize < 1)
             {
                 const auto size = this->size();
-                assert(size <= newSize);
+                //assert(size <= newSize);
                 ret._length = size;
                 ret._init = false;
             }
@@ -1728,14 +1790,14 @@ namespace cmpsptr
             this->_data = P(nullptr);
         }*/
 
-        inline BaseVct<T, P, L, fixedSize, dispose>(const BaseVct& copy)
+        inline BaseVct<T, P, L, fixedSize, dispose>(const BaseVct<T, P, L, 0, true>& copy)
         {
-            if constexpr(fixedSize < 1)
-            {
-                this->_length = copy.size();
-                this->_init = false;
-            }
-            this->_data = copy._data;
+            this->copy(copy);
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>(const BaseVct<T, P, L, fixedSize, false>& copy)
+        {
+            this->copy(copy);
         }
 
         inline BaseVct<T, P, L, fixedSize, dispose>(const P beginPtr, const L size = fixedSize, const bool own = false)
@@ -1754,7 +1816,7 @@ namespace cmpsptr
         {
             //static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
             assert(fixedSize < 1 || size <= fixedSize);
-            this->_data = P(beginPtr);
+            this->_data = beginPtr;
             if constexpr(fixedSize < 1)
             {
                 this->_length = size < 0 ? size * -1 : size;
@@ -1769,33 +1831,45 @@ namespace cmpsptr
                 L i = 0U;
                 auto end = list.end();
                 auto size = list.size();
-                //auto data = new (std::nothrow) T[size];
-                auto length = sizeof(T) * size;
-                auto data = alloc(length);
+                auto data = new (std::nothrow) T[size];
+                //auto length = sizeof(T) * size;
+                //auto data = alloc(length);
                 if (data)
                 {
-                    /*for (auto it = list.begin(); i < size && it != end; ++it)
+                    for (auto it = list.begin(); i < size && it != end; ++it)
                     {
-                        data[i++] = *it;
-                    }*/
+                        (const_cast<typename std::remove_const<T>::type&>(data[i++])) = const_cast<typename std::remove_const<T>::type&>(*it);
+                    }
+                    this->_data = const_cast<typename std::remove_const<T>::type*>(data);
                     //std::memcpy(const_cast<void*>(static_cast<const void*>(const_cast<const T*>(data))), list.begin(), length);
-                    std::memcpy(data, list.begin(), length);
-                    this->_length = size;
-                    this->_data = P(static_cast<T*>(data));
-                    this->_init = true;
+                    //std::memcpy(data, list.begin(), length);
+                    //this->_data = P(static_cast<T*>(data));
+                    //if constexpr(fixedSize < 1)
+                    {
+                        this->_length = size;
+                        this->_init = true;
+                    }
                 }
                 else
                 {
-                    this->_length = 0U;
                     this->_data = P(nullptr);
-                    this->_init = false;
+                    //if constexpr(fixedSize < 1)
+                    {
+                        this->_init = false;
+                        this->_length = 0U;
+                    }
                 }
             }
             else
             {
                 //static_assert(fixedSize <= list.size(), "The initialization list passed, has fewer elements than required.");
                 assert(fixedSize <= list.size());
-                this->_data = list.begin();
+                this->_data = const_cast<typename std::remove_const_t<T*>>(list.begin());
+                /*if constexpr(fixedSize < 1)
+                {
+                    this->_init = false;
+                    this->_length = list.size();
+                }*/
             }
         }
 
@@ -1838,14 +1912,14 @@ namespace tbrpgsca
         PROP_CUSTOM_FIELD(Play, playFlags, setPlayFlags, swapPlayFlags, withPlayFlags, int, public, protected, _play_flags)
     public:
         static void FreeDemoMemory();
-        static CmpsVct<Actor> Players();
-        static CmpsVct<const State, uint32_t, 12> States();
+        static CmpsVct<Actor, uint32_t, 4U> Players();
+        static CmpsVct<const State, uint32_t, 12U> States();
         static CmpsVct<CmpsVct<const Ability>> Abilities();
-        static CmpsVct<QMap<CmpsPtr<const State>, int>> StateMasks();
+        static CmpsVct<QMap<CmpsPtr<const State>, int>, uint32_t, 15U> StateMasks();
         static CmpsVct<CmpsVct<Actor>> Enemies();
         static CmpsVct<const Ability> PartyItems();
-        static CmpsVct<const Costume> Races();
-        static CmpsVct<const Costume> Jobs();
+        static CmpsVct<const Costume, uint32_t, 8U> Races();
+        static CmpsVct<const Costume, uint32_t, 20U> Jobs();
 
         inline bool hasAllFlags(unsigned int const flag) const
         {
@@ -1886,13 +1960,11 @@ namespace tbrpgsca
 
         inline Play& operator=(const Play& play)
         {
-             this->_play_flags = play._play_flags;
+             //this->_play_flags = play._play_flags;
+             return *this;
         }
 
-        inline Play(int const flags = 0)
-        {
-             this->_play_flags = flags;
-        }
+        inline Play(int const flags = 0) : _play_flags(flags) {}
 
         inline ~Play() {}
 

@@ -375,7 +375,10 @@ namespace tbrpgsca
         //CmpsPtr<QMap<CmpsPtr<const State>, int>> _state_dur;
         //CmpsVct<CmpsVct<const Ability>, uint32_t, 2U, CmpsPtr<CmpsVct<const Ability>>> _a_skills;
         QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
-        CmpsVct<CmpsPtr<const Costume>, uint32_t, EquipPos::COUNT> _equipment;
+        CmpsVct<CmpsPtr<const Costume>, uint32_t, EquipPos::COUNT> _equipment
+        {
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+        };
         //QMap<char, CmpsPtr<Costume>> _equipment;
 #if USE_DMG_ROLES
         QVector<CmpsPtr<Costume>>* _dmg_roles;
@@ -409,7 +412,8 @@ namespace tbrpgsca
         template <typename SpriteRun>
         void setCurrentHp(QString* const ret, CmpsPtr<Scene> scene, const SpriteRun* const actorEvent, int const hp, bool const survive);
 
-        inline Actor() : Suit() {}
+        inline Actor() : Suit(), _extra(nullptr), _lv(0), _max_lv(0), _xp(0), _maxp(0), _res(nullptr),
+                        _st_res(nullptr), _skills_cr_qty(nullptr), _skills_rg_turn(nullptr), _items(nullptr) {}
 
         friend class Scene;
         friend class Ability;

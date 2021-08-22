@@ -83,7 +83,7 @@ namespace tbrpgsca
 
         Ability& operator=(const Ability& ability) const;
 
-        inline Ability() : Role() {}
+        inline Ability() : Role(), _lv_rq(0), _m_qty(0), _r_qty(0), _r_states(nullptr), _sound(nullptr) {}
 
         friend class Actor;
         friend class Costume;

@@ -10,7 +10,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-inline CmpsVct<const State, uint32_t, 12> _States
+State _states[12]
 {
     State(1, TR_TXT_STATE_REGEN, "", false, 7,-1,0,0, -7,0,0, 0,0,0, 0,0,0,0,0, false, false, false, false,
                             false, false, false, false, true, nullptr, false, nullptr, nullptr, nullptr),
@@ -38,7 +38,8 @@ inline CmpsVct<const State, uint32_t, 12> _States
                             false, false, false, false, false, nullptr, false, nullptr, nullptr, nullptr)
 
 };
-inline CmpsVct<QMap<CmpsPtr<const State>, int>> _State_Masks
+inline CmpsVct<const State, uint32_t, 12U> _States = _states;
+inline QMap<CmpsPtr<const State>, int> _state_masks[15]
 {
     QMap<CmpsPtr<const State>, int>(std::map<CmpsPtr<const State>, int> {{&_States[0], 0}}),
     QMap<CmpsPtr<const State>, int>(std::map<CmpsPtr<const State>, int> {{&_States[1], 0}}),
@@ -56,17 +57,18 @@ inline CmpsVct<QMap<CmpsPtr<const State>, int>> _State_Masks
     QMap<CmpsPtr<const State>, int>(std::map<CmpsPtr<const State>, int> {{&_States[1], 0}, {&_States[3], 0}, {&_States[5], 0}}),
     QMap<CmpsPtr<const State>, int>(std::map<CmpsPtr<const State>, int> {{&_States[7], 0}, {&_States[8], 0}, {&_States[9], 0}})
 };
-inline CmpsVct<CmpsVct<const Ability>> _Abilities
+inline CmpsVct<QMap<CmpsPtr<const State>, int>, uint32_t, 15U> _State_Masks(_state_masks);
+inline const Ability _std_skills[2]
 {
-    CmpsVct<const Ability>
-    {
-        Ability(1, TR_TXT_SKILL_ATTACK, "", "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK, 10,0,-3, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, &(_State_Masks[10])),
-        Ability(2, TR_TXT_SKILL_DEFEND, "", "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF, 0,-1,-2, FLAG_TRG_SELF,0, 0,0, false, false, nullptr, nullptr),
-        Ability(3, TR_TXT_SKILL_HEAL, "", "", false, true, false, false, 0, 0,3,0, DMG_TYPE_SPI, -13,0,0, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, nullptr),
-        Ability(4, TR_TXT_SKILL_RAISE, "", "", false, true, false, false, 0, 0,10,0, DMG_TYPE_SPI, -7,0,0, FLAG_TRG_ONE | FLAG_TRG_KO,0, 0,0, false, true, nullptr, nullptr)
-    }
+    Ability(3, TR_TXT_SKILL_HEAL, "", "", false, true, false, false, 0, 0,3,0, DMG_TYPE_SPI, -13,0,0, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, nullptr),
+    Ability(4, TR_TXT_SKILL_RAISE, "", "", false, true, false, false, 0, 0,10,0, DMG_TYPE_SPI, -7,0,0, FLAG_TRG_ONE | FLAG_TRG_KO,0, 0,0, false, true, nullptr, nullptr)
 };
-inline CmpsVct<const Costume> _Races
+inline CmpsVct<const Ability> _abilities[1]
+{
+    CmpsVct<const Ability>(_std_skills)
+};
+inline CmpsVct<CmpsVct<const Ability>> _Abilities(_abilities);
+inline const Costume _races[8]
 {
     Costume(1, TR_TXT_RACE_ELF, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                              false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
@@ -84,7 +86,7 @@ inline CmpsVct<const Costume> _Races
                              false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
     Costume(8, TR_TXT_RACE_TROLL, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
                              false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr)
-}, _Jobs
+}, _jobs[20]
 {
     Costume(1, TR_TXT_JOB_ALCHEMIST, "Alchemist", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                              false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
@@ -127,24 +129,28 @@ inline CmpsVct<const Costume> _Races
     Costume(20, TR_TXT_JOB_FAIRY, "Fairy", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
                              false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr)
 };
-inline CmpsVct<CmpsVct<Actor>> _Enemies
+inline CmpsVct<const Costume, uint32_t, 8U> _Races(_races);
+inline CmpsVct<const Costume, uint32_t, 20U> _Jobs(_jobs);
+inline Actor _enemy[4]
 {
-    CmpsVct<Actor>
-    {
-        Actor(5, TR_TXT_RACE_GOBLIN, "", (_Races[4]), (_Jobs[9]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
-        Actor(6, TR_TXT_RACE_LIZARD, "", (_Races[5]), (_Jobs[13]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
-        Actor(7, TR_TXT_RACE_TROLL, "", (_Races[2]), (_Jobs[12]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
-        Actor(8, TR_TXT_RACE_OGRE, "", (_Races[6]), (_Jobs[1]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr)
-    }
+    Actor(5, TR_TXT_RACE_GOBLIN, "", (_Races[4]), (_Jobs[9]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
+    Actor(6, TR_TXT_RACE_LIZARD, "", (_Races[5]), (_Jobs[13]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
+    Actor(7, TR_TXT_RACE_TROLL, "", (_Races[2]), (_Jobs[12]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
+    Actor(8, TR_TXT_RACE_OGRE, "", (_Races[6]), (_Jobs[1]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr)
 };
-inline CmpsVct<Actor> _Players
+inline CmpsVct<Actor> _enemies[1]
+{
+    CmpsVct<Actor>(_enemy)
+};
+inline CmpsVct<CmpsVct<Actor>> _Enemies(_enemies);
+inline Actor _players[4]
 {
     Actor(1, TR_TXT_ACTOR_CODY, "", (_Races[3]), (_Jobs[7]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
     Actor(2, TR_TXT_ACTOR_VICTORIA, "", (_Races[0]), (_Jobs[16]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
     Actor(4, TR_TXT_ACTOR_STEPHANIE, "", (_Races[2]), (_Jobs[19]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
     Actor(3, TR_TXT_ACTOR_GEORGE, "", (_Races[1]), (_Jobs[2]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr)
 };
-
+inline CmpsVct<Actor, uint32_t, 4U> _Players(_players);
 inline CmpsVct<const Ability> _Party_Items;
 
 /*void Play::FreeDemoMemory()
@@ -203,12 +209,12 @@ inline CmpsVct<const Ability> _Party_Items;
     states.clear();
 }*/
 
-CmpsVct<const State, uint32_t, 12> Play::States()
+CmpsVct<const State, uint32_t, 12U> Play::States()
 {
     return _States;
 }
 
-CmpsVct<QMap<CmpsPtr<const State>, int>> Play::StateMasks()
+CmpsVct<QMap<CmpsPtr<const State>, int>, uint32_t, 15U> Play::StateMasks()
 {
     return _State_Masks;
 }
@@ -218,12 +224,12 @@ CmpsVct<CmpsVct<const Ability>> Play::Abilities()
     return _Abilities;
 }
 
-CmpsVct<const Costume> Play::Races()
+CmpsVct<const Costume, uint32_t, 8U> Play::Races()
 {
     return _Races;
 }
 
-CmpsVct<const Costume> Play::Jobs()
+CmpsVct<const Costume, uint32_t, 20U> Play::Jobs()
 {
     return _Jobs;
 }
@@ -233,7 +239,7 @@ CmpsVct<CmpsVct<Actor>> Play::Enemies()
     return _Enemies;
 }
 
-CmpsVct<Actor> Play::Players()
+CmpsVct<Actor, uint32_t, 4U> Play::Players()
 {
     return _Players;
 }

@@ -360,7 +360,8 @@ Ability::~Ability()
 #if USE_TEMPLATE
 template void Ability::applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun) const;
 template void Ability::execute(QString& ret, CmpsPtr<Scene> scene, const ArenaWidget* const spriteRun, Actor& user, Actor* target) const;
-#else
+#endif
+//#else
 template void Ability::applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun) const;
 template void Ability::execute(QString& ret, CmpsPtr<Scene> scene, const Scene::SpriteAct* const spriteRun, Actor& user, Actor* target) const;
-#endif
+//#endif
