@@ -1768,7 +1768,7 @@ namespace cmpsptr
         {
             //static_assert(fixedSize < 1 || newSize <= fixedSize, "The compressed array passed, has fewer elements than required.");
             //BaseVct<T, P, L, newSize, false> ret;
-            BaseVct<T, P, L, 0, false> ret;
+            BaseVct<T, P, L, 0, true> ret;
             ret._data = this->_data;
             //if constexpr(newSize < 1)
             {
