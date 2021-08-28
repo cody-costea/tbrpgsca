@@ -42,7 +42,7 @@ Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the numbe
 thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS 3//3
+    #define COMPRESS_POINTERS -3//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -568,7 +568,7 @@ namespace cmpsptr
     {
     protected:
         inline static uint32_t _null_idx = 0U;
-        inline static std::vector<void*> _ptr_list;
+        inline static QVector<void*> _ptr_list;
         //inline static std::mutex _locker;
         inline static QMutex _locker;
 
@@ -654,6 +654,9 @@ namespace cmpsptr
             }
             else if (listed(ptr))
             {
+                qDebug() << "_ptr_list.size() = " << _ptr_list.size();
+                qDebug() << ptr << " >> 1 = " << (ptr >> 1);
+                qDebug() << "(" << ptr << " >> 1) - 1U = " << (ptr >> 1) - 1U;
                 return static_cast<T*>(_ptr_list[(ptr >> 1) - 1U]);
             }
             else
@@ -823,6 +826,7 @@ namespace cmpsptr
     protected:        
         inline T* addr() const
         {
+            qDebug() << static_cast<uintptr_t>(this->_ptr) << " << " << SHIFT_LEN << " = " << (static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
             return reinterpret_cast<T*>(static_cast<uintptr_t>(this->_ptr) << SHIFT_LEN);
         }
 
@@ -834,6 +838,7 @@ namespace cmpsptr
         inline void setAddr(T* const ptr)
         {
             uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+            qDebug() << "addr = " << addr; //qDebug() << "ptr = " << ptr;
             qDebug() << "SHIFT_LEN = " << QString::number(SHIFT_LEN);
             qDebug() << "1073741824UL * " << (2UL << SHIFT_LEN) << " = " << (1073741824UL * (2 << SHIFT_LEN));
             assert(addr < 1073741824UL * (2UL << SHIFT_LEN)); //TODO: analyze alternative solutions
@@ -1521,6 +1526,10 @@ namespace cmpsptr
         {
             if constexpr(fixedSize < 1)
             {
+                if (this == nullptr)
+                {
+                    return false;
+                }
                 return this->_init;
             }
             else
@@ -1641,7 +1650,7 @@ namespace cmpsptr
 
         inline BaseVct<T, P, L, fixedSize, dispose>& operator=(const BaseVct<T, P, L, 0, true>& copy)
         {
-            this->clear();
+            //this->clear();
             this->copy(copy);
             return *this;
         }
@@ -1812,7 +1821,7 @@ namespace cmpsptr
             }
         }
 
-        inline BaseVct<T, P, L, fixedSize, dispose>(T* beginPtr = nullptr, const L size = fixedSize, const bool own = false)
+        inline BaseVct<T, P, L, fixedSize, dispose>(T* beginPtr, const L size = fixedSize, const bool own = false)
         {
             //static_assert(fixedSize < 1 || size <= fixedSize, "The size cannot be higher, than the fixed length.");
             assert(fixedSize < 1 || size <= fixedSize);
@@ -1826,7 +1835,7 @@ namespace cmpsptr
 
         inline BaseVct<T, P, L, fixedSize, dispose>(std::initializer_list<T> list)
         {
-            if constexpr(fixedSize < 1)
+            //if constexpr(fixedSize < 1)
             {
                 L i = 0U;
                 auto end = list.end();
@@ -1844,7 +1853,7 @@ namespace cmpsptr
                     //std::memcpy(const_cast<void*>(static_cast<const void*>(const_cast<const T*>(data))), list.begin(), length);
                     //std::memcpy(data, list.begin(), length);
                     //this->_data = P(static_cast<T*>(data));
-                    //if constexpr(fixedSize < 1)
+                    if constexpr(fixedSize < 1)
                     {
                         this->_length = size;
                         this->_init = true;
@@ -1853,23 +1862,33 @@ namespace cmpsptr
                 else
                 {
                     this->_data = P(nullptr);
-                    //if constexpr(fixedSize < 1)
+                    if constexpr(fixedSize < 1)
                     {
                         this->_init = false;
                         this->_length = 0U;
                     }
                 }
             }
-            else
+            /*else
             {
                 //static_assert(fixedSize <= list.size(), "The initialization list passed, has fewer elements than required.");
                 assert(fixedSize <= list.size());
                 this->_data = const_cast<typename std::remove_const_t<T*>>(list.begin());
-                /*if constexpr(fixedSize < 1)
+                if constexpr(fixedSize < 1)
                 {
                     this->_init = false;
                     this->_length = list.size();
-                }*/
+                }
+            }*/
+        }
+
+        inline BaseVct<T, P, L, fixedSize, dispose>()
+        {
+            this->_data = nullptr;
+            if constexpr(fixedSize < 1)
+            {
+                this->_init = false;
+                this->_length = 0;
             }
         }
 

@@ -161,29 +161,33 @@ namespace tbrpgsca
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
-                auto skillVct = equipment[i].ptr()->_a_skills;
-                if (skillVct)
+                auto equiped = equipment[i].ptr();
+                if (equiped)
                 {
-                    uint32_t vctSize = skillVct.size();
-                    for (uint32_t j = 0U; j < vctSize; j += 1U)
+                    auto skillVct = equiped->_a_skills;
+                    if (skillVct)
                     {
-                        auto skills = skillVct[j];
-                        uint32_t cnt = skills.size();
-                        for (uint32_t k = 0U; k < cnt; k += 1U)
+                        uint32_t vctSize = skillVct.size();
+                        for (uint32_t j = 0U; j < vctSize; j += 1U)
                         {
-                            auto skill = &skills.at(k);
-                            if (compFun(*skill, ability))
+                            auto skills = skillVct[j];
+                            uint32_t cnt = skills.size();
+                            for (uint32_t k = 0U; k < cnt; k += 1U)
                             {
-                                if constexpr(first)
+                                auto skill = &skills.at(k);
+                                if (compFun(*skill, ability))
                                 {
-                                    if (compFun(*skill))
+                                    if constexpr(first)
                                     {
-                                        return skill;
+                                        if (compFun(*skill))
+                                        {
+                                            return skill;
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    ability = skill;
+                                    else
+                                    {
+                                        ability = skill;
+                                    }
                                 }
                             }
                         }
@@ -203,7 +207,7 @@ namespace tbrpgsca
                 for (; idx < len; idx += 1U)
                 {
                     auto skill = &_def_skills.at(idx);
-                    if (compFun(*skill, ability))
+                    if (skill && compFun(*skill, ability))
                     {
                         if constexpr(first)
                         {
@@ -220,49 +224,67 @@ namespace tbrpgsca
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
-                auto skillVct = equipment[i].ptr()->_a_skills;
-                if (skillVct)
+                auto equiped = equipment[i].ptr();
+                if (equiped)
                 {
-                    uint32_t vctSize = skillVct.size();
-                    for (uint32_t j = 0U; j < vctSize; j += 1U)
+                    auto skillVct = equiped->_a_skills;
+                    if (skillVct)
                     {
-                        auto skills = skillVct[j];
-                        uint32_t size = skills.size();
-                        uint32_t cnt = len + size;
-                        //if (ret < (len += size))
-                        if (ret < cnt)
+                        uint32_t vctSize = skillVct.size();
+                        qDebug() << "vctSize = " << vctSize;
+                        for (uint32_t j = 0U; j < vctSize; j += 1U)
                         {
-                            if (ability)
+                            auto skills = skillVct[j];
+                            if (skills)
                             {
-                                idx = 0U;
-                            }
-                            else
-                            {
-                                idx = (ret - len);
-                                ability = &skills.at(idx);
-                                idx += 1;
-                            }
-                            for (; idx < size; idx += 1U)
-                            {
-                                auto skill = &skills.at(idx);
-                                if (compFun(*skill, ability))
+                                uint32_t size = skills.size();
+                                uint32_t cnt = len + size;
+                                qDebug() << "size = " << size;
+                                qDebug() << "cnt = " << cnt;
+                                //if (ret < (len += size))
+                                if (ret < cnt)
                                 {
-                                    if constexpr(first)
+                                    if (ability)
                                     {
-                                        return SkillSearch(skill, idx + len);
+                                        idx = 0U;
                                     }
                                     else
                                     {
-                                        ability = skill;
-                                        ret = idx + len;
+                                        idx = (ret - len);
+                                        ability = &(skills.at(idx));
+                                        idx += 1;
+                                    }
+                                    for (; idx < size; idx += 1U)
+                                    {
+                                        auto skill = &(skills.at(idx));
+                                        if (skill)
+                                        {
+                                            if (compFun(*skill, ability))
+                                            {
+                                                if constexpr(first)
+                                                {
+                                                    qDebug() << "skill pointer = " << reinterpret_cast<uintptr_t>(skill);
+                                                    qDebug() << "skill->_name = " << skill->_name;
+                                                    return SkillSearch(skill, idx + len);
+                                                }
+                                                else
+                                                {
+                                                    ability = skill;
+                                                    ret = idx + len;
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                                len = cnt;
                             }
                         }
-                        len = cnt;
                     }
                 }
             }
+            //TODO: check skills from states
+            qDebug() << "ability pointer = " << reinterpret_cast<uintptr_t>(ability);
+            //qDebug() << "ability->_name = " << ability->_name;
             return SkillSearch(ability, ret);
         }
 
@@ -276,7 +298,7 @@ namespace tbrpgsca
                 for (uint32_t i = 0U; i < len; i += 1U)
                 {
                     auto skill = &_def_skills.at(i);
-                    if (compFun(*skill, ability))
+                    if (skill && compFun(*skill, ability))
                     {
                         if constexpr(first)
                         {
@@ -292,31 +314,35 @@ namespace tbrpgsca
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
-                auto skillVct = equipment[i].ptr()->_a_skills;
-                if (skillVct)
+                auto equiped = equipment[i].ptr();
+                if (equiped)
                 {
-                    uint32_t vctSize = skillVct.size();
-                    for (uint32_t j = 0U; j < vctSize; j += 1U)
+                    auto skillVct = equiped->_a_skills;
+                    if (skillVct)
                     {
-                        auto skills = skillVct[j];
-                        uint32_t cnt = skills.size();
-                        for (uint32_t k = 0U; k < cnt; k += 1U)
+                        uint32_t vctSize = skillVct.size();
+                        for (uint32_t j = 0U; j < vctSize; j += 1U)
                         {
-                            auto skill = &skills.at(k);
-
-                            if (compFun(*skill, ability))
+                            auto skills = skillVct[j];
+                            uint32_t cnt = skills.size();
+                            for (uint32_t k = 0U; k < cnt; k += 1U)
                             {
-                                if constexpr(first)
+                                auto skill = &skills.at(k);
+
+                                if (compFun(*skill, ability))
                                 {
-                                    return k + len;
-                                }
-                                else
-                                {
-                                    ret = k + len;
+                                    if constexpr(first)
+                                    {
+                                        return k + len;
+                                    }
+                                    else
+                                    {
+                                        ret = k + len;
+                                    }
                                 }
                             }
+                            len += cnt;
                         }
-                        len += cnt;
                     }
                 }
             }

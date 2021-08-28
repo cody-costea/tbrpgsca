@@ -18,11 +18,13 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using namespace tbrpgsca;
 
-const CmpsVct<const Ability, uint32_t, 2U> Actor::_def_skills
+inline const Ability _default_skills_arr[2]
 {
     Ability(1, TR_TXT_SKILL_ATTACK, "", "", false, false, false, true, 0, 0,0,0, DMG_TYPE_ATK, 10,0,-3, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, &(Play::StateMasks()[10])),
     Ability(2, TR_TXT_SKILL_DEFEND, "", "", false, false, false, false, 0, 0,0,0, DMG_TYPE_DEF, 0,-1,-2, FLAG_TRG_SELF,0, 0,0, false, false, nullptr, nullptr)
 };
+
+const CmpsVct<const Ability, uint32_t, 2U> Actor::_def_skills = _default_skills_arr;
 
 int Actor::remainingSkillUses(const Ability& skill) const
 {
@@ -58,11 +60,15 @@ uint32_t Actor::skillsCount() const
     auto equipment = this->_equipment;
     for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
     {
-        auto skills = equipment[i].ptr()->_a_skills;
-        auto size = skills.size();
-        for (uint32_t j = 0U; j < size; j += 1U)
+        auto equiped = equipment[i].ptr();
+        if (equiped)
         {
-            len += skills[j].size();
+            auto skills = equiped->_a_skills;
+            auto size = skills.size();
+            for (uint32_t j = 0U; j < size; j += 1U)
+            {
+                len += skills[j].size();
+            }
         }
     }
     return len;
@@ -78,21 +84,25 @@ const Ability* Actor::skill(uint32_t idx) const
     auto equipment = this->_equipment;
     for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
     {
-        auto skillVct = equipment[i].ptr()->_a_skills;
-        if (skillVct)
+        auto equiped = equipment[i].ptr();
+        if (equiped)
         {
-            uint32_t vctSize = skillVct.size();
-            for (uint32_t j = 0U; j < vctSize; j += 1U)
+            auto skillVct = equiped->_a_skills;
+            if (skillVct)
             {
-                auto skills = skillVct[j];
-                uint32_t cnt = len + skills.size();
-                if (idx < cnt)
+                uint32_t vctSize = skillVct.size();
+                for (uint32_t j = 0U; j < vctSize; j += 1U)
                 {
-                    return &skills.at(idx - len);
-                }
-                else
-                {
-                    len = cnt;
+                    auto skills = skillVct[j];
+                    uint32_t cnt = len + skills.size();
+                    if (idx < cnt)
+                    {
+                        return &skills.at(idx - len);
+                    }
+                    else
+                    {
+                        len = cnt;
+                    }
                 }
             }
         }

@@ -85,7 +85,9 @@ void Ability::applyCosts(QString* ret, Actor& user, CmpsPtr<Scene> scene, const 
 bool Ability::canPerform(const Actor& actor) const
 {
     int const blockedSkills = actor._b_skill_types;
-    QMap<const Ability*, int>* skillsQty = actor._skills_cr_qty;
+    auto skillsQty = actor._skills_cr_qty;
+    qDebug() << "this ability pointer = " << reinterpret_cast<uintptr_t>(this);
+    qDebug() << "this->_name = " << this->_name;
     return (this->_dmg_type & blockedSkills) == 0 && this->_m_mp <= actor._mp && this->_m_hp < actor._hp
             && this->_m_sp <= actor._sp && actor._lv >= this->_lv_rq && (skillsQty == nullptr || skillsQty->value(this, 1) > 0);
 }
