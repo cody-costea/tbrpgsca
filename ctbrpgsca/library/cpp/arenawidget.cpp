@@ -299,12 +299,16 @@ void ArenaWidget::prepareItemsBox(Actor& actor)
 
 Actor* ArenaWidget::getPlayerFromTargetBox(int index)
 {
-    for (auto party : this->_parties)
+    auto parties = this->_parties;
+    const int pSize = parties.size();
+    for (int i = 0; i < pSize; ++i)
+    //for (auto party : this->_parties)
     {
+        auto party = parties[i];
         int const size = party.size();
         if (index < size)
         {
-            return &party[index];
+            return &(party[index]);
         }
         else
         {

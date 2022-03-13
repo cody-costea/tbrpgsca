@@ -796,7 +796,7 @@ void Scene::operator()(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& part
         int const pSize = party.size();
         if (crActor == nullptr)
         {
-            crActor = &party[0];
+            crActor = &(party[0]);
         }
         for (int j = 0; j < pSize; j += 1)
         {
@@ -836,7 +836,7 @@ void Scene::operator()(QString& ret, CmpsVct<CmpsVct<Actor>, uint32_t, 2U>& part
             auto pSize = party.size();
             for (uint32_t i = 0; i < pSize; i += 1)
             {
-                players->append(&party[i]);
+                players->append(&(party[i]));
             }
         }
     }

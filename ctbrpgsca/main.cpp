@@ -47,10 +47,11 @@ int main(int argc, char* argv[])
     QString ret;
     //DemoLib demoLib;
     QApplication a(argc, argv);
-    CmpsVct<CmpsVct<Actor>, uint32_t, 2U> parties { nullptr, nullptr };
+    CmpsVct<CmpsVct<Actor>, uint32_t, 2U> parties { Play::Players(), Play::Enemies() };
     qDebug() << "parties.length = " << parties.size();
-    parties[0] = Play::Players();
-    parties[1] = Play::Enemies().at(0);
+    //parties[0] = Play::Players();
+    //parties[1] = Play::Enemies().at(0);
+    //parties[1] = Play::Enemies2();//.at(0);
     const QList<QScreen*>& screens = QApplication::screens();
     if (screens.size() > 0)
     {

@@ -57,6 +57,7 @@ const Costume& Actor::job() const
 uint32_t Actor::skillsCount() const
 {
     uint32_t len = _def_skills.size();
+    //return len;
     auto equipment = this->_equipment;
     for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
     {
@@ -67,7 +68,11 @@ uint32_t Actor::skillsCount() const
             auto size = skills.size();
             for (uint32_t j = 0U; j < size; j += 1U)
             {
-                len += skills[j].size();
+                auto s = skills[j];
+                if (s)
+                {
+                    len += s.size();
+                }
             }
         }
     }

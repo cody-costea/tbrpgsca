@@ -63,29 +63,36 @@ inline const Ability _std_skills[2]
     Ability(3, TR_TXT_SKILL_HEAL, "", "", false, true, false, false, 0, 0,3,0, DMG_TYPE_SPI, -13,0,0, FLAG_TRG_ONE,0, 0,0, false, false, nullptr, nullptr),
     Ability(4, TR_TXT_SKILL_RAISE, "", "", false, true, false, false, 0, 0,10,0, DMG_TYPE_SPI, -7,0,0, FLAG_TRG_ONE | FLAG_TRG_KO,0, 0,0, false, true, nullptr, nullptr)
 };
-inline CmpsVct<const Ability> _abilities[1]
+inline CmpsVct<const Ability> _abilities[2]
 {
-    CmpsVct<const Ability>(_std_skills)
+    CmpsVct<const Ability>(_std_skills),
+    nullptr
+};
+inline CmpsVct<const Ability> _no_abilities[2]
+{
+    nullptr,
+    nullptr
 };
 inline CmpsVct<CmpsVct<const Ability>> _Abilities(_abilities);
+inline CmpsVct<CmpsVct<const Ability>> _NoAbilities(_no_abilities);
 inline const Costume _races[8]
 {
     Costume(1, TR_TXT_RACE_ELF, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(2, TR_TXT_RACE_GNOME, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(3, TR_TXT_RACE_HUMAN, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(4, TR_TXT_RACE_HALF_ORC, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(5, TR_TXT_RACE_GOBLIN, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(6, TR_TXT_RACE_LIZARD, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(7, TR_TXT_RACE_OGRE, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr),
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr),
     Costume(8, TR_TXT_RACE_TROLL, "", false, 0,0, 0,0,0, 35,10,10, 7,7,7,7,7, false, false,
-                             false, false, false, false, _Abilities, false, nullptr, nullptr, nullptr)
+                             false, false, false, false, _NoAbilities, false, nullptr, nullptr, nullptr)
 }, _jobs[20]
 {
     Costume(1, TR_TXT_JOB_ALCHEMIST, "Alchemist", false, 0,0, 0,0,0, 0,0,0, 0,0,0,0,0, false, false,
@@ -142,7 +149,7 @@ inline CmpsVct<Actor> _enemies[1]
 {
     CmpsVct<Actor>(_enemy)
 };
-inline CmpsVct<CmpsVct<Actor>> _Enemies(_enemies);
+//inline CmpsVct<CmpsVct<Actor>> _Enemies(_enemies);
 inline Actor _players[4]
 {
     Actor(1, TR_TXT_ACTOR_CODY, "", (_Races[3]), (_Jobs[7]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr),
@@ -151,6 +158,7 @@ inline Actor _players[4]
     Actor(3, TR_TXT_ACTOR_GEORGE, "", (_Races[1]), (_Jobs[2]), 1,9, 35,10,10, 7,7,7,7,7, nullptr, nullptr, nullptr)
 };
 inline CmpsVct<Actor, uint32_t, 4U> _Players(_players);
+inline CmpsVct<Actor, uint32_t, 4U> _Enemies(_enemy);
 inline CmpsVct<const Ability> _Party_Items;
 
 /*void Play::FreeDemoMemory()
@@ -234,7 +242,12 @@ CmpsVct<const Costume, uint32_t, 20U> Play::Jobs()
     return _Jobs;
 }
 
-CmpsVct<CmpsVct<Actor>> Play::Enemies()
+/*CmpsVct<CmpsVct<Actor>> Play::Enemies()
+{
+    return _Enemies;
+}*/
+
+CmpsVct<Actor, uint32_t, 4U> Play::Enemies()
 {
     return _Enemies;
 }

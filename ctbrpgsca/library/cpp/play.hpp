@@ -42,7 +42,7 @@ Setting the ALIGN_PTR_LOW_BITS macro to a positive value, can increase the numbe
 thus allowing compression of larger adresses, but will reduce usable memory, as it will also lead to its increased fragmentation.
 */
     #define ALIGN_PTR_LOW_BITS 4
-    #define COMPRESS_POINTERS -3//3
+    #define COMPRESS_POINTERS 0//3
 #else
     #define ALIGN_PTR_LOW_BITS 0
     #define COMPRESS_POINTERS 0
@@ -1612,10 +1612,12 @@ namespace cmpsptr
             return size; //TODO: analyze if something better can be done for unsigned values;
         }
 
-        template<typename R = bool, typename... Args>
-        auto resize(const L nSize, Args&&... args) -> std::enable_if_t<(fixedSize < 1), R>
+        template<typename R = bool>
+        //template<typename R = bool, typename... Args>
+        //auto resize(const L nSize, Args&&... args) -> std::enable_if_t<(fixedSize < 1), R>
+        auto resize(const L nSize) -> std::enable_if_t<(fixedSize < 1), R>
         {
-            T* nArr = new (std::nothrow) T[nSize] { T(std::forward<Args>(args)...) };
+            T* nArr = new (std::nothrow) T[nSize]; //{ T(std::forward<Args>(args)...) };
             if (nArr == nullptr)
             {
                 return false;
@@ -1932,10 +1934,11 @@ namespace tbrpgsca
     public:
         static void FreeDemoMemory();
         static CmpsVct<Actor, uint32_t, 4U> Players();
+        static CmpsVct<Actor, uint32_t, 4U> Enemies();
         static CmpsVct<const State, uint32_t, 12U> States();
         static CmpsVct<CmpsVct<const Ability>> Abilities();
         static CmpsVct<QMap<CmpsPtr<const State>, int>, uint32_t, 15U> StateMasks();
-        static CmpsVct<CmpsVct<Actor>> Enemies();
+        //static CmpsVct<CmpsVct<Actor>> Enemies();
         static CmpsVct<const Ability> PartyItems();
         static CmpsVct<const Costume, uint32_t, 8U> Races();
         static CmpsVct<const Costume, uint32_t, 20U> Jobs();

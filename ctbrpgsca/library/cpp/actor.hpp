@@ -221,6 +221,7 @@ namespace tbrpgsca
                     }
                 }
             }
+            //return SkillSearch(ability, ret);
             auto equipment = this->_equipment;
             for (uint32_t i = 0U; i < Actor::EquipPos::COUNT; i += 1U)
             {
@@ -231,7 +232,6 @@ namespace tbrpgsca
                     if (skillVct)
                     {
                         uint32_t vctSize = skillVct.size();
-                        qDebug() << "vctSize = " << vctSize;
                         for (uint32_t j = 0U; j < vctSize; j += 1U)
                         {
                             auto skills = skillVct[j];
@@ -239,8 +239,6 @@ namespace tbrpgsca
                             {
                                 uint32_t size = skills.size();
                                 uint32_t cnt = len + size;
-                                qDebug() << "size = " << size;
-                                qDebug() << "cnt = " << cnt;
                                 //if (ret < (len += size))
                                 if (ret < cnt)
                                 {
@@ -263,8 +261,6 @@ namespace tbrpgsca
                                             {
                                                 if constexpr(first)
                                                 {
-                                                    qDebug() << "skill pointer = " << reinterpret_cast<uintptr_t>(skill);
-                                                    qDebug() << "skill->_name = " << skill->_name;
                                                     return SkillSearch(skill, idx + len);
                                                 }
                                                 else
@@ -283,8 +279,6 @@ namespace tbrpgsca
                 }
             }
             //TODO: check skills from states
-            qDebug() << "ability pointer = " << reinterpret_cast<uintptr_t>(ability);
-            //qDebug() << "ability->_name = " << ability->_name;
             return SkillSearch(ability, ret);
         }
 
@@ -403,7 +397,7 @@ namespace tbrpgsca
         QMap<const Ability*, int>* _skills_cr_qty,* _skills_rg_turn,* _items;
         CmpsVct<CmpsPtr<const Costume>, uint32_t, EquipPos::COUNT> _equipment
         {
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr//, nullptr
         };
         //QMap<char, CmpsPtr<Costume>> _equipment;
 #if USE_DMG_ROLES
